@@ -5,18 +5,44 @@ export const useProductStore = defineStore("product", () => {
   const supabase = useSupabaseClient<any>();
   const products = ref<Product[]>([]);
   const loading = ref(true);
+  const page = ref(1);
+  const limit = 12;
+  const hasMore = ref(true);
 
   // Fetch
-  const fetchProducts = async () => {
+  const fetchProducts = async (isLoadMore = false) => {
     loading.value = true;
     try {
+      if (!isLoadMore) {
+        page.value = 1;
+      } else {
+        page.value += 1;
+      }
+
+      const from = (page.value - 1) * limit;
+      const to = from + limit - 1;
+
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .order("id", { ascending: false });
+        .is("deleted_at", null)
+        .order("id", { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
-      products.value = data || [];
+
+      const newProducts = data || [];
+      if (newProducts.length < limit) {
+        hasMore.value = false;
+      } else {
+        hasMore.value = true;
+      }
+
+      if (isLoadMore) {
+        products.value = [...products.value, ...newProducts];
+      } else {
+        products.value = newProducts;
+      }
     } catch (e) {
       throw e;
     } finally {
@@ -149,23 +175,16 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
-  // Delete
+  // Delete (Soft Delete)
   const deleteProduct = async (id: number) => {
     loading.value = true;
     try {
-      const existing = products.value.find((p) => p.id === id);
-
-      const { error } = await supabase.from("products").delete().eq("id", id);
+      const { error } = await supabase
+        .from("products")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", id);
 
       if (error) throw error;
-
-      // Cleanup image from storage
-      if (existing?.image_url) {
-        const oldPath = existing.image_url.split("/product-images/")[1];
-        if (oldPath) {
-          await supabase.storage.from("product-images").remove([oldPath]);
-        }
-      }
 
       products.value = products.value.filter((p) => p.id !== id);
     } catch (e) {
@@ -178,6 +197,7 @@ export const useProductStore = defineStore("product", () => {
   return {
     products,
     loading,
+    hasMore,
     fetchProducts,
     fetchProductById,
     addProduct,
