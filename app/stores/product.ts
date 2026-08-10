@@ -5,6 +5,8 @@ export interface Product {
   id: number
   name: string
   price: number
+  description?: string | null
+  link?: string | null
   image_url: string | null
 }
 
@@ -31,8 +33,28 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  // Fetch By ID
+  const fetchProductById = async (id: number): Promise<Product | null> => {
+    loading.value = true
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single()
+      
+      if (error) throw error
+      return data as Product
+    } catch (e) {
+      console.error("Error fetching product by id:", e)
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
   // Add
-  const addProduct = async (name: string, price: number, file: File | null) => {
+  const addProduct = async (name: string, price: number, description: string | null, link: string | null, file: File | null) => {
     loading.value = true
     try {
       let imageUrl = null
@@ -55,7 +77,7 @@ export const useProductStore = defineStore('product', () => {
 
       const { data, error } = await supabase
         .from('products')
-        .insert([{ name, price, image_url: imageUrl }])
+        .insert([{ name, price, description, link, image_url: imageUrl }])
         .select()
         .single()
       
@@ -73,7 +95,7 @@ export const useProductStore = defineStore('product', () => {
   }
 
   // Update
-  const updateProduct = async (id: number, name: string, price: number, file: File | null) => {
+  const updateProduct = async (id: number, name: string, price: number, description: string | null, link: string | null, file: File | null) => {
      loading.value = true
      try {
        const existing = products.value.find(p => p.id === id)
@@ -95,10 +117,10 @@ export const useProductStore = defineStore('product', () => {
          imageUrl = publicUrlData.publicUrl
        }
 
-       const { data, error } = await supabase
-         .from('products')
-         .update({ name, price, image_url: imageUrl })
-         .eq('id', id)
+        const { data, error } = await supabase
+          .from('products')
+          .update({ name, price, description, link, image_url: imageUrl })
+          .eq('id', id)
          .select()
          .single()
        
@@ -142,6 +164,7 @@ export const useProductStore = defineStore('product', () => {
     products,
     loading,
     fetchProducts,
+    fetchProductById,
     addProduct,
     updateProduct,
     deleteProduct

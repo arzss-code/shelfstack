@@ -3,11 +3,11 @@ import { ref, watch } from 'vue'
 import { useToast } from 'primevue/usetoast'
 
 const props = defineProps<{
-  initialData?: { id: number; name: string; price: number; image_url: string | null } | null
+  initialData?: { id: number; name: string; price: number; description?: string | null; link?: string | null; image_url: string | null } | null
 }>()
 
 const emit = defineEmits<{
-  save: [name: string, price: number, file: File | null]
+  save: [name: string, price: number, description: string | null, link: string | null, file: File | null]
   cancel: []
 }>()
 
@@ -16,15 +16,21 @@ const toast = useToast()
 
 const name = ref('')
 const price = ref<number | null>(null)
+const description = ref<string | null>(null)
+const link = ref<string | null>(null)
 const imageFile = ref<File | null>(null)
 
 watch(() => props.initialData, (newVal) => {
   if (newVal) {
     name.value = newVal.name
     price.value = newVal.price
+    description.value = newVal.description || null
+    link.value = newVal.link || null
   } else {
     name.value = ''
     price.value = null
+    description.value = null
+    link.value = null
   }
   imageFile.value = null
 }, { immediate: true })
@@ -107,7 +113,7 @@ const onFileSelect = async (event: any) => {
 
 const handleSave = () => {
   if (!name.value || price.value === null) return
-  emit('save', name.value, price.value, imageFile.value)
+  emit('save', name.value, price.value, description.value, link.value, imageFile.value)
   visible.value = false
 }
 
@@ -127,7 +133,17 @@ const handleCancel = () => {
       
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">
         <label for="price" style="font-weight: 600;">Harga</label>
-        <InputNumber id="price" v-model="price" mode="currency" currency="USD" locale="en-US" />
+        <InputNumber id="price" v-model="price" mode="currency" currency="IDR" locale="id-ID" />
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label for="description" style="font-weight: 600;">Deskripsi</label>
+        <Textarea id="description" v-model="description" rows="3" autoResize />
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label for="link" style="font-weight: 600;">Link Referensi</label>
+        <InputText id="link" v-model="link" placeholder="https://..." />
       </div>
       
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">

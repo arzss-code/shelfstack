@@ -21,11 +21,11 @@ const openEditForm = (product: Product) => {
   isFormVisible.value = true
 }
 
-const handleSave = async (name: string, price: number, file: File | null) => {
+const handleSave = async (name: string, price: number, description: string | null, link: string | null, file: File | null) => {
   if (editingProduct.value) {
-    await productStore.updateProduct(editingProduct.value.id, name, price, file)
+    await productStore.updateProduct(editingProduct.value.id, name, price, description, link, file)
   } else {
-    await productStore.addProduct(name, price, file)
+    await productStore.addProduct(name, price, description, link, file)
   }
 }
 
@@ -38,11 +38,7 @@ const handleDelete = async (id: number) => {
 
 <template>
   <div style="display: flex; flex-direction: column; gap: 2rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <h1 style="margin-bottom: 0.5rem;">Product Management</h1>
-        <p style="color: var(--p-text-muted-color); margin-top: 0;">Kelola daftar produk, harga, dan gambar dari Supabase.</p>
-      </div>
+    <div style="display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
       <Button label="Tambah Produk" icon="pi pi-plus" @click="openAddForm" />
     </div>
 

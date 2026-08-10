@@ -5,12 +5,12 @@
 <template>
   <div>
     <header style="padding: 1rem; border-bottom: 1px solid var(--p-content-border-color); display: flex; justify-content: space-between; align-items: center;">
-      <h2 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+      <h2 style="margin: 0; display: flex; align-items: center; gap: 0.5rem; color: var(--p-primary-color);">
         <i class="pi pi-box" style="font-size: 1.5rem"></i>
-        Talenavi
+        Product Manager
       </h2>
       <nav>
-        <!-- Place for navigation links -->
+        <NuxtLink to="/" style="text-decoration: none; font-weight: 500; color: var(--p-text-color);">Beranda</NuxtLink>
       </nav>
     </header>
 

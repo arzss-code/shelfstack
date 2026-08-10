@@ -2,6 +2,25 @@
 Semua perubahan penting dalam projek **Product Management FE**.
 Format ini berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [v0.5.0] - 2026-08-10
+### Added
+- Halaman **Detail Produk** (`/product/[id]`) untuk menampilkan data produk secara utuh.
+- Fungsi `fetchProductById` pada `product.ts` untuk melayani *routing* dinamis.
+
+### Changed
+- Mengubah judul proyek di layout utama menjadi **Product Manager**.
+- Merapikan tata letak (*layout*) beranda (`index.vue`) dan `ProductList.vue` yang ditambahkan tombol (mata/detail).
+
+## [v0.4.0] - 2026-08-10
+### Added
+- Penambahan atribut data produk lengkap (`description` dan `link`) pada `ProductForm.vue`, `ProductList.vue`, antarmuka `product.ts`, dan dokumentasi panduan SQL.
+
+### Changed
+- Penyelarasan UI komponen ke desain *B2B Anti-Slop* sesuai mandat `DESIGN.md`. 
+- Menonaktifkan secara paksa `box-shadow` PrimeVue Card dan menggantinya dengan `border` solid bersudut kaku maksimal 12px.
+- Sinkronisasi CSS root variable dengan profil warna utama `oklch(0.45 0.16 250)` (Talenavi Blue).
+
+
 ## [v0.3.0-beta.1] - 2026-08-10
 ### Added
 - Implementasi sistem **Toast Notification** global menggunakan PrimeVue di `app.vue`.
