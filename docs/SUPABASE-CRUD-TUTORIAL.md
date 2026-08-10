@@ -1,8 +1,8 @@
-# Tutorial CRUD Supabase di Nuxt 3
+# Tutorial CRUD Supabase di Nuxt 3 & Standarisasi Talenavi
 
-Dokumen ini adalah panduan *step-by-step* untuk memahami bagaimana fitur CRUD Produk dan Upload Gambar dengan Supabase diterapkan dalam proyek Nuxt 3 ini. Panduan ini dirancang dengan berpegang teguh pada prinsip *Clean Code* dari Talenavi, *Vue Best Practices* (Composition API), dan *Supabase Best Practices*.
+Dokumen ini adalah panduan komprehensif untuk memahami bagaimana fitur CRUD Produk dan Upload Gambar dengan Supabase diterapkan dalam proyek Nuxt 3 ini. Panduan ini dirancang dengan berpegang teguh pada prinsip *Clean Code* dari Talenavi, *Vue Best Practices* (Composition API), serta kewajiban kepatuhan terhadap `SOP-SUPABASE`.
 
-## 1. Persiapan Database (Prasyarat)
+## 1. Persiapan Database & Storage (Prasyarat)
 
 Sesuai aturan *Supabase Postgres Best Practices*, pastikan tabel Anda mendefinisikan *Row Level Security (RLS)* jika nanti data bersifat privat. Namun untuk tahap pengembangan ini, asumsikan kita memiliki tabel publik.
 
@@ -21,7 +21,7 @@ create table public.products (
 **Bucket Storage:**
 Buat *bucket* bernama `product-images` dan atur agar bersifat *Public* (sehingga gambar dapat diakses langsung menggunakan URL).
 
-## 2. Setup Kredensial (Environment Variables)
+## 2. Kredensial & Cegah Crash SSR
 
 Proyek Nuxt membutuhkan URL dan Key untuk berinteraksi dengan Supabase. Ini diatur secara aman menggunakan file `.env`:
 
@@ -29,52 +29,78 @@ Proyek Nuxt membutuhkan URL dan Key untuk berinteraksi dengan Supabase. Ini diat
 NUXT_PUBLIC_SUPABASE_URL=https://<project_id>.supabase.co
 NUXT_PUBLIC_SUPABASE_KEY=<anon_key>
 ```
-Rahasia ini otomatis di-load oleh modul `@nuxtjs/supabase` yang sudah kita daftarkan di `nuxt.config.ts`.
+> [!WARNING]
+> **Penting (Mencegah SSR Crash):** Modul `@nuxtjs/supabase` **wajib** mendeteksi variabel *environment* ini. Jika Anda mencoba menjalankan Nuxt (khususnya Nuxt 4) tanpa file `.env`, *plugin* Supabase akan gagal dimuat (throw warning) dan hal ini dapat memutus rantai inisialisasi *plugin* lain seperti `@pinia/nuxt`. Hal ini akan menyebabkan *crash* fatal `Cannot read properties of undefined (reading 'state')` di *hook* `app:rendered`. Selalu pastikan kredensial Anda terisi (sekalipun *dummy* saat tahap pengembangan UI).
 
 ## 3. State Management dengan Pinia
 
-Sesuai *Vue Best Practices*, kita harus memastikan state tetap dapat diprediksi dengan menjaga satu sumber kebenaran (single source of truth). Kita memisahkan logika fetching/orchestration di dalam `stores` (misal: `app/stores/product.ts`).
-
-Di Nuxt 3 dengan `@nuxtjs/supabase`, kita menggunakan composable `useSupabaseClient()` untuk memanggil API.
+Sesuai *Vue Best Practices*, kita harus memastikan *state* tetap dapat diprediksi dengan memisahkan logika orkestrasi di dalam `stores` (misal: `app/stores/product.ts`). Di Nuxt 3 dengan `@nuxtjs/supabase`, kita menggunakan composable `useSupabaseClient()` untuk memanggil API.
 
 ### A. Fetch Data (Read)
 ```typescript
 const fetchProducts = async () => {
   const { data, error } = await supabase
     .from('products')
-    .select('*')
-    .order('created_at', { ascending: false }) // Tampilkan yang terbaru
+    .select('id, name, price, image_url') // Praktik terbaik: jangan gunakan select('*')
+    .order('created_at', { ascending: false })
   
   if (error) throw error
   products.value = data || []
 }
 ```
-**Tips Performa Supabase:** 
-Selalu seleksi kolom spesifik yang dibutuhkan (`.select('id, name, price')`) jika tabel berukuran sangat besar. Menggunakan index pada `created_at` juga disarankan jika sering mengurutkan.
 
-### B. Upload Image & Insert Data (Create)
-Upload file dan Insert baris adalah dua transaksi berbeda.
-1. Upload file ke Supabase Storage.
-2. Dapatkan URL *public* file tersebut.
-3. Insert data ke tabel `products` lengkap dengan URL-nya.
+### B. Upload Image (SOP Kepatuhan Storage)
+
+Mengacu pada `SOP-SUPABASE` Bab 2, **dilarang keras mengunggah foto mentah berukuran besar langsung ke Storage**. Kita wajib membatasi unggahan awal maksimal 5 MB, hanya menerima format (JPEG, PNG, WebP), dan melakukan **kompresi sisi klien (Browser)** menggunakan HTML5 Canvas API agar ukuran yang terkirim ke server idealnya di bawah 1 MB (WebP).
+
+Proses ini ditangani secara khusus di komponen `app/components/ProductForm.vue`:
 
 ```typescript
-// Contoh implementasi di Store
+const compressImage = (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    // 1. Baca file
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = (event) => {
+      const img = new Image()
+      img.src = event.target?.result as string
+      img.onload = () => {
+        // 2. Siapkan Canvas & Batasi Lebar Maksimal (1200px)
+        const canvas = document.createElement('canvas')
+        const MAX_WIDTH = 1200
+        let { width, height } = img
+        
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width)
+          width = MAX_WIDTH
+        }
+        canvas.width = width; canvas.height = height
+        
+        const ctx = canvas.getContext('2d')
+        ctx?.drawImage(img, 0, 0, width, height)
+        
+        // 3. Ekspor ke WebP (Quality 70%)
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", { type: 'image/webp' }))
+          } else reject('Gagal kompresi')
+        }, 'image/webp', 0.7) 
+      }
+    }
+  })
+}
+```
+
+Setelah gambar dikecilkan secara instan di browser pengguna, barulah fungsi di Pinia `uploadImage()` mengirimkannya:
+```typescript
 const uploadImage = async (file: File) => {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Math.random()}.${fileExt}`;
+  const fileName = `${Math.random()}.webp`; // Selalu .webp dari hasil kompresi
   const { data, error } = await supabase.storage
     .from('product-images')
     .upload(fileName, file);
-
-  if (error) throw error;
-  
-  // Dapatkan URL Public
-  const { data: publicUrlData } = supabase.storage
-    .from('product-images')
-    .getPublicUrl(fileName);
     
-  return publicUrlData.publicUrl;
+  if (error) throw error;
+  return supabase.storage.from('product-images').getPublicUrl(fileName).data.publicUrl;
 };
 ```
 
@@ -83,32 +109,30 @@ Prinsipnya mirip dengan Create.
 - **Update**: Gunakan `.update(payload).eq('id', targetId)`
 - **Delete**: Gunakan `.delete().eq('id', targetId)`
 
-*Penting:* Jika Anda menghapus produk, Anda idealnya juga harus menghapus filenya dari storage untuk menghemat ruang.
+> [!TIP]
+> Jika Anda menghapus produk, Anda secara arsitektural idealnya juga memicu penghapusan *file image* dari storage untuk menghemat ruang.
 
-## 4. Struktur Komponen (Vue 3)
+## 4. UI dan UX (PrimeVue)
 
-Sesuai *Vue Best Practices*, kita harus memecah komponen yang besar. Untuk halaman utama `index.vue`, peranannya sebagai *Route View / Container* adalah untuk **menghubungkan Pinia Store dengan UI Components**. 
+### A. Dialog & Form (`ProductForm.vue`)
+Kita memecah form ke komponen terpisah agar `index.vue` tetap bersih. Form dibungkus menggunakan komponen `<Dialog>` dari PrimeVue agar pengguna tidak mengalami perpindahan halaman (*context switch*). Validasi file ditangani di komponen ini dan mencegah eksekusi `.emit('save')` jika file melanggar SOP.
 
-Pada praktik terbaik:
-- State disimpan di `useProductStore`.
-- Tabel ditampilkan menggunakan `<DataTable>`.
-- Form ditangani di dalam `<Dialog>` untuk menghindari perpindahan halaman (*context switch*).
+### B. Global Toast Notifications
+Untuk memberitahu pengguna mengenai hasil dari validasi file (sukses dikompresi, ditolak karena format, atau ditolak karena ukuran mentah > 5MB), kita mengaktifkan `<Toast />` di *root* `app/app.vue` dan memanggil `useToast()` di setiap komponen yang membutuhkan.
 
 ```vue
-<script setup lang="ts">
-// Selalu gunakan <script setup lang="ts">
-import { useProductStore } from '~/stores/product'
-import { onMounted } from 'vue'
-
-const productStore = useProductStore()
-
-onMounted(async () => {
-  await productStore.fetchProducts()
-})
-</script>
+<!-- app/app.vue -->
+<template>
+  <div>
+    <Toast /> <!-- Merender pop-up notifikasi secara global -->
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
+</template>
 ```
 
-Dengan mengikuti standar di atas, aplikasi Anda akan:
-1. **Performa Optimal**: Proses query efisien dengan Supabase.
-2. **Mudah Dipelihara**: Logika state (Store) terpisah dari tampilan (View).
-3. **Standar Keamanan Tepat**: File credential tersimpan rahasia di `.env`.
+Dengan mengikuti standar tutorial terbaru ini, aplikasi Anda akan:
+1. **Sangat Hemat Biaya (Egress)** karena implementasi Native Canvas Compression.
+2. **User Friendly** dengan hadirnya Toast Notifikasi PrimeVue.
+3. **Lebih Aman & Stabil** (Bebas dari fatal SSR Pinia error berkat setup kredensial yang tepat).
