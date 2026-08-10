@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Product } from "~/stores/product";
+import type { Product } from "~/types/product";
 
 defineProps<{
   products: Product[];
@@ -20,11 +20,7 @@ const router = useRouter();
     <!-- Loading State: Skeleton Grid -->
     <div
       v-if="loading"
-      style="
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1.5rem;
-      "
+      class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6"
     >
       <Card v-for="i in 6" :key="i">
         <template #header>
@@ -40,7 +36,7 @@ const router = useRouter();
           <Skeleton width="100%" height="3rem" />
         </template>
         <template #footer>
-          <div style="display: flex; gap: 0.5rem; justify-content: flex-end">
+          <div class="flex gap-2 justify-end">
             <Skeleton shape="circle" size="2.5rem" />
             <Skeleton shape="circle" size="2.5rem" />
             <Skeleton shape="circle" size="2.5rem" />
@@ -52,71 +48,40 @@ const router = useRouter();
     <!-- Empty State -->
     <div
       v-else-if="products.length === 0"
-      style="
-        text-align: center;
-        padding: 4rem 2rem;
-        background-color: var(--p-content-background);
-        border-radius: 16px;
-        border: 1px dashed var(--p-content-border-color);
-      "
+      class="text-center py-16 px-8 bg-[color:var(--p-content-background)] rounded-2xl border border-dashed border-[color:var(--p-content-border-color)]"
     >
       <template v-if="isSearching">
         <i
-          class="pi pi-search"
-          style="
-            font-size: 2.5rem;
-            color: var(--p-text-muted-color);
-            margin-bottom: 1.5rem;
-          "
+          class="pi pi-search text-4xl text-[color:var(--p-text-muted-color)] mb-6"
         ></i>
         <h3
-          style="
-            margin: 0 0 0.5rem 0;
-            color: var(--p-text-color);
-            font-weight: 600;
-            font-size: 1.25rem;
-          "
+          class="m-0 mb-2 text-[color:var(--p-text-color)] font-semibold text-xl"
         >
           Pencarian tidak ditemukan
         </h3>
-        <p style="margin: 0; color: var(--p-text-muted-color)">
+        <p class="m-0 text-[color:var(--p-text-muted-color)]">
           Tidak ada produk yang cocok dengan kata kunci pencarian Anda.
         </p>
       </template>
       <template v-else>
         <i
-          class="pi pi-box"
-          style="
-            font-size: 2.5rem;
-            color: var(--p-text-muted-color);
-            margin-bottom: 1.5rem;
-          "
+          class="pi pi-box text-4xl text-[color:var(--p-text-muted-color)] mb-6"
         ></i>
         <h3
-          style="
-            margin: 0 0 0.5rem 0;
-            color: var(--p-text-color);
-            font-weight: 600;
-            font-size: 1.25rem;
-          "
+          class="m-0 mb-2 text-[color:var(--p-text-color)] font-semibold text-xl"
         >
           Katalog masih kosong
         </h3>
-        <p style="margin: 0; color: var(--p-text-muted-color)">
+        <p class="m-0 text-[color:var(--p-text-muted-color)]">
           Silakan klik tombol "Tambah Produk" untuk mulai mengelola etalase.
         </p>
       </template>
     </div>
 
     <!-- Product Grid -->
-    <!-- Product Grid -->
     <div
       v-else
-      style="
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1.5rem;
-      "
+      class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6"
     >
       <div
         v-for="product in products"
@@ -126,127 +91,65 @@ const router = useRouter();
       >
         <!-- Image Container -->
         <div
-          style="
-            position: relative;
-            padding-top: 66.66%;
-            width: 100%;
-            border-bottom: 1px solid var(--p-content-border-color);
-          "
+          class="relative pt-[66.66%] w-full border-b border-[color:var(--p-content-border-color)]"
         >
           <img
             v-if="product.image_url"
             :src="product.image_url"
             :alt="product.name"
-            style="
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-            "
+            class="absolute top-0 left-0 w-full h-full object-cover"
           />
           <div
             v-else
-            style="
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              background-color: var(--p-surface-100);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "
+            class="absolute top-0 left-0 w-full h-full bg-[color:var(--p-surface-100)] flex items-center justify-center"
           >
             <i
-              class="pi pi-image"
-              style="font-size: 2.5rem; color: var(--p-text-muted-color)"
+              class="pi pi-image text-4xl text-[color:var(--p-text-muted-color)]"
             ></i>
           </div>
         </div>
 
         <!-- Content -->
-        <div
-          style="
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-          "
-        >
+        <div class="p-5 flex flex-col flex-grow">
           <h3
-            style="
-              margin: 0 0 0.25rem 0;
-              font-size: 1.15rem;
-              font-weight: 600;
-              color: var(--p-text-color);
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            "
+            class="m-0 mb-1 text-[1.15rem] font-semibold text-[color:var(--p-text-color)] whitespace-nowrap overflow-hidden text-ellipsis"
           >
             {{ product.name }}
           </h3>
           <span
-            style="
-              font-size: 1rem;
-              font-weight: 600;
-              color: var(--p-primary-color);
-              margin-bottom: 0.75rem;
-            "
+            class="text-base font-semibold text-[color:var(--p-primary-color)] mb-3"
           >
             Rp {{ product.price.toLocaleString("id-ID") }}
           </span>
 
           <p
-            style="
-              margin: 0 0 1.25rem 0;
-              color: var(--p-text-muted-color);
-              font-size: 0.9rem;
-              line-height: 1.5;
-              display: -webkit-box;
-              -webkit-line-clamp: 2;
-              line-clamp: 2;
-              -webkit-box-orient: vertical;
-              overflow: hidden;
-              flex-grow: 1;
-            "
+            class="m-0 mb-5 text-[color:var(--p-text-muted-color)] text-[0.9rem] leading-relaxed line-clamp-2 flex-grow"
           >
             {{ product.description || "Tidak ada deskripsi." }}
           </p>
 
           <!-- Actions -->
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-top: auto;
-            "
-            @click.stop
-          >
+          <div class="flex justify-between items-center mt-auto" @click.stop>
             <a
               v-if="product.link"
               :href="product.link"
               target="_blank"
               class="product-link"
             >
-              <i class="pi pi-external-link" style="font-size: 0.75rem"></i>
+              <i class="pi pi-external-link text-[0.75rem]"></i>
               Referensi
             </a>
             <span v-else></span>
             <!-- spacer -->
 
-            <div style="display: flex; gap: 0.25rem">
+            <div class="flex gap-1">
               <Button
                 icon="pi pi-pencil"
                 severity="secondary"
                 text
                 rounded
                 aria-label="Edit"
-                style="width: 2.25rem; height: 2.25rem; padding: 0"
+                class="w-9 h-9 p-0"
                 @click="emit('edit', product)"
               />
               <Button
@@ -255,7 +158,7 @@ const router = useRouter();
                 text
                 rounded
                 aria-label="Delete"
-                style="width: 2.25rem; height: 2.25rem; padding: 0"
+                class="w-9 h-9 p-0"
                 @click="emit('delete', product.id)"
               />
             </div>

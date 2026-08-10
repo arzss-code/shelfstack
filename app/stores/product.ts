@@ -1,13 +1,5 @@
 import { defineStore } from "pinia";
-
-export interface Product {
-  id: number;
-  name: string;
-  price: number;
-  description?: string | null;
-  link?: string | null;
-  image_url: string | null;
-}
+import type { Product } from "~/types/product";
 
 export const useProductStore = defineStore("product", () => {
   const supabase = useSupabaseClient<any>();
@@ -125,6 +117,14 @@ export const useProductStore = defineStore("product", () => {
           .getPublicUrl(fileName);
 
         imageUrl = publicUrlData.publicUrl;
+
+        // Cleanup old image if exists
+        if (existing?.image_url) {
+          const oldPath = existing.image_url.split("/product-images/")[1];
+          if (oldPath) {
+            await supabase.storage.from("product-images").remove([oldPath]);
+          }
+        }
       }
 
       const { data, error } = await supabase
@@ -153,9 +153,19 @@ export const useProductStore = defineStore("product", () => {
   const deleteProduct = async (id: number) => {
     loading.value = true;
     try {
+      const existing = products.value.find((p) => p.id === id);
+
       const { error } = await supabase.from("products").delete().eq("id", id);
 
       if (error) throw error;
+
+      // Cleanup image from storage
+      if (existing?.image_url) {
+        const oldPath = existing.image_url.split("/product-images/")[1];
+        if (oldPath) {
+          await supabase.storage.from("product-images").remove([oldPath]);
+        }
+      }
 
       products.value = products.value.filter((p) => p.id !== id);
     } catch (e) {

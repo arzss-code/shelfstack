@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useProductStore, type Product } from "~/stores/product";
+import { useProductStore } from "~/stores/product";
+import type { Product } from "~/types/product";
 import { useToast } from "primevue/usetoast";
 import { useConfirm } from "primevue/useconfirm";
 
@@ -130,51 +131,27 @@ const handleDelete = async (id: number) => {
 <template>
   <div>
     <!-- Header & Search & Add Button -->
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 2.5rem;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-      "
-    >
+    <div class="flex justify-between items-end mb-10 flex-wrap gap-6">
       <div>
         <h1
-          style="
-            margin: 0 0 0.25rem 0;
-            font-size: 2.25rem;
-            font-weight: 700;
-            color: var(--p-text-color);
-            letter-spacing: -0.03em;
-          "
+          class="m-0 mb-1 text-4xl font-bold tracking-tight text-[color:var(--p-text-color)]"
         >
           Daftar Produk
         </h1>
-        <p
-          style="
-            margin: 0;
-            color: var(--p-text-muted-color);
-            font-size: 1.05rem;
-          "
-        >
+        <p class="m-0 text-lg text-[color:var(--p-text-muted-color)]">
           Kelola inventaris dan katalog produk Anda secara efisien.
         </p>
       </div>
 
-      <div
-        style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap"
-      >
+      <div class="flex gap-4 items-center flex-wrap">
         <IconField iconPosition="left">
           <InputIcon
-            class="pi pi-search"
-            style="color: var(--p-text-muted-color)"
+            class="pi pi-search text-[color:var(--p-text-muted-color)]"
           />
           <InputText
             v-model="searchQuery"
             placeholder="Cari produk..."
-            style="width: 280px"
+            class="w-[280px]"
           />
         </IconField>
 
@@ -200,6 +177,7 @@ const handleDelete = async (id: number) => {
     <ProductForm
       v-model:visible="isFormVisible"
       :initial-data="editingProduct"
+      :loading="productStore.loading"
       @save="handleSave"
     />
   </div>

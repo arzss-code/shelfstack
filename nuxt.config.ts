@@ -9,17 +9,17 @@ export default defineNuxtConfig({
     enabled: true,
   },
 
-  css: [
-    "primeicons/primeicons.css",
-    "~/assets/css/main.css"
+  css: ["primeicons/primeicons.css", "~/assets/css/main.css"],
+
+  modules: [
+    "@primevue/nuxt-module",
+    "@pinia/nuxt",
+    "@nuxtjs/supabase",
+    "@nuxtjs/tailwindcss",
   ],
 
-
-
-  modules: ["@primevue/nuxt-module", "@pinia/nuxt", "@nuxtjs/supabase"],
-
   supabase: {
-    redirect: false
+    redirect: false,
   },
 
   primevue: {
@@ -27,12 +27,12 @@ export default defineNuxtConfig({
       theme: {
         preset: Aura,
         options: {
-          darkModeSelector: 'system'
-        }
+          darkModeSelector: "system",
+        },
       },
     },
     components: {
-      include: '*'
-    }
+      include: "*",
+    },
   },
 });

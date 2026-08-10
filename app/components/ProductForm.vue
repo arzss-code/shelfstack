@@ -1,5 +1,27 @@
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
+import { compressImage } from "~/utils/image";
+import { z } from "zod";
+
+const productSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "Nama produk wajib diisi.")
+    .max(50, "Nama produk maksimal 50 karakter."),
+  price: z
+    .number({ message: "Harga wajib diisi." })
+    .min(0, "Harga tidak boleh negatif."),
+  link: z
+    .union([
+      z
+        .string()
+        .url("Format link tidak valid (gunakan http:// atau https://)."),
+      z.literal(""),
+      z.null(),
+    ])
+    .optional(),
+});
 
 const props = defineProps<{
   initialData?: {
@@ -10,6 +32,7 @@ const props = defineProps<{
     link?: string | null;
     image_url: string | null;
   } | null;
+  loading?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -30,7 +53,7 @@ const name = ref("");
 const price = ref<number | null>(null);
 const description = ref<string | null>(null);
 const link = ref<string | null>(null);
-const imageFile = ref<File | null>(null);
+const imageFile = shallowRef<File | null>(null);
 
 const errors = ref<{ name?: string; price?: string; link?: string }>({});
 
@@ -53,57 +76,6 @@ watch(
   },
   { immediate: true },
 );
-
-const compressImage = (file: File): Promise<File> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 1200;
-
-        let width = img.width;
-        let height = img.height;
-
-        if (width > MAX_WIDTH) {
-          height = Math.round((height * MAX_WIDTH) / width);
-          width = MAX_WIDTH;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext("2d");
-        ctx?.drawImage(img, 0, 0, width, height);
-
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              const compressedFile = new File(
-                [blob],
-                file.name.replace(/\.[^/.]+$/, "") + ".webp",
-                {
-                  type: "image/webp",
-                  lastModified: Date.now(),
-                },
-              );
-              resolve(compressedFile);
-            } else {
-              reject(new Error("Canvas to Blob failed"));
-            }
-          },
-          "image/webp",
-          0.7,
-        ); // Kualitas 70%
-      };
-      img.onerror = (error) => reject(error);
-    };
-    reader.onerror = (error) => reject(error);
-  });
-};
 
 const onFileSelect = async (event: any) => {
   const file = event.files[0] as File;
@@ -153,28 +125,23 @@ const onFileSelect = async (event: any) => {
 const validateForm = (): boolean => {
   errors.value = {};
 
-  if (!name.value || name.value.trim() === "") {
-    errors.value.name = "Nama produk wajib diisi.";
-  } else if (name.value.length > 50) {
-    errors.value.name = "Nama produk maksimal 50 karakter.";
+  const result = productSchema.safeParse({
+    name: name.value,
+    price: price.value,
+    link: link.value,
+  });
+
+  if (!result.success) {
+    result.error.issues.forEach((issue) => {
+      const field = issue.path[0] as keyof typeof errors.value;
+      if (!errors.value[field]) {
+        errors.value[field] = issue.message;
+      }
+    });
+    return false;
   }
 
-  if (price.value === null || price.value === undefined) {
-    errors.value.price = "Harga wajib diisi.";
-  } else if (price.value < 0) {
-    errors.value.price = "Harga tidak boleh negatif.";
-  }
-
-  if (link.value) {
-    const urlPattern =
-      /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-    if (!urlPattern.test(link.value)) {
-      errors.value.link =
-        "Format link tidak valid (gunakan http:// atau https://).";
-    }
-  }
-
-  return Object.keys(errors.value).length === 0;
+  return true;
 };
 
 const handleSave = () => {
@@ -203,17 +170,11 @@ const handleCancel = () => {
     :header="initialData ? 'Edit Produk' : 'Tambah Produk'"
     :style="{ width: '30rem' }"
   >
-    <div
-      style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem"
-    >
-      <div style="display: flex; flex-direction: column; gap: 0.35rem">
+    <div class="flex flex-col gap-4 mt-4">
+      <div class="flex flex-col gap-1.5">
         <label
           for="name"
-          style="
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--p-text-color);
-          "
+          class="text-[0.95rem] font-semibold text-[color:var(--p-text-color)]"
           >Nama Produk</label
         >
         <InputText
@@ -225,19 +186,15 @@ const handleCancel = () => {
         />
         <small
           v-if="errors.name"
-          style="color: var(--p-red-500); font-weight: 500"
+          class="text-[color:var(--p-red-500)] font-medium"
           >{{ errors.name }}</small
         >
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 0.35rem">
+      <div class="flex flex-col gap-1.5">
         <label
           for="price"
-          style="
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--p-text-color);
-          "
+          class="text-[0.95rem] font-semibold text-[color:var(--p-text-color)]"
           >Harga</label
         >
         <InputNumber
@@ -250,32 +207,24 @@ const handleCancel = () => {
         />
         <small
           v-if="errors.price"
-          style="color: var(--p-red-500); font-weight: 500"
+          class="text-[color:var(--p-red-500)] font-medium"
           >{{ errors.price }}</small
         >
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 0.35rem">
+      <div class="flex flex-col gap-1.5">
         <label
           for="description"
-          style="
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--p-text-color);
-          "
+          class="text-[0.95rem] font-semibold text-[color:var(--p-text-color)]"
           >Deskripsi</label
         >
         <Textarea id="description" v-model="description" rows="3" autoResize />
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 0.35rem">
+      <div class="flex flex-col gap-1.5">
         <label
           for="link"
-          style="
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--p-text-color);
-          "
+          class="text-[0.95rem] font-semibold text-[color:var(--p-text-color)]"
           >Tautan Referensi (Opsional)</label
         >
         <InputText
@@ -286,18 +235,14 @@ const handleCancel = () => {
         />
         <small
           v-if="errors.link"
-          style="color: var(--p-red-500); font-weight: 500"
+          class="text-[color:var(--p-red-500)] font-medium"
           >{{ errors.link }}</small
         >
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 0.35rem">
+      <div class="flex flex-col gap-1.5">
         <label
-          style="
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--p-text-color);
-          "
+          class="text-[0.95rem] font-semibold text-[color:var(--p-text-color)]"
           >Gambar Produk</label
         >
         <FileUpload
@@ -311,27 +256,25 @@ const handleCancel = () => {
         />
         <small
           v-if="initialData && initialData.image_url"
-          style="color: var(--p-text-muted-color); margin-top: 0.25rem"
+          class="text-[color:var(--p-text-muted-color)] mt-1"
           >* Biarkan kosong jika tidak ingin mengubah gambar.</small
         >
       </div>
     </div>
 
-    <div
-      style="
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.5rem;
-        margin-top: 2rem;
-      "
-    >
+    <div class="flex justify-end gap-2 mt-8">
       <Button
         type="button"
         label="Batal"
         severity="secondary"
         @click="handleCancel"
       ></Button>
-      <Button type="button" label="Simpan" @click="handleSave"></Button>
+      <Button
+        type="button"
+        label="Simpan"
+        @click="handleSave"
+        :loading="loading"
+      ></Button>
     </div>
   </Dialog>
 </template>
