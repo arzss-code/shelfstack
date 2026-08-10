@@ -1,164 +1,169 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { defineStore } from "pinia";
 
 export interface Product {
-  id: number
-  name: string
-  price: number
-  description?: string | null
-  link?: string | null
-  image_url: string | null
+  id: number;
+  name: string;
+  price: number;
+  description?: string | null;
+  link?: string | null;
+  image_url: string | null;
 }
 
-export const useProductStore = defineStore('product', () => {
-  const supabase = useSupabaseClient()
-  const products = ref<Product[]>([])
-  const loading = ref(false)
+export const useProductStore = defineStore("product", () => {
+  const supabase = useSupabaseClient<any>();
+  const products = ref<Product[]>([]);
+  const loading = ref(false);
 
   // Fetch
   const fetchProducts = async () => {
-    loading.value = true
+    loading.value = true;
     try {
       const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('id', { ascending: false })
-      
-      if (error) throw error
-      products.value = data || []
+        .from("products")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) throw error;
+      products.value = data || [];
     } catch (e) {
-      console.error("Error fetching products:", e)
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
-  }
+  };
 
   // Fetch By ID
   const fetchProductById = async (id: number): Promise<Product | null> => {
-    loading.value = true
+    loading.value = true;
     try {
       const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .single()
-      
-      if (error) throw error
-      return data as Product
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) throw error;
+      return data as Product;
     } catch (e) {
-      console.error("Error fetching product by id:", e)
-      return null
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
-  }
+  };
 
   // Add
-  const addProduct = async (name: string, price: number, description: string | null, link: string | null, file: File | null) => {
-    loading.value = true
+  const addProduct = async (
+    name: string,
+    price: number,
+    description: string | null,
+    link: string | null,
+    file: File | null,
+  ) => {
+    loading.value = true;
     try {
-      let imageUrl = null
+      let imageUrl = null;
 
       if (file) {
-        const fileExt = file.name.split('.').pop()
-        const fileName = `images/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`
+        const fileExt = file.name.split(".").pop();
+        const fileName = `images/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
         const { error: uploadError } = await supabase.storage
-          .from('product-images')
-          .upload(fileName, file)
-        
-        if (uploadError) throw uploadError
+          .from("product-images")
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
 
         const { data: publicUrlData } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(fileName)
-        
-        imageUrl = publicUrlData.publicUrl
+          .from("product-images")
+          .getPublicUrl(fileName);
+
+        imageUrl = publicUrlData.publicUrl;
       }
 
       const { data, error } = await supabase
-        .from('products')
+        .from("products")
         .insert([{ name, price, description, link, image_url: imageUrl }])
         .select()
-        .single()
-      
-      if (error) throw error
-      
+        .single();
+
+      if (error) throw error;
+
       if (data) {
-        products.value.unshift(data as Product)
+        products.value.unshift(data as Product);
       }
     } catch (e) {
-      console.error("Error adding product:", e)
-      throw e
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
-  }
+  };
 
   // Update
-  const updateProduct = async (id: number, name: string, price: number, description: string | null, link: string | null, file: File | null) => {
-     loading.value = true
-     try {
-       const existing = products.value.find(p => p.id === id)
-       let imageUrl = existing?.image_url || null
+  const updateProduct = async (
+    id: number,
+    name: string,
+    price: number,
+    description: string | null,
+    link: string | null,
+    file: File | null,
+  ) => {
+    loading.value = true;
+    try {
+      const existing = products.value.find((p) => p.id === id);
+      let imageUrl = existing?.image_url || null;
 
-       if (file) {
-         const fileExt = file.name.split('.').pop()
-         const fileName = `images/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`
-         const { error: uploadError } = await supabase.storage
-           .from('product-images')
-           .upload(fileName, file)
-         
-         if (uploadError) throw uploadError
+      if (file) {
+        const fileExt = file.name.split(".").pop();
+        const fileName = `images/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from("product-images")
+          .upload(fileName, file);
 
-         const { data: publicUrlData } = supabase.storage
-           .from('product-images')
-           .getPublicUrl(fileName)
-         
-         imageUrl = publicUrlData.publicUrl
-       }
+        if (uploadError) throw uploadError;
 
-        const { data, error } = await supabase
-          .from('products')
-          .update({ name, price, description, link, image_url: imageUrl })
-          .eq('id', id)
-         .select()
-         .single()
-       
-       if (error) throw error
-       
-       if (data) {
-         const index = products.value.findIndex(p => p.id === id)
-         if (index !== -1) {
-           products.value[index] = data as Product
-         }
-       }
-     } catch (e) {
-       console.error("Error updating product:", e)
-       throw e
-     } finally {
-       loading.value = false
-     }
-  }
+        const { data: publicUrlData } = supabase.storage
+          .from("product-images")
+          .getPublicUrl(fileName);
+
+        imageUrl = publicUrlData.publicUrl;
+      }
+
+      const { data, error } = await supabase
+        .from("products")
+        .update({ name, price, description, link, image_url: imageUrl })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        const index = products.value.findIndex((p) => p.id === id);
+        if (index !== -1) {
+          products.value[index] = data as Product;
+        }
+      }
+    } catch (e) {
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  };
 
   // Delete
   const deleteProduct = async (id: number) => {
-    loading.value = true
+    loading.value = true;
     try {
-      const { error } = await supabase
-        .from('products')
-        .delete()
-        .eq('id', id)
-      
-      if (error) throw error
-      
-      products.value = products.value.filter(p => p.id !== id)
+      const { error } = await supabase.from("products").delete().eq("id", id);
+
+      if (error) throw error;
+
+      products.value = products.value.filter((p) => p.id !== id);
     } catch (e) {
-      console.error("Error deleting product:", e)
-      throw e
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
-  }
+  };
 
   return {
     products,
@@ -167,6 +172,6 @@ export const useProductStore = defineStore('product', () => {
     fetchProductById,
     addProduct,
     updateProduct,
-    deleteProduct
-  }
-})
+    deleteProduct,
+  };
+});

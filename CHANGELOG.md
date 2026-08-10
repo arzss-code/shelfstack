@@ -2,6 +2,17 @@
 Semua perubahan penting dalam projek **Product Management FE**.
 Format ini berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [v0.6.0] - 2026-08-10
+### Added
+- Implementasi dukungan penuh **Mode Gelap (Dark Mode)** yang responsif secara otomatis mengikuti pengaturan sistem operasi (OS) pengguna.
+- Penanganan dan pelemparan *error* (Error Handling) tersentralisasi pada `product.ts` yang terhubung langsung dengan *Toast Notification* di tingkat komponen (UI).
+
+### Changed
+- Perombakan tata letak UI aplikasi secara menyeluruh berdasarkan panduan standar **Impeccable** (Bersih, Profesional, Minimalis).
+- Penggunaan **Semantic Tokens** (`--p-content-background`, `--p-text-color`) menggantikan *hardcoded surface colors* untuk mengatasi *bug* percampuran warna pada Mode Gelap.
+- Penghapusan komponen `<Card>` PrimeVue bawaan pada `ProductList.vue` dan diganti dengan desain kartu (Grid Card) khusus yang sepenuhnya interaktif (*clickable*) dengan *hover effect* yang halus.
+- Pembatasan maksimal lebar konten (*max-width container*) pada Layout Utama (`1200px`) untuk mengakomodasi layar *ultrawide*.
+
 ## [v0.5.0] - 2026-08-10
 ### Added
 - Halaman **Detail Produk** (`/product/[id]`) untuk menampilkan data produk secara utuh.
