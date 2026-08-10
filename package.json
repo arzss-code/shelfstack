@@ -1,0 +1,25 @@
+{
+  "name": "product-management",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxtjs/supabase": "^2.0.9",
+    "@pinia/nuxt": "^1.0.1",
+    "@primeuix/themes": "^2.0.3",
+    "@primevue/nuxt-module": "^4.5.5",
+    "@supabase/supabase-js": "^2.112.2",
+    "nuxt": "^4.5.2",
+    "pinia": "^4.0.2",
+    "primeicons": "^8.0.0",
+    "primevue": "^4.5.5",
+    "vue": "^3.5.40",
+    "vue-router": "^5.2.0"
+  }
+}
