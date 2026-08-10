@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useToast } from 'primevue/usetoast'
 
 const props = defineProps<{
   initialData?: { id: number; name: string; price: number; image_url: string | null } | null
@@ -11,6 +12,7 @@ const emit = defineEmits<{
 }>()
 
 const visible = defineModel<boolean>('visible', { default: false })
+const toast = useToast()
 
 const name = ref('')
 const price = ref<number | null>(null)
@@ -27,8 +29,80 @@ watch(() => props.initialData, (newVal) => {
   imageFile.value = null
 }, { immediate: true })
 
-const onFileSelect = (event: any) => {
-  imageFile.value = event.files[0]
+const compressImage = (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = (event) => {
+      const img = new Image()
+      img.src = event.target?.result as string
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const MAX_WIDTH = 1200
+        
+        let width = img.width
+        let height = img.height
+        
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width)
+          width = MAX_WIDTH
+        }
+        
+        canvas.width = width
+        canvas.height = height
+        
+        const ctx = canvas.getContext('2d')
+        ctx?.drawImage(img, 0, 0, width, height)
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            // Kita menyimpan hasilnya sebagai WebP sesuai efisiensi modern
+            const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+              type: 'image/webp',
+              lastModified: Date.now(),
+            })
+            resolve(compressedFile)
+          } else {
+            reject(new Error('Canvas to Blob failed'))
+          }
+        }, 'image/webp', 0.7) // Kualitas 70%
+      }
+      img.onerror = (error) => reject(error)
+    }
+    reader.onerror = (error) => reject(error)
+  })
+}
+
+const onFileSelect = async (event: any) => {
+  const file = event.files[0] as File
+  if (!file) return
+
+  // 1. Validasi Format
+  const allowedFormats = ['image/jpeg', 'image/png', 'image/webp']
+  if (!allowedFormats.includes(file.type)) {
+    toast.add({ severity: 'error', summary: 'Format Ditolak', detail: 'Hanya format JPEG, PNG, dan WebP yang diizinkan sesuai SOP.', life: 5000 })
+    // Menghapus pilihan sebelumnya jika ada masalah
+    event.options.clear()
+    return
+  }
+
+  // 2. Validasi Ukuran (Maksimal 5MB)
+  const maxSize = 5 * 1024 * 1024 // 5 MB
+  if (file.size > maxSize) {
+    toast.add({ severity: 'error', summary: 'Ukuran Berlebih', detail: 'Ukuran maksimal file mentah adalah 5 MB.', life: 5000 })
+    event.options.clear()
+    return
+  }
+
+  // 3. Kompresi Sisi Klien
+  try {
+    const compressed = await compressImage(file)
+    imageFile.value = compressed
+    toast.add({ severity: 'success', summary: 'Kompresi Berhasil', detail: `File siap diunggah. Ukuran akhir: ${(compressed.size / 1024).toFixed(2)} KB`, life: 3000 })
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Gagal Memproses', detail: 'Terjadi kesalahan saat memproses gambar.', life: 5000 })
+    console.error(error)
+  }
 }
 
 const handleSave = () => {

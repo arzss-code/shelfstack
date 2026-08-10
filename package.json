@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@nuxtjs/supabase": "^2.0.9",
-    "@pinia/nuxt": "^0.11.0",
+    "@pinia/nuxt": "^1.0.1",
     "@primeuix/themes": "^2.0.3",
     "@primevue/nuxt-module": "^4.5.5",
     "@supabase/supabase-js": "^2.112.2",

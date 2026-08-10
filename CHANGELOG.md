@@ -2,6 +2,13 @@
 Semua perubahan penting dalam projek **Product Management FE**.
 Format ini berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [v0.3.0-beta.1] - 2026-08-10
+### Added
+- Implementasi sistem **Toast Notification** global menggunakan PrimeVue di `app.vue`.
+- Validasi unggahan gambar (maksimal 5MB dan hanya menerima format `jpeg`, `png`, `webp`) sesuai `SOP-SUPABASE`.
+- **Kompresi Gambar Sisi Klien** (Client-side Compression) menggunakan HTML5 Canvas API untuk mengubah ukuran (resize) menjadi max lebar 1200px dan mengonversi gambar menjadi format `WebP` berkualitas 70% demi penghematan kuota penyimpanan.
+
+
 ## [v0.2.0-beta.3] - 2026-08-10
 ### Fixed
 - Menurunkan versi (downgrade) `@pinia/nuxt` dari `1.0.1` ke `0.11.0` untuk mengatasi *bug compatibility* antara `nuxtApp.payload.pinia` dengan Nuxt 4 yang menyebabkan gagal *render* SSR.

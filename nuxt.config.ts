@@ -28,5 +28,8 @@ export default defineNuxtConfig({
         preset: Aura,
       },
     },
+    components: {
+      include: '*'
+    }
   },
 });
