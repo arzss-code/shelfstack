@@ -4,7 +4,7 @@ import type { Product } from "~/types/product";
 export const useProductStore = defineStore("product", () => {
   const supabase = useSupabaseClient<any>();
   const products = ref<Product[]>([]);
-  const loading = ref(false);
+  const loading = ref(true);
 
   // Fetch
   const fetchProducts = async () => {
