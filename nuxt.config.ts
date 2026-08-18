@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     enabled: true,
   },
 
-  css: ["primeicons/primeicons.css", "~/assets/css/main.css"],
+  css: ["primeicons/primeicons.css"],
 
   modules: [
     "@primevue/nuxt-module",
@@ -23,12 +23,20 @@ export default defineNuxtConfig({
     redirect: false,
   },
 
+  tailwindcss: {
+    cssPath: "~/assets/css/main.css",
+  },
+
   primevue: {
     options: {
       theme: {
         preset: Aura,
         options: {
           darkModeSelector: "system",
+          cssLayer: {
+            name: "primevue",
+            order: "tailwind-base, primevue, tailwind-utilities",
+          },
         },
       },
     },

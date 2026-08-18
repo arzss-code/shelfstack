@@ -48,32 +48,28 @@ const router = useRouter();
     <!-- Empty State -->
     <div
       v-else-if="products.length === 0"
-      class="text-center py-16 px-8 bg-[color:var(--p-content-background)] rounded-2xl border border-dashed border-[color:var(--p-content-border-color)]"
+      class="flex flex-col items-center justify-center py-20 px-8 bg-white dark:bg-[color:var(--p-surface-900)] rounded-xl border border-dashed border-[color:var(--p-content-border-color)] shadow-sm"
     >
       <template v-if="isSearching">
-        <i
-          class="pi pi-search text-4xl text-[color:var(--p-text-muted-color)] mb-6"
-        ></i>
-        <h3
-          class="m-0 mb-2 text-[color:var(--p-text-color)] font-semibold text-xl"
-        >
+        <div class="w-16 h-16 rounded-full bg-[color:var(--p-surface-100)] flex items-center justify-center mb-6">
+          <i class="pi pi-search text-2xl text-[color:var(--p-text-muted-color)]"></i>
+        </div>
+        <h3 class="m-0 mb-2 text-[color:var(--p-text-color)] font-semibold text-lg">
           Pencarian tidak ditemukan
         </h3>
-        <p class="m-0 text-[color:var(--p-text-muted-color)]">
-          Tidak ada produk yang cocok dengan kata kunci pencarian Anda.
+        <p class="m-0 text-[color:var(--p-text-muted-color)] text-sm max-w-md text-center">
+          Tidak ada produk yang cocok dengan kata kunci pencarian Anda. Coba kata kunci lain atau periksa kembali ejaan Anda.
         </p>
       </template>
       <template v-else>
-        <i
-          class="pi pi-box text-4xl text-[color:var(--p-text-muted-color)] mb-6"
-        ></i>
-        <h3
-          class="m-0 mb-2 text-[color:var(--p-text-color)] font-semibold text-xl"
-        >
+        <div class="w-16 h-16 rounded-full bg-[color:var(--p-surface-100)] flex items-center justify-center mb-6">
+          <i class="pi pi-box text-2xl text-[color:var(--p-text-muted-color)]"></i>
+        </div>
+        <h3 class="m-0 mb-2 text-[color:var(--p-text-color)] font-semibold text-lg">
           Katalog masih kosong
         </h3>
-        <p class="m-0 text-[color:var(--p-text-muted-color)]">
-          Silakan klik tombol "Tambah Produk" untuk mulai mengelola etalase.
+        <p class="m-0 text-[color:var(--p-text-muted-color)] text-sm max-w-md text-center leading-relaxed">
+          Sistem Anda siap digunakan. Anda dapat mulai mengelola inventaris dengan menambahkan produk pertama Anda ke dalam etalase.
         </p>
       </template>
     </div>
