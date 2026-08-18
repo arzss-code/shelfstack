@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { Product } from "~/types/product";
+import { productRepository } from "~/repository/product";
 
 export const useProductStore = defineStore("product", () => {
   const supabase = useSupabaseClient<any>();
@@ -22,16 +23,8 @@ export const useProductStore = defineStore("product", () => {
       const from = (page.value - 1) * limit;
       const to = from + limit - 1;
 
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .is("deleted_at", null)
-        .order("id", { ascending: false })
-        .range(from, to);
+      const newProducts = await productRepository.getProducts(supabase, from, to);
 
-      if (error) throw error;
-
-      const newProducts = data || [];
       if (newProducts.length < limit) {
         hasMore.value = false;
       } else {
@@ -54,14 +47,7 @@ export const useProductStore = defineStore("product", () => {
   const fetchProductById = async (id: number): Promise<Product | null> => {
     loading.value = true;
     try {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (error) throw error;
-      return data as Product;
+      return await productRepository.getProductById(supabase, id);
     } catch (e) {
       throw e;
     } finally {
@@ -82,31 +68,19 @@ export const useProductStore = defineStore("product", () => {
       let imageUrl = null;
 
       if (file) {
-        const fileExt = file.name.split(".").pop();
-        const fileName = `images/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from("product-images")
-          .upload(fileName, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: publicUrlData } = supabase.storage
-          .from("product-images")
-          .getPublicUrl(fileName);
-
-        imageUrl = publicUrlData.publicUrl;
+        imageUrl = await productRepository.uploadImage(supabase, file);
       }
 
-      const { data, error } = await supabase
-        .from("products")
-        .insert([{ name, price, description, link, image_url: imageUrl }])
-        .select()
-        .single();
+      const newProduct = await productRepository.addProduct(supabase, {
+        name,
+        price,
+        description,
+        link,
+        image_url: imageUrl,
+      });
 
-      if (error) throw error;
-
-      if (data) {
-        products.value.unshift(data as Product);
+      if (newProduct) {
+        products.value.unshift(newProduct);
       }
     } catch (e) {
       throw e;
@@ -130,42 +104,21 @@ export const useProductStore = defineStore("product", () => {
       let imageUrl = existing?.image_url || null;
 
       if (file) {
-        const fileExt = file.name.split(".").pop();
-        const fileName = `images/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from("product-images")
-          .upload(fileName, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: publicUrlData } = supabase.storage
-          .from("product-images")
-          .getPublicUrl(fileName);
-
-        imageUrl = publicUrlData.publicUrl;
-
-        // Cleanup old image if exists
-        if (existing?.image_url) {
-          const oldPath = existing.image_url.split("/product-images/")[1];
-          if (oldPath) {
-            await supabase.storage.from("product-images").remove([oldPath]);
-          }
-        }
+        imageUrl = await productRepository.uploadImage(supabase, file, imageUrl);
       }
 
-      const { data, error } = await supabase
-        .from("products")
-        .update({ name, price, description, link, image_url: imageUrl })
-        .eq("id", id)
-        .select()
-        .single();
+      const updatedProduct = await productRepository.updateProduct(supabase, id, {
+        name,
+        price,
+        description,
+        link,
+        image_url: imageUrl,
+      });
 
-      if (error) throw error;
-
-      if (data) {
+      if (updatedProduct) {
         const index = products.value.findIndex((p) => p.id === id);
         if (index !== -1) {
-          products.value[index] = data as Product;
+          products.value[index] = updatedProduct;
         }
       }
     } catch (e) {
@@ -179,13 +132,7 @@ export const useProductStore = defineStore("product", () => {
   const deleteProduct = async (id: number) => {
     loading.value = true;
     try {
-      const { error } = await supabase
-        .from("products")
-        .update({ deleted_at: new Date().toISOString() })
-        .eq("id", id);
-
-      if (error) throw error;
-
+      await productRepository.deleteProduct(supabase, id);
       products.value = products.value.filter((p) => p.id !== id);
     } catch (e) {
       throw e;

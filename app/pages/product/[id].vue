@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useProductStore, type Product } from "~/stores/product";
+import { useProductStore } from "~/stores/product";
+import type { Product } from "~/types/product";
 import { useToast } from "primevue/usetoast";
 
 const product = ref<Product | null>(null);

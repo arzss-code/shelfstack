@@ -97,7 +97,7 @@ const router = useRouter();
             v-if="product.image_url"
             :src="product.image_url"
             :alt="product.name"
-            class="absolute top-0 left-0 w-full h-full object-cover"
+            class="absolute top-0 left-0 w-full h-full object-cover object-top"
           />
           <div
             v-else

@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxtjs/supabase",
     "@nuxtjs/tailwindcss",
+    "@nuxt/eslint",
   ],
 
   supabase: {
