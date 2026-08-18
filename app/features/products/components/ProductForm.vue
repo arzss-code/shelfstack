@@ -170,7 +170,7 @@ const handleCancel = () => {
     :header="initialData ? 'Edit Produk' : 'Tambah Produk'"
     :style="{ width: '30rem' }"
   >
-    <div class="flex flex-col gap-4 mt-4">
+    <div class="grid grid-cols-1 gap-4 mt-4 w-full">
       <div class="flex flex-col gap-1.5">
         <label
           for="name"
@@ -182,7 +182,7 @@ const handleCancel = () => {
           v-model="name"
           autofocus
           autocomplete="off"
-          :class="{ 'p-invalid': errors.name }"
+          :class="[{ 'p-invalid': errors.name }, 'w-full']"
         />
         <small
           v-if="errors.name"
@@ -203,6 +203,7 @@ const handleCancel = () => {
           mode="currency"
           currency="IDR"
           locale="id-ID"
+          class="w-full"
           :class="{ 'p-invalid': errors.price }"
         />
         <small
@@ -218,10 +219,10 @@ const handleCancel = () => {
           class="text-[0.95rem] font-semibold text-[color:var(--p-text-color)]"
           >Deskripsi</label
         >
-        <Textarea id="description" v-model="description" rows="3" autoResize />
+        <Textarea id="description" v-model="description" rows="3" autoResize class="w-full" />
       </div>
 
-      <div class="flex flex-col gap-1.5">
+      <div class="grid grid-cols-1 gap-1.5">
         <label
           for="link"
           class="text-[0.95rem] font-semibold text-[color:var(--p-text-color)]"
@@ -231,7 +232,7 @@ const handleCancel = () => {
           id="link"
           v-model="link"
           placeholder="https://..."
-          :class="{ 'p-invalid': errors.link }"
+          :class="[{ 'p-invalid': errors.link }, 'w-full']"
         />
         <small
           v-if="errors.link"
@@ -240,7 +241,7 @@ const handleCancel = () => {
         >
       </div>
 
-      <div class="flex flex-col gap-1.5">
+      <div class="grid grid-cols-1 gap-1.5">
         <label
           class="text-[0.95rem] font-semibold text-[color:var(--p-text-color)]"
           >Gambar Produk</label

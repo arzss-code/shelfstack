@@ -3,6 +3,8 @@ import { useProductStore } from "~/stores/product";
 import type { Product } from "~/types/product";
 import { useToast } from "primevue/usetoast";
 import { useConfirm } from "primevue/useconfirm";
+import ProductList from "~/features/products/components/ProductList.vue";
+import ProductForm from "~/features/products/components/ProductForm.vue";
 
 useSeoMeta({
   title: "Katalog",
@@ -172,6 +174,21 @@ const handleDelete = async (id: number) => {
       @edit="openEditForm"
       @delete="handleDelete"
     />
+
+    <!-- Load More Button -->
+    <div
+      v-if="productStore.hasMore && !searchQuery.trim()"
+      class="flex justify-center mt-8 mb-4"
+    >
+      <Button
+        label="Muat Lebih Banyak"
+        icon="pi pi-sync"
+        :loading="productStore.loading"
+        @click="productStore.fetchProducts(true)"
+        severity="secondary"
+        rounded
+      />
+    </div>
 
     <!-- Container for Product Form Modal -->
     <ProductForm
