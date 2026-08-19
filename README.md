@@ -1,4 +1,4 @@
-# Product Management FE
+# Product Management
 
 Aplikasi frontend untuk kelola katalog produk internal. Dibangun ngikutin SOP Talenavi untuk nge-handle list produk, tambah/edit data, dan pastinya state management yang rapi.
 

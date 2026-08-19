@@ -1,30 +1,40 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-import Aura from "@primeuix/themes/aura";
+import Aura from '@primeuix/themes/aura'
 
 export default defineNuxtConfig({
-  compatibilityDate: "2025-07-15",
+  compatibilityDate: '2025-07-15',
 
   devtools: {
     enabled: true,
   },
 
-  css: ["primeicons/primeicons.css"],
+  css: ['primeicons/primeicons.css'],
 
   modules: [
-    "@primevue/nuxt-module",
-    "@pinia/nuxt",
-    "@nuxtjs/supabase",
-    "@nuxtjs/tailwindcss",
-    "@nuxt/eslint",
+    '@primevue/nuxt-module',
+    '@pinia/nuxt',
+    '@nuxtjs/supabase',
+    '@nuxtjs/tailwindcss',
+    '@nuxt/eslint',
+    '@nuxt/image',
+    'nuxt-security',
   ],
 
   supabase: {
     redirect: false,
   },
 
+  security: {
+    headers: {
+      contentSecurityPolicy: {
+        'img-src': ["'self'", 'data:', 'https://*.supabase.co'],
+      },
+    },
+  },
+
   tailwindcss: {
-    cssPath: "~/assets/css/main.css",
+    cssPath: '~/assets/css/main.css',
   },
 
   primevue: {
@@ -32,16 +42,16 @@ export default defineNuxtConfig({
       theme: {
         preset: Aura,
         options: {
-          darkModeSelector: "system",
+          darkModeSelector: 'system',
           cssLayer: {
-            name: "primevue",
-            order: "tailwind-base, primevue, tailwind-utilities",
+            name: 'primevue',
+            order: 'tailwind-base, primevue, tailwind-utilities',
           },
         },
       },
     },
     components: {
-      include: "*",
+      include: '*',
     },
   },
-});
+})
