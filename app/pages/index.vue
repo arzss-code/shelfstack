@@ -1,53 +1,68 @@
 <script setup lang="ts">
-import { useProductStore } from "~/stores/product";
-import type { Product } from "~/types/product";
-import { useToast } from "primevue/usetoast";
-import { useConfirm } from "primevue/useconfirm";
-import ProductList from "~/features/products/components/ProductList.vue";
-import ProductForm from "~/features/products/components/ProductForm.vue";
+import { useProductStore } from '~/stores/product'
+import type { Product } from '~/types/product'
+import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
+import ProductList from '~/features/products/components/ProductList.vue'
+import ProductForm from '~/features/products/components/ProductForm.vue'
 
 useSeoMeta({
-  title: "Katalog",
-});
+  title: 'Katalog',
+})
 
-const productStore = useProductStore();
-const toast = useToast();
-const confirm = useConfirm();
+const productStore = useProductStore()
+const toast = useToast()
+const confirm = useConfirm()
 
-const isFormVisible = ref(false);
-const editingProduct = ref<Product | null>(null);
-const searchQuery = ref("");
+const isFormVisible = ref(false)
+const editingProduct = ref<Product | null>(null)
+const searchQuery = ref('')
+const activeTab = ref('0')
 
 const filteredProducts = computed(() => {
-  if (!searchQuery.value.trim()) return productStore.products;
-  const query = searchQuery.value.toLowerCase();
-  return productStore.products.filter((p) =>
-    p.name.toLowerCase().includes(query),
-  );
-});
+  const sourceList = activeTab.value === '0' ? productStore.products : productStore.deletedProducts
+  if (!searchQuery.value.trim()) return sourceList
+  const query = searchQuery.value.toLowerCase()
+  return sourceList.filter((p) => p.name.toLowerCase().includes(query))
+})
+
+watch(activeTab, async (newVal) => {
+  if (newVal === '1' && productStore.deletedProducts.length === 0) {
+    try {
+      await productStore.fetchDeletedProducts()
+    } catch (e) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Gagal memuat keranjang sampah',
+        life: 3000,
+      })
+    }
+  }
+})
 
 onMounted(async () => {
   try {
-    await productStore.fetchProducts();
+    await productStore.fetchProducts()
   } catch (error: any) {
     toast.add({
-      severity: "error",
-      summary: "Gagal Memuat Data",
-      detail: error?.message || "Gagal mengambil daftar produk.",
+      severity: 'error',
+      summary: 'Gagal Memuat Data',
+      detail: error?.message || 'Gagal mengambil daftar produk.',
       life: 5000,
-    });
+    })
   }
-});
+})
 
 const openAddForm = () => {
-  editingProduct.value = null;
-  isFormVisible.value = true;
-};
+  editingProduct.value = null
+  isFormVisible.value = true
+}
 
 const openEditForm = (product: Product) => {
-  editingProduct.value = product;
-  isFormVisible.value = true;
-};
+  editingProduct.value = product
+  isFormVisible.value = true
+}
 
 const handleSave = async (
   name: string,
@@ -65,69 +80,100 @@ const handleSave = async (
         description,
         link,
         file,
-      );
+      )
       toast.add({
-        severity: "success",
-        summary: "Berhasil",
-        detail: "Produk berhasil diperbarui.",
+        severity: 'success',
+        summary: 'Berhasil',
+        detail: 'Produk berhasil diperbarui.',
         life: 3000,
-      });
+      })
     } else {
-      await productStore.addProduct(name, price, description, link, file);
+      await productStore.addProduct(name, price, description, link, file)
       toast.add({
-        severity: "success",
-        summary: "Berhasil",
-        detail: "Produk baru berhasil ditambahkan.",
+        severity: 'success',
+        summary: 'Berhasil',
+        detail: 'Produk baru berhasil ditambahkan.',
         life: 3000,
-      });
+      })
     }
   } catch (error: any) {
-    if (error?.message?.includes("row-level security policy")) {
+    if (error?.message?.includes('row-level security policy')) {
       toast.add({
-        severity: "error",
-        summary: "Akses Ditolak (RLS)",
-        detail: "Supabase menolak operasi. Pastikan RLS Policy sudah diatur.",
+        severity: 'error',
+        summary: 'Akses Ditolak (RLS)',
+        detail: 'Supabase menolak operasi. Pastikan RLS Policy sudah diatur.',
         life: 8000,
-      });
+      })
     } else {
       toast.add({
-        severity: "error",
-        summary: "Gagal Menyimpan",
-        detail: error?.message || "Terjadi kesalahan tidak terduga.",
+        severity: 'error',
+        summary: 'Gagal Menyimpan',
+        detail: error?.message || 'Terjadi kesalahan tidak terduga.',
         life: 5000,
-      });
+      })
     }
   }
-};
+}
 
 const handleDelete = async (id: number) => {
   confirm.require({
-    message: "Apakah Anda yakin ingin menghapus produk ini?",
-    header: "Konfirmasi Penghapusan",
-    icon: "pi pi-exclamation-triangle",
-    acceptLabel: "Hapus",
-    rejectLabel: "Batal",
-    acceptClass: "p-button-danger",
+    message: 'Apakah Anda yakin ingin menghapus produk ini?',
+    header: 'Konfirmasi Penghapusan',
+    icon: 'pi pi-exclamation-triangle',
+    acceptLabel: 'Hapus',
+    rejectLabel: 'Batal',
+    acceptClass: 'p-button-danger',
     accept: async () => {
       try {
-        await productStore.deleteProduct(id);
+        await productStore.deleteProduct(id)
         toast.add({
-          severity: "success",
-          summary: "Terhapus",
-          detail: "Produk berhasil dihapus.",
+          severity: 'success',
+          summary: 'Terhapus',
+          detail: 'Produk berhasil dihapus.',
           life: 3000,
-        });
+        })
       } catch (error: any) {
         toast.add({
-          severity: "error",
-          summary: "Gagal Menghapus",
-          detail: error?.message || "Terjadi kesalahan.",
+          severity: 'error',
+          summary: 'Gagal Menghapus',
+          detail: error?.message || 'Terjadi kesalahan.',
           life: 5000,
-        });
+        })
       }
     },
-  });
-};
+  })
+}
+
+const handleRestore = async (id: number) => {
+  confirm.require({
+    message: 'Apakah Anda yakin ingin mengembalikan produk ini dari keranjang sampah?',
+    header: 'Konfirmasi Restore',
+    icon: 'pi pi-info-circle',
+    acceptLabel: 'Restore',
+    rejectLabel: 'Batal',
+    acceptClass: 'p-button-success',
+    accept: async () => {
+      try {
+        await productStore.restoreProduct(id)
+        toast.add({
+          severity: 'success',
+          summary: 'Berhasil',
+          detail: 'Produk berhasil dikembalikan.',
+          life: 3000,
+        })
+        // Refresh active list in background if needed
+        productStore.fetchProducts()
+      } catch (error: any) {
+        toast.add({
+          severity: 'error',
+          summary: 'Gagal Mengembalikan',
+          detail: error?.message || 'Terjadi kesalahan.',
+          life: 5000,
+        })
+      }
+    },
+  })
+}
 </script>
 
 <template>
@@ -135,60 +181,81 @@ const handleDelete = async (id: number) => {
     <!-- Header & Search & Add Button -->
     <div class="flex justify-between items-end mb-10 flex-wrap gap-6">
       <div>
-        <h1
-          class="m-0 mb-1 text-4xl font-bold tracking-tight text-[color:var(--p-text-color)]"
-        >
+        <h1 class="m-0 mb-1 text-4xl font-bold tracking-tight text-surface-900 dark:text-surface-0">
           Daftar Produk
         </h1>
-        <p class="m-0 text-lg text-[color:var(--p-text-muted-color)]">
+        <p class="m-0 text-lg text-surface-500 dark:text-surface-400">
           Kelola inventaris dan katalog produk Anda secara efisien.
         </p>
       </div>
 
       <div class="flex gap-4 items-center flex-wrap">
-        <IconField iconPosition="left">
-          <InputIcon
-            class="pi pi-search text-[color:var(--p-text-muted-color)]"
-          />
-          <InputText
-            v-model="searchQuery"
-            placeholder="Cari produk..."
-            class="w-[280px]"
-          />
+        <IconField icon-position="left">
+          <InputIcon class="pi pi-search text-surface-400 dark:text-surface-500" />
+          <InputText v-model="searchQuery" placeholder="Cari produk..." class="w-[280px]" />
         </IconField>
 
-        <Button
-          label="Tambah Produk"
-          icon="pi pi-plus"
-          severity="primary"
-          @click="openAddForm"
-        />
+        <Button label="Tambah Produk" icon="pi pi-plus" severity="primary" @click="openAddForm" />
       </div>
     </div>
 
-    <!-- Container for Product List -->
-    <ProductList
-      :products="filteredProducts"
-      :loading="productStore.loading"
-      :is-searching="searchQuery.trim().length > 0"
-      @edit="openEditForm"
-      @delete="handleDelete"
-    />
+    <Tabs v-model:value="activeTab" class="!bg-transparent">
+      <TabList class="!bg-transparent">
+        <Tab value="0">Produk Aktif</Tab>
+        <Tab value="1">Keranjang Sampah</Tab>
+      </TabList>
+      <TabPanels class="px-0 pb-0 !bg-transparent">
+        <TabPanel value="0">
+          <ProductList
+            :products="filteredProducts"
+            :loading="productStore.loading"
+            :is-searching="searchQuery.trim().length > 0"
+            @edit="openEditForm"
+            @delete="handleDelete"
+          />
 
-    <!-- Load More Button -->
-    <div
-      v-if="productStore.hasMore && !searchQuery.trim()"
-      class="flex justify-center mt-8 mb-4"
-    >
-      <Button
-        label="Muat Lebih Banyak"
-        icon="pi pi-sync"
-        :loading="productStore.loading"
-        @click="productStore.fetchProducts(true)"
-        severity="secondary"
-        rounded
-      />
-    </div>
+          <!-- Load More Button -->
+          <div
+            v-if="productStore.hasMore && !searchQuery.trim()"
+            class="flex justify-center mt-8 mb-4"
+          >
+            <Button
+              label="Muat Lebih Banyak"
+              icon="pi pi-sync"
+              :loading="productStore.loading"
+              severity="secondary"
+              rounded
+              @click="productStore.fetchProducts(true)"
+            />
+          </div>
+        </TabPanel>
+
+        <TabPanel value="1">
+          <ProductList
+            :products="filteredProducts"
+            :loading="productStore.loading"
+            :is-searching="searchQuery.trim().length > 0"
+            is-trash
+            @restore="handleRestore"
+          />
+
+          <!-- Load More Button (Trash) -->
+          <div
+            v-if="productStore.hasMoreDeleted && !searchQuery.trim()"
+            class="flex justify-center mt-8 mb-4"
+          >
+            <Button
+              label="Muat Lebih Banyak"
+              icon="pi pi-sync"
+              :loading="productStore.loading"
+              severity="secondary"
+              rounded
+              @click="productStore.fetchDeletedProducts(true)"
+            />
+          </div>
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
 
     <!-- Container for Product Form Modal -->
     <ProductForm
