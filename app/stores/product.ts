@@ -1,59 +1,94 @@
-import { defineStore } from "pinia";
-import type { Product } from "~/types/product";
-import { productRepository } from "~/repository/product";
+import { defineStore } from 'pinia'
+import type { Product } from '~/types/product'
+import { productRepository } from '~/repository/product'
 
-export const useProductStore = defineStore("product", () => {
-  const supabase = useSupabaseClient<any>();
-  const products = ref<Product[]>([]);
-  const loading = ref(true);
-  const page = ref(1);
-  const limit = 12;
-  const hasMore = ref(true);
+export const useProductStore = defineStore('product', () => {
+  const supabase = useSupabaseClient<any>()
+  const { logActivity } = useActivityLog()
+  const products = ref<Product[]>([])
+  const deletedProducts = ref<Product[]>([])
+  const loading = ref(true)
+  const page = ref(1)
+  const limit = 12
+  const hasMore = ref(true)
+  const hasMoreDeleted = ref(true)
 
   // Fetch
   const fetchProducts = async (isLoadMore = false) => {
-    loading.value = true;
+    loading.value = true
     try {
       if (!isLoadMore) {
-        page.value = 1;
+        page.value = 1
       } else {
-        page.value += 1;
+        page.value += 1
       }
 
-      const from = (page.value - 1) * limit;
-      const to = from + limit - 1;
+      const from = (page.value - 1) * limit
+      const to = from + limit - 1
 
-      const newProducts = await productRepository.getProducts(supabase, from, to);
+      const newProducts = await productRepository.getProducts(supabase, from, to)
 
       if (newProducts.length < limit) {
-        hasMore.value = false;
+        hasMore.value = false
       } else {
-        hasMore.value = true;
+        hasMore.value = true
       }
 
       if (isLoadMore) {
-        products.value = [...products.value, ...newProducts];
+        products.value = [...products.value, ...newProducts]
       } else {
-        products.value = newProducts;
+        products.value = newProducts
       }
     } catch (e) {
-      throw e;
+      throw e
     } finally {
-      loading.value = false;
+      loading.value = false
     }
-  };
+  }
+
+  const fetchDeletedProducts = async (isLoadMore = false) => {
+    loading.value = true
+    try {
+      if (!isLoadMore) {
+        page.value = 1
+      } else {
+        page.value += 1
+      }
+
+      const from = (page.value - 1) * limit
+      const to = from + limit - 1
+
+      const newDeleted = await productRepository.getDeletedProducts(supabase, from, to)
+
+      if (newDeleted.length < limit) {
+        hasMoreDeleted.value = false
+      } else {
+        hasMoreDeleted.value = true
+      }
+
+      if (isLoadMore) {
+        deletedProducts.value = [...deletedProducts.value, ...newDeleted]
+      } else {
+        deletedProducts.value = newDeleted
+      }
+    } catch (e) {
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
 
   // Fetch By ID
   const fetchProductById = async (id: number): Promise<Product | null> => {
-    loading.value = true;
+    loading.value = true
     try {
-      return await productRepository.getProductById(supabase, id);
+      return await productRepository.getProductById(supabase, id)
     } catch (e) {
-      throw e;
+      throw e
     } finally {
-      loading.value = false;
+      loading.value = false
     }
-  };
+  }
 
   // Add
   const addProduct = async (
@@ -63,12 +98,12 @@ export const useProductStore = defineStore("product", () => {
     link: string | null,
     file: File | null,
   ) => {
-    loading.value = true;
+    loading.value = true
     try {
-      let imageUrl = null;
+      let imageUrl = null
 
       if (file) {
-        imageUrl = await productRepository.uploadImage(supabase, file);
+        imageUrl = await productRepository.uploadImage(supabase, file)
       }
 
       const newProduct = await productRepository.addProduct(supabase, {
@@ -77,17 +112,24 @@ export const useProductStore = defineStore("product", () => {
         description,
         link,
         image_url: imageUrl,
-      });
+      })
 
       if (newProduct) {
-        products.value.unshift(newProduct);
+        products.value.unshift(newProduct)
+        await logActivity({
+          entity_type: 'product',
+          entity_id: newProduct.id,
+          action: 'CREATE',
+          description: `Created product "${newProduct.name}"`,
+          new_data: newProduct,
+        })
       }
     } catch (e) {
-      throw e;
+      throw e
     } finally {
-      loading.value = false;
+      loading.value = false
     }
-  };
+  }
 
   // Update
   const updateProduct = async (
@@ -98,13 +140,13 @@ export const useProductStore = defineStore("product", () => {
     link: string | null,
     file: File | null,
   ) => {
-    loading.value = true;
+    loading.value = true
     try {
-      const existing = products.value.find((p) => p.id === id);
-      let imageUrl = existing?.image_url || null;
+      const existing = products.value.find((p) => p.id === id)
+      let imageUrl = existing?.image_url || null
 
       if (file) {
-        imageUrl = await productRepository.uploadImage(supabase, file, imageUrl);
+        imageUrl = await productRepository.uploadImage(supabase, file, imageUrl)
       }
 
       const updatedProduct = await productRepository.updateProduct(supabase, id, {
@@ -113,42 +155,88 @@ export const useProductStore = defineStore("product", () => {
         description,
         link,
         image_url: imageUrl,
-      });
+      })
 
       if (updatedProduct) {
-        const index = products.value.findIndex((p) => p.id === id);
+        const index = products.value.findIndex((p) => p.id === id)
         if (index !== -1) {
-          products.value[index] = updatedProduct;
+          products.value[index] = updatedProduct
         }
+        await logActivity({
+          entity_type: 'product',
+          entity_id: updatedProduct.id,
+          action: 'UPDATE',
+          description: `Updated product "${updatedProduct.name}"`,
+          old_data: existing,
+          new_data: updatedProduct,
+        })
       }
     } catch (e) {
-      throw e;
+      throw e
     } finally {
-      loading.value = false;
+      loading.value = false
     }
-  };
+  }
 
   // Delete (Soft Delete)
   const deleteProduct = async (id: number) => {
-    loading.value = true;
+    loading.value = true
     try {
-      await productRepository.deleteProduct(supabase, id);
-      products.value = products.value.filter((p) => p.id !== id);
+      const existing = products.value.find((p) => p.id === id)
+      await productRepository.deleteProduct(supabase, id)
+      products.value = products.value.filter((p) => p.id !== id)
+
+      if (existing) {
+        await logActivity({
+          entity_type: 'product',
+          entity_id: id,
+          action: 'DELETE',
+          description: `Deleted product "${existing.name}"`,
+          old_data: existing,
+        })
+      }
     } catch (e) {
-      throw e;
+      throw e
     } finally {
-      loading.value = false;
+      loading.value = false
     }
-  };
+  }
+
+  const restoreProduct = async (id: number) => {
+    loading.value = true
+    try {
+      const existing = deletedProducts.value.find((p) => p.id === id)
+      await productRepository.restoreProduct(supabase, id)
+      deletedProducts.value = deletedProducts.value.filter((p) => p.id !== id)
+
+      if (existing) {
+        await logActivity({
+          entity_type: 'product',
+          entity_id: id,
+          action: 'RESTORE',
+          description: `Restored product "${existing.name}"`,
+          new_data: existing,
+        })
+      }
+    } catch (e) {
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
 
   return {
     products,
+    deletedProducts,
     loading,
     hasMore,
+    hasMoreDeleted,
     fetchProducts,
+    fetchDeletedProducts,
     fetchProductById,
     addProduct,
     updateProduct,
     deleteProduct,
-  };
-});
+    restoreProduct,
+  }
+})

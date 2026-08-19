@@ -14,12 +14,20 @@ export const productRepository = {
     return data as Product[]
   },
 
-  async getProductById(supabase: SupabaseClient, id: number) {
+  async getDeletedProducts(supabase: SupabaseClient, from: number, to: number) {
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .eq('id', id)
-      .single()
+      .not('deleted_at', 'is', null)
+      .order('deleted_at', { ascending: false })
+      .range(from, to)
+
+    if (error) throw error
+    return data as Product[]
+  },
+
+  async getProductById(supabase: SupabaseClient, id: number) {
+    const { data, error } = await supabase.from('products').select('*').eq('id', id).single()
 
     if (error) throw error
     return data as Product
@@ -27,13 +35,15 @@ export const productRepository = {
 
   async addProduct(
     supabase: SupabaseClient,
-    product: { name: string; price: number; description: string | null; link: string | null; image_url: string | null }
+    product: {
+      name: string
+      price: number
+      description: string | null
+      link: string | null
+      image_url: string | null
+    },
   ) {
-    const { data, error } = await supabase
-      .from('products')
-      .insert([product])
-      .select()
-      .single()
+    const { data, error } = await supabase.from('products').insert([product]).select().single()
 
     if (error) throw error
     return data as Product
@@ -42,7 +52,13 @@ export const productRepository = {
   async updateProduct(
     supabase: SupabaseClient,
     id: number,
-    product: { name: string; price: number; description: string | null; link: string | null; image_url: string | null }
+    product: {
+      name: string
+      price: number
+      description: string | null
+      link: string | null
+      image_url: string | null
+    },
   ) {
     const { data, error } = await supabase
       .from('products')
@@ -65,19 +81,24 @@ export const productRepository = {
     return true
   },
 
+  async restoreProduct(supabase: SupabaseClient, id: number) {
+    const { error } = await supabase.from('products').update({ deleted_at: null }).eq('id', id)
+
+    if (error) throw error
+    return true
+  },
+
   async uploadImage(supabase: SupabaseClient, file: File, existingImageUrl?: string | null) {
     const fileExt = file.name.split('.').pop()
     const fileName = `images/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`
-    
+
     const { error: uploadError } = await supabase.storage
       .from('product-images')
       .upload(fileName, file)
 
     if (uploadError) throw uploadError
 
-    const { data: publicUrlData } = supabase.storage
-      .from('product-images')
-      .getPublicUrl(fileName)
+    const { data: publicUrlData } = supabase.storage.from('product-images').getPublicUrl(fileName)
 
     const newImageUrl = publicUrlData.publicUrl
 
@@ -90,5 +111,5 @@ export const productRepository = {
     }
 
     return newImageUrl
-  }
+  },
 }
