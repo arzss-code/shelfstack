@@ -6,10 +6,7 @@ echo -e "===\n>> Talenavi Pre-push Hook: Checking branch name / Mengecek nama br
 BRANCH=`git rev-parse --abbrev-ref HEAD`
 PROTECTED_BRANCHES="^(master|develop)"
 
-if [[ $1 != *"$BRANCH"* ]]
-then
-  echo -e "\n🚫 You must use (git push origin $BRANCH) / Anda harus menggunakan (git push origin $BRANCH).\n" && exit 1
-fi
+# Check is skipped because $1 is the remote name ('origin'), not the branch name.
 
 if [[ "$BRANCH" =~ $PROTECTED_BRANCHES ]]
 then
