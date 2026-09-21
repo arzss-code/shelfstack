@@ -16,7 +16,7 @@ const categories = [
   'Tech & Gadget',
   'Rumah & Dapur',
   'Furnitur & Ruang Kerja',
-  'Pakaian & EDC',
+  'Pakaian & Aksesoris',
   'Alat Tulis & Kerajinan',
 ]
 
@@ -42,7 +42,7 @@ const categoryMap: Record<string, string> = {
   'Tech & Gadget': 'tech',
   'Rumah & Dapur': 'home',
   'Furnitur & Ruang Kerja': 'furniture',
-  'Pakaian & EDC': 'lifestyle',
+  'Pakaian & Aksesoris': 'lifestyle',
   'Alat Tulis & Kerajinan': 'stationery',
 }
 

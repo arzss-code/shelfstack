@@ -88,7 +88,7 @@ const handleGoogle = async () => {
       </div>
 
       <!-- Register Form -->
-      <form class="flex flex-col gap-4" @submit.prevent="handleRegister">
+      <form novalidate class="flex flex-col gap-4" @submit.prevent="handleRegister">
         <div class="flex flex-col gap-1.5">
           <label for="full_name" class="text-xs sm:text-sm font-semibold text-brand-ink">
             Nama Lengkap

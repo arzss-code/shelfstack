@@ -80,7 +80,7 @@ const handleGoogle = async () => {
       </div>
 
       <!-- Login Form -->
-      <form class="flex flex-col gap-4" @submit.prevent="handleLogin">
+      <form novalidate class="flex flex-col gap-4" @submit.prevent="handleLogin">
         <div class="flex flex-col gap-1.5">
           <label for="email" class="text-xs sm:text-sm font-semibold text-brand-ink">
             Alamat Email

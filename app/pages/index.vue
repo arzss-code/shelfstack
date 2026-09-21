@@ -33,7 +33,7 @@ const flashDeals = [
     price: 2790000,
     originalPrice: 3490000,
     image:
-      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=80',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAynKifeGh812agpR-N5vrbzYrObnMBGBpKqOt5BuB8nzQSr3hRM2QiC8Es4mJ6TZryn6kp3D-34nzApSaNKo6bZiB1f6-2uwYTAANz5M1-ozj1kzcmJc4MPgN0GOYc-xyMkK-fmzpQWwrqxTtJ2DgOso0KwutBsnXS4ij7LnjLtCruiTCVDHWkH-Wj2tQ5i-SDX1dj3rI3HRyzpGuAkJFRvs8Ssem43I8fz-D6nOJbVH8zBxp0Hs7I',
   },
   {
     id: 'deal-2',
@@ -45,7 +45,7 @@ const flashDeals = [
     price: 1390000,
     originalPrice: 1650000,
     image:
-      'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=500&auto=format&fit=crop&q=80',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAlVHdoo0TBYH_29rzh60ZaJN1zAp3FM5XY4LsF_uNFymSb0KJeLCCj39PwJuAOs0hWip88VsrQrMxHOYqDiy1DFtpIPoN8S1wcV33KEpPivlgegL1rCYjxgfVfYEGvufmoAzyXKuW42Jg9tjaU4rxf4PETHL2D2nquOW83Mch-6pil3L49VlyYuf1L1HXHO5f0o7iRYqG750DfVR0svuzT0Ad2czpMhRObhAtfeWjLbf7hROElsBRl',
   },
   {
     id: 'deal-3',
@@ -57,11 +57,11 @@ const flashDeals = [
     price: 2150000,
     originalPrice: 2850000,
     image:
-      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=80',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuCadIIQO11giIAUD132e7ZegJ34KKp0iYv606GF2tsBOjKa0pr_kzvpQNQn7xyuWLhuceoyYjmGzTQBfSqWlR3LKlXZ3LWlitc_jnvtlV6UWKNjOftbu32cotcD4v-MfNIBqAeY1-CvkM53Q86F-kLP-8jxcmrcJO5PWZQ15FpNfLMpX8ElpBV85rYw9rG7OkCXFjbPCb9O3szD7-mk3ZCDsQKHPojIrXgxR3E_-89VhZ_vYXSgVJLD',
   },
   {
     id: 'deal-4',
-    name: 'Pena Presisi Logam Billet',
+    name: 'Pena Presisi Titanium & Kuningan',
     category: 'Alat Tulis',
     discount: 'HEMAT 30%',
     rating: '4.8',
@@ -69,7 +69,7 @@ const flashDeals = [
     price: 720000,
     originalPrice: 1050000,
     image:
-      'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=500&auto=format&fit=crop&q=80',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuCtGtrTCVBPJytnec8yoiKZ2iY9yzFgcAGMVbDl8vffvV6ZEoNZFfgeDAQvYGDQ9PHSAAxfVK2j8hKUAZ8b8VxmoAnLrSjVNR8ihTPjQ6pP4gUAImGZd2tG7Lzf12mjzZ9daMM6X8wl7uLjiCTNo0sgJqsJX1aqeuE6NGKVIOcdjxjMbFEaL7kqquFVa0SMIXQWDpPCysw4-xUBBBhXrgB7_alEgVQ5G1N_PIViWD7Wd3vqGT2JE6cr',
   },
 ]
 
@@ -82,7 +82,7 @@ const featuredCategories = [
     desc: 'Audio resolusi tinggi, perangkat pintar nirkabel, keyboard mekanikal, dan adaptor daya presisi.',
     cta: 'Lihat Koleksi Tech',
     image:
-      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&auto=format&fit=crop&q=80',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuCmvA8rTc663X0aMY0i5AsRtnJWHHEMBE15l26ff2OBzeQ4YDMUc2bIfeMkM1wTrGpE8S1YpwKD1VFVOTPX83GWEoIoe_Wa5MeCsuOmxDtwLGsMeIlQpoOx_MrCo-cewC9QSL9DbpyFqpGe5CRkiClgbq2Ky9rCJ0x0lVhK8dgvYyfzRf9uFB-43LAqvdnR3zkN9hNg27b6fzEk8dmLSQTX2fxG3PRKyc-Ag1IX7VVNaYXvISjMYLi4',
     spanTwo: true,
   },
   {
@@ -92,7 +92,7 @@ const featuredCategories = [
     desc: 'Peralatan seduh kopi manual, gelas kaca borosilikat tahan panas, dan keramik meja makan minimalis.',
     cta: 'Lihat Koleksi Rumah',
     image:
-      'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop&q=80',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDDdnlKb3T3WJuD42WKCuYWlCi4su1XSA6opLKqIdBufFf2I89pgRHDlMhA-UQF8FA_W3JOC97K0Q67vQxjw_-tNPtI8Emhlv4itv2QxeDnZLfXVHK1pvqKMf3q_32bMom_wtTevyGn9RDkAPGYTJQyVapwhGLWNqs0sM8vT8WYthdz-1U1PIzS4aiuVS1jCvjsJtrrE3FBMRl_xhjHgG0XQOOBR7eT595CX28mslcd4ewk9ikvHvjQ',
     spanTwo: false,
   },
   {
@@ -102,7 +102,7 @@ const featuredCategories = [
     desc: 'Kursi ergonomis, meja modular solid, dan sistem rak penyimpanan terorganisir untuk ruang kerja.',
     cta: 'Lihat Koleksi Furnitur',
     image:
-      'https://images.unsplash.com/photo-1580481077195-c228303d8392?w=600&auto=format&fit=crop&q=80',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuBc4XLDPg-9mRKQs1TlWbx1Sb6XRiOWWni_U00DefHZgPir91Sh9rS7GKOm0M2z7-S_5MPydGZ4snKfV2T-45YtfmX164d7iygok6Xq5dDum6OvvemCbgkUxAQ5UejU182htov0POdSz3dv8rCbDOIL8RdpkpYwK8qlbeuhBv98GLCvxB8t7BKzw5Yw2aMy-fX1H5itwB8_gTE1ZqTCstf34P3WDCDvrtao2RT1FG0WniZroxgjAw0i',
     spanTwo: false,
   },
   {
@@ -112,7 +112,7 @@ const featuredCategories = [
     desc: 'Tas selempang harian, kaus katun organik combed, dan jam tangan fungsional berdaya tahan tinggi.',
     cta: 'Lihat Koleksi Pakaian',
     image:
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAmK-nhltzS02RWfXj2Rx0Z8IvcV4TaPXHuYYeWMUhax_zC2LYbpNt--0RSd434mVakffTmk5s3va6NmCFXP32mL8xAUGwVx2oxYnYz_MI8jzlChs_vH53-QpQZQN9HgXIrNIxEUh-Gqko7SDdTs-v0pIb9qEn65QsCAFwAPLeEveKSsEmDVLW9YfSvaX7Q_HkhaHpfmUVv35TntI0JCNP3GnMk9WRyV4KVSnNZt_4xLlROZJMms7kg',
     spanTwo: false,
   },
   {
@@ -122,7 +122,7 @@ const featuredCategories = [
     desc: 'Pena presisi berbobot mantap, buku catatan bergaris halus, dan penggaris segitiga arsitektural.',
     cta: 'Lihat Koleksi Alat Tulis',
     image:
-      'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=600&auto=format&fit=crop&q=80',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuBPUa0JzIOqwWaWZqIgu4I0PA1v7YbfFltproG-m3AwYxCiPhIouH_GwoAtPLqA3FnGnU-OMudyp3jajkJzdlcRAWIpVL0-paLzRvVRqx_L1jA73N31qDSXEo2y5pCl1pUeK734CTQrN5Eg_3ZGqZpnALspE46_3lMJDtkCoUBQC7202e3hqxG0XYEjKXtFPoKfZt_EtUzxp1sujWSSVRhcd1F4Kw9OTlD8ICNKKBY46ME_8Zpbu1K5',
     spanTwo: false,
   },
 ]
@@ -246,7 +246,7 @@ onMounted(async () => {
             >
               <img
                 class="w-full h-80 sm:h-96 object-cover group-hover:scale-105 transition-transform duration-500"
-                src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwVY6_XJIJ--I5tlVeVHvg6ErT_oBXt2avwd8dlAuTVukdzmLAppAhyNQAGXm3rQFEX1mHUEJ1GZ0wxvknebBIyNihYqTnXUswGHZuBSXpTUJrW6irkYFSwJUdz3lXaf3SIaU32wSKZaVrV6lC7Krf-diQ9YtZ80tMZPN0gDm7158w3dT3TGRm9DJY3Zr0K4RKBXS_5cVnFyD0hA50xpvdjViEWoa2fQmCh6xzjHcub1jp-D9HREja"
                 alt="Headphone Nirkabel Studio"
               />
               <div
@@ -269,7 +269,7 @@ onMounted(async () => {
               >
                 <img
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  src="https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&auto=format&fit=crop&q=80"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhuBSFbEmAvUs-dIR2YRW-AgUpd_FXgqc62yOMrFXAqiJxphILJy3g73g9zMSiczWs5C_QAJAN1CjOVg_pzST382d0uUBGS5pFhsCPOFK1nOrZaHe-97eQ5JqcvSwsi3UzEkT3yFNe2vkYGKvByoxn2fF4xlojiv56WR8B1rwrUZFxLT-WZVzHWHvp1T17Fqfe44ym_WRhnIIM_2T_g3dkxEIvLv9oyO86-o48wqWDKZfPrK2obggw"
                   alt="Lampu Meja Kerja"
                 />
                 <span
@@ -284,7 +284,7 @@ onMounted(async () => {
               >
                 <img
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=80"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaW1aKJlLR-zy1At4XWYvwZTHyVzcedxmF5czH_xXSLAw5u-HsTZgUrlfag8Lcz8Wy41SeSwYS-HeeyVsHZK3HIKWSVxEmb50sDQgwEwzPqy8Tk7DfzdvdVw4uC3VyiWSo8w_SV806yxW6xxj4tygQ5PGNzL4_0kdeany5eVB7SlX4r2_9T2mzzvz4Eqy6YNr5Hqd0-C230EfZJntIcrv_ptSdiTpKbYG9ESr-91MiSkickFdwXSq7"
                   alt="Tas Komuter Multifungsi"
                 />
                 <span
