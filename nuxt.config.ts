@@ -37,6 +37,15 @@ export default defineNuxtConfig({
     cssPath: '~/assets/css/main.css',
   },
 
+  // Abaikan nested worktree Kilo (.kilo/) agar Vite watcher + HMR tidak melambat.
+  vite: {
+    server: {
+      watch: {
+        ignored: ['**/.kilo/**'],
+      },
+    },
+  },
+
   primevue: {
     options: {
       theme: {

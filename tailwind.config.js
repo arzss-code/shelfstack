@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  // Ikut OS (prefers-color-scheme), sama seperti PrimeVue darkModeSelector: 'system'.
+  // Jangan pakai 'class' agar tidak tabrakan: satu sumber kebenaran mode gelap.
+  darkMode: 'media',
   content: [
     './app/**/*.{js,vue,ts}',
     './components/**/*.{js,vue,ts}',
@@ -12,6 +15,23 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Token brand storefront (DESIGN.md). Nilai hidup di main.css sebagai
+        // CSS variable + override dark-mode. Ganti warna cukup di SATU tempat.
+        brand: {
+          canvas: 'var(--brand-canvas)',
+          ink: 'var(--brand-ink)',
+          onink: 'var(--brand-onink)',
+          inkhover: 'var(--brand-inkhover)',
+          body: 'var(--brand-body)',
+          muted: 'var(--brand-muted)',
+          faint: 'var(--brand-faint)',
+          hair: 'var(--brand-hair)',
+          hairsoft: 'var(--brand-hairsoft)',
+          soft: 'var(--brand-soft)',
+          cobalt: 'var(--brand-cobalt)',
+          cobaltdeep: 'var(--brand-cobaltdeep)',
+          strip: 'var(--brand-strip)',
+        },
         primary: {
           50: 'var(--p-primary-50)',
           100: 'var(--p-primary-100)',
