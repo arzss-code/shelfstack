@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useProductStore } from '~/features/products/stores/product'
 import { useToast } from 'primevue/usetoast'
+import { useCategories } from '~/composables/useCategories'
 import ProductList from '~/features/products/components/ProductList.vue'
 
 useSeoMeta({
@@ -13,6 +14,7 @@ const productStore = useProductStore()
 const toast = useToast()
 const route = useRoute()
 const router = useRouter()
+const { categories: dynamicCategories, fetchCategories, CATEGORY_KEYWORDS } = useCategories()
 
 const searchQuery = ref((route.query.q as string) || '')
 const selectedCategory = ref((route.query.category as string) || 'all')
@@ -21,47 +23,15 @@ const selectedSort = ref('featured')
 const gridDensity = ref<'compact' | 'spacious'>('compact')
 const showMobileFilterModal = ref(false)
 
-const categories = [
-  { id: 'all', label: 'Semua Kategori', keywords: [] },
-  {
-    id: 'tech',
-    label: 'Teknologi & Gadget',
-    keywords: [
-      'keyboard',
-      'audio',
-      'charge',
-      'usb',
-      'monitor',
-      'stand',
-      'dock',
-      'hub',
-      'kabel',
-      'mouse',
-      'sound',
-      'gadget',
-    ],
-  },
-  {
-    id: 'home',
-    label: 'Dekorasi & Rumah',
-    keywords: ['organizer', 'tray', 'pot', 'vas', 'dekorasi', 'mat', 'lampu', 'home', 'rumah'],
-  },
-  {
-    id: 'furniture',
-    label: 'Furnitur & Meja',
-    keywords: ['meja', 'kursi', 'desk', 'chair', 'rak', 'shelf', 'furnitur', 'bangku'],
-  },
-  {
-    id: 'lifestyle',
-    label: 'Pakaian & Gaya Hidup',
-    keywords: ['tas', 'case', 'dompet', 'jaket', 'sleeve', 'edc', 'lifestyle'],
-  },
-  {
-    id: 'stationery',
-    label: 'Alat Tulis & Kantor',
-    keywords: ['pen', 'notebook', 'buku', 'planner', 'pad', 'tulis', 'kantor'],
-  },
-]
+// Kategori filter chips — dibangun dari data dinamis
+const categories = computed(() => [
+  { id: 'all', label: 'Semua Kategori', keywords: [] as string[] },
+  ...dynamicCategories.value.map((c) => ({
+    id: c.slug,
+    label: c.name,
+    keywords: CATEGORY_KEYWORDS[c.slug] ?? [],
+  })),
+])
 
 const sortOptions = [
   { id: 'featured', label: 'Pilihan Kurator' },
@@ -79,7 +49,7 @@ const priceRanges = [
 
 onMounted(async () => {
   try {
-    await productStore.fetchProducts()
+    await Promise.all([productStore.fetchProducts(), fetchCategories()])
   } catch (error: unknown) {
     toast.add({
       severity: 'error',
@@ -113,7 +83,7 @@ const filteredProducts = computed(() => {
 
   // 2. Category Filter
   if (selectedCategory.value !== 'all') {
-    const cat = categories.find((c) => c.id === selectedCategory.value)
+    const cat = categories.value.find((c) => c.id === selectedCategory.value)
     if (cat && cat.keywords.length > 0) {
       list = list.filter((p) => {
         const text = `${p.name} ${p.description || ''}`.toLowerCase()

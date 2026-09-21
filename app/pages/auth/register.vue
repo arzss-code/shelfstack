@@ -72,7 +72,7 @@ const handleGoogle = async () => {
   <div class="min-h-[75vh] flex flex-col items-center justify-center py-8 sm:py-12 px-4">
     <!-- Card Container -->
     <div
-      class="w-full max-w-[480px] bg-brand-canvas border border-brand-hair rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-floating"
+      class="w-full max-w-[460px] bg-brand-canvas border border-brand-hair rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-floating"
     >
       <!-- Brand Header -->
       <div class="flex flex-col items-center text-center mb-8">
@@ -80,98 +80,117 @@ const handleGoogle = async () => {
           <AppLogo />
         </NuxtLink>
         <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
-          Daftar
+          Buat Akun
         </h1>
         <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1.5 leading-relaxed">
-          Buat akun baru untuk kemudahan transaksi, pelacakan pengiriman, dan penawaran khusus.
+          Daftar gratis dan mulai belanja produk kurasi terbaik ShelfStack.
         </p>
       </div>
 
       <!-- Register Form -->
       <form novalidate class="flex flex-col gap-4" @submit.prevent="handleRegister">
+        <!-- Full Name -->
         <div class="flex flex-col gap-1.5">
           <label for="full_name" class="text-xs sm:text-sm font-semibold text-brand-ink">
             Nama Lengkap
           </label>
-          <InputText
+          <input
             id="full_name"
             v-model="fullName"
+            type="text"
             autocomplete="name"
-            placeholder="Nama kamu"
-            class="w-full"
-            :invalid="!!errors.full_name"
+            placeholder="Nama lengkap Anda"
+            :class="[
+              'w-full h-11 px-4 rounded-xl border text-sm text-brand-ink bg-white placeholder:text-zinc-400 outline-none transition-all',
+              errors.full_name
+                ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-200'
+                : 'border-zinc-300 focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/10',
+            ]"
           />
           <small v-if="errors.full_name" class="text-red-500 text-xs font-medium mt-0.5">
             {{ errors.full_name }}
           </small>
         </div>
 
+        <!-- Email -->
         <div class="flex flex-col gap-1.5">
           <label for="email" class="text-xs sm:text-sm font-semibold text-brand-ink">
             Alamat Email
           </label>
-          <InputText
+          <input
             id="email"
             v-model="email"
             type="email"
             autocomplete="email"
             placeholder="nama@email.com"
-            class="w-full"
-            :invalid="!!errors.email"
+            :class="[
+              'w-full h-11 px-4 rounded-xl border text-sm text-brand-ink bg-white placeholder:text-zinc-400 outline-none transition-all',
+              errors.email
+                ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-200'
+                : 'border-zinc-300 focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/10',
+            ]"
           />
           <small v-if="errors.email" class="text-red-500 text-xs font-medium mt-0.5">
             {{ errors.email }}
           </small>
         </div>
 
+        <!-- Password -->
         <div class="flex flex-col gap-1.5">
           <label for="password" class="text-xs sm:text-sm font-semibold text-brand-ink">
             Kata Sandi
           </label>
-          <Password
+          <input
             id="password"
             v-model="password"
-            toggle-mask
+            type="password"
             autocomplete="new-password"
             placeholder="Minimal 8 karakter"
-            input-class="w-full"
-            class="w-full"
-            :invalid="!!errors.password"
+            :class="[
+              'w-full h-11 px-4 rounded-xl border text-sm text-brand-ink bg-white placeholder:text-zinc-400 outline-none transition-all',
+              errors.password
+                ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-200'
+                : 'border-zinc-300 focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/10',
+            ]"
           />
           <small v-if="errors.password" class="text-red-500 text-xs font-medium mt-0.5">
             {{ errors.password }}
           </small>
         </div>
 
+        <!-- Confirm Password -->
         <div class="flex flex-col gap-1.5">
           <label for="confirm_password" class="text-xs sm:text-sm font-semibold text-brand-ink">
             Konfirmasi Kata Sandi
           </label>
-          <Password
+          <input
             id="confirm_password"
             v-model="confirmPassword"
-            :feedback="false"
-            toggle-mask
+            type="password"
             autocomplete="new-password"
-            placeholder="Ulangi password"
-            input-class="w-full"
-            class="w-full"
-            :invalid="!!errors.confirm_password"
+            placeholder="Ulangi kata sandi"
+            :class="[
+              'w-full h-11 px-4 rounded-xl border text-sm text-brand-ink bg-white placeholder:text-zinc-400 outline-none transition-all',
+              errors.confirm_password
+                ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-200'
+                : 'border-zinc-300 focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/10',
+            ]"
           />
           <small v-if="errors.confirm_password" class="text-red-500 text-xs font-medium mt-0.5">
             {{ errors.confirm_password }}
           </small>
         </div>
 
-        <Button
+        <!-- Primary CTA Button -->
+        <button
           type="submit"
-          label="Buat Akun"
-          icon="pi pi-user-plus"
-          severity="contrast"
-          rounded
-          class="w-full h-11 font-semibold text-sm cursor-pointer mt-2 shadow-whisper"
-          :loading="pending"
-        />
+          :disabled="pending"
+          class="mt-2 w-full h-11 rounded-full bg-brand-ink text-white text-sm font-bold tracking-wide hover:bg-black active:scale-[0.98] transition-all shadow-whisper flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+        >
+          <i v-if="pending" class="pi pi-spin pi-spinner text-xs" />
+          <i v-else class="pi pi-user-plus text-xs" />
+          <span>{{ pending ? 'Memproses...' : 'Buat Akun' }}</span>
+        </button>
       </form>
 
       <!-- Divider -->
@@ -185,18 +204,17 @@ const handleGoogle = async () => {
       </div>
 
       <!-- Google OAuth -->
-      <Button
-        label="Daftar dengan Google"
-        icon="pi pi-google"
-        severity="secondary"
-        outlined
-        rounded
-        class="w-full h-11 font-semibold text-sm cursor-pointer hover:bg-brand-canvas-soft transition-colors"
-        :loading="pending"
+      <button
+        type="button"
+        :disabled="pending"
+        class="w-full h-11 rounded-full border border-zinc-300 hover:border-zinc-400 bg-white text-brand-ink text-sm font-semibold hover:bg-zinc-50 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
         @click="handleGoogle"
-      />
+      >
+        <i class="pi pi-google text-sm" />
+        <span>Daftar dengan Google</span>
+      </button>
 
-      <!-- Benefits / Trust List -->
+      <!-- Security / Trust Reassurance -->
       <div
         class="mt-6 pt-5 border-t border-brand-hairsoft flex items-center justify-center gap-4 text-[11px] text-brand-muted"
       >

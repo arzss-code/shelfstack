@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { useAuth } from '~/features/auth/composables/useAuth'
+import { useCategories } from '~/composables/useCategories'
 import AppLogo from './AppLogo.vue'
 
 const { user, profile, isAdmin, fetchProfile, signOut } = useAuth()
+const {
+  categories: dynamicCategories,
+  categoryMap: dynamicCategoryMap,
+  fetchCategories,
+} = useCategories()
 const router = useRouter()
 
 const isMobileMenuOpen = ref(false)
@@ -11,17 +17,24 @@ const isUserMenuOpen = ref(false)
 const searchQuery = ref('')
 const selectedCategory = ref('Semua Kategori')
 
-const categories = [
+// Daftar dropdown kategori termasuk opsi "Semua Kategori" di awal
+const dropdownCategories = computed(() => [
   'Semua Kategori',
-  'Tech & Gadget',
-  'Rumah & Dapur',
-  'Furnitur & Ruang Kerja',
-  'Pakaian & Aksesoris',
-  'Alat Tulis & Kerajinan',
-]
+  ...dynamicCategories.value.map((c) => c.name),
+])
 
-onMounted(() => {
+// Sub-nav pita kategori — dibangun dinamis dari data
+const subNavCategories = computed(() => [
+  { name: 'Semua Produk', path: '/katalog' },
+  ...dynamicCategories.value.map((c) => ({
+    name: c.name,
+    path: `/katalog?category=${c.slug}`,
+  })),
+])
+
+onMounted(async () => {
   fetchProfile()
+  await fetchCategories()
 })
 
 const displayName = computed(
@@ -38,33 +51,16 @@ const handleSearch = () => {
   isMobileMenuOpen.value = false
 }
 
-const categoryMap: Record<string, string> = {
-  'Tech & Gadget': 'tech',
-  'Rumah & Dapur': 'home',
-  'Furnitur & Ruang Kerja': 'furniture',
-  'Pakaian & Aksesoris': 'lifestyle',
-  'Alat Tulis & Kerajinan': 'stationery',
-}
-
 const selectCategory = (cat: string) => {
   selectedCategory.value = cat
   isCategoryDropdownOpen.value = false
-  const catId = categoryMap[cat]
-  if (catId) {
-    router.push({ path: '/katalog', query: { category: catId } })
+  const catSlug = dynamicCategoryMap.value[cat]
+  if (catSlug) {
+    router.push({ path: '/katalog', query: { category: catSlug } })
   } else {
     router.push('/katalog')
   }
 }
-
-const subNavCategories = [
-  { name: 'Semua Produk', path: '/katalog' },
-  { name: 'Tech & Gadget', path: '/katalog?category=tech' },
-  { name: 'Rumah & Dapur', path: '/katalog?category=home' },
-  { name: 'Furnitur & Ruang Kerja', path: '/katalog?category=furniture' },
-  { name: 'Pakaian & Aksesoris', path: '/katalog?category=lifestyle' },
-  { name: 'Alat Tulis & Kerajinan', path: '/katalog?category=stationery' },
-]
 
 const handleLogout = async () => {
   isUserMenuOpen.value = false
@@ -134,7 +130,7 @@ const handleLogout = async () => {
                 class="absolute left-0 top-full mt-2 w-56 bg-white border border-brand-hair rounded-card shadow-floating py-2 z-50"
               >
                 <button
-                  v-for="cat in categories"
+                  v-for="cat in dropdownCategories"
                   :key="cat"
                   type="button"
                   class="w-full text-left px-4 py-2 text-xs font-medium text-brand-ink hover:bg-brand-canvas-soft transition-colors flex items-center justify-between cursor-pointer"

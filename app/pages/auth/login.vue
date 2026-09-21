@@ -85,14 +85,18 @@ const handleGoogle = async () => {
           <label for="email" class="text-xs sm:text-sm font-semibold text-brand-ink">
             Alamat Email
           </label>
-          <InputText
+          <input
             id="email"
             v-model="email"
             type="email"
             autocomplete="email"
             placeholder="nama@email.com"
-            class="w-full"
-            :invalid="!!errors.email"
+            :class="[
+              'w-full h-11 px-4 rounded-xl border text-sm text-brand-ink bg-white placeholder:text-zinc-400 outline-none transition-all',
+              errors.email
+                ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-200'
+                : 'border-zinc-300 focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/10',
+            ]"
           />
           <small v-if="errors.email" class="text-red-500 text-xs font-medium mt-0.5">
             {{ errors.email }}
@@ -104,37 +108,43 @@ const handleGoogle = async () => {
             <label for="password" class="text-xs sm:text-sm font-semibold text-brand-ink">
               Kata Sandi
             </label>
-            <span
-              class="text-xs text-brand-muted hover:text-brand-ink cursor-pointer transition-colors"
+            <NuxtLink
+              to="/auth/forgot-password"
+              class="text-xs text-brand-accent hover:underline font-medium no-underline"
             >
               Lupa sandi?
-            </span>
+            </NuxtLink>
           </div>
-          <Password
-            id="password"
-            v-model="password"
-            :feedback="false"
-            toggle-mask
-            autocomplete="current-password"
-            placeholder="••••••••"
-            input-class="w-full"
-            class="w-full"
-            :invalid="!!errors.password"
-          />
+          <div class="relative">
+            <input
+              id="password"
+              v-model="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="••••••••"
+              :class="[
+                'w-full h-11 px-4 pr-12 rounded-xl border text-sm text-brand-ink bg-white placeholder:text-zinc-400 outline-none transition-all',
+                errors.password
+                  ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-200'
+                  : 'border-zinc-300 focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/10',
+              ]"
+            />
+          </div>
           <small v-if="errors.password" class="text-red-500 text-xs font-medium mt-0.5">
             {{ errors.password }}
           </small>
         </div>
 
-        <Button
+        <!-- Primary CTA Button -->
+        <button
           type="submit"
-          label="Masuk"
-          icon="pi pi-sign-in"
-          severity="contrast"
-          rounded
-          class="w-full h-11 font-semibold text-sm cursor-pointer mt-2 shadow-whisper"
-          :loading="pending"
-        />
+          :disabled="pending"
+          class="mt-2 w-full h-11 rounded-full bg-brand-ink text-white text-sm font-bold tracking-wide hover:bg-black active:scale-[0.98] transition-all shadow-whisper flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+        >
+          <i v-if="pending" class="pi pi-spin pi-spinner text-xs" />
+          <i v-else class="pi pi-sign-in text-xs" />
+          <span>{{ pending ? 'Memproses...' : 'Masuk' }}</span>
+        </button>
       </form>
 
       <!-- Divider -->
@@ -148,16 +158,15 @@ const handleGoogle = async () => {
       </div>
 
       <!-- Google OAuth -->
-      <Button
-        label="Masuk dengan Google"
-        icon="pi pi-google"
-        severity="secondary"
-        outlined
-        rounded
-        class="w-full h-11 font-semibold text-sm cursor-pointer hover:bg-brand-canvas-soft transition-colors"
-        :loading="pending"
+      <button
+        type="button"
+        :disabled="pending"
+        class="w-full h-11 rounded-full border border-zinc-300 hover:border-zinc-400 bg-white text-brand-ink text-sm font-semibold hover:bg-zinc-50 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
         @click="handleGoogle"
-      />
+      >
+        <i class="pi pi-google text-sm" />
+        <span>Masuk dengan Google</span>
+      </button>
 
       <!-- Security / Trust Reassurance -->
       <div

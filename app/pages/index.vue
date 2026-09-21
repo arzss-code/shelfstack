@@ -96,7 +96,7 @@ const featuredCategories = [
     spanTwo: false,
   },
   {
-    name: 'Furnitur & Meja Kerja',
+    name: 'Furnitur & Ruang Kerja',
     category: 'furniture',
     count: '180 Produk',
     desc: 'Kursi ergonomis, meja modular solid, dan sistem rak penyimpanan terorganisir untuk ruang kerja.',

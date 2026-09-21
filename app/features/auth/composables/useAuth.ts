@@ -13,6 +13,11 @@ const SUPABASE_ERROR_ID: Array<[RegExp, string]> = [
   [/password should be at least/i, 'Password terlalu lemah (minimal 8 karakter).'],
   [/email not confirmed/i, 'Email belum dikonfirmasi. Cek inbox kamu.'],
   [/too many requests/i, 'Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.'],
+  [
+    /email link is invalid or has expired/i,
+    'Tautan reset password sudah tidak berlaku. Minta ulang.',
+  ],
+  [/user not found/i, 'Email tidak ditemukan. Periksa kembali alamat email Anda.'],
 ]
 
 function toIndonesianMessage(error: { message: string }, fallback: string) {
@@ -91,6 +96,35 @@ export function useAuth() {
     await navigateTo('/')
   }
 
+  /**
+   * Mengirim email tautan reset password ke alamat yang diberikan.
+   * Supabase akan mengirim tautan ke `redirectTo`, di mana user dapat mengatur password baru.
+   */
+  const sendPasswordResetEmail = async (email: string) => {
+    pending.value = true
+    try {
+      const redirectTo = `${window.location.origin}/auth/reset-password`
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+      if (error) throw new Error(toIndonesianMessage(error, 'Gagal mengirim email reset password.'))
+    } finally {
+      pending.value = false
+    }
+  }
+
+  /**
+   * Mengupdate password user yang sudah login melalui tautan reset.
+   * Harus dipanggil di halaman `/auth/reset-password` setelah Supabase menginisiasi sesi dari magic link.
+   */
+  const updatePassword = async (newPassword: string) => {
+    pending.value = true
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      if (error) throw new Error(toIndonesianMessage(error, 'Gagal memperbarui password.'))
+    } finally {
+      pending.value = false
+    }
+  }
+
   return {
     user,
     profile,
@@ -102,5 +136,7 @@ export function useAuth() {
     signIn,
     signInWithGoogle,
     signOut,
+    sendPasswordResetEmail,
+    updatePassword,
   }
 }
