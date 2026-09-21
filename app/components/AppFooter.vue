@@ -14,7 +14,6 @@
         <div class="lg:col-span-5 flex flex-col items-start gap-4">
           <div class="flex items-center gap-3">
             <AppLogo variant="inverse" size="lg" />
-            <span class="w-2 h-2 rounded-full bg-brand-accent animate-pulse" />
           </div>
           <p class="font-body text-sm leading-relaxed text-white/70 max-w-sm m-0">
             Kurasi perlengkapan kerja, audio, furnitur, dan kebutuhan rumah tangga modern dengan
