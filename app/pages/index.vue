@@ -218,22 +218,37 @@ onMounted(async () => {
             </NuxtLink>
           </div>
 
-          <!-- Reassurance Trust Points -->
-          <div class="pt-3 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-brand-muted">
-            <span class="flex items-center gap-1.5">
-              <i class="pi pi-check-circle text-brand-success text-xs" />
-              <span>100% Produk Original</span>
-            </span>
-            <span class="text-brand-faint">•</span>
-            <span class="flex items-center gap-1.5">
-              <i class="pi pi-truck text-brand-ink text-xs" />
-              <span>Pengiriman Cepat 24 Jam</span>
-            </span>
-            <span class="text-brand-faint">•</span>
-            <span class="flex items-center gap-1.5">
-              <i class="pi pi-shield text-brand-accent text-xs" />
-              <span>Garansi 30 Hari</span>
-            </span>
+          <!-- Informative Store Credibility Highlights -->
+          <div class="pt-5 border-t border-brand-hair/60 grid grid-cols-3 gap-4 max-w-md">
+            <div>
+              <p
+                class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tracking-tight"
+              >
+                1.300+
+              </p>
+              <p class="font-body text-xs text-brand-muted m-0 mt-0.5 font-medium">
+                Produk Pilihan
+              </p>
+            </div>
+            <div>
+              <p
+                class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tracking-tight"
+              >
+                5 Kategori
+              </p>
+              <p class="font-body text-xs text-brand-muted m-0 mt-0.5 font-medium">
+                Kerja &amp; Rumah
+              </p>
+            </div>
+            <div>
+              <p
+                class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tracking-tight flex items-center gap-1"
+              >
+                <span>4.9</span>
+                <i class="pi pi-star-fill text-xs text-brand-warning" />
+              </p>
+              <p class="font-body text-xs text-brand-muted m-0 mt-0.5 font-medium">18rb+ Ulasan</p>
+            </div>
           </div>
         </div>
 
@@ -299,66 +314,68 @@ onMounted(async () => {
       </div>
     </section>
 
-    <!-- SECTION 2: 4 VALUE PROPOSITIONS -->
-    <section class="w-full bg-brand-canvas-soft border border-brand-hair rounded-card p-6 sm:p-8">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="flex items-center gap-3">
+    <!-- SECTION 2: 4 SHOPPING ASSURANCES (Bilah Kebijakan Belanja Terpercaya) -->
+    <section
+      class="w-full bg-white border border-brand-hair rounded-card p-5 sm:p-6 shadow-whisper"
+    >
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4 divide-y sm:divide-y-0 sm:divide-x divide-brand-hairsoft"
+      >
+        <div class="flex items-center gap-3.5 sm:px-3">
           <div
-            class="w-10 h-10 rounded-full bg-white border border-brand-hair flex items-center justify-center shrink-0 shadow-whisper text-brand-ink"
+            class="w-11 h-11 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center shrink-0 text-brand-accent shadow-whisper"
           >
-            <i class="pi pi-verified text-base text-brand-accent" />
+            <i class="pi pi-verified text-lg" />
           </div>
           <div>
-            <h4 class="font-display m-0 text-xs font-bold uppercase tracking-wider text-brand-ink">
-              100% Terverifikasi Asli
-            </h4>
-            <p class="font-body m-0 text-xs text-brand-muted">
-              Kurasi langsung dari produsen resmi
+            <h4 class="font-display m-0 text-sm font-bold text-brand-ink">100% Produk Original</h4>
+            <p class="font-body m-0 text-xs text-brand-muted mt-0.5">
+              Jaminan keaslian resmi langsung dari produsen
             </p>
           </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3.5 pt-4 sm:pt-0 sm:px-3">
           <div
-            class="w-10 h-10 rounded-full bg-white border border-brand-hair flex items-center justify-center shrink-0 shadow-whisper text-brand-ink"
+            class="w-11 h-11 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center shrink-0 text-brand-ink shadow-whisper"
           >
-            <i class="pi pi-truck text-base text-brand-ink" />
+            <i class="pi pi-truck text-lg" />
           </div>
           <div>
-            <h4 class="font-display m-0 text-xs font-bold uppercase tracking-wider text-brand-ink">
-              Pengiriman Cepat 24 Jam
+            <h4 class="font-display m-0 text-sm font-bold text-brand-ink">
+              Gratis Ongkir Se-Indonesia
             </h4>
-            <p class="font-body m-0 text-xs text-brand-muted">
-              Kemasan ekstra aman &amp; berasuransi
+            <p class="font-body m-0 text-xs text-brand-muted mt-0.5">
+              Bebas ongkos kirim min. belanja Rp500.000
             </p>
           </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3.5 pt-4 sm:pt-0 sm:px-3">
           <div
-            class="w-10 h-10 rounded-full bg-white border border-brand-hair flex items-center justify-center shrink-0 shadow-whisper text-brand-ink"
+            class="w-11 h-11 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center shrink-0 text-brand-ink shadow-whisper"
           >
-            <i class="pi pi-replay text-base text-brand-ink" />
+            <i class="pi pi-replay text-lg" />
           </div>
           <div>
-            <h4 class="font-display m-0 text-xs font-bold uppercase tracking-wider text-brand-ink">
-              Garansi 30 Hari Kembali
-            </h4>
-            <p class="font-body m-0 text-xs text-brand-muted">Jaminan tukar barang tanpa repot</p>
+            <h4 class="font-display m-0 text-sm font-bold text-brand-ink">Garansi Retur 30 Hari</h4>
+            <p class="font-body m-0 text-xs text-brand-muted mt-0.5">
+              Jaminan tukar baru jika barang cacat atau tidak sesuai
+            </p>
           </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3.5 pt-4 sm:pt-0 sm:px-3">
           <div
-            class="w-10 h-10 rounded-full bg-white border border-brand-hair flex items-center justify-center shrink-0 shadow-whisper text-brand-ink"
+            class="w-11 h-11 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center shrink-0 text-brand-accent shadow-whisper"
           >
-            <i class="pi pi-comments text-base text-brand-ink" />
+            <i class="pi pi-comments text-lg" />
           </div>
           <div>
-            <h4 class="font-display m-0 text-xs font-bold uppercase tracking-wider text-brand-ink">
-              Layanan Pelanggan Ramah
-            </h4>
-            <p class="font-body m-0 text-xs text-brand-muted">Bantuan cepat untuk setiap pesanan</p>
+            <h4 class="font-display m-0 text-sm font-bold text-brand-ink">Layanan Bantuan 24/7</h4>
+            <p class="font-body m-0 text-xs text-brand-muted mt-0.5">
+              Respon cepat untuk konsultasi dan lacak pesanan
+            </p>
           </div>
         </div>
       </div>
