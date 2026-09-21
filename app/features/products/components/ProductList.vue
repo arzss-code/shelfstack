@@ -6,6 +6,8 @@ defineProps<{
   loading: boolean
   isSearching?: boolean
   isTrash?: boolean
+  /** Mode etalase publik: sembunyikan tombol edit/hapus, kartu klik ke detail. */
+  hideActions?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -23,7 +25,7 @@ const router = useRouter()
     <div v-if="loading" class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
       <Card v-for="i in 6" :key="i">
         <template #header>
-          <Skeleton height="200px" style="border-radius: 12px 12px 0 0" />
+          <Skeleton height="200px" style="border-radius: 32px 32px 0 0" />
         </template>
         <template #title>
           <Skeleton width="80%" height="1.5rem" />
@@ -101,18 +103,19 @@ const router = useRouter()
       <div
         v-for="product in products"
         :key="product.id"
-        class="product-card"
+        class="product-card group"
         @click="router.push(`/product/${product.id}`)"
       >
         <!-- Image Container -->
         <div
-          class="relative pt-[66.66%] w-full border-b border-surface-200 dark:border-surface-800"
+          class="relative pt-[66.66%] w-full border-b border-surface-200 dark:border-surface-800 overflow-hidden"
         >
           <img
             v-if="product.image_url"
             :src="product.image_url"
             :alt="product.name"
-            class="absolute top-0 left-0 w-full h-full object-cover object-top"
+            loading="lazy"
+            class="absolute top-0 left-0 w-full h-full object-cover object-top transition-transform duration-300 ease-out group-hover:scale-[1.04]"
           />
           <div
             v-else
@@ -123,16 +126,20 @@ const router = useRouter()
         </div>
 
         <!-- Content -->
-        <div class="p-5 flex flex-col flex-grow">
+        <div class="p-8 flex flex-col flex-grow">
           <h3
-            class="m-0 mb-1 text-[1.15rem] font-semibold text-surface-900 dark:text-surface-0 whitespace-nowrap overflow-hidden text-ellipsis"
+            class="m-0 mb-1 text-2xl font-medium leading-[1.25] text-brand-body whitespace-nowrap overflow-hidden text-ellipsis"
             :title="product.name"
           >
             {{ product.name }}
           </h3>
-          <p class="text-base font-semibold text-primary-600 dark:text-primary-400 mb-3">
+          <p class="text-xl font-bold tabular-nums text-brand-body mb-1">
             Rp {{ product.price.toLocaleString('id-ID') }}
           </p>
+
+          <span class="mb-4 inline-flex items-center gap-1.5 text-base font-bold text-brand-cobalt">
+            Lihat detail <i class="pi pi-arrow-right text-xs" />
+          </span>
 
           <p
             class="m-0 mb-5 text-surface-500 dark:text-surface-400 text-[0.9rem] leading-relaxed line-clamp-2 flex-grow"
@@ -141,7 +148,7 @@ const router = useRouter()
           </p>
 
           <!-- Actions -->
-          <div class="flex justify-between items-center mt-auto" @click.stop>
+          <div v-if="!hideActions" class="flex justify-between items-center mt-auto" @click.stop>
             <a v-if="product.link" :href="product.link" target="_blank" class="product-link">
               <i class="pi pi-external-link text-[0.75rem]" />
               Referensi
@@ -194,23 +201,19 @@ const router = useRouter()
 .product-card {
   display: flex;
   flex-direction: column;
-  background-color: var(--p-content-background);
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 12px;
+  background-color: var(--brand-canvas);
+  border: 1px solid var(--brand-hairsoft);
+  border-radius: 32px;
   overflow: hidden;
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+    transform 0.2s ease-out,
+    border-color 0.2s ease-out;
   cursor: pointer;
   height: 100%;
 }
 .product-card:hover {
-  border-color: var(--p-primary-color);
+  border-color: var(--brand-ink);
   transform: translateY(-4px);
-  box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 .product-link {
   color: var(--p-text-muted-color);
@@ -224,5 +227,15 @@ const router = useRouter()
 }
 .product-link:hover {
   color: var(--p-primary-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card,
+  .product-card img {
+    transition: none;
+  }
+  .product-card:hover {
+    transform: none;
+  }
 }
 </style>

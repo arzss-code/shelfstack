@@ -2,18 +2,21 @@
 import { computed } from 'vue'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
+import type { ActivityLog } from '~/features/activities/composables/useActivities'
+import type { Json } from '~/types/database.types'
 
 const props = defineProps<{
-  activity: any | null
+  activity: ActivityLog | null
 }>()
 
 const visible = defineModel<boolean>('visible', { default: false })
 
-const formatDate = (dateStr: string) => {
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return '-'
   return format(new Date(dateStr), 'dd MMM yyyy, HH:mm', { locale: id })
 }
 
-const formatValue = (val: any) => {
+const formatValue = (val: Json | undefined) => {
   if (val === null || val === undefined || val === '') return '-'
   if (typeof val === 'object') return JSON.stringify(val)
   return String(val)
@@ -21,8 +24,8 @@ const formatValue = (val: any) => {
 
 const selectedActivityChanges = computed(() => {
   if (!props.activity) return []
-  const o = props.activity.old_data || {}
-  const n = props.activity.new_data || {}
+  const o = (props.activity.old_data || {}) as Record<string, Json | undefined>
+  const n = (props.activity.new_data || {}) as Record<string, Json | undefined>
   const keys = Array.from(new Set([...Object.keys(o), ...Object.keys(n)]))
 
   return keys.map((key) => {
