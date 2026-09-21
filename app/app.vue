@@ -1,11 +1,9 @@
 <script setup lang="ts">
 useHead({
   titleTemplate: (titleChunk) => {
-    return titleChunk
-      ? `${titleChunk} | Simple Product CRUD`
-      : "Simple Product CRUD";
+    return titleChunk ? `${titleChunk} | ShelfStack` : 'ShelfStack'
   },
-});
+})
 </script>
 
 <template>

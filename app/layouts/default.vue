@@ -2,7 +2,7 @@
 
 <template>
   <div
-    class="flex flex-col min-h-screen bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-0 transition-colors"
+    class="storefront flex flex-col min-h-screen bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-0 transition-colors"
   >
     <AppNavbar />
 

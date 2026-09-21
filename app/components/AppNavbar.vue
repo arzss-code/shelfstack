@@ -1,54 +1,89 @@
 <script setup lang="ts">
-// Navbar Component
+import { useAuth } from '~/features/auth/composables/useAuth'
+
+const { user, profile, isAdmin, fetchProfile, signOut } = useAuth()
+
+onMounted(() => {
+  fetchProfile()
+})
+
+const displayName = computed(
+  () => profile.value?.full_name || user.value?.email?.split('@')[0] || '',
+)
+const initial = computed(() => displayName.value.charAt(0).toUpperCase() || '?')
+
+// Gaya DESIGN.md: link pasif muted, aktif = pil gelap (button-pill-tab-active).
+// Warna via class brand-* (variabel, otomatis ikut mode gelap). Tanpa dark: manual.
+const linkCls = (isActive: boolean) => [
+  'px-4 py-2 rounded-full text-sm font-bold transition-colors no-underline',
+  isActive ? 'bg-brand-ink text-brand-onink' : 'text-brand-muted hover:text-brand-body',
+]
 </script>
 
 <template>
   <header
-    class="sticky top-0 z-20 flex justify-center px-8 py-4 bg-surface-0/80 dark:bg-surface-950/80 border-b border-surface-200 dark:border-surface-800 shadow-sm backdrop-blur-md"
+    class="sticky top-0 z-20 flex justify-center bg-brand-canvas px-4 border-b border-brand-hairsoft sm:px-8"
   >
-    <div class="flex items-center justify-between w-full max-w-[1200px]">
+    <div class="flex items-center justify-between w-full max-w-[1280px] h-16">
       <!-- Brand Logo -->
       <NuxtLink
         to="/"
-        class="flex items-center gap-3 text-surface-900 dark:text-surface-0 no-underline group"
+        class="flex items-center gap-2.5 no-underline group"
+        aria-label="ShelfStack beranda"
       >
-        <div
-          class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-600 text-white group-hover:scale-105 transition-transform shadow-sm"
+        <span
+          class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-ink text-brand-onink transition-transform group-hover:scale-105"
         >
-          <i class="pi pi-box text-lg" />
-        </div>
-        <h2 class="m-0 text-lg font-bold tracking-tight">Simple Product CRUD</h2>
+          <i class="pi pi-box text-base" />
+        </span>
+        <span class="m-0 text-[17px] font-bold tracking-tight text-brand-ink"> ShelfStack </span>
       </NuxtLink>
 
       <!-- Navigation Links -->
-      <nav class="flex items-center gap-8">
+      <nav class="flex items-center gap-1 sm:gap-2" aria-label="Navigasi utama">
         <NuxtLink v-slot="{ href, navigate, isActive }" to="/" custom>
-          <a
-            :href="href || undefined"
-            :class="[
-              'px-3 py-1.5 rounded-md text-sm font-semibold transition-colors',
-              isActive
-                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400'
-                : 'text-surface-500 hover:text-surface-900 hover:bg-surface-100 dark:text-surface-400 dark:hover:text-surface-0 dark:hover:bg-surface-800',
-            ]"
-            @click="navigate"
-          >
-            Beranda
-          </a>
+          <a :href="href || undefined" :class="linkCls(isActive)" @click="navigate"> Beranda </a>
         </NuxtLink>
-        <NuxtLink v-slot="{ href, navigate, isActive }" to="/admin/activities" custom>
-          <a
-            :href="href || undefined"
-            :class="[
-              'px-3 py-1.5 rounded-md text-sm font-semibold transition-colors',
-              isActive
-                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400'
-                : 'text-surface-500 hover:text-surface-900 hover:bg-surface-100 dark:text-surface-400 dark:hover:text-surface-0 dark:hover:bg-surface-800',
-            ]"
-            @click="navigate"
+        <NuxtLink v-slot="{ href, navigate, isActive }" to="/katalog" custom>
+          <a :href="href || undefined" :class="linkCls(isActive)" @click="navigate"> Katalog </a>
+        </NuxtLink>
+        <NuxtLink v-if="isAdmin" v-slot="{ href, navigate, isActive }" to="/admin/products" custom>
+          <a :href="href || undefined" :class="linkCls(isActive)" @click="navigate"> Kelola </a>
+        </NuxtLink>
+        <NuxtLink
+          v-if="isAdmin"
+          v-slot="{ href, navigate, isActive }"
+          to="/admin/activities"
+          custom
+        >
+          <a :href="href || undefined" :class="linkCls(isActive)" @click="navigate"> Admin </a>
+        </NuxtLink>
+
+        <span class="mx-1 hidden h-5 w-px bg-brand-hairsoft sm:inline-block" />
+
+        <template v-if="user">
+          <span
+            class="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-full bg-brand-ink text-sm font-bold text-brand-onink"
+            :title="displayName"
           >
-            Activity Log
-          </a>
+            {{ initial }}
+          </span>
+          <Button
+            label="Keluar"
+            icon="pi pi-sign-out"
+            severity="secondary"
+            text
+            size="small"
+            rounded
+            @click="signOut"
+          />
+        </template>
+        <NuxtLink
+          v-else
+          to="/auth/login"
+          class="rounded-full bg-brand-ink px-5 py-2.5 text-sm font-bold text-brand-onink no-underline transition-colors hover:bg-brand-inkhover"
+        >
+          Masuk
         </NuxtLink>
       </nav>
     </div>
