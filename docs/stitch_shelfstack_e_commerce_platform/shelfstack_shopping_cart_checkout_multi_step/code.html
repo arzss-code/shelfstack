@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"tertiary":"#585a5a","on-secondary-container":"#636262","field":"#f0f0f0","surface-container-lowest":"#ffffff","secondary":"#5f5e5e","error":"#ba1a1a","on-secondary-fixed-variant":"#474646","primary-fixed-dim":"#b3c5ff","hairline-soft":"#f0f0f0","primary":"#0050cb","on-primary-fixed":"#001849","text-muted":"#707070","primary-container":"#0066ff","secondary-container":"#e2dfde","on-error":"#ffffff","surface-bright":"#fbf9f9","text-faint":"#adadad","on-tertiary-fixed":"#1a1c1c","surface-tint":"#0054d6","outline-variant":"#c2c6d8","canvas":"#ffffff","tertiary-fixed-dim":"#c6c6c7","error-container":"#ffdad6","background":"#fbf9f9","on-surface":"#1b1c1c","on-tertiary":"#ffffff","secondary-fixed":"#e5e2e1","on-background":"#1b1c1c","on-secondary-fixed":"#1c1b1b","tertiary-fixed":"#e2e2e2","on-error-container":"#93000a","surface-variant":"#e4e2e2","inverse-on-surface":"#f2f0f0","outline":"#727687","tertiary-container":"#717272","ink-soft":"#262626","surface-dim":"#dbdad9","on-primary":"#ffffff","canvas-soft":"#f3f3f3","secondary-fixed-dim":"#c8c6c5","inverse-surface":"#303031","on-secondary":"#ffffff","accent-electric":"#0066ff","on-tertiary-fixed-variant":"#454747","primary-fixed":"#dae1ff","overlay-scrim":"rgba(115, 115, 115, 0.56)","surface":"#fbf9f9","inverse-primary":"#b3c5ff","surface-container-low":"#f5f3f3","surface-container-high":"#e9e8e7","on-primary-fixed-variant":"#003fa4","ink":"#141414","hairline":"#e0e0e0","surface-container-highest":"#e4e2e2","surface-container":"#efeded","on-primary-container":"#f8f7ff","on-tertiary-container":"#f8f8f8","on-surface-variant":"#424656"},"borderRadius":{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},"spacing":{"space-lg":"1.5rem","space-sm":"0.5rem","gutter-mobile":"1rem","margin":"3rem","space-md":"1rem","space-xl":"2rem","space-xs":"0.25rem","margin-mobile":"1.25rem","gutter":"1.5rem"},"fontFamily":{"body-sm":["DM Sans"],"headline-lg":["Hanken Grotesk"],"headline-md":["Hanken Grotesk"],"caption":["DM Sans"],"body-lg":["DM Sans"],"display":["Hanken Grotesk"],"link":["DM Sans"],"headline-lg-mobile":["Hanken Grotesk"],"headline-md-mobile":["Hanken Grotesk"],"title-md":["Hanken Grotesk"],"body-md":["DM Sans"],"display-mobile":["Hanken Grotesk"],"label-md":["DM Sans"],"headline-sm":["Hanken Grotesk"],"title-lg":["Hanken Grotesk"]},"fontSize":{"body-sm":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-lg":["56px",{"lineHeight":"60px","letterSpacing":"-0.025em","fontWeight":"700"}],"headline-md":["44px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"600"}],"caption":["12px",{"lineHeight":"16px","fontWeight":"400"}],"body-lg":["20px",{"lineHeight":"28px","fontWeight":"400"}],"display":["80px",{"lineHeight":"80px","letterSpacing":"-0.03em","fontWeight":"700"}],"link":["16px",{"lineHeight":"24px","fontWeight":"600"}],"headline-lg-mobile":["36px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-md-mobile":["28px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"title-md":["20px",{"lineHeight":"26px","letterSpacing":"-0.005em","fontWeight":"600"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"display-mobile":["48px",{"lineHeight":"52px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.04em","fontWeight":"700"}],"headline-sm":["32px",{"lineHeight":"36px","letterSpacing":"-0.015em","fontWeight":"600"}],"title-lg":["24px",{"lineHeight":"30px","letterSpacing":"-0.01em","fontWeight":"600"}]}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="w-full"><div class="bg-ink text-on-primary py-1.5 px-space-md sm:px-space-lg text-caption font-caption"><div class="max-w-7xl mx-auto flex items-center justify-between"><div class="flex items-center gap-space-sm truncate"><span class="inline-block w-1.5 h-1.5 rounded-full bg-accent-electric"></span><span class="font-medium tracking-tight">Free Express Shipping on orders over $75</span><span class="hidden md:inline text-text-muted">·</span><span class="hidden md:inline text-canvas-soft/80">30-Day Risk-Free Returns</span></div><div class="flex items-center gap-space-md text-caption font-caption"><a class="hover:text-canvas-soft transition-colors hidden sm:inline" data-path="help-center" href="#">Help Center</a><a class="hover:text-canvas-soft transition-colors hidden sm:inline" data-path="track-order" href="#">Track Order</a><div class="flex items-center gap-space-xs cursor-pointer hover:text-canvas-soft transition-colors font-medium"><span class="material-symbols-outlined text-[14px]">language</span><span>USD ($)</span><span class="material-symbols-outlined text-[14px]">arrow_drop_down</span></div></div></div></div><div class="max-w-7xl mx-auto px-space-md sm:px-space-lg py-space-sm flex items-center gap-space-md"><div class="flex items-center gap-space-md"><a class="flex items-center gap-space-sm group" data-path="home" href="#"><img alt="Brand logo. - Primary color: #0066ff
+- Font: hankenGrotesk
+- Mode: light
+- Roundness: rounded-full
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xxr3vYezhanvKgo5CiY-uShx9Z_nxpg3u_P87x04A40OQUZh9sYlZWGLokcyGv6XdZPRKhMvMdJNS6CEtao5ecIeCUG00jOkEZDv3htiNQdAHWJcL7YURulUxM5iQCtehrjw7dkJRK5GCi-33XWEmna2C6wl2SnlH0Jo30mvuBheFB51F5jx9qe3V6ldh4PuT2DB8HtgpzQK4yyLrrefFU7iF8zxAJedNiQI_bGz8noloxhRhU692YRfw"/><div class="flex flex-col"><span class="font-headline-sm text-title-lg tracking-tight font-bold text-ink leading-none">ShelfStack</span><span class="font-label-md text-caption uppercase text-text-muted tracking-wider leading-none mt-0.5">Store</span></div></a><button class="hidden lg:flex items-center gap-space-xs bg-canvas-soft hover:bg-surface-container-high text-on-surface font-link text-body-sm px-space-md py-space-sm rounded-full transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">grid_view</span><span>Departments</span><span class="material-symbols-outlined text-[16px] text-text-muted">expand_more</span></button></div><div class="flex-1 max-w-xl mx-auto hidden md:block"><div class="relative flex items-center w-full bg-field hover:bg-canvas rounded-full px-space-sm py-1 transition-colors"><button class="flex items-center gap-space-xs px-space-sm py-1 font-body-sm text-body-sm text-text-muted hover:text-ink transition-colors" type="button"><span class="font-medium">All</span><span class="material-symbols-outlined text-[16px]">expand_more</span></button><div class="h-4 w-[1px] bg-outline-variant/60 mx-1"></div><input class="w-full bg-transparent px-space-sm py-1.5 font-body-sm text-body-sm text-ink placeholder-text-faint focus:outline-none" placeholder="Search curated design, tech, and everyday essentials..." type="text"/><button aria-label="Search" class="w-8 h-8 rounded-full bg-ink text-on-primary flex items-center justify-center hover:bg-accent-electric transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">search</span></button></div></div><nav class="hidden xl:flex items-center gap-space-md font-link text-body-sm text-on-surface-variant" data-active-classes="bg-ink text-on-primary font-medium rounded-full px-space-sm py-1"><a class="hover:text-on-surface transition-colors" data-path="deals" href="#">Deals</a><a class="hover:text-on-surface transition-colors" data-path="best-sellers" href="#">Best Sellers</a><a class="hover:text-on-surface transition-colors" data-path="new-drops" href="#">New Drops</a><a class="hover:text-on-surface transition-colors" data-path="gift-cards" href="#">Gift Cards</a></nav><div class="flex items-center gap-space-sm ml-auto"><button aria-label="Wishlist" class="relative p-2 rounded-full hover:bg-canvas-soft text-ink transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">favorite</span><span class="absolute top-1 right-1 w-4 h-4 rounded-full bg-ink text-on-primary text-[10px] font-caption flex items-center justify-center font-bold">0</span></button><a class="flex items-center gap-space-sm bg-field hover:bg-surface-container-high py-1 px-space-sm rounded-full transition-colors" data-path="cart" href="#"><div class="relative flex items-center justify-center w-7 h-7 rounded-full bg-ink text-on-primary"><span class="material-symbols-outlined text-[16px]">shopping_bag</span><span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent-electric text-on-primary text-[10px] font-caption flex items-center justify-center font-bold">3</span></div><div class="hidden sm:flex flex-col text-left pr-space-xs"><span class="font-caption text-caption text-text-muted leading-none">Bag Total</span><span class="font-title-md text-body-sm font-semibold text-ink leading-tight">$496.00</span></div></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center hover:bg-primary-container transition-colors cursor-pointer"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div><div class="w-full bg-surface-container-low/70 overflow-x-auto"><div class="max-w-7xl mx-auto px-space-md sm:px-space-lg flex items-center gap-space-lg whitespace-nowrap py-2.5"><nav class="flex items-center gap-space-lg font-link text-body-sm text-on-surface-variant" data-active-classes="text-ink font-bold"><a class="hover:text-on-surface transition-colors" data-path="tech-and-gadgets" href="#">Tech &amp; Gadgets</a><a class="hover:text-on-surface transition-colors" data-path="home-and-kitchen-essentials" href="#">Home &amp; Kitchen Essentials</a><a class="hover:text-on-surface transition-colors" data-path="furniture-and-space-living" href="#">Furniture &amp; Space Living</a><a class="hover:text-on-surface transition-colors" data-path="fashion-and-accessories" href="#">Fashion &amp; Accessories</a><a class="hover:text-on-surface transition-colors" data-path="stationery-and-craft-tools" href="#">Stationery &amp; Craft Tools</a></nav><div class="h-3.5 w-[1px] bg-outline-variant/60 hidden sm:block"></div><a class="inline-flex items-center gap-1 font-link text-body-sm text-accent-electric hover:underline font-semibold tracking-tight" data-path="sale-and-clearance" href="#"><span class="material-symbols-outlined text-[16px]">local_fire_department</span><span>Sale &amp; Clearance</span></a></div></div></div></header><main class="w-full pt-36 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- Top Stepper Progression & Express Checkout Bar -->
+<section class="w-full bg-surface-bright py-space-lg px-space-md sm:px-space-lg">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-lg">
+<!-- Stepper Indicator -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-space-md bg-canvas-soft rounded-lg p-space-md">
+<div class="flex items-center gap-space-xs text-caption font-caption text-text-muted">
+<span class="font-headline-sm text-body-sm text-ink font-semibold tracking-tight">TRANSACTION PROTOCOL:</span>
+<span class="font-mono text-caption text-text-muted">SEC-99824-SS</span>
+</div>
+<nav aria-label="Checkout Steps" class="flex items-center flex-wrap gap-space-sm sm:gap-space-md">
+<!-- Step 1: Cart -->
+<div class="flex items-center gap-space-xs">
+<span class="w-7 h-7 rounded-full bg-ink text-on-primary font-headline-sm text-caption flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</span>
+<span class="font-title-md text-body-sm font-semibold text-ink">1. Bag Review</span>
+</div>
+<div class="h-0.5 w-6 bg-surface-container-highest"></div>
+<!-- Step 2: Shipping (Active) -->
+<div class="flex items-center gap-space-xs bg-canvas rounded-full py-1 px-space-sm shadow-sm">
+<span class="w-7 h-7 rounded-full bg-accent-electric text-on-primary font-headline-sm text-caption flex items-center justify-center font-bold">2</span>
+<span class="font-title-md text-body-sm font-semibold text-ink">Shipping &amp; Delivery</span>
+<span class="inline-block w-2 h-2 rounded-full bg-accent-electric animate-pulse"></span>
+</div>
+<div class="h-0.5 w-6 bg-surface-container-highest"></div>
+<!-- Step 3: Payment -->
+<div class="flex items-center gap-space-xs text-text-faint">
+<span class="w-7 h-7 rounded-full bg-surface-container text-text-muted font-headline-sm text-caption flex items-center justify-center font-semibold">3</span>
+<span class="font-title-md text-body-sm font-medium">Payment</span>
+</div>
+<div class="h-0.5 w-6 bg-surface-container-highest hidden sm:block"></div>
+<!-- Step 4: Confirmation -->
+<div class="hidden sm:flex items-center gap-space-xs text-text-faint">
+<span class="w-7 h-7 rounded-full bg-surface-container text-text-muted font-headline-sm text-caption flex items-center justify-center font-semibold">4</span>
+<span class="font-title-md text-body-sm font-medium">Review</span>
+</div>
+</nav>
+<div class="hidden xl:flex items-center gap-1.5 text-caption font-caption text-text-muted">
+<span class="material-symbols-outlined text-[16px] text-accent-electric">lock</span>
+<span>End-to-End TLS 1.3 Encryption</span>
+</div>
+</div>
+<!-- Express Checkout Hub -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md bg-canvas rounded-lg p-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-md text-caption uppercase text-text-muted tracking-wider">Express Instant Checkout</span>
+<span class="text-caption font-caption text-text-faint hidden md:inline">• Skip manual address input</span>
+</div>
+<div class="flex items-center gap-space-xs sm:gap-space-sm flex-wrap">
+<button class="h-10 px-space-md rounded-full bg-ink hover:bg-ink-soft text-on-primary font-link text-body-sm flex items-center gap-1.5 transition-all" type="button">
+<span class="font-headline-sm font-bold text-[15px] tracking-tight">Pay</span>
+</button>
+<button class="h-10 px-space-md rounded-full bg-[#5a31f4] hover:opacity-90 text-on-primary font-link text-body-sm flex items-center gap-1 transition-all" type="button">
+<span class="font-headline-sm font-bold text-caption tracking-wider">shop</span>
+<span class="bg-canvas text-[#5a31f4] text-[10px] font-bold px-1 rounded-sm">Pay</span>
+</button>
+<button class="h-10 px-space-md rounded-full bg-canvas-soft hover:bg-surface-container text-ink font-link text-body-sm flex items-center gap-1.5 transition-all" type="button">
+<span class="font-headline-sm font-bold text-caption text-[#4285F4]">G</span>
+<span class="font-title-md text-caption text-ink font-semibold">Pay</span>
+</button>
+<button class="h-10 px-space-md rounded-full bg-[#003087] hover:bg-[#00256c] text-on-primary font-link text-body-sm flex items-center gap-1 transition-all" type="button">
+<span class="font-headline-sm italic font-bold text-caption">PayPal</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Main 12-Column Checkout Interface (7:5 Split Grid) -->
+<section class="w-full max-w-7xl mx-auto px-space-md sm:px-space-lg py-space-xl">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+<!-- LEFT COLUMN: Cart Items & Multi-Step Accordion (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-xl min-w-0">
+<!-- Cart Items Overview & Upsell Drawer Surface -->
+<div class="bg-canvas rounded-lg p-space-md sm:p-space-lg flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-accent-electric"></span>
+<h2 class="font-headline-sm text-title-lg font-bold text-ink">Selected Stack Items</h2>
+<span class="bg-canvas-soft font-label-md text-caption text-ink px-space-xs py-0.5 rounded-full font-bold">3 Units</span>
+</div>
+<button class="font-link text-caption text-text-muted hover:text-ink underline transition-colors" type="button">Edit Complete Bag</button>
+</div>
+<!-- Free Shipping Milestone Progress Meter -->
+<div class="bg-surface-container-low rounded-DEFAULT p-space-md flex flex-col gap-space-xs">
+<div class="flex items-center justify-between text-caption font-caption">
+<span class="flex items-center gap-1 text-ink font-medium">
+<span class="material-symbols-outlined text-accent-electric text-[18px]">verified</span>
+<span>Tier Achieved: Free 2-Day Priority Shipping Unlocked</span>
+</span>
+<span class="font-title-md text-caption font-bold text-accent-electric">100% (Orders &gt; $75)</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-accent-electric rounded-full transition-all duration-500" style="width: 100%;"></div>
+</div>
+</div>
+<!-- Line Items List -->
+<div class="flex flex-col gap-space-md divide-y-0">
+<!-- Item 1: Audio / Tech -->
+<div class="flex items-start gap-space-md p-space-sm rounded-DEFAULT bg-canvas-soft/60 hover:bg-canvas-soft transition-colors">
+<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-DEFAULT bg-surface-container-high overflow-hidden shrink-0 flex items-center justify-center relative">
+<img class="w-full h-full object-cover" data-alt="Minimalist matte black over-ear studio headphones resting on an architectonic stone pedestal, soft diffuse studio illumination, clean industrial product photo style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4NSjwoQDkGQN7o-dM24ZLacxL5-8iqBYjvTaZdQLAFw2sCGCwbZagWlXL6X6OnGsplCpQZ4qfgL2USJ9epfxDHMAXkanAsPfQLxfyiH33MNITfvi78GXrC9HQ10Z_ZDdyGPvj51Y0J8tGMvT7kffuZUi806R0dCU_4JS0v63IPF3dM9Zlo_aVeiRrysIlUGT3R93a0gb9DRLupmjXr5pm6iso0-207OiycYvNHr6QG2yWduCgxYUW"/>
+<span class="absolute top-1 left-1 bg-ink text-on-primary text-[10px] font-label-md px-1.5 py-0.5 rounded-full uppercase tracking-widest">Tech</span>
+</div>
+<div class="flex-1 min-w-0 flex flex-col justify-between h-full">
+<div class="flex items-start justify-between gap-space-sm">
+<div>
+<h3 class="font-headline-sm text-body-md font-bold text-ink truncate">Studio ANC Wireless Over-Ear Headphones</h3>
+<p class="font-body-sm text-caption text-text-muted mt-0.5">Matte Obsidian Black • Breathable Mesh</p>
+</div>
+<span class="font-headline-sm text-body-md font-bold text-ink shrink-0">$229.00</span>
+</div>
+<div class="flex items-center justify-between mt-space-sm">
+<!-- Quantity Pill Selector -->
+<div class="flex items-center bg-canvas rounded-full px-2 py-1 gap-space-sm shadow-sm">
+<button aria-label="Decrease quantity" class="w-5 h-5 rounded-full hover:bg-canvas-soft flex items-center justify-center text-text-muted hover:text-ink" type="button">
+<span class="material-symbols-outlined text-[14px]">remove</span>
+</button>
+<span class="font-title-md text-caption font-bold text-ink">1</span>
+<button aria-label="Increase quantity" class="w-5 h-5 rounded-full hover:bg-canvas-soft flex items-center justify-center text-text-muted hover:text-ink" type="button">
+<span class="material-symbols-outlined text-[14px]">add</span>
+</button>
+</div>
+<button class="text-caption font-caption text-text-muted hover:text-error transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[15px]">delete</span>
+<span class="hidden sm:inline">Remove</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 2: Home & Kitchen -->
+<div class="flex items-start gap-space-md p-space-sm rounded-DEFAULT bg-canvas-soft/60 hover:bg-canvas-soft transition-colors">
+<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-DEFAULT bg-surface-container-high overflow-hidden shrink-0 flex items-center justify-center relative">
+<img class="w-full h-full object-cover" data-alt="Sculptural matte black electric gooseneck kettle with ergonomic pour handle on cast concrete tabletop, high contrast modern kitchen setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVd8VYSvTWi1wiREIaggs7iCh0VP1CQWC3O58r9AiTnQmSwW_LP9Vwi9n28GmiT4eZU0zyT9NELAd7E6Jl1DOPCoRDGkkIRkW9JdbJN2oLEMXmcB7ukWPNMtcK5rMoQ3tiAt4KVZZjnL-bfOnf_QYfcAOwDqHz4l-Cgc3HVqMwn5wvKFmvLtHuT8alsc8fnAdZes9bB8gRhtaeYXRQ7kog1xHp4vQ4FRKq-v0xbsdEsHAWLTTjX3Ai"/>
+<span class="absolute top-1 left-1 bg-ink text-on-primary text-[10px] font-label-md px-1.5 py-0.5 rounded-full uppercase tracking-widest">Home</span>
+</div>
+<div class="flex-1 min-w-0 flex flex-col justify-between h-full">
+<div class="flex items-start justify-between gap-space-sm">
+<div>
+<h3 class="font-headline-sm text-body-md font-bold text-ink truncate">Precision Gooseneck Matte Electric Kettle</h3>
+<p class="font-body-sm text-caption text-text-muted mt-0.5">0.9L Capacity • Stovetop Cast Base</p>
+</div>
+<span class="font-headline-sm text-body-md font-bold text-ink shrink-0">$89.00</span>
+</div>
+<div class="flex items-center justify-between mt-space-sm">
+<div class="flex items-center bg-canvas rounded-full px-2 py-1 gap-space-sm shadow-sm">
+<button aria-label="Decrease quantity" class="w-5 h-5 rounded-full hover:bg-canvas-soft flex items-center justify-center text-text-muted hover:text-ink" type="button">
+<span class="material-symbols-outlined text-[14px]">remove</span>
+</button>
+<span class="font-title-md text-caption font-bold text-ink">1</span>
+<button aria-label="Increase quantity" class="w-5 h-5 rounded-full hover:bg-canvas-soft flex items-center justify-center text-text-muted hover:text-ink" type="button">
+<span class="material-symbols-outlined text-[14px]">add</span>
+</button>
+</div>
+<button class="text-caption font-caption text-text-muted hover:text-error transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[15px]">delete</span>
+<span class="hidden sm:inline">Remove</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 3: Fashion & EDC -->
+<div class="flex items-start gap-space-md p-space-sm rounded-DEFAULT bg-canvas-soft/60 hover:bg-canvas-soft transition-colors">
+<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-DEFAULT bg-surface-container-high overflow-hidden shrink-0 flex items-center justify-center relative">
+<img class="w-full h-full object-cover" data-alt="Technical ballistic nylon commuter backpack in stealth charcoal black, waterproof taped zips and anodized aluminum hardware, gallery lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDt1Z10x0lzZnaDsSY8PCqW8woB0UC4VKmVV7Hdn8kumW_p05XO0523NbQ39SELImj0T57Fo6ri0O6eOBdIGtAeGodU95OogZwtmqjMX91dkETJeDzdGiOLRirCwFQuqWrD_E4mWVBbDaoZzYZXLdQw_J7zt_kGj1PFJeMHIT_Buaklt-jqkl69aW68T55X2NbjET8E5FV_2hxAMNp0qLySAsFFlxhg2VJ73dR1o0HIi9GnRSZdYsQD"/>
+<span class="absolute top-1 left-1 bg-ink text-on-primary text-[10px] font-label-md px-1.5 py-0.5 rounded-full uppercase tracking-widest">EDC</span>
+</div>
+<div class="flex-1 min-w-0 flex flex-col justify-between h-full">
+<div class="flex items-start justify-between gap-space-sm">
+<div>
+<h3 class="font-headline-sm text-body-md font-bold text-ink truncate">Ballistic Cordura® Modular Tech Backpack</h3>
+<p class="font-body-sm text-caption text-text-muted mt-0.5">Stealth Charcoal • 24L Weatherproof</p>
+</div>
+<span class="font-headline-sm text-body-md font-bold text-ink shrink-0">$135.00</span>
+</div>
+<div class="flex items-center justify-between mt-space-sm">
+<div class="flex items-center bg-canvas rounded-full px-2 py-1 gap-space-sm shadow-sm">
+<button aria-label="Decrease quantity" class="w-5 h-5 rounded-full hover:bg-canvas-soft flex items-center justify-center text-text-muted hover:text-ink" type="button">
+<span class="material-symbols-outlined text-[14px]">remove</span>
+</button>
+<span class="font-title-md text-caption font-bold text-ink">1</span>
+<button aria-label="Increase quantity" class="w-5 h-5 rounded-full hover:bg-canvas-soft flex items-center justify-center text-text-muted hover:text-ink" type="button">
+<span class="material-symbols-outlined text-[14px]">add</span>
+</button>
+</div>
+<button class="text-caption font-caption text-text-muted hover:text-error transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[15px]">delete</span>
+<span class="hidden sm:inline">Remove</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- 1-Click Upsell / Cart Cross-Sell Add-ons -->
+<div class="bg-surface-container-low rounded-DEFAULT p-space-md flex flex-col gap-space-sm mt-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-caption uppercase text-text-muted tracking-wider">Curated System Complements</span>
+<span class="font-caption text-caption text-accent-electric font-semibold">Special Bundle Price</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+<!-- Addon 1 -->
+<div class="bg-canvas p-space-sm rounded-DEFAULT flex items-center justify-between gap-space-sm shadow-sm">
+<div class="flex items-center gap-space-xs min-w-0">
+<div class="w-10 h-10 rounded-DEFAULT bg-field shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-text-muted text-[20px]">menu_book</span>
+</div>
+<div class="truncate">
+<p class="font-title-md text-caption font-bold text-ink truncate">Matte Project Journal</p>
+<p class="font-body-sm text-caption text-text-muted">160gsm Grid • +$24.00</p>
+</div>
+</div>
+<button class="px-space-sm py-1 rounded-full bg-field hover:bg-ink hover:text-on-primary text-ink text-caption font-link font-semibold transition-colors shrink-0" type="button">
+                  + Add
+                </button>
+</div>
+<!-- Addon 2 -->
+<div class="bg-canvas p-space-sm rounded-DEFAULT flex items-center justify-between gap-space-sm shadow-sm">
+<div class="flex items-center gap-space-xs min-w-0">
+<div class="w-10 h-10 rounded-DEFAULT bg-field shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-text-muted text-[20px]">charging_station</span>
+</div>
+<div class="truncate">
+<p class="font-title-md text-caption font-bold text-ink truncate">MagCharge Quad Stand</p>
+<p class="font-body-sm text-caption text-text-muted">CNC Anodized • +$95.00</p>
+</div>
+</div>
+<button class="px-space-sm py-1 rounded-full bg-field hover:bg-ink hover:text-on-primary text-ink text-caption font-link font-semibold transition-colors shrink-0" type="button">
+                  + Add
+                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Multi-Step Segmented Accordion Form -->
+<div class="flex flex-col gap-space-md">
+<!-- SECTION 1: Customer Contact -->
+<div class="bg-canvas rounded-lg p-space-md sm:p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-6 h-6 rounded-full bg-ink text-on-primary font-headline-sm text-caption flex items-center justify-center font-bold">1</span>
+<h3 class="font-headline-sm text-title-md font-bold text-ink">Contact Information</h3>
+</div>
+<span class="text-caption font-caption text-text-muted">Already registered? <a class="text-accent-electric font-semibold hover:underline" href="#">Log in</a></span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Email Address for Dispatch &amp; Tracking</label>
+<div class="relative flex items-center w-full">
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-body-sm text-ink placeholder-text-faint focus:outline-none transition-colors" type="email" value="alexander.wright@techstudio.design"/>
+<span class="material-symbols-outlined absolute right-4 text-accent-electric text-[20px]">check_circle</span>
+</div>
+</div>
+<label class="flex items-center gap-space-sm cursor-pointer mt-1">
+<input checked="" class="w-4 h-4 rounded text-ink focus:ring-0 accent-ink cursor-pointer" type="checkbox"/>
+<span class="font-body-sm text-caption text-text-muted">Keep me updated on deterministic shipping tracking &amp; verified dispatch records</span>
+</label>
+</div>
+</div>
+<!-- SECTION 2: Shipping Destination Address -->
+<div class="bg-canvas rounded-lg p-space-md sm:p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-6 h-6 rounded-full bg-accent-electric text-on-primary font-headline-sm text-caption flex items-center justify-center font-bold">2</span>
+<h3 class="font-headline-sm text-title-md font-bold text-ink">Shipping Destination</h3>
+</div>
+<span class="bg-canvas-soft px-space-sm py-0.5 rounded-full font-label-md text-caption text-ink font-semibold">Priority Delivery Hub</span>
+</div>
+<form class="flex flex-col gap-space-md" onsubmit="event.preventDefault();">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">First Name</label>
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-body-sm text-ink placeholder-text-faint focus:outline-none transition-colors" type="text" value="Alexander"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Last Name</label>
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-body-sm text-ink placeholder-text-faint focus:outline-none transition-colors" type="text" value="Wright"/>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Street Address</label>
+<span class="text-[11px] font-caption text-text-faint">Auto-fill enabled</span>
+</div>
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-body-sm text-ink placeholder-text-faint focus:outline-none transition-colors" type="text" value="442 Crosby Street, Floor 6"/>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Apt / Suite / Unit</label>
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-body-sm text-ink placeholder-text-faint focus:outline-none transition-colors" type="text" value="Loft 6B"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">City</label>
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-body-sm text-ink placeholder-text-faint focus:outline-none transition-colors" type="text" value="New York"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Postal / ZIP Code</label>
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-body-sm text-ink placeholder-text-faint focus:outline-none transition-colors" type="text" value="10012"/>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Country / Region</label>
+<div class="relative">
+<select class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-body-sm text-ink focus:outline-none transition-colors appearance-none cursor-pointer">
+<option selected="">United States (USD $)</option>
+<option>Canada (CAD $)</option>
+<option>United Kingdom (GBP £)</option>
+<option>European Union (EUR €)</option>
+<option>Japan (JPY ¥)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 pointer-events-none text-text-muted">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Phone (for Courier Delivery)</label>
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-body-sm text-ink placeholder-text-faint focus:outline-none transition-colors" type="tel" value="+1 (212) 555-0194"/>
+</div>
+</div>
+</form>
+</div>
+<!-- SECTION 3: Delivery Speed & Logistics Options -->
+<div class="bg-canvas rounded-lg p-space-md sm:p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-6 h-6 rounded-full bg-field text-ink font-headline-sm text-caption flex items-center justify-center font-bold">3</span>
+<h3 class="font-headline-sm text-title-md font-bold text-ink">Delivery Method</h3>
+</div>
+<span class="text-caption font-caption text-text-muted flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-accent-electric">eco</span>
+<span>100% Carbon Neutral</span>
+</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Method 1: Priority 2-Day Air (Selected default via promo) -->
+<label class="flex items-center justify-between p-space-md rounded-DEFAULT bg-canvas-soft hover:bg-surface-container cursor-pointer transition-colors shadow-sm">
+<div class="flex items-center gap-space-md">
+<input checked="" class="w-4 h-4 accent-accent-electric cursor-pointer" name="delivery_method" type="radio"/>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-sm font-bold text-ink">Priority Express 2-Day Air</span>
+<span class="bg-accent-electric text-on-primary font-label-md text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Free With Order</span>
+</div>
+<span class="font-body-sm text-caption text-text-muted">Estimated Arrival: Thursday, Oct 24 • Signed Courier Drop</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-headline-sm text-body-sm font-bold text-accent-electric">FREE</span>
+<span class="block text-caption font-caption text-text-muted line-through">$18.00</span>
+</div>
+</label>
+<!-- Method 2: Standard Tracked -->
+<label class="flex items-center justify-between p-space-md rounded-DEFAULT bg-field/60 hover:bg-canvas-soft cursor-pointer transition-colors">
+<div class="flex items-center gap-space-md">
+<input class="w-4 h-4 accent-accent-electric cursor-pointer" name="delivery_method" type="radio"/>
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-sm font-bold text-ink">Standard Ground Tracked</span>
+<span class="font-body-sm text-caption text-text-muted">3–5 Business Days • Real-time GPS Tracking</span>
+</div>
+</div>
+<span class="font-headline-sm text-body-sm font-bold text-ink">FREE</span>
+</label>
+<!-- Method 3: White Glove Scheduled Delivery -->
+<label class="flex items-center justify-between p-space-md rounded-DEFAULT bg-field/60 hover:bg-canvas-soft cursor-pointer transition-colors">
+<div class="flex items-center gap-space-md">
+<input class="w-4 h-4 accent-accent-electric cursor-pointer" name="delivery_method" type="radio"/>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-sm font-bold text-ink">White Glove Scheduled Delivery</span>
+<span class="bg-surface-container text-text-muted font-label-md text-[10px] px-2 py-0.5 rounded-full uppercase">Appointment</span>
+</div>
+<span class="font-body-sm text-caption text-text-muted">Direct to room of choice + unboxing &amp; eco-recycling</span>
+</div>
+</div>
+<span class="font-headline-sm text-body-sm font-bold text-ink">$25.00</span>
+</label>
+</div>
+</div>
+<!-- SECTION 4: Payment Method Protocol -->
+<div class="bg-canvas rounded-lg p-space-md sm:p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-6 h-6 rounded-full bg-field text-ink font-headline-sm text-caption flex items-center justify-center font-bold">4</span>
+<h3 class="font-headline-sm text-title-md font-bold text-ink">Payment Protocol</h3>
+</div>
+<div class="flex items-center gap-1 bg-surface-container px-space-sm py-1 rounded-full text-caption font-caption text-text-muted">
+<span class="material-symbols-outlined text-accent-electric text-[15px]">security</span>
+<span>256-Bit SSL Encrypted</span>
+</div>
+</div>
+<!-- Payment Selector Tabs -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-xs bg-canvas-soft p-1 rounded-full">
+<button class="py-2 rounded-full bg-ink text-on-primary font-link text-caption flex items-center justify-center gap-1 transition-all font-semibold" type="button">
+<span class="material-symbols-outlined text-[16px]">credit_card</span>
+<span>Card</span>
+</button>
+<button class="py-2 rounded-full hover:bg-canvas text-ink font-link text-caption flex items-center justify-center gap-1 transition-all" type="button">
+<span>Shop Pay</span>
+</button>
+<button class="py-2 rounded-full hover:bg-canvas text-ink font-link text-caption flex items-center justify-center gap-1 transition-all" type="button">
+<span>Klarna</span>
+</button>
+<button class="py-2 rounded-full hover:bg-canvas text-ink font-link text-caption flex items-center justify-center gap-1 transition-all" type="button">
+<span>ACH / Wire</span>
+</button>
+</div>
+<!-- Credit Card Form Fields -->
+<div class="flex flex-col gap-space-md bg-canvas-soft/40 p-space-md rounded-DEFAULT">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Card Number</label>
+<div class="flex items-center gap-1">
+<span class="font-mono text-caption text-text-muted font-bold tracking-wider">VISA • MC • AMEX</span>
+</div>
+</div>
+<div class="relative flex items-center">
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT pl-space-md pr-12 text-body-sm font-mono text-ink placeholder-text-faint focus:outline-none transition-colors" placeholder="4242 •••• •••• 4242" type="text"/>
+<span class="material-symbols-outlined absolute right-4 text-text-muted text-[20px]">credit_card</span>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Expiration Date</label>
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-mono text-ink placeholder-text-faint focus:outline-none transition-colors" placeholder="MM / YY" type="text"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Security Code (CVC)</label>
+<span class="text-[11px] font-caption text-text-faint">3 or 4 digits</span>
+</div>
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-mono text-ink placeholder-text-faint focus:outline-none transition-colors" maxlength="4" placeholder="•••" type="password"/>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Name on Card</label>
+<input class="w-full h-12 bg-field focus:bg-canvas rounded-DEFAULT px-space-md text-body-sm font-body-sm uppercase tracking-wide text-ink placeholder-text-faint focus:outline-none transition-colors" type="text" value="ALEXANDER WRIGHT"/>
+</div>
+</div>
+<!-- Installment Notice -->
+<div class="flex items-center justify-between p-space-sm rounded-DEFAULT bg-field/60 text-caption font-caption text-text-muted">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-ink">schedule</span>
+<span>Or split into <strong>4 interest-free payments of $110.97</strong></span>
+</span>
+<a class="text-ink font-semibold hover:underline" href="#">Learn More</a>
+</div>
+<!-- Billing Toggle -->
+<div class="pt-space-xs">
+<label class="flex items-center gap-space-sm cursor-pointer">
+<input checked="" class="w-4 h-4 rounded text-ink focus:ring-0 accent-ink cursor-pointer" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-ink font-medium">Billing address matches shipping address (442 Crosby St)</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Sticky Order Summary & Trust Matrix (5 cols) -->
+<div class="lg:col-span-5 lg:sticky lg:top-40 flex flex-col gap-space-lg min-w-0">
+<!-- Main Sticky Summary Card -->
+<div class="bg-canvas rounded-lg p-space-lg sm:p-space-xl shadow-md flex flex-col gap-space-lg">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex flex-col">
+<span class="font-label-md text-caption uppercase text-text-muted tracking-widest">Transaction Scope</span>
+<h2 class="font-headline-sm text-title-lg font-bold text-ink">Order Summary</h2>
+</div>
+<div class="w-10 h-10 rounded-full bg-field flex items-center justify-center text-ink">
+<span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+</div>
+</div>
+<!-- Promo / Coupon Code Component -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-md text-caption uppercase text-text-muted tracking-wider">Promotion / VIP Voucher</label>
+<div class="flex items-center gap-space-xs">
+<div class="relative flex-1">
+<input class="w-full h-11 bg-field focus:bg-canvas rounded-full px-space-md text-body-sm font-mono font-semibold text-ink uppercase tracking-wider focus:outline-none" type="text" value="STACKVIP10"/>
+<span class="absolute right-3 top-2.5 text-accent-electric text-caption font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>-10%</span>
+</span>
+</div>
+<button class="h-11 px-space-md rounded-full bg-ink text-on-primary hover:bg-accent-electric font-link text-body-sm font-semibold transition-colors" type="button">
+                Apply
+              </button>
+</div>
+<div class="flex items-center justify-between mt-1 text-caption font-caption">
+<span class="text-accent-electric font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">sell</span>
+<span>Active Voucher: 10% Dept Bundle Bonus</span>
+</span>
+<button class="text-text-muted hover:text-ink underline" type="button">Remove</button>
+</div>
+</div>
+<!-- Financial Breakdown Table -->
+<div class="flex flex-col gap-space-sm py-space-sm bg-surface-container-low rounded-DEFAULT p-space-md">
+<div class="flex items-center justify-between text-body-sm font-body-sm text-text-muted">
+<span>Items Subtotal (3 items)</span>
+<span class="font-title-md text-body-sm font-semibold text-ink">$453.00</span>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="flex items-center gap-1 text-ink">
+<span>Multi-Department Bundle (10%)</span>
+</span>
+<span class="bg-accent-electric text-on-primary font-headline-sm text-caption px-2 py-0.5 rounded-full font-bold">-$45.30</span>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm text-text-muted">
+<div class="flex items-center gap-1">
+<span>Estimated Shipping</span>
+<span class="text-[11px] bg-canvas-soft px-1.5 py-0.5 rounded text-ink font-semibold">Priority 2-Day Air</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="line-through text-caption text-text-faint">$18.00</span>
+<span class="font-title-md text-body-sm font-bold text-accent-electric">FREE</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm text-text-muted">
+<div class="flex items-center gap-1">
+<span>Estimated Sales Tax</span>
+<span class="text-[11px] text-text-faint font-mono">NY (8.875%)</span>
+</div>
+<span class="font-title-md text-body-sm font-semibold text-ink">$36.18</span>
+</div>
+<div class="h-px bg-surface-container-high my-1"></div>
+<div class="flex items-baseline justify-between pt-1">
+<div>
+<span class="font-headline-sm text-body-md font-bold text-ink">Total Amount Due</span>
+<span class="block text-caption font-caption text-text-muted">Includes applicable federal &amp; municipal duties</span>
+</div>
+<div class="text-right">
+<span class="font-headline-sm text-headline-sm font-bold text-ink tracking-tight">$443.88</span>
+<span class="block font-mono text-[11px] text-text-muted">USD NET</span>
+</div>
+</div>
+</div>
+<!-- Primary Call to Action -->
+<div class="flex flex-col gap-space-xs">
+<button class="w-full h-14 rounded-full bg-ink hover:bg-accent-electric text-on-primary font-headline-sm text-body-md font-bold flex items-center justify-center gap-space-sm shadow-md transition-all active:scale-[0.99] group" type="button">
+<span>Authorize &amp; Place Order</span>
+<span class="font-mono font-normal opacity-80">• $443.88</span>
+<span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<p class="text-center text-caption font-caption text-text-faint">By completing purchase, you accept ShelfStack terms of sale and transit policy.</p>
+</div>
+<!-- Direct Trust Matrix & Guarantees -->
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-field flex items-center justify-center shrink-0 text-accent-electric">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+<div>
+<h4 class="font-title-md text-body-sm font-semibold text-ink">30-Day In-Home Trial &amp; Free Returns</h4>
+<p class="font-body-sm text-caption text-text-muted">Prepaid returns label included in all original parcel crates.</p>
+</div>
+</div>
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-field flex items-center justify-center shrink-0 text-ink">
+<span class="material-symbols-outlined text-[18px]">shield</span>
+</div>
+<div>
+<h4 class="font-title-md text-body-sm font-semibold text-ink">256-Bit Bank-Grade Shielded Protocol</h4>
+<p class="font-body-sm text-caption text-text-muted">Zero plain-text credential persistence. PCI DSS Level 1 certified.</p>
+</div>
+</div>
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-field flex items-center justify-center shrink-0 text-ink">
+<span class="material-symbols-outlined text-[18px]">award_star</span>
+</div>
+<div>
+<h4 class="font-title-md text-body-sm font-semibold text-ink">2-Year Departmental Warranty</h4>
+<p class="font-body-sm text-caption text-text-muted">Direct manufacturer guarantee verified for each SKU in order.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Ambient Carbon Offset Metric Box -->
+<div class="bg-canvas-soft rounded-lg p-space-md flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-canvas flex items-center justify-center text-accent-electric shrink-0">
+<span class="material-symbols-outlined text-[22px]">forest</span>
+</div>
+<div>
+<p class="font-headline-sm text-body-sm font-bold text-ink">Offset Log: 4.8 kg CO₂e Neutralized</p>
+<p class="font-body-sm text-caption text-text-muted">Verified reforestation credit applied at checkout.</p>
+</div>
+</div>
+<span class="font-mono text-caption text-accent-electric font-semibold shrink-0">0.00 MT Net</span>
+</div>
+<!-- Concierge Live Assist Contact -->
+<div class="flex items-center justify-between px-space-sm text-caption font-caption text-text-muted">
+<span>Need immediate assistance with this cart?</span>
+<a class="text-ink font-semibold hover:underline flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[15px]">headset_mic</span>
+<span>Live Concierge</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+</div></main><footer class="w-full bg-surface py-space-xl"><div class="max-w-7xl mx-auto px-space-md sm:px-space-lg"><div class="bg-ink text-on-primary rounded-lg p-space-lg md:p-space-xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-xl mb-space-xl"><div class="lg:col-span-2 flex flex-col gap-space-md pr-space-lg"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-full bg-accent-electric flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[20px]">inventory_2</span></div><span class="font-headline-sm text-title-lg tracking-tight font-bold text-on-primary">ShelfStack</span></div><p class="font-body-md text-body-sm text-canvas-soft/80 max-w-sm">Curated multi-category department store engineered with architectural clarity, verified durability, and deterministic design.</p><div class="flex flex-col gap-space-xs mt-space-sm"><span class="font-label-md text-caption uppercase text-text-faint tracking-wider">Join the ShelfStack Dispatch</span><div class="flex items-center max-w-md bg-ink-soft rounded-full p-1"><input class="w-full bg-transparent px-space-md py-2 font-body-sm text-body-sm text-on-primary placeholder-text-muted focus:outline-none" placeholder="Enter your business or personal email..." type="email"/><button class="bg-accent-electric hover:bg-primary text-on-primary font-link text-body-sm px-space-md py-2 rounded-full transition-colors whitespace-nowrap" type="button">Subscribe</button></div></div></div><div class="flex flex-col gap-space-sm"><h3 class="font-title-md text-body-md font-semibold text-on-primary">Shop Departments</h3><div class="flex flex-col gap-space-xs font-body-sm text-body-sm text-canvas-soft/80"><a class="hover:text-on-primary transition-colors" data-path="tech-and-gadgets" href="#">Tech &amp; Gadgets</a><a class="hover:text-on-primary transition-colors" data-path="home-and-kitchen-essentials" href="#">Home &amp; Kitchen Essentials</a><a class="hover:text-on-primary transition-colors" data-path="furniture-and-space-living" href="#">Furniture &amp; Space Living</a><a class="hover:text-on-primary transition-colors" data-path="fashion-and-accessories" href="#">Fashion &amp; Accessories</a><a class="hover:text-on-primary transition-colors" data-path="stationery-and-craft-tools" href="#">Stationery &amp; Craft Tools</a><a class="text-accent-electric hover:underline font-medium" data-path="sale-and-clearance" href="#">Sale &amp; Clearance</a></div></div><div class="flex flex-col gap-space-sm"><h3 class="font-title-md text-body-md font-semibold text-on-primary">Customer Care</h3><div class="flex flex-col gap-space-xs font-body-sm text-body-sm text-canvas-soft/80"><a class="hover:text-on-primary transition-colors" data-path="help-center" href="#">Help Center &amp; FAQ</a><a class="hover:text-on-primary transition-colors" data-path="track-order" href="#">Track Package</a><a class="hover:text-on-primary transition-colors" data-path="returns-and-exchanges" href="#">Returns &amp; Exchanges</a><a class="hover:text-on-primary transition-colors" data-path="shipping-policy" href="#">Shipping Policy</a><a class="hover:text-on-primary transition-colors" data-path="warranty-claims" href="#">Warranty Claims</a><a class="hover:text-on-primary transition-colors" data-path="contact-concierge" href="#">Contact Concierge</a></div></div><div class="flex flex-col gap-space-sm"><h3 class="font-title-md text-body-md font-semibold text-on-primary">Curatorial Ethos</h3><div class="flex flex-col gap-space-xs font-body-sm text-body-sm text-canvas-soft/80"><a class="hover:text-on-primary transition-colors" data-path="about" href="#">About ShelfStack</a><a class="hover:text-on-primary transition-colors" data-path="sustainability-report" href="#">Sustainability Report</a><a class="hover:text-on-primary transition-colors" data-path="designer-showcases" href="#">Designer Showcases</a><a class="hover:text-on-primary transition-colors" data-path="press-kit" href="#">Press &amp; Media</a><a class="hover:text-on-primary transition-colors" data-path="corporate-procurement" href="#">Corporate Procurement</a></div></div></div><div class="pt-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md text-caption font-caption text-text-muted"><div class="flex items-center gap-space-md"><span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-accent-electric">verified</span><span>Authentic Stock Guaranteed</span></span><span>·</span><span>Carbon Neutral Logistics</span><span>·</span><span>256-Bit Encrypted Payments</span></div><div class="flex items-center gap-space-md"><a class="hover:text-canvas-soft transition-colors" data-path="privacy-policy" href="#">Privacy Policy</a><a class="hover:text-canvas-soft transition-colors" data-path="terms-of-service" href="#">Terms of Service</a><a class="hover:text-canvas-soft transition-colors" data-path="accessibility" href="#">Accessibility</a><span>© 2025 ShelfStack Inc.</span></div></div></div></div></footer></body></html>

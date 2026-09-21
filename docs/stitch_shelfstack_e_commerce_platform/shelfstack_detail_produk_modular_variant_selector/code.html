@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-canvas" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>ShelfStack — Minimalist Developer Workspace</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "field": "#f0f0f0", "outline": "#727687", "surface-tint": "#0054d6", "ink-soft": "#262626", "on-primary-container": "#f8f7ff", "on-error-container": "#93000a", "text-muted": "#707070", "accent-electric": "#0066ff", "tertiary": "#585a5a", "surface-container-high": "#e9e8e7", "on-secondary-container": "#636262", "on-primary": "#ffffff", "primary-container": "#0066ff", "hairline": "#e0e0e0", "secondary": "#5f5e5e", "on-tertiary": "#ffffff", "on-error": "#ffffff", "surface-container-low": "#f5f3f3", "tertiary-container": "#717272", "surface-dim": "#dbdad9", "on-secondary-fixed-variant": "#474646", "text-faint": "#adadad", "surface-container": "#efeded", "secondary-fixed": "#e5e2e1", "overlay-scrim": "rgba(115, 115, 115, 0.56)", "on-primary-fixed": "#001849", "on-tertiary-container": "#f8f8f8", "tertiary-fixed-dim": "#c6c6c7", "surface": "#fbf9f9", "on-primary-fixed-variant": "#003fa4", "background": "#fbf9f9", "canvas-soft": "#f3f3f3", "secondary-container": "#e2dfde", "on-background": "#1b1c1c", "inverse-surface": "#303031", "surface-container-highest": "#e4e2e2", "secondary-fixed-dim": "#c8c6c5", "surface-container-lowest": "#ffffff", "on-tertiary-fixed": "#1a1c1c", "inverse-primary": "#b3c5ff", "outline-variant": "#c2c6d8", "primary-fixed-dim": "#b3c5ff", "surface-variant": "#e4e2e2", "primary-fixed": "dae1ff", "ink": "#141414", "surface-bright": "#fbf9f9", "tertiary-fixed": "#e2e2e2", "inverse-on-surface": "#f2f0f0", "error-container": "#ffdad6", "on-surface-variant": "#424656", "on-surface": "#1b1c1c", "on-tertiary-fixed-variant": "#454747", "primary": "#0050cb", "error": "#ba1a1a", "canvas": "#ffffff", "hairline-soft": "#f0f0f0", "on-secondary": "#ffffff" }, "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, "spacing": { "gutter": "1.5rem", "space-lg": "1.5rem", "gutter-mobile": "1rem", "space-sm": "0.5rem", "margin-mobile": "1.25rem", "space-xs": "0.25rem", "space-md": "1rem", "space-xl": "2rem", "margin": "3rem" }, "fontFamily": { "display-mobile": [ "Hanken Grotesk" ], "label-md": [ "DM Sans" ], "body-lg": [ "DM Sans" ], "headline-sm": [ "Hanken Grotesk" ], "headline-lg-mobile": [ "Hanken Grotesk" ], "display": [ "Hanken Grotesk" ], "link": [ "DM Sans" ], "title-lg": [ "Hanken Grotesk" ], "title-md": [ "Hanken Grotesk" ], "headline-md": [ "Hanken Grotesk" ], "headline-md-mobile": [ "Hanken Grotesk" ], "headline-lg": [ "Hanken Grotesk" ], "caption": [ "DM Sans" ], "body-sm": [ "DM Sans" ], "body-md": [ "DM Sans" ] }, "fontSize": { "display-mobile": [ "48px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "label-md": [ "12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "700" } ], "body-lg": [ "20px", { "lineHeight": "28px", "fontWeight": "400" } ], "headline-sm": [ "32px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600" } ], "headline-lg-mobile": [ "36px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "display": [ "80px", { "lineHeight": "80px", "letterSpacing": "-0.03em", "fontWeight": "700" } ], "link": [ "16px", { "lineHeight": "24px", "fontWeight": "600" } ], "title-lg": [ "24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "title-md": [ "20px", { "lineHeight": "26px", "letterSpacing": "-0.005em", "fontWeight": "600" } ], "headline-md": [ "44px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "headline-md-mobile": [ "28px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" } ], "headline-lg": [ "56px", { "lineHeight": "60px", "letterSpacing": "-0.025em", "fontWeight": "700" } ], "caption": [ "12px", { "lineHeight": "16px", "fontWeight": "400" } ], "body-sm": [ "14px", { "lineHeight": "20px", "fontWeight": "400" } ], "body-md": [ "16px", { "lineHeight": "24px", "fontWeight": "400" } ] } } } };</script></head><body class="bg-canvas font-body-md text-ink antialiased min-h-full flex flex-col selection:bg-accent-electric selection:text-on-primary"><header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 pointer-events-none"><div class="h-20 w-full px-margin-mobile lg:px-margin flex items-center justify-between max-w-[1440px] mx-auto"><div class="pointer-events-auto flex items-center gap-space-sm bg-canvas-soft/90 backdrop-blur-xl px-space-md py-space-xs rounded-full shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><a class="flex items-center gap-space-xs" data-path="home" href="#"><img alt="ShelfStack Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xxr3vYezhanvKgo5CiY-uShx9Z_nxpg3u_P87x04A40OQUZh9sYlZWGLokcyGv6XdZPRKhMvMdJNS6CEtao5ecIeCUG00jOkEZDv3htiNQdAHWJcL7YURulUxM5iQCtehrjw7dkJRK5GCi-33XWEmna2C6wl2SnlH0Jo30mvuBheFB51F5jx9qe3V6ldh4PuT2DB8HtgpzQK4yyLrrefFU7iF8zxAJedNiQI_bGz8noloxhRhU692YRfw"/><span class="font-title-md text-title-md font-semibold tracking-tight text-ink">ShelfStack</span></a></div><nav class="pointer-events-auto hidden md:flex items-center gap-space-xs bg-canvas-soft/90 backdrop-blur-xl p-space-xs rounded-full shadow-[0_1px_8px_rgba(0,0,0,0.04)]" data-active-classes="bg-ink text-on-primary font-bold rounded-full shadow-sm"><a class="font-body-sm text-body-sm px-space-md py-space-xs text-on-surface-variant hover:text-ink transition-colors rounded-full" data-path="catalog" href="#">Catalog</a><a class="font-body-sm text-body-sm px-space-md py-space-xs text-on-surface-variant hover:text-ink transition-colors rounded-full" data-path="desk-setups" href="#">Desk Setups</a><a class="font-body-sm text-body-sm px-space-md py-space-xs text-on-surface-variant hover:text-ink transition-colors rounded-full" data-path="accessories" href="#">Accessories</a><a class="font-body-sm text-body-sm px-space-md py-space-xs text-on-surface-variant hover:text-ink transition-colors rounded-full" data-path="new-drops" href="#">New Drops</a></nav><div class="pointer-events-auto flex items-center gap-space-xs bg-canvas-soft/90 backdrop-blur-xl p-space-xs rounded-full shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="hidden lg:flex items-center bg-canvas rounded-full px-space-md py-1.5"><span class="material-symbols-outlined text-text-muted text-[18px] mr-1.5">search</span><input class="bg-transparent text-ink placeholder:text-text-faint text-caption font-caption outline-none w-28 focus:w-36 transition-all" placeholder="Search gear (⌘K)" type="text"/></div><a class="flex items-center gap-1.5 px-space-md py-space-xs rounded-full bg-canvas text-ink hover:bg-ink hover:text-on-primary transition-all" data-path="cart" href="#"><span class="material-symbols-outlined text-[18px]">shopping_bag</span><span class="font-label-md text-label-md">Cart</span><span class="w-5 h-5 rounded-full bg-accent-electric text-on-primary text-[10px] font-bold flex items-center justify-center leading-none">3</span></a><a class="p-space-xs rounded-full hover:bg-canvas transition-colors" data-path="account" href="#"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></a></div></div></header><main class="w-full pt-20 flex-1 bg-canvas"><div class="flex flex-col w-full">
+<!-- Interactive Configurator Controller Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Configuration State
+      const state = {
+        wood: { name: 'Solid American Walnut', price: 229, code: 'WALNUT' },
+        leg: { name: 'Anodized Space Gray', price: 0, code: 'GRAY' },
+        size: { name: 'Standard 46"', sub: 'Dual 27"-32" Displays', delta: 0, code: '46IN' },
+        addons: {
+          magstack: { selected: true, price: 119, name: 'MagStack 3-in-1 Charging Monolith' },
+          orbit: { selected: true, price: 39, name: 'Orbit Magnetic Cable Anchor (4-Pack)' },
+          keyhub: { selected: false, price: 55, name: 'KeyHub Machined Aluminum Palm Rest' },
+          raceway: { selected: false, price: 78, name: 'Under-Desk Volthub Raceway' }
+        },
+        qty: 1
+      };
+
+      const prices = {
+        base: () => state.wood.price + state.size.delta,
+        addonsTotal: () => Object.values(state.addons).filter(a => a.selected).reduce((acc, cur) => acc + cur.price, 0),
+        discountRate: 0.10, // 10% ecosystem bundle discount if 2+ addons
+        calc() {
+          const rawBase = this.base();
+          const addons = this.addonsTotal();
+          const rawTotal = (rawBase + addons) * state.qty;
+          const activeAddonsCount = Object.values(state.addons).filter(a => a.selected).length;
+          const discount = activeAddonsCount >= 2 ? (addons * this.discountRate * state.qty) : 0;
+          const finalTotal = rawTotal - discount;
+          return {
+            rawTotal,
+            discount,
+            finalTotal,
+            installment: (finalTotal / 4).toFixed(2)
+          };
+        }
+      };
+
+      function updateUI() {
+        const c = prices.calc();
+        // Prices & Buttons
+        const heroPrice = document.getElementById('price-hero');
+        const affirmPrice = document.getElementById('price-affirm');
+        const totalSummary = document.getElementById('price-summary-total');
+        const ctaBtn = document.getElementById('cta-add-to-cart');
+        const stickyBtn = document.getElementById('sticky-add-btn');
+        const stickyPrice = document.getElementById('sticky-price');
+        const discountBox = document.getElementById('discount-applied-banner');
+        const discountVal = document.getElementById('discount-saved-val');
+
+        const formattedFinal = '$' + c.finalTotal.toFixed(2);
+        if (heroPrice) heroPrice.textContent = '$' + (state.wood.price + state.size.delta).toFixed(2);
+        if (affirmPrice) affirmPrice.textContent = '$' + c.installment;
+        if (totalSummary) totalSummary.textContent = formattedFinal;
+        if (ctaBtn) ctaBtn.textContent = `Add Modular Setup to Bag (${formattedFinal})`;
+        if (stickyBtn) stickyBtn.textContent = `Add to Bag • ${formattedFinal}`;
+        if (stickyPrice) stickyPrice.textContent = formattedFinal;
+
+        if (discountBox && discountVal) {
+          if (c.discount > 0) {
+            discountBox.classList.remove('hidden');
+            discountBox.classList.add('flex');
+            discountVal.textContent = '-$' + c.discount.toFixed(2);
+          } else {
+            discountBox.classList.remove('flex');
+            discountBox.classList.add('hidden');
+          }
+        }
+
+        // Summary specs
+        const summarySpec = document.getElementById('summary-selection-text');
+        if (summarySpec) {
+          summarySpec.textContent = `${state.wood.name} / ${state.leg.name} / ${state.size.name}`;
+        }
+        const stickySpec = document.getElementById('sticky-selected-spec');
+        if (stickySpec) {
+          stickySpec.textContent = `${state.wood.name} • ${state.size.name}`;
+        }
+      }
+
+      // Thumbnail gallery handler
+      const mainHeroImg = document.getElementById('pdp-main-image');
+      const thumbs = document.querySelectorAll('.thumb-selector');
+      const angleTag = document.getElementById('active-angle-name');
+
+      const imagesMap = {
+        'angle-1': {
+          title: 'Full Studio Perspective',
+          src: 'placeholder',
+          alt: 'Cinematic wide eye-level photo of the ShelfStack Studio Shelf Pro resting on a bright oak desk supporting dual Apple Studio Displays and mechanical keyboard, soft natural morning studio light with subtle metallic reflections.'
+        },
+        'angle-2': {
+          title: 'Under-Shelf 32mm Snap Rail Mechanism',
+          src: 'placeholder',
+          alt: 'Precision macro photography of the underside of a desk riser showing the precision CNC-milled 32mm magnetic anodized aluminum rail with modular cable hooks securely attached.'
+        },
+        'angle-3': {
+          title: 'Solid American Walnut Surface & Bevel',
+          src: 'placeholder',
+          alt: 'Tactile extreme close-up detail shot of rich dark American walnut wood grain on an architectural desk shelf with hand-sanded 45-degree chamfered front ergonomic edge.'
+        },
+        'angle-4': {
+          title: 'Anodized Space Gray Joint Detail',
+          src: 'placeholder',
+          alt: 'Architectural industrial design detail showing the bead-blasted space gray 6063 aerospace aluminum leg bracket seamlessly joined to a hardwood desk shelf with flush countersunk hex bolts.'
+        },
+        'angle-5': {
+          title: 'Rear Cable Management Channel',
+          src: 'placeholder',
+          alt: 'Rear angled view of minimalist desk riser showing clean pass-through routing for braided Thunderbolt and power cables into a discreet hidden tray.'
+        }
+      };
+
+      thumbs.forEach(btn => {
+        btn.addEventListener('click', () => {
+          thumbs.forEach(t => {
+            t.classList.remove('bg-ink', 'text-on-primary');
+            t.classList.add('bg-canvas-soft', 'text-ink');
+          });
+          btn.classList.add('bg-ink', 'text-on-primary');
+          btn.classList.remove('bg-canvas-soft', 'text-ink');
+
+          const angleId = btn.dataset.angle;
+          if (imagesMap[angleId] && mainHeroImg) {
+            mainHeroImg.setAttribute('data-alt', imagesMap[angleId].alt);
+            if (angleTag) angleTag.textContent = imagesMap[angleId].title;
+          }
+        });
+      });
+
+      // Wood foundation selector
+      document.querySelectorAll('[data-wood-target]').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('[data-wood-target]').forEach(w => {
+            w.classList.remove('bg-field', 'text-ink');
+            w.classList.add('bg-canvas-soft', 'text-ink');
+            const mark = w.querySelector('.check-indicator');
+            if (mark) mark.classList.add('opacity-0');
+          });
+          item.classList.remove('bg-canvas-soft');
+          item.classList.add('bg-field');
+          const mark = item.querySelector('.check-indicator');
+          if (mark) mark.classList.remove('opacity-0');
+
+          state.wood.name = item.dataset.woodName;
+          state.wood.price = parseFloat(item.dataset.woodPrice);
+          updateUI();
+        });
+      });
+
+      // Leg finish selector
+      document.querySelectorAll('[data-leg-target]').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('[data-leg-target]').forEach(l => {
+            l.classList.remove('bg-field');
+            l.classList.add('bg-canvas-soft');
+            const mark = l.querySelector('.leg-check');
+            if (mark) mark.classList.add('opacity-0');
+          });
+          item.classList.add('bg-field');
+          item.classList.remove('bg-canvas-soft');
+          const mark = item.querySelector('.leg-check');
+          if (mark) mark.classList.remove('opacity-0');
+
+          state.leg.name = item.dataset.legName;
+          updateUI();
+        });
+      });
+
+      // Size dimension selector
+      document.querySelectorAll('[data-size-target]').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('[data-size-target]').forEach(s => {
+            s.classList.remove('bg-ink', 'text-on-primary');
+            s.classList.add('bg-canvas-soft', 'text-ink');
+          });
+          item.classList.add('bg-ink', 'text-on-primary');
+          item.classList.remove('bg-canvas-soft', 'text-ink');
+
+          state.size.name = item.dataset.sizeName;
+          state.size.delta = parseFloat(item.dataset.sizeDelta);
+          updateUI();
+        });
+      });
+
+      // Add-on checkboxes
+      document.querySelectorAll('[data-addon-id]').forEach(box => {
+        box.addEventListener('change', (e) => {
+          const addonId = e.target.dataset.addonId;
+          if (state.addons[addonId]) {
+            state.addons[addonId].selected = e.target.checked;
+            updateUI();
+          }
+        });
+      });
+
+      // Quantity controls
+      const qtyDisplay = document.getElementById('qty-display');
+      document.getElementById('qty-plus')?.addEventListener('click', () => {
+        if (state.qty < 9) {
+          state.qty += 1;
+          if (qtyDisplay) qtyDisplay.textContent = state.qty;
+          updateUI();
+        }
+      });
+      document.getElementById('qty-minus')?.addEventListener('click', () => {
+        if (state.qty > 1) {
+          state.qty -= 1;
+          if (qtyDisplay) qtyDisplay.textContent = state.qty;
+          updateUI();
+        }
+      });
+
+      // CAD Blueprint Modal Toggle
+      const cadModal = document.getElementById('cad-blueprint-modal');
+      const openCad = document.getElementById('open-cad-btn');
+      const closeCad = document.getElementById('close-cad-btn');
+
+      if (openCad && cadModal) {
+        openCad.addEventListener('click', () => {
+          cadModal.classList.remove('hidden');
+          cadModal.classList.add('flex');
+        });
+      }
+      if (closeCad && cadModal) {
+        closeCad.addEventListener('click', () => {
+          cadModal.classList.add('hidden');
+          cadModal.classList.remove('flex');
+        });
+      }
+
+      // Sticky bar observer
+      const stickyBar = document.getElementById('sticky-buy-dock');
+      const heroBuyAnchor = document.getElementById('buy-dock-anchor');
+
+      if (stickyBar && heroBuyAnchor) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) {
+              stickyBar.classList.remove('translate-y-32', 'opacity-0', 'pointer-events-none');
+              stickyBar.classList.add('translate-y-0', 'opacity-100');
+            } else {
+              stickyBar.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+              stickyBar.classList.remove('translate-y-0', 'opacity-100');
+            }
+          });
+        }, { threshold: 0.1 });
+
+        observer.observe(heroBuyAnchor);
+      }
+
+      // Initialize
+      updateUI();
+    });
+  </script>
+<!-- TOP BREADCRUMBS & NAVIGATION ANCHORS -->
+<div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin pt-space-lg pb-space-sm w-full">
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<nav class="flex items-center gap-space-xs font-body-sm text-body-sm text-text-muted">
+<a class="hover:text-ink transition-colors" href="#">Catalog</a>
+<span class="text-text-faint">/</span>
+<a class="hover:text-ink transition-colors" href="#">Desk Shelves &amp; Risers</a>
+<span class="text-text-faint">/</span>
+<span class="text-ink font-medium">Studio Shelf Pro (Series 04)</span>
+</nav>
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-canvas-soft text-ink font-caption text-caption">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-electric"></span>
+          Series 04.2 Revision
+        </span>
+<span class="hidden sm:inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-field text-text-muted font-caption text-caption">
+          SKU: SS-PRO46-WAL
+        </span>
+</div>
+</div>
+</div>
+<!-- MAIN PRODUCT DETAIL SPLIT VIEW -->
+<div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin pb-space-xl w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-8 items-start">
+<!-- LEFT COLUMN: CINEMATIC SHOWCASE & BLUEPRINTS (lg:col-span-7) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<!-- Primary Viewport Frame -->
+<div class="relative w-full rounded-lg bg-canvas-soft overflow-hidden group">
+<!-- Aspect ratio 4:3 container -->
+<div class="w-full aspect-[4/3] relative flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]" data-alt="Editorial gallery photograph of the ShelfStack Studio Shelf Pro in rich American walnut with space gray anodized aluminum pillars on an ultra-clean white oak studio desk, supporting dual 32-inch 6K monitors with warm ambient workspace lighting." id="pdp-main-image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAUcNDOf7oyLKBkTWBpUGW3w1j-Wa7rlIaa6F49NRgLHfgb1P5jvWp1FylUjIFQm6auEwJiHnKnGkd6U8hbru_GVgh28sSQoXnykW56hM6p_34ISVMV__8ODCSEWueG8pjwUeLH9hyGSeTPsw5awaK6nCmYthTS_7JXpqJ1hBoSlsoS9bI6x4BWsoQr98oiolcYv6l6kJ7kL44jTd79Xa7sIDjFTV90WX-OqvNbxVROY3JRZjJnw9n"/>
+<!-- Architectural Callout Badges Overlaid -->
+<div class="absolute top-space-md left-space-md flex flex-col gap-space-xs items-start pointer-events-none">
+<span class="inline-flex items-center gap-2 px-space-md py-1.5 rounded-full bg-canvas/90 backdrop-blur-md text-ink font-label-md text-label-md">
+<span class="w-2 h-2 rounded-full bg-accent-electric animate-pulse"></span>
+<span>Dual-Tier System</span>
+</span>
+<span class="px-space-md py-1 rounded-full bg-ink/80 backdrop-blur-md text-on-primary font-caption text-caption">
+                CNC Milled 6063 Alloy + Solid Hardwood
+              </span>
+</div>
+<!-- Capacity Badge -->
+<div class="absolute bottom-space-md left-space-md pointer-events-none">
+<div class="flex items-center gap-2 px-space-md py-1.5 rounded-full bg-canvas/90 backdrop-blur-md text-ink font-caption text-caption">
+<span class="material-symbols-outlined text-[16px] text-accent-electric">fitness_center</span>
+<span>Certified Static Load: <strong>65 kg (143 lbs)</strong></span>
+</div>
+</div>
+<!-- Exploded CAD Quick Trigger Button -->
+<button class="absolute bottom-space-md right-space-md flex items-center gap-2 px-space-md py-space-xs rounded-full bg-ink text-on-primary hover:bg-ink-soft transition-all active:scale-95 shadow-sm" id="open-cad-btn" type="button">
+<span class="material-symbols-outlined text-[16px] text-accent-electric">view_in_ar</span>
+<span class="font-label-md text-label-md">CAD Blueprint</span>
+</button>
+</div>
+</div>
+<!-- Interactive Thumbnail Strip (5 Angles) -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between px-1">
+<span class="font-caption text-caption text-text-muted uppercase tracking-wider">Perspective Viewport</span>
+<span class="font-caption text-caption text-ink font-medium" id="active-angle-name">Full Studio Perspective</span>
+</div>
+<div class="grid grid-cols-5 gap-space-xs sm:gap-space-sm">
+<button class="thumb-selector flex flex-col items-center justify-center p-space-xs rounded bg-ink text-on-primary transition-all text-center" data-angle="angle-1" type="button">
+<span class="material-symbols-outlined text-[20px]">panorama</span>
+<span class="font-caption text-[11px] leading-tight mt-1 truncate w-full">Studio</span>
+</button>
+<button class="thumb-selector flex flex-col items-center justify-center p-space-xs rounded bg-canvas-soft text-ink hover:bg-field transition-all text-center" data-angle="angle-2" type="button">
+<span class="material-symbols-outlined text-[20px]">linear_scale</span>
+<span class="font-caption text-[11px] leading-tight mt-1 truncate w-full">Snap Rail</span>
+</button>
+<button class="thumb-selector flex flex-col items-center justify-center p-space-xs rounded bg-canvas-soft text-ink hover:bg-field transition-all text-center" data-angle="angle-3" type="button">
+<span class="material-symbols-outlined text-[20px]">texture</span>
+<span class="font-caption text-[11px] leading-tight mt-1 truncate w-full">Grain</span>
+</button>
+<button class="thumb-selector flex flex-col items-center justify-center p-space-xs rounded bg-canvas-soft text-ink hover:bg-field transition-all text-center" data-angle="angle-4" type="button">
+<span class="material-symbols-outlined text-[20px]">hardware</span>
+<span class="font-caption text-[11px] leading-tight mt-1 truncate w-full">Alloy Joint</span>
+</button>
+<button class="thumb-selector flex flex-col items-center justify-center p-space-xs rounded bg-canvas-soft text-ink hover:bg-field transition-all text-center" data-angle="angle-5" type="button">
+<span class="material-symbols-outlined text-[20px]">cable</span>
+<span class="font-caption text-[11px] leading-tight mt-1 truncate w-full">Cabling</span>
+</button>
+</div>
+</div>
+<!-- High-Impact Visual Quote / Craft Strip -->
+<div class="mt-space-md p-space-lg rounded bg-canvas-soft flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-full bg-canvas flex items-center justify-center text-ink shrink-0">
+<span class="material-symbols-outlined text-[24px]">architecture</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-ink font-semibold">Zero-Flex Extrusion Core</p>
+<p class="font-body-sm text-body-sm text-text-muted">Single billet aerospace aluminum spine prevents center-sagging on ultra-wide screens.</p>
+</div>
+</div>
+<div class="flex sm:flex-col items-center sm:items-end shrink-0 gap-1 text-right">
+<span class="font-label-md text-label-md text-accent-electric uppercase">Toleranced</span>
+<span class="font-caption text-caption text-text-muted font-mono">±0.05mm precision</span>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: MODULAR VARIANT CONFIGURATOR & BUY ENGINE (lg:col-span-5) -->
+<div class="lg:col-span-5 flex flex-col gap-space-lg lg:sticky lg:top-24">
+<!-- Header & Badges -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between gap-space-sm">
+<span class="px-space-md py-1 rounded-full bg-canvas-soft text-ink font-label-md text-label-md uppercase tracking-wider">
+              Flagship Architecture
+            </span>
+<div class="flex items-center gap-1.5 px-space-md py-1 rounded-full bg-canvas-soft font-caption text-caption text-ink">
+<span class="w-2 h-2 rounded-full bg-accent-electric animate-pulse"></span>
+<span class="font-medium text-ink">In Stock — Ships within 24h</span>
+</div>
+</div>
+<h1 class="font-headline-md text-headline-md text-ink font-bold tracking-tight mt-space-xs">
+            Studio Shelf Pro
+          </h1>
+<p class="font-body-md text-body-md text-text-muted">
+            Series 04 / Heavy-Duty Modular Dual-Tier Desk Ecosystem
+          </p>
+<!-- Rating & Verified count -->
+<div class="flex items-center gap-space-sm pt-space-xs">
+<div class="flex items-center text-ink">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-body-sm text-body-sm text-ink font-bold">4.96</span>
+<span class="font-body-sm text-body-sm text-text-muted">(340 verified engineering setups)</span>
+</div>
+<!-- Dynamic Pricing Box -->
+<div class="flex items-baseline gap-space-md mt-space-sm">
+<span class="font-headline-sm text-headline-sm text-ink font-bold tracking-tight" id="price-hero">
+              $229.00
+            </span>
+<span class="font-body-sm text-body-sm text-text-muted line-through">
+              $259.00
+            </span>
+<span class="px-space-sm py-0.5 rounded-full bg-accent-electric text-on-primary font-caption text-caption font-bold">
+              Save $30
+            </span>
+</div>
+<div class="inline-flex items-center gap-1.5 text-text-muted font-body-sm text-body-sm">
+<span>Pay in 4 interest-free installments of</span>
+<span class="font-semibold text-ink" id="price-affirm">$57.25</span>
+<span class="font-caption text-caption text-text-faint">with Affirm or Klarna</span>
+</div>
+</div>
+<div class="w-full h-px bg-hairline-soft"></div>
+<!-- CONFIGURATION STEP 1: Wood Surface Selection -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-ink uppercase tracking-wider">
+              Step 1: Hardwood Foundation
+            </label>
+<span class="font-caption text-caption text-text-muted">FSC® 100% Certified Solid Wood</span>
+</div>
+<div class="grid grid-cols-1 gap-space-xs">
+<!-- Option A: Walnut (Default Active) -->
+<div class="flex items-center justify-between p-space-md rounded bg-field cursor-pointer hover:bg-canvas-soft transition-all" data-wood-name="Solid American Walnut" data-wood-price="229" data-wood-target="">
+<div class="flex items-center gap-space-md">
+<div class="w-8 h-8 rounded-full bg-[#3d271d] shrink-0 shadow-inner"></div>
+<div class="flex flex-col">
+<span class="font-title-md text-body-md text-ink font-semibold">Solid American Walnut</span>
+<span class="font-caption text-caption text-text-muted">Appalachian slow-growth, hand-rubbed Danish oil</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-md text-label-md text-ink font-bold">$229.00</span>
+<span class="check-indicator material-symbols-outlined text-[20px] text-accent-electric">check_circle</span>
+</div>
+</div>
+<!-- Option B: White Oak -->
+<div class="flex items-center justify-between p-space-md rounded bg-canvas-soft cursor-pointer hover:bg-field transition-all" data-wood-name="European White Oak" data-wood-price="219" data-wood-target="">
+<div class="flex items-center gap-space-md">
+<div class="w-8 h-8 rounded-full bg-[#c8af88] shrink-0 shadow-inner"></div>
+<div class="flex flex-col">
+<span class="font-title-md text-body-md text-ink font-semibold">European White Oak</span>
+<span class="font-caption text-caption text-text-muted">Bavarian alpine timber, natural matte raw finish</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-md text-label-md text-ink font-bold">$219.00</span>
+<span class="check-indicator opacity-0 material-symbols-outlined text-[20px] text-accent-electric">check_circle</span>
+</div>
+</div>
+<!-- Option C: Midnight Ash -->
+<div class="flex items-center justify-between p-space-md rounded bg-canvas-soft cursor-pointer hover:bg-field transition-all" data-wood-name="Matte Midnight Ash" data-wood-price="239" data-wood-target="">
+<div class="flex items-center gap-space-md">
+<div class="w-8 h-8 rounded-full bg-[#1c1d20] shrink-0 shadow-inner"></div>
+<div class="flex flex-col">
+<span class="font-title-md text-body-md text-ink font-semibold">Matte Midnight Ash</span>
+<span class="font-caption text-caption text-text-muted">Deep ebonized open grain, fingerprint-resistant lacquer</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-md text-label-md text-ink font-bold">$239.00</span>
+<span class="check-indicator opacity-0 material-symbols-outlined text-[20px] text-accent-electric">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+<!-- CONFIGURATION STEP 2: Riser Leg Finish -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-ink uppercase tracking-wider">
+              Step 2: Aluminum Leg Architecture
+            </label>
+<span class="font-caption text-caption text-text-muted">6063 T6 Anodized</span>
+</div>
+<div class="grid grid-cols-3 gap-space-xs">
+<button class="flex flex-col items-center justify-center p-space-sm rounded bg-field text-center hover:bg-canvas-soft transition-all relative" data-leg-name="Anodized Space Gray" data-leg-target="" type="button">
+<div class="w-6 h-6 rounded-full bg-[#525458] mb-1.5 shadow-inner"></div>
+<span class="font-body-sm text-caption text-ink font-semibold">Space Gray</span>
+<span class="leg-check material-symbols-outlined text-[14px] text-accent-electric mt-0.5">check</span>
+</button>
+<button class="flex flex-col items-center justify-center p-space-sm rounded bg-canvas-soft text-center hover:bg-field transition-all relative" data-leg-name="Matte Silver Frost" data-leg-target="" type="button">
+<div class="w-6 h-6 rounded-full bg-[#d2d4d8] mb-1.5 shadow-inner"></div>
+<span class="font-body-sm text-caption text-ink font-semibold">Silver Frost</span>
+<span class="leg-check opacity-0 material-symbols-outlined text-[14px] text-accent-electric mt-0.5">check</span>
+</button>
+<button class="flex flex-col items-center justify-center p-space-sm rounded bg-canvas-soft text-center hover:bg-field transition-all relative" data-leg-name="Stealth Obsidian Black" data-leg-target="" type="button">
+<div class="w-6 h-6 rounded-full bg-[#181819] mb-1.5 shadow-inner"></div>
+<span class="font-body-sm text-caption text-ink font-semibold">Obsidian Black</span>
+<span class="leg-check opacity-0 material-symbols-outlined text-[14px] text-accent-electric mt-0.5">check</span>
+</button>
+</div>
+</div>
+<!-- CONFIGURATION STEP 3: Size & Dimension -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-ink uppercase tracking-wider">
+              Step 3: Shelf Span Dimension
+            </label>
+<span class="font-caption text-caption text-text-muted">Clearance Height: 95mm (3.74")</span>
+</div>
+<div class="grid grid-cols-3 gap-space-xs">
+<button class="flex flex-col items-start p-space-sm rounded bg-canvas-soft text-ink hover:bg-field transition-all text-left" data-size-delta="-20" data-size-name='Compact 38"' data-size-target="" type="button">
+<span class="font-body-sm text-body-sm font-bold">38" Compact</span>
+<span class="font-caption text-[11px] text-text-muted mt-0.5">Ultrawide / Dual 24"</span>
+<span class="font-caption text-caption text-accent-electric font-semibold mt-1">-$20.00</span>
+</button>
+<button class="flex flex-col items-start p-space-sm rounded bg-ink text-on-primary hover:bg-ink-soft transition-all text-left" data-size-delta="0" data-size-name='Standard 46"' data-size-target="" type="button">
+<span class="font-body-sm text-body-sm font-bold">46" Standard</span>
+<span class="font-caption text-[11px] opacity-80 mt-0.5">Dual 27"-32" Screens</span>
+<span class="font-caption text-caption opacity-90 font-medium mt-1">Included</span>
+</button>
+<button class="flex flex-col items-start p-space-sm rounded bg-canvas-soft text-ink hover:bg-field transition-all text-left" data-size-delta="40" data-size-name='Ultra-Wide 54"' data-size-target="" type="button">
+<span class="font-body-sm text-body-sm font-bold">54" Ultra</span>
+<span class="font-caption text-[11px] text-text-muted mt-0.5">Dual 32" + Monitors</span>
+<span class="font-caption text-caption text-accent-electric font-semibold mt-1">+$40.00</span>
+</button>
+</div>
+</div>
+<!-- MODULAR ADD-ON ECOSYSTEM -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<label class="font-label-md text-label-md text-ink uppercase tracking-wider">
+                Modular Snap Ecosystem
+              </label>
+<span class="px-space-xs py-0.5 rounded-full bg-accent-electric text-on-primary text-[10px] font-bold">
+                Bundle -10%
+              </span>
+</div>
+<span class="font-caption text-caption text-text-muted">Snaps into bottom rail</span>
+</div>
+<div class="flex flex-col gap-space-xs">
+<!-- Module 1 -->
+<label class="flex items-center justify-between p-space-sm rounded bg-canvas-soft hover:bg-field cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm">
+<input checked="" class="w-4 h-4 rounded text-ink focus:ring-0 accent-ink cursor-pointer" data-addon-id="magstack" type="checkbox"/>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-ink font-semibold">MagStack 3-in-1 Charging Monolith</span>
+<span class="font-caption text-caption text-text-muted">15W Qi2 fast charging for iPhone, AirPods &amp; Apple Watch</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-ink font-bold">+$119.00</span>
+</label>
+<!-- Module 2 -->
+<label class="flex items-center justify-between p-space-sm rounded bg-canvas-soft hover:bg-field cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm">
+<input checked="" class="w-4 h-4 rounded text-ink focus:ring-0 accent-ink cursor-pointer" data-addon-id="orbit" type="checkbox"/>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-ink font-semibold">Orbit Magnetic Cable Anchor (4-Pack)</span>
+<span class="font-caption text-caption text-text-muted">Neodymium snaps to align braided Thunderbolt cables</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-ink font-bold">+$39.00</span>
+</label>
+<!-- Module 3 -->
+<label class="flex items-center justify-between p-space-sm rounded bg-canvas-soft hover:bg-field cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm">
+<input class="w-4 h-4 rounded text-ink focus:ring-0 accent-ink cursor-pointer" data-addon-id="keyhub" type="checkbox"/>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-ink font-semibold">KeyHub Machined Aluminum Palm Rest</span>
+<span class="font-caption text-caption text-text-muted">Bead-blasted ergonomic wrist support matching leg anodization</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-ink font-bold">+$55.00</span>
+</label>
+<!-- Module 4 -->
+<label class="flex items-center justify-between p-space-sm rounded bg-canvas-soft hover:bg-field cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm">
+<input class="w-4 h-4 rounded text-ink focus:ring-0 accent-ink cursor-pointer" data-addon-id="raceway" type="checkbox"/>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-ink font-semibold">Under-Desk Volthub Raceway</span>
+<span class="font-caption text-caption text-text-muted">High-capacity cable trough with surge protector enclosure</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-ink font-bold">+$78.00</span>
+</label>
+</div>
+</div>
+<!-- CONFIGURATION SUMMARY BOX & BUNDLE DISCOUNT BANNER -->
+<div class="p-space-md rounded bg-field flex flex-col gap-space-xs">
+<div class="flex items-center justify-between text-text-muted font-body-sm text-body-sm">
+<span>Selected Architecture:</span>
+<span class="font-semibold text-ink text-right truncate max-w-[240px]" id="summary-selection-text">
+              Solid American Walnut / Space Gray / Standard 46"
+            </span>
+</div>
+<!-- Dynamic Discount Banner -->
+<div class="flex items-center justify-between p-space-xs px-space-sm rounded-full bg-accent-electric text-on-primary font-caption text-caption" id="discount-applied-banner">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">local_offer</span>
+              10% Modular Ecosystem discount applied
+            </span>
+<span class="font-bold" id="discount-saved-val">-$15.80</span>
+</div>
+<div class="flex items-center justify-between pt-space-xs border-t border-hairline-soft">
+<span class="font-title-md text-title-md text-ink font-bold">Total Investment:</span>
+<span class="font-headline-sm text-title-lg text-ink font-bold" id="price-summary-total">$371.20</span>
+</div>
+</div>
+<!-- BUY ACTIONS & QUANTITY (Anchor for sticky bar detection) -->
+<div class="flex flex-col gap-space-xs" id="buy-dock-anchor">
+<div class="flex items-center gap-space-xs">
+<!-- Stepper Pill -->
+<div class="flex items-center bg-canvas-soft rounded-full p-1 shrink-0">
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-field text-ink transition-colors" id="qty-minus" type="button">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+<span class="font-label-md text-label-md px-3 text-ink font-bold" id="qty-display">1</span>
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-field text-ink transition-colors" id="qty-plus" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+<!-- Primary Add To Bag Pill -->
+<button class="flex-1 bg-ink text-on-primary hover:bg-ink-soft py-3.5 px-space-lg rounded-full font-label-md text-label-md tracking-tight flex items-center justify-center gap-2 transition-all active:scale-[0.99] shadow-sm" id="cta-add-to-cart" type="button">
+              Add Modular Setup to Bag ($371.20)
+            </button>
+</div>
+<!-- Fast Checkout Pill -->
+<button class="w-full bg-[#5a31f4] hover:bg-[#4b26d1] text-on-primary py-3 px-space-lg rounded-full font-label-md text-label-md tracking-tight flex items-center justify-center gap-2 transition-all active:scale-[0.99]" type="button">
+<span>Buy with</span>
+<span class="font-bold tracking-tighter text-[16px]">Shop Pay</span>
+</button>
+</div>
+<!-- TRUST & ASSURANCE GUARANTEES -->
+<div class="grid grid-cols-3 gap-space-xs pt-space-xs">
+<div class="flex flex-col items-center text-center p-space-xs rounded bg-canvas-soft">
+<span class="material-symbols-outlined text-[20px] text-accent-electric mb-1">local_shipping</span>
+<span class="font-caption text-[11px] font-bold text-ink">Free Express Delivery</span>
+<span class="font-caption text-[10px] text-text-muted">Global orders &gt;$150</span>
+</div>
+<div class="flex flex-col items-center text-center p-space-xs rounded bg-canvas-soft">
+<span class="material-symbols-outlined text-[20px] text-accent-electric mb-1">published_with_changes</span>
+<span class="font-caption text-[11px] font-bold text-ink">30-Day Studio Trial</span>
+<span class="font-caption text-[10px] text-text-muted">Zero restocking fee</span>
+</div>
+<div class="flex flex-col items-center text-center p-space-xs rounded bg-canvas-soft">
+<span class="material-symbols-outlined text-[20px] text-accent-electric mb-1">verified_user</span>
+<span class="font-caption text-[11px] font-bold text-ink">Lifetime Guarantee</span>
+<span class="font-caption text-[10px] text-text-muted">Zero-wobble promise</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 1: ARCHITECTURAL DEEP-DIVE: "ENGINEERED TO DISAPPEAR" -->
+<section class="w-full bg-canvas-soft py-margin mt-space-xl">
+<div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin">
+<!-- Section Header -->
+<div class="flex flex-col max-w-2xl mb-space-xl">
+<span class="font-label-md text-label-md uppercase tracking-wider text-accent-electric mb-space-xs">
+          Structural Architecture
+        </span>
+<h2 class="font-headline-lg text-headline-md sm:text-headline-lg text-ink font-bold tracking-tight">
+          Engineered to disappear into your workflow.
+        </h2>
+<p class="font-body-lg text-body-lg text-text-muted mt-space-sm">
+          Every joint, angle, and channel is calibrated to reduce visual noise while bearing industrial weight with imperceptible flex.
+        </p>
+</div>
+<!-- 4-Card Bento Architecture Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Card 1 -->
+<div class="flex flex-col p-space-lg rounded-lg bg-canvas transition-all hover:translate-y-[-2px]">
+<div class="w-full aspect-[4/3] rounded bg-canvas-soft mb-space-md overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Technical macro illustration of an integrated 32mm snap rail groove running along the underside of a walnut desk shelf, machined with extreme aerospace precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWmXUp8EPpwOfsXDikXK2EFcfjJENHpJy6Ou8NRWkIKt_mJxl5BfNVgB0R01U9z7qDNQZdCqQi1lvHx014DUgdnqWUEo5UidKexVjmaO9l3n8SJvF1USeBJ_4bAbtXlSRd_Z-g2EMpW_4eRBbf8VlhNqhRBdcyakXdDUHppNMGQ-lx57PcTCZmUL1A4bvCqgTorU3n1CXij7rQOi6t3FUimAv3k1u41G-wAn7jLSbdTighBGl3K8Gk"/>
+<div class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-ink text-on-primary font-mono text-[10px]">
+              TOL: 0.02MM
+            </div>
+</div>
+<span class="font-label-md text-label-md text-text-muted uppercase">01 / Magnetic Rail</span>
+<h3 class="font-title-lg text-title-lg text-ink font-bold mt-1">Integrated 32mm Snap Rail</h3>
+<p class="font-body-sm text-body-sm text-text-muted mt-2">
+            Continuous bottom track allows MagStack chargers and cable anchors to click magnetically anywhere along the span without visible screws.
+          </p>
+</div>
+<!-- Card 2 -->
+<div class="flex flex-col p-space-lg rounded-lg bg-canvas transition-all hover:translate-y-[-2px]">
+<div class="w-full aspect-[4/3] rounded bg-canvas-soft mb-space-md overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Diagram showing hidden wire conduits drilled inside the legs of a high-end designer monitor shelf, channeling thick cables out of view." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACpx9vZ4m8lJ_7eXw9W_nh-FKVMITJOppqU2JCMmtgW1ggpYTcHR0jl3USDuTf0S_esBrgKjVmWj48upm_eBmeFidJNPK3tog8wDzscAWok_z5LqHywr9TZrSQLGn6hW-YQ1RX7qsgVDgSaROIxtUZK9T3f5OwDYEL8VDeTn5TaQpTfaQd_hmhzF1AERi53y7ZH9S5CTTjG8kMiP6-WiFseXUcRnmd-QGMrS2dofgu3lOWLmJH4RQC"/>
+<div class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-accent-electric text-on-primary font-mono text-[10px]">
+              ZERO-DRAG
+            </div>
+</div>
+<span class="font-label-md text-label-md text-text-muted uppercase">02 / Conduit Route</span>
+<h3 class="font-title-lg text-title-lg text-ink font-bold mt-1">Internal Wire Conduit</h3>
+<p class="font-body-sm text-body-sm text-text-muted mt-2">
+            Hollow structural aluminum legs double as high-throughput wire channels to swallow braided monitor cables completely.
+          </p>
+</div>
+<!-- Card 3 -->
+<div class="flex flex-col p-space-lg rounded-lg bg-canvas transition-all hover:translate-y-[-2px]">
+<div class="w-full aspect-[4/3] rounded bg-canvas-soft mb-space-md overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Close up of a sculpted front edge of a wooden desk shelf featuring a hand-finished ergonomic bevel designed for wrist resting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRdVmiiN4K37teyv_szDHHeVWmxU5T9JZvjqK9zzvJ3NmrNR6kc70Kjxo8eMUe5iF5PirPvj3n9d3EUl1RYeCD6rs_TbsHurUDy1Y7r_pt5tTzI0B-d8wJ8vzyEFNok20Jl9cGMVhem5UygzHdx6cisyO82i0Td6wfXwjaSoQ86xTw8_xPh4y1TyCgBwyYCZJZw09hSig4nqn51W5gH8YB9iBpLEUPc-FyTE1t2pVRqtcbOEC413Rw"/>
+<div class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-ink text-on-primary font-mono text-[10px]">
+              45° BEVEL
+            </div>
+</div>
+<span class="font-label-md text-label-md text-text-muted uppercase">03 / Ergonomics</span>
+<h3 class="font-title-lg text-title-lg text-ink font-bold mt-1">Recessed Fore-Edge</h3>
+<p class="font-body-sm text-body-sm text-text-muted mt-2">
+            A continuous 45-degree chamfered slope creates comfortable palm resting relief when pulling keyboards directly underneath.
+          </p>
+</div>
+<!-- Card 4 -->
+<div class="flex flex-col p-space-lg rounded-lg bg-canvas transition-all hover:translate-y-[-2px]">
+<div class="w-full aspect-[4/3] rounded bg-canvas-soft mb-space-md overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Close-up photograph of high-density textured acoustic silicone dampening pads on the base of metal desk riser feet protecting a desk surface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCV9iAXyfNZQ_1UKn_MJVdIQcgMMJBHI3VNWx0BWoh1Doq2aadL118wu4h9GQV9E0G-q-6HG5qwgS0GgTtpTJlt6oZr4zI-zmYP-qzVpX6RhfCoul2a1peebzL2yQ6MGuWwS3VxxC6p3D5vK81JhMHgJxfzCPHOPLiA7FqTPtVi_6RIx0kvzfPFKl6LeUlDcnaIn1KcUg7Fohm7U3theK_NH3lFPulZHz9bYrnof02Pem6igyaJzUI"/>
+<div class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-ink text-on-primary font-mono text-[10px]">
+              NON-MARRING
+            </div>
+</div>
+<span class="font-label-md text-label-md text-text-muted uppercase">04 / Surface Grip</span>
+<h3 class="font-title-lg text-title-lg text-ink font-bold mt-1">Acoustic Silicone Feet</h3>
+<p class="font-body-sm text-body-sm text-text-muted mt-2">
+            High-durometer molded silicone footings isolate desk resonances and prevent hairline scratches across raw solid wood desks.
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: TECHNICAL BLUEPRINT SPECIFICATIONS -->
+<section class="w-full py-margin">
+<div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<!-- Section Intro & Metric Stat Callouts -->
+<div class="lg:col-span-4 flex flex-col gap-space-md">
+<span class="font-label-md text-label-md uppercase tracking-wider text-accent-electric">
+            Engineering Specs
+          </span>
+<h2 class="font-headline-md text-headline-md text-ink font-bold tracking-tight">
+            Toleranced for lifelong permanence.
+          </h2>
+<p class="font-body-md text-body-md text-text-muted">
+            All materials are sustainably harvested, cut with waterjet accuracy, and hand-finished with low-VOC bio-resins in our Portland workshop.
+          </p>
+<div class="p-space-md rounded bg-field flex flex-col gap-space-xs mt-space-sm">
+<div class="flex items-center gap-2 text-ink">
+<span class="material-symbols-outlined text-accent-electric">eco</span>
+<span class="font-title-md text-title-md font-bold">FSC® C104237 Certified</span>
+</div>
+<p class="font-caption text-caption text-text-muted">
+              100% of the walnut and oak timbers utilized in ShelfStack series originate from managed North American regeneration forests.
+            </p>
+</div>
+</div>
+<!-- Two-Column Minimalist Spec Table -->
+<div class="lg:col-span-8 bg-canvas rounded-lg overflow-hidden">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-gutter gap-y-0">
+<!-- Row 1 -->
+<div class="flex flex-col py-space-md border-b border-hairline-soft">
+<span class="font-caption text-caption text-text-muted uppercase tracking-wider">Standard Span (Length)</span>
+<span class="font-title-md text-body-md text-ink font-semibold mt-1">1168 mm / 46.0 in</span>
+<span class="font-caption text-caption text-text-faint mt-0.5">Fits dual 27" or 32" displays comfortably</span>
+</div>
+<div class="flex flex-col py-space-md border-b border-hairline-soft">
+<span class="font-caption text-caption text-text-muted uppercase tracking-wider">Depth &amp; Platform Width</span>
+<span class="font-title-md text-body-md text-ink font-semibold mt-1">260 mm / 10.25 in</span>
+<span class="font-caption text-caption text-text-faint mt-0.5">Ample clearance for studio monitors and docking stations</span>
+</div>
+<!-- Row 2 -->
+<div class="flex flex-col py-space-md border-b border-hairline-soft">
+<span class="font-caption text-caption text-text-muted uppercase tracking-wider">Vertical Clearance Height</span>
+<span class="font-title-md text-body-md text-ink font-semibold mt-1">95 mm / 3.74 in</span>
+<span class="font-caption text-caption text-text-faint mt-0.5">Slides mechanical keyboards up to 80% TKL &amp; mouse</span>
+</div>
+<div class="flex flex-col py-space-md border-b border-hairline-soft">
+<span class="font-caption text-caption text-text-muted uppercase tracking-wider">Static Weight Capacity</span>
+<span class="font-title-md text-body-md text-ink font-semibold mt-1">65.0 kg / 143.3 lbs</span>
+<span class="font-caption text-caption text-text-faint mt-0.5">Tested to 3x safety factor under sustained pressure</span>
+</div>
+<!-- Row 3 -->
+<div class="flex flex-col py-space-md border-b border-hairline-soft">
+<span class="font-caption text-caption text-text-muted uppercase tracking-wider">Alloy Composition</span>
+<span class="font-title-md text-body-md text-ink font-semibold mt-1">6063-T6 Structural Aluminum</span>
+<span class="font-caption text-caption text-text-faint mt-0.5">Bead-blasted satin matte finish with 15µm anodization</span>
+</div>
+<div class="flex flex-col py-space-md border-b border-hairline-soft">
+<span class="font-caption text-caption text-text-muted uppercase tracking-wider">Surface Top Material</span>
+<span class="font-title-md text-body-md text-ink font-semibold mt-1">Prime Grade Solid American Walnut</span>
+<span class="font-caption text-caption text-text-faint mt-0.5">Thickness: 20mm kiln-dried solid plank (no veneers)</span>
+</div>
+<!-- Row 4 -->
+<div class="flex flex-col py-space-md border-b border-hairline-soft">
+<span class="font-caption text-caption text-text-muted uppercase tracking-wider">Snap Rail Standard</span>
+<span class="font-title-md text-body-md text-ink font-semibold mt-1">Proprietary MagLock™ 32mm</span>
+<span class="font-caption text-caption text-text-faint mt-0.5">N52 grade neodymium alignment system</span>
+</div>
+<div class="flex flex-col py-space-md border-b border-hairline-soft">
+<span class="font-caption text-caption text-text-muted uppercase tracking-wider">Packaging Metric</span>
+<span class="font-title-md text-body-md text-ink font-semibold mt-1">100% Recyclable Flatpack Pulp</span>
+<span class="font-caption text-caption text-text-faint mt-0.5">Ships with solid brass installation hex key</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: "FREQUENTLY PAIRED WITH" COMPANION MODULES -->
+<section class="w-full bg-canvas-soft py-margin">
+<div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin">
+<div class="flex flex-col sm:flex-row sm:items-end justify-between mb-space-lg gap-space-sm">
+<div>
+<span class="font-label-md text-label-md uppercase tracking-wider text-accent-electric">Complete the System</span>
+<h2 class="font-headline-sm text-headline-sm text-ink font-bold tracking-tight mt-1">
+            Frequently Paired Companions
+          </h2>
+</div>
+<a class="font-label-md text-label-md text-ink hover:text-accent-electric transition-colors flex items-center gap-1" href="#">
+<span>Explore All 14 Ecosystem Modules</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Companion 1 -->
+<div class="flex flex-col p-space-md rounded-lg bg-canvas transition-all hover:translate-y-[-2px]">
+<div class="w-full aspect-[4/3] rounded bg-canvas-soft mb-space-md overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Minimalist natural Merino wool desk felt pad in charcoal gray under a mechanical keyboard on a modern white desk." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZvc9nhuJQn3yA6TezrVrsdoDD8nRKfBpIyI-bGXKNteFri1m6Jv9Gxfz6_JfEQVREdMYLV_EhNzCjyjB5fK_2Li4w5-zHDCK3rjdwCFWFRcnECfaXxnNKsgW40K7r8mBe30ZMEhBv05LBONduuJuVw1DhcKdOzbHZzdJArac0IT9LR3csuVT6RVEbAR7g7xONYPO9GTcPwCyegmV9J36chR4pDLvT0wBpCh_Yg3t4QLaHsSYWOfAN"/>
+</div>
+<span class="font-caption text-caption text-text-muted uppercase">Tactile Foundation</span>
+<h4 class="font-title-md text-title-md text-ink font-bold mt-1">Merino Felt Desk Mat (Large)</h4>
+<p class="font-body-sm text-body-sm text-text-muted mt-1">High-density 4mm natural Bavarian wool felt with non-slip cork base.</p>
+<div class="flex items-center justify-between mt-space-md pt-space-sm border-t border-hairline-soft">
+<span class="font-title-md text-body-md text-ink font-bold">$68.00</span>
+<button class="px-space-md py-1.5 rounded-full bg-field hover:bg-ink hover:text-on-primary text-ink font-label-md text-label-md transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Add</span>
+</button>
+</div>
+</div>
+<!-- Companion 2 -->
+<div class="flex flex-col p-space-md rounded-lg bg-canvas transition-all hover:translate-y-[-2px]">
+<div class="w-full aspect-[4/3] rounded bg-canvas-soft mb-space-md overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Machined aluminum dual headphone stand attached to the side rail of a minimalist desk shelf supporting high-end planar magnetic headphones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_Zu3eu_UPcrKRuceELBNCX5KH6pd5Op21rpVLDa4mCE2UiiC5BMj2CDJRQAm7nPdOi2R_7NIBajh_oqISDfpt38nKJOiyHucCip0FlWBJLkdbOjhb3YL10HM2VaC2_GCDnni4cQhmWru77_NNHzzmJGRWRlcqyP_nptJx0u_sJ06rqmwnMrseWaWqK9J_K-DDci5VYwdwaYthZb7L6Fvo3rbKkFa8heQ3OSyQLbEs-9mNjlKvO_xj"/>
+</div>
+<span class="font-caption text-caption text-text-muted uppercase">Audio Organization</span>
+<h4 class="font-title-md text-title-md text-ink font-bold mt-1">AeroHead Rail Stand</h4>
+<p class="font-body-sm text-body-sm text-text-muted mt-1">Suspends studio headphones cleanly off the desk via bottom rail slot.</p>
+<div class="flex items-center justify-between mt-space-md pt-space-sm border-t border-hairline-soft">
+<span class="font-title-md text-body-md text-ink font-bold">$49.00</span>
+<button class="px-space-md py-1.5 rounded-full bg-field hover:bg-ink hover:text-on-primary text-ink font-label-md text-label-md transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Add</span>
+</button>
+</div>
+</div>
+<!-- Companion 3 -->
+<div class="flex flex-col p-space-md rounded-lg bg-canvas transition-all hover:translate-y-[-2px]">
+<div class="w-full aspect-[4/3] rounded bg-canvas-soft mb-space-md overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Minimalist matte black aluminum desk tray organizer with dedicated slots for Apple Pencil, AirPods, and fountain pens." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFSM9GcmnjiclStAu9__t_ZITUGiSgnhEE6c5ASnYXssAxqB_cxaQmFctDkiEeUmHLWG3VcTPmgRICgfx_wSzumyTs_TXiAZQc7eq9-MAJ9RzcVrpP2pfVSWB9H8qhmKL6uF6ksOzkPZh7sSY1A7ndOCJ5r9VzmAiRQds9gzNWVx8QX3ztLM1t3uUOIF2AkdiQTTCR2T5tM6NLnt9w0MSQXm0Qc9Dnn6IyvbDEL5jSJZkZe-Q6Tv1o"/>
+</div>
+<span class="font-caption text-caption text-text-muted uppercase">Everyday Carry</span>
+<h4 class="font-title-md text-title-md text-ink font-bold mt-1">CatchAll Machined Catch Tray</h4>
+<p class="font-body-sm text-body-sm text-text-muted mt-1">Carved from solid aircraft aluminum billet with micro-suede lining.</p>
+<div class="flex items-center justify-between mt-space-md pt-space-sm border-t border-hairline-soft">
+<span class="font-title-md text-body-md text-ink font-bold">$42.00</span>
+<button class="px-space-md py-1.5 rounded-full bg-field hover:bg-ink hover:text-on-primary text-ink font-label-md text-label-md transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 4: REAL STUDIO VERIFIED REVIEWS & SETUP SPECS -->
+<section class="w-full py-margin">
+<div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin">
+<!-- Review Overview Metric Banner -->
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-space-lg mb-space-lg border-b border-hairline-soft gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="flex flex-col">
+<span class="font-display text-headline-lg text-ink font-bold leading-none">4.96</span>
+<div class="flex items-center text-accent-electric mt-1">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="w-px h-12 bg-hairline-soft"></div>
+<div>
+<p class="font-title-md text-title-md text-ink font-bold">Field-Tested by 340+ Engineers</p>
+<p class="font-body-sm text-body-sm text-text-muted">98% of verified buyers recommend this setup to peers</p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="px-space-md py-2 rounded-full bg-field text-ink font-label-md text-label-md hover:bg-canvas-soft transition-colors" type="button">
+            Filter: With Photos
+          </button>
+<button class="px-space-md py-2 rounded-full bg-ink text-on-primary font-label-md text-label-md hover:bg-ink-soft transition-colors" type="button">
+            Write Review
+          </button>
+</div>
+</div>
+<!-- Reviews Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Review 1 -->
+<div class="flex flex-col p-space-lg rounded-lg bg-canvas-soft">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-caption text-caption text-text-muted">2 days ago</span>
+</div>
+<div class="flex items-center gap-2 mb-space-xs">
+<span class="font-title-md text-body-md font-bold text-ink">Julian V.</span>
+<span class="inline-flex items-center gap-0.5 text-[11px] text-accent-electric font-semibold">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+              Verified Buyer
+            </span>
+</div>
+<div class="px-2 py-1 rounded bg-field text-text-muted font-mono text-[11px] mb-space-sm">
+            Setup: 2x Apple Studio Displays + Mac Studio M2 Max
+          </div>
+<p class="font-body-sm text-body-sm text-ink leading-relaxed">
+            "The zero-sag claim is 100% legitimate. Both displays weigh around 30 lbs total and the center has zero measurable deflection. The magnetic cable anchors cleaned up four braided Thunderbolt cables instantly."
+          </p>
+<div class="mt-space-md pt-space-sm border-t border-hairline-soft flex items-center justify-between font-caption text-caption text-text-muted">
+<span>Helpful?</span>
+<button class="flex items-center gap-1 hover:text-ink transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">thumb_up</span>
+<span>42</span>
+</button>
+</div>
+</div>
+<!-- Review 2 -->
+<div class="flex flex-col p-space-lg rounded-lg bg-canvas-soft">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-caption text-caption text-text-muted">1 week ago</span>
+</div>
+<div class="flex items-center gap-2 mb-space-xs">
+<span class="font-title-md text-body-md font-bold text-ink">Evelyn K.</span>
+<span class="inline-flex items-center gap-0.5 text-[11px] text-accent-electric font-semibold">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+              Verified Buyer
+            </span>
+</div>
+<div class="px-2 py-1 rounded bg-field text-text-muted font-mono text-[11px] mb-space-sm">
+            Setup: 49" Samsung Odyssey OLED G9 Ultrawide
+          </div>
+<p class="font-body-sm text-body-sm text-ink leading-relaxed">
+            "Packaging was akin to an architectural scale model. The American Walnut grain is gorgeous with deep chocolate undertones. Being able to park an entire Keychron Q1 underneath clears so much desk acreage."
+          </p>
+<div class="mt-space-md pt-space-sm border-t border-hairline-soft flex items-center justify-between font-caption text-caption text-text-muted">
+<span>Helpful?</span>
+<button class="flex items-center gap-1 hover:text-ink transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">thumb_up</span>
+<span>29</span>
+</button>
+</div>
+</div>
+<!-- Review 3 -->
+<div class="flex flex-col p-space-lg rounded-lg bg-canvas-soft">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-caption text-caption text-text-muted">2 weeks ago</span>
+</div>
+<div class="flex items-center gap-2 mb-space-xs">
+<span class="font-title-md text-body-md font-bold text-ink">Marcus T.</span>
+<span class="inline-flex items-center gap-0.5 text-[11px] text-accent-electric font-semibold">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+              Verified Buyer
+            </span>
+</div>
+<div class="px-2 py-1 rounded bg-field text-text-muted font-mono text-[11px] mb-space-sm">
+            Setup: Pro Audio Dev • Genelec 8030C Monitors
+          </div>
+<p class="font-body-sm text-body-sm text-ink leading-relaxed">
+            "The silicone isolation feet on these risers actually prevented high-end audio rumble from transferring into my pine studio desk. Truly museum-grade industrial hardware."
+          </p>
+<div class="mt-space-md pt-space-sm border-t border-hairline-soft flex items-center justify-between font-caption text-caption text-text-muted">
+<span>Helpful?</span>
+<button class="flex items-center gap-1 hover:text-ink transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">thumb_up</span>
+<span>18</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- MODAL: CAD BLUEPRINT / EXPLODED SCHEMATIC OVERLAY -->
+<div class="fixed inset-0 z-50 hidden items-center justify-center bg-overlay-scrim backdrop-blur-sm p-4" id="cad-blueprint-modal">
+<div class="bg-canvas rounded-lg max-w-3xl w-full p-space-lg shadow-xl relative flex flex-col gap-space-md max-h-[921px] overflow-y-auto">
+<div class="flex items-center justify-between pb-space-sm border-b border-hairline-soft">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-electric text-[24px]">view_in_ar</span>
+<span class="font-title-lg text-title-lg text-ink font-bold">CAD Blueprint — Series 04 Architecture</span>
+</div>
+<button class="w-8 h-8 rounded-full bg-field hover:bg-canvas-soft flex items-center justify-center text-ink transition-colors" id="close-cad-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="w-full aspect-[16/9] bg-canvas-soft rounded flex items-center justify-center p-4 relative overflow-hidden">
+<!-- Blueprint Schematic Graphic Mock -->
+<svg class="w-full h-full text-ink" fill="none" stroke="currentColor" viewbox="0 0 600 300">
+<!-- Main Deck -->
+<rect height="24" rx="4" stroke-width="2" width="500" x="50" y="80"></rect>
+<line class="text-accent-electric" stroke-dasharray="4 4" stroke-width="1" x1="50" x2="550" y1="92" y2="92"></line>
+<!-- Legs -->
+<rect height="95" rx="2" stroke-width="2" width="40" x="80" y="104"></rect>
+<rect height="95" rx="2" stroke-width="2" width="40" x="480" y="104"></rect>
+<!-- Feet -->
+<rect height="6" rx="2" stroke-width="1.5" width="50" x="75" y="199"></rect>
+<rect height="6" rx="2" stroke-width="1.5" width="50" x="475" y="199"></rect>
+<!-- Dimensional Annotations -->
+<line stroke-width="1" x1="50" x2="550" y1="50" y2="50"></line>
+<line stroke-width="1" x1="50" x2="50" y1="45" y2="55"></line>
+<line stroke-width="1" x1="550" x2="550" y1="45" y2="55"></line>
+<text fill="currentColor" font-family="DM Sans" font-size="12" text-anchor="middle" x="300" y="42">1168.0 mm [46.00 IN] ±0.05</text>
+<line stroke-width="1" x1="570" x2="570" y1="104" y2="199"></line>
+<line stroke-width="1" x1="565" x2="575" y1="104" y2="104"></line>
+<line stroke-width="1" x1="565" x2="575" y1="199" y2="199"></line>
+<text fill="currentColor" font-family="DM Sans" font-size="11" x="585" y="156">95.0 mm</text>
+</svg>
+<div class="absolute bottom-3 left-4 px-2 py-1 rounded bg-field text-[11px] font-mono text-text-muted">
+          DWG NO: SS-04-A103 REV 2.4
+        </div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-xs text-center">
+<div class="p-space-xs rounded bg-field">
+<span class="block font-caption text-caption text-text-muted">Wall Thickness</span>
+<span class="font-label-md text-label-md text-ink font-bold">3.2mm 6063-T6</span>
+</div>
+<div class="p-space-xs rounded bg-field">
+<span class="block font-caption text-caption text-text-muted">Chamfer</span>
+<span class="font-label-md text-label-md text-ink font-bold">45° x 1.5mm</span>
+</div>
+<div class="p-space-xs rounded bg-field">
+<span class="block font-caption text-caption text-text-muted">Fasteners</span>
+<span class="font-label-md text-label-md text-ink font-bold">M6 Black Oxide</span>
+</div>
+<div class="p-space-xs rounded bg-field">
+<span class="block font-caption text-caption text-text-muted">Certification</span>
+<span class="font-label-md text-label-md text-ink font-bold">ISO 9001-2015</span>
+</div>
+</div>
+</div>
+</div>
+<!-- FLOATING STICKY BOTTOM BUY DOCK (VISIBLE ON SCROLL) -->
+<div class="fixed bottom-4 left-0 right-0 z-40 px-4 transition-all duration-300 transform translate-y-32 opacity-0 pointer-events-none" id="sticky-buy-dock">
+<div class="max-w-3xl mx-auto bg-ink text-on-primary rounded-full p-2 pl-5 shadow-2xl flex items-center justify-between gap-space-md border border-ink-soft">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-accent-electric/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px] text-accent-electric">shelves</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md font-bold truncate">Studio Shelf Pro</span>
+<span class="font-caption text-caption text-on-primary/70 truncate" id="sticky-selected-spec">
+            Solid American Walnut • Standard 46"
+          </span>
+</div>
+</div>
+<div class="flex items-center gap-space-md shrink-0">
+<div class="hidden sm:flex flex-col text-right">
+<span class="font-title-md text-title-md font-bold leading-none" id="sticky-price">$371.20</span>
+<span class="font-caption text-[11px] text-accent-electric font-medium">10% bundle applied</span>
+</div>
+<button class="bg-accent-electric hover:bg-primary-container text-on-primary py-2.5 px-space-lg rounded-full font-label-md text-label-md transition-all active:scale-95 flex items-center gap-1.5" id="sticky-add-btn" type="button">
+          Add to Bag • $371.20
+        </button>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-ink text-on-primary rounded-t-lg mt-space-xl overflow-hidden"><div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin py-margin"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-gutter items-start pb-margin"><div class="lg:col-span-5 flex flex-col items-start gap-space-md"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm font-bold tracking-tight text-on-primary">ShelfStack</span><div class="w-2 h-2 rounded-full bg-accent-electric animate-pulse"></div></div><p class="font-body-md text-body-md text-text-muted max-w-md">Curated physical architecture for modern developers, code artisans, and ergonomic purists. Engineered with ruthless reduction and tactile permanence.</p><div class="w-full max-w-sm mt-space-xs"><label class="block font-caption text-caption uppercase tracking-wider text-text-muted mb-space-xs">Dispatch Letter</label><div class="flex items-center bg-ink-soft p-space-xs rounded-full"><input class="bg-transparent px-space-md py-space-xs text-on-primary placeholder:text-text-faint font-body-sm text-body-sm outline-none w-full" placeholder="developer@stack.sh" type="email"/><button class="bg-accent-electric text-on-primary font-label-md text-label-md px-space-md py-space-xs rounded-full hover:opacity-90 transition-opacity flex items-center gap-1 shrink-0" type="button"><span>Subscribe</span><span class="material-symbols-outlined text-[14px]">arrow_forward</span></button></div></div></div><div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-gutter"><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-text-muted uppercase tracking-wider">Shop</span><nav class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-primary/80"><a class="hover:text-on-primary transition-colors" data-path="catalog" href="#">Desks &amp; Shelves</a><a class="hover:text-on-primary transition-colors" data-path="catalog" href="#">Monitor Risers</a><a class="hover:text-on-primary transition-colors" data-path="catalog" href="#">Desk Pads &amp; Felt</a><a class="hover:text-on-primary transition-colors" data-path="catalog" href="#">Cable Tray Architecture</a><a class="hover:text-on-primary transition-colors" data-path="new-drops" href="#">New Releases</a></nav></div><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-text-muted uppercase tracking-wider">Stack Ecosystem</span><nav class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-primary/80"><a class="hover:text-on-primary transition-colors" data-path="desk-setups" href="#">Featured Labs</a><a class="hover:text-on-primary transition-colors" data-path="desk-setups" href="#">Architectural Blueprints</a><a class="hover:text-on-primary transition-colors" data-path="catalog" href="#">3D Configurator</a><a class="hover:text-on-primary transition-colors" data-path="home" href="#">Studio Visits</a></nav></div><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-text-muted uppercase tracking-wider">Assurance</span><nav class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-primary/80"><a class="hover:text-on-primary transition-colors" data-path="home" href="#">Lifetime Guarantee</a><a class="hover:text-on-primary transition-colors" data-path="home" href="#">Global Transit</a><a class="hover:text-on-primary transition-colors" data-path="account" href="#">Order Telemetry</a><a class="hover:text-on-primary transition-colors" data-path="home" href="#">Carbon Offsets</a></nav></div></div></div><div class="pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><div class="inline-flex items-center gap-2 bg-ink-soft px-space-md py-1.5 rounded-full"><span class="w-2 h-2 rounded-full bg-accent-electric"></span><span class="font-caption text-caption text-on-primary/90 font-mono">Systems All Normal</span></div><span class="font-caption text-caption text-text-muted">v2.4.0-curatorial</span></div><div class="flex items-center gap-space-md font-caption text-caption text-text-muted"><span>© 2025 ShelfStack Inc. All rights reserved.</span><a class="hover:text-on-primary transition-colors" href="#">Privacy</a><a class="hover:text-on-primary transition-colors" href="#">Terms</a></div></div></div></footer></body></html>

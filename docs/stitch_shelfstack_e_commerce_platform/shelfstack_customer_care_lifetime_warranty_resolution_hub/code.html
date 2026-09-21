@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "tertiary-fixed-dim": "#c6c6c7", "on-tertiary-container": "#f8f8f8", "on-secondary-fixed-variant": "#474646", "surface-container-highest": "#e4e2e2", "on-primary": "#ffffff", "tertiary-container": "#717272", "on-primary-container": "#f8f7ff", "hairline-soft": "#f0f0f0", "tertiary-fixed": "#e2e2e2", "on-surface-variant": "#424656", "outline-variant": "#c2c6d8", "on-background": "#1b1c1c", "surface-variant": "#e4e2e2", "secondary-fixed-dim": "#c8c6c5", "on-secondary-container": "#636262", "surface-container-low": "#f5f3f3", "hairline": "#e0e0e0", "primary": "#0050cb", "ink": "#141414", "inverse-surface": "#303031", "surface-bright": "#fbf9f9", "on-tertiary-fixed-variant": "#454747", "overlay-scrim": "rgba(115, 115, 115, 0.56)", "error": "#ba1a1a", "inverse-on-surface": "#f2f0f0", "on-error": "#ffffff", "surface": "#fbf9f9", "on-primary-fixed": "#001849", "ink-soft": "#262626", "surface-dim": "#dbdad9", "text-faint": "#adadad", "primary-fixed": "#dae1ff", "on-primary-fixed-variant": "#003fa4", "canvas-soft": "#f3f3f3", "accent-electric": "#0066ff", "on-tertiary": "#ffffff", "on-secondary-fixed": "#1c1b1b", "secondary-fixed": "#e5e2e1", "tertiary": "#585a5a", "outline": "#727687", "on-tertiary-fixed": "#1a1c1c", "surface-tint": "#0054d6", "background": "#fbf9f9", "surface-container": "#efeded", "error-container": "#ffdad6", "secondary-container": "#e2dfde", "surface-container-lowest": "#ffffff", "on-surface": "#1b1c1c", "surface-container-high": "#e9e8e7", "on-error-container": "#93000a", "text-muted": "#707070", "inverse-primary": "#b3c5ff", "on-secondary": "#ffffff", "primary-container": "#0066ff", "secondary": "#5f5e5e", "field": "#f0f0f0", "canvas": "#ffffff", "primary-fixed-dim": "#b3c5ff" }, "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, "spacing": { "space-sm": "0.5rem", "margin-mobile": "1.25rem", "gutter": "1.5rem", "margin": "3rem", "space-xl": "2rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "space-md": "1rem", "gutter-mobile": "1rem" }, "fontFamily": { "headline-md": ["Hanken Grotesk"], "body-lg": ["DM Sans"], "title-lg": ["Hanken Grotesk"], "body-md": ["DM Sans"], "display": ["Hanken Grotesk"], "title-md": ["Hanken Grotesk"], "headline-lg-mobile": ["Hanken Grotesk"], "display-mobile": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"], "headline-sm": ["Hanken Grotesk"], "body-sm": ["DM Sans"], "caption": ["DM Sans"], "label-md": ["DM Sans"], "link": ["DM Sans"], "headline-md-mobile": ["Hanken Grotesk"] }, "fontSize": { "headline-md": ["44px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-lg": ["20px", { "lineHeight": "28px", "fontWeight": "400" }], "title-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "display": ["80px", { "lineHeight": "80px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "title-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-lg-mobile": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "display-mobile": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg": ["56px", { "lineHeight": "60px", "letterSpacing": "-0.025em", "fontWeight": "700" }], "headline-sm": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "caption": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "700" }], "link": ["16px", { "lineHeight": "24px", "fontWeight": "600" }], "headline-md-mobile": ["28px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased selection:bg-accent-electric selection:text-on-primary"><header class="fixed top-0 left-0 w-full z-50 bg-canvas/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="bg-ink text-canvas py-1.5 px-6 text-center"><div class="max-w-[1440px] mx-auto flex items-center justify-center gap-space-sm"><span class="w-1.5 h-1.5 rounded-full bg-accent-electric"></span><span class="font-label-md text-label-md tracking-wider uppercase">Complimentary Global Dispatch on curations over $150</span><span class="w-1.5 h-1.5 rounded-full bg-accent-electric"></span></div></div><div class="h-28 max-w-[1440px] mx-auto px-6 flex flex-col justify-between py-space-sm"><div class="flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><img alt="Brand logo. - Primary color: #0066ff - Font: hankenGrotesk - Mode: light - Roundness: rounded-full" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xxr3vYezhanvKgo5CiY-uShx9Z_nxpg3u_P87x04A40OQUZh9sYlZWGLokcyGv6XdZPRKhMvMdJNS6CEtao5ecIeCUG00jOkEZDv3htiNQdAHWJcL7YURulUxM5iQCtehrjw7dkJRK5GCi-33XWEmna2C6wl2SnlH0Jo30mvuBheFB51F5jx9qe3V6ldh4PuT2DB8HtgpzQK4yyLrrefFU7iF8zxAJedNiQI_bGz8noloxhRhU692YRfw"/><a class="font-title-lg text-title-lg tracking-tighter text-ink font-bold" data-path="showroom" href="#">SHELFSTACK</a><span class="font-caption text-caption uppercase tracking-widest text-text-muted px-2.5 py-0.5 rounded-full bg-canvas-soft hidden lg:inline-block">EST. 2024 / ARCHIVE</span></div><div class="flex-1 max-w-md mx-space-md hidden md:flex items-center justify-between px-4 py-2 rounded-full bg-field hover:bg-surface-container transition-colors"><div class="flex items-center gap-space-xs text-text-muted"><span class="material-symbols-outlined text-[18px]">search</span><span class="font-body-sm text-body-sm text-text-faint">Curated items, archival editions, designers...</span></div><div class="flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-canvas shadow-[0_1px_4px_rgba(0,0,0,0.04)]"><span class="font-caption text-caption text-text-muted font-bold">⌘K</span></div></div><div class="flex items-center gap-space-sm"><a class="w-10 h-10 rounded-full flex items-center justify-center text-ink hover:bg-canvas-soft transition-colors" data-path="curations" href="#"><span class="material-symbols-outlined text-[20px]">favorite</span></a><a class="flex items-center gap-space-xs px-4 py-2 rounded-full bg-ink text-canvas hover:opacity-90 transition-opacity" data-path="cart" href="#"><span class="material-symbols-outlined text-[18px]">shopping_bag</span><span class="font-label-md text-label-md tracking-wider">$443.88</span><span class="w-2 h-2 rounded-full bg-accent-electric"></span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div><nav class="flex items-center gap-space-xs overflow-x-auto py-1" data-active-classes="bg-ink text-on-primary font-bold rounded-full"><a class="px-3.5 py-1.5 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:bg-canvas-soft hover:text-on-surface transition-all whitespace-nowrap" data-path="showroom" href="#">Showroom</a><a class="px-3.5 py-1.5 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:bg-canvas-soft hover:text-on-surface transition-all whitespace-nowrap" data-path="tech-and-gadgets" href="#">Tech &amp; Gadgets</a><a class="px-3.5 py-1.5 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:bg-canvas-soft hover:text-on-surface transition-all whitespace-nowrap" data-path="home-and-kitchen" href="#">Home &amp; Kitchen</a><a class="px-3.5 py-1.5 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:bg-canvas-soft hover:text-on-surface transition-all whitespace-nowrap" data-path="furniture" href="#">Furniture</a><a class="px-3.5 py-1.5 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:bg-canvas-soft hover:text-on-surface transition-all whitespace-nowrap" data-path="fashion-and-edc" href="#">Fashion &amp; EDC</a><a class="px-3.5 py-1.5 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:bg-canvas-soft hover:text-on-surface transition-all whitespace-nowrap" data-path="new-drops" href="#">New Drops</a><a class="px-3.5 py-1.5 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:bg-canvas-soft hover:text-on-surface transition-all whitespace-nowrap" data-path="best-sellers" href="#">Best Sellers</a><a class="px-3.5 py-1.5 rounded-full font-body-sm text-body-sm text-on-surface-variant hover:bg-canvas-soft hover:text-on-surface transition-all whitespace-nowrap" data-path="archival-deals" href="#">Archival Deals</a><a aria-current="page" class="px-3.5 py-1.5 transition-all whitespace-nowrap bg-ink text-on-primary font-bold rounded-full" data-path="curations" href="#">Curations</a></nav></div></header><main class="w-full pt-28 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- Hero Section -->
+<section class="w-full bg-surface-container-lowest px-6 lg:px-12 py-16 lg:py-24 border-b border-hairline-soft">
+<div class="max-w-[1440px] mx-auto flex flex-col gap-8">
+<!-- Live SLA Bar -->
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-canvas-soft">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-electric opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-accent-electric"></span>
+</span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-ink">
+            CURATOR RESOLUTION PROTOCOL • 24/7 DEDICATED CONCIERGE
+          </span>
+</div>
+<div class="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-surface-container-low shadow-sm">
+<span class="font-caption text-caption text-text-muted">Active System SLA: <strong class="text-ink font-semibold">99.98%</strong></span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-caption text-caption text-text-muted">Avg Response: <strong class="text-accent-electric font-semibold">4.2 Mins</strong></span>
+</div>
+</div>
+<!-- Headline Block -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+<div class="lg:col-span-8 flex flex-col gap-4">
+<h1 class="font-display text-headline-lg lg:text-display tracking-tighter text-ink leading-none">
+            Customer Care &amp; Warranty Hub.
+          </h1>
+<p class="font-body-lg text-body-lg text-text-muted max-w-3xl leading-relaxed">
+            Initiate zero-friction lifetime warranty claims, manage 30-day trial returns, track replacement shipments, and connect directly with technical hardware specialists.
+          </p>
+</div>
+<div class="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-end">
+<div class="p-4 rounded-xl bg-canvas-soft flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-ink text-canvas flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+<div>
+<p class="font-title-md text-body-sm font-semibold text-ink leading-tight">Tier 1 Coverage</p>
+<p class="font-caption text-caption text-text-muted">Hardware Authentication Active</p>
+</div>
+</div>
+<span class="font-label-md text-label-md px-2.5 py-1 rounded-full bg-accent-electric text-on-primary">PROVEN</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3-Pillar Resolution Cards -->
+<section class="w-full px-6 lg:px-12 py-12 lg:py-16">
+<div class="max-w-[1440px] mx-auto">
+<div class="flex items-center justify-between mb-8">
+<div>
+<p class="font-label-md text-label-md uppercase tracking-widest text-text-muted">Primary Protocols</p>
+<h2 class="font-title-lg text-title-lg text-ink font-bold">Select Resolution Path</h2>
+</div>
+<span class="font-caption text-caption text-text-faint hidden sm:inline-block">DIRECT REPAIR • LOGISTICS • WORKSHOP</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Pillar 1 -->
+<div class="p-8 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-full bg-canvas-soft flex items-center justify-center text-ink group-hover:bg-ink group-hover:text-canvas transition-colors">
+<span class="material-symbols-outlined text-[24px]">verified</span>
+</div>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-canvas-soft font-caption text-caption text-ink font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-electric"></span>
+                Serial verified
+              </span>
+</div>
+<div class="flex flex-col gap-2">
+<h3 class="font-title-md text-title-md text-ink font-bold">
+                Stack Lifetime Warranty™ Claim
+              </h3>
+<p class="font-body-sm text-body-sm text-text-muted leading-normal">
+                Instant hardware repair or direct 1-to-1 swap for certified defects across all Tier 1 gear. Zero shipping fees covered worldwide.
+              </p>
+</div>
+</div>
+<div class="pt-8">
+<button class="w-full py-3 px-6 rounded-full bg-ink text-on-primary font-body-sm font-semibold hover:opacity-90 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+<span>File Warranty Claim</span>
+<span class="material-symbols-outlined text-[18px]">north_east</span>
+</button>
+</div>
+</div>
+<!-- Pillar 2 -->
+<div class="p-8 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-full bg-canvas-soft flex items-center justify-center text-ink group-hover:bg-ink group-hover:text-canvas transition-colors">
+<span class="material-symbols-outlined text-[24px]">replay</span>
+</div>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-canvas-soft font-caption text-caption text-text-muted">
+                30-day window
+              </span>
+</div>
+<div class="flex flex-col gap-2">
+<h3 class="font-title-md text-title-md text-ink font-bold">
+                Risk-Free 30-Day Return &amp; Exchange
+              </h3>
+<p class="font-body-sm text-body-sm text-text-muted leading-normal">
+                Generate prepaid paperless QR courier labels, schedule home white-glove pickup, or swap variant sizes seamlessly via our drop vaults.
+              </p>
+</div>
+</div>
+<div class="pt-8">
+<button class="w-full py-3 px-6 rounded-full bg-canvas-soft text-ink font-body-sm font-semibold hover:bg-surface-container transition-all flex items-center justify-center gap-2">
+<span>Initiate Fast Return</span>
+<span class="material-symbols-outlined text-[18px]">north_east</span>
+</button>
+</div>
+</div>
+<!-- Pillar 3 -->
+<div class="p-8 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-full bg-canvas-soft flex items-center justify-center text-ink group-hover:bg-ink group-hover:text-canvas transition-colors">
+<span class="material-symbols-outlined text-[24px]">support_agent</span>
+</div>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-canvas-soft font-caption text-caption text-ink font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-electric"></span>
+                9 Curators Online
+              </span>
+</div>
+<div class="flex flex-col gap-2">
+<h3 class="font-title-md text-title-md text-ink font-bold">
+                Curatorial Hardware Concierge
+              </h3>
+<p class="font-body-sm text-body-sm text-text-muted leading-normal">
+                Technical consultation for custom desk wiring, architectural ergonomics, firmware diagnostics, and bespoke atelier orders.
+              </p>
+</div>
+</div>
+<div class="pt-8">
+<button class="w-full py-3 px-6 rounded-full bg-canvas-soft text-ink font-body-sm font-semibold hover:bg-surface-container transition-all flex items-center justify-center gap-2">
+<span class="w-2 h-2 rounded-full bg-accent-electric animate-pulse"></span>
+<span>Start Live Dispatch Chat</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Active Warranty & Return Tracker -->
+<section class="w-full px-6 lg:px-12 py-8">
+<div class="max-w-[1440px] mx-auto">
+<div class="bg-surface-container-lowest rounded-xl p-6 lg:p-10 shadow-sm flex flex-col gap-8">
+<!-- Header of Claim -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-hairline-soft">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-accent-electric/10 text-accent-electric flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[22px]">swap_horizontal_circle</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md font-bold text-ink">Active Warranty Claim</span>
+<span class="font-caption text-caption px-2.5 py-0.5 rounded-full bg-accent-electric text-on-primary font-semibold">IN TRANSIT</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-muted">Docket Reference: <strong class="text-ink font-medium">#CLM-8921-WTY</strong> • Initiated Oct 21, 2025</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 rounded-full bg-canvas-soft text-ink hover:bg-surface-container text-body-sm font-medium transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span>Download Return Label</span>
+</button>
+<button class="px-5 py-2 rounded-full bg-accent-electric text-on-primary hover:opacity-90 text-body-sm font-semibold transition-opacity flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">local_shipping</span>
+<span>Track Replacement Package</span>
+</button>
+</div>
+</div>
+<!-- Product & Timeline Details -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+<!-- Product Preview -->
+<div class="lg:col-span-5 flex items-center gap-4 p-4 rounded-lg bg-canvas-soft">
+<img class="w-20 h-20 rounded-md object-cover bg-surface-container flex-shrink-0" data-alt="Modern studio over-ear wireless headphones in matte obsidian black, minimal architectural lighting on white studio backdrop, precise industrial hardware details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCywF3qQ_oP5oNi0G2IOjJdigmw0kDI5asmqrnb2U183j6-Jbxv1tzUw9O3XcBNFIgrdLUg6ZvdmHJPJpWbuaddmorwGYR-xNAN-Iu3sL3mGijLhZHEiai8te5ACtcs1tlkHgsZE0YxFDX2xHdoZqnp4aUF1M5pjhMvd6h4T7J0VqOmzTEP8oxQWoOiw-qPirNaanysTW6QpiPatsCrb3t5j7clFLLOhYcClkmrkUYlHvdnO-ZmIzje"/>
+<div class="flex flex-col">
+<span class="font-caption text-caption uppercase tracking-wider text-text-muted">Direct Swap Approved</span>
+<h4 class="font-title-md text-body-md font-bold text-ink">Studio ANC Wireless Over-Ear</h4>
+<p class="font-body-sm text-body-sm text-text-muted">Finish: Matte Obsidian • SN: SS-90812-OBS</p>
+<div class="mt-2 flex items-center gap-1.5 text-accent-electric font-body-sm text-caption font-semibold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                Certified Hardware Provenance Swapped
+              </div>
+</div>
+</div>
+<!-- Live Logistics Step Progress -->
+<div class="lg:col-span-7 flex flex-col gap-6">
+<div class="flex items-center justify-between font-caption text-caption text-text-muted">
+<span>Origin: ShelfStack Depot (Zurich Hub)</span>
+<span class="text-ink font-semibold">Est. Arrival: Tomorrow, Oct 24 by 14:00</span>
+</div>
+<!-- Visual Progress Tracker -->
+<div class="relative w-full">
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-accent-electric rounded-full w-[78%] transition-all duration-500"></div>
+</div>
+<div class="flex justify-between items-start mt-3">
+<div class="flex flex-col items-center text-center">
+<div class="w-6 h-6 rounded-full bg-ink text-canvas flex items-center justify-center text-[12px] font-bold">✓</div>
+<span class="font-caption text-caption mt-1 font-semibold text-ink">Claim Filed</span>
+<span class="font-caption text-caption text-text-faint text-[10px]">Oct 21</span>
+</div>
+<div class="flex flex-col items-center text-center">
+<div class="w-6 h-6 rounded-full bg-ink text-canvas flex items-center justify-center text-[12px] font-bold">✓</div>
+<span class="font-caption text-caption mt-1 font-semibold text-ink">Inspected</span>
+<span class="font-caption text-caption text-text-faint text-[10px]">Oct 22</span>
+</div>
+<div class="flex flex-col items-center text-center">
+<div class="w-6 h-6 rounded-full bg-accent-electric text-on-primary flex items-center justify-center text-[12px] font-bold ring-4 ring-accent-electric/20">
+<span class="material-symbols-outlined text-[14px]">local_shipping</span>
+</div>
+<span class="font-caption text-caption mt-1 font-bold text-accent-electric">Dispatched</span>
+<span class="font-caption text-caption text-text-muted text-[10px]">DHL Exp #7712-4</span>
+</div>
+<div class="flex flex-col items-center text-center opacity-60">
+<div class="w-6 h-6 rounded-full bg-surface-container text-text-muted flex items-center justify-center text-[12px]">4</div>
+<span class="font-caption text-caption mt-1 text-text-muted">Delivered</span>
+<span class="font-caption text-caption text-text-faint text-[10px]">442 Crosby St</span>
+</div>
+</div>
+</div>
+<!-- Real-time Location Note -->
+<div class="p-3.5 rounded-lg bg-surface-container-low flex items-center justify-between text-body-sm">
+<div class="flex items-center gap-2 text-ink">
+<span class="material-symbols-outlined text-accent-electric text-[18px]">flight_land</span>
+<span>Sorted at JFK Express Air Cargo Facility • Handed over to Local Courier.</span>
+</div>
+<span class="font-caption text-caption text-text-muted hidden md:inline">28 mins ago</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Self-Service Resolution & Diagnostic Matrix -->
+<section class="w-full px-6 lg:px-12 py-12">
+<div class="max-w-[1440px] mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Diagnostic & Dispatch Map Widget -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<div class="p-6 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-5">
+<div>
+<p class="font-label-md text-label-md uppercase tracking-widest text-text-muted">Global Care Grid</p>
+<h3 class="font-title-md text-title-md font-bold text-ink">Atelier Logistics Centers</h3>
+</div>
+<p class="font-body-sm text-body-sm text-text-muted">
+              ShelfStack operates decentralized express fulfillment and technical replacement nodes in four international zones.
+            </p>
+<div class="flex flex-col gap-3">
+<div class="p-3.5 rounded-lg bg-canvas-soft flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-2.5 rounded-full bg-accent-electric"></span>
+<div>
+<p class="font-body-sm text-body-sm font-semibold text-ink">Zurich Primary Atelier</p>
+<p class="font-caption text-caption text-text-muted">European Vault • Live Queue: 0</p>
+</div>
+</div>
+<span class="font-label-md text-label-md text-text-muted uppercase">ACTIVE</span>
+</div>
+<div class="p-3.5 rounded-lg bg-canvas-soft flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-2.5 rounded-full bg-accent-electric"></span>
+<div>
+<p class="font-body-sm text-body-sm font-semibold text-ink">Tokyo Shibuya Depot</p>
+<p class="font-caption text-caption text-text-muted">APAC Dispatch • Live Queue: 1</p>
+</div>
+</div>
+<span class="font-label-md text-label-md text-text-muted uppercase">ACTIVE</span>
+</div>
+<div class="p-3.5 rounded-lg bg-canvas-soft flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-2.5 rounded-full bg-accent-electric"></span>
+<div>
+<p class="font-body-sm text-body-sm font-semibold text-ink">New York SoHo Node</p>
+<p class="font-caption text-caption text-text-muted">Americas Care • Live Queue: 0</p>
+</div>
+</div>
+<span class="font-label-md text-label-md text-text-muted uppercase">ACTIVE</span>
+</div>
+</div>
+<div class="pt-2">
+<a class="inline-flex items-center gap-1.5 font-link text-link text-accent-electric hover:underline text-body-sm" href="#">
+<span>View Global Transit Protocols</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Concierge Direct Connect Box -->
+<div class="p-6 rounded-xl bg-ink text-canvas flex flex-col gap-4 shadow-sm">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-full object-cover border border-white/20" data-alt="Monochrome portrait of a technical support hardware specialist in clean minimalist architectural studio setting, black and white tone, neutral professional expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtIK5H_FWPAWu9uYZtZMSW8BenJQxIIrYvs0BtfU6avjgtcEtaoNU70jxnGPH-mDsQSRTYBnVK2d-YPHoRe_80bSuyuYlGe5tn2sUsH9VOTgXXuhE_6oiXam246pTPBK8fniCEn7cU-PlLH7ftV3u9mkVj0gJH5J6ZOJDI9TwL9TB1W4VFXdyYO4STUyV6ZvOAZzhLS25S9k4v4zM7iaHchF7wMYUvRXBNa6e-zELS6TpCG0IIJHYk"/>
+<div>
+<p class="font-title-md text-body-md font-bold text-canvas">Julian Vane</p>
+<p class="font-caption text-caption text-tertiary-fixed">Senior Hardware Curator • Online</p>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-tertiary-fixed leading-relaxed">
+              "Need immediate schematic schematics, driver firmware binaries, or physical modular replacement parts? Connect to direct terminal session."
+            </p>
+<button class="w-full py-2.5 px-4 rounded-full bg-accent-electric text-on-primary font-body-sm font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>Open Hardware Console</span>
+</button>
+</div>
+</div>
+<!-- Right Column: Interactive Knowledge Base & Accordion FAQ -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- Search Pill -->
+<div class="relative w-full">
+<input class="w-full h-14 pl-12 pr-6 rounded-full bg-surface-container-lowest text-ink placeholder-text-faint font-body-md text-body-sm focus:outline-none shadow-sm focus:ring-2 focus:ring-ink" placeholder="Search warranty policies, dispatch timelines, import tariffs, and product manuals..." type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-muted text-[20px]">
+              search
+            </span>
+</div>
+<!-- FAQ Accordion Header -->
+<div class="flex items-center justify-between pt-2">
+<h3 class="font-title-lg text-title-lg font-bold text-ink">Curator Resolution FAQ</h3>
+<span class="font-caption text-caption text-text-muted">Updated Daily • v2.4</span>
+</div>
+<!-- Accordions -->
+<div class="flex flex-col gap-3" id="faq-group">
+<!-- Accordion Item 1 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm transition-all">
+<button class="w-full p-6 text-left flex items-center justify-between gap-4 focus:outline-none" onclick="toggleFaq(1)">
+<span class="font-title-md text-body-md font-bold text-ink">
+                  How does the ShelfStack Lifetime Warranty coverage work on mechanical switches and batteries?
+                </span>
+<span class="w-8 h-8 rounded-full bg-canvas-soft flex items-center justify-center text-ink flex-shrink-0 transition-transform" id="faq-icon-1">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</span>
+</button>
+<div class="px-6 pb-6 pt-0 text-text-muted font-body-sm text-body-sm leading-relaxed hidden" id="faq-content-1">
+                Every mechanical component—including custom tactile switches, rotary encoders, hinge linkages, and chassis milled enclosures—is warrantied unconditionally against mechanical fatigue for life. Lithium-ion power cells are guaranteed to retain at least 80% nominal capacity for the first 36 months; beyond this window, we supply factory-calibrated modular swap modules at cost with zero labor dispatch surcharges.
+              </div>
+</div>
+<!-- Accordion Item 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm transition-all">
+<button class="w-full p-6 text-left flex items-center justify-between gap-4 focus:outline-none" onclick="toggleFaq(2)">
+<span class="font-title-md text-body-md font-bold text-ink">
+                  What is the return protocol for global international dispatches?
+                </span>
+<span class="w-8 h-8 rounded-full bg-canvas-soft flex items-center justify-center text-ink flex-shrink-0 transition-transform" id="faq-icon-2">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</span>
+</button>
+<div class="px-6 pb-6 pt-0 text-text-muted font-body-sm text-body-sm leading-relaxed hidden" id="faq-content-2">
+                We provide prepaid international commercial return manifests via DHL Express or FedEx International Priority across 74 countries. Simply choose "Initiate Fast Return", print or save your digital QR barcode, and hand the package to any authorized drop courier or request an on-demand doorstep pickup. All import duties originally assessed are reconciled automatically back to your primary payment method upon receipt at our hub.
+              </div>
+</div>
+<!-- Accordion Item 3 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm transition-all">
+<button class="w-full p-6 text-left flex items-center justify-between gap-4 focus:outline-none" onclick="toggleFaq(3)">
+<span class="font-title-md text-body-md font-bold text-ink">
+                  Can I modify my delivery address once the batch packing phase has commenced?
+                </span>
+<span class="w-8 h-8 rounded-full bg-canvas-soft flex items-center justify-center text-ink flex-shrink-0 transition-transform" id="faq-icon-3">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</span>
+</button>
+<div class="px-6 pb-6 pt-0 text-text-muted font-body-sm text-body-sm leading-relaxed hidden" id="faq-content-3">
+                Address modifications remain open until the digital courier dispatch scan occurs (typically 2 hours after packing). To update the delivery destination, execute an instantaneous hold via the Concierge Console or your Order Dossier. If transit is already underway, our concierge directly reroutes the consignment with air carriers via priority telematics.
+              </div>
+</div>
+<!-- Accordion Item 4 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm transition-all">
+<button class="w-full p-6 text-left flex items-center justify-between gap-4 focus:outline-none" onclick="toggleFaq(4)">
+<span class="font-title-md text-body-md font-bold text-ink">
+                  How do I certify and register the cryptographic provenance of rare archival drops?
+                </span>
+<span class="w-8 h-8 rounded-full bg-canvas-soft flex items-center justify-center text-ink flex-shrink-0 transition-transform" id="faq-icon-4">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</span>
+</button>
+<div class="px-6 pb-6 pt-0 text-text-muted font-body-sm text-body-sm leading-relaxed hidden" id="faq-content-4">
+                Archival editions embed an encrypted NFC chip located behind the aluminum chassis plate. Tap your smartphone to the marked target zone to launch the ShelfStack Authentication Certificate. Once verified, the unit's unique edition sequence is cryptographically bound to your curator profile, ensuring transferrable secondary-market warranty privileges.
+              </div>
+</div>
+</div>
+<!-- Self-Service Quick Action Chips -->
+<div class="flex flex-wrap items-center gap-2.5 pt-4">
+<span class="font-caption text-caption text-text-muted uppercase tracking-wider">Direct Manuals:</span>
+<button class="px-3.5 py-1.5 rounded-full bg-canvas-soft text-ink font-body-sm text-caption hover:bg-surface-container flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[14px]">description</span>
+<span>Obsidian ANC Firmware 3.2</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full bg-canvas-soft text-ink font-body-sm text-caption hover:bg-surface-container flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[14px]">architecture</span>
+<span>Artisan Ergonomic Rig Spec</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full bg-canvas-soft text-ink font-body-sm text-caption hover:bg-surface-container flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span>Swiss Mechanical Guarantee Whitepaper</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Resolution Guarantee Strip -->
+<section class="w-full px-6 lg:px-12 py-16">
+<div class="max-w-[1440px] mx-auto">
+<div class="p-8 lg:p-12 rounded-xl bg-canvas-soft flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="flex flex-col gap-2 max-w-2xl">
+<div class="inline-flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-accent-electric"></span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-ink font-bold">Uncompromising Support Mandate</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-ink font-bold">Never stranded with defective hardware.</h3>
+<p class="font-body-sm text-body-sm text-text-muted leading-relaxed">
+            Every piece curated by ShelfStack is backed by a deterministic zero-friction swap guarantee. If our engineering review fails to diagnose and remediate a hardware defect within 48 hours, an advance replacement unit dispatches automatically.
+          </p>
+</div>
+<div class="flex items-center gap-3 flex-shrink-0">
+<button class="px-6 py-3 rounded-full bg-ink text-on-primary font-body-sm font-semibold hover:opacity-90 transition-opacity">
+            Register New Serial
+          </button>
+<button class="px-6 py-3 rounded-full bg-surface-container-lowest text-ink font-body-sm font-semibold hover:bg-surface-container transition-colors">
+            Terms of Guarantee
+          </button>
+</div>
+</div>
+</div>
+</section>
+<script>
+    function toggleFaq(id) {
+      const content = document.getElementById('faq-content-' + id);
+      const icon = document.getElementById('faq-icon-' + id);
+      
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+  </script>
+</div></main><footer class="w-full bg-ink text-canvas mt-space-xl"><div class="max-w-[1440px] mx-auto px-6 py-16"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-space-lg pb-16 border-b border-white/10"><div class="lg:col-span-4 flex flex-col gap-space-md"><div class="flex items-center gap-space-sm"><span class="w-3 h-3 rounded-full bg-accent-electric"></span><span class="font-title-lg text-title-lg font-bold tracking-tight text-white">SHELFSTACK</span></div><p class="font-body-sm text-body-sm text-tertiary-fixed max-w-sm">An elite modernist department store &amp; hardware dispatch. Engineering bespoke spatial balance, curated utilitarian everyday carries, and industrial furniture.</p><div class="flex flex-col gap-space-xs mt-space-sm"><span class="font-label-md text-label-md uppercase tracking-wider text-text-muted">Curator Dispatch Ledger</span><div class="flex items-center gap-space-xs"><input class="px-4 py-2.5 rounded-full bg-white/5 border border-white/10 text-white placeholder-text-faint font-body-sm text-body-sm focus:outline-none focus:border-accent-electric flex-1 max-w-xs" placeholder="Enter curator email..." type="email"/><button class="px-5 py-2.5 rounded-full bg-accent-electric text-on-primary font-label-md text-label-md tracking-wider uppercase hover:opacity-90 transition-opacity" type="button">Subscribe</button></div></div></div><div class="lg:col-span-2 flex flex-col gap-space-sm"><span class="font-label-md text-label-md uppercase tracking-widest text-text-muted">Departments</span><ul class="flex flex-col gap-space-xs font-body-sm text-body-sm text-tertiary-fixed"><li class="hover:text-white transition-colors"><a data-path="showroom" href="#">Showroom</a></li><li class="hover:text-white transition-colors"><a data-path="tech-and-gadgets" href="#">Tech &amp; Gadgets</a></li><li class="hover:text-white transition-colors"><a data-path="home-and-kitchen" href="#">Home &amp; Kitchen</a></li><li class="hover:text-white transition-colors"><a data-path="furniture" href="#">Architectural Furniture</a></li><li class="hover:text-white transition-colors"><a data-path="fashion-and-edc" href="#">Utility EDC</a></li></ul></div><div class="lg:col-span-2 flex flex-col gap-space-sm"><span class="font-label-md text-label-md uppercase tracking-widest text-text-muted">Curation Vault</span><ul class="flex flex-col gap-space-xs font-body-sm text-body-sm text-tertiary-fixed"><li class="hover:text-white transition-colors"><a data-path="new-drops" href="#">Recent Drops</a></li><li class="hover:text-white transition-colors"><a data-path="best-sellers" href="#">Index of Standards</a></li><li class="hover:text-white transition-colors"><a data-path="archival-deals" href="#">Decommissioned Stock</a></li><li class="hover:text-white transition-colors"><a data-path="curations" href="#">Designer Dossiers</a></li></ul></div><div class="lg:col-span-2 flex flex-col gap-space-sm"><span class="font-label-md text-label-md uppercase tracking-widest text-text-muted">Customer Care</span><ul class="flex flex-col gap-space-xs font-body-sm text-body-sm text-tertiary-fixed"><li class="hover:text-white transition-colors"><a href="#">Global Dispatch &amp; Freight</a></li><li class="hover:text-white transition-colors"><a href="#">Warranty &amp; Repair Vault</a></li><li class="hover:text-white transition-colors"><a href="#">Trade Program Access</a></li><li class="hover:text-white transition-colors"><a href="#">Return Protocol</a></li></ul></div><div class="lg:col-span-2 flex flex-col gap-space-sm"><span class="font-label-md text-label-md uppercase tracking-widest text-text-muted">The Ledger</span><ul class="flex flex-col gap-space-xs font-body-sm text-body-sm text-tertiary-fixed"><li class="hover:text-white transition-colors"><a href="#">Spatial Manifestos</a></li><li class="hover:text-white transition-colors"><a href="#">Sustainability Metrics</a></li><li class="hover:text-white transition-colors"><a href="#">Curator Authentication</a></li><li class="hover:text-white transition-colors"><a href="#">Certificates of Provenance</a></li></ul></div></div><div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-space-md font-caption text-caption text-text-muted"><div>© 2025 ShelfStack Architectural Store Ltd. All Rights Reserved.</div><div class="flex items-center gap-space-md"><span>Zurich</span><span>•</span><span>Tokyo</span><span>•</span><span>New York</span><span>•</span><span>Copenhagen</span></div></div></div></footer></body></html>

@@ -1,6 +1,76 @@
 # Changelog
 
-Catatan update untuk **Product Management**.
+Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
+
+## [Unreleased — Sprint 3 berjalan]
+
+### Changed (IA restructure 2026-09-18)
+
+- Beranda `/` ditulis ulang jadi landing publik (hero, kategori, produk unggulan, value props, CTA admin) — tidak lagi CRUD langsung.
+- Etalase publik pindah ke `/katalog` (search + `ProductList` mode `hideActions` baru, klik kartu ke detail).
+- CRUD lengkap pindah ke `/admin/products` (guard `admin`, layout admin).
+- Navbar: tambah link Katalog + Kelola (admin). Sidebar admin: tambah Produk.
+- API baru `GET /api/categories` (defensif: landing tetap jalan walau tabel belum ada).
+- Tes E2E disesuaikan: `home.spec` (landing), `product.spec` (katalog publik + guard admin).
+- Redesign landing (`/`): hero split dengan visual produk asli + kartu harga real (fallback picsum),
+  pills kategori scroll-snap, grid unggulan, value props format editorial rows (bukan 3 kartu kembar),
+  satu label CTA "Masuk" untuk semua intent login, footer ringkas. Nol em-dash, dual light/dark.
+- Bahasa visual storefront (adaptasi pola DESIGN.md, bukan jiplak brand): foto produk di depan,
+  radius 16px untuk permukaan foto/kartu + full-pill untuk tombol/tab/badge, satu aksen emerald,
+  strip promo gelap sebagai satu-satunya momen kontras, tanpa shadow dekoratif lebar.
+- Iterasi DESIGN.md: Montserrat (display+body, scope `.storefront`, admin tetap Inter), kanvas putih
+  - ink `#0a1317`, CTA pil hitam marketing + cobalt `#0064e0` untuk aksi/link commerce, tab pil aktif
+    gelap, kartu foto 32px tanpa shadow, search-pill `#f1f4f7`, breadcrumb + galeri detail 32px.
+    Catatan: radius 32px adalah keputusan sadar mengikuti DESIGN.md (melewati batas 16px default).
+- Sistem token tunggal: warna brand hidup sebagai CSS variable di `main.css` + class `brand-*`
+  (tailwind.config), dark-mode ikut OS di semua lapis (Tailwind `darkMode: 'media'`, PrimeVue `system`,
+  media query CSS). Perbaikan nyata: sebelumnya dark Tailwind tidak ikut sehingga navbar putih
+  di halaman hitam. Diverifikasi via production build + screenshot light/dark.
+- Audit konsistensi token: seluruh hex di permukaan publik kini hanya dari palet DESIGN.md
+  (ink, cobalt, hairline, surface-soft); bocoran emerald di login/register diganti pil hitam
+  `contrast` + link cobalt; heading auth ke weight 500. Emerald dipertahankan hanya di register
+  admin (layout/sidebar/activities) sebagai bahasa terpisah yang disengaja.
+
+## [v0.10.0-s2] - 2026-09-18
+
+### Added
+
+- Auth email+password + Google OAuth (`useAuth`, `/auth/login`, `/auth/register`, `/auth/callback`).
+- Middleware `auth` + `admin`, layout `admin.vue` (shell, diisi penuh Fase 4), guard `/admin/activities`.
+- Migrasi `20260918010001` (profiles, categories, kolom stock/category_id/price_cents, trigger auto-profiles + sync price_cents) dan `20260918010002` (RLS strict products/profiles/activity/storage).
+- Fix keamanan pre-push: semua cek admin lewat `is_admin()` SECURITY DEFINER (anti-rekursi RLS);
+  policy owner-update dihapus karena memungkinkan self-promote (`SET role='admin'` ke baris sendiri).
+- Server guard `requireUser/requireAdmin` (`server/utils/auth.ts`) dipasang di semua endpoint tulis products + baca sampah; endpoint `GET /api/auth/me`.
+- E2E `tests/e2e/auth.spec.ts` (guard redirect, validasi form, 401 anon, katalog publik) + helper `waitForHydration`.
+
+### Changed
+
+- Navbar: rebrand ShelfStack + state login/logout + link Admin kondisional; judul tab app.
+- Perbaikan flaky E2E pre-existing: tunggu hidrasi + locator dialog + scope main + poll-retry klik.
+- `nuxt.config.ts`: Vite watcher abaikan `.kilo/**`.
+
+### Note (belum dieksekusi, butuh aksi manusia)
+
+- Migrasi SQL ditulis tapi **belum di-push ke Supabase Cloud** (butuh `supabase link` + `db push` + akun admin pertama via dashboard). Sampai itu dilakukan, RLS lama (`USING true`) masih aktif di cloud.
+- Akun admin pertama dibuat manual: daftar via UI lalu `update profiles set role='admin'` di SQL Editor.
+
+## [v0.9.0-s1] - 2026-09-18
+
+### Added
+
+- Skema validasi bersama **Zod** di `shared/schemas/product.ts` dipakai client + server.
+- Unit test `tests/unit/product-schema.spec.ts` (9 case, termasuk kasus negatif PRD-1-02).
+- `supabase/seed.sql` (8 produk) untuk `supabase db reset --local`.
+- DevDependency `vue-tsc` untuk gate typecheck.
+- Dokumentasi rencana portofolio 12 minggu di `docs/` (`PORTFOLIO-PLAN`, `SPRINT-PLAN`, `BACKLOG`, `PHASE-0..5`, `ADR/`, `PORTFOLIO-PACKAGING`).
+
+### Changed
+
+- Migrasi FSD-lite: `app/stores/product.ts` + `app/repository/product.ts` pindah ke `app/features/products/` (file lama jadi alias, dihapus Sprint 2).
+- Typed Supabase client (`useSupabaseClient<Database>()`, interface `ActivityLog`) — tidak ada `any` lagi di product/activity flow kecuali `catch`.
+- Validasi server `POST/PUT /api/products` via Zod → `400` konsisten (tidak lagi insert body mentah).
+- `eslint.config.mjs` + `vitest.config.ts` mengabaikan `.kilo/**` (nested worktree merusak lint/test).
+- README: koreksi Nuxt 3 → Nuxt 4, rebrand ShelfStack.
 
 ## [v0.8.0-beta.1] - 2026-08-18
 
