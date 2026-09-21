@@ -1,24 +1,33 @@
 import { test, expect } from '@playwright/test'
+import { waitForHydration } from './helpers'
 
-test('has title and main heading', async ({ page }) => {
+test('beranda: hero + CTA katalog', async ({ page }) => {
   await page.goto('/')
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Katalog \| Simple Product CRUD/)
-
-  // Expect the main heading to be visible
-  const heading = page.getByRole('heading', { name: 'Daftar Produk' })
-  await expect(heading).toBeVisible()
+  await expect(page).toHaveTitle(/ShelfStack/)
+  await expect(
+    page.getByRole('heading', { name: 'Etalase rapi di depan, operasional tertib di belakang.' }),
+  ).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Lihat Katalog' })).toBeVisible()
 })
 
-test('can open add product modal', async ({ page }) => {
+test('beranda: CTA mengarah ke katalog', async ({ page }) => {
+  await page.goto('/')
+  await waitForHydration(page)
+
+  await page.getByRole('link', { name: 'Lihat Katalog' }).click()
+  await expect(page).toHaveURL(/\/katalog/)
+  await expect(page.getByRole('heading', { name: 'Katalog' })).toBeVisible()
+})
+
+test('beranda: bagian unggulan + admin CTA tampil', async ({ page }) => {
   await page.goto('/')
 
-  // Click the add button
-  const addButton = page.getByRole('button', { name: 'Tambah Produk' })
-  await addButton.click()
-
-  // Wait for modal to appear
-  const modalHeading = page.getByRole('heading', { name: 'Tambah Produk', exact: true })
-  await expect(modalHeading).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Produk Unggulan' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Kenapa ShelfStack' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Kelola katalogmu sendiri' })).toBeVisible()
+  const ctaBand = page.locator('section', {
+    has: page.getByRole('heading', { name: 'Kelola katalogmu sendiri' }),
+  })
+  await expect(ctaBand.getByRole('link', { name: 'Masuk' })).toBeVisible()
 })
