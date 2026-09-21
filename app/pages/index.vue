@@ -254,59 +254,73 @@ onMounted(async () => {
 
         <!-- Right Column: Curatorial Showcase Mosaic -->
         <div class="lg:col-span-6 relative">
-          <div class="grid grid-cols-12 gap-3">
+          <div class="grid grid-cols-12 gap-3 h-80 sm:h-96">
             <!-- Main Hero Tile: Wireless Headphones -->
             <div
-              class="col-span-8 bg-brand-canvas-soft rounded-card overflow-hidden relative group border border-brand-hair shadow-whisper"
+              class="col-span-7 bg-brand-canvas-soft rounded-card overflow-hidden relative group border border-brand-hair shadow-whisper h-full"
             >
               <img
-                class="w-full h-80 sm:h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwVY6_XJIJ--I5tlVeVHvg6ErT_oBXt2avwd8dlAuTVukdzmLAppAhyNQAGXm3rQFEX1mHUEJ1GZ0wxvknebBIyNihYqTnXUswGHZuBSXpTUJrW6irkYFSwJUdz3lXaf3SIaU32wSKZaVrV6lC7Krf-diQ9YtZ80tMZPN0gDm7158w3dT3TGRm9DJY3Zr0K4RKBXS_5cVnFyD0hA50xpvdjViEWoa2fQmCh6xzjHcub1jp-D9HREja"
                 alt="Headphone Nirkabel Studio"
               />
               <div
-                class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md rounded-full px-4 py-2 flex items-center justify-between border border-brand-hair shadow-whisper"
+                class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md rounded-full px-3.5 py-2 flex items-center justify-between border border-brand-hair shadow-whisper"
               >
-                <div>
-                  <p class="text-xs font-bold text-brand-ink m-0 leading-tight">
+                <div class="min-w-0 pr-2">
+                  <p class="text-xs font-bold text-brand-ink m-0 leading-tight truncate">
                     Headphone Studio ANC
                   </p>
-                  <p class="text-[11px] text-brand-muted m-0">Koleksi Terlaris</p>
+                  <p class="text-[11px] text-brand-muted m-0 truncate">Koleksi Terlaris</p>
                 </div>
-                <span class="text-xs font-bold text-brand-accent">Rp2.680.000</span>
+                <span class="text-xs font-bold text-brand-accent shrink-0">Rp2.680.000</span>
               </div>
             </div>
 
-            <!-- Secondary Hero Mosaic Stack -->
-            <div class="col-span-4 flex flex-col gap-3">
+            <!-- Secondary Hero Mosaic Stack (2 Rows with Matching Height & Bottom-Pill Overlay) -->
+            <div class="col-span-5 flex flex-col gap-3 h-full">
+              <!-- Top Row: Desk Lamp -->
               <div
-                class="bg-brand-canvas-soft rounded-card overflow-hidden h-40 sm:h-46 relative group border border-brand-hair shadow-whisper"
+                class="flex-1 min-h-0 bg-brand-canvas-soft rounded-card overflow-hidden relative group border border-brand-hair shadow-whisper"
               >
                 <img
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhuBSFbEmAvUs-dIR2YRW-AgUpd_FXgqc62yOMrFXAqiJxphILJy3g73g9zMSiczWs5C_QAJAN1CjOVg_pzST382d0uUBGS5pFhsCPOFK1nOrZaHe-97eQ5JqcvSwsi3UzEkT3yFNe2vkYGKvByoxn2fF4xlojiv56WR8B1rwrUZFxLT-WZVzHWHvp1T17Fqfe44ym_WRhnIIM_2T_g3dkxEIvLv9oyO86-o48wqWDKZfPrK2obggw"
                   alt="Lampu Meja Kerja"
                 />
-                <span
-                  class="absolute top-2 right-2 bg-brand-ink text-white text-[10px] px-2.5 py-0.5 rounded-full font-bold"
+                <div
+                  class="absolute bottom-2.5 left-2.5 right-2.5 bg-white/95 backdrop-blur-md rounded-full px-3 py-1.5 flex items-center justify-between border border-brand-hair shadow-whisper"
                 >
-                  Lampu Meja
-                </span>
+                  <div class="min-w-0 pr-1.5">
+                    <p class="text-[11px] font-bold text-brand-ink m-0 leading-tight truncate">
+                      Lampu Meja Task
+                    </p>
+                    <p class="text-[10px] text-brand-muted m-0 truncate">Pencahayaan</p>
+                  </div>
+                  <span class="text-[11px] font-bold text-brand-accent shrink-0">Rp850.000</span>
+                </div>
               </div>
 
+              <!-- Bottom Row: EDC Commuter Bag -->
               <div
-                class="bg-brand-canvas-soft rounded-card overflow-hidden h-40 sm:h-46 relative group border border-brand-hair shadow-whisper"
+                class="flex-1 min-h-0 bg-brand-canvas-soft rounded-card overflow-hidden relative group border border-brand-hair shadow-whisper"
               >
                 <img
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaW1aKJlLR-zy1At4XWYvwZTHyVzcedxmF5czH_xXSLAw5u-HsTZgUrlfag8Lcz8Wy41SeSwYS-HeeyVsHZK3HIKWSVxEmb50sDQgwEwzPqy8Tk7DfzdvdVw4uC3VyiWSo8w_SV806yxW6xxj4tygQ5PGNzL4_0kdeany5eVB7SlX4r2_9T2mzzvz4Eqy6YNr5Hqd0-C230EfZJntIcrv_ptSdiTpKbYG9ESr-91MiSkickFdwXSq7"
                   alt="Tas Komuter Multifungsi"
                 />
-                <span
-                  class="absolute bottom-2 left-2 bg-white text-brand-ink text-[10px] px-2.5 py-0.5 rounded-full font-bold shadow-whisper border border-brand-hair"
+                <div
+                  class="absolute bottom-2.5 left-2.5 right-2.5 bg-white/95 backdrop-blur-md rounded-full px-3 py-1.5 flex items-center justify-between border border-brand-hair shadow-whisper"
                 >
-                  Tas EDC
-                </span>
+                  <div class="min-w-0 pr-1.5">
+                    <p class="text-[11px] font-bold text-brand-ink m-0 leading-tight truncate">
+                      Tas Komuter EDC
+                    </p>
+                    <p class="text-[10px] text-brand-muted m-0 truncate">Tahan Cuaca</p>
+                  </div>
+                  <span class="text-[11px] font-bold text-brand-accent shrink-0">Rp1.120.000</span>
+                </div>
               </div>
             </div>
           </div>
