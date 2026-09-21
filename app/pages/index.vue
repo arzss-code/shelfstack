@@ -106,7 +106,7 @@ const featuredCategories = [
     spanTwo: false,
   },
   {
-    name: 'Pakaian & EDC',
+    name: 'Pakaian & Aksesoris',
     category: 'lifestyle',
     count: '260 Produk',
     desc: 'Tas selempang harian, kaus katun organik combed, dan jam tangan fungsional berdaya tahan tinggi.',
