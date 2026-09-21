@@ -78,7 +78,7 @@ const contextItems = computed(() => {
         </div>
       </template>
 
-      <div v-if="activity" class="flex flex-col gap-6 font-mono text-[13px] pt-2">
+      <div v-if="activity" class="flex flex-col gap-6 font-sans text-[13px] pt-2">
         <!-- Context Card -->
         <div
           class="rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-[#18181b] overflow-hidden shadow-sm"
