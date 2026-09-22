@@ -13,7 +13,7 @@
 
 ### 1.1 Visi Produk
 
-**ShelfStack** adalah platform _e-commerce full-stack_ kurasi premium (_modernist department store_) yang berfokus pada penyediaan instrumen kerja berpresisi tinggi, perangkat audio taktil, furnitur ruang kerja ergonomis, dan perlengkapan _Everyday Carry (EDC)_ terkurasi.
+**ShelfStack** adalah platform _e-commerce full-stack_ kurasi premium (_modernist department store_) yang berfokus pada penyediaan instrumen kerja berpresisi tinggi, perangkat audio taktil, furnitur ruang kerja ergonomis, serta pakaian dan aksesoris terkurasi.
 
 Platform ini dirancang dengan pendekatan arsitektur modern (_clean code_, _atomic component system_, dan _type-safe data layer_), menjamin performa tinggi, pengalaman berbelanja tanpa hambatan (_frictionless_), serta transparansi manajemen inventaris bagi tim internal toko.
 
@@ -178,18 +178,18 @@ Spesifikasi berfokus pada kapasitas volume, daya listrik, dan keamanan pangan:
 }
 ```
 
-#### 4. Kategori: **Pakaian & Aksesoris EDC** (`fashion-edc`)
+#### 4. Kategori: **Pakaian & Aksesoris** (`pakaian-aksesoris` / `fashion-accessories`)
 
-Spesifikasi berfokus pada ukuran fisik, ketahanan cuaca, dan material tekstil:
+Spesifikasi berfokus pada ukuran fisik, ketahanan bahan, dan material tekstil:
 
 ```json
 {
-  "specs_type": "edc",
+  "specs_type": "apparel_accessories",
   "capacity_liters": 6.5,
   "outer_fabric": "Cordura® 500D Ballistic Waterproof Nylon",
   "zipper_type": "YKK® AquaGuard Weatherproof",
   "hardware_buckle": "Fidlock® V-Buckle Magnetic Anodized",
-  "compartments": "Tablet pocket up to 11-inch + hidden passport vault",
+  "compartments": "Kompartemen tablet hingga 11 inci + saku dokumen rahasia",
   "strap_adjustable_cm": "80 - 135 cm",
   "warranty_months": 24
 }
