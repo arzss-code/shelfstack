@@ -119,7 +119,7 @@ create index idx_products_deleted on public.products(deleted_at);
 
 Berikut adalah kontrak skema JSON untuk masing-masing kategori produk:
 
-#### 1. Kategori: **Tech & Gadget** (`tech-gadgets`)
+#### 1. Kategori: **Tech & Gadget** (`tech`)
 
 Spesifikasi berfokus pada kapabilitas elektronik, daya, dan koneksi:
 
@@ -137,7 +137,7 @@ Spesifikasi berfokus pada kapabilitas elektronik, daya, dan koneksi:
 }
 ```
 
-#### 2. Kategori: **Furnitur & Meja Kerja** (`furniture`)
+#### 2. Kategori: **Furnitur & Ruang Kerja** (`furniture`)
 
 Spesifikasi berfokus pada dimensi spasial, material konstruksi, dan ergonomi:
 
@@ -160,13 +160,13 @@ Spesifikasi berfokus pada dimensi spasial, material konstruksi, dan ergonomi:
 }
 ```
 
-#### 3. Kategori: **Rumah & Dapur** (`home-kitchen`)
+#### 3. Kategori: **Rumah & Dapur** (`home`)
 
 Spesifikasi berfokus pada kapasitas volume, daya listrik, dan keamanan pangan:
 
 ```json
 {
-  "specs_type": "kitchen",
+  "specs_type": "home",
   "capacity_liters": 0.9,
   "power_wattage": 1200,
   "voltage": "220V - 50Hz",
@@ -178,13 +178,13 @@ Spesifikasi berfokus pada kapasitas volume, daya listrik, dan keamanan pangan:
 }
 ```
 
-#### 4. Kategori: **Pakaian & Aksesoris** (`pakaian-aksesoris` / `fashion-accessories`)
+#### 4. Kategori: **Pakaian & Aksesoris** (`lifestyle`)
 
 Spesifikasi berfokus pada ukuran fisik, ketahanan bahan, dan material tekstil:
 
 ```json
 {
-  "specs_type": "apparel_accessories",
+  "specs_type": "lifestyle",
   "capacity_liters": 6.5,
   "outer_fabric": "Cordura® 500D Ballistic Waterproof Nylon",
   "zipper_type": "YKK® AquaGuard Weatherproof",
@@ -195,7 +195,7 @@ Spesifikasi berfokus pada ukuran fisik, ketahanan bahan, dan material tekstil:
 }
 ```
 
-#### 5. Kategori: **Alat Tulis & Arsip** (`stationery`)
+#### 5. Kategori: **Alat Tulis & Kerajinan** (`stationery`)
 
 Spesifikasi berfokus pada presisi mekanikal, bahan bodi, dan standar refill:
 
