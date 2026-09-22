@@ -42,7 +42,7 @@ const navigateToDetail = () => {
         :alt="product.name"
         loading="lazy"
         class="w-full h-full object-cover rounded-media transition-transform duration-500 group-hover:scale-105"
-      />
+      >
       <div
         v-else
         class="flex items-center justify-center w-full h-full text-brand-faint bg-brand-canvas-soft rounded-media"

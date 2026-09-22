@@ -56,7 +56,7 @@ const handleSubmit = async () => {
         <p class="text-sm font-semibold text-brand-ink m-0">Email dikirim!</p>
         <p class="text-xs text-brand-muted m-0 mt-1.5 leading-relaxed">
           Cek inbox Anda di <span class="font-semibold text-brand-ink">{{ email }}</span
-          >.<br />
+          >.<br >
           Klik tautan di email untuk mengatur password baru.
         </p>
       </div>

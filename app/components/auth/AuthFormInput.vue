@@ -50,7 +50,7 @@ const emit = defineEmits<{
       ]"
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       @focus="emit('clearError')"
-    />
+    >
 
     <Transition name="fade">
       <small v-if="props.error" class="text-red-500 text-xs font-medium">

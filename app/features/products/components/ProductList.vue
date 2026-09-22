@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Product } from '~/types/product'
+import ProductCard from './ProductCard.vue'
 
 defineProps<{
   products: Product[]
@@ -17,16 +18,6 @@ const emit = defineEmits<{
   delete: [id: number]
   restore: [id: number]
 }>()
-
-const router = useRouter()
-
-const formatRupiah = (value: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-  }).format(value)
-}
 </script>
 
 <template>

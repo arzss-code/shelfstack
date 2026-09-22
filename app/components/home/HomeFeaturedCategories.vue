@@ -120,7 +120,7 @@ const featuredCategories = [
             :src="cat.image"
             :alt="cat.name"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          />
+          >
         </div>
       </NuxtLink>
     </div>
