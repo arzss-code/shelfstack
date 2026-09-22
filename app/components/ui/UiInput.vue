@@ -65,7 +65,7 @@ const emit = defineEmits<{
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
         @blur="emit('blur')"
         @focus="emit('focus')"
-      >
+      />
 
       <!-- Right Icon -->
       <div v-if="rightIcon" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted">

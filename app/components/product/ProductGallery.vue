@@ -17,7 +17,7 @@ defineProps<{
         :src="product.image_url"
         :alt="product.name"
         class="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
-      >
+      />
       <div v-else class="flex flex-col items-center justify-center text-brand-faint">
         <i class="pi pi-image text-5xl mb-2" />
         <span class="text-xs font-medium">Gambar Produk Belum Tersedia</span>

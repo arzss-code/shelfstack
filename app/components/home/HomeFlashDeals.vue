@@ -89,7 +89,7 @@ const flashDeals = [
         <div
           class="relative aspect-square rounded-media overflow-hidden bg-brand-canvas-soft border border-brand-hair"
         >
-          <img :src="deal.image" :alt="deal.name" class="w-full h-full object-cover" >
+          <img :src="deal.image" :alt="deal.name" class="w-full h-full object-cover" />
           <span
             class="absolute top-2 left-2 bg-brand-accent text-white text-[10px] font-bold px-2 py-0.5 rounded-full"
           >

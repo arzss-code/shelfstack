@@ -152,7 +152,7 @@ const handleLogout = async () => {
               type="text"
               class="w-full bg-transparent px-3 text-xs sm:text-sm text-brand-ink placeholder:text-brand-faint focus:outline-none"
               placeholder="Cari produk kebutuhan kerja, rumah, audio, furnitur..."
-            >
+            />
 
             <button
               type="submit"
@@ -319,7 +319,7 @@ const handleLogout = async () => {
           type="text"
           placeholder="Cari produk..."
           class="w-full bg-transparent text-xs text-brand-ink placeholder-brand-faint focus:outline-none"
-        >
+        />
         <button
           type="submit"
           class="w-6 h-6 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0"

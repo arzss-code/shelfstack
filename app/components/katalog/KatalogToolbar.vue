@@ -37,7 +37,7 @@ const emit = defineEmits<{
         aria-label="Cari produk..."
         class="w-full h-10 pl-9 pr-8 text-xs sm:text-sm bg-brand-field text-brand-ink placeholder:text-brand-faint rounded-full border border-transparent outline-none focus:border-brand-hair focus:bg-brand-canvas focus:ring-2 focus:ring-brand-ink transition-all"
         @input="emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
-      >
+      />
       <button
         v-if="searchQuery"
         type="button"
