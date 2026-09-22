@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-primary-container":"#f8f7ff","primary-container":"#0066ff","on-tertiary-fixed-variant":"#454747","surface-container-highest":"#e4e2e2","on-error":"#ffffff","secondary":"#5f5e5e","tertiary-container":"#717272","on-tertiary-fixed":"#1a1c1c","field":"#f0f0f0","on-error-container":"#93000a","on-tertiary":"#ffffff","surface":"#fbf9f9","overlay-scrim":"rgba(115, 115, 115, 0.56)","secondary-fixed-dim":"#c8c6c5","surface-variant":"#e4e2e2","canvas":"#ffffff","text-muted":"#707070","tertiary-fixed":"#e2e2e2","primary":"#0050cb","primary-fixed":"#dae1ff","on-surface":"#1b1c1c","secondary-fixed":"#e5e2e1","on-secondary-fixed-variant":"#474646","on-background":"#1b1c1c","surface-container":"#efeded","on-primary":"#ffffff","background":"#fbf9f9","surface-container-high":"#e9e8e7","on-secondary-fixed":"#1c1b1b","on-tertiary-container":"#f8f8f8","tertiary":"#585a5a","text-faint":"#adadad","inverse-on-surface":"#f2f0f0","secondary-container":"#e2dfde","accent-electric":"#0066ff","on-primary-fixed-variant":"#003fa4","error-container":"#ffdad6","tertiary-fixed-dim":"#c6c6c7","outline-variant":"#c2c6d8","on-secondary-container":"#636262","ink":"#141414","on-primary-fixed":"#001849","surface-tint":"#0054d6","canvas-soft":"#f3f3f3","on-secondary":"#ffffff","hairline":"#e0e0e0","outline":"#727687","ink-soft":"#262626","inverse-surface":"#303031","surface-container-lowest":"#ffffff","surface-dim":"#dbdad9","error":"#ba1a1a","hairline-soft":"#f0f0f0","inverse-primary":"#b3c5ff","surface-container-low":"#f5f3f3","on-surface-variant":"#424656","primary-fixed-dim":"#b3c5ff","surface-bright":"#fbf9f9"},borderRadius:{DEFAULT:"1rem",lg:"2rem",xl:"3rem",full:"9999px"},spacing:{"space-xl":"2rem","margin-mobile":"1.25rem","space-md":"1rem",margin:"3rem",gutter:"1.5rem","gutter-mobile":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","space-lg":"1.5rem"},fontFamily:{"headline-lg":["Hanken Grotesk"],"headline-sm":["Hanken Grotesk"],display:["Hanken Grotesk"],"body-lg":["DM Sans"],caption:["DM Sans"],"title-md":["Hanken Grotesk"],"display-mobile":["Hanken Grotesk"],"body-sm":["DM Sans"],"headline-md":["Hanken Grotesk"],"headline-lg-mobile":["Hanken Grotesk"],link:["DM Sans"],"body-md":["DM Sans"],"headline-md-mobile":["Hanken Grotesk"],"label-md":["DM Sans"],"title-lg":["Hanken Grotesk"]},fontSize:{"headline-lg":["56px",{lineHeight:"60px",letterSpacing:"-0.025em",fontWeight:"700"}],"headline-sm":["32px",{lineHeight:"36px",letterSpacing:"-0.015em",fontWeight:"600"}],display:["80px",{lineHeight:"80px",letterSpacing:"-0.03em",fontWeight:"700"}],"body-lg":["20px",{lineHeight:"28px",fontWeight:"400"}],caption:["12px",{lineHeight:"16px",fontWeight:"400"}],"title-md":["20px",{lineHeight:"26px",letterSpacing:"-0.005em",fontWeight:"600"}],"display-mobile":["48px",{lineHeight:"52px",letterSpacing:"-0.02em",fontWeight:"700"}],"body-sm":["14px",{lineHeight:"20px",fontWeight:"400"}],"headline-md":["44px",{lineHeight:"48px",letterSpacing:"-0.02em",fontWeight:"600"}],"headline-lg-mobile":["36px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"700"}],link:["16px",{lineHeight:"24px",fontWeight:"600"}],"body-md":["16px",{lineHeight:"24px",fontWeight:"400"}],"headline-md-mobile":["28px",{lineHeight:"32px",letterSpacing:"-0.015em",fontWeight:"600"}],"label-md":["12px",{lineHeight:"16px",letterSpacing:"0.04em",fontWeight:"700"}],"title-lg":["24px",{lineHeight:"30px",letterSpacing:"-0.01em",fontWeight:"600"}]}}}}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-canvas"><div class="bg-ink text-canvas py-1.5 px-gutter"><div class="max-w-7xl mx-auto flex items-center justify-between font-caption text-caption"><div class="flex items-center gap-space-sm"><span class="w-1.5 h-1.5 rounded-full bg-accent-electric"></span><p class="tracking-wide">Free Express Shipping on orders over $75 · 30-Day Risk-Free Returns · Shop New Arrivals</p></div><div class="hidden md:flex items-center gap-space-lg text-secondary-fixed-dim"><a class="hover:text-canvas transition-colors" data-path="help-center" href="#">Help Center</a><a class="hover:text-canvas transition-colors" data-path="track-order" href="#">Track Order</a><span class="text-hairline">USD $</span></div></div></div><div class="h-20 max-w-7xl mx-auto px-gutter flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg shrink-0"><a class="flex items-center gap-space-sm group" data-path="home" href="#"><img alt="Brand logo. - Primary color: #0066ff
+- Font: hankenGrotesk
+- Mode: light
+- Roundness: rounded-full
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xxr3vYezhanvKgo5CiY-uShx9Z_nxpg3u_P87x04A40OQUZh9sYlZWGLokcyGv6XdZPRKhMvMdJNS6CEtao5ecIeCUG00jOkEZDv3htiNQdAHWJcL7YURulUxM5iQCtehrjw7dkJRK5GCi-33XWEmna2C6wl2SnlH0Jo30mvuBheFB51F5jx9qe3V6ldh4PuT2DB8HtgpzQK4yyLrrefFU7iF8zxAJedNiQI_bGz8noloxhRhU692YRfw"/><span class="font-title-lg text-title-lg tracking-tight text-ink">ShelfStack</span></a><button class="hidden xl:flex items-center gap-space-xs bg-canvas-soft hover:bg-surface-container text-ink font-label-md text-label-md px-space-md py-space-sm rounded-full transition-all" type="button"><span class="material-symbols-outlined text-[18px]">category</span><span>Departments</span><span class="material-symbols-outlined text-[16px] text-text-muted">expand_more</span></button></div><div class="flex-1 max-w-xl mx-space-md hidden md:block"><div class="relative flex items-center w-full bg-field rounded-full px-space-xs py-1 transition-all focus-within:bg-canvas focus-within:ring-2 focus-within:ring-ink"><button class="flex items-center gap-1 font-caption text-caption text-ink font-semibold px-space-sm py-1.5 rounded-full hover:bg-canvas-soft transition-colors shrink-0" type="button"><span>All</span><span class="material-symbols-outlined text-[14px] text-text-muted">arrow_drop_down</span></button><span class="w-px h-4 bg-hairline mx-1"></span><input class="w-full bg-transparent px-space-sm font-body-sm text-body-sm text-ink placeholder-text-faint focus:outline-none" placeholder="Search minimalist furniture, tech audio, home essentials..." type="text"/><button class="w-8 h-8 rounded-full bg-ink text-canvas flex items-center justify-center shrink-0 hover:opacity-90 transition-opacity" type="button"><span class="material-symbols-outlined text-[16px]">search</span></button></div></div><div class="flex items-center gap-space-sm shrink-0"><div class="hidden lg:flex items-center gap-space-md mr-space-xs"><a class="font-link text-link text-on-surface-variant hover:text-on-surface transition-colors" data-path="deals" href="#">Deals</a><a class="font-link text-link text-on-surface-variant hover:text-on-surface transition-colors" data-path="best-sellers" href="#">Best Sellers</a><a class="font-link text-link text-on-surface-variant hover:text-on-surface transition-colors" data-path="new-drops" href="#">New Drops</a><a class="font-link text-link text-on-surface-variant hover:text-on-surface transition-colors" data-path="gift-cards" href="#">Gift Cards</a></div><div class="flex items-center gap-space-xs"><a class="relative p-space-xs text-on-surface-variant hover:text-ink transition-colors rounded-full hover:bg-canvas-soft" data-path="wishlist" href="#"><span class="material-symbols-outlined text-[22px]">favorite</span><span class="absolute top-0 right-0 w-4 h-4 rounded-full bg-ink text-canvas font-caption text-[10px] font-bold flex items-center justify-center">4</span></a><a class="flex items-center gap-space-xs bg-field hover:bg-surface-container text-ink font-label-md text-label-md px-3.5 py-2 rounded-full transition-all" data-path="cart" href="#"><span class="material-symbols-outlined text-[18px]">shopping_bag</span><span>Cart</span><span class="bg-accent-electric text-canvas text-[11px] font-bold px-1.5 py-0.5 rounded-full leading-none">2</span><span class="text-ink font-semibold ml-0.5">$148.00</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div><div class="bg-canvas-soft"><div class="max-w-7xl mx-auto px-gutter"><nav class="flex items-center gap-space-xs py-2 overflow-x-auto" data-active-classes="bg-ink text-canvas font-bold"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-ink px-space-md py-1.5 rounded-full whitespace-nowrap transition-colors" data-path="tech-gadgets" href="#">Tech &amp; Gadgets</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-ink px-space-md py-1.5 rounded-full whitespace-nowrap transition-colors" data-path="home-kitchen" href="#">Home &amp; Kitchen Essentials</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-ink px-space-md py-1.5 rounded-full whitespace-nowrap transition-colors" data-path="furniture-living" href="#">Furniture &amp; Space Living</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-ink px-space-md py-1.5 rounded-full whitespace-nowrap transition-colors" data-path="fashion-accessories" href="#">Fashion &amp; Accessories</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-ink px-space-md py-1.5 rounded-full whitespace-nowrap transition-colors" data-path="stationery-craft" href="#">Stationery &amp; Craft Tools</a><a class="font-body-sm text-body-sm text-accent-electric font-semibold px-space-md py-1.5 rounded-full whitespace-nowrap hover:bg-primary-fixed/30 transition-colors flex items-center gap-1" data-path="sale-clearance" href="#"><span>Sale &amp; Clearance</span><span class="bg-accent-electric text-canvas font-caption text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">%</span></a></nav></div></div></header><main class="w-full pt-44 bg-surface"><div class="max-w-7xl mx-auto px-gutter"><div class="flex flex-col w-full">
+<!-- SECTION 1: HERO MULTI-DEPARTMENT SHOWCASE -->
+<section class="w-full pb-space-xl">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
+<!-- Left Column: Editorial Statement & Actions -->
+<div class="lg:col-span-6 flex flex-col justify-between space-y-space-lg">
+<div>
+<div class="inline-flex items-center gap-space-xs bg-canvas-soft text-ink px-space-md py-1 rounded-full mb-space-md">
+<span class="w-2 h-2 rounded-full bg-accent-electric animate-pulse"></span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-ink">Autonomous Catalog · 2025 Release</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg tracking-tight text-ink mb-space-md">
+            Everyday essentials, precision engineered.
+          </h1>
+<p class="font-body-lg text-body-lg text-secondary max-w-xl leading-relaxed">
+            ShelfStack curates high-utility industrial consumer goods across five architectural departments—from low-latency studio acoustics and precision brew systems to modular living surfaces and machined EDC.
+          </p>
+</div>
+<!-- Call to Action Stadium Pills -->
+<div class="flex flex-wrap items-center gap-space-md pt-space-xs">
+<a class="bg-ink text-canvas font-label-md text-label-md px-space-xl py-3.5 rounded-full hover:opacity-90 transition-all flex items-center gap-space-xs" href="#departments">
+<span>Explore All Categories</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+<a class="bg-canvas-soft hover:bg-surface-container text-ink font-label-md text-label-md px-space-xl py-3.5 rounded-full transition-all flex items-center gap-space-xs" href="#flash-deals">
+<span class="material-symbols-outlined text-[18px] text-accent-electric">bolt</span>
+<span>View Today's Flash Deals</span>
+</a>
+</div>
+<!-- Quick Department Micro-Tiles -->
+<div class="pt-space-md">
+<p class="font-caption text-caption text-text-muted uppercase tracking-wider mb-space-sm">Select Department Node</p>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-space-xs">
+<a class="bg-canvas-soft hover:bg-surface-container p-space-sm rounded-lg flex flex-col transition-colors group" href="#department-catalog" onclick="filterDepartment('tech')">
+<span class="material-symbols-outlined text-ink group-hover:text-accent-electric text-[20px] mb-1">headphones</span>
+<span class="font-label-md text-label-md text-ink font-semibold">Tech</span>
+<span class="font-caption text-caption text-text-muted">420+ Items</span>
+</a>
+<a class="bg-canvas-soft hover:bg-surface-container p-space-sm rounded-lg flex flex-col transition-colors group" href="#department-catalog" onclick="filterDepartment('home')">
+<span class="material-symbols-outlined text-ink group-hover:text-accent-electric text-[20px] mb-1">coffee_maker</span>
+<span class="font-label-md text-label-md text-ink font-semibold">Home</span>
+<span class="font-caption text-caption text-text-muted">310+ Items</span>
+</a>
+<a class="bg-canvas-soft hover:bg-surface-container p-space-sm rounded-lg flex flex-col transition-colors group" href="#department-catalog" onclick="filterDepartment('furniture')">
+<span class="material-symbols-outlined text-ink group-hover:text-accent-electric text-[20px] mb-1">chair</span>
+<span class="font-label-md text-label-md text-ink font-semibold">Furniture</span>
+<span class="font-caption text-caption text-text-muted">180+ Items</span>
+</a>
+<a class="bg-canvas-soft hover:bg-surface-container p-space-sm rounded-lg flex flex-col transition-colors group" href="#department-catalog" onclick="filterDepartment('fashion')">
+<span class="material-symbols-outlined text-ink group-hover:text-accent-electric text-[20px] mb-1">backpack</span>
+<span class="font-label-md text-label-md text-ink font-semibold">Apparel</span>
+<span class="font-caption text-caption text-text-muted">260+ Items</span>
+</a>
+<a class="bg-canvas-soft hover:bg-surface-container p-space-sm rounded-lg flex flex-col transition-colors group" href="#department-catalog" onclick="filterDepartment('stationery')">
+<span class="material-symbols-outlined text-ink group-hover:text-accent-electric text-[20px] mb-1">edit_square</span>
+<span class="font-label-md text-label-md text-ink font-semibold">Stationery</span>
+<span class="font-caption text-caption text-text-muted">150+ Items</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Right Column: Curatorial Showcase Mosaic -->
+<div class="lg:col-span-6 relative">
+<div class="grid grid-cols-12 gap-space-sm">
+<!-- Main Hero Tile: Wireless ANC Headphones & Kettle Arrangement -->
+<div class="col-span-8 bg-canvas-soft rounded-lg overflow-hidden relative group">
+<img class="w-full h-80 sm:h-96 object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Minimalist studio still life of premium matte black over-ear wireless headphones resting next to a sleek matte ceramic pour-over coffee dripper on an architectural concrete slab with diffused natural morning window light and clean monochrome tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwVY6_XJIJ--I5tlVeVHvg6ErT_oBXt2avwd8dlAuTVukdzmLAppAhyNQAGXm3rQFEX1mHUEJ1GZ0wxvknebBIyNihYqTnXUswGHZuBSXpTUJrW6irkYFSwJUdz3lXaf3SIaU32wSKZaVrV6lC7Krf-diQ9YtZ80tMZPN0gDm7158w3dT3TGRm9DJY3Zr0K4RKBXS_5cVnFyD0hA50xpvdjViEWoa2fQmCh6xzjHcub1jp-D9HREja"/>
+<div class="absolute bottom-space-md left-space-md right-space-md bg-canvas/90 backdrop-blur rounded-full px-space-md py-space-xs flex items-center justify-between">
+<div>
+<p class="font-label-md text-label-md text-ink font-bold leading-tight">Acoustic &amp; Pour Duo</p>
+<p class="font-caption text-caption text-text-muted">Cross-Department Setup 01</p>
+</div>
+<span class="font-label-md text-label-md text-accent-electric font-bold">$268.00</span>
+</div>
+</div>
+<!-- Secondary Hero Mosaic Stack -->
+<div class="col-span-4 flex flex-col gap-space-sm">
+<div class="bg-canvas-soft rounded-lg overflow-hidden h-40 sm:h-48 relative group">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Close up architectural detail of an ergonomic brushed aluminum task lamp with warm directional LED illumination casting sharp soft geometric shadows on a white wooden tabletop surface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhuBSFbEmAvUs-dIR2YRW-AgUpd_FXgqc62yOMrFXAqiJxphILJy3g73g9zMSiczWs5C_QAJAN1CjOVg_pzST382d0uUBGS5pFhsCPOFK1nOrZaHe-97eQ5JqcvSwsi3UzEkT3yFNe2vkYGKvByoxn2fF4xlojiv56WR8B1rwrUZFxLT-WZVzHWHvp1T17Fqfe44ym_WRhnIIM_2T_g3dkxEIvLv9oyO86-o48wqWDKZfPrK2obggw"/>
+<span class="absolute top-2 right-2 bg-ink text-canvas font-caption text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Desk Lab</span>
+</div>
+<div class="bg-canvas-soft rounded-lg overflow-hidden h-40 sm:h-48 relative group">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Artisanal heavy-duty ballistic nylon and full-grain leather commuter tote bag shown in neutral monochrome setting, architectural studio props and precise tailoring seams." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaW1aKJlLR-zy1At4XWYvwZTHyVzcedxmF5czH_xXSLAw5u-HsTZgUrlfag8Lcz8Wy41SeSwYS-HeeyVsHZK3HIKWSVxEmb50sDQgwEwzPqy8Tk7DfzdvdVw4uC3VyiWSo8w_SV806yxW6xxj4tygQ5PGNzL4_0kdeany5eVB7SlX4r2_9T2mzzvz4Eqy6YNr5Hqd0-C230EfZJntIcrv_ptSdiTpKbYG9ESr-91MiSkickFdwXSq7"/>
+<span class="absolute bottom-2 left-2 bg-canvas text-ink font-caption text-[10px] px-2 py-0.5 rounded-full font-bold">Modular EDC</span>
+</div>
+</div>
+</div>
+<!-- Floating Badge -->
+<div class="absolute -bottom-4 -left-4 hidden md:flex items-center gap-space-sm bg-ink text-canvas px-space-md py-space-sm rounded-full shadow-lg">
+<span class="material-symbols-outlined text-[18px] text-accent-electric">verified</span>
+<span class="font-label-md text-label-md">1,320+ Precision Items in Stock</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: DEPARTMENT CATEGORY NAVIGATOR (5 Bespoke Cards) -->
+<section class="w-full py-space-xl" id="departments">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-space-lg gap-space-sm">
+<div>
+<span class="font-label-md text-label-md text-accent-electric uppercase tracking-widest block mb-space-xs font-bold">Curated Infrastructure</span>
+<h2 class="font-headline-md text-headline-md tracking-tight text-ink">Explore Five Dedicated Divisions</h2>
+</div>
+<p class="font-body-sm text-body-sm text-secondary max-w-md">
+        Structured catalogs tested against rigorous architectural tolerances, mechanical reliability, and tactile longevity.
+      </p>
+</div>
+<!-- 5 Architectural Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1: Tech & Gadgets (Spans 2 columns on large screens) -->
+<a class="lg:col-span-2 bg-canvas-soft hover:bg-surface-container rounded-lg overflow-hidden group transition-all flex flex-col md:flex-row" href="#department-catalog" onclick="filterDepartment('tech')">
+<div class="md:w-1/2 p-space-lg flex flex-col justify-between order-2 md:order-1">
+<div>
+<div class="flex items-center gap-space-xs mb-space-sm">
+<span class="font-caption text-caption text-accent-electric uppercase tracking-widest font-bold">Division 01</span>
+<span class="w-1.5 h-1.5 rounded-full bg-hairline"></span>
+<span class="font-caption text-caption text-text-muted">420 Products</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-ink font-bold mb-space-xs group-hover:text-primary transition-colors">Tech &amp; Gadgets</h3>
+<p class="font-body-sm text-body-sm text-secondary mb-space-md">
+              Audio, Smart Devices, Desk Tech &amp; Power. Studio monitors, Qi2 wireless docks, low-latency mechanical keyboards, and precision GaN charging solutions.
+            </p>
+</div>
+<div class="flex items-center gap-space-sm font-label-md text-label-md text-ink font-bold pt-space-md">
+<span>Browse Tech Division</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+<div class="md:w-1/2 min-h-[260px] overflow-hidden order-1 md:order-2">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Futuristic minimalist desktop workstation with CNC machined aluminum charging dock, studio reference speakers in dark charcoal, and wireless mechanical keyboard arranged on a felt desk mat." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmvA8rTc663X0aMY0i5AsRtnJWHHEMBE15l26ff2OBzeQ4YDMUc2bIfeMkM1wTrGpE8S1YpwKD1VFVOTPX83GWEoIoe_Wa5MeCsuOmxDtwLGsMeIlQpoOx_MrCo-cewC9QSL9DbpyFqpGe5CRkiClgbq2Ky9rCJ0x0lVhK8dgvYyfzRf9uFB-43LAqvdnR3zkN9hNg27b6fzEk8dmLSQTX2fxG3PRKyc-Ag1IX7VVNaYXvISjMYLi4"/>
+</div>
+</a>
+<!-- Card 2: Home & Kitchen -->
+<a class="bg-canvas-soft hover:bg-surface-container rounded-lg overflow-hidden group transition-all flex flex-col" href="#department-catalog" onclick="filterDepartment('home')">
+<div class="h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Minimalist kitchen setup showcasing a precision matte black gooseneck kettle, ribbed ceramic coffee carafe, and stackable stoneware bowls against a subtle off-white tiled backsplash." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDdnlKb3T3WJuD42WKCuYWlCi4su1XSA6opLKqIdBufFf2I89pgRHDlMhA-UQF8FA_W3JOC97K0Q67vQxjw_-tNPtI8Emhlv4itv2QxeDnZLfXVHK1pvqKMf3q_32bMom_wtTevyGn9RDkAPGYTJQyVapwhGLWNqs0sM8vT8WYthdz-1U1PIzS4aiuVS1jCvjsJtrrE3FBMRl_xhjHgG0XQOOBR7eT595CX28mslcd4ewk9ikvHvjQ"/>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-space-xs mb-space-sm">
+<span class="font-caption text-caption text-text-muted uppercase tracking-widest font-bold">Division 02</span>
+<span class="w-1.5 h-1.5 rounded-full bg-hairline"></span>
+<span class="font-caption text-caption text-text-muted">310 Products</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-ink font-bold mb-space-xs group-hover:text-primary transition-colors">Home &amp; Kitchen Essentials</h3>
+<p class="font-body-sm text-body-sm text-secondary">
+              Pour-overware, Minimalist Cookware, Tabletop ceramics and heat-resistant borosilicate tools for mindful daily rituals.
+            </p>
+</div>
+<div class="flex items-center gap-space-sm font-label-md text-label-md text-ink font-bold pt-space-md">
+<span>Shop Home</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</a>
+<!-- Card 3: Furniture & Living -->
+<a class="bg-canvas-soft hover:bg-surface-container rounded-lg overflow-hidden group transition-all flex flex-col" href="#department-catalog" onclick="filterDepartment('furniture')">
+<div class="h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="High-end minimalist living room interior showing an ergonomic sculpted ash wood lounge chair, modular modular powder-coated steel shelving system with architectural art books and stone accessories." src="https://lh  3.googleusercontent.com/aida-public/AB6AXuBc4XLDPg-9mRKQs1TlWbx1Sb6XRiOWWni_U00DefHZgPir91Sh9rS7GKOm0M2z7-S_5MPydGZ4snKfV2T-45YtfmX164d7iygok6Xq5dDum6OvvemCbgkUxAQ5UejU182htov0POdSz3dv8rCbDOIL8RdpkpYwK8qlbeuhBv98GLCvxB8t7BKzw5Yw2aMy-fX1H5itwB8_gTE1ZqTCstf34P3WDCDvrtao2RT1FG0WniZroxgjAw0i"/>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-space-xs mb-space-sm">
+<span class="font-caption text-caption text-text-muted uppercase tracking-widest font-bold">Division 03</span>
+<span class="w-1.5 h-1.5 rounded-full bg-hairline"></span>
+<span class="font-caption text-caption text-text-muted">180 Products</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-ink font-bold mb-space-xs group-hover:text-primary transition-colors">Furniture &amp; Space Living</h3>
+<p class="font-body-sm text-body-sm text-secondary">
+              Ergonomic Seating, Modular Tables, Storage Systems tailored for high-density modern creative apartments.
+            </p>
+</div>
+<div class="flex items-center gap-space-sm font-label-md text-label-md text-ink font-bold pt-space-md">
+<span>Shop Furniture</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</a>
+<!-- Card 4: Fashion & Accessories -->
+<a class="bg-canvas-soft hover:bg-surface-container rounded-lg overflow-hidden group transition-all flex flex-col" href="#department-catalog" onclick="filterDepartment('fashion')">
+<div class="h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Minimalist monochrome clothing and accessories flat-lay featuring a weatherproof Cordura commuter sling bag, heavyweight organic pima cotton tee in charcoal, and a brushed titanium field watch." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmK-nhltzS02RWfXj2Rx0Z8IvcV4TaPXHuYYeWMUhax_zC2LYbpNt--0RSd434mVakffTmk5s3va6NmCFXP32mL8xAUGwVx2oxYnYz_MI8jzlChs_vH53-QpQZQN9HgXIrNIxEUh-Gqko7SDdTs-v0pIb9qEn65QsCAFwAPLeEveKSsEmDVLW9YfSvaX7Q_HkhaHpfmUVv35TntI0JCNP3GnMk9WRyV4KVSnNZt_4xLlROZJMms7kg"/>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-space-xs mb-space-sm">
+<span class="font-caption text-caption text-text-muted uppercase tracking-widest font-bold">Division 04</span>
+<span class="w-1.5 h-1.5 rounded-full bg-hairline"></span>
+<span class="font-caption text-caption text-text-muted">260 Products</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-ink font-bold mb-space-xs group-hover:text-primary transition-colors">Fashion &amp; Accessories</h3>
+<p class="font-body-sm text-body-sm text-secondary">
+              Everyday Carry Bags, Organic Cotton Apparel, Timepieces, and modular travel kit engineered for fluid urban transit.
+            </p>
+</div>
+<div class="flex items-center gap-space-sm font-label-md text-label-md text-ink font-bold pt-space-md">
+<span>Shop Fashion &amp; EDC</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</a>
+<!-- Card 5: Stationery & Craft Tools -->
+<a class="bg-canvas-soft hover:bg-surface-container rounded-lg overflow-hidden group transition-all flex flex-col" href="#department-catalog" onclick="filterDepartment('stationery')">
+<div class="h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Architects desk flat lay featuring machined brass and titanium drafting pens, grid-ruled dot notebooks with lay-flat bookbinding, and heavy aluminum triangular rulers on grey slate background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPUa0JzIOqwWaWZqIgu4I0PA1v7YbfFltproG-m3AwYxCiPhIouH_GwoAtPLqA3FnGnU-OMudyp3jajkJzdlcRAWIpVL0-paLzRvVRqx_L1jA73N31qDSXEo2y5pCl1pUeK734CTQrN5Eg_3ZGqZpnALspE46_3lMJDtkCoUBQC7202e3hqxG0XYEjKXtFPoKfZt_EtUzxp1sujWSSVRhcd1F4Kw9OTlD8ICNKKBY46ME_8Zpbu1K5"/>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-space-xs mb-space-sm">
+<span class="font-caption text-caption text-text-muted uppercase tracking-widest font-bold">Division 05</span>
+<span class="w-1.5 h-1.5 rounded-full bg-hairline"></span>
+<span class="font-caption text-caption text-text-muted">150 Products</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-ink font-bold mb-space-xs group-hover:text-primary transition-colors">Stationery &amp; Craft Tools</h3>
+<p class="font-body-sm text-body-sm text-secondary">
+              Precision Machined Pens, Gridded Notebooks, Studio Organizers, and mathematical drafting accessories.
+            </p>
+</div>
+<div class="flex items-center gap-space-sm font-label-md text-label-md text-ink font-bold pt-space-md">
+<span>Shop Stationery</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</a>
+</div>
+</section>
+<!-- SECTION 3: FLASH DEALS & LIMITED DROPS (With Electric Blue Timer) -->
+<section class="w-full py-space-xl" id="flash-deals">
+<div class="bg-ink text-canvas rounded-lg p-space-lg md:p-space-xl">
+<!-- Flash Deals Header Bar -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between pb-space-lg gap-space-md">
+<div>
+<div class="inline-flex items-center gap-space-xs bg-accent-electric text-canvas font-caption text-caption font-bold px-space-md py-1 rounded-full uppercase tracking-wider mb-space-xs">
+<span class="material-symbols-outlined text-[14px]">timer</span>
+<span>24-Hour Cross-Category Drop</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-canvas font-bold">Limited Vault Pricing</h2>
+<p class="font-body-sm text-body-sm text-secondary-fixed-dim">Strict inventory allotments. Once marked complete, pricing reverts to standard retail index.</p>
+</div>
+<!-- Electric Blue Timer & Progress Unit -->
+<div class="flex flex-col sm:flex-row sm:items-center gap-space-md bg-ink-soft p-space-md rounded-lg">
+<div>
+<p class="font-caption text-caption text-text-faint uppercase tracking-wider">Vault Closes In</p>
+<div class="flex items-center gap-space-xs font-title-lg text-title-lg font-bold text-canvas font-mono mt-0.5">
+<span class="bg-ink px-2 py-1 rounded-full" id="timer-hours">07</span>
+<span>:</span>
+<span class="bg-ink px-2 py-1 rounded-full" id="timer-minutes">42</span>
+<span>:</span>
+<span class="bg-ink px-2 py-1 rounded-full text-accent-electric" id="timer-seconds">19</span>
+</div>
+</div>
+<div class="w-full sm:w-36">
+<div class="flex justify-between font-caption text-caption text-secondary-fixed-dim mb-1">
+<span>Claimed</span>
+<span class="text-accent-electric font-bold">81%</span>
+</div>
+<div class="w-full h-2 bg-ink rounded-full overflow-hidden">
+<div class="w-4/5 h-full bg-accent-electric rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- 4-Column Deal Product Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- Deal 1: Tech Studio Headphones -->
+<div class="bg-canvas text-ink rounded-lg p-space-md flex flex-col justify-between group">
+<div>
+<div class="relative w-full h-52 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform" data-alt="Studio ANC Wireless Over-Ear Headphones in space grey resting on minimal architectural podium with diffused directional lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAynKifeGh812agpR-N5vrbzYrObnMBGBpKqOt5BuB8nzQSr3hRM2QiC8Es4mJ6TZryn6kp3D-34nzApSaNKo6bZiB1f6-2uwYTAANz5M1-ozj1kzcmJc4MPgN0GOYc-xyMkK-fmzpQWwrqxTtJ2DgOso0KwutBsnXS4ij7LnjLtCruiTCVDHWkH-Wj2tQ5i-SDX1dj3rI3HRyzpGuAkJFRvs8Ssem43I8fz-D6nOJbVH8zBxp0Hs7I"/>
+<span class="absolute top-space-xs left-space-xs bg-accent-electric text-canvas font-label-md text-[11px] font-bold px-2 py-0.5 rounded-full">SAVE 28%</span>
+<span class="absolute top-space-xs right-space-xs bg-canvas text-ink font-caption text-[11px] font-semibold px-2 py-0.5 rounded-full">Tech</span>
+</div>
+<div class="flex items-center gap-1 text-ink mb-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md font-bold">4.9</span>
+<span class="font-caption text-caption text-text-muted">(320)</span>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Studio ANC Wireless Headphones</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">Custom 40mm beryllium drivers, active hybrid isolation, 38-hour battery endurance.</p>
+</div>
+<div>
+<div class="flex items-baseline gap-space-xs mb-space-sm">
+<span class="font-title-lg text-title-lg text-ink font-bold">$179</span>
+<span class="font-body-sm text-body-sm text-text-faint line-through">$249</span>
+</div>
+<button class="w-full bg-accent-electric hover:bg-primary text-canvas font-label-md text-label-md py-2.5 rounded-full flex items-center justify-center gap-space-xs transition-colors" onclick="addToBag('Studio ANC Wireless Headphones', 179)">
+<span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+<span>Add to Bag</span>
+</button>
+</div>
+</div>
+<!-- Deal 2: Home Pour-over Kettle -->
+<div class="bg-canvas text-ink rounded-lg p-space-md flex flex-col justify-between group">
+<div>
+<div class="relative w-full h-52 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform" data-alt="Precision Gooseneck Matte Black electric kettle with micro digital temperature dial on a light stone countertop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlVHdoo0TBYH_29rzh60ZaJN1zAp3FM5XY4LsF_uNFymSb0KJeLCCj39PwJuAOs0hWip88VsrQrMxHOYqDiy1DFtpIPoN8S1wcV33KEpPivlgegL1rCYjxgfVfYEGvufmoAzyXKuW42Jg9tjaU4rxf4PETHL2D2nquOW83Mch-6pil3L49VlyYuf1L1HXHO5f0o7iRYqG750DfVR0svuzT0Ad2czpMhRObhAtfeWjLbf7hROElsBRl"/>
+<span class="absolute top-space-xs left-space-xs bg-accent-electric text-canvas font-label-md text-[11px] font-bold px-2 py-0.5 rounded-full">SAVE 25%</span>
+<span class="absolute top-space-xs right-space-xs bg-canvas text-ink font-caption text-[11px] font-semibold px-2 py-0.5 rounded-full">Home</span>
+</div>
+<div class="flex items-center gap-1 text-ink mb-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md font-bold">4.8</span>
+<span class="font-caption text-caption text-text-muted">(184)</span>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Precision Gooseneck Matte Black Kettle</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">Variable degree-level temperature regulation and ergonomic counterbalance handle.</p>
+</div>
+<div>
+<div class="flex items-baseline gap-space-xs mb-space-sm">
+<span class="font-title-lg text-title-lg text-ink font-bold">$89</span>
+<span class="font-body-sm text-body-sm text-text-faint line-through">$119</span>
+</div>
+<button class="w-full bg-accent-electric hover:bg-primary text-canvas font-label-md text-label-md py-2.5 rounded-full flex items-center justify-center gap-space-xs transition-colors" onclick="addToBag('Precision Gooseneck Kettle', 89)">
+<span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+<span>Add to Bag</span>
+</button>
+</div>
+</div>
+<!-- Deal 3: Fashion Commuter Backpack -->
+<div class="bg-canvas text-ink rounded-lg p-space-md flex flex-col justify-between group">
+<div>
+<div class="relative w-full h-52 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform" data-alt="Ballistic Cordura Modular Commuter Backpack in stealth black with Fidlock magnetic buckle closures and waterproof zippers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCadIIQO11giIAUD132e7ZegJ34KKp0iYv606GF2tsBOjKa0pr_kzvpQNQn7xyuWLhuceoyYjmGzTQBfSqWlR3LKlXZ3LWlitc_jnvtlV6UWKNjOftbu32cotcD4v-MfNIBqAeY1-CvkM53Q86F-kLP-8jxcmrcJO5PWZQ15FpNfLMpX8ElpBV85rYw9rG7OkCXFjbPCb9O3szD7-mk3ZCDsQKHPojIrXgxR3E_-89VhZ_vYXSgVJLD"/>
+<span class="absolute top-space-xs left-space-xs bg-accent-electric text-canvas font-label-md text-[11px] font-bold px-2 py-0.5 rounded-full">SAVE 21%</span>
+<span class="absolute top-space-xs right-space-xs bg-canvas text-ink font-caption text-[11px] font-semibold px-2 py-0.5 rounded-full">Fashion</span>
+</div>
+<div class="flex items-center gap-1 text-ink mb-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md font-bold">5.0</span>
+<span class="font-caption text-caption text-text-muted">(412)</span>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Ballistic Cordura Commuter Backpack</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">1680D abrasion-proof Cordura textile with suspended 16-inch laptop cocoon.</p>
+</div>
+<div>
+<div class="flex items-baseline gap-space-xs mb-space-sm">
+<span class="font-title-lg text-title-lg text-ink font-bold">$135</span>
+<span class="font-body-sm text-body-sm text-text-faint line-through">$170</span>
+</div>
+<button class="w-full bg-accent-electric hover:bg-primary text-canvas font-label-md text-label-md py-2.5 rounded-full flex items-center justify-center gap-space-xs transition-colors" onclick="addToBag('Ballistic Cordura Backpack', 135)">
+<span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+<span>Add to Bag</span>
+</button>
+</div>
+</div>
+<!-- Deal 4: Stationery Machined Pen -->
+<div class="bg-canvas text-ink rounded-lg p-space-md flex flex-col justify-between group">
+<div>
+<div class="relative w-full h-52 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform" data-alt="Machined Titanium mechanical writing pen standing upright inside a solid cylindrical polished brass desk base." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtGtrTCVBPJytnec8yoiKZ2iY9yzFgcAGMVbDl8vffvV6ZEoNZFfgeDAQvYGDQ9PHSAAxfVK2j8hKUAZ8b8VxmoAnLrSjVNR8ihTPjQ6pP4gUAImGZd2tG7Lzf12mjzZ9daMM6X8wl7uLjiCTNo0sgJqsJX1aqeuE6NGKVIOcdjxjMbFEaL7kqquFVa0SMIXQWDpPCysw4-xUBBBhXrgB7_alEgVQ5G1N_PIViWD7Wd3vqGT2JE6cr"/>
+<span class="absolute top-space-xs left-space-xs bg-accent-electric text-canvas font-label-md text-[11px] font-bold px-2 py-0.5 rounded-full">SAVE 26%</span>
+<span class="absolute top-space-xs right-space-xs bg-canvas text-ink font-caption text-[11px] font-semibold px-2 py-0.5 rounded-full">Stationery</span>
+</div>
+<div class="flex items-center gap-1 text-ink mb-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md font-bold">4.9</span>
+<span class="font-caption text-caption text-text-muted">(95)</span>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Machined Titanium Pen &amp; Brass Base</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">Zero-tolerance CNC body compatible with Schmidt and Parker ballpoint cartridges.</p>
+</div>
+<div>
+<div class="flex items-baseline gap-space-xs mb-space-sm">
+<span class="font-title-lg text-title-lg text-ink font-bold">$48</span>
+<span class="font-body-sm text-body-sm text-text-faint line-through">$65</span>
+</div>
+<button class="w-full bg-accent-electric hover:bg-primary text-canvas font-label-md text-label-md py-2.5 rounded-full flex items-center justify-center gap-space-xs transition-colors" onclick="addToBag('Machined Titanium Pen', 48)">
+<span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+<span>Add to Bag</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 4: DEPARTMENT TABBED CATALOG SHOWCASE -->
+<section class="w-full py-space-xl" id="department-catalog">
+<div class="flex flex-col gap-space-md mb-space-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-sm">
+<div>
+<span class="font-label-md text-label-md text-accent-electric uppercase tracking-widest block mb-space-xs font-bold">Catalog Exploration</span>
+<h2 class="font-headline-md text-headline-md tracking-tight text-ink">Curated By Department</h2>
+</div>
+<p class="font-body-sm text-body-sm text-secondary">
+          Displaying authentic inventory with live stock status indicators.
+        </p>
+</div>
+<!-- Segmented Tab Bar (Stadium Pill Geometry) -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-2 scrollbar-none">
+<button class="tab-btn bg-ink text-canvas font-label-md text-label-md px-space-lg py-2.5 rounded-full whitespace-nowrap transition-all font-semibold" id="tab-all" onclick="filterDepartment('all')">All Departments</button>
+<button class="tab-btn bg-canvas-soft hover:bg-surface-container text-ink font-label-md text-label-md px-space-lg py-2.5 rounded-full whitespace-nowrap transition-all font-semibold" id="tab-tech" onclick="filterDepartment('tech')">Tech &amp; Gadgets</button>
+<button class="tab-btn bg-canvas-soft hover:bg-surface-container text-ink font-label-md text-label-md px-space-lg py-2.5 rounded-full whitespace-nowrap transition-all font-semibold" id="tab-home" onclick="filterDepartment('home')">Home &amp; Kitchen</button>
+<button class="tab-btn bg-canvas-soft hover:bg-surface-container text-ink font-label-md text-label-md px-space-lg py-2.5 rounded-full whitespace-nowrap transition-all font-semibold" id="tab-furniture" onclick="filterDepartment('furniture')">Furniture &amp; Living</button>
+<button class="tab-btn bg-canvas-soft hover:bg-surface-container text-ink font-label-md text-label-md px-space-lg py-2.5 rounded-full whitespace-nowrap transition-all font-semibold" id="tab-fashion" onclick="filterDepartment('fashion')">Fashion &amp; EDC</button>
+<button class="tab-btn bg-canvas-soft hover:bg-surface-container text-ink font-label-md text-label-md px-space-lg py-2.5 rounded-full whitespace-nowrap transition-all font-semibold" id="tab-stationery" onclick="filterDepartment('stationery')">Stationery &amp; Tools</button>
+</div>
+<!-- Filter and Sorting Strip -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm bg-canvas-soft p-space-sm rounded-lg">
+<div class="flex flex-wrap items-center gap-space-xs">
+<button class="bg-canvas text-ink font-body-sm text-body-sm px-space-md py-1.5 rounded-full flex items-center gap-space-xs hover:bg-surface-container transition-colors">
+<span class="w-2 h-2 rounded-full bg-accent-electric"></span>
+<span>In Stock Only</span>
+</button>
+<button class="bg-canvas text-ink font-body-sm text-body-sm px-space-md py-1.5 rounded-full flex items-center gap-space-xs hover:bg-surface-container transition-colors">
+<span>Free Express Shipping</span>
+</button>
+<button class="bg-canvas text-ink font-body-sm text-body-sm px-space-md py-1.5 rounded-full flex items-center gap-space-xs hover:bg-surface-container transition-colors">
+<span>Price: $0 – $500</span>
+</button>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="font-caption text-caption text-text-muted">Sort By:</span>
+<select class="bg-canvas font-body-sm text-body-sm text-ink px-space-md py-1.5 rounded-full focus:outline-none cursor-pointer">
+<option>Featured Architecture</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+<option>Highest Rated (4.8+)</option>
+</select>
+</div>
+</div>
+</div>
+<!-- 8-Card Curated Product Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter" id="product-grid">
+<!-- Product 1: Tech -->
+<div class="product-card" data-category="tech">
+<div class="bg-canvas rounded-lg p-space-md flex flex-col justify-between group transition-all">
+<div>
+<div class="relative w-full h-56 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Minimalist MagCharge quad dock crafted in CNC milled aerospace aluminum holding a smartphone, smartwatch, and earbuds simultaneously." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQh9N8_0qFU0nd9h3YpuralShzCTNGkxHhHPkt9T3abm0DHru31WVIpWIqobR6GiCPXu28JZE09OarYWoSrVmPk_c31uYHNlGTxQ_p4fgkcRCTfUY2sgCcIATRWL_5v1R4WH2wCtcI_8AA5LfqK558ro0jbiHMtWJITzfcE8vRmiRqogyXm3DY4d8DzkKv6EX807RTBA_T9i6Ki5LP7TDsTHaorjeFbZ7DMy3zTiq1b2gfbX4sbcSP"/>
+<span class="absolute top-space-xs left-space-xs bg-canvas text-ink font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Tech</span>
+</div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-caption text-caption text-text-muted">Audio &amp; Power</span>
+<div class="flex items-center gap-0.5 text-ink font-label-md text-caption">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.9</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">MagCharge Quad Desktop Dock</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">Universal 4-device simultaneous high-speed inductive power station.</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-title-lg text-title-lg text-ink font-bold">$95</span>
+<button class="w-9 h-9 rounded-full bg-ink text-canvas hover:bg-accent-electric flex items-center justify-center transition-colors" onclick="addToBag('MagCharge Quad Desktop Dock', 95)" title="Add to Bag">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product 2: Home & Kitchen -->
+<div class="product-card" data-category="home">
+<div class="bg-canvas rounded-lg p-space-md flex flex-col justify-between group transition-all">
+<div>
+<div class="relative w-full h-56 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Double walled transparent borosilicate glass French press coffee maker with minimalist matte stainless steel plunger mechanism on a bright white marble counter." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAe_kVniZyrtt4BuBfRiw0aDYS7qSD3RVciVptlYy5EvaCXwP4e8gpbbnTChXal9j5aR8D5AbEFFc38TeEIpTT9uI9Brtad0eFYsM-DCeBmToP3z2kLTWWMTNsO_X42PBuG-Vo3W2VYl7V14brE_RvxtKdUQOag9duezBNeeZnIobvfHhDvBuGEGTsDiccCm08qK9h0gsosCBCeco5QDJbVdTAZiZJUuukj5s8ASyMi0xWOd-bjRkeM"/>
+<span class="absolute top-space-xs left-space-xs bg-canvas text-ink font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Home</span>
+</div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-caption text-caption text-text-muted">Coffee &amp; Brew</span>
+<div class="flex items-center gap-0.5 text-ink font-label-md text-caption">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.8</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Double-Walled Borosilicate French Press</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">Thermal retaining glass chamber with dual ultra-fine mesh filtration.</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-title-lg text-title-lg text-ink font-bold">$58</span>
+<button class="w-9 h-9 rounded-full bg-ink text-canvas hover:bg-accent-electric flex items-center justify-center transition-colors" onclick="addToBag('Double-Walled French Press', 58)" title="Add to Bag">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product 3: Furniture -->
+<div class="product-card" data-category="furniture">
+<div class="bg-canvas rounded-lg p-space-md flex flex-col justify-between group transition-all">
+<div>
+<div class="relative w-full h-56 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Solid white ash sculptural monolithic stool and side table with organic curves and subtle wood grain texture standing in a museum gallery." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyhiRjvOph439XlOQI9etHZN-ETsCkrxx_rO4WvayK8RZ6inCRwa3QIPKXrOE8Lu-LyWjjbbj9eBxKd8e8Oiktwy7OF-Oj6HTB3mRMmNsSfj_vyLVo4CdFgQn54ZgWAXRDpU6PjFmptA2sNxo3SggF9yhEorZzgw9okl1eynviRen1mITSJ2a2lJpP75JkQsYtA1fnlE6JJ9HQssSAj3n56dToGk2cYTFJ5dR7An3-Bmjax3hgQj6g"/>
+<span class="absolute top-space-xs left-space-xs bg-canvas text-ink font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Furniture</span>
+</div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-caption text-caption text-text-muted">Space &amp; Living</span>
+<div class="flex items-center gap-0.5 text-ink font-label-md text-caption">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.9</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Solid Ash Sculptural Stool</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">Dual-purpose monolithic seating block carved from single-source American ash wood.</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-title-lg text-title-lg text-ink font-bold">$210</span>
+<button class="w-9 h-9 rounded-full bg-ink text-canvas hover:bg-accent-electric flex items-center justify-center transition-colors" onclick="addToBag('Solid Ash Sculptural Stool', 210)" title="Add to Bag">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product 4: Fashion -->
+<div class="product-card" data-category="fashion">
+<div class="bg-canvas rounded-lg p-space-md flex flex-col justify-between group transition-all">
+<div>
+<div class="relative w-full h-56 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Folded stack of heavyweight Pima cotton t-shirts in off-white, heather charcoal, and black arranged neatly with raw fabric edge detail." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAggJaoLRawZqhzhdZ4d2IbiQy7K2s0vn4qJo0PEQBiYawvZzXsoeT8u-uWwvq4WAgqhXDsLPWT0prR8Kw5WbBU2LOyJaMTZD9VGSeknkr65elQBDtRuN-PiEu7L6GpT8qEa9ZPjX-hTJtrqqYXbYGumvQyYgEiMKzYKiwblcPKS0Ofp9KeQZkLKM8kU15TU7K4b-yJ7T_aSAyjmqNoImptxra0IlSb4UYczSrLrX5UR3FTLYq7_0Yd"/>
+<span class="absolute top-space-xs left-space-xs bg-canvas text-ink font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Fashion</span>
+</div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-caption text-caption text-text-muted">Apparel Essentials</span>
+<div class="flex items-center gap-0.5 text-ink font-label-md text-caption">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.7</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Heavyweight Pima Cotton Tee (3-Pk)</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">280 GSM long-staple organic cotton with structured double-needle rib collar.</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-title-lg text-title-lg text-ink font-bold">$78</span>
+<button class="w-9 h-9 rounded-full bg-ink text-canvas hover:bg-accent-electric flex items-center justify-center transition-colors" onclick="addToBag('Heavyweight Pima Cotton Tee 3-Pk', 78)" title="Add to Bag">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product 5: Tech -->
+<div class="product-card" data-category="tech">
+<div class="bg-canvas rounded-lg p-space-md flex flex-col justify-between group transition-all">
+<div>
+<div class="relative w-full h-56 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Under-desk magnetic modular cable routing system with precision black silicone clips and braided USB-C cables running neatly along a matte frame." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxKsc_vngjQEW3tuSW__mO0nxEIMaDU3oK_jRcMyK1bToJ3QXKp87F-cu1U352Aq0MJ4c_dUtZnJWJXRXYsi4M2RsAzbxSQguqqJTIwo4cvWCs4uTYEm04bhXlSNgTl3lpA-W313IzBNLj8y4M9maslV1QOEtvAmS4aITmSagR1wtQJnGG3Tq98Q5EKaKZq7M0DOCYBtJb2bstn2oGFSCNMv0nIvt37HsDjnKViOLAduzF5-qQmmTm"/>
+<span class="absolute top-space-xs left-space-xs bg-canvas text-ink font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Tech</span>
+</div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-caption text-caption text-text-muted">Desk Ergonomics</span>
+<div class="flex items-center gap-0.5 text-ink font-label-md text-caption">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.9</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Magnetic Modular Cable Channel</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">High-strength neodymium track system to hide all workspace cords cleanly.</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-title-lg text-title-lg text-ink font-bold">$34</span>
+<button class="w-9 h-9 rounded-full bg-ink text-canvas hover:bg-accent-electric flex items-center justify-center transition-colors" onclick="addToBag('Magnetic Modular Cable Channel', 34)" title="Add to Bag">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product 6: Home & Kitchen -->
+<div class="product-card" data-category="home">
+<div class="bg-canvas rounded-lg p-space-md flex flex-col justify-between group transition-all">
+<div>
+<div class="relative w-full h-56 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Two hand crafted speckled ceramic ramen bowls with wooden chopsticks resting across the rim against a minimalist Scandinavian table." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAM9EMKmWqqHaQe01fY9viwDQnQux-h3sB4Ran9uZ_r0m2WKb3Uug-msxcWwOCjMI4HEtsKtZmgrk8mYe-AweFhTEvQpTHwpDuAjKtewQVPwZDcVdkb99cHsb1U4fyRWuzi-swwibfN0Kczv11ikHLYLLwJMyAbxUievcYhuW9RoUUgGdJqMEq--Shjx1mPxwvu0fbvyfH9MYCtn-8EGZmS3ZW2PPOSjUznX7d2jrg1BRoBcpCla7_M"/>
+<span class="absolute top-space-xs left-space-xs bg-canvas text-ink font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Home</span>
+</div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-caption text-caption text-text-muted">Tabletop Ceramic</span>
+<div class="flex items-center gap-0.5 text-ink font-label-md text-caption">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.8</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Ceramic Ramen Bowl Set (2-Piece)</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">Fired stoneware with matte reactive glaze and integrated rest notch.</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-title-lg text-title-lg text-ink font-bold">$64</span>
+<button class="w-9 h-9 rounded-full bg-ink text-canvas hover:bg-accent-electric flex items-center justify-center transition-colors" onclick="addToBag('Ceramic Ramen Bowl Set', 64)" title="Add to Bag">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product 7: Stationery -->
+<div class="product-card" data-category="stationery">
+<div class="bg-canvas rounded-lg p-space-md flex flex-col justify-between group transition-all">
+<div>
+<div class="relative w-full h-56 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Solid anodized matte black aluminum architect drafting scale with laser etched white millimetric divisions and matching 0.5mm lead drafting pencil." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSMG3kapFKhcyxJbIUTykokTh2mOe8jJx2JrvK03ekU8y0KY7GL0Yg5jjMyCVUMyCuJBMWqrKa0v3HOGL7vf7mRfJf6w-JAhBs1a74L17j3ZEZHgI-0k_dXQ_9koOGjT1loBkYDcqO8MeTVwaMwrqQo__Cr-AVv_6zR-ij6KD-ZphcKVE02QLXxA7ChqA2xX4U7EQvLCSF6bpR-W4On6FY2aVi2hj0XYxLpGofesuN_PEmuYkC_GL9"/>
+<span class="absolute top-space-xs left-space-xs bg-canvas text-ink font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Stationery</span>
+</div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-caption text-caption text-text-muted">Drafting Instruments</span>
+<div class="flex items-center gap-0.5 text-ink font-label-md text-caption">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>5.0</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Aluminum Architects Scale &amp; Pencil</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">Laser-etched metric &amp; imperial graduations with knurled grip drafting pencil.</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-title-lg text-title-lg text-ink font-bold">$42</span>
+<button class="w-9 h-9 rounded-full bg-ink text-canvas hover:bg-accent-electric flex items-center justify-center transition-colors" onclick="addToBag('Architects Scale &amp; Pencil', 42)" title="Add to Bag">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product 8: Furniture -->
+<div class="product-card" data-category="furniture">
+<div class="bg-canvas rounded-lg p-space-md flex flex-col justify-between group transition-all">
+<div>
+<div class="relative w-full h-56 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="High performance ergonomic breathable mesh executive task chair with polished aluminum five star castor base in a bright studio office." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCER_Zs6fSFswlgLny7qdSqpXy4B2-EShFZuKxbpzwCG6HD7A5Oatf44uuFf-QrXEYL8_zGbb4sUaly2l9ZPlkQZVwCYojfamsBhivUKxX3oEAQ7OhQ-8z1EEj_6lG1RrzNoez9IkRUMMZ9i8HjmiuLV924nvC90kHUPhZd-J4bGG1lzmsJ-CBh5t5wmdWxJMu76EOk_9Yd9yGULA7EMYMur-rE90f6Dzaas7_w2sBSrzZHX1wPntti"/>
+<span class="absolute top-space-xs left-space-xs bg-canvas text-ink font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Furniture</span>
+</div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-caption text-caption text-text-muted">Ergonomic Task</span>
+<div class="flex items-center gap-0.5 text-ink font-label-md text-caption">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.9</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink font-bold line-clamp-1 mb-1">Ergonomic Lumbar Mesh Chair</h3>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-2 mb-space-md">Self-weighting synchro-tilt mechanism and 4D omnidirectional armrests.</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-title-lg text-title-lg text-ink font-bold">$380</span>
+<button class="w-9 h-9 rounded-full bg-ink text-canvas hover:bg-accent-electric flex items-center justify-center transition-colors" onclick="addToBag('Ergonomic Lumbar Mesh Chair', 380)" title="Add to Bag">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 5: "BUNDLE & SAVE ACROSS DEPARTMENTS" (Cross-Department Builder) -->
+<section class="w-full py-space-xl">
+<div class="bg-canvas-soft rounded-lg p-space-lg md:p-space-xl">
+<div class="max-w-3xl mb-space-lg">
+<div class="inline-flex items-center gap-space-xs bg-canvas text-ink px-space-md py-1 rounded-full mb-space-xs">
+<span class="material-symbols-outlined text-[16px] text-accent-electric">layers</span>
+<span class="font-label-md text-label-md uppercase tracking-wider font-bold">Smart Cross-Shopping System</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-ink font-bold">Build Your Daily Rhythm</h2>
+<p class="font-body-sm text-body-sm text-secondary">
+          Equip across categories. Combine any item from Tech + Home + EDC and instantly unlock 15% automatic cart tiering with unified express shipping.
+        </p>
+</div>
+<!-- Bundle Grid & Calculator -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-center">
+<!-- Slot 1: Audio / Tech (Selected) -->
+<div class="lg:col-span-3 bg-canvas rounded-lg p-space-md relative">
+<span class="absolute top-2 right-2 bg-canvas-soft text-ink font-caption text-[10px] font-bold px-2 py-0.5 rounded-full">Slot 01 · Tech</span>
+<div class="h-36 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-sm flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Studio ANC Wireless Headphones in matte black." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk_RmSpj2wFiiK11LDNB6rQviwOb8KdWqp9dgOtVSZiFEyKncCedSfvb01ZfwrnPmVi5UeixA6Gi9oI3OiaN5JM6QjjMRtsSVb2pAjo1dli2BBDSCSPnSGU3GG1fkIIZnBZHeSYp1aEIUSKVgngheY_t5srmChmZk1efkYLcsDr8VNVihnXwByWLIIZDk-nT2Nz71jN1lVK-D1-n--5fbPp_PS4xXQNhCZt51Ro13VBjv4UOYOoA8r"/>
+</div>
+<p class="font-label-md text-label-md text-ink font-bold truncate">Studio ANC Wireless</p>
+<p class="font-caption text-caption text-text-muted">Division: Tech &amp; Gadgets</p>
+<p class="font-title-md text-title-md text-ink font-bold mt-2">$179.00</p>
+<div class="mt-2 flex items-center gap-1 text-accent-electric font-caption text-caption font-bold">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Selected</span>
+</div>
+</div>
+<!-- Plus Divider -->
+<div class="hidden lg:flex lg:col-span-1 justify-center">
+<div class="w-8 h-8 rounded-full bg-canvas text-ink flex items-center justify-center font-bold text-lg">+</div>
+</div>
+<!-- Slot 2: Coffee / Kitchen (Selected) -->
+<div class="lg:col-span-3 bg-canvas rounded-lg p-space-md relative">
+<span class="absolute top-2 right-2 bg-canvas-soft text-ink font-caption text-[10px] font-bold px-2 py-0.5 rounded-full">Slot 02 · Home</span>
+<div class="h-36 bg-canvas-soft rounded-DEFAULT overflow-hidden mb-space-sm flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="Precision Gooseneck Matte Black Kettle on light base." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbNj5JNwScNgIWq8YYfxSu98dNqfPXJCGj14LdQEbto77aXR0akZWh3WctCFVOJUqrKky3eQn-9kQ1STDvukGL3H0QW6nystyJsnhumViOImpjzP8KIG19rJJjWXSoRSGn56I2cjrLPKqJzRSCqhMqLVgMiEaB_shVOm8Aqb89Me5QEpsHc4KKat_6CVnIxppRY_LtwEar5H6FlBPOa1F97m2OKcAq8zSOq2wVX767-cxV-Ekdr76f"/>
+</div>
+<p class="font-label-md text-label-md text-ink font-bold truncate">Precision Gooseneck</p>
+<p class="font-caption text-caption text-text-muted">Division: Home &amp; Kitchen</p>
+<p class="font-title-md text-title-md text-ink font-bold mt-2">$89.00</p>
+<div class="mt-2 flex items-center gap-1 text-accent-electric font-caption text-caption font-bold">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Selected</span>
+</div>
+</div>
+<!-- Plus Divider -->
+<div class="hidden lg:flex lg:col-span-1 justify-center">
+<div class="w-8 h-8 rounded-full bg-canvas text-ink flex items-center justify-center font-bold text-lg">+</div>
+</div>
+<!-- Slot 3: Fashion or EDC (Active Selection) -->
+<div class="lg:col-span-4 bg-ink text-canvas rounded-lg p-space-lg flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-md text-label-md text-accent-electric font-bold uppercase tracking-wider">Bundle Summary</span>
+<span class="bg-accent-electric text-canvas font-caption text-[10px] font-bold px-2 py-0.5 rounded-full">15% SAVED</span>
+</div>
+<div class="space-y-space-xs font-body-sm text-body-sm text-secondary-fixed-dim pb-space-md">
+<div class="flex justify-between">
+<span>Items Retail Subtotal</span>
+<span class="text-canvas font-mono">$322.00</span>
+</div>
+<div class="flex justify-between text-accent-electric">
+<span>Multi-Department Tier (-15%)</span>
+<span class="font-mono">-$48.30</span>
+</div>
+<div class="flex justify-between">
+<span>Express Dispatch</span>
+<span class="text-canvas">Free ($0.00)</span>
+</div>
+</div>
+<div class="pt-space-sm pb-space-md">
+<span class="font-caption text-caption text-text-faint">Total Unified Investment</span>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-sm text-headline-sm font-bold text-canvas">$273.70</span>
+<span class="font-body-sm text-body-sm text-text-faint line-through">$322.00</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-accent-electric hover:bg-primary text-canvas font-label-md text-label-md py-3.5 rounded-full transition-colors flex items-center justify-center gap-space-xs" onclick="claimBundle()">
+<span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+<span>Claim 3-Piece Rhythm Bundle</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 6: TRUST & RETAIL ASSURANCE BAR -->
+<section class="w-full py-space-xl">
+<!-- 4 Value Pillars -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter mb-space-xl">
+<div class="p-space-md bg-canvas-soft rounded-lg flex items-start gap-space-md">
+<span class="material-symbols-outlined text-ink text-[28px] mt-0.5">verified_user</span>
+<div>
+<h4 class="font-title-md text-title-md text-ink font-bold mb-1">Verified Authentic</h4>
+<p class="font-body-sm text-body-sm text-secondary">Direct architectural factory provenance and serial registry on all hardware.</p>
+</div>
+</div>
+<div class="p-space-md bg-canvas-soft rounded-lg flex items-start gap-space-md">
+<span class="material-symbols-outlined text-ink text-[28px] mt-0.5">local_shipping</span>
+<div>
+<h4 class="font-title-md text-title-md text-ink font-bold mb-1">Fast 2-Day Delivery</h4>
+<p class="font-body-sm text-body-sm text-secondary">Dispatched within 4 hours from regional multi-hub automated distribution nodes.</p>
+</div>
+</div>
+<div class="p-space-md bg-canvas-soft rounded-lg flex items-start gap-space-md">
+<span class="material-symbols-outlined text-ink text-[28px] mt-0.5">eco</span>
+<div>
+<h4 class="font-title-md text-title-md text-ink font-bold mb-1">Carbon-Neutral Shipping</h4>
+<p class="font-body-sm text-body-sm text-secondary">Zero-plastic corrugated packaging offset via verified certified reforestation projects.</p>
+</div>
+</div>
+<div class="p-space-md bg-canvas-soft rounded-lg flex items-start gap-space-md">
+<span class="material-symbols-outlined text-ink text-[28px] mt-0.5">published_with_changes</span>
+<div>
+<h4 class="font-title-md text-title-md text-ink font-bold mb-1">30-Day In-Home Trial</h4>
+<p class="font-body-sm text-body-sm text-secondary">Test the form, touch, and mechanics in your space. Friction-free returns included.</p>
+</div>
+</div>
+</div>
+<!-- Customer Reviews Across Departments -->
+<div>
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-space-lg gap-space-xs">
+<div>
+<span class="font-label-md text-label-md text-accent-electric uppercase tracking-widest block mb-space-xs font-bold">Customer Chronicle</span>
+<h3 class="font-headline-sm text-headline-sm text-ink font-bold">Verified Collector Perspectives</h3>
+</div>
+<div class="flex items-center gap-space-xs font-label-md text-label-md text-ink font-semibold">
+<span class="flex text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</span>
+<span>4.92 / 5.0 Global Rating across 18,400+ Shipments</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Review 1: Tech Buyer -->
+<div class="bg-canvas rounded-lg p-space-lg flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="bg-canvas-soft text-ink font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Tech Dept</span>
+</div>
+<p class="font-body-md text-body-md text-ink leading-relaxed mb-space-md">
+              "The Studio ANC headphones have exceeded both my Sony and Apple pairs in raw tonal balance. The build tolerance feels like a precision Leica camera."
+            </p>
+</div>
+<div class="flex items-center gap-space-sm pt-space-sm">
+<div class="w-8 h-8 rounded-full bg-ink text-canvas font-bold text-xs flex items-center justify-center">MK</div>
+<div>
+<div class="flex items-center gap-1">
+<span class="font-label-md text-label-md text-ink font-bold">Marcus K.</span>
+<span class="material-symbols-outlined text-accent-electric text-[14px]">verified</span>
+</div>
+<p class="font-caption text-caption text-text-muted">Audio Systems Architect · San Francisco</p>
+</div>
+</div>
+</div>
+<!-- Review 2: Home & Kitchen Buyer -->
+<div class="bg-canvas rounded-lg p-space-lg flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="bg-canvas-soft text-ink font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Home Dept</span>
+</div>
+<p class="font-body-md text-body-md text-ink leading-relaxed mb-space-md">
+              "The gooseneck kettle's flow rate calibration has transformed my daily morning pour-over ritual. ShelfStack’s packaging was completely plastic-free and pristine."
+            </p>
+</div>
+<div class="flex items-center gap-space-sm pt-space-sm">
+<div class="w-8 h-8 rounded-full bg-ink text-canvas font-bold text-xs flex items-center justify-center">SL</div>
+<div>
+<div class="flex items-center gap-1">
+<span class="font-label-md text-label-md text-ink font-bold">Soren L.</span>
+<span class="material-symbols-outlined text-accent-electric text-[14px]">verified</span>
+</div>
+<p class="font-caption text-caption text-text-muted">Industrial Designer · Copenhagen</p>
+</div>
+</div>
+</div>
+<!-- Review 3: Cross-Shopping Collector -->
+<div class="bg-canvas rounded-lg p-space-lg flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="bg-accent-electric text-canvas font-caption text-[11px] font-bold px-2 py-0.5 rounded-full">Cross Bundle</span>
+</div>
+<p class="font-body-md text-body-md text-ink leading-relaxed mb-space-md">
+              "Used the 3-category rhythm builder to overhaul my studio workspace: desk dock, ergonomic stool, and drafting pen. Saved nearly $70 automatically at checkout."
+            </p>
+</div>
+<div class="flex items-center gap-space-sm pt-space-sm">
+<div class="w-8 h-8 rounded-full bg-ink text-canvas font-bold text-xs flex items-center justify-center">ET</div>
+<div>
+<div class="flex items-center gap-1">
+<span class="font-label-md text-label-md text-ink font-bold">Elena T.</span>
+<span class="material-symbols-outlined text-accent-electric text-[14px]">verified</span>
+</div>
+<p class="font-caption text-caption text-text-muted">Creative Technologist · New York</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive Client-side Script for Department Tabs & Timer -->
+<script>
+    // Live Countdown Timer logic
+    let totalSeconds = (7 * 3600) + (42 * 60) + 19;
+    const hoursEl = document.getElementById('timer-hours');
+    const minutesEl = document.getElementById('timer-minutes');
+    const secondsEl = document.getElementById('timer-seconds');
+
+    if (hoursEl && minutesEl && secondsEl) {
+      setInterval(() => {
+        if (totalSeconds > 0) {
+          totalSeconds--;
+          const h = Math.floor(totalSeconds / 3600);
+          const m = Math.floor((totalSeconds % 3600) / 60);
+          const s = totalSeconds % 60;
+          hoursEl.textContent = h.toString().padStart(2, '0');
+          minutesEl.textContent = m.toString().padStart(2, '0');
+          secondsEl.textContent = s.toString().padStart(2, '0');
+        }
+      }, 1000);
+    }
+
+    // Department Catalog Filtering
+    function filterDepartment(dept) {
+      const cards = document.querySelectorAll('.product-card');
+      const tabs = document.querySelectorAll('.tab-btn');
+
+      // Update Tab Styles
+      tabs.forEach(tab => {
+        tab.className = 'tab-btn bg-canvas-soft hover:bg-surface-container text-ink font-label-md text-label-md px-space-lg py-2.5 rounded-full whitespace-nowrap transition-all font-semibold';
+      });
+
+      const activeTab = document.getElementById('tab-' + dept);
+      if (activeTab) {
+        activeTab.className = 'tab-btn bg-ink text-canvas font-label-md text-label-md px-space-lg py-2.5 rounded-full whitespace-nowrap transition-all font-semibold';
+      }
+
+      // Filter product items
+      cards.forEach(card => {
+        if (dept === 'all' || card.getAttribute('data-category') === dept) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Cart and Bundle notification micro-actions
+    function addToBag(title, price) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-6 right-6 z-50 bg-ink text-canvas px-space-lg py-3 rounded-full flex items-center gap-space-sm shadow-xl transition-all duration-300 transform translate-y-0';
+      toast.innerHTML = `
+        <span class="material-symbols-outlined text-accent-electric text-[20px]">check_circle</span>
+        <span class="font-label-md text-label-md font-semibold">${title} added ($${price})</span>
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    function claimBundle() {
+      addToBag('3-Piece Rhythm Bundle', 273.70);
+    }
+  </script>
+</div></div></main><footer class="w-full bg-ink text-canvas rounded-t-xl mt-space-xl pt-space-xl pb-space-lg"><div class="max-w-7xl mx-auto px-gutter"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-lg pb-space-xl"><div class="lg:col-span-2 pr-space-lg"><div class="flex items-center gap-space-sm mb-space-md"><img alt="Brand logo. - Primary color: #0066ff
+- Font: hankenGrotesk
+- Mode: light
+- Roundness: rounded-full
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xxr3vYezhanvKgo5CiY-uShx9Z_nxpg3u_P87x04A40OQUZh9sYlZWGLokcyGv6XdZPRKhMvMdJNS6CEtao5ecIeCUG00jOkEZDv3htiNQdAHWJcL7YURulUxM5iQCtehrjw7dkJRK5GCi-33XWEmna2C6wl2SnlH0Jo30mvuBheFB51F5jx9qe3V6ldh4PuT2DB8HtgpzQK4yyLrrefFU7iF8zxAJedNiQI_bGz8noloxhRhU692YRfw"/><span class="font-title-lg text-title-lg tracking-tight text-canvas">ShelfStack</span></div><p class="font-body-sm text-body-sm text-secondary-fixed-dim max-w-sm mb-space-lg leading-relaxed">Curated multi-category inventory engineered for refined spaces and modern craft. Architectural minimalism meets high-utility everyday design.</p><div class="mb-space-lg"><p class="font-label-md text-label-md text-canvas uppercase tracking-wider mb-space-xs">Join The Stack Journal</p><div class="flex items-center max-w-md bg-ink-soft rounded-full p-1 focus-within:ring-2 focus-within:ring-accent-electric"><input class="w-full bg-transparent px-space-md font-body-sm text-body-sm text-canvas placeholder-text-faint focus:outline-none" placeholder="Enter your business email" type="email"/><button class="bg-accent-electric text-canvas font-label-md text-label-md px-space-lg py-2.5 rounded-full hover:opacity-90 transition-opacity shrink-0" type="button">Subscribe</button></div></div><div class="inline-flex items-center gap-space-xs bg-ink-soft px-space-md py-1.5 rounded-full text-caption font-caption"><span class="w-2 h-2 rounded-full bg-accent-electric animate-pulse"></span><span class="text-secondary-fixed-dim">All Services Operational · Node 01</span></div></div><div><p class="font-title-md text-title-md text-canvas mb-space-md">Shop Category</p><ul class="space-y-space-sm font-body-sm text-body-sm text-secondary-fixed-dim"><li class="hover:text-canvas transition-colors"><a data-path="tech-gadgets" href="#">Tech &amp; Gadgets</a></li><li class="hover:text-canvas transition-colors"><a data-path="home-kitchen" href="#">Home Essentials</a></li><li class="hover:text-canvas transition-colors"><a data-path="furniture-living" href="#">Furniture &amp; Living</a></li><li class="hover:text-canvas transition-colors"><a data-path="fashion-accessories" href="#">Fashion Apparel</a></li><li class="hover:text-canvas transition-colors"><a data-path="stationery-craft" href="#">Stationery Tools</a></li><li class="hover:text-canvas transition-colors"><a data-path="sale-clearance" href="#">Archived Clearance</a></li></ul></div><div><p class="font-title-md text-title-md text-canvas mb-space-md">Customer Care</p><ul class="space-y-space-sm font-body-sm text-body-sm text-secondary-fixed-dim"><li class="hover:text-canvas transition-colors"><a data-path="help-center" href="#">Support &amp; FAQ</a></li><li class="hover:text-canvas transition-colors"><a data-path="track-order" href="#">Order Tracking</a></li><li class="hover:text-canvas transition-colors"><a data-path="shipping-returns" href="#">Shipping &amp; Returns</a></li><li class="hover:text-canvas transition-colors"><a data-path="warranty-guarantee" href="#">3-Year Warranty</a></li><li class="hover:text-canvas transition-colors"><a data-path="gift-cards" href="#">Stack Gift Registry</a></li></ul></div><div><p class="font-title-md text-title-md text-canvas mb-space-md">Stack Account</p><ul class="space-y-space-sm font-body-sm text-body-sm text-secondary-fixed-dim"><li class="hover:text-canvas transition-colors"><a data-path="account-overview" href="#">Account Profile</a></li><li class="hover:text-canvas transition-colors"><a data-path="wishlist" href="#">Saved Wishlists (4)</a></li><li class="hover:text-canvas transition-colors"><a data-path="order-history" href="#">Purchases &amp; Invoices</a></li><li class="hover:text-canvas transition-colors"><a data-path="addresses-wallet" href="#">Payment &amp; Addresses</a></li><li class="hover:text-canvas transition-colors"><a data-path="login" href="#">Security &amp; Auth</a></li></ul></div></div><div class="pt-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md text-secondary-fixed-dim font-caption text-caption"><p>© 2025 ShelfStack Architectural Commerce Inc. All rights reserved.</p><div class="flex items-center gap-space-lg"><a class="hover:text-canvas transition-colors" data-path="privacy-policy" href="#">Privacy Policy</a><a class="hover:text-canvas transition-colors" data-path="terms-service" href="#">Terms of Service</a><a class="hover:text-canvas transition-colors" data-path="cookie-settings" href="#">Cookie Settings</a><a class="hover:text-canvas transition-colors" data-path="accessibility" href="#">Accessibility</a></div></div></div></footer></body></html>

@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
+import type { Database } from '~/types/database.types'
 import type { Product } from '~/types/product'
-import { productRepository } from '~/repository/product'
+import { productRepository } from '~/features/products/repository/product'
 
 export const useProductStore = defineStore('product', () => {
-  const supabase = useSupabaseClient<any>()
+  const supabase = useSupabaseClient<Database>()
   const { logActivity } = useActivityLog()
   const products = ref<Product[]>([])
   const deletedProducts = ref<Product[]>([])

@@ -4,8 +4,8 @@ export function useActivityLog() {
     entity_id: number
     action: 'CREATE' | 'UPDATE' | 'DELETE' | 'RESTORE'
     description: string
-    old_data?: any
-    new_data?: any
+    old_data?: unknown
+    new_data?: unknown
   }) => {
     try {
       await $fetch('/api/activities', {

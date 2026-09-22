@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  // Mode terang default (Clean White E-Commerce). Hanya aktif jika class .dark disematkan secara eksplisit.
+  darkMode: 'class',
   content: [
     './app/**/*.{js,vue,ts}',
     './components/**/*.{js,vue,ts}',
@@ -12,6 +14,30 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Token brand storefront (Gallery Modernist). Semua nilai terikat ke CSS variables di main.css.
+        // TIDAK ADA HARDCODED COLOR: Konsisten di seluruh UI dan otomatis adaptif dark-mode.
+        brand: {
+          canvas: 'var(--brand-canvas)',
+          'canvas-soft': 'var(--brand-canvas-soft)',
+          field: 'var(--brand-field)',
+          ink: 'var(--brand-ink)',
+          'ink-soft': 'var(--brand-ink-soft)',
+          onink: 'var(--brand-onink)',
+          inkhover: 'var(--brand-inkhover)',
+          body: 'var(--brand-body)',
+          muted: 'var(--brand-muted)',
+          faint: 'var(--brand-faint)',
+          hair: 'var(--brand-hair)',
+          hairsoft: 'var(--brand-hairsoft)',
+          soft: 'var(--brand-soft)',
+          accent: 'var(--brand-accent)',
+          'accent-hover': 'var(--brand-accent-hover)',
+          cobalt: 'var(--brand-cobalt)',
+          cobaltdeep: 'var(--brand-cobaltdeep)',
+          strip: 'var(--brand-strip)',
+          success: 'var(--brand-success)',
+          warning: 'var(--brand-warning)',
+        },
         primary: {
           50: 'var(--p-primary-50)',
           100: 'var(--p-primary-100)',
@@ -39,6 +65,22 @@ export default {
           900: 'var(--p-surface-900)',
           950: 'var(--p-surface-950)',
         },
+      },
+      fontFamily: {
+        display: ['var(--font-display)', 'sans-serif'],
+        body: ['var(--font-body)', 'sans-serif'],
+        mono: ['var(--font-body)', 'sans-serif'],
+        saans: ['Saans', 'DM Sans', '-apple-system', 'sans-serif'],
+      },
+      borderRadius: {
+        card: 'var(--radius-card)',
+        field: 'var(--radius-field)',
+        media: 'var(--radius-media)',
+      },
+      boxShadow: {
+        whisper: 'var(--shadow-whisper)',
+        nav: 'var(--shadow-nav)',
+        floating: 'var(--shadow-floating)',
       },
     },
   },

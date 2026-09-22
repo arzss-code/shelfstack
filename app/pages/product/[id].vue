@@ -1,184 +1,130 @@
 <script setup lang="ts">
-import { useProductStore } from "~/stores/product";
-import type { Product } from "~/types/product";
-import { useToast } from "primevue/usetoast";
+import { useProductStore } from '~/features/products/stores/product'
+import type { Product } from '~/types/product'
+import { useToast } from 'primevue/usetoast'
+import ProductGallery from '~/components/product/ProductGallery.vue'
+import ProductConfigurator from '~/components/product/ProductConfigurator.vue'
 
-const product = ref<Product | null>(null);
+const route = useRoute()
+const router = useRouter()
+const productStore = useProductStore()
+const toast = useToast()
+
+const product = ref<Product | null>(null)
+const loading = ref(true)
 
 useSeoMeta({
-  title: () => (product.value ? product.value.name : "Detail Produk"),
-});
-
-const route = useRoute();
-const router = useRouter();
-const productStore = useProductStore();
-const toast = useToast();
-
-const loading = ref(true);
+  title: () =>
+    product.value ? `${product.value.name} — ShelfStack` : 'Detail Produk — ShelfStack',
+  description: () =>
+    product.value?.description || 'Beli produk berkualitas tinggi terkurasi resmi di ShelfStack.',
+  ogTitle: () => (product.value ? `${product.value.name} — ShelfStack` : 'Detail Produk'),
+  ogDescription: () =>
+    product.value?.description || 'Beli produk berkualitas tinggi terkurasi resmi di ShelfStack.',
+  ogImage: () => product.value?.image_url || undefined,
+})
 
 onMounted(async () => {
-  const id = Number(route.params.id);
+  const id = Number(route.params.id)
   if (!isNaN(id)) {
     try {
-      product.value = await productStore.fetchProductById(id);
-    } catch (error: any) {
+      product.value = await productStore.fetchProductById(id)
+    } catch (error: unknown) {
       toast.add({
-        severity: "error",
-        summary: "Gagal Memuat Produk",
-        detail: error?.message || "Terjadi kesalahan.",
+        severity: 'error',
+        summary: 'Gagal Memuat Produk',
+        detail: error instanceof Error ? error.message : 'Terjadi kesalahan sistem.',
         life: 5000,
-      });
+      })
     }
   }
-  loading.value = false;
-});
+  loading.value = false
+})
 
-const goBack = () => {
-  router.push("/");
-};
+const onAddToBag = (payload: { quantity: number; color: string; material: string }) => {
+  toast.add({
+    severity: 'success',
+    summary: 'Ditambahkan ke Bag',
+    detail: `${product.value?.name} (${payload.quantity}x) berhasil dimasukkan.`,
+    life: 3000,
+  })
+}
+
+const onBuyNow = (payload: { quantity: number; color: string; material: string }) => {
+  onAddToBag(payload)
+  router.push('/katalog')
+}
 </script>
 
 <template>
-  <div style="max-width: 800px; margin: 0 auto; padding-top: 1rem">
-    <div style="margin-bottom: 1.5rem">
-      <Button
-        icon="pi pi-arrow-left"
-        label="Kembali"
-        severity="secondary"
-        text
-        @click="goBack"
-      />
+  <div class="space-y-8 pb-16 pt-2">
+    <!-- Breadcrumbs -->
+    <nav
+      aria-label="Breadcrumbs"
+      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 border-b border-brand-hairsoft overflow-x-auto"
+    >
+      <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
+        ShelfStack
+      </NuxtLink>
+      <span class="text-brand-faint">/</span>
+      <NuxtLink
+        to="/katalog"
+        class="hover:text-brand-ink no-underline text-brand-muted transition-colors"
+      >
+        Katalog
+      </NuxtLink>
+      <span class="text-brand-faint">/</span>
+      <span v-if="product" class="text-brand-ink font-semibold truncate max-w-56">
+        {{ product.name }}
+      </span>
+    </nav>
+
+    <!-- Back Action -->
+    <div class="flex items-center">
+      <UiButton to="/katalog" variant="secondary" size="sm" icon="pi-arrow-left">
+        Kembali ke Katalog
+      </UiButton>
     </div>
 
-    <Card v-if="loading">
-      <template #content>
-        <div style="display: flex; gap: 2rem; flex-wrap: wrap">
-          <Skeleton width="300px" height="300px" borderRadius="12px" />
-          <div
-            style="flex: 1; display: flex; flex-direction: column; gap: 1rem"
-          >
-            <Skeleton width="60%" height="2rem" />
-            <Skeleton width="30%" height="1.5rem" />
-            <Skeleton width="100%" height="6rem" />
-          </div>
-        </div>
-      </template>
-    </Card>
+    <!-- Loading Skeleton View -->
+    <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 animate-pulse">
+      <div class="lg:col-span-7 aspect-[4/3] bg-brand-field rounded-card" />
+      <div class="lg:col-span-5 space-y-4">
+        <div class="h-4 w-32 bg-brand-field rounded-full" />
+        <div class="h-8 w-3/4 bg-brand-field rounded-full" />
+        <div class="h-6 w-1/3 bg-brand-field rounded-full" />
+        <div class="h-24 w-full bg-brand-field rounded-card" />
+        <div class="h-12 w-full bg-brand-field rounded-full" />
+      </div>
+    </div>
 
-    <Card v-else-if="product">
-      <template #content>
-        <div style="display: flex; gap: 2.5rem; flex-wrap: wrap">
-          <!-- Gambar Produk -->
-          <div style="flex-shrink: 0; width: 350px">
-            <img
-              v-if="product.image_url"
-              :src="product.image_url"
-              :alt="product.name"
-              style="
-                width: 100%;
-                height: auto;
-                border-radius: 12px;
-                object-fit: cover;
-                border: 1px solid var(--p-surface-200);
-              "
-            />
-            <div
-              v-else
-              style="
-                width: 100%;
-                height: 350px;
-                background-color: var(--p-surface-200);
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              "
-            >
-              <i
-                class="pi pi-image"
-                style="font-size: 4rem; color: var(--p-text-muted-color)"
-              ></i>
-            </div>
-          </div>
+    <!-- Product Detail Hub -->
+    <div v-else-if="product" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+      <div class="lg:col-span-7">
+        <ProductGallery :product="product" />
+      </div>
+      <div class="lg:col-span-5">
+        <ProductConfigurator :product="product" @add-to-bag="onAddToBag" @buy-now="onBuyNow" />
+      </div>
+    </div>
 
-          <!-- Detail Informasi -->
-          <div
-            style="flex: 1; display: flex; flex-direction: column; gap: 1.5rem"
-          >
-            <div>
-              <h1
-                style="
-                  margin: 0 0 0.5rem 0;
-                  font-size: 2rem;
-                  color: var(--p-text-color);
-                "
-              >
-                {{ product.name }}
-              </h1>
-              <span
-                style="
-                  font-size: 1.5rem;
-                  font-weight: 600;
-                  color: var(--p-primary-color);
-                "
-              >
-                Rp {{ product.price.toLocaleString("id-ID") }}
-              </span>
-            </div>
-
-            <div>
-              <h3 style="margin: 0 0 0.5rem 0; color: var(--p-text-color)">
-                Deskripsi
-              </h3>
-              <p
-                style="
-                  margin: 0;
-                  line-height: 1.6;
-                  color: var(--p-text-muted-color);
-                  white-space: pre-wrap;
-                "
-              >
-                {{
-                  product.description || "Tidak ada deskripsi untuk produk ini."
-                }}
-              </p>
-            </div>
-
-            <div v-if="product.link" style="margin-top: 1rem">
-              <a
-                :href="product.link"
-                target="_blank"
-                style="text-decoration: none"
-              >
-                <Button
-                  label="Kunjungi Halaman Referensi"
-                  icon="pi pi-external-link"
-                  severity="primary"
-                />
-              </a>
-            </div>
-          </div>
-        </div>
-      </template>
-    </Card>
-
-    <Card v-else>
-      <template #content>
-        <div style="text-align: center; padding: 3rem">
-          <i
-            class="pi pi-exclamation-triangle"
-            style="
-              font-size: 3rem;
-              color: var(--p-text-muted-color);
-              margin-bottom: 1rem;
-            "
-          ></i>
-          <h2>Produk Tidak Ditemukan</h2>
-          <p style="color: var(--p-text-muted-color)">
-            Produk yang Anda cari mungkin telah dihapus atau tidak tersedia.
-          </p>
-        </div>
-      </template>
-    </Card>
+    <!-- Product Not Found View -->
+    <div
+      v-else
+      class="text-center py-20 px-6 bg-brand-canvas-soft border border-dashed border-brand-hair rounded-card max-w-xl mx-auto space-y-4"
+    >
+      <div
+        class="w-14 h-14 rounded-full bg-brand-canvas border border-brand-hair flex items-center justify-center mx-auto text-brand-muted shadow-whisper"
+      >
+        <i class="pi pi-exclamation-triangle text-2xl" />
+      </div>
+      <h2 class="font-display text-2xl font-bold text-brand-ink m-0">Produk Tidak Ditemukan</h2>
+      <p class="font-body text-sm text-brand-muted m-0">
+        Produk yang Anda cari mungkin telah dihapus atau ID tidak valid dalam database katalog.
+      </p>
+      <UiButton to="/katalog" variant="primary" icon="pi-arrow-right" icon-pos="right">
+        Kembali ke Katalog
+      </UiButton>
+    </div>
   </div>
 </template>

@@ -1,8 +1,16 @@
+import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '~/types/database.types'
+
+type ActivityRow = Database['public']['Tables']['activity_logs']['Row']
+export interface ActivityLog extends ActivityRow {
+  isNew?: boolean
+}
+
 export function useActivities() {
-  const supabase = useSupabaseClient<any>()
-  const activities = ref<any[]>([])
+  const supabase: SupabaseClient<Database> = useSupabaseClient<Database>()
+  const activities = ref<ActivityLog[]>([])
   const loading = ref(false)
-  let channel: any = null
+  let channel: RealtimeChannel | null = null
 
   const fetchActivities = async () => {
     loading.value = true
@@ -13,7 +21,7 @@ export function useActivities() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      activities.value = data || []
+      activities.value = (data || []) as ActivityLog[]
     } catch (e) {
       console.error(e)
     } finally {
@@ -29,7 +37,7 @@ export function useActivities() {
         { event: 'INSERT', schema: 'public', table: 'activity_logs' },
         (payload) => {
           // Add temporary 'isNew' flag for UI highlighting
-          const newActivity: any = { ...payload.new, isNew: true }
+          const newActivity: ActivityLog = { ...(payload.new as ActivityRow), isNew: true }
           activities.value.unshift(newActivity)
 
           // Remove highlight flag after 2 seconds

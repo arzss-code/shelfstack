@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-primary":"#ffffff","error-container":"#ffdad6","on-secondary-container":"#636262","secondary-container":"#e2dfde","on-secondary-fixed-variant":"#474646","primary-container":"#0066ff","secondary-fixed-dim":"#c8c6c5","surface-tint":"#0054d6","on-background":"#1b1c1c","on-tertiary-fixed":"#1a1c1c","error":"#ba1a1a","primary":"#0050cb","on-error-container":"#93000a","tertiary-fixed":"#e2e2e2","outline-variant":"#c2c6d8","background":"#fbf9f9","primary-fixed":"#dae1ff","inverse-on-surface":"#f2f0f0","text-muted":"#707070","tertiary-fixed-dim":"#c6c6c7","accent-electric":"#0066ff","surface-container-highest":"#e4e2e2","ink-soft":"#262626","canvas-soft":"#f3f3f3","outline":"#727687","on-tertiary-fixed-variant":"#454747","tertiary-container":"#717272","surface-dim":"#dbdad9","primary-fixed-dim":"#b3c5ff","surface-container":"#efeded","on-tertiary-container":"#f8f8f8","secondary-fixed":"#e5e2e1","surface-container-high":"#e9e8e7","tertiary":"#585a5a","on-secondary":"#ffffff","surface-bright":"#fbf9f9","surface-variant":"#e4e2e2","canvas":"#ffffff","ink":"#141414","overlay-scrim":"rgba(115, 115, 115, 0.56)","surface-container-lowest":"#ffffff","surface":"#fbf9f9","on-surface":"#1b1c1c","on-primary-fixed-variant":"#003fa4","hairline-soft":"#f0f0f0","inverse-primary":"#b3c5ff","on-error":"#ffffff","inverse-surface":"#303031","on-primary-fixed":"#001849","on-surface-variant":"#424656","text-faint":"#adadad","hairline":"#e0e0e0","surface-container-low":"#f5f3f3","on-tertiary":"#ffffff","secondary":"#5f5e5e","field":"#f0f0f0","on-secondary-fixed":"#1c1b1b","on-primary-container":"#f8f7ff"},borderRadius:{DEFAULT:"1rem",lg:"2rem",xl:"3rem",full:"9999px"},spacing:{"space-xs":"0.25rem","space-md":"1rem","margin-mobile":"1.25rem","space-xl":"2rem","space-lg":"1.5rem","gutter-mobile":"1rem","space-sm":"0.5rem","margin":"3rem","gutter":"1.5rem"},fontFamily:{link:["DM Sans"],caption:["DM Sans"],display:["Hanken Grotesk"],"headline-lg":["Hanken Grotesk"],"label-md":["DM Sans"],"headline-md":["Hanken Grotesk"],"title-md":["Hanken Grotesk"],"body-sm":["DM Sans"],"title-lg":["Hanken Grotesk"],"headline-sm":["Hanken Grotesk"],"headline-lg-mobile":["Hanken Grotesk"],"headline-md-mobile":["Hanken Grotesk"],"body-md":["DM Sans"],"body-lg":["DM Sans"],"display-mobile":["Hanken Grotesk"]},fontSize:{link:["16px",{lineHeight:"24px",fontWeight:"600"}],caption:["12px",{lineHeight:"16px",fontWeight:"400"}],display:["80px",{lineHeight:"80px",letterSpacing:"-0.03em",fontWeight:"700"}],"headline-lg":["56px",{lineHeight:"60px",letterSpacing:"-0.025em",fontWeight:"700"}],"label-md":["12px",{lineHeight:"16px",letterSpacing:"0.04em",fontWeight:"700"}],"headline-md":["44px",{lineHeight:"48px",letterSpacing:"-0.02em",fontWeight:"600"}],"title-md":["20px",{lineHeight:"26px",letterSpacing:"-0.005em",fontWeight:"600"}],"body-sm":["14px",{lineHeight:"20px",fontWeight:"400"}],"title-lg":["24px",{lineHeight:"30px",letterSpacing:"-0.01em",fontWeight:"600"}],"headline-sm":["32px",{lineHeight:"36px",letterSpacing:"-0.015em",fontWeight:"600"}],"headline-lg-mobile":["36px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"700"}],"headline-md-mobile":["28px",{lineHeight:"32px",letterSpacing:"-0.015em",fontWeight:"600"}],"body-md":["16px",{lineHeight:"24px",fontWeight:"400"}],"body-lg":["20px",{lineHeight:"28px",fontWeight:"400"}],"display-mobile":["48px",{lineHeight:"52px",letterSpacing:"-0.02em",fontWeight:"700"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased selection:bg-accent-electric selection:text-on-primary"><header class="fixed top-0 left-0 w-full z-50 bg-canvas/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-40 flex flex-col justify-between"><div class="w-full bg-canvas-soft px-6 lg:px-12 py-1.5 flex items-center justify-between text-caption font-caption text-text-muted"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-accent-electric"></span><span class="text-ink font-bold">Complimentary Global Dispatch</span><span>on curations over $150</span></div><div class="flex items-center gap-6"><a class="hover:text-ink transition-colors" data-path="track-order" href="#">Track Shipment</a><a class="hover:text-ink transition-colors" data-path="help-center" href="#">Concierge Support</a><div class="flex items-center gap-1 cursor-pointer hover:text-ink transition-colors"><span class="font-medium">USD / Global</span><span class="material-symbols-outlined text-[14px]">expand_more</span></div></div></div><div class="w-full max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6 py-2"><a class="flex items-center gap-3" data-path="home" href="#"><img alt="Brand logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xxr3vYezhanvKgo5CiY-uShx9Z_nxpg3u_P87x04A40OQUZh9sYlZWGLokcyGv6XdZPRKhMvMdJNS6CEtao5ecIeCUG00jOkEZDv3htiNQdAHWJcL7YURulUxM5iQCtehrjw7dkJRK5GCi-33XWEmna2C6wl2SnlH0Jo30mvuBheFB51F5jx9qe3V6ldh4PuT2DB8HtgpzQK4yyLrrefFU7iF8zxAJedNiQI_bGz8noloxhRhU692YRfw"/><span class="font-title-lg text-title-lg tracking-tight text-ink">ShelfStack</span></a><div class="flex-1 max-w-2xl flex items-center bg-field rounded-full px-3 py-1.5 focus-within:bg-canvas focus-within:ring-2 focus-within:ring-ink transition-all"><div class="relative group flex items-center pl-2 pr-3 cursor-pointer text-text-muted hover:text-ink"><span class="text-body-sm font-body-sm font-medium">All Vaults</span><span class="material-symbols-outlined text-[18px] ml-1">unfold_more</span></div><div class="h-4 w-[1px] bg-hairline"></div><div class="flex-1 flex items-center px-3 gap-2"><span class="material-symbols-outlined text-text-faint text-[20px]">search</span><input class="w-full bg-transparent border-0 outline-none text-body-sm font-body-sm text-ink placeholder:text-text-faint" placeholder="Search minimalist hardware, ergonomic tools, archival furniture..." type="text"/></div><button class="px-4 py-1.5 rounded-full bg-ink text-canvas font-body-sm text-body-sm hover:opacity-90 transition-opacity">Search</button></div><div class="flex items-center gap-4"><a class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-canvas-soft text-ink transition-colors" data-path="wishlist" href="#"><span class="material-symbols-outlined text-[22px]">favorite</span></a><a class="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-field hover:bg-surface-container-high transition-colors text-ink relative group" data-path="cart" href="#"><span class="material-symbols-outlined text-[20px]">shopping_bag</span><div class="flex flex-col text-left"><div class="flex items-center gap-1.5"><span class="text-caption font-caption font-bold tracking-wider uppercase text-text-muted">Cart</span><span class="w-4 h-4 rounded-full bg-accent-electric text-on-primary text-[10px] font-bold flex items-center justify-center leading-none">3</span></div><span class="text-body-sm font-body-sm font-bold text-accent-electric">$443.88</span></div></a><a class="w-8 h-8 rounded-full bg-primary flex items-center justify-center" data-path="account" href="#"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></a></div></div><div class="w-full bg-canvas/70 backdrop-blur-md px-6 lg:px-12 border-t border-hairline-soft"><div class="max-w-7xl mx-auto flex items-center justify-between"><nav class="flex items-center gap-2 py-1.5 overflow-x-auto" data-active-classes="bg-ink text-canvas rounded-full px-4 py-1.5"><a class="px-4 py-1.5 rounded-full text-body-sm font-body-sm text-on-surface-variant hover:text-ink transition-colors whitespace-nowrap" data-path="home" href="#">Showroom</a><a class="px-4 py-1.5 rounded-full text-body-sm font-body-sm text-on-surface-variant hover:text-ink transition-colors whitespace-nowrap" data-path="tech-gadgets" href="#">Tech &amp; Gadgets</a><a class="px-4 py-1.5 rounded-full text-body-sm font-body-sm text-on-surface-variant hover:text-ink transition-colors whitespace-nowrap" data-path="home-kitchen" href="#">Home &amp; Kitchen</a><a class="px-4 py-1.5 rounded-full text-body-sm font-body-sm text-on-surface-variant hover:text-ink transition-colors whitespace-nowrap" data-path="furniture" href="#">Furniture</a><a class="px-4 py-1.5 rounded-full text-body-sm font-body-sm text-on-surface-variant hover:text-ink transition-colors whitespace-nowrap" data-path="fashion-edc" href="#">Fashion &amp; EDC</a><a class="px-4 py-1.5 rounded-full text-body-sm font-body-sm text-on-surface-variant hover:text-ink transition-colors whitespace-nowrap" data-path="new-drops" href="#">New Drops</a><a class="px-4 py-1.5 rounded-full text-body-sm font-body-sm text-on-surface-variant hover:text-ink transition-colors whitespace-nowrap" data-path="best-sellers" href="#">Best Sellers</a><a class="px-4 py-1.5 rounded-full text-body-sm font-body-sm text-on-surface-variant hover:text-ink transition-colors whitespace-nowrap" data-path="deals" href="#">Archival Deals</a></nav><div class="hidden md:flex items-center gap-2"><span class="text-caption font-caption uppercase tracking-wider text-text-muted">Curator Edition</span><span class="px-2 py-0.5 rounded-full bg-field text-[11px] font-bold text-accent-electric">v4.8</span></div></div></div></div></header><main class="w-full pt-40 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- CATEGORY HEADER & STRIP -->
+<section class="w-full bg-surface-bright pt-6 pb-10">
+<div class="max-w-7xl mx-auto px-6 lg:px-12">
+<!-- Breadcrumb -->
+<nav class="flex items-center gap-2 text-caption font-caption text-text-muted mb-6">
+<a class="hover:text-ink transition-colors" href="#">ShelfStack</a>
+<span class="text-text-faint">/</span>
+<a class="hover:text-ink transition-colors" href="#">Department Hub</a>
+<span class="text-text-faint">/</span>
+<span class="text-ink font-semibold">Tech &amp; Precision Hardware</span>
+</nav>
+<!-- Headline & Subtext -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8">
+<div class="max-w-3xl space-y-3">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-field text-caption font-caption uppercase tracking-wider text-ink font-bold">
+<span class="w-2 h-2 rounded-full bg-accent-electric"></span>
+            Hardware Archive 04.09
+          </div>
+<h1 class="font-headline-lg text-headline-lg text-ink tracking-tight">
+            Tech &amp; Precision Hardware.
+          </h1>
+<p class="font-body-lg text-body-lg text-text-muted">
+            Curated architectural devices, tactile audio equipment, desk monoliths, and deterministic everyday tools engineered for technologists.
+          </p>
+</div>
+<!-- Metric pill summary -->
+<div class="flex items-center gap-3 bg-canvas-soft px-4 py-2.5 rounded-full text-caption font-caption text-text-muted">
+<span class="font-medium text-ink">Showing 84 Artifacts</span>
+<span class="text-text-faint">•</span>
+<span>Guaranteed 48h Dispatch</span>
+<span class="text-text-faint">•</span>
+<span>2-Year Vault Warranty</span>
+</div>
+</div>
+<!-- Department Cross-Pill Filter Strip -->
+<div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+<button class="px-4 py-2 rounded-full bg-ink text-canvas font-body-sm text-body-sm font-medium whitespace-nowrap">
+          All Tech <span class="ml-1.5 opacity-70">84</span>
+</button>
+<button class="px-4 py-2 rounded-full bg-canvas-soft hover:bg-surface-container-high text-on-surface-variant hover:text-ink font-body-sm text-body-sm transition-colors whitespace-nowrap">
+          Audio &amp; Acoustics <span class="ml-1.5 text-text-muted">22</span>
+</button>
+<button class="px-4 py-2 rounded-full bg-canvas-soft hover:bg-surface-container-high text-on-surface-variant hover:text-ink font-body-sm text-body-sm transition-colors whitespace-nowrap">
+          Desk Architecture <span class="ml-1.5 text-text-muted">18</span>
+</button>
+<button class="px-4 py-2 rounded-full bg-canvas-soft hover:bg-surface-container-high text-on-surface-variant hover:text-ink font-body-sm text-body-sm transition-colors whitespace-nowrap">
+          Power &amp; Charging <span class="ml-1.5 text-text-muted">14</span>
+</button>
+<button class="px-4 py-2 rounded-full bg-canvas-soft hover:bg-surface-container-high text-on-surface-variant hover:text-ink font-body-sm text-body-sm transition-colors whitespace-nowrap">
+          Tactile Keyboards &amp; Input <span class="ml-1.5 text-text-muted">16</span>
+</button>
+<button class="px-4 py-2 rounded-full bg-canvas-soft hover:bg-surface-container-high text-on-surface-variant hover:text-ink font-body-sm text-body-sm transition-colors whitespace-nowrap">
+          Optics &amp; Sensors <span class="ml-1.5 text-text-muted">14</span>
+</button>
+</div>
+</div>
+</section>
+<!-- TOOLBAR UTILITY ROW -->
+<section class="w-full bg-canvas py-4 shadow-sm">
+<div class="max-w-7xl mx-auto px-6 lg:px-12 flex flex-wrap items-center justify-between gap-4">
+<!-- Active Filters Tag Strip -->
+<div class="flex items-center flex-wrap gap-2">
+<span class="text-caption font-caption text-text-muted uppercase tracking-wider mr-1">Active:</span>
+<button class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-field hover:bg-surface-container-highest text-caption font-caption text-ink transition-colors">
+<span>In Stock Only</span>
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-field hover:bg-surface-container-highest text-caption font-caption text-ink transition-colors">
+<span>Matte Obsidian</span>
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-field hover:bg-surface-container-highest text-caption font-caption text-ink transition-colors">
+<span>$50 – $350</span>
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+<button class="text-caption font-caption text-accent-electric hover:underline ml-1">
+          Clear All
+        </button>
+</div>
+<!-- Controls: Sort & Grid Density -->
+<div class="flex items-center gap-4 ml-auto">
+<div class="flex items-center gap-2 bg-field rounded-full px-3 py-1.5 text-body-sm font-body-sm text-ink">
+<span class="text-text-muted font-normal text-caption font-caption uppercase tracking-wider">Sort</span>
+<div class="flex items-center gap-1 cursor-pointer font-medium">
+<span>Featured / Curated First</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</div>
+</div>
+<div class="hidden sm:flex items-center bg-field p-1 rounded-full">
+<button class="p-1 rounded-full hover:bg-canvas text-text-muted hover:text-ink transition-colors" id="view-compact" title="4-Column Density">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+</button>
+<button class="p-1 rounded-full bg-canvas text-ink shadow-sm transition-colors" id="view-spacious" title="3-Column Gallery">
+<span class="material-symbols-outlined text-[18px]">view_comfy</span>
+</button>
+</div>
+<span class="text-caption font-caption text-text-muted font-medium pl-1">84 Units</span>
+</div>
+</div>
+</section>
+<!-- DUAL COLUMN BODY: FILTERS + PRODUCT GRID -->
+<section class="w-full py-10 bg-surface">
+<div class="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-start gap-10">
+<!-- LEFT SIDEBAR FACETED PANEL -->
+<aside class="w-full lg:w-72 flex-shrink-0 flex flex-col gap-8 bg-canvas p-6 rounded-2xl shadow-sm">
+<!-- Filter Header -->
+<div class="flex items-center justify-between pb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-ink text-[20px]">tune</span>
+<h2 class="font-title-md text-title-md text-ink">Faceted Vault</h2>
+</div>
+<button class="text-caption font-caption text-text-muted hover:text-ink transition-colors">
+            Reset
+          </button>
+</div>
+<!-- 1. Availability Group -->
+<div class="space-y-3 pb-6">
+<h3 class="text-caption font-caption uppercase tracking-wider text-text-muted font-bold">Dispatch Status</h3>
+<div class="space-y-2.5">
+<label class="flex items-center justify-between cursor-pointer group">
+<div class="flex items-center gap-2.5">
+<span class="w-5 h-5 rounded-md bg-ink text-canvas flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</span>
+<span class="font-body-sm text-body-sm text-ink font-medium">In Stock &amp; Ready</span>
+</div>
+<span class="text-caption font-caption text-text-muted">71</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<div class="flex items-center gap-2.5">
+<span class="w-5 h-5 rounded-md bg-field group-hover:bg-surface-container-high flex items-center justify-center"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-ink">Vault Pre-Order</span>
+</div>
+<span class="text-caption font-caption text-text-muted">9</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<div class="flex items-center gap-2.5">
+<span class="w-5 h-5 rounded-md bg-field group-hover:bg-surface-container-high flex items-center justify-center"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-ink">Archival Archive</span>
+</div>
+<span class="text-caption font-caption text-text-muted">4</span>
+</label>
+</div>
+</div>
+<!-- 2. Price Range Slider & Brackets -->
+<div class="space-y-4 pb-6">
+<div class="flex items-center justify-between">
+<h3 class="text-caption font-caption uppercase tracking-wider text-text-muted font-bold">Valuation Span</h3>
+<span class="text-caption font-caption font-bold text-accent-electric">$25 – $650</span>
+</div>
+<!-- Mock dual track bar -->
+<div class="relative w-full h-1.5 bg-field rounded-full overflow-hidden">
+<div class="absolute left-1/12 right-1/4 h-full bg-accent-electric"></div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="bg-field px-3 py-1.5 rounded-full flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-text-faint text-caption font-caption">Min</span>
+<span class="text-ink font-medium">$25</span>
+</div>
+<div class="bg-field px-3 py-1.5 rounded-full flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-text-faint text-caption font-caption">Max</span>
+<span class="text-ink font-medium">$650</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="px-2.5 py-1 rounded-full bg-canvas-soft hover:bg-field cursor-pointer text-caption font-caption text-on-surface-variant hover:text-ink">Under $50</span>
+<span class="px-2.5 py-1 rounded-full bg-ink text-canvas cursor-pointer text-caption font-caption">$50–$150</span>
+<span class="px-2.5 py-1 rounded-full bg-canvas-soft hover:bg-field cursor-pointer text-caption font-caption text-on-surface-variant hover:text-ink">$150–$300</span>
+<span class="px-2.5 py-1 rounded-full bg-canvas-soft hover:bg-field cursor-pointer text-caption font-caption text-on-surface-variant hover:text-ink">$300+</span>
+</div>
+</div>
+<!-- 3. Color & Finish Swatches -->
+<div class="space-y-3 pb-6">
+<h3 class="text-caption font-caption uppercase tracking-wider text-text-muted font-bold">Finish &amp; Metallurgy</h3>
+<div class="flex items-center gap-2 flex-wrap">
+<button class="w-7 h-7 rounded-full bg-[#141414] shadow-sm ring-2 ring-accent-electric flex items-center justify-center" title="Matte Obsidian Black">
+<span class="w-1.5 h-1.5 rounded-full bg-canvas"></span>
+</button>
+<button class="w-7 h-7 rounded-full bg-[#d8d8d8] hover:scale-105 transition-transform" title="Anodized Silver"></button>
+<button class="w-7 h-7 rounded-full bg-[#525252] hover:scale-105 transition-transform" title="Space Gray"></button>
+<button class="w-7 h-7 rounded-full bg-[#d6c7b2] hover:scale-105 transition-transform" title="Desert Sand"></button>
+<button class="w-7 h-7 rounded-full bg-[#c2a25d] hover:scale-105 transition-transform" title="Raw Brass"></button>
+<button class="w-7 h-7 rounded-full bg-[#27382b] hover:scale-105 transition-transform" title="Forest Green"></button>
+</div>
+</div>
+<!-- 4. Department Sub-brands -->
+<div class="space-y-3 pb-6">
+<h3 class="text-caption font-caption uppercase tracking-wider text-text-muted font-bold">Atelier &amp; Studio</h3>
+<div class="space-y-2">
+<label class="flex items-center justify-between cursor-pointer group">
+<div class="flex items-center gap-2.5">
+<span class="w-5 h-5 rounded-md bg-ink text-canvas flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</span>
+<span class="font-body-sm text-body-sm text-ink font-medium">StackLab™ Vault</span>
+</div>
+<span class="text-caption font-caption text-text-muted">38</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<div class="flex items-center gap-2.5">
+<span class="w-5 h-5 rounded-md bg-field group-hover:bg-surface-container-high flex items-center justify-center"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-ink">teenage engineering</span>
+</div>
+<span class="text-caption font-caption text-text-muted">12</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<div class="flex items-center gap-2.5">
+<span class="w-5 h-5 rounded-md bg-field group-hover:bg-surface-container-high flex items-center justify-center"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-ink">Braun Heritage</span>
+</div>
+<span class="text-caption font-caption text-text-muted">9</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<div class="flex items-center gap-2.5">
+<span class="w-5 h-5 rounded-md bg-field group-hover:bg-surface-container-high flex items-center justify-center"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-ink">Keychron Studio</span>
+</div>
+<span class="text-caption font-caption text-text-muted">15</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<div class="flex items-center gap-2.5">
+<span class="w-5 h-5 rounded-md bg-field group-hover:bg-surface-container-high flex items-center justify-center"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-ink">Nothing Tech</span>
+</div>
+<span class="text-caption font-caption text-text-muted">10</span>
+</label>
+</div>
+</div>
+<!-- 5. Protocols & Connectivity -->
+<div class="space-y-3 pb-6">
+<h3 class="text-caption font-caption uppercase tracking-wider text-text-muted font-bold">Interfaces &amp; Spec</h3>
+<div class="flex flex-wrap gap-1.5">
+<span class="px-3 py-1 rounded-full bg-field hover:bg-canvas-soft cursor-pointer text-caption font-caption text-ink font-medium">USB-C 3.2</span>
+<span class="px-3 py-1 rounded-full bg-field hover:bg-canvas-soft cursor-pointer text-caption font-caption text-ink font-medium">Bluetooth 5.4</span>
+<span class="px-3 py-1 rounded-full bg-field hover:bg-canvas-soft cursor-pointer text-caption font-caption text-ink font-medium">Qi2 MagSafe</span>
+<span class="px-3 py-1 rounded-full bg-field hover:bg-canvas-soft cursor-pointer text-caption font-caption text-ink font-medium">100W GaN</span>
+<span class="px-3 py-1 rounded-full bg-field hover:bg-canvas-soft cursor-pointer text-caption font-caption text-ink font-medium">Hot-Swap</span>
+</div>
+</div>
+<!-- Filter Apply / Reset Actions -->
+<div class="space-y-2 pt-2">
+<button class="w-full py-3 rounded-full bg-accent-electric text-on-primary font-link text-link text-center hover:opacity-90 transition-opacity">
+            Apply Filters (84)
+          </button>
+<button class="w-full py-2 rounded-full bg-transparent hover:bg-canvas-soft text-text-muted font-body-sm text-body-sm text-center transition-colors">
+            Reset Everything
+          </button>
+</div>
+</aside>
+<!-- RIGHT COLUMN: 3-COLUMN PRODUCT GRID -->
+<div class="flex-1 w-full">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="product-grid-container">
+<!-- CARD 1: STUDIO ANC WIRELESS -->
+<div class="group bg-canvas rounded-2xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+<div>
+<div class="relative w-full aspect-square bg-canvas-soft rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Minimalist matte black over-ear wireless studio headphones resting on an architect concrete slab under soft diffused daylight, architectural studio product shot, monochromatic high contrast with subtle dark graphite textures" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNCqqbIO-JDR8Bniavpl74Jxo19EYnmGIhTgArl0frSzWjMwwVmbWpoyZmbZQgLQ4lSTsorVYrnLATU6eGPA61XR_ig1HKTgN4WQRPTei54dCQWFVHm_jAWG_Qid_KEoZZ5qE918sz0KnHohLHxNh8ZlcDRRCMoLS36pxoc3In7pDjG5RcEX7fkUhPs-vtcpzS3puf6ErT_5qZ4ywLKrSINy9cP4MC9Kx5RZHPKuV8REfLQ2SusHPt"/>
+<!-- Badges -->
+<div class="absolute top-3 left-3 flex flex-col gap-1">
+<span class="px-2.5 py-1 rounded-full bg-accent-electric text-on-primary text-caption font-caption font-bold">
+                    Bestseller
+                  </span>
+</div>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-canvas/80 backdrop-blur-md flex items-center justify-center text-ink hover:text-accent-electric transition-colors" title="Save to Archival Wishlist">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<!-- Product Meta -->
+<div class="space-y-1 mb-3">
+<div class="flex items-center justify-between">
+<span class="text-caption font-caption uppercase tracking-wider text-text-muted">Acoustics • Series 3</span>
+<div class="flex items-center gap-1 text-caption font-caption text-ink font-semibold">
+<span class="material-symbols-outlined text-[14px] text-ink" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.9</span>
+<span class="text-text-muted font-normal">(128)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+                  Studio ANC Wireless Over-Ear
+                </h3>
+<p class="font-body-sm text-body-sm text-text-muted line-clamp-1">
+                  Matte Obsidian Black • Custom 45mm Drivers
+                </p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-3">
+<div class="flex flex-col">
+<span class="text-caption font-caption text-text-muted uppercase">Vault Price</span>
+<span class="font-title-lg text-title-lg text-ink font-bold">$229.00</span>
+</div>
+<button class="px-4 py-2 rounded-full bg-field hover:bg-ink hover:text-canvas text-ink font-body-sm text-body-sm font-semibold transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Quick Bag</span>
+</button>
+</div>
+</div>
+<!-- CARD 2: MAGCHARGE MONOLITH -->
+<div class="group bg-canvas rounded-2xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+<div>
+<div class="relative w-full aspect-square bg-canvas-soft rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Sculptural anodized space gray aluminum quad wireless desktop charger monolith charging a smartphone and smartwatch, sharp architectural edges, soft shadow, pure gallery light studio photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkT8DyQujss40PJikSa0aVOZaqvXW2bjzE6ZRvt3zudLvcuXWpyiBa9c_GfP3qeEw0yPs9etIAjIT56JsoKC4fTmAzDxuoFHEGlb4Pi0CjJw_nIwMlJf4yb0u4TCoIDfReIEfSjMRaZQszfbM8A4mbjMCt7GOazcwcUOJ6aKcT7Iytrisc5Y21VkVeoCzY54_9Vx21WYzGF_3Te1XpOd8Re5G56OttEQ74jcHbIkSMIxaC9RcAPB6C"/>
+<div class="absolute top-3 left-3">
+<span class="px-2.5 py-1 rounded-full bg-ink text-canvas text-caption font-caption font-bold">
+                    Curator Pick
+                  </span>
+</div>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-canvas/80 backdrop-blur-md flex items-center justify-center text-ink hover:text-accent-electric transition-colors" title="Save to Wishlist">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center justify-between">
+<span class="text-caption font-caption uppercase tracking-wider text-text-muted">Desk Power • Qi2</span>
+<div class="flex items-center gap-1 text-caption font-caption text-ink font-semibold">
+<span class="material-symbols-outlined text-[14px] text-ink" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.8</span>
+<span class="text-text-muted font-normal">(94)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+                  MagCharge Quad Desktop Monolith
+                </h3>
+<p class="font-body-sm text-body-sm text-text-muted line-clamp-1">
+                  CNC Anodized Space Gray • 100W GaN
+                </p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-3">
+<div class="flex flex-col">
+<span class="text-caption font-caption text-text-muted uppercase">Vault Price</span>
+<span class="font-title-lg text-title-lg text-ink font-bold">$95.00</span>
+</div>
+<button class="px-4 py-2 rounded-full bg-field hover:bg-ink hover:text-canvas text-ink font-body-sm text-body-sm font-semibold transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Quick Bag</span>
+</button>
+</div>
+</div>
+<!-- CARD 3: TACTILE MECHANICAL KEYBOARD -->
+<div class="group bg-canvas rounded-2xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+<div>
+<div class="relative w-full aspect-square bg-canvas-soft rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="High precision 75 percent mechanical keyboard with dark graphite CNC aluminum chassis, clean dye sub PBT keycaps with minimal sans typography, top down architectural desk layout" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA07H9ypjA8X7T8LIrKQR7AFoGGzZ3QdJcmQPs7RgKefq5Vm8O5dYa022J7Maz5JFcV_vzkj-5n9zY0cBPWwR4vhes4CmJgr4Plu-1xjfZXxajH-2jvmQaXTaCi6I6CWfwKdFOfv4MTGKOJABjiY7gwNe0c791rEOZZrup1JD0mNjAoSkJ6xXJh1sAh2n9BIOGb0mqvzgCXj4gvKOAT5zURGhDaxtzrK7w6IlAt3NVnH9GW00sT0IS9"/>
+<div class="absolute top-3 left-3">
+<span class="px-2.5 py-1 rounded-full bg-surface-container-highest text-ink text-caption font-caption font-bold">
+                    New Drop
+                  </span>
+</div>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-canvas/80 backdrop-blur-md flex items-center justify-center text-ink hover:text-accent-electric transition-colors" title="Save to Wishlist">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center justify-between">
+<span class="text-caption font-caption uppercase tracking-wider text-text-muted">Input Hardware • 75%</span>
+<div class="flex items-center gap-1 text-caption font-caption text-ink font-semibold">
+<span class="material-symbols-outlined text-[14px] text-ink" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>5.0</span>
+<span class="text-text-muted font-normal">(42)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+                  Tactile CNC 75% Mechanical Board
+                </h3>
+<p class="font-body-sm text-body-sm text-text-muted line-clamp-1">
+                  Gateron Oil King • PBT Dye-Sub Custom
+                </p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-3">
+<div class="flex flex-col">
+<span class="text-caption font-caption text-text-muted uppercase">Vault Price</span>
+<span class="font-title-lg text-title-lg text-ink font-bold">$185.00</span>
+</div>
+<button class="px-4 py-2 rounded-full bg-field hover:bg-ink hover:text-canvas text-ink font-body-sm text-body-sm font-semibold transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Configure</span>
+</button>
+</div>
+</div>
+<!-- CARD 4: PRECISION GOOSENECK KETTLE -->
+<div class="group bg-canvas rounded-2xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+<div>
+<div class="relative w-full aspect-square bg-canvas-soft rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Matte black minimalist electric gooseneck kettle with fine polished brass handle accents standing on stone countertop in a serene Japanese modernist kitchen, soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCer7Rj6HuhkR_vF0JXbKsL_6FyABNZHcCtVOrGO0S_AS648UaVeI93TqrRwG7vceW2Gr8Jg_eqXPO72n1reL3VgcdWlqu4h1l2mt8dJNYcm2kNvxr0XhO3SdqQmxAQiFUEoBx7N5p-UyQivAGLcbpDB4BStRUN-llyJJIUoWFoAb2mPoBcWDr1xwqPJjElq2N6bKD8v8QpxbxfVBygz9bhDnBhLNCnTLN4X-BMscJ10Gf6U_lNYxXg"/>
+<div class="absolute top-3 left-3">
+<span class="px-2.5 py-1 rounded-full bg-field text-text-muted text-caption font-caption font-medium">
+                    Crossover Craft
+                  </span>
+</div>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-canvas/80 backdrop-blur-md flex items-center justify-center text-ink hover:text-accent-electric transition-colors" title="Save to Wishlist">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center justify-between">
+<span class="text-caption font-caption uppercase tracking-wider text-text-muted">Home &amp; Studio • 0.9L</span>
+<div class="flex items-center gap-1 text-caption font-caption text-ink font-semibold">
+<span class="material-symbols-outlined text-[14px] text-ink" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.9</span>
+<span class="text-text-muted font-normal">(210)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+                  Precision Gooseneck Electric Kettle
+                </h3>
+<p class="font-body-sm text-body-sm text-text-muted line-clamp-1">
+                  Stovetop Cast Base • PID Temp Controller
+                </p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-3">
+<div class="flex flex-col">
+<span class="text-caption font-caption text-text-muted uppercase">Vault Price</span>
+<span class="font-title-lg text-title-lg text-ink font-bold">$89.00</span>
+</div>
+<button class="px-4 py-2 rounded-full bg-field hover:bg-ink hover:text-canvas text-ink font-body-sm text-body-sm font-semibold transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Quick Bag</span>
+</button>
+</div>
+</div>
+<!-- CARD 5: MINIMALIST DESK LIGHTBAR -->
+<div class="group bg-canvas rounded-2xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+<div>
+<div class="relative w-full aspect-square bg-canvas-soft rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Sleek ultra-slim anodized black desk monitor lightbar mounted on a thin bezelless glass screen, ambient warm asymmetric glow, clean Scandinavian minimal desk environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxzwu1TFMjdi_UUje3McvVXsi2HYVJPEA_BMyjLytD4Wrpldvdzy02WCeiscoBlKJ8d9knWXRqLMwRbWaVn0xfWu0jG3oPPlp2g9lsFQLlOQFyYjsjnSkGqE4-CMQVNR7TyN6fHk3h8tB9IV7cY8z_sSpfwQAvcanyzmt04jEZfyiRwvASDx3kszjYB9dc7QKMiojebOI-Ik9njp8-pgdlk1WzpXINTDbl9Y0CX75U8XUDZXbkjDs-"/>
+<div class="absolute top-3 left-3">
+<span class="px-2.5 py-1 rounded-full bg-field text-ink text-caption font-caption font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-electric"></span>
+                    Low Stock • 4 Left
+                  </span>
+</div>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-canvas/80 backdrop-blur-md flex items-center justify-center text-ink hover:text-accent-electric transition-colors" title="Save to Wishlist">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center justify-between">
+<span class="text-caption font-caption uppercase tracking-wider text-text-muted">Optics • CRI ≥ 98</span>
+<div class="flex items-center gap-1 text-caption font-caption text-ink font-semibold">
+<span class="material-symbols-outlined text-[14px] text-ink" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.7</span>
+<span class="text-text-muted font-normal">(67)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+                  Minimalist 4K Desk Sensor Lightbar
+                </h3>
+<p class="font-body-sm text-body-sm text-text-muted line-clamp-1">
+                  Auto Dimming Touch Sensor • Anti-Glare
+                </p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-3">
+<div class="flex flex-col">
+<span class="text-caption font-caption text-text-muted uppercase">Vault Price</span>
+<span class="font-title-lg text-title-lg text-ink font-bold">$119.00</span>
+</div>
+<button class="px-4 py-2 rounded-full bg-field hover:bg-ink hover:text-canvas text-ink font-body-sm text-body-sm font-semibold transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Quick Bag</span>
+</button>
+</div>
+</div>
+<!-- CARD 6: MODULAR TECH BACKPACK -->
+<div class="group bg-canvas rounded-2xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+<div>
+<div class="relative w-full aspect-square bg-canvas-soft rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Technical weatherproof ballistic Cordura commuter backpack in dark stealth charcoal, sleek geometric monolithic silhouette with fidlock magnetic buckles, clean urban photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpsfHw7cXttqDnagWhlM6U7Z1pT5bpJ63hiXSGoP6LsC8VhRH4NU54TvRbe83aQnpU_5po8jFBLqvhnza7jFvMK5tNWKODDNwpuEJVCCHwNv_q7IfyCZpvKe1gTBF7Xm-PDX-h0VGOP-SkXv0IXiaolXiH2c32H1-G6tXaDrgyrGPZ0NiAmfHMttro1iBY5O4JJ71b03sbW8Qu_y8vqMxXVmhJZ-oQ4rbXcXXYMlLE0plFh1xdPEku"/>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-canvas/80 backdrop-blur-md flex items-center justify-center text-ink hover:text-accent-electric transition-colors" title="Save to Wishlist">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center justify-between">
+<span class="text-caption font-caption uppercase tracking-wider text-text-muted">Carry • 24L Waterproof</span>
+<div class="flex items-center gap-1 text-caption font-caption text-ink font-semibold">
+<span class="material-symbols-outlined text-[14px] text-ink" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.9</span>
+<span class="text-text-muted font-normal">(154)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+                  Ballistic Cordura® Tech Pack
+                </h3>
+<p class="font-body-sm text-body-sm text-text-muted line-clamp-1">
+                  Stealth Charcoal • Magnetic Fidlock
+                </p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-3">
+<div class="flex flex-col">
+<span class="text-caption font-caption text-text-muted uppercase">Vault Price</span>
+<span class="font-title-lg text-title-lg text-ink font-bold">$135.00</span>
+</div>
+<button class="px-4 py-2 rounded-full bg-field hover:bg-ink hover:text-canvas text-ink font-body-sm text-body-sm font-semibold transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Quick Bag</span>
+</button>
+</div>
+</div>
+<!-- CARD 7: TITANIUM EDC MICRO BLADE -->
+<div class="group bg-canvas rounded-2xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+<div>
+<div class="relative w-full aspect-square bg-canvas-soft rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Ultra minimalist Grade 5 titanium pocket utility blade knife with ceramic bearing mechanism, brushed silver raw industrial finish placed on dark textured slate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHmOvVyM3WTtJSHC98URbmywNB-vZooiCC41Het-T4Xd8GzVaW35rcW3n6wBwM17typqrACDb6TDltEpb2bbaKPlDJo21xB75lMA06bsa90oD13QdpVzyk57Vb2Qa85Uor6f26j9eg9OGGYGber35MDGUD0PHxjf1aLPbLVIK66i1-UYoxdhAlokweTAqODTSDlDYMQ1QsKxmmievX3sJ8o3ex9swB3UwTQEGv3mX_e2cCh4gku_57"/>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-canvas/80 backdrop-blur-md flex items-center justify-center text-ink hover:text-accent-electric transition-colors" title="Save to Wishlist">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center justify-between">
+<span class="text-caption font-caption uppercase tracking-wider text-text-muted">EDC • Titanium Gr.5</span>
+<div class="flex items-center gap-1 text-caption font-caption text-ink font-semibold">
+<span class="material-symbols-outlined text-[14px] text-ink" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.8</span>
+<span class="text-text-muted font-normal">(88)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+                  Titanium EDC Micro Utility Blade
+                </h3>
+<p class="font-body-sm text-body-sm text-text-muted line-clamp-1">
+                  Grade 5 Raw Titanium • Ceramic Bearing
+                </p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-3">
+<div class="flex flex-col">
+<span class="text-caption font-caption text-text-muted uppercase">Vault Price</span>
+<span class="font-title-lg text-title-lg text-ink font-bold">$48.00</span>
+</div>
+<button class="px-4 py-2 rounded-full bg-field hover:bg-ink hover:text-canvas text-ink font-body-sm text-body-sm font-semibold transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Quick Bag</span>
+</button>
+</div>
+</div>
+<!-- CARD 8: MAGSAFE ALUMINUM WALLET -->
+<div class="group bg-canvas rounded-2xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+<div>
+<div class="relative w-full aspect-square bg-canvas-soft rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Anodized billet aluminum MagSafe slim kickstand wallet cardholder attached to a dark titanium phone, precise chamfered edges, minimalist tech lifestyle product showcase" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmBxG2k6f8DzsCv9V9X5HCzFmmgS0yin9C1dfB46n13pXjUUurUO62nHJ2l0DxppyqAciVYK8yJRWP3Y7xGKSnacdWp--cOx0VGaXftKO4iKG3WLM59KtbKKc9klgRqiCET0aO4Gn1lENDeNJGEmJqTAK_fnH6R4qw3O0km5EFZ_g849sepnQlXvVcC5tCBXCKYS3jsxnh6FajN5Zx-yjEu_nx9YFFotYM5wCgrUoTSiW-SeSLBG3B"/>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-canvas/80 backdrop-blur-md flex items-center justify-center text-ink hover:text-accent-electric transition-colors" title="Save to Wishlist">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center justify-between">
+<span class="text-caption font-caption uppercase tracking-wider text-text-muted">Carry Hardware • MagSafe</span>
+<div class="flex items-center gap-1 text-caption font-caption text-ink font-semibold">
+<span class="material-symbols-outlined text-[14px] text-ink" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>4.9</span>
+<span class="text-text-muted font-normal">(112)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+                  Billet Kickstand MagSafe Wallet
+                </h3>
+<p class="font-body-sm text-body-sm text-text-muted line-clamp-1">
+                  RFID Shielded • Holds 6 Cards Securely
+                </p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-3">
+<div class="flex flex-col">
+<span class="text-caption font-caption text-text-muted uppercase">Vault Price</span>
+<span class="font-title-lg text-title-lg text-ink font-bold">$64.00</span>
+</div>
+<button class="px-4 py-2 rounded-full bg-field hover:bg-ink hover:text-canvas text-ink font-body-sm text-body-sm font-semibold transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Quick Bag</span>
+</button>
+</div>
+</div>
+</div>
+<!-- PAGINATION SECTION -->
+<div class="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6">
+<span class="text-caption font-caption text-text-muted">
+            Showing artifacts 1 – 8 of 84 total in Vault
+          </span>
+<div class="flex items-center gap-1.5">
+<button class="px-3.5 py-1.5 rounded-full bg-field hover:bg-surface-container-high text-caption font-caption font-medium text-text-muted hover:text-ink transition-colors">
+              Previous
+            </button>
+<button class="w-8 h-8 rounded-full bg-ink text-canvas text-caption font-caption font-bold flex items-center justify-center">
+              1
+            </button>
+<button class="w-8 h-8 rounded-full bg-field hover:bg-surface-container-high text-caption font-caption text-ink flex items-center justify-center transition-colors">
+              2
+            </button>
+<button class="w-8 h-8 rounded-full bg-field hover:bg-surface-container-high text-caption font-caption text-ink flex items-center justify-center transition-colors">
+              3
+            </button>
+<button class="w-8 h-8 rounded-full bg-field hover:bg-surface-container-high text-caption font-caption text-ink flex items-center justify-center transition-colors">
+              4
+            </button>
+<span class="px-1 text-text-faint text-caption font-caption">...</span>
+<button class="w-8 h-8 rounded-full bg-field hover:bg-surface-container-high text-caption font-caption text-ink flex items-center justify-center transition-colors">
+              11
+            </button>
+<button class="px-3.5 py-1.5 rounded-full bg-field hover:bg-surface-container-high text-caption font-caption font-medium text-ink transition-colors">
+              Next
+            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- BOTTOM EDITORIAL DISCOVERY BANNER -->
+<section class="w-full bg-surface-bright py-16">
+<div class="max-w-7xl mx-auto px-6 lg:px-12">
+<div class="relative bg-ink text-canvas rounded-3xl p-8 lg:p-12 overflow-hidden flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 shadow-xl">
+<!-- Subtle architectural background graphic -->
+<div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-accent-electric/10 blur-3xl pointer-events-none"></div>
+<div class="max-w-2xl space-y-3 relative z-10">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ink-soft text-caption font-caption uppercase tracking-wider text-canvas-soft">
+<span class="material-symbols-outlined text-[14px] text-accent-electric">handyman</span>
+            Bespoke Architecture Program
+          </div>
+<h2 class="font-headline-md text-headline-md text-canvas tracking-tight">
+            Can't locate the exact hardware specification?
+          </h2>
+<p class="font-body-md text-body-md text-text-muted">
+            Our hardware curators maintain direct fabrication pipelines with design engineering studios in Tokyo, Berlin, and Stockholm. Speak with our Curatorial Concierge for tailored office fleet procurement.
+          </p>
+</div>
+<div class="relative z-10 flex-shrink-0">
+<button class="px-6 py-3.5 rounded-full bg-accent-electric text-on-primary font-link text-link font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm">
+<span>Request Custom Procurement</span>
+<span class="material-symbols-outlined text-[18px]">arrow_outward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  // Simple responsive view toggler for 3 vs 4 column layout
+  const btnCompact = document.getElementById('view-compact');
+  const btnSpacious = document.getElementById('view-spacious');
+  const gridContainer = document.getElementById('product-grid-container');
+
+  if (btnCompact && btnSpacious && gridContainer) {
+    btnCompact.addEventListener('click', () => {
+      gridContainer.classList.remove('lg:grid-cols-3');
+      gridContainer.classList.add('lg:grid-cols-4');
+      btnCompact.classList.add('bg-canvas', 'text-ink', 'shadow-sm');
+      btnCompact.classList.remove('text-text-muted');
+      btnSpacious.classList.remove('bg-canvas', 'text-ink', 'shadow-sm');
+      btnSpacious.classList.add('text-text-muted');
+    });
+
+    btnSpacious.addEventListener('click', () => {
+      gridContainer.classList.remove('lg:grid-cols-4');
+      gridContainer.classList.add('lg:grid-cols-3');
+      btnSpacious.classList.add('bg-canvas', 'text-ink', 'shadow-sm');
+      btnSpacious.classList.remove('text-text-muted');
+      btnCompact.classList.remove('bg-canvas', 'text-ink', 'shadow-sm');
+      btnCompact.classList.add('text-text-muted');
+    });
+  }
+</script></main><footer class="w-full bg-ink text-canvas-soft pt-20 pb-12"><div class="max-w-7xl mx-auto px-6 lg:px-12"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16"><div class="lg:col-span-2 flex flex-col justify-between pr-8"><div class="space-y-4"><div class="flex items-center gap-3"><span class="font-title-lg text-title-lg tracking-tight text-canvas">ShelfStack</span><span class="px-2 py-0.5 rounded-full bg-canvas-soft/10 text-caption font-caption text-text-faint">System Vault</span></div><p class="text-body-sm font-body-sm text-text-muted max-w-sm">Curated architectural artifacts, deterministic digital gear, and physical workspaces for technologists who refuse aesthetic compromise.</p></div><div class="mt-8"><span class="text-caption font-caption uppercase tracking-widest text-text-muted block mb-3">The Dispatch Protocol</span><div class="flex items-center bg-ink-soft rounded-full p-1.5 max-w-md"><input class="w-full bg-transparent px-4 py-1 text-body-sm font-body-sm text-canvas placeholder:text-text-muted outline-none" placeholder="curator@workspace.dev" type="email"/><button class="px-5 py-2 rounded-full bg-accent-electric text-canvas font-body-sm text-body-sm font-semibold hover:opacity-90 transition-opacity">Join</button></div></div></div><div><h4 class="text-title-md font-title-md text-canvas mb-4">Shop Departments</h4><ul class="space-y-2.5 text-body-sm font-body-sm text-text-muted"><li><a class="hover:text-canvas transition-colors" data-path="tech-gadgets" href="#">Tech &amp; Gadgets</a></li><li><a class="hover:text-canvas transition-colors" data-path="home-kitchen" href="#">Home &amp; Kitchen</a></li><li><a class="hover:text-canvas transition-colors" data-path="furniture" href="#">Furniture &amp; Space</a></li><li><a class="hover:text-canvas transition-colors" data-path="fashion-edc" href="#">Fashion &amp; EDC</a></li><li><a class="hover:text-canvas transition-colors" data-path="stationery-craft" href="#">Stationery &amp; Tools</a></li></ul></div><div><h4 class="text-title-md font-title-md text-canvas mb-4">Customer Care</h4><ul class="space-y-2.5 text-body-sm font-body-sm text-text-muted"><li><a class="hover:text-canvas transition-colors" data-path="track-order" href="#">Order Tracking</a></li><li><a class="hover:text-canvas transition-colors" data-path="help-center" href="#">Concierge Support</a></li><li><a class="hover:text-canvas transition-colors" data-path="shipping-returns" href="#">Global Transit Rates</a></li><li><a class="hover:text-canvas transition-colors" data-path="warranty-guarantee" href="#">Stack Lifetime Warranty</a></li><li><a class="hover:text-canvas transition-colors" data-path="vault-repair" href="#">Repair &amp; Circularity</a></li></ul></div><div><h4 class="text-title-md font-title-md text-canvas mb-4">Stack Account</h4><ul class="space-y-2.5 text-body-sm font-body-sm text-text-muted"><li><a class="hover:text-canvas transition-colors" data-path="account" href="#">Curator Profile</a></li><li><a class="hover:text-canvas transition-colors" data-path="wishlist" href="#">Saved Hardware</a></li><li><a class="hover:text-canvas transition-colors" data-path="orders" href="#">Ledger &amp; Invoices</a></li><li><a class="hover:text-canvas transition-colors" data-path="cart" href="#">Cart &amp; Checkout</a></li></ul></div></div><div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-caption font-caption text-text-muted"><div class="flex items-center gap-3"><div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-accent-electric animate-pulse"></span><span class="text-canvas font-medium">Operational Systems Online</span></div><span class="text-text-muted">•</span><span>Global Fulfillment Centers 99.98% SLA</span></div><div class="flex items-center gap-6"><a class="hover:text-canvas transition-colors" data-path="privacy-policy" href="#">Privacy Architecture</a><a class="hover:text-canvas transition-colors" data-path="terms-of-service" href="#">Terms of Dispatch</a><span class="text-text-muted">© 2025 ShelfStack Corp. All rights reserved.</span></div></div></div></footer></body></html>

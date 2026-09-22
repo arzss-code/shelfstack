@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-canvas" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>ShelfStack — Minimalist Developer Workspace</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "field": "#f0f0f0", "outline": "#727687", "surface-tint": "#0054d6", "ink-soft": "#262626", "on-primary-container": "#f8f7ff", "on-error-container": "#93000a", "text-muted": "#707070", "accent-electric": "#0066ff", "tertiary": "#585a5a", "surface-container-high": "#e9e8e7", "on-secondary-container": "#636262", "on-primary": "#ffffff", "primary-container": "#0066ff", "hairline": "#e0e0e0", "secondary": "#5f5e5e", "on-tertiary": "#ffffff", "on-error": "#ffffff", "surface-container-low": "#f5f3f3", "tertiary-container": "#717272", "surface-dim": "#dbdad9", "on-secondary-fixed-variant": "#474646", "text-faint": "#adadad", "surface-container": "#efeded", "secondary-fixed": "#e5e2e1", "overlay-scrim": "rgba(115, 115, 115, 0.56)", "on-primary-fixed": "#001849", "on-tertiary-container": "#f8f8f8", "tertiary-fixed-dim": "#c6c6c7", "surface": "#fbf9f9", "on-primary-fixed-variant": "#003fa4", "background": "#fbf9f9", "canvas-soft": "#f3f3f3", "secondary-container": "#e2dfde", "on-background": "#1b1c1c", "inverse-surface": "#303031", "surface-container-highest": "#e4e2e2", "secondary-fixed-dim": "#c8c6c5", "surface-container-lowest": "#ffffff", "on-tertiary-fixed": "#1a1c1c", "inverse-primary": "#b3c5ff", "outline-variant": "#c2c6d8", "primary-fixed-dim": "#b3c5ff", "surface-variant": "#e4e2e2", "primary-fixed": "dae1ff", "ink": "#141414", "surface-bright": "#fbf9f9", "tertiary-fixed": "#e2e2e2", "inverse-on-surface": "#f2f0f0", "error-container": "#ffdad6", "on-surface-variant": "#424656", "on-surface": "#1b1c1c", "on-tertiary-fixed-variant": "#454747", "primary": "#0050cb", "error": "#ba1a1a", "canvas": "#ffffff", "hairline-soft": "#f0f0f0", "on-secondary": "#ffffff" }, "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, "spacing": { "gutter": "1.5rem", "space-lg": "1.5rem", "gutter-mobile": "1rem", "space-sm": "0.5rem", "margin-mobile": "1.25rem", "space-xs": "0.25rem", "space-md": "1rem", "space-xl": "2rem", "margin": "3rem" }, "fontFamily": { "display-mobile": [ "Hanken Grotesk" ], "label-md": [ "DM Sans" ], "body-lg": [ "DM Sans" ], "headline-sm": [ "Hanken Grotesk" ], "headline-lg-mobile": [ "Hanken Grotesk" ], "display": [ "Hanken Grotesk" ], "link": [ "DM Sans" ], "title-lg": [ "Hanken Grotesk" ], "title-md": [ "Hanken Grotesk" ], "headline-md": [ "Hanken Grotesk" ], "headline-md-mobile": [ "Hanken Grotesk" ], "headline-lg": [ "Hanken Grotesk" ], "caption": [ "DM Sans" ], "body-sm": [ "DM Sans" ], "body-md": [ "DM Sans" ] }, "fontSize": { "display-mobile": [ "48px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "label-md": [ "12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "700" } ], "body-lg": [ "20px", { "lineHeight": "28px", "fontWeight": "400" } ], "headline-sm": [ "32px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600" } ], "headline-lg-mobile": [ "36px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "display": [ "80px", { "lineHeight": "80px", "letterSpacing": "-0.03em", "fontWeight": "700" } ], "link": [ "16px", { "lineHeight": "24px", "fontWeight": "600" } ], "title-lg": [ "24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "title-md": [ "20px", { "lineHeight": "26px", "letterSpacing": "-0.005em", "fontWeight": "600" } ], "headline-md": [ "44px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "headline-md-mobile": [ "28px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" } ], "headline-lg": [ "56px", { "lineHeight": "60px", "letterSpacing": "-0.025em", "fontWeight": "700" } ], "caption": [ "12px", { "lineHeight": "16px", "fontWeight": "400" } ], "body-sm": [ "14px", { "lineHeight": "20px", "fontWeight": "400" } ], "body-md": [ "16px", { "lineHeight": "24px", "fontWeight": "400" } ] } } } };</script></head><body class="bg-canvas font-body-md text-ink antialiased min-h-full flex flex-col selection:bg-accent-electric selection:text-on-primary"><header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 pointer-events-none"><div class="h-20 w-full px-margin-mobile lg:px-margin flex items-center justify-between max-w-[1440px] mx-auto"><div class="pointer-events-auto flex items-center gap-space-sm bg-canvas-soft/90 backdrop-blur-xl px-space-md py-space-xs rounded-full shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><a class="flex items-center gap-space-xs" data-path="home" href="#"><img alt="ShelfStack Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xxr3vYezhanvKgo5CiY-uShx9Z_nxpg3u_P87x04A40OQUZh9sYlZWGLokcyGv6XdZPRKhMvMdJNS6CEtao5ecIeCUG00jOkEZDv3htiNQdAHWJcL7YURulUxM5iQCtehrjw7dkJRK5GCi-33XWEmna2C6wl2SnlH0Jo30mvuBheFB51F5jx9qe3V6ldh4PuT2DB8HtgpzQK4yyLrrefFU7iF8zxAJedNiQI_bGz8noloxhRhU692YRfw"/><span class="font-title-md text-title-md font-semibold tracking-tight text-ink">ShelfStack</span></a></div><nav class="pointer-events-auto hidden md:flex items-center gap-space-xs bg-canvas-soft/90 backdrop-blur-xl p-space-xs rounded-full shadow-[0_1px_8px_rgba(0,0,0,0.04)]" data-active-classes="bg-ink text-on-primary font-bold rounded-full shadow-sm"><a class="font-body-sm text-body-sm px-space-md py-space-xs text-on-surface-variant hover:text-ink transition-colors rounded-full" data-path="catalog" href="#">Catalog</a><a class="font-body-sm text-body-sm px-space-md py-space-xs text-on-surface-variant hover:text-ink transition-colors rounded-full" data-path="desk-setups" href="#">Desk Setups</a><a class="font-body-sm text-body-sm px-space-md py-space-xs text-on-surface-variant hover:text-ink transition-colors rounded-full" data-path="accessories" href="#">Accessories</a><a class="font-body-sm text-body-sm px-space-md py-space-xs text-on-surface-variant hover:text-ink transition-colors rounded-full" data-path="new-drops" href="#">New Drops</a></nav><div class="pointer-events-auto flex items-center gap-space-xs bg-canvas-soft/90 backdrop-blur-xl p-space-xs rounded-full shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="hidden lg:flex items-center bg-canvas rounded-full px-space-md py-1.5"><span class="material-symbols-outlined text-text-muted text-[18px] mr-1.5">search</span><input class="bg-transparent text-ink placeholder:text-text-faint text-caption font-caption outline-none w-28 focus:w-36 transition-all" placeholder="Search gear (⌘K)" type="text"/></div><a class="flex items-center gap-1.5 px-space-md py-space-xs rounded-full bg-canvas text-ink hover:bg-ink hover:text-on-primary transition-all" data-path="cart" href="#"><span class="material-symbols-outlined text-[18px]">shopping_bag</span><span class="font-label-md text-label-md">Cart</span><span class="w-5 h-5 rounded-full bg-accent-electric text-on-primary text-[10px] font-bold flex items-center justify-center leading-none">3</span></a><a class="p-space-xs rounded-full hover:bg-canvas transition-colors" data-path="account" href="#"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></a></div></div></header><main class="w-full pt-20 flex-1 bg-canvas"><div class="flex flex-col w-full">
+<!-- Top Notification Pill Bar -->
+<div class="w-full bg-canvas-soft py-2 px-margin-mobile lg:px-margin flex items-center justify-center gap-space-sm text-ink text-caption font-caption">
+<span class="inline-flex items-center gap-1 font-label-md text-label-md bg-ink text-on-primary px-2.5 py-0.5 rounded-full">NEW</span>
+<span class="text-secondary font-body-sm text-body-sm">Series 04 Modular Desk Architecture is now shipping globally.</span>
+<a class="font-link text-link text-accent-electric hover:underline flex items-center gap-0.5" href="#catalog-section">
+      Shop Drop <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+<!-- HERO SECTION -->
+<section class="relative w-full max-w-[1440px] mx-auto px-margin-mobile lg:px-margin pt-space-xl pb-space-xl lg:pb-margin">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
+<!-- Text Narrative Column -->
+<div class="lg:col-span-6 flex flex-col items-start gap-space-md z-10">
+<!-- Eyebrow Pill -->
+<div class="inline-flex items-center gap-2 px-space-md py-1.5 rounded-full bg-canvas-soft text-ink font-label-md text-label-md">
+<span class="w-2 h-2 rounded-full bg-accent-electric animate-pulse"></span>
+<span>Series 04 — Modular Workspace</span>
+<span class="text-text-muted">/</span>
+<span class="text-secondary font-mono">v4.2 PRO</span>
+</div>
+<!-- Headline with terminal dot -->
+<h1 class="font-display text-headline-lg lg:text-display text-ink tracking-tight">
+          Curated tools for mindful craft.
+        </h1>
+<!-- Subtitle -->
+<p class="font-body-lg text-body-lg text-secondary max-w-xl">
+          Precision aluminum risers, magnetic cable routing, and tactile mechanical interfaces designed to disappear into your workflow.
+        </p>
+<!-- CTA Action Row -->
+<div class="flex flex-wrap items-center gap-space-sm pt-space-xs w-full">
+<a class="px-space-lg py-3 rounded-full bg-ink text-on-primary font-label-md text-label-md hover:bg-ink-soft transition-all flex items-center gap-2 shadow-sm" href="#catalog-section">
+<span>Explore Catalog</span>
+<span class="material-symbols-outlined text-[18px]">south</span>
+</a>
+<button class="px-space-lg py-3 rounded-full bg-canvas-soft text-ink hover:bg-field transition-all font-label-md text-label-md flex items-center gap-2" id="open-video-tour" type="button">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+<span>Watch Desk Tour (2m)</span>
+</button>
+</div>
+<!-- Trust & Shipping Chip Group -->
+<div class="flex flex-wrap items-center gap-space-md pt-space-sm">
+<div class="flex items-center gap-1.5">
+<div class="flex items-center text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+<span class="font-body-sm text-body-sm font-semibold text-ink">4.92 / 5</span>
+<span class="font-caption text-caption text-text-muted">(2,410+ developers)</span>
+</div>
+<span class="hidden sm:inline w-1 h-1 rounded-full bg-hairline"></span>
+<div class="flex items-center gap-1.5 text-secondary font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[18px] text-accent-electric">local_shipping</span>
+<span>Free express dispatch over $150</span>
+</div>
+</div>
+</div>
+<!-- Hero Visual Showcase Banner with Spec Chips -->
+<div class="lg:col-span-6 relative mt-space-lg lg:mt-0">
+<div class="relative w-full rounded-lg overflow-hidden bg-field aspect-[4/3] lg:aspect-[5/4] flex items-center justify-center group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]" data-alt="Editorial photograph of an immaculate minimalist developer desk setup featuring a dual walnut and space gray aluminum monitor shelf, mechanical keyboard with PBT keycaps, ultra-wide curved screen displaying syntax-highlighted code, magnetic phone pedestal charger, and wool felt desk mat in bright morning studio daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAev4__GgRSnmHMtfnvTNKciT81g7mt2cpaWbsWGQf7cNX-O_K4kI_qC5uNDy85_ZS0q_sCuahFiG677bDLAnqDnkE1EqfdXVJMM9jRszRf8yag03amfhWeT_BfzwrxaDyCiBDdweGwV-ZVyhT5vWikuMYCxuVS5yBVzwBrYdeAX-OfSPW6LCD4nn272R3cEeanPmmpld1QGLDHapG9_K5bTXkpMj3LTs7gA7EjQeksZxmpib_qGveU"/>
+<!-- Floating Spec Pill: Walnut & Aluminum -->
+<div class="absolute top-6 left-6 bg-canvas/95 backdrop-blur-md px-3.5 py-2 rounded-full flex items-center gap-2 shadow-sm pointer-events-none">
+<span class="w-2 h-2 rounded-full bg-ink"></span>
+<span class="font-label-md text-label-md text-ink">Solid Walnut &amp; Anodized 6063</span>
+</div>
+<!-- Floating Spec Pill: Qi2 15W Dock -->
+<div class="absolute bottom-6 right-6 bg-canvas/95 backdrop-blur-md px-3.5 py-2 rounded-full flex items-center gap-2 shadow-sm pointer-events-none">
+<span class="material-symbols-outlined text-accent-electric text-[18px]">bolt</span>
+<span class="font-label-md text-label-md text-ink">Qi2 15W Magnetic Monolith</span>
+</div>
+<!-- Floating Spec Pill: Load Rating -->
+<div class="absolute bottom-6 left-6 hidden sm:flex bg-canvas/95 backdrop-blur-md px-3 py-1.5 rounded-full items-center gap-2 shadow-sm pointer-events-none">
+<span class="font-caption text-caption text-secondary font-mono">PAYLOAD CAPACITY: 65KG</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- VALUE STRIP: Engineering Highlights -->
+<section class="w-full bg-field py-space-lg">
+<div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-canvas flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-ink text-[20px]">precision_manufacturing</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-ink uppercase tracking-wider">Tolerance ±0.05mm</h4>
+<p class="font-caption text-caption text-secondary">CNC machined billets</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-canvas flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-accent-electric text-[20px]">shield</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-ink uppercase tracking-wider">Lifetime Warranty</h4>
+<p class="font-caption text-caption text-secondary">Zero-wobble promise</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-canvas flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-ink text-[20px]">cable</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-ink uppercase tracking-wider">Concealed Runs</h4>
+<p class="font-caption text-caption text-secondary">Zero desktop cable sightlines</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-canvas flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-ink text-[20px]">forest</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-ink uppercase tracking-wider">FSC Hardwood</h4>
+<p class="font-caption text-caption text-secondary">Sustainably harvested timber</p>
+</div>
+</div>
+</div>
+</section>
+<!-- INTERACTIVE CATALOG HEADER & FILTER SYSTEM -->
+<section class="w-full max-w-[1440px] mx-auto px-margin-mobile lg:px-margin pt-space-xl" id="catalog-section">
+<!-- Section Title & Meta Count -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-lg">
+<div>
+<div class="inline-flex items-center gap-2 font-caption text-caption text-secondary uppercase tracking-widest mb-space-xs">
+<span>CATALOGUE DIRECTORY</span>
+<span>•</span>
+<span class="text-accent-electric font-mono">ALL MODULES READY</span>
+</div>
+<h2 class="font-headline-lg text-headline-sm lg:text-headline-lg text-ink">
+          Tools engineered for clarity.
+        </h2>
+</div>
+<p class="font-body-md text-body-md text-secondary max-w-md">
+        Every unit conforms to our standardized 32mm grid system for seamless interconnectivity across desk surfaces.
+      </p>
+</div>
+<!-- Category Segments Bar (Stadium-pills) -->
+<div class="w-full overflow-x-auto pb-space-xs scrollbar-none">
+<div class="inline-flex items-center gap-1.5 p-1.5 bg-canvas-soft rounded-full">
+<button class="category-btn px-space-md py-2 rounded-full font-label-md text-label-md bg-canvas text-ink shadow-sm transition-all flex items-center gap-1.5" data-category="all" type="button">
+<span>All Modules</span>
+<span class="px-2 py-0.5 rounded-full bg-field text-[11px] font-mono">38</span>
+</button>
+<button class="category-btn px-space-md py-2 rounded-full font-label-md text-label-md text-secondary hover:text-ink transition-all" data-category="shelves" type="button">
+          Desk Shelves &amp; Risers
+        </button>
+<button class="category-btn px-space-md py-2 rounded-full font-label-md text-label-md text-secondary hover:text-ink transition-all" data-category="charging" type="button">
+          Audio &amp; Power
+        </button>
+<button class="category-btn px-space-md py-2 rounded-full font-label-md text-label-md text-secondary hover:text-ink transition-all" data-category="pads" type="button">
+          Desk Pads &amp; Tactile
+        </button>
+<button class="category-btn px-space-md py-2 rounded-full font-label-md text-label-md text-secondary hover:text-ink transition-all" data-category="cable" type="button">
+          Cable Management
+        </button>
+<button class="category-btn px-space-md py-2 rounded-full font-label-md text-label-md text-secondary hover:text-ink transition-all" data-category="lighting" type="button">
+          Lighting &amp; Optics
+        </button>
+</div>
+</div>
+<!-- Sub-filter Toolbar (Sort, Availability, Search Input) -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pt-space-md pb-space-lg">
+<div class="flex flex-wrap items-center gap-space-xs">
+<!-- Stock toggle pill -->
+<button class="px-space-md py-2 rounded-full bg-field text-ink hover:bg-canvas-soft transition-colors font-label-md text-label-md flex items-center gap-2" id="stock-toggle" type="button">
+<span class="w-2 h-2 rounded-full bg-accent-electric" id="stock-dot"></span>
+<span>In Stock Only</span>
+</button>
+<!-- Material Filter Pill -->
+<div class="relative">
+<select class="appearance-none bg-field text-ink px-space-md py-2 pr-8 rounded-full font-label-md text-label-md focus:outline-none cursor-pointer" id="material-filter">
+<option value="all">Material: All Finishes</option>
+<option value="walnut">American Walnut</option>
+<option value="aluminum">Anodized Space Gray</option>
+<option value="felt">Merino Wool Felt</option>
+</select>
+<span class="material-symbols-outlined text-[16px] text-secondary absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+<!-- Sort Filter Pill -->
+<div class="relative">
+<select class="appearance-none bg-field text-ink px-space-md py-2 pr-8 rounded-full font-label-md text-label-md focus:outline-none cursor-pointer" id="sort-filter">
+<option value="featured">Sort: Featured</option>
+<option value="price-asc">Price: Low to High</option>
+<option value="price-desc">Price: High to Low</option>
+<option value="rating">Top Customer Rated</option>
+</select>
+<span class="material-symbols-outlined text-[16px] text-secondary absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Quick Search inside Catalog -->
+<div class="relative w-full sm:w-64">
+<span class="material-symbols-outlined text-secondary text-[18px] absolute left-3.5 top-1/2 -translate-y-1/2">search</span>
+<input class="w-full bg-field text-ink placeholder:text-text-faint text-body-sm font-body-sm pl-10 pr-space-md py-2 rounded-full outline-none focus:bg-canvas focus:ring-2 focus:ring-ink transition-all" id="catalog-search" placeholder="Filter by spec, name..." type="text"/>
+</div>
+</div>
+<!-- PRODUCT CATALOG GRID (8 ITEMS) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter pb-space-xl" id="product-grid">
+<!-- Product 1: Studio Shelf Pro (Best Seller) -->
+<article class="product-card group flex flex-col bg-canvas rounded-lg overflow-hidden transition-all" data-category="shelves" data-material="walnut" data-price="229">
+<div class="relative aspect-square w-full bg-field rounded-lg overflow-hidden flex items-center justify-center p-space-md">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" data-alt="Solid dark American walnut dual monitor riser shelf with bead-blasted matte black aluminum legs, resting on an architectural white surface in clean daylight studio." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw6DSaFPOM4AKU9xa8GY_1ygwwWpjoXuQhKPvjfsNBoMqDMfwEsI4nCn4tUaMSNtpqv5JiBz5R0dO34cJFIkELv8s1i7z_MFC0q3MGVw9GPreBZ37dLhx39XYY5fquGieLtlYb8IgfYD9TBvGmvqOGzmQ89mrp_9FHOxw-K0K8E1yxFKqBwGvlhdCHO9yIsGJGiby0iID74_8o7ZW1kUEQLxs0bcouzrPGXmXmzxkxlfJ3n-_5FqTt"/>
+<span class="absolute top-4 left-4 bg-accent-electric text-on-primary font-label-md text-label-md px-3 py-1 rounded-full uppercase tracking-wider">
+            Best Seller
+          </span>
+<button aria-label="Quick save" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-canvas/90 text-ink hover:text-accent-electric flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">favorite_border</span>
+</button>
+<div class="absolute bottom-3 left-3 right-3 flex items-center gap-1.5">
+<span class="bg-canvas/90 backdrop-blur-sm text-ink px-2.5 py-1 rounded-full text-caption font-caption">Dual Display (46")</span>
+<span class="bg-canvas/90 backdrop-blur-sm text-ink px-2.5 py-1 rounded-full text-caption font-caption">Walnut / Alloy</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1 justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between text-caption font-caption text-secondary mb-1">
+<span>SERIES 04 ARCHITECTURE</span>
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-semibold">4.9</span>
+<span class="text-text-muted">(340)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+              Studio Shelf Pro — Dual Display Riser
+            </h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">
+              Elevates twin 27-32" displays. Integrated aluminum slide rails for under-shelf accessories.
+            </p>
+</div>
+<div class="pt-space-xs flex items-center justify-between">
+<span class="font-title-md text-title-md font-bold text-ink">$229</span>
+<button class="quick-add-btn px-space-md py-2 rounded-full bg-ink text-on-primary hover:bg-accent-electric transition-colors font-label-md text-label-md flex items-center gap-1.5" type="button">
+<span>Add to Bag</span>
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product 2: MagStack 3-in-1 Charging Monolith -->
+<article class="product-card group flex flex-col bg-canvas rounded-lg overflow-hidden transition-all" data-category="charging" data-material="aluminum" data-price="119">
+<div class="relative aspect-square w-full bg-field rounded-lg overflow-hidden flex items-center justify-center p-space-md">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" data-alt="Milled solid aluminum vertical desk stand with magnetic charging circles for smartphone, smartwatch, and earbuds, dark space gray finish with sandblasted anodized surface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD36XqmVxbip0vuRtO5zGqHwYzvLrrfkdoAG8YKSS3WFfyN0PTzArQXCyZuOHbVqDTFx99wTdmxw7nnxP1GXoBh8zXyKA0r_mkT83R3wouO3mqmHbiAV4Zz6x2tsF6IC5wIU_6e7yqDH_a6UoVh6wzpAw3BoNQ82YEA96OPxx9Qn6B6d_wz45AO3b6kMmAhaYlfM4LUp6UKtRg6f0mRxcp8WZnyrnJq-xXcR1pqWdrRop486uTSeMM7"/>
+<span class="absolute top-4 left-4 bg-ink text-on-primary font-label-md text-label-md px-3 py-1 rounded-full uppercase tracking-wider">
+            Qi2 15W Certified
+          </span>
+<button aria-label="Quick save" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-canvas/90 text-ink hover:text-accent-electric flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">favorite_border</span>
+</button>
+<div class="absolute bottom-3 left-3 right-3 flex items-center gap-1.5">
+<span class="bg-canvas/90 backdrop-blur-sm text-ink px-2.5 py-1 rounded-full text-caption font-caption">620g Weighted Base</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1 justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between text-caption font-caption text-secondary mb-1">
+<span>POWER ARCHITECTURE</span>
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-semibold">4.8</span>
+<span class="text-text-muted">(188)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+              MagStack 3-in-1 Charging Monolith
+            </h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">
+              Solid CNC billet with micro-suction stabilization. Delivers full speed concurrent charging.
+            </p>
+</div>
+<div class="pt-space-xs flex items-center justify-between">
+<span class="font-title-md text-title-md font-bold text-ink">$119</span>
+<button class="quick-add-btn px-space-md py-2 rounded-full bg-ink text-on-primary hover:bg-accent-electric transition-colors font-label-md text-label-md flex items-center gap-1.5" type="button">
+<span>Add to Bag</span>
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product 3: Linear Tactile Desk Mat -->
+<article class="product-card group flex flex-col bg-canvas rounded-lg overflow-hidden transition-all" data-category="pads" data-material="felt" data-price="64">
+<div class="relative aspect-square w-full bg-field rounded-lg overflow-hidden flex items-center justify-center p-space-md">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" data-alt="Minimalist dark charcoal wool felt desk pad with natural cork bottom layer, precision die-cut rounded stadium edges, showcasing premium woven texture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0NpSZlmP1w5PoG9cupT7SdJBpPEHNICbLUlGG-JDv-m56nk82bIFQmp2xmhsd41K59CxZ5kCgU4rO20dX81sy8mAbWFBwWyrCQpZOM66326-hBEOQTI0_NGJo3A5BuAGDLvctUr5JGVsKSXZYeZFhaH5kqlhWwEjO9JUxM9vVTc4WkY5I9q8HaO2ZTOqBtn3ZMKYyvehMxwxbe8mZjbXtMchbSN1b3DkkKJCXPKpS3C74lWeRDR_D"/>
+<button aria-label="Quick save" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-canvas/90 text-ink hover:text-accent-electric flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">favorite_border</span>
+</button>
+<div class="absolute bottom-3 left-3 right-3 flex items-center gap-1.5">
+<span class="bg-canvas/90 backdrop-blur-sm text-ink px-2.5 py-1 rounded-full text-caption font-caption">Charcoal / Cork</span>
+<span class="bg-canvas/90 backdrop-blur-sm text-ink px-2.5 py-1 rounded-full text-caption font-caption">900 × 400mm</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1 justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between text-caption font-caption text-secondary mb-1">
+<span>TACTILE SURFACE</span>
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-semibold">4.9</span>
+<span class="text-text-muted">(512)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+              Linear Tactile Wool &amp; Cork Desk Mat
+            </h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">
+              Merino wool top with natural non-slip Portuguese cork underlayer. Ultra-smooth mouse glide.
+            </p>
+</div>
+<div class="pt-space-xs flex items-center justify-between">
+<span class="font-title-md text-title-md font-bold text-ink">$64</span>
+<button class="quick-add-btn px-space-md py-2 rounded-full bg-ink text-on-primary hover:bg-accent-electric transition-colors font-label-md text-label-md flex items-center gap-1.5" type="button">
+<span>Add to Bag</span>
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product 4: Orbit Magnetic Cable Anchor -->
+<article class="product-card group flex flex-col bg-canvas rounded-lg overflow-hidden transition-all" data-category="cable" data-material="aluminum" data-price="39">
+<div class="relative aspect-square w-full bg-field rounded-lg overflow-hidden flex items-center justify-center p-space-md">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" data-alt="Four architectural circular metal magnetic cable collared discs in matte black and titanium gray holding braided USB-C cables neatly aligned on wooden desk." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2MhjmCOA-uhYJqt9YnuYDjj5HzaqIJz_Gy1vzi_gOYwEx5ejVQMrDuRzJG18g3yhwCuiJXTEhIZ-pOH1e0QFlRJg_4d2vAVs6p5wSI23CPn78iMd0P4FUcmW6O5fPo4r1flozaNMzwuQI-l54DSjElc9svLk7orxhfVzZrBQeDsDSCM4uYWI2trvOeNREaiJ3to9KKh9MTzPbSpwt6Q-Fz-Y-LdikB4HYQkRMlbtASuAXZZsPvGF2"/>
+<span class="absolute top-4 left-4 bg-canvas-soft text-ink font-label-md text-label-md px-3 py-1 rounded-full uppercase tracking-wider">
+            Set of 4
+          </span>
+<button aria-label="Quick save" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-canvas/90 text-ink hover:text-accent-electric flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">favorite_border</span>
+</button>
+</div>
+<div class="p-4 flex flex-col flex-1 justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between text-caption font-caption text-secondary mb-1">
+<span>CABLE CONTROL</span>
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-semibold">4.7</span>
+<span class="text-text-muted">(96)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+              Orbit Magnetic Cable Anchor System
+            </h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">
+              Weighted steel organizers snap securely to shelf rails or adhesive magnetic bases.
+            </p>
+</div>
+<div class="pt-space-xs flex items-center justify-between">
+<span class="font-title-md text-title-md font-bold text-ink">$39</span>
+<button class="quick-add-btn px-space-md py-2 rounded-full bg-ink text-on-primary hover:bg-accent-electric transition-colors font-label-md text-label-md flex items-center gap-1.5" type="button">
+<span>Add to Bag</span>
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product 5: Lumen Beam Monitor Lightbar -->
+<article class="product-card group flex flex-col bg-canvas rounded-lg overflow-hidden transition-all" data-category="lighting" data-material="aluminum" data-price="149">
+<div class="relative aspect-square w-full bg-field rounded-lg overflow-hidden flex items-center justify-center p-space-md">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" data-alt="Slim cylindrical matte black aluminum monitor lightbar clamped to the top edge of a thin computer screen casting glare-free warm diffused illumination down onto desk." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVwiKl7boRXB9lInBDjyWD9OpL6OsTCUGKmYK9TfFX4fTK5YdgBiZst6aANjh30ZGU5Y1AkO30b6l4HqrTvPNCKI23UwGlWVon24sNKaPIsa08eIC4OpW7dHEw3yhFRHRVcpd3FF3MQPV0E3tASOo5HlOiyz7lNZMp3ZZ9SQ63DPVz3Ko2fW0FdDRlZg6Br1VoLfkHz54fyTbQBUqc-YtYUO7SBOUn3FUjBm5_ezUuYzT2AAi-Jk7Q"/>
+<span class="absolute top-4 left-4 bg-accent-electric text-on-primary font-label-md text-label-md px-3 py-1 rounded-full uppercase tracking-wider">
+            CRI 98+
+          </span>
+<button aria-label="Quick save" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-canvas/90 text-ink hover:text-accent-electric flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">favorite_border</span>
+</button>
+</div>
+<div class="p-4 flex flex-col flex-1 justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between text-caption font-caption text-secondary mb-1">
+<span>OPTICAL AMBIANCE</span>
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-semibold">4.9</span>
+<span class="text-text-muted">(210)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+              Lumen Beam Monitor Lightbar
+            </h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">
+              Zero screen glare asymmetric optical design. Wireless tactile rotary dial for color temp.
+            </p>
+</div>
+<div class="pt-space-xs flex items-center justify-between">
+<span class="font-title-md text-title-md font-bold text-ink">$149</span>
+<button class="quick-add-btn px-space-md py-2 rounded-full bg-ink text-on-primary hover:bg-accent-electric transition-colors font-label-md text-label-md flex items-center gap-1.5" type="button">
+<span>Add to Bag</span>
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product 6: Hexagon Acoustic Desk Baffles -->
+<article class="product-card group flex flex-col bg-canvas rounded-lg overflow-hidden transition-all" data-category="pads" data-material="felt" data-price="85">
+<div class="relative aspect-square w-full bg-field rounded-lg overflow-hidden flex items-center justify-center p-space-md">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" data-alt="Modern architectural acoustic sound-dampening desk divider screens in light stone gray felt attached with black low-profile steel brackets." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB794oCU7yJKuQzUmMAftKCZjmcViW9i0Cw9tokwesYyJBmxw2gtsoDYFYccktj8yfyJwcTXuA-mgv4mcoe38BKsBXSIv2q6hU-3tIDZIRlb9cO1bG0ZaH-UjjnG9LaQR28j4HThfvb_o1wiCmIjnsIqt6WH-AckBetft5HN61OpeHEffbc64HtIdYEPCWT_SUaCREzCE5aMD7LgcDaiCmWN6Tnw_5atNptnbMUBK2yOj9rMO3qxR3r"/>
+<button aria-label="Quick save" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-canvas/90 text-ink hover:text-accent-electric flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">favorite_border</span>
+</button>
+</div>
+<div class="p-4 flex flex-col flex-1 justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between text-caption font-caption text-secondary mb-1">
+<span>ACOUSTIC PRIVACY</span>
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-semibold">4.6</span>
+<span class="text-text-muted">(74)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+              Hexagon Modular Acoustic Baffles
+            </h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">
+              High density PET felt absorbs keystroke reflections and echoes during voice calls.
+            </p>
+</div>
+<div class="pt-space-xs flex items-center justify-between">
+<span class="font-title-md text-title-md font-bold text-ink">$85</span>
+<button class="quick-add-btn px-space-md py-2 rounded-full bg-ink text-on-primary hover:bg-accent-electric transition-colors font-label-md text-label-md flex items-center gap-1.5" type="button">
+<span>Add to Bag</span>
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product 7: KeyHub Machined Aluminum Keyboard Rest -->
+<article class="product-card group flex flex-col bg-canvas rounded-lg overflow-hidden transition-all" data-category="shelves" data-material="aluminum" data-price="55">
+<div class="relative aspect-square w-full bg-field rounded-lg overflow-hidden flex items-center justify-center p-space-md">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" data-alt="Sculpted unibody aluminum wrist rest for mechanical keyboard with micro-bead finish and non-slip rubber silicone pads." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnnzZP8lHCu_7zN5Lqur3Aup7hi1cpRK3hrKAYDAdZeavSm_CuuMRQfCcej4d4N8lm09hV19zjT4tgoxgk_J_cV69oaBkhTCbP4BPalbLHlezRulr5Mu6vNs-RkSlQOZ0WKZpeJCU09s6QM57jh-DA52Ih_Tzw-NU2zabNvFQMmCIyLmObfLpcYXhy7VUCDMtwLcrqK4TZZllQ-sh5Fw8hpXB3YGzkwntsUhQF_bFU2VoflZ9lVkWG"/>
+<button aria-label="Quick save" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-canvas/90 text-ink hover:text-accent-electric flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">favorite_border</span>
+</button>
+</div>
+<div class="p-4 flex flex-col flex-1 justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between text-caption font-caption text-secondary mb-1">
+<span>ERGONOMIC REST</span>
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-semibold">4.8</span>
+<span class="text-text-muted">(142)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+              KeyHub Machined Aluminum Palm Rest
+            </h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">
+              Engineered 8-degree ergonomic slant matches custom mechanical mechanical boards.
+            </p>
+</div>
+<div class="pt-space-xs flex items-center justify-between">
+<span class="font-title-md text-title-md font-bold text-ink">$55</span>
+<button class="quick-add-btn px-space-md py-2 rounded-full bg-ink text-on-primary hover:bg-accent-electric transition-colors font-label-md text-label-md flex items-center gap-1.5" type="button">
+<span>Add to Bag</span>
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product 8: VoltHub Under-Desk Cable Management Tray -->
+<article class="product-card group flex flex-col bg-canvas rounded-lg overflow-hidden transition-all" data-category="cable" data-material="aluminum" data-price="78">
+<div class="relative aspect-square w-full bg-field rounded-lg overflow-hidden flex items-center justify-center p-space-md">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" data-alt="Wide under-desk powder-coated steel cable raceway tray holding large power brick surge protectors and cables out of sight, clean industrial construction." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJ5rSJhBW1VLSidJds0aWmJ3nDfFddwO_LLfpM1aulsMrnOlfma1zTe-5oBUKbDwEeC3_I3fu4s9ReOa4t0sJRQfcdHKPqoXqe75Sij4j3KfGQfCL0_fv1uzK3ZdKvjOmNXH2Xmw7a_nQRcpyZbBvCFP8RKq6QxmzFgJVJ4HNoHo_9Uw6r7gEx3MaTqapI5-9A8BFZoIqk1BagmAX9cTP6Ei5KE8pK2ofwSl6LsieeKn0rFD9-WsAU"/>
+<button aria-label="Quick save" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-canvas/90 text-ink hover:text-accent-electric flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">favorite_border</span>
+</button>
+<div class="absolute bottom-3 left-3 right-3 flex items-center gap-1.5">
+<span class="bg-canvas/90 backdrop-blur-sm text-ink px-2.5 py-1 rounded-full text-caption font-caption">Easy Drop-Down Hinges</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1 justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between text-caption font-caption text-secondary mb-1">
+<span>UNDER-SURFACE CONCEAL</span>
+<div class="flex items-center gap-1 text-ink">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-semibold">4.9</span>
+<span class="text-text-muted">(289)</span>
+</div>
+</div>
+<h3 class="font-title-md text-title-md text-ink group-hover:text-accent-electric transition-colors">
+              VoltHub Under-Desk Cable Raceway
+            </h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1">
+              Drop-down dual-hinge architecture accommodates oversized laptop bricks and power strips.
+            </p>
+</div>
+<div class="pt-space-xs flex items-center justify-between">
+<span class="font-title-md text-title-md font-bold text-ink">$78</span>
+<button class="quick-add-btn px-space-md py-2 rounded-full bg-ink text-on-primary hover:bg-accent-electric transition-colors font-label-md text-label-md flex items-center gap-1.5" type="button">
+<span>Add to Bag</span>
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- INTERACTIVE CONFIGURATOR / BUNDLER SECTION -->
+<section class="w-full bg-canvas-soft py-margin my-space-xl">
+<div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
+<!-- Left: Configurator Steps & Options -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<div class="inline-flex items-center gap-2 px-space-md py-1 rounded-full bg-canvas text-ink font-label-md text-label-md w-fit">
+<span class="text-accent-electric font-bold">15% SAVINGS</span>
+<span>Stack Builder Engine</span>
+</div>
+<h2 class="font-headline-lg text-headline-sm lg:text-headline-lg text-ink">
+            Build your synchronized workspace.
+          </h2>
+<p class="font-body-md text-body-md text-secondary">
+            Select an architectural foundation and snap complimentary accessories directly into the integrated magnetic rails.
+          </p>
+<!-- Step Progress Track -->
+<div class="grid grid-cols-3 gap-2 pt-space-xs">
+<div class="flex flex-col gap-1">
+<span class="font-caption text-caption text-ink font-semibold">01 Foundation</span>
+<div class="h-1.5 rounded-full bg-accent-electric w-full"></div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-caption text-caption text-ink font-semibold">02 Surface &amp; Mat</span>
+<div class="h-1.5 rounded-full bg-ink w-full"></div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-caption text-caption text-secondary">03 Cable Routing</span>
+<div class="h-1.5 rounded-full bg-field w-full"></div>
+</div>
+</div>
+<!-- Interactive Choice Group -->
+<div class="flex flex-col gap-space-sm pt-space-sm">
+<span class="font-label-md text-label-md uppercase tracking-wider text-secondary">Step 1: Choose Riser Material</span>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm" id="bundle-step-riser">
+<label class="bundle-option cursor-pointer p-4 rounded-lg bg-canvas flex flex-col gap-2 transition-all ring-2 ring-ink">
+<input checked="" class="sr-only" name="riser" type="radio" value="walnut"/>
+<div class="flex items-center justify-between">
+<span class="font-title-md text-title-md text-ink">Walnut Solid</span>
+<span class="w-4 h-4 rounded-full bg-accent-electric"></span>
+</div>
+<span class="font-caption text-caption text-secondary">American black walnut, matte sealed</span>
+<span class="font-label-md text-label-md text-ink font-bold mt-2">$229</span>
+</label>
+<label class="bundle-option cursor-pointer p-4 rounded-lg bg-canvas flex flex-col gap-2 transition-all">
+<input class="sr-only" name="riser" type="radio" value="oak"/>
+<div class="flex items-center justify-between">
+<span class="font-title-md text-title-md text-ink">White Oak</span>
+<span class="w-4 h-4 rounded-full bg-field"></span>
+</div>
+<span class="font-caption text-caption text-secondary">Scandinavian white oak, natural wax</span>
+<span class="font-label-md text-label-md text-ink font-bold mt-2">$219</span>
+</label>
+<label class="bundle-option cursor-pointer p-4 rounded-lg bg-canvas flex flex-col gap-2 transition-all">
+<input class="sr-only" name="riser" type="radio" value="anodized"/>
+<div class="flex items-center justify-between">
+<span class="font-title-md text-title-md text-ink">Full Alloy</span>
+<span class="w-4 h-4 rounded-full bg-field"></span>
+</div>
+<span class="font-caption text-caption text-secondary">Anodized Space Gray 6063-T6</span>
+<span class="font-label-md text-label-md text-ink font-bold mt-2">$249</span>
+</label>
+</div>
+</div>
+<!-- Addon Checkboxes -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<span class="font-label-md text-label-md uppercase tracking-wider text-secondary">Include Snap-On Modules</span>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+<label class="flex items-center justify-between p-3.5 bg-canvas rounded-DEFAULT cursor-pointer">
+<div class="flex items-center gap-3">
+<input checked="" class="w-4 h-4 accent-ink cursor-pointer" id="add-mat" type="checkbox"/>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-ink">Linear Wool Felt Mat</div>
+<div class="font-caption text-caption text-secondary">Custom notch cut for riser feet</div>
+</div>
+</div>
+<span class="font-label-md text-label-md text-ink">+$64</span>
+</label>
+<label class="flex items-center justify-between p-3.5 bg-canvas rounded-DEFAULT cursor-pointer">
+<div class="flex items-center gap-3">
+<input checked="" class="w-4 h-4 accent-ink cursor-pointer" id="add-cables" type="checkbox"/>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-ink">Orbit Cable Anchor (4-pack)</div>
+<div class="font-caption text-caption text-secondary">Snaps to underside track</div>
+</div>
+</div>
+<span class="font-label-md text-label-md text-ink">+$39</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Right: Live Bundle Summary Card -->
+<div class="lg:col-span-5">
+<div class="bg-canvas p-space-lg rounded-lg flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-electric">tune</span>
+<span class="font-title-md text-title-md text-ink">Configured Bundle</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-field font-label-md text-label-md text-ink">3 Modules</span>
+</div>
+<!-- Preview Visual Mock -->
+<div class="w-full h-44 rounded-DEFAULT bg-field flex items-center justify-center p-space-sm overflow-hidden">
+<img class="h-full object-contain mix-blend-multiply" data-alt="Architectural exploded layout of a dark walnut monitor shelf with dark felt mat and steel magnetic cable clips arranged cleanly on light background." id="bundle-preview-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRyKW722EqtxIqnVHxjRtkAE-gbY6_1rQEu2ZN7buBEVtgzs9c5OOYFfPUhHlRolggS4DixRfljiOBLvTT83jCB9ollM9RwcwHghHglAUf6k-lRg2TKX4if45mrhUGxShih2-PxSaVBp2WJGXuIN_9ewI-WbSq-xIjExfS445Y-43Owmyl7C9fiBDVemux9XLYUQJFyMKh-1Mlqgm_Yiyd4_0xWD1zb9a3ePBs9bloFcnGxe9WOvW2"/>
+</div>
+<!-- Breakdown -->
+<div class="flex flex-col gap-2 font-body-sm text-body-sm text-secondary pt-2">
+<div class="flex justify-between">
+<span>Studio Shelf Pro (Solid Walnut)</span>
+<span class="text-ink font-mono font-medium">$229.00</span>
+</div>
+<div class="flex justify-between" id="bundle-row-mat">
+<span>Linear Wool Felt Desk Mat</span>
+<span class="text-ink font-mono font-medium">$64.00</span>
+</div>
+<div class="flex justify-between" id="bundle-row-cables">
+<span>Orbit Magnetic Cable Anchors</span>
+<span class="text-ink font-mono font-medium">$39.00</span>
+</div>
+<div class="flex justify-between text-accent-electric pt-2">
+<span>Bundle Optimization (15%)</span>
+<span class="font-mono font-bold" id="bundle-discount">-$49.80</span>
+</div>
+</div>
+<!-- Total Bar -->
+<div class="flex items-center justify-between pt-space-xs">
+<div>
+<span class="font-caption text-caption text-secondary uppercase block">Subtotal</span>
+<span class="font-headline-sm text-headline-sm text-ink font-bold" id="bundle-total-price">$282.20</span>
+</div>
+<button class="px-space-lg py-3 rounded-full bg-accent-electric text-on-primary font-label-md text-label-md hover:bg-primary transition-colors flex items-center gap-2" id="add-bundle-btn" type="button">
+<span>Claim Bundle</span>
+<span class="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
+</button>
+</div>
+<p class="font-caption text-caption text-secondary text-center">
+              Includes pre-assembled magnetic clips, hardware, and complimentary surface balm.
+            </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- "ENGINEERED TO DISAPPEAR" ARCHITECTURAL HIGHLIGHTS -->
+<section class="w-full max-w-[1440px] mx-auto px-margin-mobile lg:px-margin py-space-xl">
+<div class="max-w-2xl mb-space-lg">
+<div class="font-caption text-caption text-secondary uppercase tracking-widest mb-space-xs">MATERIAL ETHOS</div>
+<h2 class="font-headline-lg text-headline-sm lg:text-headline-lg text-ink">
+        Engineered to disappear.
+      </h2>
+<p class="font-body-md text-body-md text-secondary mt-2">
+        A workspace should never fight for attention. Our structural forms are reduced to absolute utility so your code and concepts occupy the center stage.
+      </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Feature 1 -->
+<div class="p-space-lg bg-canvas rounded-lg flex flex-col justify-between group">
+<div>
+<div class="w-12 h-12 rounded-full bg-field flex items-center justify-center text-ink mb-space-md group-hover:bg-ink group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">view_in_ar</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-ink mb-2">Aerospace 6063 Aluminum</h3>
+<p class="font-body-md text-body-md text-secondary">
+            CNC machined billets are bead-blasted with sub-micron glass beads to produce a soft, diffuse luster identical to high-end mobile workstations.
+          </p>
+</div>
+<div class="mt-space-md aspect-[16/10] rounded-DEFAULT bg-field overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Extreme macro detail of bead-blasted matte space gray aluminum chamfered edge showing subtle texture and laser etched logo." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2G12FKQhoKUpoMBHNsn9_j8RKDtQJHcEswF8fW3KtGEzzwPRM0mSg3wC7P9sFfJJF_5A6FAcxZ3D0Cod0iRbVd3FB-NUKtT358Lhf1mMGYa91szWIG6u_nQIhQWM6bmdzEXaaWyYMR94aaY5ZmkHp-pbgs3lVoKrsg1j_ghd1ePljAARPoRitaukdMPoyfbxrSDhPncTkaTiM-Yiqlfj3p06zq-RVOqteWao80gZOGv_JeTw7qZ3S"/>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="p-space-lg bg-canvas rounded-lg flex flex-col justify-between group">
+<div>
+<div class="w-12 h-12 rounded-full bg-field flex items-center justify-center text-ink mb-space-md group-hover:bg-ink group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">grid_view</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-ink mb-2">Modular Continuous Rails</h3>
+<p class="font-body-md text-body-md text-secondary">
+            Under-shelf channels feature embedded rare-earth magnets allowing storage bins, headphone brackets, and hubs to slide and lock without tools.
+          </p>
+</div>
+<div class="mt-space-md aspect-[16/10] rounded-DEFAULT bg-field overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Underside architectural view of wooden shelf rail showing modular aluminum magnetic tray docking smoothly into channel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaDuDMYnVj_K1WvRWu0B9tjMoJQ9rFBvqLo1hCQ9qLNzUe1oMSeVBv7h-uSGlj8DUMmOdd6GGzjZpRbcnifFtw7Jjxk3QO-PvAr9iMo9m4paAC88uKAufh9jDCYJDfgTmgA6E38Dgff0zpPTk6SCQFxWdNcUxeL1Fo10fdoO6RxfiSSArC2AxXhzI9eiMlmVuzEXfnAXiQDoukiwKx1VSxGFL-zqWLIftaCSTeH9pa-oYb3eHi5AOU"/>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="p-space-lg bg-canvas rounded-lg flex flex-col justify-between group">
+<div>
+<div class="w-12 h-12 rounded-full bg-field flex items-center justify-center text-ink mb-space-md group-hover:bg-ink group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">all_inclusive</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-ink mb-2">Zero Visual Clutter</h3>
+<p class="font-body-md text-body-md text-secondary">
+            Every cable is guided vertically through discreet leg conduits and under-surface raceways, ensuring complete spatial serenity.
+          </p>
+</div>
+<div class="mt-space-md aspect-[16/10] rounded-DEFAULT bg-field overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Rear architectural shot of organized cables passing invisible through black anodized shelf riser leg grommet." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB76dd98slWPBeLEkEmfZzwe-9egLvLj1dSfua4qn2uDsriVm-KPMH2AmWVuXWkJY4atQkWTsDKFC_dQsI0mrAwLM87IXVjK1foKH0OiJwCKl2D00Kl5OAs402wHwLV69rioOCD0wNzFoPhZLKcwe9JszDtGvtq4C5MCUtONJQXegFhpYOckdY88XyVOX36cs6_ekSZDWgvUXoxqcmXlNpLnr1ZF80Nss7SxhvueNI_vVON0U_jH0lH"/>
+</div>
+</div>
+</div>
+</section>
+<!-- SOCIAL PROOF / TESTIMONIAL CAROUSEL SECTION -->
+<section class="w-full bg-canvas-soft py-margin">
+<div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-lg">
+<div>
+<span class="font-caption text-caption text-secondary uppercase tracking-widest block mb-space-xs">VERIFIED WORKSPACE REVIEWS</span>
+<h2 class="font-headline-lg text-headline-sm lg:text-headline-lg text-ink">
+            Adopted by relentless creators.
+          </h2>
+</div>
+<div class="flex items-center gap-space-xs">
+<button aria-label="Previous review" class="w-11 h-11 rounded-full bg-canvas text-ink hover:bg-field flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">west</span>
+</button>
+<button aria-label="Next review" class="w-11 h-11 rounded-full bg-canvas text-ink hover:bg-field flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">east</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Review 1 -->
+<div class="bg-canvas p-space-lg rounded-lg flex flex-col justify-between">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-caption text-caption text-accent-electric font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified</span> Verified Buyer
+              </span>
+</div>
+<p class="font-body-md text-body-md text-ink italic">
+              "The Studio Shelf Pro completely transformed my dual Pro Display XDR setup. The aluminum finish matches Apple Space Gray seamlessly. Zero wobble even at max standing desk velocity."
+            </p>
+</div>
+<div class="pt-space-md flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-ink text-on-primary flex items-center justify-center font-bold text-caption">
+              AK
+            </div>
+<div>
+<div class="font-title-md text-body-md font-bold text-ink">Alexandre Kovacs</div>
+<div class="font-caption text-caption text-secondary">Staff Infrastructure Engineer, Linear</div>
+</div>
+</div>
+</div>
+<!-- Review 2 -->
+<div class="bg-canvas p-space-lg rounded-lg flex flex-col justify-between">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-caption text-caption text-accent-electric font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified</span> Verified Buyer
+              </span>
+</div>
+<p class="font-body-md text-body-md text-ink italic">
+              "The MagStack and under-desk cable tray removed every visible wire from my desk. In eight hours of deep work, having zero visual noise genuinely keeps my cognitive focus dialed in."
+            </p>
+</div>
+<div class="pt-space-md flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-accent-electric text-on-primary flex items-center justify-center font-bold text-caption">
+              SL
+            </div>
+<div>
+<div class="font-title-md text-body-md font-bold text-ink">Sarah Lindqvist</div>
+<div class="font-caption text-caption text-secondary">Founding Designer, Vercel Ecosystem</div>
+</div>
+</div>
+</div>
+<!-- Review 3 -->
+<div class="bg-canvas p-space-lg rounded-lg flex flex-col justify-between">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex text-ink">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-caption text-caption text-accent-electric font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified</span> Verified Buyer
+              </span>
+</div>
+<p class="font-body-md text-body-md text-ink italic">
+              "The wool felt desk mat has the perfect balance of friction and cushion for heavy typing sessions. ShelfStack's packaging and tolerances feel more like Leica hardware than office accessories."
+            </p>
+</div>
+<div class="pt-space-md flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-field text-ink flex items-center justify-center font-bold text-caption">
+              MR
+            </div>
+<div>
+<div class="font-title-md text-body-md font-bold text-ink">Marcus Reed</div>
+<div class="font-caption text-caption text-secondary">Principal Architect, Stripe Terminal</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- QUICK CART TOAST / SLIDE-IN CONFIRMATION NOTIFICATION -->
+<div class="fixed bottom-6 right-6 bg-ink text-on-primary p-space-md rounded-lg shadow-xl translate-y-24 opacity-0 transition-all duration-300 z-50 flex items-center gap-space-md pointer-events-none" id="cart-toast">
+<div class="w-8 h-8 rounded-full bg-accent-electric flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md">Item Added to Bag</h4>
+<p class="font-caption text-caption text-text-muted" id="toast-desc">Studio Shelf Pro configured</p>
+</div>
+<a class="px-3 py-1 bg-ink-soft hover:bg-surface-tint text-on-primary font-label-md text-label-md rounded-full pointer-events-auto transition-colors" data-path="cart" href="#">
+      View
+    </a>
+</div>
+<!-- EMBEDDED CLIENT SCRIPT FOR INTERACTIVITY -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Category Pill Filter Logic
+      const categoryButtons = document.querySelectorAll('.category-btn');
+      const productCards = document.querySelectorAll('.product-card');
+      const searchInput = document.getElementById('catalog-search');
+      const stockToggle = document.getElementById('stock-toggle');
+      const stockDot = document.getElementById('stock-dot');
+      const sortSelect = document.getElementById('sort-filter');
+      const materialSelect = document.getElementById('material-filter');
+
+      let currentCategory = 'all';
+      let inStockOnly = true;
+
+      categoryButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          categoryButtons.forEach(b => {
+            b.classList.remove('bg-canvas', 'text-ink', 'shadow-sm');
+            b.classList.add('text-secondary');
+          });
+          btn.classList.remove('text-secondary');
+          btn.classList.add('bg-canvas', 'text-ink', 'shadow-sm');
+
+          currentCategory = btn.dataset.category;
+          filterCatalog();
+        });
+      });
+
+      // Stock filter toggle
+      stockToggle.addEventListener('click', () => {
+        inStockOnly = !inStockOnly;
+        if (inStockOnly) {
+          stockDot.classList.replace('bg-text-faint', 'bg-accent-electric');
+          stockToggle.classList.add('bg-field');
+        } else {
+          stockDot.classList.replace('bg-accent-electric', 'bg-text-faint');
+          stockToggle.classList.remove('bg-field');
+        }
+        filterCatalog();
+      });
+
+      // Material Select filter
+      materialSelect.addEventListener('change', filterCatalog);
+
+      // Search input filter
+      searchInput.addEventListener('input', filterCatalog);
+
+      function filterCatalog() {
+        const query = searchInput.value.toLowerCase().trim();
+        const selectedMaterial = materialSelect.value;
+
+        productCards.forEach(card => {
+          const cardCategory = card.dataset.category;
+          const cardMaterial = card.dataset.material;
+          const cardTitle = card.querySelector('h3').textContent.toLowerCase();
+          const cardDesc = card.querySelector('p').textContent.toLowerCase();
+
+          const matchesCategory = (currentCategory === 'all' || cardCategory === currentCategory);
+          const matchesMaterial = (selectedMaterial === 'all' || cardMaterial === selectedMaterial);
+          const matchesQuery = !query || cardTitle.includes(query) || cardDesc.includes(query);
+
+          if (matchesCategory && matchesMaterial && matchesQuery) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      // Sort Catalog
+      sortSelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        const grid = document.getElementById('product-grid');
+        const cardsArray = Array.from(productCards);
+
+        cardsArray.sort((a, b) => {
+          const priceA = parseFloat(a.dataset.price);
+          const priceB = parseFloat(b.dataset.price);
+
+          if (val === 'price-asc') return priceA - priceB;
+          if (val === 'price-desc') return priceB - priceA;
+          return 0; // default order
+        });
+
+        cardsArray.forEach(card => grid.appendChild(card));
+      });
+
+      // 2. Interactive Bundle Engine
+      const riserOptions = document.querySelectorAll('input[name="riser"]');
+      const addMat = document.getElementById('add-mat');
+      const addCables = document.getElementById('add-cables');
+      const bundleMatRow = document.getElementById('bundle-row-mat');
+      const bundleCablesRow = document.getElementById('bundle-row-cables');
+      const bundleDiscountElem = document.getElementById('bundle-discount');
+      const bundleTotalElem = document.getElementById('bundle-total-price');
+
+      function calculateBundle() {
+        let riserPrice = 229;
+        const selectedRiser = document.querySelector('input[name="riser"]:checked').value;
+        if (selectedRiser === 'oak') riserPrice = 219;
+        if (selectedRiser === 'anodized') riserPrice = 249;
+
+        // Visual selection rings
+        document.querySelectorAll('.bundle-option').forEach(el => {
+          el.classList.remove('ring-2', 'ring-ink');
+          const dot = el.querySelector('span[class*="rounded-full"]:last-child');
+          if (dot) {
+            dot.classList.remove('bg-accent-electric');
+            dot.classList.add('bg-field');
+          }
+        });
+
+        const activeLabel = document.querySelector(`input[name="riser"][value="${selectedRiser}"]`).closest('.bundle-option');
+        if (activeLabel) {
+          activeLabel.classList.add('ring-2', 'ring-ink');
+          const activeDot = activeLabel.querySelector('span[class*="rounded-full"]:last-child');
+          if (activeDot) {
+            activeDot.classList.remove('bg-field');
+            activeDot.classList.add('bg-accent-electric');
+          }
+        }
+
+        let total = riserPrice;
+        if (addMat.checked) {
+          total += 64;
+          bundleMatRow.style.display = 'flex';
+        } else {
+          bundleMatRow.style.display = 'none';
+        }
+
+        if (addCables.checked) {
+          total += 39;
+          bundleCablesRow.style.display = 'flex';
+        } else {
+          bundleCablesRow.style.display = 'none';
+        }
+
+        const discount = total * 0.15;
+        const finalPrice = total - discount;
+
+        bundleDiscountElem.textContent = `-$${discount.toFixed(2)}`;
+        bundleTotalElem.textContent = `$${finalPrice.toFixed(2)}`;
+      }
+
+      riserOptions.forEach(r => r.addEventListener('change', calculateBundle));
+      addMat.addEventListener('change', calculateBundle);
+      addCables.addEventListener('change', calculateBundle);
+
+      // 3. Quick Add Toast Notification
+      const toast = document.getElementById('cart-toast');
+      const toastDesc = document.getElementById('toast-desc');
+      let toastTimer = null;
+
+      function triggerToast(name) {
+        toastDesc.textContent = `${name} added to cart.`;
+        toast.classList.remove('translate-y-24', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove('translate-y-0', 'opacity-100');
+          toast.classList.add('translate-y-24', 'opacity-0');
+        }, 3200);
+      }
+
+      document.querySelectorAll('.quick-add-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const card = e.target.closest('.product-card');
+          const title = card ? card.querySelector('h3').textContent : 'Item';
+          triggerToast(title.trim());
+        });
+      });
+
+      document.getElementById('add-bundle-btn').addEventListener('click', () => {
+        triggerToast('Custom Modular Stack Bundle (3 items)');
+      });
+    });
+  </script>
+</div></main><footer class="w-full bg-ink text-on-primary rounded-t-lg mt-space-xl overflow-hidden"><div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin py-margin"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-gutter items-start pb-margin"><div class="lg:col-span-5 flex flex-col items-start gap-space-md"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm font-bold tracking-tight text-on-primary">ShelfStack</span><div class="w-2 h-2 rounded-full bg-accent-electric animate-pulse"></div></div><p class="font-body-md text-body-md text-text-muted max-w-md">Curated physical architecture for modern developers, code artisans, and ergonomic purists. Engineered with ruthless reduction and tactile permanence.</p><div class="w-full max-w-sm mt-space-xs"><label class="block font-caption text-caption uppercase tracking-wider text-text-muted mb-space-xs">Dispatch Letter</label><div class="flex items-center bg-ink-soft p-space-xs rounded-full"><input class="bg-transparent px-space-md py-space-xs text-on-primary placeholder:text-text-faint font-body-sm text-body-sm outline-none w-full" placeholder="developer@stack.sh" type="email"/><button class="bg-accent-electric text-on-primary font-label-md text-label-md px-space-md py-space-xs rounded-full hover:opacity-90 transition-opacity flex items-center gap-1 shrink-0" type="button"><span>Subscribe</span><span class="material-symbols-outlined text-[14px]">arrow_forward</span></button></div></div></div><div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-gutter"><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-text-muted uppercase tracking-wider">Shop</span><nav class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-primary/80"><a class="hover:text-on-primary transition-colors" data-path="catalog" href="#">Desks &amp; Shelves</a><a class="hover:text-on-primary transition-colors" data-path="catalog" href="#">Monitor Risers</a><a class="hover:text-on-primary transition-colors" data-path="catalog" href="#">Desk Pads &amp; Felt</a><a class="hover:text-on-primary transition-colors" data-path="catalog" href="#">Cable Tray Architecture</a><a class="hover:text-on-primary transition-colors" data-path="new-drops" href="#">New Releases</a></nav></div><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-text-muted uppercase tracking-wider">Stack Ecosystem</span><nav class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-primary/80"><a class="hover:text-on-primary transition-colors" data-path="desk-setups" href="#">Featured Labs</a><a class="hover:text-on-primary transition-colors" data-path="desk-setups" href="#">Architectural Blueprints</a><a class="hover:text-on-primary transition-colors" data-path="catalog" href="#">3D Configurator</a><a class="hover:text-on-primary transition-colors" data-path="home" href="#">Studio Visits</a></nav></div><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-text-muted uppercase tracking-wider">Assurance</span><nav class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-primary/80"><a class="hover:text-on-primary transition-colors" data-path="home" href="#">Lifetime Guarantee</a><a class="hover:text-on-primary transition-colors" data-path="home" href="#">Global Transit</a><a class="hover:text-on-primary transition-colors" data-path="account" href="#">Order Telemetry</a><a class="hover:text-on-primary transition-colors" data-path="home" href="#">Carbon Offsets</a></nav></div></div></div><div class="pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><div class="inline-flex items-center gap-2 bg-ink-soft px-space-md py-1.5 rounded-full"><span class="w-2 h-2 rounded-full bg-accent-electric"></span><span class="font-caption text-caption text-on-primary/90 font-mono">Systems All Normal</span></div><span class="font-caption text-caption text-text-muted">v2.4.0-curatorial</span></div><div class="flex items-center gap-space-md font-caption text-caption text-text-muted"><span>© 2025 ShelfStack Inc. All rights reserved.</span><a class="hover:text-on-primary transition-colors" href="#">Privacy</a><a class="hover:text-on-primary transition-colors" href="#">Terms</a></div></div></div></footer></body></html>

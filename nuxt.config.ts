@@ -28,13 +28,28 @@ export default defineNuxtConfig({
   security: {
     headers: {
       contentSecurityPolicy: {
-        'img-src': ["'self'", 'data:', 'https://*.supabase.co'],
+        'img-src': [
+          "'self'",
+          'data:',
+          'https://*.supabase.co',
+          'https://lh3.googleusercontent.com',
+          'https://images.unsplash.com',
+        ],
       },
     },
   },
 
   tailwindcss: {
     cssPath: '~/assets/css/main.css',
+  },
+
+  // Abaikan nested worktree Kilo (.kilo/) agar Vite watcher + HMR tidak melambat.
+  vite: {
+    server: {
+      watch: {
+        ignored: ['**/.kilo/**'],
+      },
+    },
   },
 
   primevue: {

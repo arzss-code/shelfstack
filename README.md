@@ -1,14 +1,19 @@
-# Product Management
+# ShelfStack
 
-Aplikasi frontend untuk kelola katalog produk internal. Dibangun ngikutin SOP Talenavi untuk nge-handle list produk, tambah/edit data, dan pastinya state management yang rapi.
+Aplikasi fullstack untuk kelola katalog produk internal — berevolusi jadi mini e-commerce
+(storefront publik + admin dashboard + auth + orders). Dibangun ngikutin SOP Talenavi untuk
+nge-handle list produk, tambah/edit data, dan pastinya state management yang rapi.
+
+> Rencana portofolio 12 minggu (Sprint 1–6): lihat `docs/PORTFOLIO-PLAN.md`,
+> `docs/SPRINT-PLAN.md`, dan `docs/BACKLOG.md`.
 
 ## Tech Stack
 
-- **Nuxt 3** (Vue 3)
+- **Nuxt 4** (Vue 3)
 - **PrimeVue 4** (UI Components) + **Tailwind CSS** (Styling)
 - **Pinia** (State Management)
 - **Supabase** (Database & Storage)
-- **Zod** (Schema Validation)
+- **Zod** (Schema Validation, client + server via `shared/schemas/`)
 
 ## Cara Setup
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useActivities } from '~/features/activities/composables/useActivities'
+import type { ActivityLog } from '~/features/activities/composables/useActivities'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import ActivityDetailDialog from '~/features/activities/components/ActivityDetailDialog.vue'
@@ -8,9 +9,14 @@ useSeoMeta({
   title: 'Activity Log',
 })
 
+definePageMeta({
+  layout: 'admin',
+  middleware: 'admin',
+})
+
 const { activities, loading, fetchActivities, subscribeToRealtime } = useActivities()
 const isDialogVisible = ref(false)
-const selectedActivity = ref<any>(null)
+const selectedActivity = ref<ActivityLog | null>(null)
 
 onMounted(() => {
   fetchActivities()
@@ -36,12 +42,12 @@ const getActionSeverity = (action: string) => {
   }
 }
 
-const viewDetails = (activity: any) => {
+const viewDetails = (activity: ActivityLog) => {
   selectedActivity.value = activity
   isDialogVisible.value = true
 }
 
-const rowClass = (data: any) => {
+const rowClass = (data: ActivityLog) => {
   return [{ 'bg-emerald-50 dark:bg-emerald-900/20 transition-colors duration-1000': data.isNew }]
 }
 </script>

@@ -1,0 +1,456 @@
+{
+  "$name": "ShelfStack Design Tokens",
+  "$description": "W3C Design Tokens Community Group (DTCG) format specification for ShelfStack (Gallery Modernist v1.0.0-PROD).",
+  "$version": "1.0.0",
+  "color": {
+    "$type": "color",
+    "primary": {
+      "$value": "#141414",
+      "$description": "Primary brand ink for headers, primary CTA pills, footer inversion, and high-contrast typography."
+    },
+    "ink": {
+      "default": {
+        "$value": "#141414",
+        "$description": "Core text color for headings and interactive elements."
+      },
+      "soft": {
+        "$value": "#262626",
+        "$description": "Lifted dark for secondary lockups, subtitles, and dense table labels."
+      }
+    },
+    "text": {
+      "muted": {
+        "$value": "#707070",
+        "$description": "Secondary copy, plan descriptions, vote counts, and specs qualifiers."
+      },
+      "faint": {
+        "$value": "#adadad",
+        "$description": "Tertiary copy, input placeholders, fine print, and de-emphasized footer links."
+      },
+      "onPrimary": {
+        "$value": "#ffffff",
+        "$description": "Contrasting text on dark primary fills."
+      }
+    },
+    "canvas": {
+      "default": {
+        "$value": "#ffffff",
+        "$description": "Pure white base canvas and default card resting background."
+      },
+      "soft": {
+        "$value": "#f3f3f3",
+        "$description": "6% ink wash: floating nav pill background, featured pricing/spec card fill, segmented control tracks."
+      }
+    },
+    "field": {
+      "$value": "#f0f0f0",
+      "$description": "8% ink wash: borderless form inputs, search bars, and text fields at rest."
+    },
+    "hairline": {
+      "default": {
+        "$value": "#e0e0e0",
+        "$description": "16% neutral border for outlined pill buttons and interactive tabs."
+      },
+      "soft": {
+        "$value": "#f0f0f0",
+        "$description": "1px card borders on white-on-white surfaces without drop shadows."
+      }
+    },
+    "accent": {
+      "default": {
+        "$value": "#0066ff",
+        "$description": "Electric blue reserved exclusively for commercial signals, live telemetry states, and active savings."
+      },
+      "hover": {
+        "$value": "#0052cc",
+        "$description": "Interactive hover state for electric blue signals."
+      }
+    },
+    "status": {
+      "success": {
+        "$value": "#00875a",
+        "$description": "Stock readiness ('In Stock & Ready') and verified authentication states."
+      },
+      "warning": {
+        "$value": "#ffab00",
+        "$description": "Low stock alerts and pre-order allocation tags."
+      }
+    }
+  },
+  "fontFamily": {
+    "$type": "fontFamily",
+    "primary": {
+      "$value": ["Saans", "Hanken Grotesk", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+      "$description": "Primary neo-grotesque font stack with tight kerning and clean geometric numerals."
+    }
+  },
+  "fontWeight": {
+    "$type": "fontWeight",
+    "light": {
+      "$value": 300,
+      "$description": "Airy hero subtitles and lead paragraphs."
+    },
+    "regular": {
+      "$value": 456,
+      "$description": "Signature Saans variable bookish weight for running text and specs."
+    },
+    "semibold": {
+      "$value": 600,
+      "$description": "Interactive links, section labels, and button text."
+    },
+    "display": {
+      "$value": 652,
+      "$description": "Signature chunky display and heading weight."
+    }
+  },
+  "dimension": {
+    "$type": "dimension",
+    "spacing": {
+      "xxs": {
+        "$value": "4px",
+        "$description": "Micro padding, badge gap, hairline offsets."
+      },
+      "xs": {
+        "$value": "8px",
+        "$description": "Base grid step, chips margin, inner item spacing."
+      },
+      "sm": {
+        "$value": "12px",
+        "$description": "Form input vertical padding, compact tag lists."
+      },
+      "md": {
+        "$value": "16px",
+        "$description": "Button horizontal padding, standard component gaps."
+      },
+      "lg": {
+        "$value": "24px",
+        "$description": "Standard card internal padding."
+      },
+      "xl": {
+        "$value": "32px",
+        "$description": "Sub-grid row separation, module gaps."
+      },
+      "xxl": {
+        "$value": "48px",
+        "$description": "Large section vertical rhythm."
+      },
+      "section": {
+        "$value": "80px",
+        "$description": "Standard section vertical division."
+      },
+      "sectionLg": {
+        "$value": "120px",
+        "$description": "Hero-to-content major interlude spacing."
+      }
+    },
+    "borderRadius": {
+      "none": {
+        "$value": "0px",
+        "$description": "Full-bleed strips and edge dividers."
+      },
+      "sm": {
+        "$value": "16px",
+        "$description": "Input fields, FAQ rows, compact review cards."
+      },
+      "md": {
+        "$value": "24px",
+        "$description": "Content cards, product tiles, footer top corners."
+      },
+      "squircle": {
+        "$value": "30%",
+        "$description": "iOS-style squircle icon and studio insignia tiles."
+      },
+      "full": {
+        "$value": "9999px",
+        "$description": "Stadium pills for navigation, buttons, toggles, badges, and tags."
+      }
+    },
+    "borderWidth": {
+      "hairline": {
+        "$value": "1px",
+        "$description": "Standard hairline border replacement for drop shadows."
+      },
+      "focusRing": {
+        "$value": "2px",
+        "$description": "Input focus ring indicator in ink black."
+      }
+    }
+  },
+  "typography": {
+    "$type": "typography",
+    "display": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "80px",
+        "fontWeight": "{fontWeight.display}",
+        "lineHeight": 1.0,
+        "letterSpacing": "0px"
+      },
+      "$description": "Hero statements and large scale hardware counters."
+    },
+    "heading1": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "56px",
+        "fontWeight": "{fontWeight.display}",
+        "lineHeight": 1.0,
+        "letterSpacing": "0px"
+      },
+      "$description": "Primary page heroes and major display titles."
+    },
+    "heading2": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "44px",
+        "fontWeight": "{fontWeight.display}",
+        "lineHeight": 1.13,
+        "letterSpacing": "0px"
+      },
+      "$description": "Section headings on departmental and content pages."
+    },
+    "heading3": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "32px",
+        "fontWeight": "{fontWeight.display}",
+        "lineHeight": 1.13,
+        "letterSpacing": "0px"
+      },
+      "$description": "Card-level titles, brand chips, and award lockups."
+    },
+    "heading4": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "24px",
+        "fontWeight": "{fontWeight.display}",
+        "lineHeight": 1.25,
+        "letterSpacing": "0px"
+      },
+      "$description": "Sub-section headings and plan tier names."
+    },
+    "title": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "20px",
+        "fontWeight": "{fontWeight.semibold}",
+        "lineHeight": 1.3,
+        "letterSpacing": "0px"
+      },
+      "$description": "Feature titles and table row emphasized headers."
+    },
+    "bodyLg": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "20px",
+        "fontWeight": "{fontWeight.light}",
+        "lineHeight": 1.38,
+        "letterSpacing": "0px"
+      },
+      "$description": "Hero subtitles and light narrative counterpoints."
+    },
+    "body": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "16px",
+        "fontWeight": "{fontWeight.regular}",
+        "lineHeight": 1.38,
+        "letterSpacing": "0px"
+      },
+      "$description": "Standard body text, descriptions, and testimonials."
+    },
+    "bodySm": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "14px",
+        "fontWeight": "{fontWeight.regular}",
+        "lineHeight": 1.43,
+        "letterSpacing": "0px"
+      },
+      "$description": "Supporting specs copy, dense catalog cards, and legal notices."
+    },
+    "link": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "16px",
+        "fontWeight": "{fontWeight.semibold}",
+        "lineHeight": 1.38,
+        "letterSpacing": "0px"
+      },
+      "$description": "Navigation links and primary pill button labels."
+    },
+    "label": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "12px",
+        "fontWeight": "{fontWeight.semibold}",
+        "lineHeight": 1.33,
+        "letterSpacing": "0px"
+      },
+      "$description": "Badge chips, status tags, and metadata labels."
+    },
+    "caption": {
+      "$value": {
+        "fontFamily": "{fontFamily.primary}",
+        "fontSize": "12px",
+        "fontWeight": "{fontWeight.regular}",
+        "lineHeight": 1.33,
+        "letterSpacing": "0px"
+      },
+      "$description": "Specs fine print, timestamps, and input placeholders."
+    }
+  },
+  "component": {
+    "navPill": {
+      "background": {
+        "$type": "color",
+        "$value": "{color.canvas.soft}"
+      },
+      "borderRadius": {
+        "$type": "dimension",
+        "$value": "{dimension.borderRadius.full}"
+      },
+      "height": {
+        "$type": "dimension",
+        "$value": "56px"
+      },
+      "paddingX": {
+        "$type": "dimension",
+        "$value": "{dimension.spacing.lg}"
+      }
+    },
+    "buttonPrimary": {
+      "background": {
+        "$type": "color",
+        "$value": "{color.primary}"
+      },
+      "color": {
+        "$type": "color",
+        "$value": "{color.text.onPrimary}"
+      },
+      "borderRadius": {
+        "$type": "dimension",
+        "$value": "{dimension.borderRadius.full}"
+      },
+      "height": {
+        "$type": "dimension",
+        "$value": "44px"
+      },
+      "paddingX": {
+        "$type": "dimension",
+        "$value": "{dimension.spacing.lg}"
+      },
+      "typography": {
+        "$type": "typography",
+        "$value": "{typography.link}"
+      }
+    },
+    "buttonOutline": {
+      "background": {
+        "$type": "color",
+        "$value": "{color.canvas.default}"
+      },
+      "color": {
+        "$type": "color",
+        "$value": "{color.ink.default}"
+      },
+      "borderColor": {
+        "$type": "color",
+        "$value": "{color.hairline.default}"
+      },
+      "borderWidth": {
+        "$type": "dimension",
+        "$value": "{dimension.borderWidth.hairline}"
+      },
+      "borderRadius": {
+        "$type": "dimension",
+        "$value": "{dimension.borderRadius.full}"
+      },
+      "height": {
+        "$type": "dimension",
+        "$value": "44px"
+      },
+      "paddingX": {
+        "$type": "dimension",
+        "$value": "{dimension.spacing.lg}"
+      }
+    },
+    "productCard": {
+      "background": {
+        "$type": "color",
+        "$value": "{color.canvas.default}"
+      },
+      "borderColor": {
+        "$type": "color",
+        "$value": "{color.hairline.soft}"
+      },
+      "borderRadius": {
+        "$type": "dimension",
+        "$value": "{dimension.borderRadius.md}"
+      },
+      "padding": {
+        "$type": "dimension",
+        "$value": "{dimension.spacing.lg}"
+      }
+    },
+    "textInput": {
+      "background": {
+        "$type": "color",
+        "$value": "{color.field}"
+      },
+      "color": {
+        "$type": "color",
+        "$value": "{color.ink.default}"
+      },
+      "placeholderColor": {
+        "$type": "color",
+        "$value": "{color.text.faint}"
+      },
+      "borderRadius": {
+        "$type": "dimension",
+        "$value": "{dimension.borderRadius.sm}"
+      },
+      "paddingY": {
+        "$type": "dimension",
+        "$value": "{dimension.spacing.sm}"
+      },
+      "paddingX": {
+        "$type": "dimension",
+        "$value": "{dimension.spacing.md}"
+      },
+      "focusRingColor": {
+        "$type": "color",
+        "$value": "{color.ink.default}"
+      },
+      "focusRingWidth": {
+        "$type": "dimension",
+        "$value": "{dimension.borderWidth.focusRing}"
+      }
+    },
+    "segmentedControl": {
+      "trackBackground": {
+        "$type": "color",
+        "$value": "{color.canvas.soft}"
+      },
+      "activeBackground": {
+        "$type": "color",
+        "$value": "{color.canvas.default}"
+      },
+      "activeColor": {
+        "$type": "color",
+        "$value": "{color.ink.default}"
+      },
+      "inactiveColor": {
+        "$type": "color",
+        "$value": "{color.text.muted}"
+      },
+      "borderRadius": {
+        "$type": "dimension",
+        "$value": "{dimension.borderRadius.full}"
+      },
+      "padding": {
+        "$type": "dimension",
+        "$value": "{dimension.spacing.xxs}"
+      }
+    }
+  }
+}

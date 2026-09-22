@@ -5,6 +5,6 @@ export default defineVitestConfig({
     environment: 'happy-dom',
     globals: true,
     include: ['**/*.spec.ts', '**/*.test.ts'],
-    exclude: ['node_modules', '.nuxt', 'dist', 'playwright', 'tests/e2e'],
+    exclude: ['node_modules', '.nuxt', '.kilo', 'dist', 'playwright', 'tests/e2e'],
   },
 })
