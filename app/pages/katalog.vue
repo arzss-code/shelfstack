@@ -145,6 +145,26 @@ const clearSearch = () => {
   syncQuery()
 }
 
+const handleSearchUpdate = (val: string) => {
+  searchQuery.value = val
+  syncQuery()
+}
+
+const handleSortUpdate = (val: string) => {
+  selectedSort.value = val
+  syncQuery()
+}
+
+const handlePriceRangeUpdate = (val: string) => {
+  selectedPriceRange.value = val
+  syncQuery()
+}
+
+const handleClearPriceRange = () => {
+  selectedPriceRange.value = 'all'
+  syncQuery()
+}
+
 const resetAllFilters = () => {
   searchQuery.value = ''
   selectedCategory.value = 'all'
@@ -231,14 +251,8 @@ const resetAllFilters = () => {
       :sort-options="sortOptions"
       :grid-density="gridDensity"
       :active-filters-count="activeFiltersCount"
-      @update:search-query="
-        searchQuery = $event
-        syncQuery()
-      "
-      @update:selected-sort="
-        selectedSort = $event
-        syncQuery()
-      "
+      @update:search-query="handleSearchUpdate"
+      @update:selected-sort="handleSortUpdate"
       @update:grid-density="gridDensity = $event"
       @open-mobile-filter="showMobileFilterModal = true"
       @clear-search="clearSearch"
@@ -254,10 +268,7 @@ const resetAllFilters = () => {
       :price-range-label="priceRanges.find((p) => p.id === selectedPriceRange)?.label"
       @clear-search="clearSearch"
       @clear-category="selectCategory('all')"
-      @clear-price-range="
-        selectedPriceRange = 'all'
-        syncQuery()
-      "
+      @clear-price-range="handleClearPriceRange"
       @reset-all="resetAllFilters"
     />
 
@@ -266,10 +277,7 @@ const resetAllFilters = () => {
       <KatalogSidebar
         :price-ranges="priceRanges"
         :selected-price-range="selectedPriceRange"
-        @update:selected-price-range="
-          selectedPriceRange = $event
-          syncQuery()
-        "
+        @update:selected-price-range="handlePriceRangeUpdate"
         @reset="resetAllFilters"
       />
 
@@ -306,10 +314,7 @@ const resetAllFilters = () => {
       :selected-price-range="selectedPriceRange"
       :filtered-products-count="filteredProducts.length"
       @close="showMobileFilterModal = false"
-      @update:selected-price-range="
-        selectedPriceRange = $event
-        syncQuery()
-      "
+      @update:selected-price-range="handlePriceRangeUpdate"
       @reset="resetAllFilters"
     />
   </div>
