@@ -44,7 +44,7 @@ const formattedRating = computed(() => {
 
 const soldCountText = computed(() => {
   const count = props.product.sold_count ?? props.product.review_count ?? 0
-  if (count <= 0) return 'Produk Baru'
+  if (count <= 0) return 'Baru'
   if (count >= 1000) return `${(count / 1000).toFixed(1)}rb+ terjual`
   return `${count} terjual`
 })
@@ -100,20 +100,33 @@ const handleQuickAdd = () => {
 
 <template>
   <article
-    class="product-card group relative flex flex-col bg-brand-canvas border border-brand-hairsoft/80 rounded-2xl overflow-hidden transition-all duration-300 hover:border-brand-hair hover:shadow-floating cursor-pointer"
+    class="product-card group relative flex flex-col bg-white dark:bg-[#18191b] rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
     @click="navigateToDetail"
   >
     <!-- Stretched Semantic Link for Accessibility, Hover URL & SEO -->
     <NuxtLink
       :to="`/product/${product.slug || product.id}`"
-      class="absolute inset-0 z-0"
+      class="absolute inset-0 z-0 rounded-2xl"
       :aria-label="product.name"
       tabindex="-1"
     />
 
-    <!-- Compact Media Canvas (1:1 Aspect Ratio) -->
+    <!-- 3D Ribbon Badge: Solid Blue, Right-Curved, with Fold Effect Underneath -->
+    <div v-if="badgeInfo" class="absolute top-3 -left-2 z-20 pointer-events-none">
+      <div class="relative flex flex-col items-start">
+        <span
+          class="bg-blue-600 text-white text-[10.5px] font-bold tracking-wider uppercase pl-3 pr-3.5 py-1 rounded-r-full rounded-tl-md shadow-sm"
+        >
+          {{ badgeInfo.label }}
+        </span>
+        <!-- 3D Ribbon fold curve underneath left edge matching user reference -->
+        <span class="w-2 h-2.5 bg-blue-900 rounded-bl-md" />
+      </div>
+    </div>
+
+    <!-- Media Canvas: 1:1 Aspect Ratio with rounded-t-2xl -->
     <div
-      class="relative aspect-square w-full bg-[#f6f6f7] dark:bg-[#18191b] overflow-hidden flex items-center justify-center pointer-events-none"
+      class="relative aspect-square w-full bg-[#f6f6f8] dark:bg-[#1f2023] rounded-t-2xl overflow-hidden flex items-center justify-center pointer-events-none"
     >
       <img
         v-if="product.image_url"
@@ -127,83 +140,82 @@ const handleQuickAdd = () => {
       />
       <div
         v-else
-        class="flex flex-col items-center justify-center w-full h-full text-brand-faint gap-1"
+        class="flex flex-col items-center justify-center w-full h-full text-slate-400 gap-1"
       >
         <i class="pi pi-image text-2xl opacity-30" />
         <span class="text-[10px] font-medium tracking-widest uppercase opacity-50">ShelfStack</span>
-      </div>
-
-      <!-- Solid Blue Badge (Melekuk dari Sisi Kanan / Curved on Right) -->
-      <div v-if="badgeInfo" class="absolute top-2.5 left-0 z-10 pointer-events-none">
-        <span
-          class="inline-flex items-center gap-1 bg-brand-accent text-white text-[10.5px] font-bold tracking-wider uppercase pl-2.5 pr-3.5 py-1 rounded-r-full shadow-sm"
-        >
-          {{ badgeInfo.label }}
-        </span>
       </div>
 
       <!-- Floating Quick Add Button (Desktop Hover) -->
       <button
         v-if="hideActions && product.stock > 0"
         type="button"
-        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto w-8 h-8 rounded-full bg-brand-canvas hover:bg-brand-ink hover:text-brand-onink text-brand-ink shadow-whisper border border-brand-hair/80 flex items-center justify-center opacity-0 translate-y-1.5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 active:scale-95 cursor-pointer"
+        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto w-7 h-7 rounded-full bg-white dark:bg-zinc-800 text-slate-800 dark:text-white shadow-sm flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 active:scale-95 cursor-pointer hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600"
         :title="`Tambah ${product.name} ke Keranjang`"
         :aria-label="`Tambah ${product.name} ke Keranjang`"
         @click.stop.prevent="handleQuickAdd"
       >
-        <i v-if="justAdded" class="pi pi-check text-[11px] text-brand-success" />
-        <i v-else class="pi pi-plus text-[11px]" />
+        <i v-if="justAdded" class="pi pi-check text-[10px] text-emerald-500" />
+        <i v-else class="pi pi-plus text-[10px]" />
       </button>
     </div>
 
-    <!-- Compact Content Body -->
+    <!-- Compact Content Body: Zero divider lines, small crisp typography -->
     <div
-      class="p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 flex-1 relative z-10 pointer-events-none"
+      class="p-3 sm:p-3.5 flex flex-col justify-between gap-2 flex-1 relative z-10 pointer-events-none"
     >
       <div class="space-y-1">
-        <!-- Title: 1 line, editorial weight -->
+        <!-- Top Row: Category (Left) and Rating (Right) -->
+        <div class="flex items-center justify-between gap-1.5 min-h-[16px]">
+          <span
+            v-if="categoryName"
+            class="font-body text-[10px] uppercase font-bold text-slate-500 dark:text-zinc-400 tracking-wider truncate"
+          >
+            {{ categoryName }}
+          </span>
+          <span v-else class="text-[10px] text-transparent select-none">-</span>
+
+          <div
+            v-if="product.rating && Number(product.rating) > 0"
+            class="flex items-center gap-1 shrink-0 text-[11px] font-bold text-slate-700 dark:text-zinc-300 tabular-nums"
+          >
+            <i class="pi pi-star-fill text-amber-400 text-[10px]" />
+            <span>{{ formattedRating }}</span>
+          </div>
+        </div>
+
+        <!-- Product Title: Small, crisp font -->
         <h3
-          class="font-display font-medium text-sm sm:text-[14.5px] text-brand-ink tracking-tight truncate group-hover:text-brand-accent transition-colors m-0"
+          class="font-display font-semibold text-xs sm:text-[13px] text-slate-900 dark:text-zinc-100 tracking-tight line-clamp-2 group-hover:text-blue-600 transition-colors m-0 leading-snug"
           :title="product.name"
         >
           {{ product.name }}
         </h3>
-
-        <!-- Terjual & Kategori (Tenang, Bernapas, Tanpa Desak-desakan) -->
-        <p class="font-body m-0 text-xs text-brand-muted tabular-nums flex items-center gap-1.5">
-          <span>{{ soldCountText }}</span>
-          <span v-if="categoryName" class="text-brand-hair">·</span>
-          <span v-if="categoryName" class="truncate">{{ categoryName }}</span>
-        </p>
       </div>
 
-      <!-- Bottom Row: Price on Left, Rating on Right (Balanced & Clean) -->
-      <div
-        class="flex items-center justify-between gap-2 pt-2 border-t border-brand-hairsoft/80 pointer-events-auto"
-        @click.stop
-      >
-        <!-- Price -->
+      <!-- Price & Terjual Row: Side-by-side, No Lines -->
+      <div class="flex items-baseline justify-between gap-2 pt-0.5 pointer-events-auto" @click.stop>
+        <!-- Price on Left -->
         <span
-          class="font-display font-bold text-sm sm:text-base text-brand-ink tabular-nums tracking-tight"
+          class="font-display font-bold text-sm sm:text-[15px] text-slate-900 dark:text-white tabular-nums tracking-tight"
         >
           {{ formatRupiah(product.price) }}
         </span>
 
-        <!-- Rating dipindah ke kanan harga: Rapi, Lega, Tidak Penuh -->
-        <div
+        <!-- Terjual on Right (Sejajar dengan harga) -->
+        <span
           v-if="hideActions"
-          class="flex items-center gap-1 text-xs text-brand-ink font-semibold tabular-nums shrink-0"
+          class="text-[11px] font-medium text-slate-500 dark:text-zinc-400 tabular-nums shrink-0"
         >
-          <i class="pi pi-star-fill text-amber-500 text-[10.5px]" />
-          <span>{{ formattedRating }}</span>
-        </div>
+          {{ soldCountText }}
+        </span>
 
         <!-- Admin Actions (Management Mode) -->
         <div v-else class="flex items-center gap-1">
           <template v-if="isTrash">
             <button
               type="button"
-              class="px-2 py-0.5 rounded text-[11px] font-medium bg-brand-canvas-soft hover:bg-brand-ink hover:text-brand-onink text-brand-ink border border-brand-hair transition-colors"
+              class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 transition-colors"
               @click.stop="emit('restore', product.id)"
             >
               Restore
@@ -212,7 +224,7 @@ const handleQuickAdd = () => {
           <template v-else>
             <button
               type="button"
-              class="w-7 h-7 rounded-full bg-brand-canvas-soft hover:bg-brand-ink hover:text-brand-onink text-brand-muted transition-colors flex items-center justify-center cursor-pointer border border-brand-hair"
+              class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
               title="Ubah"
               @click.stop="emit('edit', product)"
             >
@@ -220,7 +232,7 @@ const handleQuickAdd = () => {
             </button>
             <button
               type="button"
-              class="w-7 h-7 rounded-full bg-brand-canvas-soft hover:bg-red-600 hover:text-white text-brand-muted transition-colors flex items-center justify-center cursor-pointer border border-brand-hair"
+              class="w-7 h-7 rounded-full bg-slate-100 hover:bg-red-600 hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
               title="Hapus"
               @click.stop="emit('delete', product.id)"
             >
