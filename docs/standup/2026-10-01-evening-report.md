@@ -34,20 +34,20 @@ Melanjutkan pengujian alur pesanan dari sisi pembeli hingga selesai (Order Track
 
 ### Aktivitas 1
 
-- **Target Aktivitas:** Melanjutkan Projek Frontend (Clean URL Slugs & Pembenahan Bug Data)
+- **Target Aktivitas:** Testing Projek Urip QR
 - **Target Durasi:** 4h
-- **Keterangan:** Hari ini saya telah mengimplementasikan sistem URL slug yang bersih dan human-readable tanpa suffix ID numerik pada katalog produk, memperkuat keamanan route param dengan validasi backward-compatible, serta memperbaiki bug query profile auth undefined pada saat inisialisasi SSR.
+- **Keterangan:** Hari ini saya telah melakukan pengujian (QA testing) pada fitur Urip Certificate / QR, meliputi validasi integrasi data sertifikat, fungsionalitas pencarian dan filter, pop-up preview dokumen, serta verifikasi keaslian dan keabsahan sertifikat pada environment staging.
 - **Target Description:**
-  - Hari ini saya telah mengimplementasikan sistem slug produk yang ramah SEO dan human-readable (`/product/nama-produk`) tanpa suffix ID.
-  - Hari ini saya telah memperkuat validasi routing produk dan penanganan backward-compatibility pencarian ID produk lama.
-  - Hari ini saya telah memperbaiki bug visual dan error konsol `user_id=eq.undefined` pada pemanggilan Supabase Auth profile saat hidrasi halaman.
+  - Hari ini saya telah melakukan pengujian fungsionalitas pencarian (nama produk & sertifikat) serta pagination pada halaman Urip Certificate.
+  - Hari ini saya telah memvalidasi integrasi data API dan tampilan pop-up preview gambar sertifikat/produk.
+  - Hari ini saya telah memverifikasi kesesuaian Acceptance Criteria fitur sertifikat QR pada environment staging.
 
 ### Aktivitas 2
 
-- **Target Aktivitas:** Melanjutkan Projek Frontend (Redesign Kartu Produk & Fix Visual Sidebar Keranjang)
+- **Target Aktivitas:** Melanjutkan Projek Frontend
 - **Target Durasi:** 4h
-- **Keterangan:** Hari ini saya telah meredesign tampilan kartu produk menjadi modern dan anti-slop (menghilangkan border garis, menyelaraskan harga dan jumlah terjual, memposisikan rating, dan membuat badge pita 3D), serta memperbaiki bug visual stacking z-index dan ukuran gambar pada sidebar keranjang belanja dan checkout.
+- **Keterangan:** Hari ini saya telah meredesign tampilan kartu produk menjadi modern dan anti-slop (menghilangkan border garis, menyelaraskan harga dan jumlah terjual, memposisikan rating, dan membuat badge pita 3D), memperbaiki bug visual stacking z-index dan ukuran gambar pada sidebar keranjang belanja & checkout, serta mengimplementasikan slug URL produk yang ramah SEO.
 - **Target Description:**
   - Hari ini saya telah meredesign kartu katalog produk agar compact, bersih tanpa border garis kaku, dengan kontras warna yang tegas dan badge pita 3D lipat.
   - Hari ini saya telah memperbaiki bug visual drawer keranjang (mengatasi header tertutup navbar via penyesuaian z-index dan memperbaiki thumbnail gambar yang jebol).
-  - Hari ini saya telah memastikan seluruh suite pengujian stabil melalui linting ESLint (0 error), validasi TypeScript `vue-tsc` (0 error), dan Vitest unit tests (38/38 lulus).
+  - Hari ini saya telah mengimplementasikan sistem slug produk yang ramah SEO dan human-readable (`/product/nama-produk`) serta memvalidasi kestabilan fitur melalui linting (0 error) dan unit tests (38/38 lulus).
