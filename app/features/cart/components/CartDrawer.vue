@@ -37,7 +37,7 @@ const goToKatalog = () => {
     >
       <div
         v-if="cartStore.isDrawerOpen"
-        class="fixed inset-0 bg-brand-ink/50 backdrop-blur-xs z-50 transition-opacity"
+        class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-[90] transition-opacity"
         @click="close"
       />
     </Transition>
@@ -52,49 +52,61 @@ const goToKatalog = () => {
     >
       <aside
         v-if="cartStore.isDrawerOpen"
-        class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white z-50 shadow-2xl flex flex-col border-l border-brand-hair select-none"
+        class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white dark:bg-zinc-900 z-[100] shadow-2xl flex flex-col border-l border-slate-100 dark:border-zinc-800 select-none"
         aria-label="Keranjang Belanja"
       >
         <!-- Header -->
         <header
-          class="flex items-center justify-between px-6 py-4 border-b border-brand-hairsoft bg-brand-canvas"
+          class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0"
         >
-          <div class="flex items-center gap-2">
-            <i class="pi pi-shopping-bag text-brand-ink text-lg" />
-            <h2 class="font-display font-bold text-base text-brand-ink m-0">
-              Keranjang
-              <span class="text-xs font-normal text-brand-muted">
-                ({{ cartStore.totalItems }} item)
-              </span>
-            </h2>
+          <div class="flex items-center gap-2.5">
+            <div
+              class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center"
+            >
+              <i class="pi pi-shopping-bag text-sm" />
+            </div>
+            <div>
+              <h2
+                class="font-display font-bold text-sm text-slate-900 dark:text-white m-0 flex items-center gap-1.5"
+              >
+                Keranjang Belanja
+                <span
+                  class="text-[11px] font-semibold text-blue-600 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full"
+                >
+                  {{ cartStore.totalItems }}
+                </span>
+              </h2>
+            </div>
           </div>
           <button
             type="button"
-            class="w-8 h-8 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft transition-colors cursor-pointer"
+            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
             aria-label="Tutup Keranjang"
             @click="close"
           >
-            <i class="pi pi-times text-sm" />
+            <i class="pi pi-times text-xs" />
           </button>
         </header>
 
         <!-- Body / Items List -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-4">
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
           <!-- Empty State -->
           <div
             v-if="cartStore.isEmpty"
-            class="h-full flex flex-col items-center justify-center text-center py-12 space-y-4"
+            class="h-full flex flex-col items-center justify-center text-center py-16 space-y-4"
           >
             <div
-              class="w-16 h-16 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center text-brand-muted shadow-whisper"
+              class="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700 flex items-center justify-center text-slate-400 shadow-sm"
             >
-              <i class="pi pi-shopping-cart text-2xl text-brand-muted" />
+              <i class="pi pi-shopping-cart text-2xl" />
             </div>
             <div>
-              <p class="font-display font-bold text-base text-brand-ink m-0">
+              <p class="font-display font-bold text-sm text-slate-900 dark:text-white m-0">
                 Keranjang Anda Masih Kosong
               </p>
-              <p class="font-body text-xs text-brand-muted m-0 mt-1 max-w-[240px] leading-relaxed">
+              <p
+                class="font-body text-xs text-slate-500 dark:text-zinc-400 m-0 mt-1 max-w-[240px] leading-relaxed"
+              >
                 Jelajahi katalog produk pilihan kami dan temukan kebutuhan perlengkapan Anda.
               </p>
             </div>
@@ -110,15 +122,21 @@ const goToKatalog = () => {
           </div>
 
           <!-- Items Loop -->
-          <div v-else class="divide-y divide-brand-hairsoft">
+          <div v-else class="divide-y divide-slate-100 dark:divide-zinc-800">
             <article
               v-for="item in cartStore.items"
               :key="`${item.productId}-${item.color}-${item.material}`"
-              class="py-4 first:pt-0 last:pb-0 flex gap-3.5 items-start group"
+              class="py-3.5 first:pt-0 last:pb-0 flex gap-3.5 items-start group"
             >
               <!-- Thumbnail -->
               <div
-                class="w-18 h-18 rounded-card bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center"
+                class="w-16 h-16 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700/60 overflow-hidden shrink-0 flex items-center justify-center cursor-pointer"
+                @click="
+                  () => {
+                    close()
+                    router.push(`/product/${item.slug || item.productId}`)
+                  }
+                "
               >
                 <img
                   v-if="item.imageUrl"
@@ -126,15 +144,16 @@ const goToKatalog = () => {
                   :alt="item.name"
                   class="w-full h-full object-cover"
                 />
-                <i v-else class="pi pi-image text-brand-faint text-xl" />
+                <i v-else class="pi pi-image text-slate-300 text-lg" />
               </div>
 
               <!-- Info & Stepper -->
-              <div class="flex-1 min-w-0 flex flex-col justify-between h-full gap-1.5">
+              <div class="flex-1 min-w-0 flex flex-col justify-between min-h-[64px] gap-1.5">
                 <div class="flex items-start justify-between gap-2">
-                  <div>
+                  <div class="min-w-0">
                     <h3
-                      class="font-display font-semibold text-xs text-brand-ink line-clamp-1 m-0 hover:text-brand-accent cursor-pointer transition-colors"
+                      class="font-display font-semibold text-xs text-slate-900 dark:text-white line-clamp-1 m-0 hover:text-blue-600 cursor-pointer transition-colors"
+                      :title="item.name"
                       @click="
                         () => {
                           close()
@@ -146,7 +165,7 @@ const goToKatalog = () => {
                     </h3>
                     <p
                       v-if="item.color || item.material"
-                      class="font-body text-[10px] text-brand-muted m-0 mt-0.5 line-clamp-1"
+                      class="font-body text-[10px] text-slate-500 dark:text-zinc-400 m-0 mt-0.5 line-clamp-1"
                     >
                       <span v-if="item.color">{{ item.color }}</span>
                       <span v-if="item.color && item.material"> · </span>
@@ -157,8 +176,9 @@ const goToKatalog = () => {
                   <!-- Remove Button -->
                   <button
                     type="button"
-                    class="text-brand-faint hover:text-red-600 transition-colors p-1 -mr-1 cursor-pointer"
+                    class="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors p-1 rounded-md cursor-pointer shrink-0 -mr-1"
                     aria-label="Hapus item"
+                    title="Hapus dari keranjang"
                     @click="cartStore.removeItem(item.productId, item.color, item.material)"
                   >
                     <i class="pi pi-trash text-xs" />
@@ -168,11 +188,11 @@ const goToKatalog = () => {
                 <div class="flex items-center justify-between pt-1">
                   <!-- Stepper -->
                   <div
-                    class="flex items-center border border-brand-hair rounded-full bg-brand-field h-7 px-1"
+                    class="flex items-center border border-slate-200 dark:border-zinc-700 rounded-lg bg-slate-50 dark:bg-zinc-800 h-7 px-1 gap-0.5"
                   >
                     <button
                       type="button"
-                      class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-white rounded-full transition-colors cursor-pointer text-xs"
+                      class="w-5 h-5 flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-700 rounded transition-colors cursor-pointer text-xs"
                       aria-label="Kurangi kuantitas"
                       @click="
                         cartStore.updateQuantity(
@@ -183,14 +203,16 @@ const goToKatalog = () => {
                         )
                       "
                     >
-                      <i class="pi pi-minus text-[9px]" />
+                      <i class="pi pi-minus text-[8px]" />
                     </button>
-                    <span class="w-6 text-center text-xs font-semibold text-brand-ink tabular-nums">
+                    <span
+                      class="w-6 text-center text-xs font-bold text-slate-900 dark:text-white tabular-nums"
+                    >
                       {{ item.quantity }}
                     </span>
                     <button
                       type="button"
-                      class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-white rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed"
+                      class="w-5 h-5 flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-700 rounded transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed"
                       :disabled="item.quantity >= item.stock"
                       aria-label="Tambah kuantitas"
                       @click="
@@ -202,12 +224,14 @@ const goToKatalog = () => {
                         )
                       "
                     >
-                      <i class="pi pi-plus text-[9px]" />
+                      <i class="pi pi-plus text-[8px]" />
                     </button>
                   </div>
 
                   <!-- Subtotal Item -->
-                  <span class="font-display text-xs font-bold text-brand-ink tabular-nums">
+                  <span
+                    class="font-display text-xs sm:text-[13px] font-bold text-slate-900 dark:text-white tabular-nums"
+                  >
                     {{ formatRupiah(item.price * item.quantity) }}
                   </span>
                 </div>
@@ -219,37 +243,46 @@ const goToKatalog = () => {
         <!-- Footer / Checkout Action -->
         <footer
           v-if="!cartStore.isEmpty"
-          class="p-6 border-t border-brand-hairsoft bg-brand-canvas space-y-4"
+          class="p-5 border-t border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-3.5 shrink-0"
         >
           <div class="flex items-center justify-between">
-            <span class="text-xs text-brand-muted font-medium">Total Sementara</span>
-            <span class="font-display text-base font-bold text-brand-ink tabular-nums">
+            <span class="text-xs text-slate-500 dark:text-zinc-400 font-medium"
+              >Total Sementara</span
+            >
+            <span
+              class="font-display text-base font-bold text-slate-900 dark:text-white tabular-nums"
+            >
               {{ cartStore.formattedTotalPrice }}
             </span>
           </div>
 
-          <p class="text-[10px] text-brand-muted m-0 leading-tight">
-            Pajak dihitung saat checkout. Biaya pengiriman gratis untuk pembelian minimal Rp500.000.
-          </p>
+          <div
+            class="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-800/80 border border-slate-100 dark:border-zinc-700/50 flex items-center gap-2"
+          >
+            <i class="pi pi-shield-check text-blue-600 text-xs shrink-0" />
+            <p class="text-[10.5px] text-slate-500 dark:text-zinc-400 m-0 leading-tight">
+              Garansi pengiriman resmi &amp; transaksi aman melalui Midtrans.
+            </p>
+          </div>
 
-          <div class="space-y-2">
+          <div class="space-y-2 pt-0.5">
             <UiButton
               variant="primary"
               size="md"
-              class="w-full justify-center"
+              class="w-full justify-center text-xs font-semibold py-2.5 rounded-xl"
               icon="pi-lock"
               @click="goToCheckout"
             >
-              Checkout Pesanan
+              Checkout Sekarang
             </UiButton>
 
             <UiButton
               variant="ghost"
               size="sm"
-              class="w-full justify-center text-xs text-brand-muted hover:text-brand-ink"
+              class="w-full justify-center text-xs text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
               @click="goToCartPage"
             >
-              Buka Halaman Keranjang
+              Buka Halaman Keranjang Lengkap
             </UiButton>
           </div>
         </footer>

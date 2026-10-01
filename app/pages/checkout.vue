@@ -381,24 +381,31 @@ const handleCreateOrder = async () => {
 
       <!-- Right Column: Order Summary & Pay Action -->
       <aside
-        class="lg:col-span-5 bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-24"
+        class="lg:col-span-5 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.05)] space-y-5 sticky top-28"
       >
-        <h2
-          class="font-display text-base font-bold text-brand-ink m-0 pb-3 border-b border-brand-hairsoft"
+        <div
+          class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800"
         >
-          Item Pesanan ({{ cartStore.totalItems }})
-        </h2>
+          <h2 class="font-display text-base font-bold text-slate-900 dark:text-white m-0">
+            Item Pesanan
+          </h2>
+          <span
+            class="text-xs font-semibold text-blue-600 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full"
+          >
+            {{ cartStore.totalItems }} item
+          </span>
+        </div>
 
         <!-- Items Preview Scrollable -->
-        <div class="max-h-60 overflow-y-auto divide-y divide-brand-hairsoft pr-1 space-y-3">
+        <div class="max-h-64 overflow-y-auto divide-y divide-slate-100 dark:divide-zinc-800 pr-1">
           <div
             v-for="item in cartStore.items"
             :key="`${item.productId}-${item.color}-${item.material}`"
-            class="pt-3 first:pt-0 flex items-center justify-between gap-3 text-xs"
+            class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs"
           >
             <div class="flex items-center gap-3 min-w-0">
               <div
-                class="w-12 h-12 rounded-card bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center"
+                class="w-12 h-12 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700/60 overflow-hidden shrink-0 flex items-center justify-center"
               >
                 <img
                   v-if="item.imageUrl"
@@ -406,40 +413,50 @@ const handleCreateOrder = async () => {
                   :alt="item.name"
                   class="w-full h-full object-cover"
                 />
-                <i v-else class="pi pi-image text-brand-faint" />
+                <i v-else class="pi pi-image text-slate-300 text-sm" />
               </div>
               <div class="min-w-0">
-                <p class="font-medium text-brand-ink m-0 truncate">{{ item.name }}</p>
-                <p class="text-[10px] text-brand-muted m-0">
+                <p class="font-semibold text-slate-900 dark:text-white m-0 truncate">
+                  {{ item.name }}
+                </p>
+                <p class="text-[10.5px] text-slate-500 dark:text-zinc-400 m-0">
                   {{ item.quantity }}x @ {{ formatRupiah(item.price) }}
                 </p>
               </div>
             </div>
-            <span class="font-bold text-brand-ink tabular-nums shrink-0">
+            <span class="font-bold text-slate-900 dark:text-white tabular-nums shrink-0">
               {{ formatRupiah(item.price * item.quantity) }}
             </span>
           </div>
         </div>
 
         <!-- Bill Details -->
-        <div class="pt-4 border-t border-brand-hairsoft space-y-2.5 text-xs text-brand-muted">
+        <div
+          class="pt-4 border-t border-slate-100 dark:border-zinc-800 space-y-2.5 text-xs text-slate-600 dark:text-zinc-400"
+        >
           <div class="flex items-center justify-between">
             <span>Subtotal Produk</span>
-            <span class="font-semibold text-brand-ink tabular-nums">
+            <span class="font-semibold text-slate-900 dark:text-white tabular-nums">
               {{ cartStore.formattedTotalPrice }}
             </span>
           </div>
           <div class="flex items-center justify-between">
             <span>Biaya Pengiriman</span>
-            <span class="text-brand-accent font-semibold">Gratis Ongkir</span>
+            <span class="text-emerald-600 font-semibold">Gratis Ongkir</span>
           </div>
           <div class="flex items-center justify-between">
             <span>Pajak PPN (11%)</span>
-            <span class="font-semibold text-brand-ink">Termasuk</span>
+            <span class="font-semibold text-slate-900 dark:text-white">Termasuk</span>
           </div>
-          <div class="pt-3 border-t border-brand-hairsoft flex items-center justify-between">
-            <span class="font-display font-bold text-sm text-brand-ink">Total Tagihan</span>
-            <span class="font-display text-xl font-bold text-brand-ink tabular-nums">
+          <div
+            class="pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between"
+          >
+            <span class="font-display font-bold text-sm text-slate-900 dark:text-white"
+              >Total Tagihan</span
+            >
+            <span
+              class="font-display text-xl font-bold text-slate-900 dark:text-white tabular-nums"
+            >
               {{ cartStore.formattedTotalPrice }}
             </span>
           </div>
@@ -449,7 +466,7 @@ const handleCreateOrder = async () => {
         <UiButton
           variant="primary"
           size="md"
-          class="w-full justify-center"
+          class="w-full justify-center text-xs font-semibold py-3 rounded-xl shadow-sm"
           icon="pi-lock"
           :loading="isSubmitting"
           :disabled="isSubmitting"
@@ -458,8 +475,8 @@ const handleCreateOrder = async () => {
           {{ isSubmitting ? 'Memproses Pesanan...' : 'Bayar Sekarang' }}
         </UiButton>
 
-        <p class="text-[10px] text-center text-brand-muted m-0">
-          Dengan mengklik tombol di atas, Anda menyetujui Ketentuan Layanan ShelfStack.
+        <p class="text-[10.5px] text-center text-slate-400 dark:text-zinc-500 m-0">
+          Transaksi aman terlindungi enkripsi Midtrans Payment Gateway.
         </p>
       </aside>
     </div>

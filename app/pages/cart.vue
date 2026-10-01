@@ -197,34 +197,45 @@ const goToCheckout = () => {
 
       <!-- Summary Sidebar -->
       <aside
-        class="lg:col-span-4 bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-24"
+        class="lg:col-span-4 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.05)] space-y-5 sticky top-28"
       >
-        <h2
-          class="font-display text-lg font-bold text-brand-ink m-0 pb-3 border-b border-brand-hairsoft"
+        <div
+          class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800"
         >
-          Ringkasan Pesanan
-        </h2>
+          <h2 class="font-display text-base font-bold text-slate-900 dark:text-white m-0">
+            Ringkasan Pesanan
+          </h2>
+          <span
+            class="text-xs font-semibold text-blue-600 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full"
+          >
+            {{ cartStore.totalItems }} item
+          </span>
+        </div>
 
-        <div class="space-y-3 text-xs text-brand-muted">
+        <div class="space-y-3 text-xs text-slate-600 dark:text-zinc-400">
           <div class="flex items-center justify-between">
             <span>Total Barang ({{ cartStore.totalItems }})</span>
-            <span class="font-semibold text-brand-ink tabular-nums">
+            <span class="font-semibold text-slate-900 dark:text-white tabular-nums">
               {{ cartStore.formattedTotalPrice }}
             </span>
           </div>
           <div class="flex items-center justify-between">
             <span>Biaya Pengiriman</span>
-            <span class="text-brand-accent font-semibold">Gratis Ongkir</span>
+            <span class="text-emerald-600 font-semibold">Gratis Ongkir</span>
           </div>
           <div class="flex items-center justify-between">
             <span>Estimasi Pajak (PPN 11%)</span>
-            <span class="font-semibold text-brand-ink">Termasuk</span>
+            <span class="font-semibold text-slate-900 dark:text-white">Termasuk</span>
           </div>
         </div>
 
-        <div class="pt-4 border-t border-brand-hairsoft flex items-center justify-between">
-          <span class="font-display font-bold text-sm text-brand-ink">Total Tagihan</span>
-          <span class="font-display text-xl font-bold text-brand-ink tabular-nums">
+        <div
+          class="pt-4 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between"
+        >
+          <span class="font-display font-bold text-sm text-slate-900 dark:text-white"
+            >Total Tagihan</span
+          >
+          <span class="font-display text-xl font-bold text-slate-900 dark:text-white tabular-nums">
             {{ cartStore.formattedTotalPrice }}
           </span>
         </div>
@@ -232,7 +243,7 @@ const goToCheckout = () => {
         <UiButton
           variant="primary"
           size="md"
-          class="w-full justify-center"
+          class="w-full justify-center text-xs font-semibold py-3 rounded-xl shadow-sm"
           icon="pi-lock"
           @click="goToCheckout"
         >
@@ -240,17 +251,19 @@ const goToCheckout = () => {
         </UiButton>
 
         <!-- Trust Badges -->
-        <div class="pt-2 border-t border-brand-hairsoft space-y-2 text-[11px] text-brand-muted">
+        <div
+          class="pt-3 border-t border-slate-100 dark:border-zinc-800 space-y-2 text-[11px] text-slate-500 dark:text-zinc-400"
+        >
           <div class="flex items-center gap-2">
-            <i class="pi pi-shield text-brand-accent" />
+            <i class="pi pi-shield text-blue-600" />
             <span>Pembayaran Aman Midtrans Sandbox</span>
           </div>
           <div class="flex items-center gap-2">
-            <i class="pi pi-sync text-brand-accent" />
+            <i class="pi pi-sync text-blue-600" />
             <span>Garansi Pengembalian 30 Hari</span>
           </div>
           <div class="flex items-center gap-2">
-            <i class="pi pi-check-circle text-brand-accent" />
+            <i class="pi pi-check-circle text-blue-600" />
             <span>Koleksi 100% Terkurasi Original</span>
           </div>
         </div>
