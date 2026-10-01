@@ -36,18 +36,15 @@ const emit = defineEmits<{
       <div
         v-for="i in 8"
         :key="i"
-        class="flex flex-col bg-brand-canvas border border-brand-hairsoft rounded-card p-4 overflow-hidden animate-pulse"
+        class="flex flex-col bg-brand-canvas border border-brand-hairsoft/80 rounded-2xl overflow-hidden animate-pulse"
       >
-        <div class="aspect-square w-full bg-brand-field rounded-media mb-4" />
-        <div class="space-y-2 flex-1">
-          <div class="h-3 w-1/3 bg-brand-field rounded-full" />
-          <div class="h-5 w-4/5 bg-brand-field rounded-full" />
-          <div class="h-3 w-full bg-brand-field rounded-full" />
-          <div class="h-3 w-2/3 bg-brand-field rounded-full" />
-        </div>
-        <div class="mt-4 pt-3 border-t border-brand-hairsoft flex items-center justify-between">
-          <div class="h-5 w-24 bg-brand-field rounded-full" />
-          <div class="h-8 w-24 bg-brand-field rounded-full" />
+        <div class="aspect-square w-full bg-brand-field" />
+        <div class="p-3.5 space-y-2 flex-1">
+          <div class="h-3.5 w-3/4 bg-brand-field rounded" />
+          <div class="h-2.5 w-1/3 bg-brand-field rounded" />
+          <div class="pt-2 border-t border-brand-hairsoft/60 flex items-center justify-between">
+            <div class="h-4 w-20 bg-brand-field rounded" />
+          </div>
         </div>
       </div>
     </div>
