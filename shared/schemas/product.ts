@@ -12,6 +12,16 @@ export const productSchema = z.object({
   description: z.string().max(2000, 'Deskripsi maksimal 2000 karakter.').nullish(),
   link: z.string().url('Link harus URL yang valid.').nullish(),
   image_url: z.string().url('URL gambar tidak valid.').nullish(),
+  stock: z.number().int().min(0, 'Stok minimal 0.').default(0),
+  category_id: z.string().uuid().nullish(),
+  slug: z.string().max(150).nullish(),
+  sku: z.string().max(50).nullish(),
+  weight_grams: z.number().int().positive().default(500),
+  specs: z.record(z.string(), z.unknown()).default({}),
+  gallery_urls: z.array(z.string().url()).default([]),
+  rating: z.number().min(0).max(5).default(5),
+  review_count: z.number().int().min(0).default(0),
+  is_featured: z.boolean().default(false),
 })
 
 export type ProductInput = z.infer<typeof productSchema>

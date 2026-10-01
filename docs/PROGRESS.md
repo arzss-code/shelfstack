@@ -58,24 +58,32 @@
 
 ---
 
-## 🎯 Target Berikutnya: Fase 3 (Sprint 4: Cart & Orders)
+### 🔄 Fase 3: Cart, Checkout & Midtrans Sandbox (Sprint 4)
 
-1. **State Cart (Pinia)**:
-   - Buat `app/features/cart/stores/cart.ts` dengan persistensi `localStorage`.
-   - Actions: `addItem`, `setQuantity`, `removeItem`, `clearCart`.
-   - Getter: `totalItems`, `totalPrice`.
-2. **Komponen Cart UI**:
-   - `CartDrawer.vue` (slide-over drawer dari kanan saat tombol keranjang di navbar diklik).
-   - `app/pages/cart.vue` (halaman keranjang penuh).
-3. **Checkout & Midtrans Sandbox**:
-   - Migrasi database Supabase untuk tabel `orders`, `order_items`, dan RPC `create_order()`.
-   - Halaman `/checkout` dengan validasi alamat pengiriman Zod.
-   - Endpoint backend `/server/api/orders/index.ts` untuk generate Snap Token Midtrans.
-   - Popup Midtrans Snap di sisi frontend (`snap.pay(token)`).
-   - Webhook handler `/server/api/midtrans/notification.ts` untuk update status pesanan.
-4. **Order History & Realtime Tracking**:
-   - Halaman `/orders` dan `/orders/[id].vue`.
-   - Langganan Supabase Realtime channel `orders:user_<id>` untuk update status tanpa refresh.
+- [x] **Database & Atomic RPC (`supabase/migrations/20261001000001_orders_and_checkout_rpc.sql`)**:
+  - Tabel `orders` dan `order_items` dengan RLS ketat (direct insert dilarang, hanya via RPC).
+  - PL/pgSQL function `create_order()` dengan row lock `FOR UPDATE`, decrement stok, dan anti-tamper total.
+  - Supabase Realtime publication untuk tabel `orders`.
+- [x] **Shared Schema & Type Definitions**:
+  - `shared/schemas/order.ts`: Zod schema untuk item keranjang dan alamat pengiriman dengan unit test lengkap (`tests/unit/order-schema.spec.ts`).
+  - `app/types/database.types.ts` dan `app/types/order.ts`.
+- [x] **State Cart (Pinia)**:
+  - `app/features/cart/stores/cart.ts` dengan persistensi `localStorage` (`shelfstack-cart`).
+  - Unit test lengkap di `tests/unit/cart-store.spec.ts`.
+- [x] **Storefront & Cart UI Integration**:
+  - `CartDrawer.vue` (slide-over panel interaktif dari kanan) terpasang di `app/layouts/default.vue`.
+  - Navbar `AppNavbar.vue` terhubung ke counter item dan total harga belanja realtime.
+  - Detail Produk `app/pages/product/[id].vue` terhubung ke `cartStore.addItem` (Tambah ke Bag & Beli Sekarang).
+  - Halaman keranjang penuh `app/pages/cart.vue`.
+- [x] **Checkout & Midtrans Sandbox Integration**:
+  - Halaman `app/pages/checkout.vue` dengan form alamat Zod dan trigger popup Midtrans Snap via `useMidtransSnap.ts`.
+  - Endpoint `server/api/orders/index.ts` (POST create_order RPC, GET list riwayat).
+  - Endpoint `server/api/orders/[id]/index.ts` (GET detail pesanan + relasi produk).
+  - Endpoint `server/api/orders/[id]/payment-token.post.ts` (generate Snap Token Midtrans Sandbox).
+  - Webhook handler `server/api/midtrans/notification.post.ts` dengan verifikasi signature SHA-512 (`tests/unit/midtrans-webhook.spec.ts`).
+- [x] **Order History & Realtime Tracking**:
+  - Halaman riwayat `app/pages/orders/index.vue`.
+  - Halaman detail `app/pages/orders/[id].vue` dengan timeline visual dan langganan Supabase Realtime channel `order-realtime-<id>` untuk pembaruan status live.
 
 ---
 

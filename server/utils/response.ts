@@ -12,7 +12,7 @@ export function errorResponse(
   message: string,
   errors: any = null,
   statusCode: number = 400,
-) {
+): never {
   throw createError({
     statusCode,
     message,

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useProductStore } from '~/features/products/stores/product'
+import { useCartStore } from '~/features/cart/stores/cart'
 import type { Product } from '~/types/product'
 import { useToast } from 'primevue/usetoast'
 import ProductGallery from '~/components/product/ProductGallery.vue'
@@ -8,6 +9,7 @@ import ProductConfigurator from '~/components/product/ProductConfigurator.vue'
 const route = useRoute()
 const router = useRouter()
 const productStore = useProductStore()
+const cartStore = useCartStore()
 const toast = useToast()
 
 const product = ref<Product | null>(null)
@@ -42,17 +44,44 @@ onMounted(async () => {
 })
 
 const onAddToBag = (payload: { quantity: number; color: string; material: string }) => {
+  if (!product.value) return
+
+  cartStore.addItem({
+    productId: product.value.id,
+    name: product.value.name,
+    price: product.value.price,
+    imageUrl: product.value.image_url,
+    quantity: payload.quantity,
+    stock: product.value.stock,
+    color: payload.color,
+    material: payload.material,
+    openCartDrawer: true,
+  })
+
   toast.add({
     severity: 'success',
     summary: 'Ditambahkan ke Bag',
-    detail: `${product.value?.name} (${payload.quantity}x) berhasil dimasukkan.`,
+    detail: `${product.value.name} (${payload.quantity}x) berhasil dimasukkan.`,
     life: 3000,
   })
 }
 
 const onBuyNow = (payload: { quantity: number; color: string; material: string }) => {
-  onAddToBag(payload)
-  router.push('/katalog')
+  if (!product.value) return
+
+  cartStore.addItem({
+    productId: product.value.id,
+    name: product.value.name,
+    price: product.value.price,
+    imageUrl: product.value.image_url,
+    quantity: payload.quantity,
+    stock: product.value.stock,
+    color: payload.color,
+    material: payload.material,
+    openCartDrawer: false,
+  })
+
+  router.push('/checkout')
 }
 </script>
 

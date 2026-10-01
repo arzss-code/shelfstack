@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppNavbar from '~/components/AppNavbar.vue'
 import AppFooter from '~/components/AppFooter.vue'
+import CartDrawer from '~/features/cart/components/CartDrawer.vue'
 </script>
 
 <template>
@@ -14,6 +15,9 @@ import AppFooter from '~/components/AppFooter.vue'
     <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <slot />
     </main>
+
+    <!-- Global Slide-over Cart Drawer -->
+    <CartDrawer />
 
     <!-- Modernist Inverted Footer -->
     <AppFooter />

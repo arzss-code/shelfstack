@@ -175,74 +175,51 @@ const resetAllFilters = () => {
 </script>
 
 <template>
-  <div class="space-y-8 pb-16 pt-2">
-    <!-- Breadcrumbs & Category Header -->
-    <section>
-      <nav
-        aria-label="Breadcrumb"
-        class="flex items-center gap-2 text-xs font-medium text-brand-muted mb-4"
-      >
-        <NuxtLink
-          to="/"
-          class="hover:text-brand-ink no-underline text-brand-muted transition-colors"
+  <div class="space-y-6 pb-16 pt-2">
+    <!-- Clean Minimalist Header -->
+    <header
+      class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-brand-hairsoft"
+    >
+      <div>
+        <nav
+          aria-label="Breadcrumb"
+          class="flex items-center gap-2 text-xs font-medium text-brand-muted mb-1"
         >
-          ShelfStack
-        </NuxtLink>
-        <span class="text-brand-faint">/</span>
-        <span class="text-brand-ink font-semibold">Katalog Produk</span>
-      </nav>
-
-      <!-- Headline & Subtext -->
-      <div
-        class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-brand-hairsoft"
-      >
-        <div class="max-w-2xl space-y-2">
-          <h1
-            class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-brand-ink leading-tight m-0"
+          <NuxtLink
+            to="/"
+            class="hover:text-brand-ink no-underline text-brand-muted transition-colors"
           >
-            Katalog
+            ShelfStack
+          </NuxtLink>
+          <span class="text-brand-faint">/</span>
+          <span class="text-brand-ink font-semibold">Katalog</span>
+        </nav>
+
+        <div class="flex items-center gap-2.5">
+          <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
+            Katalog Produk
           </h1>
-          <p class="font-body text-xs sm:text-sm md:text-base text-brand-muted leading-relaxed m-0">
-            Semua produk ShelfStack dalam satu etalase terpadu. Klik kartu untuk melihat detail
-            spesifikasi, varian material, dan jaminan resmi.
-          </p>
-        </div>
-
-        <!-- Metric summary pill -->
-        <div
-          class="flex items-center gap-3 bg-brand-canvas-soft border border-brand-hair px-4 py-2 rounded-full text-xs text-brand-muted shadow-whisper shrink-0 self-start lg:self-auto"
-        >
-          <span class="font-bold text-brand-ink">
-            {{ filteredProducts.length }} Produk Tersedia
+          <span
+            class="bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full text-xs font-semibold text-brand-muted tabular-nums"
+          >
+            {{ filteredProducts.length }}
           </span>
-          <span class="text-brand-faint">•</span>
+        </div>
+      </div>
+
+      <!-- Quick subtle assurances -->
+      <div class="hidden sm:flex items-center gap-4 text-xs text-brand-muted">
+        <span class="flex items-center gap-1.5">
+          <i class="pi pi-shield text-brand-accent text-xs" />
           <span>Garansi 2 Tahun</span>
-          <span class="text-brand-faint">•</span>
-          <span class="text-brand-success font-semibold flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-brand-success" />
-            Siap Kirim
-          </span>
-        </div>
+        </span>
+        <span class="text-brand-faint">·</span>
+        <span class="flex items-center gap-1.5">
+          <i class="pi pi-truck text-brand-ink text-xs" />
+          <span>Siap Kirim</span>
+        </span>
       </div>
-
-      <!-- Department Category Pills Strip -->
-      <div class="flex items-center gap-2 overflow-x-auto pt-4 pb-1 [scrollbar-width:none]">
-        <button
-          v-for="cat in categories"
-          :key="cat.id"
-          type="button"
-          :class="[
-            'px-4 py-2 rounded-full text-xs font-semibold transition-all shadow-whisper shrink-0 cursor-pointer border',
-            selectedCategory === cat.id
-              ? 'bg-brand-ink text-brand-onink border-brand-ink'
-              : 'bg-brand-canvas-soft border-brand-hair text-brand-muted hover:text-brand-ink hover:bg-brand-canvas',
-          ]"
-          @click="selectCategory(cat.id)"
-        >
-          {{ cat.label }}
-        </button>
-      </div>
-    </section>
+    </header>
 
     <!-- Toolbar: Search, Sort & View Controls -->
     <KatalogToolbar
@@ -275,8 +252,11 @@ const resetAllFilters = () => {
     <!-- MAIN BODY: Sidebar + Product Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       <KatalogSidebar
+        :categories="categories"
+        :selected-category="selectedCategory"
         :price-ranges="priceRanges"
         :selected-price-range="selectedPriceRange"
+        @update:selected-category="selectCategory"
         @update:selected-price-range="handlePriceRangeUpdate"
         @reset="resetAllFilters"
       />
@@ -310,10 +290,13 @@ const resetAllFilters = () => {
     <!-- Mobile Filter Sheet Modal -->
     <KatalogMobileFilter
       :show="showMobileFilterModal"
+      :categories="categories"
+      :selected-category="selectedCategory"
       :price-ranges="priceRanges"
       :selected-price-range="selectedPriceRange"
       :filtered-products-count="filteredProducts.length"
       @close="showMobileFilterModal = false"
+      @update:selected-category="selectCategory"
       @update:selected-price-range="handlePriceRangeUpdate"
       @reset="resetAllFilters"
     />

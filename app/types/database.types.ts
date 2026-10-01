@@ -76,39 +76,63 @@ export type Database = {
           created_at: string | null
           deleted_at: string | null
           description: string | null
+          gallery_urls: string[]
           id: number
           image_url: string | null
+          is_featured: boolean
           link: string | null
           name: string
           price: number
           price_cents: number | null
+          rating: number
+          review_count: number
+          sku: string | null
+          slug: string | null
+          specs: Json
           stock: number
+          weight_grams: number
         }
         Insert: {
           category_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
           description?: string | null
+          gallery_urls?: string[]
           id?: number
           image_url?: string | null
+          is_featured?: boolean
           link?: string | null
           name: string
           price: number
           price_cents?: number | null
+          rating?: number
+          review_count?: number
+          sku?: string | null
+          slug?: string | null
+          specs?: Json
           stock?: number
+          weight_grams?: number
         }
         Update: {
           category_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
           description?: string | null
+          gallery_urls?: string[]
           id?: number
           image_url?: string | null
+          is_featured?: boolean
           link?: string | null
           name?: string
           price?: number
           price_cents?: number | null
+          rating?: number
+          review_count?: number
+          sku?: string | null
+          slug?: string | null
+          specs?: Json
           stock?: number
+          weight_grams?: number
         }
         Relationships: [
           {
@@ -162,15 +186,107 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          address: Json
+          created_at: string | null
+          id: string
+          midtrans_id: string | null
+          paid_at: string | null
+          payment_type: string | null
+          snap_token: string | null
+          status: Database['public']['Enums']['order_status']
+          total_cents: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          address: Json
+          created_at?: string | null
+          id?: string
+          midtrans_id?: string | null
+          paid_at?: string | null
+          payment_type?: string | null
+          snap_token?: string | null
+          status?: Database['public']['Enums']['order_status']
+          total_cents?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Update: {
+          address?: Json
+          created_at?: string | null
+          id?: string
+          midtrans_id?: string | null
+          paid_at?: string | null
+          payment_type?: string | null
+          snap_token?: string | null
+          status?: Database['public']['Enums']['order_status']
+          total_cents?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          id: string
+          order_id: string
+          price_cents: number
+          product_id: number
+          qty: number
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          price_cents: number
+          product_id: number
+          qty: number
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          price_cents?: number
+          product_id?: number
+          qty?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'order_items_order_id_fkey'
+            columns: ['order_id']
+            isOneToOne: false
+            referencedRelation: 'orders'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'order_items_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_order: {
+        Args: {
+          p_address: Json
+          p_items: Json
+        }
+        Returns: string
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       activity_action: 'CREATE' | 'UPDATE' | 'DELETE' | 'RESTORE'
+      order_status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled'
     }
     CompositeTypes: {
       [_ in never]: never

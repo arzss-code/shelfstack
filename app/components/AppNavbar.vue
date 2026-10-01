@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useCategories } from '~/composables/useCategories'
+import { useCartStore } from '~/features/cart/stores/cart'
 import AppLogo from './AppLogo.vue'
 
 const { user, profile, isAdmin, fetchProfile, signOut } = useAuth()
+const cartStore = useCartStore()
 const {
   categories: dynamicCategories,
   categoryMap: dynamicCategoryMap,
@@ -181,21 +183,23 @@ const handleLogout = async () => {
           </NuxtLink>
 
           <!-- Cart Pill -->
-          <NuxtLink
-            to="/katalog"
-            class="flex items-center gap-1.5 bg-brand-field hover:bg-brand-canvas-soft text-brand-ink text-xs font-semibold px-3.5 py-2 rounded-full transition-colors no-underline border border-brand-hair"
+          <button
+            type="button"
+            class="flex items-center gap-1.5 bg-brand-field hover:bg-brand-canvas-soft text-brand-ink text-xs font-semibold px-3.5 py-2 rounded-full transition-colors border border-brand-hair cursor-pointer"
+            aria-label="Buka Keranjang Belanja"
+            @click="cartStore.openDrawer"
           >
             <i class="pi pi-shopping-bag text-sm text-brand-ink" />
             <span class="hidden sm:inline">Keranjang</span>
             <span
-              class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"
+              class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none min-w-4 text-center"
             >
-              0
+              {{ cartStore.totalItems }}
             </span>
-            <span class="text-brand-muted font-normal text-[11px] hidden lg:inline ml-0.5"
-              >Rp0</span
-            >
-          </NuxtLink>
+            <span class="text-brand-muted font-normal text-[11px] hidden lg:inline ml-0.5">
+              {{ cartStore.formattedTotalPrice }}
+            </span>
+          </button>
 
           <!-- User Authentication Section -->
           <div class="relative">
@@ -224,6 +228,13 @@ const handleLogout = async () => {
                   <p class="text-xs font-bold text-brand-ink m-0 truncate">{{ displayName }}</p>
                   <p class="text-[10px] text-brand-muted m-0 truncate">{{ user.email }}</p>
                 </div>
+                <NuxtLink
+                  to="/orders"
+                  class="block px-4 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft no-underline font-medium"
+                  @click="isUserMenuOpen = false"
+                >
+                  Pesanan Saya
+                </NuxtLink>
                 <NuxtLink
                   to="/katalog"
                   class="block px-4 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft no-underline"

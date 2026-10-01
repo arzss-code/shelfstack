@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
 
     const { data, error } = await client
       .from('products')
-      .update(parsed.data)
+      .update(parsed.data as any)
       .eq('id', id)
       .select()
       .single()
