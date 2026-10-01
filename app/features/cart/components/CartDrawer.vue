@@ -138,7 +138,7 @@ const goToKatalog = () => {
                       @click="
                         () => {
                           close()
-                          router.push(`/product/${item.productId}`)
+                          router.push(`/product/${item.slug || item.productId}`)
                         }
                       "
                     >

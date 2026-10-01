@@ -3,6 +3,7 @@ import { formatRupiah } from '~/utils/format'
 
 export interface CartItem {
   productId: number
+  slug?: string | null
   name: string
   price: number
   priceCents: number
@@ -86,6 +87,7 @@ export const useCartStore = defineStore('cart', () => {
 
   const addItem = (payload: {
     productId: number
+    slug?: string | null
     name: string
     price: number
     priceCents?: number
@@ -111,9 +113,11 @@ export const useCartStore = defineStore('cart', () => {
       const newQty = Math.min(existing.quantity + qtyToAdd, payload.stock)
       existing.quantity = newQty
       existing.stock = payload.stock
+      if (payload.slug) existing.slug = payload.slug
     } else {
       items.value.push({
         productId: payload.productId,
+        slug: payload.slug,
         name: payload.name,
         price: payload.price,
         priceCents,

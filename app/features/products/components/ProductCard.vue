@@ -30,12 +30,20 @@ const navigateToDetail = () => {
 
 <template>
   <article
-    class="product-card group flex flex-col bg-brand-canvas border border-brand-hairsoft rounded-card overflow-hidden transition-all duration-300 hover:border-brand-hair hover:shadow-floating cursor-pointer"
+    class="product-card group relative flex flex-col bg-brand-canvas border border-brand-hairsoft rounded-card overflow-hidden transition-all duration-300 hover:border-brand-hair hover:shadow-floating cursor-pointer"
     @click="navigateToDetail"
   >
+    <!-- Stretched Link for Semantic Hover Preview & SEO -->
+    <NuxtLink
+      :to="`/product/${product.slug || product.id}`"
+      class="absolute inset-0 z-0"
+      :aria-label="product.name"
+      tabindex="-1"
+    />
+
     <!-- Media Container -->
     <div
-      class="relative aspect-square w-full bg-brand-field overflow-hidden flex items-center justify-center p-3 border-b border-brand-hairsoft"
+      class="relative aspect-square w-full bg-brand-field overflow-hidden flex items-center justify-center p-3 border-b border-brand-hairsoft pointer-events-none"
     >
       <img
         v-if="product.image_url"
@@ -52,7 +60,7 @@ const navigateToDetail = () => {
       </div>
 
       <!-- Stock Status Badge -->
-      <div class="absolute top-3 left-3 pointer-events-none">
+      <div class="absolute top-3 left-3 pointer-events-none z-10">
         <UiBadge v-if="product.stock === 0" label="Habis" variant="danger" />
         <UiBadge v-else-if="product.stock < 5" :label="`Sisa ${product.stock}`" variant="warning" />
         <UiBadge v-else label="Tersedia" variant="success" />
@@ -60,7 +68,7 @@ const navigateToDetail = () => {
 
       <!-- Quick view indicator -->
       <div
-        class="absolute bottom-3 right-3 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+        class="absolute bottom-3 right-3 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-10"
       >
         <span
           class="inline-flex items-center gap-1 bg-brand-canvas/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-medium text-brand-ink shadow-whisper"
@@ -72,11 +80,11 @@ const navigateToDetail = () => {
     </div>
 
     <!-- Content Body -->
-    <div class="p-5 flex flex-col flex-1 justify-between gap-3">
+    <div class="p-5 flex flex-col flex-1 justify-between gap-3 relative z-10 pointer-events-none">
       <div>
         <div class="flex items-center justify-between text-xs text-brand-muted mb-1">
-          <span class="font-medium text-[11px] text-brand-muted tracking-tight">
-            Katalog #{{ product.id }}
+          <span class="font-medium text-[11px] text-brand-muted tracking-tight font-mono">
+            {{ product.sku || `SKU-${product.id}` }}
           </span>
           <span class="text-[11px] text-brand-muted tabular-nums"> Stok: {{ product.stock }} </span>
         </div>
@@ -85,7 +93,12 @@ const navigateToDetail = () => {
           class="font-display m-0 text-base sm:text-lg font-bold text-brand-ink line-clamp-1 group-hover:text-brand-accent transition-colors"
           :title="product.name"
         >
-          {{ product.name }}
+          <NuxtLink
+            :to="`/product/${product.slug || product.id}`"
+            class="text-inherit hover:text-brand-accent no-underline pointer-events-auto"
+          >
+            {{ product.name }}
+          </NuxtLink>
         </h3>
 
         <p class="font-body m-0 mt-1.5 text-xs text-brand-muted line-clamp-2 leading-relaxed">
@@ -95,7 +108,7 @@ const navigateToDetail = () => {
 
       <!-- Price & Action Section -->
       <div
-        class="mt-2 pt-3 border-t border-brand-hairsoft flex items-center justify-between gap-2"
+        class="mt-2 pt-3 border-t border-brand-hairsoft flex items-center justify-between gap-2 pointer-events-auto"
         @click.stop
       >
         <div>
@@ -108,7 +121,7 @@ const navigateToDetail = () => {
         <!-- Public View Action -->
         <UiButton
           v-if="hideActions"
-          :to="`/product/${product.id}`"
+          :to="`/product/${product.slug || product.id}`"
           variant="secondary"
           size="sm"
           icon="pi-arrow-right"

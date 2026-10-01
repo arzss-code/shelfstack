@@ -90,7 +90,7 @@ const goToCheckout = () => {
             <div class="flex items-center gap-4 min-w-0">
               <div
                 class="w-20 h-20 rounded-card bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center cursor-pointer"
-                @click="router.push(`/product/${item.productId}`)"
+                @click="router.push(`/product/${item.slug || item.productId}`)"
               >
                 <img
                   v-if="item.imageUrl"
@@ -103,7 +103,7 @@ const goToCheckout = () => {
 
               <div class="min-w-0">
                 <NuxtLink
-                  :to="`/product/${item.productId}`"
+                  :to="`/product/${item.slug || item.productId}`"
                   class="font-display font-bold text-sm sm:text-base text-brand-ink hover:text-brand-accent transition-colors no-underline line-clamp-1"
                 >
                   {{ item.name }}

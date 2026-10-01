@@ -71,6 +71,7 @@ const onAddToBag = (payload: { quantity: number; color: string; material: string
 
   cartStore.addItem({
     productId: product.value.id,
+    slug: product.value.slug,
     name: product.value.name,
     price: product.value.price,
     imageUrl: product.value.image_url,
@@ -94,6 +95,7 @@ const onBuyNow = (payload: { quantity: number; color: string; material: string }
 
   cartStore.addItem({
     productId: product.value.id,
+    slug: product.value.slug,
     name: product.value.name,
     price: product.value.price,
     imageUrl: product.value.image_url,
