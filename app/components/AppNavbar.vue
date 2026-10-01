@@ -35,8 +35,8 @@ const subNavCategories = computed(() => [
 ])
 
 onMounted(async () => {
-  fetchProfile()
-  await fetchCategories()
+  fetchProfile().catch(() => {})
+  await fetchCategories().catch(() => {})
 })
 
 const displayName = computed(

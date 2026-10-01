@@ -17,6 +17,7 @@ const emit = defineEmits<{
   edit: [product: Product]
   delete: [id: number]
   restore: [id: number]
+  resetFilters: []
 }>()
 </script>
 
@@ -64,9 +65,17 @@ const emit = defineEmits<{
         </div>
         <h3 class="font-display m-0 mb-2 text-lg font-bold text-brand-ink">Tidak ada produk</h3>
         <p class="font-body m-0 text-sm text-brand-muted max-w-md leading-relaxed">
-          Belum ada produk aktif yang ditemukan dengan kata kunci pencarian Anda. Coba periksa
-          kembali ejaan atau gunakan istilah lain.
+          Belum ada produk aktif yang ditemukan dengan kata kunci atau filter saat ini.
         </p>
+        <UiButton
+          variant="secondary"
+          size="sm"
+          class="mt-4"
+          icon="pi-refresh"
+          @click="emit('resetFilters')"
+        >
+          Reset Filter &amp; Tampilkan Semua
+        </UiButton>
       </template>
 
       <template v-else-if="isTrash">

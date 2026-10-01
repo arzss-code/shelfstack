@@ -133,13 +133,6 @@ const onBuyNow = (payload: { quantity: number; color: string; material: string }
       </span>
     </nav>
 
-    <!-- Back Action -->
-    <div class="flex items-center">
-      <UiButton to="/katalog" variant="secondary" size="sm" icon="pi-arrow-left">
-        Kembali ke Katalog
-      </UiButton>
-    </div>
-
     <!-- Loading Skeleton View -->
     <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 animate-pulse">
       <div class="lg:col-span-7 aspect-[4/3] bg-brand-field rounded-card" />

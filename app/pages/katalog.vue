@@ -7,6 +7,7 @@ import KatalogToolbar, { type SortOption } from '~/components/katalog/KatalogToo
 import KatalogSidebar, { type PriceRange } from '~/components/katalog/KatalogSidebar.vue'
 import KatalogActiveFilters from '~/components/katalog/KatalogActiveFilters.vue'
 import KatalogMobileFilter from '~/components/katalog/KatalogMobileFilter.vue'
+import type { Product } from '~/types/product'
 
 useSeoMeta({
   title: 'Katalog Produk — ShelfStack',
@@ -19,6 +20,26 @@ const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const { categories: dynamicCategories, fetchCategories, CATEGORY_KEYWORDS } = useCategories()
+
+// SSR-first data fetching: Muat produk di server untuk hilangkan delay skeleton
+const { data: initialProducts } = await useAsyncData(
+  'katalog-products',
+  async () => {
+    const res = await $fetch<{ status: string; data: Product[] }>('/api/products', {
+      params: { from: 0, to: 11 },
+    })
+    return res.data || []
+  },
+  {
+    default: () => [] as Product[],
+  },
+)
+
+// Sinkronkan ke store pinia jika data dari SSR tersedia
+if (initialProducts.value && initialProducts.value.length > 0) {
+  productStore.products = initialProducts.value
+  productStore.loading = false
+}
 
 const searchQuery = ref((route.query.q as string) || '')
 const selectedCategory = ref((route.query.category as string) || 'all')
@@ -53,7 +74,11 @@ const priceRanges: PriceRange[] = [
 
 onMounted(async () => {
   try {
-    await Promise.all([productStore.fetchProducts(), fetchCategories()])
+    await fetchCategories()
+    // Jika store masih kosong atau belum terhidrasi, fetch dari API
+    if (productStore.products.length === 0) {
+      await productStore.fetchProducts()
+    }
   } catch (error: unknown) {
     toast.add({
       severity: 'error',
@@ -90,19 +115,29 @@ const filteredProducts = computed(() => {
     list = list.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
-        (p.description && p.description.toLowerCase().includes(q)),
+        (p.description && p.description.toLowerCase().includes(q)) ||
+        (p.sku && p.sku.toLowerCase().includes(q)),
     )
   }
 
-  // 2. Category Filter
+  // 2. Category Filter (Check both DB category_id and keyword matching)
   if (selectedCategory.value !== 'all') {
-    const cat = categories.value.find((c) => c.id === selectedCategory.value)
-    if (cat && cat.keywords.length > 0) {
-      list = list.filter((p) => {
+    const normSlug = selectedCategory.value === 'accessories' ? 'lifestyle' : selectedCategory.value
+    const activeCatObj = dynamicCategories.value.find((c) => c.slug === normSlug)
+    const catKeywords = CATEGORY_KEYWORDS[normSlug] ?? []
+
+    list = list.filter((p) => {
+      // Direct category_id match jika ada relasi di DB
+      if (activeCatObj && p.category_id && p.category_id === activeCatObj.id) {
+        return true
+      }
+      // Keyword fallback match pada nama atau deskripsi
+      if (catKeywords.length > 0) {
         const text = `${p.name} ${p.description || ''}`.toLowerCase()
-        return cat.keywords.some((kw) => text.includes(kw))
-      })
-    }
+        return catKeywords.some((kw) => text.includes(kw))
+      }
+      return false
+    })
   }
 
   // 3. Price Range Filter
@@ -264,10 +299,11 @@ const resetAllFilters = () => {
       <section class="lg:col-span-9 space-y-6">
         <ProductList
           :products="filteredProducts"
-          :loading="productStore.loading"
+          :loading="productStore.loading && productStore.products.length === 0"
           :is-searching="activeFiltersCount > 0"
           :density="gridDensity"
           hide-actions
+          @reset-filters="resetAllFilters"
         />
 
         <!-- Load More Action -->

@@ -9,7 +9,7 @@ export interface CategoryItem {
 
 export const CANONICAL_CATEGORIES: CategoryItem[] = [
   {
-    id: '11111111-1111-1111-1111-111111111111',
+    id: '28082f15-1fd6-425e-9f6e-ed197c591c39',
     name: 'Tech & Gadget',
     slug: 'tech',
     description:
@@ -19,7 +19,7 @@ export const CANONICAL_CATEGORIES: CategoryItem[] = [
     display_order: 1,
   },
   {
-    id: '22222222-2222-2222-2222-222222222222',
+    id: '4ca7076f-667c-45f4-aea6-cd76356a5ef2',
     name: 'Rumah & Dapur',
     slug: 'home',
     description:
@@ -29,7 +29,7 @@ export const CANONICAL_CATEGORIES: CategoryItem[] = [
     display_order: 2,
   },
   {
-    id: '33333333-3333-3333-3333-333333333333',
+    id: '0c6b1f1d-64ca-4c94-8666-91a97f8e4095',
     name: 'Furnitur & Ruang Kerja',
     slug: 'furniture',
     description:
@@ -39,7 +39,7 @@ export const CANONICAL_CATEGORIES: CategoryItem[] = [
     display_order: 3,
   },
   {
-    id: '44444444-4444-4444-4444-444444444444',
+    id: 'f11887b3-ff92-4d6f-a119-a972efd79144',
     name: 'Pakaian & Aksesoris',
     slug: 'lifestyle',
     description:
@@ -49,7 +49,7 @@ export const CANONICAL_CATEGORIES: CategoryItem[] = [
     display_order: 4,
   },
   {
-    id: '55555555-5555-5555-5555-555555555555',
+    id: '8d426592-2d81-4d0a-85a3-edae2803b8ad',
     name: 'Alat Tulis & Kerajinan',
     slug: 'stationery',
     description:

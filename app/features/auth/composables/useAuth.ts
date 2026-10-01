@@ -36,24 +36,45 @@ export function useAuth() {
   const isAdmin = computed(() => profile.value?.role === 'admin')
 
   const fetchProfile = async (force = false) => {
-    if (!user.value) {
+    const userId = user.value?.id
+    if (!userId) {
       profile.value = null
       return null
     }
     if (profile.value && !force) return profile.value
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, user_id, full_name, role')
-      .eq('user_id', user.value.id)
-      .single()
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, user_id, full_name, role')
+        .eq('user_id', userId)
+        .single()
 
-    if (error) {
+      if (error) {
+        profile.value = null
+        return null
+      }
+      profile.value = data as UserProfile
+      return profile.value
+    } catch {
       profile.value = null
       return null
     }
-    profile.value = data as UserProfile
-    return profile.value
+  }
+
+  // Auto-fetch profile saat session user terhidrasi di client
+  if (import.meta.client) {
+    watch(
+      () => user.value?.id,
+      (newId) => {
+        if (newId) {
+          fetchProfile()
+        } else {
+          profile.value = null
+        }
+      },
+      { immediate: true },
+    )
   }
 
   const signUp = async (fullName: string, email: string, password: string) => {
