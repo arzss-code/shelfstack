@@ -18,8 +18,8 @@ update public.products
 set slug = lower(regexp_replace(regexp_replace(name, '[^a-zA-Z0-9\s-]', '', 'g'), '\s+', '-', 'g')) || '-' || id
 where slug is null or slug = '';
 
--- Pastikan kolom slug unique
-create unique index if not exists idx_products_slug on public.products(slug);
+-- Pastikan kolom slug unique untuk produk aktif (partial unique index)
+create unique index if not exists idx_products_slug_active on public.products(slug) where deleted_at is null;
 
 -- 3. Backfill SKU unik untuk setiap produk
 update public.products
@@ -33,11 +33,12 @@ update public.products
 set gallery_urls = array[image_url]
 where (gallery_urls is null or array_length(gallery_urls, 1) is null) and image_url is not null;
 
--- 5. Indeks Performa Tambahan
-create index if not exists idx_products_category_id on public.products(category_id);
-create index if not exists idx_products_price_cents on public.products(price_cents);
-create index if not exists idx_products_is_featured on public.products(is_featured);
-create index if not exists idx_products_rating on public.products(rating desc);
+-- 5. Indeks Performa Tambahan (B-Tree & GIN)
+create index if not exists idx_products_category_id on public.products(category_id) where deleted_at is null;
+create index if not exists idx_products_price_cents on public.products(price_cents) where deleted_at is null;
+create index if not exists idx_products_is_featured on public.products(is_featured) where deleted_at is null;
+create index if not exists idx_products_rating on public.products(rating desc) where deleted_at is null;
+create index if not exists idx_products_specs_gin on public.products using gin (specs);
 
 -- 6. Trigger auto-slug saat produk baru dibuat tanpa slug
 create or replace function public.handle_product_slug()

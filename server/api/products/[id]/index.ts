@@ -6,19 +6,32 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event)
   const rawParam = getRouterParam(event, 'id')
 
-  if (!rawParam) {
+  if (!rawParam || typeof rawParam !== 'string') {
     errorResponse(event, 'Identifier parameter is required', null, 400)
   }
 
-  const isNumeric = /^\d+$/.test(rawParam)
-  const numericId = isNumeric ? Number(rawParam) : null
+  // Security Sanitization: cegah path traversal, invalid characters, atau ReDoS
+  const param = rawParam.trim()
+  if (param.length > 100 || !/^[a-zA-Z0-9_-]+$/.test(param)) {
+    errorResponse(event, 'Format parameter produk tidak valid', null, 400)
+  }
+
+  const isNumeric = /^\d+$/.test(param)
+  const numericId = isNumeric ? Number(param) : null
 
   if (method === 'GET') {
+    // Performance: Browser cache 60s, Shared CDN cache 5m, SWR 10m
+    setHeader(
+      event,
+      'Cache-Control',
+      'public, max-age=60, s-maxage=300, stale-while-revalidate=600',
+    )
+
     let query = client.from('products').select('*').is('deleted_at', null)
     if (numericId !== null) {
       query = query.eq('id', numericId)
     } else {
-      query = query.eq('slug', rawParam)
+      query = query.eq('slug', param)
     }
 
     const { data, error } = await query.single()
@@ -45,7 +58,7 @@ export default defineEventHandler(async (event) => {
     if (numericId !== null) {
       updateQuery = updateQuery.eq('id', numericId)
     } else {
-      updateQuery = updateQuery.eq('slug', rawParam)
+      updateQuery = updateQuery.eq('slug', param)
     }
 
     const { data, error } = await updateQuery.select().single()
@@ -65,7 +78,7 @@ export default defineEventHandler(async (event) => {
     if (numericId !== null) {
       deleteQuery = deleteQuery.eq('id', numericId)
     } else {
-      deleteQuery = deleteQuery.eq('slug', rawParam)
+      deleteQuery = deleteQuery.eq('slug', param)
     }
 
     const { error } = await deleteQuery

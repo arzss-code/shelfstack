@@ -28,19 +28,42 @@ useSeoMeta({
 
 onMounted(async () => {
   const param = (route.params.id || (route.params as Record<string, string>).slug) as string
-  if (param) {
-    try {
-      product.value = await productStore.fetchProductById(param)
-    } catch (error: unknown) {
+  if (!param) {
+    loading.value = false
+    return
+  }
+
+  // 1. Instant Cache Render: 0ms load transition jika produk sudah dimuat di katalog/home
+  const cached = productStore.products.find((p) => p.slug === param || String(p.id) === param)
+  if (cached) {
+    product.value = cached
+    loading.value = false
+  }
+
+  // 2. Fresh Network Fetch (Stale-While-Revalidate)
+  try {
+    const fresh = await productStore.fetchProductById(param)
+    if (fresh) {
+      product.value = fresh
+
+      // 3. Canonical URL Normalization: jika dibuka via ID numerik, sinkronkan ke slug di URL bar
+      if (/^\d+$/.test(param) && fresh.slug) {
+        router.replace({ path: `/product/${fresh.slug}` })
+      }
+    }
+  } catch (error: unknown) {
+    if (!product.value) {
       toast.add({
         severity: 'error',
         summary: 'Gagal Memuat Produk',
-        detail: error instanceof Error ? error.message : 'Terjadi kesalahan sistem.',
+        detail:
+          error instanceof Error ? error.message : 'Produk tidak ditemukan atau telah diarsipkan.',
         life: 5000,
       })
     }
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 })
 
 const onAddToBag = (payload: { quantity: number; color: string; material: string }) => {
