@@ -44,23 +44,23 @@ const formattedRating = computed(() => {
 
 const soldCountText = computed(() => {
   const count = props.product.sold_count ?? props.product.review_count ?? 0
-  if (count <= 0) return 'Baru'
+  if (count <= 0) return 'Produk Baru'
   if (count >= 1000) return `${(count / 1000).toFixed(1)}rb+ terjual`
   return `${count} terjual`
 })
 
 const badgeInfo = computed(() => {
   if (props.product.stock === 0) {
-    return { label: 'Habis', type: 'out-of-stock' }
+    return { label: 'Habis' }
   }
   if (props.product.stock > 0 && props.product.stock <= 3) {
-    return { label: `Sisa ${props.product.stock}`, type: 'low-stock' }
+    return { label: `Sisa ${props.product.stock}` }
   }
   if (props.product.is_featured) {
-    return { label: 'Unggulan', type: 'featured' }
+    return { label: 'Unggulan' }
   }
   if ((props.product.sold_count ?? 0) >= 30) {
-    return { label: 'Terlaris', type: 'bestseller' }
+    return { label: 'Terlaris' }
   }
   return null
 })
@@ -133,29 +133,10 @@ const handleQuickAdd = () => {
         <span class="text-[10px] font-medium tracking-widest uppercase opacity-50">ShelfStack</span>
       </div>
 
-      <!-- Badge Overlay (Compact & Tasteful) -->
-      <div v-if="badgeInfo" class="absolute top-2.5 left-2.5 z-10 pointer-events-none">
+      <!-- Solid Blue Badge (Melekuk dari Sisi Kanan / Curved on Right) -->
+      <div v-if="badgeInfo" class="absolute top-2.5 left-0 z-10 pointer-events-none">
         <span
-          v-if="badgeInfo.type === 'out-of-stock'"
-          class="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase bg-brand-ink/90 text-brand-onink backdrop-blur-sm shadow-whisper"
-        >
-          {{ badgeInfo.label }}
-        </span>
-        <span
-          v-else-if="badgeInfo.type === 'low-stock'"
-          class="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/25 backdrop-blur-sm shadow-whisper"
-        >
-          {{ badgeInfo.label }}
-        </span>
-        <span
-          v-else-if="badgeInfo.type === 'featured'"
-          class="px-2 py-0.5 rounded text-[10px] font-medium tracking-wide bg-brand-canvas/90 text-brand-accent border border-brand-accent/20 backdrop-blur-sm shadow-whisper"
-        >
-          {{ badgeInfo.label }}
-        </span>
-        <span
-          v-else-if="badgeInfo.type === 'bestseller'"
-          class="px-2 py-0.5 rounded text-[10px] font-medium tracking-wide bg-brand-canvas/90 text-brand-ink border border-brand-hair/80 backdrop-blur-sm shadow-whisper"
+          class="inline-flex items-center gap-1 bg-brand-accent text-white text-[10.5px] font-bold tracking-wider uppercase pl-2.5 pr-3.5 py-1 rounded-r-full shadow-sm"
         >
           {{ badgeInfo.label }}
         </span>
@@ -165,7 +146,7 @@ const handleQuickAdd = () => {
       <button
         v-if="hideActions && product.stock > 0"
         type="button"
-        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto w-8 h-8 rounded-full bg-brand-canvas/90 hover:bg-brand-ink hover:text-brand-onink text-brand-ink shadow-whisper border border-brand-hair/80 flex items-center justify-center opacity-0 translate-y-1.5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 active:scale-95 cursor-pointer backdrop-blur-sm"
+        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto w-8 h-8 rounded-full bg-brand-canvas hover:bg-brand-ink hover:text-brand-onink text-brand-ink shadow-whisper border border-brand-hair/80 flex items-center justify-center opacity-0 translate-y-1.5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 active:scale-95 cursor-pointer"
         :title="`Tambah ${product.name} ke Keranjang`"
         :aria-label="`Tambah ${product.name} ke Keranjang`"
         @click.stop.prevent="handleQuickAdd"
@@ -175,9 +156,9 @@ const handleQuickAdd = () => {
       </button>
     </div>
 
-    <!-- Compact Content Body (Title + Rating & Terjual + Price) -->
+    <!-- Compact Content Body -->
     <div
-      class="p-3 sm:p-3.5 flex flex-col justify-between gap-1.5 flex-1 relative z-10 pointer-events-none"
+      class="p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 flex-1 relative z-10 pointer-events-none"
     >
       <div class="space-y-1">
         <!-- Title: 1 line, editorial weight -->
@@ -188,48 +169,33 @@ const handleQuickAdd = () => {
           {{ product.name }}
         </h3>
 
-        <!-- Social Proof Row: Rating & Terjual (1 compact line) -->
-        <div class="flex items-center gap-1.5 text-xs text-brand-muted">
-          <span
-            class="inline-flex items-center gap-1 font-semibold text-brand-ink text-[11.5px] tabular-nums"
-          >
-            <i class="pi pi-star-fill text-amber-500 text-[10px]" />
-            {{ formattedRating }}
-          </span>
-          <span class="text-brand-hair">·</span>
-          <span class="text-[11px] text-brand-muted tabular-nums">
-            {{ soldCountText }}
-          </span>
-          <span v-if="categoryName" class="text-brand-hair hidden sm:inline">·</span>
-          <span v-if="categoryName" class="text-[11px] text-brand-muted truncate hidden sm:inline">
-            {{ categoryName }}
-          </span>
-        </div>
+        <!-- Terjual & Kategori (Tenang, Bernapas, Tanpa Desak-desakan) -->
+        <p class="font-body m-0 text-xs text-brand-muted tabular-nums flex items-center gap-1.5">
+          <span>{{ soldCountText }}</span>
+          <span v-if="categoryName" class="text-brand-hair">·</span>
+          <span v-if="categoryName" class="truncate">{{ categoryName }}</span>
+        </p>
       </div>
 
-      <!-- Bottom Row: Clean Price + Action -->
+      <!-- Bottom Row: Price on Left, Rating on Right (Balanced & Clean) -->
       <div
         class="flex items-center justify-between gap-2 pt-2 border-t border-brand-hairsoft/80 pointer-events-auto"
         @click.stop
       >
+        <!-- Price -->
         <span
           class="font-display font-bold text-sm sm:text-base text-brand-ink tabular-nums tracking-tight"
         >
           {{ formatRupiah(product.price) }}
         </span>
 
-        <!-- Mobile Quick Add -->
-        <div v-if="hideActions">
-          <button
-            v-if="product.stock > 0"
-            type="button"
-            class="sm:hidden w-7 h-7 rounded-full bg-brand-canvas-soft hover:bg-brand-ink hover:text-brand-onink text-brand-ink border border-brand-hair flex items-center justify-center active:scale-95 cursor-pointer"
-            :title="`Tambah ${product.name} ke Keranjang`"
-            @click.stop.prevent="handleQuickAdd"
-          >
-            <i v-if="justAdded" class="pi pi-check text-[10px] text-brand-success" />
-            <i v-else class="pi pi-plus text-[10px]" />
-          </button>
+        <!-- Rating dipindah ke kanan harga: Rapi, Lega, Tidak Penuh -->
+        <div
+          v-if="hideActions"
+          class="flex items-center gap-1 text-xs text-brand-ink font-semibold tabular-nums shrink-0"
+        >
+          <i class="pi pi-star-fill text-amber-500 text-[10.5px]" />
+          <span>{{ formattedRating }}</span>
         </div>
 
         <!-- Admin Actions (Management Mode) -->
