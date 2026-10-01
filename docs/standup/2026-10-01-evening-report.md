@@ -36,18 +36,18 @@ Melanjutkan pengujian alur pesanan dari sisi pembeli hingga selesai (Order Track
 
 - **Target Aktivitas:** Testing Projek Urip QR
 - **Target Durasi:** 4h
-- **Keterangan:** Hari ini saya telah melakukan pengujian (QA testing) pada fitur Urip Certificate / QR, meliputi validasi integrasi data sertifikat, fungsionalitas pencarian dan filter, pop-up preview dokumen, serta verifikasi keaslian dan keabsahan sertifikat pada environment staging.
+- **Keterangan:** Hari ini saya telah melakukan testing pada fitur Urip Certificate / QR, meliputi pengujian search, filter sertifikat, dan validasi data pada staging.
 - **Target Description:**
-  - Hari ini saya telah melakukan pengujian fungsionalitas pencarian (nama produk & sertifikat) serta pagination pada halaman Urip Certificate.
-  - Hari ini saya telah memvalidasi integrasi data API dan tampilan pop-up preview gambar sertifikat/produk.
-  - Hari ini saya telah memverifikasi kesesuaian Acceptance Criteria fitur sertifikat QR pada environment staging.
+  - Hari ini saya telah melakukan testing fitur pencarian dan filter pada halaman sertifikat QR.
+  - Hari ini saya telah memvalidasi integrasi data dan preview pop-up dokumen sertifikat.
+  - Hari ini saya telah memverifikasi kesesuaian Acceptance Criteria pada website staging.
 
 ### Aktivitas 2
 
 - **Target Aktivitas:** Melanjutkan Projek Frontend
 - **Target Durasi:** 4h
-- **Keterangan:** Hari ini saya telah meredesign tampilan kartu produk menjadi modern dan anti-slop (menghilangkan border garis, menyelaraskan harga dan jumlah terjual, memposisikan rating, dan membuat badge pita 3D), memperbaiki bug visual stacking z-index dan ukuran gambar pada sidebar keranjang belanja & checkout, serta mengimplementasikan slug URL produk yang ramah SEO.
+- **Keterangan:** Hari ini saya telah mengerjakan Fitur Kartu Produk (redesign layout compact), Fitur Keranjang Belanja & Checkout (perbaikan visual sidebar drawer), serta Fitur URL Slug Produk (slug ramah SEO).
 - **Target Description:**
-  - Hari ini saya telah meredesign kartu katalog produk agar compact, bersih tanpa border garis kaku, dengan kontras warna yang tegas dan badge pita 3D lipat.
-  - Hari ini saya telah memperbaiki bug visual drawer keranjang (mengatasi header tertutup navbar via penyesuaian z-index dan memperbaiki thumbnail gambar yang jebol).
-  - Hari ini saya telah mengimplementasikan sistem slug produk yang ramah SEO dan human-readable (`/product/nama-produk`) serta memvalidasi kestabilan fitur melalui linting (0 error) dan unit tests (38/38 lulus).
+  - Hari ini saya telah mengerjakan Fitur Kartu Produk (redesign tampilan compact, badge 3D, dan rating).
+  - Hari ini saya telah mengerjakan Fitur Keranjang & Checkout (perbaikan bug visual z-index dan thumbnail sidebar drawer).
+  - Hari ini saya telah mengerjakan Fitur URL Slug Produk (implementasi slug bersih ramah SEO tanpa suffix ID).
