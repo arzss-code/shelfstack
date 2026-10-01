@@ -36,6 +36,35 @@ const categoryName = computed(() => {
   return cat ? cat.name : null
 })
 
+const formattedRating = computed(() => {
+  const r = props.product.rating
+  if (!r || Number(r) <= 0) return '5.0'
+  return Number(r).toFixed(1)
+})
+
+const soldCountText = computed(() => {
+  const count = props.product.sold_count ?? props.product.review_count ?? 0
+  if (count <= 0) return 'Baru'
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}rb+ terjual`
+  return `${count} terjual`
+})
+
+const badgeInfo = computed(() => {
+  if (props.product.stock === 0) {
+    return { label: 'Habis', type: 'out-of-stock' }
+  }
+  if (props.product.stock > 0 && props.product.stock <= 3) {
+    return { label: `Sisa ${props.product.stock}`, type: 'low-stock' }
+  }
+  if (props.product.is_featured) {
+    return { label: 'Unggulan', type: 'featured' }
+  }
+  if ((props.product.sold_count ?? 0) >= 30) {
+    return { label: 'Terlaris', type: 'bestseller' }
+  }
+  return null
+})
+
 const navigateToDetail = () => {
   const target = props.product.slug || props.product.id
   router.push(`/product/${target}`)
@@ -104,22 +133,31 @@ const handleQuickAdd = () => {
         <span class="text-[10px] font-medium tracking-widest uppercase opacity-50">ShelfStack</span>
       </div>
 
-      <!-- Urgent Stock Status Tag (Minimalist & Unobtrusive) -->
-      <div v-if="product.stock === 0" class="absolute top-2.5 left-2.5 z-10 pointer-events-none">
+      <!-- Badge Overlay (Compact & Tasteful) -->
+      <div v-if="badgeInfo" class="absolute top-2.5 left-2.5 z-10 pointer-events-none">
         <span
-          class="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase bg-brand-ink/90 text-brand-onink backdrop-blur-sm"
+          v-if="badgeInfo.type === 'out-of-stock'"
+          class="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase bg-brand-ink/90 text-brand-onink backdrop-blur-sm shadow-whisper"
         >
-          Habis
+          {{ badgeInfo.label }}
         </span>
-      </div>
-      <div
-        v-else-if="product.stock > 0 && product.stock <= 3"
-        class="absolute top-2.5 left-2.5 z-10 pointer-events-none"
-      >
         <span
-          class="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/25 backdrop-blur-sm"
+          v-else-if="badgeInfo.type === 'low-stock'"
+          class="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/25 backdrop-blur-sm shadow-whisper"
         >
-          Sisa {{ product.stock }}
+          {{ badgeInfo.label }}
+        </span>
+        <span
+          v-else-if="badgeInfo.type === 'featured'"
+          class="px-2 py-0.5 rounded text-[10px] font-medium tracking-wide bg-brand-canvas/90 text-brand-accent border border-brand-accent/20 backdrop-blur-sm shadow-whisper"
+        >
+          {{ badgeInfo.label }}
+        </span>
+        <span
+          v-else-if="badgeInfo.type === 'bestseller'"
+          class="px-2 py-0.5 rounded text-[10px] font-medium tracking-wide bg-brand-canvas/90 text-brand-ink border border-brand-hair/80 backdrop-blur-sm shadow-whisper"
+        >
+          {{ badgeInfo.label }}
         </span>
       </div>
 
@@ -137,11 +175,11 @@ const handleQuickAdd = () => {
       </button>
     </div>
 
-    <!-- Compact Content Body (Zero Redundancy) -->
+    <!-- Compact Content Body (Title + Rating & Terjual + Price) -->
     <div
-      class="p-3 sm:p-3.5 flex flex-col justify-between gap-2 flex-1 relative z-10 pointer-events-none"
+      class="p-3 sm:p-3.5 flex flex-col justify-between gap-1.5 flex-1 relative z-10 pointer-events-none"
     >
-      <div class="space-y-0.5">
+      <div class="space-y-1">
         <!-- Title: 1 line, editorial weight -->
         <h3
           class="font-display font-medium text-sm sm:text-[14.5px] text-brand-ink tracking-tight truncate group-hover:text-brand-accent transition-colors m-0"
@@ -150,10 +188,23 @@ const handleQuickAdd = () => {
           {{ product.name }}
         </h3>
 
-        <!-- Subtle Micro Meta: Category or SKU without redundant text -->
-        <p class="font-body m-0 text-[11px] text-brand-muted tracking-tight truncate">
-          {{ categoryName || product.sku || 'Koleksi Esensial' }}
-        </p>
+        <!-- Social Proof Row: Rating & Terjual (1 compact line) -->
+        <div class="flex items-center gap-1.5 text-xs text-brand-muted">
+          <span
+            class="inline-flex items-center gap-1 font-semibold text-brand-ink text-[11.5px] tabular-nums"
+          >
+            <i class="pi pi-star-fill text-amber-500 text-[10px]" />
+            {{ formattedRating }}
+          </span>
+          <span class="text-brand-hair">·</span>
+          <span class="text-[11px] text-brand-muted tabular-nums">
+            {{ soldCountText }}
+          </span>
+          <span v-if="categoryName" class="text-brand-hair hidden sm:inline">·</span>
+          <span v-if="categoryName" class="text-[11px] text-brand-muted truncate hidden sm:inline">
+            {{ categoryName }}
+          </span>
+        </div>
       </div>
 
       <!-- Bottom Row: Clean Price + Action -->
@@ -162,7 +213,7 @@ const handleQuickAdd = () => {
         @click.stop
       >
         <span
-          class="font-display font-semibold text-sm sm:text-[15px] text-brand-ink tabular-nums tracking-tight"
+          class="font-display font-bold text-sm sm:text-base text-brand-ink tabular-nums tracking-tight"
         >
           {{ formatRupiah(product.price) }}
         </span>

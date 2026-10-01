@@ -17,5 +17,6 @@ export interface Product {
   gallery_urls?: string[]
   rating?: number
   review_count?: number
+  sold_count?: number
   is_featured?: boolean
 }

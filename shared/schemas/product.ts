@@ -21,6 +21,7 @@ export const productSchema = z.object({
   gallery_urls: z.array(z.string().url()).default([]),
   rating: z.number().min(0).max(5).default(5),
   review_count: z.number().int().min(0).default(0),
+  sold_count: z.number().int().min(0).default(0),
   is_featured: z.boolean().default(false),
 })
 
