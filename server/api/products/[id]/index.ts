@@ -4,17 +4,27 @@ import { productSchema } from '../../../../shared/schemas/product'
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
   const client = await serverSupabaseClient(event)
-  const id = Number(getRouterParam(event, 'id'))
+  const rawParam = getRouterParam(event, 'id')
 
-  if (!id) {
-    return errorResponse(event, 'Invalid ID', null, 400)
+  if (!rawParam) {
+    errorResponse(event, 'Identifier parameter is required', null, 400)
   }
 
-  if (method === 'GET') {
-    const { data, error } = await client.from('products').select('*').eq('id', id).single()
+  const isNumeric = /^\d+$/.test(rawParam)
+  const numericId = isNumeric ? Number(rawParam) : null
 
-    if (error) {
-      return errorResponse(event, 'Product not found', error, 404)
+  if (method === 'GET') {
+    let query = client.from('products').select('*').is('deleted_at', null)
+    if (numericId !== null) {
+      query = query.eq('id', numericId)
+    } else {
+      query = query.eq('slug', rawParam)
+    }
+
+    const { data, error } = await query.single()
+
+    if (error || !data) {
+      errorResponse(event, 'Product not found', error, 404)
     }
 
     return successResponse('Product retrieved successfully', data)
@@ -28,18 +38,20 @@ export default defineEventHandler(async (event) => {
     const parsed = productSchema.safeParse(body)
 
     if (!parsed.success) {
-      return errorResponse(event, 'Validation error', parsed.error.flatten().fieldErrors, 400)
+      errorResponse(event, 'Validation error', parsed.error.flatten().fieldErrors, 400)
     }
 
-    const { data, error } = await client
-      .from('products')
-      .update(parsed.data as any)
-      .eq('id', id)
-      .select()
-      .single()
+    let updateQuery = client.from('products').update(parsed.data as any)
+    if (numericId !== null) {
+      updateQuery = updateQuery.eq('id', numericId)
+    } else {
+      updateQuery = updateQuery.eq('slug', rawParam)
+    }
+
+    const { data, error } = await updateQuery.select().single()
 
     if (error) {
-      return errorResponse(event, 'Failed to update product', error, 500)
+      errorResponse(event, 'Failed to update product', error, 500)
     }
 
     return successResponse('Product updated successfully', data)
@@ -48,13 +60,18 @@ export default defineEventHandler(async (event) => {
   if (method === 'DELETE') {
     await requireAdmin(event)
 
-    const { error } = await client
-      .from('products')
-      .update({ deleted_at: new Date().toISOString() })
-      .eq('id', id)
+    let deleteQuery = client.from('products').update({ deleted_at: new Date().toISOString() })
+
+    if (numericId !== null) {
+      deleteQuery = deleteQuery.eq('id', numericId)
+    } else {
+      deleteQuery = deleteQuery.eq('slug', rawParam)
+    }
+
+    const { error } = await deleteQuery
 
     if (error) {
-      return errorResponse(event, 'Failed to delete product', error, 500)
+      errorResponse(event, 'Failed to delete product', error, 500)
     }
 
     return successResponse('Product deleted successfully', null)

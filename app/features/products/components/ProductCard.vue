@@ -23,7 +23,8 @@ const emit = defineEmits<{
 const router = useRouter()
 
 const navigateToDetail = () => {
-  router.push(`/product/${props.product.id}`)
+  const target = props.product.slug || props.product.id
+  router.push(`/product/${target}`)
 }
 </script>
 

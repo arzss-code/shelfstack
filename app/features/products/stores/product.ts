@@ -79,11 +79,11 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
-  // Fetch By ID
-  const fetchProductById = async (id: number): Promise<Product | null> => {
+  // Fetch By ID or Slug
+  const fetchProductById = async (idOrSlug: number | string): Promise<Product | null> => {
     loading.value = true
     try {
-      return await productRepository.getProductById(supabase, id)
+      return await productRepository.getProductById(supabase, idOrSlug)
     } catch (e) {
       throw e
     } finally {

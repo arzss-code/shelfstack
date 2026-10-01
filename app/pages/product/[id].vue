@@ -27,10 +27,10 @@ useSeoMeta({
 })
 
 onMounted(async () => {
-  const id = Number(route.params.id)
-  if (!isNaN(id)) {
+  const param = (route.params.id || (route.params as Record<string, string>).slug) as string
+  if (param) {
     try {
-      product.value = await productStore.fetchProductById(id)
+      product.value = await productStore.fetchProductById(param)
     } catch (error: unknown) {
       toast.add({
         severity: 'error',
