@@ -19,13 +19,14 @@ withDefaults(
 </script>
 
 <template>
-  <button
+  <UiButton
     type="submit"
-    :disabled="loading"
-    class="mt-2 w-full h-11 rounded-full bg-brand-ink text-white text-sm font-bold tracking-wide hover:bg-black active:scale-[0.98] transition-all shadow-whisper flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+    variant="primary"
+    block
+    :loading="loading"
+    :icon="loading ? undefined : icon"
+    class="mt-2 h-11"
   >
-    <i v-if="loading" class="pi pi-spin pi-spinner text-xs" />
-    <i v-else :class="`pi ${icon} text-xs`" />
-    <span>{{ loading ? loadingLabel : label }}</span>
-  </button>
+    {{ loading ? loadingLabel : label }}
+  </UiButton>
 </template>
