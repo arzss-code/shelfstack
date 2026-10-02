@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCartStore } from '~/features/cart/stores/cart'
+import { type CartItem, useCartStore } from '~/features/cart/stores/cart'
 import { formatRupiah } from '~/utils/format'
 
 const cartStore = useCartStore()
@@ -12,6 +12,35 @@ useSeoMeta({
 
 const goToCheckout = () => {
   router.push('/checkout')
+}
+
+const handleManualQuantityInput = (event: Event, item: CartItem) => {
+  const target = event.target as HTMLInputElement
+  const sanitized = target.value.replace(/[^0-9]/g, '')
+  target.value = sanitized
+  if (!sanitized) return
+  const val = parseInt(sanitized, 10)
+  if (val > item.stock) {
+    target.value = String(item.stock)
+    cartStore.updateQuantity(item.productId, item.stock, item.color, item.material)
+  } else if (val >= 1) {
+    cartStore.updateQuantity(item.productId, val, item.color, item.material)
+  }
+}
+
+const handleManualQuantityBlur = (event: Event, item: CartItem) => {
+  const target = event.target as HTMLInputElement
+  const val = parseInt(target.value, 10)
+  if (!target.value || isNaN(val) || val < 1) {
+    target.value = '1'
+    cartStore.updateQuantity(item.productId, 1, item.color, item.material)
+  } else if (val > item.stock) {
+    target.value = String(item.stock)
+    cartStore.updateQuantity(item.productId, item.stock, item.color, item.material)
+  } else {
+    target.value = String(val)
+    cartStore.updateQuantity(item.productId, val, item.color, item.material)
+  }
 }
 </script>
 
@@ -145,9 +174,18 @@ const goToCheckout = () => {
                 >
                   <i class="pi pi-minus text-[10px]" />
                 </button>
-                <span class="w-8 text-center text-xs font-semibold text-brand-ink tabular-nums">
-                  {{ item.quantity }}
-                </span>
+                <input
+                  :value="item.quantity"
+                  type="text"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  aria-label="Kuantitas produk"
+                  class="w-10 text-center text-xs font-semibold text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-white focus:ring-1 focus:ring-brand-accent/50 rounded-full transition-all p-0 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  @focus="($event.target as HTMLInputElement).select()"
+                  @input="handleManualQuantityInput($event, item)"
+                  @blur="handleManualQuantityBlur($event, item)"
+                  @keydown.enter="($event.target as HTMLInputElement).blur()"
+                />
                 <button
                   type="button"
                   class="w-6 h-6 flex items-center justify-center text-brand-ink hover:bg-white rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed"

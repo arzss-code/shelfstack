@@ -91,6 +91,26 @@ describe('useCartStore', () => {
     expect(cart.isEmpty).toBe(true)
   })
 
+  it('membatasi kuantitas saat update kuantitas manual melebihi batas stok yang tersedia', () => {
+    const cart = useCartStore()
+    cart.addItem({
+      productId: 1,
+      name: 'Mechanical Keyboard',
+      price: 1500000,
+      stock: 25,
+      quantity: 1,
+      openCartDrawer: false,
+    })
+
+    // Input manual kuantitas besar dalam batas stok
+    cart.updateQuantity(1, 20)
+    expect(cart.items[0]?.quantity).toBe(20)
+
+    // Input manual kuantitas melebihi stok (misal user mengetik 100)
+    cart.updateQuantity(1, 100)
+    expect(cart.items[0]?.quantity).toBe(25)
+  })
+
   it('menghapus item secara spesifik dan membersihkan seluruh isi keranjang', () => {
     const cart = useCartStore()
     cart.addItem({

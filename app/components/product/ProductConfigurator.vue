@@ -42,6 +42,35 @@ const decrementQty = () => {
   }
 }
 
+const handleQuantityInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const sanitized = target.value.replace(/[^0-9]/g, '')
+  target.value = sanitized
+  if (!sanitized) return
+  const val = parseInt(sanitized, 10)
+  if (val > maxQuantity.value) {
+    quantity.value = maxQuantity.value
+    target.value = String(maxQuantity.value)
+  } else if (val >= 1) {
+    quantity.value = val
+  }
+}
+
+const handleQuantityBlur = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const val = parseInt(target.value, 10)
+  if (!target.value || isNaN(val) || val < 1) {
+    quantity.value = 1
+    target.value = '1'
+  } else if (val > maxQuantity.value) {
+    quantity.value = maxQuantity.value
+    target.value = String(maxQuantity.value)
+  } else {
+    quantity.value = val
+    target.value = String(val)
+  }
+}
+
 const handleAddToBag = () => {
   if (isOutOfStock.value) return
   emit('addToBag', {
@@ -185,9 +214,19 @@ const handleBuyNow = () => {
           >
             <i class="pi pi-minus text-xs" />
           </button>
-          <span class="w-10 text-center font-display font-bold text-sm text-brand-ink tabular-nums">
-            {{ quantity }}
-          </span>
+          <input
+            :value="quantity"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            aria-label="Jumlah unit pesanan"
+            :disabled="isOutOfStock"
+            class="w-12 text-center font-display font-bold text-sm text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-white focus:ring-1 focus:ring-brand-accent/40 rounded-sm transition-all py-1 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            @focus="($event.target as HTMLInputElement).select()"
+            @input="handleQuantityInput"
+            @blur="handleQuantityBlur"
+            @keydown.enter="($event.target as HTMLInputElement).blur()"
+          />
           <button
             type="button"
             aria-label="Tambah jumlah"
