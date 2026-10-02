@@ -168,8 +168,13 @@ const handleLogout = async () => {
 
         <!-- Right Commerce Actions -->
         <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          <!-- Wishlist Button with Premium Tooltip -->
-          <div class="relative group hidden sm:block">
+          <!-- Wishlist Button with UiTooltip -->
+          <UiTooltip
+            text="Koleksi Disimpan"
+            position="bottom"
+            align="center"
+            class="hidden sm:inline-flex"
+          >
             <NuxtLink
               to="/katalog"
               class="relative p-2 text-brand-muted hover:text-brand-ink rounded-full hover:bg-brand-canvas-soft transition-colors no-underline flex items-center justify-center cursor-pointer"
@@ -182,21 +187,10 @@ const handleLogout = async () => {
                 0
               </span>
             </NuxtLink>
+          </UiTooltip>
 
-            <!-- Wishlist Floating Tooltip -->
-            <div
-              class="absolute left-1/2 -translate-x-1/2 top-full pt-2 pointer-events-none opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 ease-out z-50"
-            >
-              <div
-                class="bg-brand-ink text-white text-[11px] font-medium rounded-lg py-1 px-2.5 shadow-floating border border-white/10 whitespace-nowrap"
-              >
-                Koleksi Disimpan
-              </div>
-            </div>
-          </div>
-
-          <!-- Cart Pill with Premium Floating Tooltip Card -->
-          <div class="relative group">
+          <!-- Cart Pill with UiTooltip -->
+          <UiTooltip position="bottom" align="end">
             <button
               type="button"
               class="flex items-center gap-2 bg-brand-field hover:bg-brand-canvas-soft text-brand-ink text-xs font-semibold px-3.5 py-2 rounded-full transition-all border border-brand-hair hover:border-brand-ink/20 cursor-pointer shadow-whisper"
@@ -213,37 +207,34 @@ const handleLogout = async () => {
               </span>
             </button>
 
-            <!-- Premium Cart Floating Tooltip Card -->
-            <div
-              class="absolute right-0 top-full pt-2 pointer-events-none opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 ease-out z-50 hidden sm:block"
-            >
-              <div
-                class="bg-brand-ink text-white rounded-xl py-2 px-3 shadow-floating border border-white/10 min-w-[190px] whitespace-nowrap"
-              >
-                <div v-if="cartStore.totalItems > 0" class="space-y-1">
-                  <div
-                    class="flex items-center justify-between gap-3 text-[11px] font-medium text-zinc-300"
-                  >
-                    <span>Subtotal ({{ cartStore.totalItems }} item)</span>
-                  </div>
-                  <div class="flex items-baseline justify-between gap-3">
-                    <span
-                      class="font-display text-sm font-bold text-white tabular-nums tracking-tight"
-                    >
-                      {{ cartStore.formattedTotalPrice }}
-                    </span>
-                    <span class="text-[10px] text-blue-400 font-semibold flex items-center gap-0.5">
-                      Buka <i class="pi pi-arrow-right text-[8px]" />
-                    </span>
-                  </div>
+            <!-- Rich Popover Content Slot -->
+            <template #content>
+              <div v-if="cartStore.totalItems > 0" class="space-y-1 min-w-[190px]">
+                <div
+                  class="flex items-center justify-between gap-3 text-[11px] font-medium text-zinc-300"
+                >
+                  <span>Subtotal ({{ cartStore.totalItems }} item)</span>
                 </div>
-                <div v-else class="text-[11px] text-zinc-300 flex items-center gap-2 py-0.5">
-                  <i class="pi pi-shopping-bag text-xs text-zinc-400" />
-                  <span>Keranjang belanja kosong</span>
+                <div class="flex items-baseline justify-between gap-3">
+                  <span
+                    class="font-display text-sm font-bold text-white tabular-nums tracking-tight"
+                  >
+                    {{ cartStore.formattedTotalPrice }}
+                  </span>
+                  <span class="text-[10px] text-blue-400 font-semibold flex items-center gap-0.5">
+                    Buka <i class="pi pi-arrow-right text-[8px]" />
+                  </span>
                 </div>
               </div>
-            </div>
-          </div>
+              <div
+                v-else
+                class="text-[11px] text-zinc-300 flex items-center gap-2 py-0.5 min-w-[170px]"
+              >
+                <i class="pi pi-shopping-bag text-xs text-zinc-400" />
+                <span>Keranjang belanja kosong</span>
+              </div>
+            </template>
+          </UiTooltip>
 
           <!-- User Authentication Section -->
           <div class="relative">
