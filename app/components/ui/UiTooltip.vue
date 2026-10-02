@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useAttrs } from 'vue'
+
+const attrs = useAttrs()
+const isPositioned = computed(() => {
+  return (
+    typeof attrs.class === 'string' && /(?:^|\s)(absolute|fixed|sticky)(?:\s|$)/.test(attrs.class)
+  )
+})
 
 const props = withDefaults(
   defineProps<{
@@ -65,7 +72,7 @@ const cardClasses = computed(() => {
 </script>
 
 <template>
-  <div class="relative group/tooltip inline-flex">
+  <div :class="[isPositioned ? '' : 'relative', 'group/tooltip inline-flex']">
     <!-- Slot Elemen Pemicu (Button, Icon, Link) -->
     <slot />
 

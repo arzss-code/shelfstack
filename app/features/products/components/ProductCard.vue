@@ -126,7 +126,7 @@ const handleQuickAdd = () => {
 
     <!-- Media Canvas: 1:1 Aspect Ratio with rounded-t-2xl -->
     <div
-      class="relative aspect-square w-full bg-[#f6f6f8] dark:bg-[#1f2023] rounded-t-2xl overflow-hidden flex items-center justify-center pointer-events-none"
+      class="relative aspect-square w-full bg-[#f6f6f8] dark:bg-[#1f2023] rounded-t-2xl overflow-hidden pointer-events-none"
     >
       <img
         v-if="product.image_url"
@@ -134,7 +134,7 @@ const handleQuickAdd = () => {
         :alt="product.name"
         loading="lazy"
         :class="[
-          'w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105',
+          'w-full h-full object-cover block transition-transform duration-500 ease-out group-hover:scale-105',
           product.stock === 0 ? 'opacity-60 grayscale' : '',
         ]"
       />
@@ -147,23 +147,26 @@ const handleQuickAdd = () => {
       </div>
 
       <!-- Floating Quick Add Button (Desktop Hover) -->
-      <UiTooltip
+      <div
         v-if="hideActions && product.stock > 0"
-        :text="justAdded ? 'Ditambahkan ke Bag' : 'Tambah ke Bag'"
-        position="top"
-        align="end"
         class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
       >
-        <button
-          type="button"
-          class="w-7 h-7 rounded-full bg-white dark:bg-zinc-800 text-slate-800 dark:text-white shadow-sm flex items-center justify-center active:scale-95 cursor-pointer hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-colors"
-          :aria-label="`Tambah ${product.name} ke Keranjang`"
-          @click.stop.prevent="handleQuickAdd"
+        <UiTooltip
+          :text="justAdded ? 'Ditambahkan ke Bag' : 'Tambah ke Bag'"
+          position="top"
+          align="end"
         >
-          <i v-if="justAdded" class="pi pi-check text-[10px] text-emerald-500" />
-          <i v-else class="pi pi-plus text-[10px]" />
-        </button>
-      </UiTooltip>
+          <button
+            type="button"
+            class="w-7 h-7 rounded-full bg-white dark:bg-zinc-800 text-slate-800 dark:text-white shadow-sm flex items-center justify-center active:scale-95 cursor-pointer hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-colors"
+            :aria-label="`Tambah ${product.name} ke Keranjang`"
+            @click.stop.prevent="handleQuickAdd"
+          >
+            <i v-if="justAdded" class="pi pi-check text-[10px] text-emerald-500" />
+            <i v-else class="pi pi-plus text-[10px]" />
+          </button>
+        </UiTooltip>
+      </div>
     </div>
 
     <!-- Compact Content Body: Zero divider lines, small crisp typography -->
