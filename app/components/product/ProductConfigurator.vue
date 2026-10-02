@@ -148,22 +148,22 @@ const handleBuyNow = () => {
         <span class="font-bold text-brand-ink">{{ selectedColor }}</span>
       </div>
       <div class="flex items-center gap-2.5">
-        <button
-          v-for="c in colors"
-          :key="c.name"
-          type="button"
-          :title="c.name"
-          :class="[
-            'w-9 h-9 rounded-full border-2 transition-all cursor-pointer flex items-center justify-center',
-            c.class,
-            selectedColor === c.name
-              ? 'border-brand-accent ring-2 ring-brand-accent/30 scale-105'
-              : 'border-brand-hair hover:scale-105',
-          ]"
-          @click="selectedColor = c.name"
-        >
-          <i v-if="selectedColor === c.name" class="pi pi-check text-xs text-white" />
-        </button>
+        <UiTooltip v-for="c in colors" :key="c.name" :text="c.name" position="top">
+          <button
+            type="button"
+            :aria-label="c.name"
+            :class="[
+              'w-9 h-9 rounded-full border-2 transition-all cursor-pointer flex items-center justify-center',
+              c.class,
+              selectedColor === c.name
+                ? 'border-brand-accent ring-2 ring-brand-accent/30 scale-105'
+                : 'border-brand-hair hover:scale-105',
+            ]"
+            @click="selectedColor = c.name"
+          >
+            <i v-if="selectedColor === c.name" class="pi pi-check text-xs text-white" />
+          </button>
+        </UiTooltip>
       </div>
     </div>
 

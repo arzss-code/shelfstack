@@ -214,14 +214,16 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
               </div>
 
               <!-- Delete Button -->
-              <button
-                type="button"
-                class="text-brand-faint hover:text-red-600 transition-colors p-1.5 cursor-pointer rounded-full hover:bg-red-50"
-                aria-label="Hapus produk"
-                @click="cartStore.removeItem(item.productId, item.color, item.material)"
-              >
-                <i class="pi pi-trash text-sm" />
-              </button>
+              <UiTooltip text="Hapus item" position="top" align="end">
+                <button
+                  type="button"
+                  class="text-brand-faint hover:text-red-600 transition-colors p-1.5 cursor-pointer rounded-full hover:bg-red-50"
+                  aria-label="Hapus produk"
+                  @click="cartStore.removeItem(item.productId, item.color, item.material)"
+                >
+                  <i class="pi pi-trash text-sm" />
+                </button>
+              </UiTooltip>
             </div>
           </article>
         </div>

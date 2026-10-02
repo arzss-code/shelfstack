@@ -147,17 +147,23 @@ const handleQuickAdd = () => {
       </div>
 
       <!-- Floating Quick Add Button (Desktop Hover) -->
-      <button
+      <UiTooltip
         v-if="hideActions && product.stock > 0"
-        type="button"
-        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto w-7 h-7 rounded-full bg-white dark:bg-zinc-800 text-slate-800 dark:text-white shadow-sm flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 active:scale-95 cursor-pointer hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600"
-        :title="`Tambah ${product.name} ke Keranjang`"
-        :aria-label="`Tambah ${product.name} ke Keranjang`"
-        @click.stop.prevent="handleQuickAdd"
+        :text="justAdded ? 'Ditambahkan ke Bag' : 'Tambah ke Bag'"
+        position="top"
+        align="end"
+        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
       >
-        <i v-if="justAdded" class="pi pi-check text-[10px] text-emerald-500" />
-        <i v-else class="pi pi-plus text-[10px]" />
-      </button>
+        <button
+          type="button"
+          class="w-7 h-7 rounded-full bg-white dark:bg-zinc-800 text-slate-800 dark:text-white shadow-sm flex items-center justify-center active:scale-95 cursor-pointer hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-colors"
+          :aria-label="`Tambah ${product.name} ke Keranjang`"
+          @click.stop.prevent="handleQuickAdd"
+        >
+          <i v-if="justAdded" class="pi pi-check text-[10px] text-emerald-500" />
+          <i v-else class="pi pi-plus text-[10px]" />
+        </button>
+      </UiTooltip>
     </div>
 
     <!-- Compact Content Body: Zero divider lines, small crisp typography -->
@@ -222,22 +228,26 @@ const handleQuickAdd = () => {
             </button>
           </template>
           <template v-else>
-            <button
-              type="button"
-              class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
-              title="Ubah"
-              @click.stop="emit('edit', product)"
-            >
-              <i class="pi pi-pencil text-[10px]" />
-            </button>
-            <button
-              type="button"
-              class="w-7 h-7 rounded-full bg-slate-100 hover:bg-red-600 hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
-              title="Hapus"
-              @click.stop="emit('delete', product.id)"
-            >
-              <i class="pi pi-trash text-[10px]" />
-            </button>
+            <UiTooltip text="Ubah Produk" position="top">
+              <button
+                type="button"
+                class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Ubah Produk"
+                @click.stop="emit('edit', product)"
+              >
+                <i class="pi pi-pencil text-[10px]" />
+              </button>
+            </UiTooltip>
+            <UiTooltip text="Hapus Produk" position="top" align="end">
+              <button
+                type="button"
+                class="w-7 h-7 rounded-full bg-slate-100 hover:bg-red-600 hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Hapus Produk"
+                @click.stop="emit('delete', product.id)"
+              >
+                <i class="pi pi-trash text-[10px]" />
+              </button>
+            </UiTooltip>
           </template>
         </div>
       </div>

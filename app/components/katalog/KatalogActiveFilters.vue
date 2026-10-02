@@ -26,14 +26,16 @@ const emit = defineEmits<{
       class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-field text-xs text-brand-ink border border-brand-hairsoft"
     >
       <span>Kata Kunci: "{{ searchQuery }}"</span>
-      <button
-        type="button"
-        class="hover:text-red-500 cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
-        title="Hapus filter pencarian"
-        @click="emit('clearSearch')"
-      >
-        <i class="pi pi-times text-[10px]" />
-      </button>
+      <UiTooltip text="Hapus filter pencarian" position="top">
+        <button
+          type="button"
+          class="hover:text-red-500 cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
+          aria-label="Hapus filter pencarian"
+          @click="emit('clearSearch')"
+        >
+          <i class="pi pi-times text-[10px]" />
+        </button>
+      </UiTooltip>
     </span>
 
     <!-- Category tag -->
@@ -42,14 +44,16 @@ const emit = defineEmits<{
       class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-field text-xs text-brand-ink border border-brand-hairsoft"
     >
       <span>Kategori: {{ categoryLabel }}</span>
-      <button
-        type="button"
-        class="hover:text-red-500 cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
-        title="Hapus filter kategori"
-        @click="emit('clearCategory')"
-      >
-        <i class="pi pi-times text-[10px]" />
-      </button>
+      <UiTooltip text="Hapus filter kategori" position="top">
+        <button
+          type="button"
+          class="hover:text-red-500 cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
+          aria-label="Hapus filter kategori"
+          @click="emit('clearCategory')"
+        >
+          <i class="pi pi-times text-[10px]" />
+        </button>
+      </UiTooltip>
     </span>
 
     <!-- Price range tag -->
@@ -58,14 +62,16 @@ const emit = defineEmits<{
       class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-field text-xs text-brand-ink border border-brand-hairsoft"
     >
       <span>Harga: {{ priceRangeLabel }}</span>
-      <button
-        type="button"
-        class="hover:text-red-500 cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
-        title="Hapus filter harga"
-        @click="emit('clearPriceRange')"
-      >
-        <i class="pi pi-times text-[10px]" />
-      </button>
+      <UiTooltip text="Hapus filter harga" position="top">
+        <button
+          type="button"
+          class="hover:text-red-500 cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
+          aria-label="Hapus filter harga"
+          @click="emit('clearPriceRange')"
+        >
+          <i class="pi pi-times text-[10px]" />
+        </button>
+      </UiTooltip>
     </span>
 
     <!-- Reset all button -->

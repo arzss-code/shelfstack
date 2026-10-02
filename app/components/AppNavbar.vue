@@ -156,13 +156,15 @@ const handleLogout = async () => {
               placeholder="Cari produk kebutuhan kerja, rumah, audio, furnitur..."
             />
 
-            <button
-              type="submit"
-              class="w-8 h-8 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0 hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
-              aria-label="Cari produk"
-            >
-              <i class="pi pi-search text-xs" />
-            </button>
+            <UiTooltip text="Cari produk" position="bottom">
+              <button
+                type="submit"
+                class="w-8 h-8 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0 hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
+                aria-label="Cari produk"
+              >
+                <i class="pi pi-search text-xs" />
+              </button>
+            </UiTooltip>
           </form>
         </div>
 

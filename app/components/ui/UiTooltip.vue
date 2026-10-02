@@ -33,12 +33,12 @@ const positionClasses = computed(() => {
           : props.align === 'end'
             ? 'right-0'
             : 'left-1/2 -translate-x-1/2',
-        '-translate-y-1 group-hover:translate-y-0',
+        '-translate-y-1 group-hover/tooltip:translate-y-0',
       ].join(' ')
     case 'left':
-      return 'right-full pr-2 top-1/2 -translate-y-1/2 -translate-x-1 group-hover:translate-x-0'
+      return 'right-full pr-2 top-1/2 -translate-y-1/2 -translate-x-1 group-hover/tooltip:translate-x-0'
     case 'right':
-      return 'left-full pl-2 top-1/2 -translate-y-1/2 translate-x-1 group-hover:translate-x-0'
+      return 'left-full pl-2 top-1/2 -translate-y-1/2 translate-x-1 group-hover/tooltip:translate-x-0'
     case 'bottom':
     default:
       return [
@@ -48,7 +48,7 @@ const positionClasses = computed(() => {
           : props.align === 'end'
             ? 'right-0'
             : 'left-1/2 -translate-x-1/2',
-        'translate-y-1 group-hover:translate-y-0',
+        'translate-y-1 group-hover/tooltip:translate-y-0',
       ].join(' ')
   }
 })
@@ -65,7 +65,7 @@ const cardClasses = computed(() => {
 </script>
 
 <template>
-  <div class="relative group inline-flex">
+  <div class="relative group/tooltip inline-flex">
     <!-- Slot Elemen Pemicu (Button, Icon, Link) -->
     <slot />
 
@@ -73,7 +73,7 @@ const cardClasses = computed(() => {
     <div
       v-if="!disabled && (text || $slots.content)"
       :class="[
-        'absolute pointer-events-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-out z-50 hidden sm:block',
+        'absolute pointer-events-none opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 ease-out z-50 hidden sm:block',
         positionClasses,
       ]"
       role="tooltip"

@@ -38,15 +38,21 @@ const emit = defineEmits<{
         class="w-full h-10 pl-9 pr-8 text-xs sm:text-sm bg-brand-field text-brand-ink placeholder:text-brand-faint rounded-full border border-transparent outline-none focus:border-brand-hair focus:bg-brand-canvas focus:ring-2 focus:ring-brand-ink transition-all"
         @input="emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
       />
-      <button
+      <UiTooltip
         v-if="searchQuery"
-        type="button"
-        class="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-brand-hair flex items-center justify-center text-[10px] text-brand-ink hover:bg-brand-muted hover:text-white transition-colors cursor-pointer border-0"
-        title="Hapus pencarian"
-        @click="emit('clearSearch')"
+        text="Hapus pencarian"
+        position="top"
+        class="absolute right-2.5 top-1/2 -translate-y-1/2"
       >
-        <i class="pi pi-times" />
-      </button>
+        <button
+          type="button"
+          class="w-5 h-5 rounded-full bg-brand-hair flex items-center justify-center text-[10px] text-brand-ink hover:bg-brand-muted hover:text-white transition-colors cursor-pointer border-0"
+          aria-label="Hapus pencarian"
+          @click="emit('clearSearch')"
+        >
+          <i class="pi pi-times" />
+        </button>
+      </UiTooltip>
     </div>
 
     <!-- Controls Right: Mobile Filter Button, Sort Dropdown & Density Toggle -->
@@ -91,32 +97,36 @@ const emit = defineEmits<{
       <div
         class="hidden sm:flex items-center bg-brand-field p-1 rounded-full border border-brand-hairsoft"
       >
-        <button
-          type="button"
-          :class="[
-            'w-8 h-8 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
-            gridDensity === 'compact'
-              ? 'bg-brand-canvas text-brand-ink shadow-whisper'
-              : 'text-brand-muted bg-transparent hover:text-brand-ink',
-          ]"
-          title="Tampilan 4 Kolom"
-          @click="emit('update:gridDensity', 'compact')"
-        >
-          <i class="pi pi-th-large text-xs" />
-        </button>
-        <button
-          type="button"
-          :class="[
-            'w-8 h-8 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
-            gridDensity === 'spacious'
-              ? 'bg-brand-canvas text-brand-ink shadow-whisper'
-              : 'text-brand-muted bg-transparent hover:text-brand-ink',
-          ]"
-          title="Tampilan 3 Kolom"
-          @click="emit('update:gridDensity', 'spacious')"
-        >
-          <i class="pi pi-table text-xs" />
-        </button>
+        <UiTooltip text="Tampilan 4 Kolom" position="top">
+          <button
+            type="button"
+            :class="[
+              'w-8 h-8 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+              gridDensity === 'compact'
+                ? 'bg-brand-canvas text-brand-ink shadow-whisper'
+                : 'text-brand-muted bg-transparent hover:text-brand-ink',
+            ]"
+            aria-label="Tampilan 4 Kolom"
+            @click="emit('update:gridDensity', 'compact')"
+          >
+            <i class="pi pi-th-large text-xs" />
+          </button>
+        </UiTooltip>
+        <UiTooltip text="Tampilan 3 Kolom" position="top">
+          <button
+            type="button"
+            :class="[
+              'w-8 h-8 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+              gridDensity === 'spacious'
+                ? 'bg-brand-canvas text-brand-ink shadow-whisper'
+                : 'text-brand-muted bg-transparent hover:text-brand-ink',
+            ]"
+            aria-label="Tampilan 3 Kolom"
+            @click="emit('update:gridDensity', 'spacious')"
+          >
+            <i class="pi pi-table text-xs" />
+          </button>
+        </UiTooltip>
       </div>
     </div>
   </section>

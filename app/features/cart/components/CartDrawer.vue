@@ -107,14 +107,16 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
               </h2>
             </div>
           </div>
-          <button
-            type="button"
-            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            aria-label="Tutup Keranjang"
-            @click="close"
-          >
-            <i class="pi pi-times text-xs" />
-          </button>
+          <UiTooltip text="Tutup Keranjang" position="bottom" align="end">
+            <button
+              type="button"
+              class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              aria-label="Tutup Keranjang"
+              @click="close"
+            >
+              <i class="pi pi-times text-xs" />
+            </button>
+          </UiTooltip>
         </header>
 
         <!-- Body / Items List -->
@@ -203,15 +205,16 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                   </div>
 
                   <!-- Remove Button -->
-                  <button
-                    type="button"
-                    class="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors p-1 rounded-md cursor-pointer shrink-0 -mr-1"
-                    aria-label="Hapus item"
-                    title="Hapus dari keranjang"
-                    @click="cartStore.removeItem(item.productId, item.color, item.material)"
-                  >
-                    <i class="pi pi-trash text-xs" />
-                  </button>
+                  <UiTooltip text="Hapus item" position="left">
+                    <button
+                      type="button"
+                      class="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors p-1 rounded-md cursor-pointer shrink-0 -mr-1"
+                      aria-label="Hapus item"
+                      @click="cartStore.removeItem(item.productId, item.color, item.material)"
+                    >
+                      <i class="pi pi-trash text-xs" />
+                    </button>
+                  </UiTooltip>
                 </div>
 
                 <div class="flex items-center justify-between pt-1">
