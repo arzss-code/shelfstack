@@ -185,19 +185,18 @@ const handleLogout = async () => {
           <!-- Cart Pill -->
           <button
             type="button"
-            class="flex items-center gap-1.5 bg-brand-field hover:bg-brand-canvas-soft text-brand-ink text-xs font-semibold px-3.5 py-2 rounded-full transition-colors border border-brand-hair cursor-pointer"
+            class="flex items-center gap-2 bg-brand-field hover:bg-brand-canvas-soft text-brand-ink text-xs font-semibold px-3.5 py-2 rounded-full transition-all border border-brand-hair hover:border-brand-ink/20 cursor-pointer shadow-whisper"
+            :title="`Keranjang Belanja: ${cartStore.totalItems} item${cartStore.totalItems > 0 ? ` (${cartStore.formattedTotalPrice})` : ''}`"
             aria-label="Buka Keranjang Belanja"
             @click="cartStore.openDrawer"
           >
             <i class="pi pi-shopping-bag text-sm text-brand-ink" />
             <span class="hidden sm:inline">Keranjang</span>
             <span
-              class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none min-w-4 text-center"
+              v-if="cartStore.totalItems > 0"
+              class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none min-w-4 text-center tabular-nums"
             >
-              {{ cartStore.totalItems }}
-            </span>
-            <span class="text-brand-muted font-normal text-[11px] hidden lg:inline ml-0.5">
-              {{ cartStore.formattedTotalPrice }}
+              {{ cartStore.totalItems > 99 ? '99+' : cartStore.totalItems }}
             </span>
           </button>
 
