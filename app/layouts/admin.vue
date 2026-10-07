@@ -28,6 +28,24 @@ import AppFooter from '~/components/AppFooter.vue'
 
       <nav class="flex flex-col gap-1.5" aria-label="Navigasi Menu Admin">
         <NuxtLink
+          to="/admin"
+          class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center gap-2.5 text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
+          exact-active-class="!bg-brand-ink !text-brand-onink shadow-whisper"
+        >
+          <i class="pi pi-chart-bar text-xs" />
+          <span>Dashboard</span>
+        </NuxtLink>
+
+        <NuxtLink
+          to="/admin/orders"
+          class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center gap-2.5 text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
+          active-class="!bg-brand-ink !text-brand-onink shadow-whisper"
+        >
+          <i class="pi pi-shopping-bag text-xs" />
+          <span>Kelola Pesanan</span>
+        </NuxtLink>
+
+        <NuxtLink
           to="/admin/products"
           class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center gap-2.5 text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
           active-class="!bg-brand-ink !text-brand-onink shadow-whisper"
