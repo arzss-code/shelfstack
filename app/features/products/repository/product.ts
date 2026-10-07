@@ -10,6 +10,8 @@ interface ProductPayload {
   description: string | null
   link: string | null
   image_url: string | null
+  stock?: number
+  category_id?: string | null
 }
 
 export const productRepository = {

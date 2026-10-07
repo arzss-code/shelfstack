@@ -220,7 +220,20 @@ const handleQuickAdd = () => {
         </span>
 
         <!-- Admin Actions (Management Mode) -->
-        <div v-else class="flex items-center gap-1">
+        <div v-else class="flex items-center gap-1.5">
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+            :class="[
+              product.stock === 0
+                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'
+                : product.stock < 5
+                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+            ]"
+          >
+            Stok: {{ product.stock }}
+          </span>
+
           <template v-if="isTrash">
             <button
               type="button"

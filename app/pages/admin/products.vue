@@ -75,6 +75,8 @@ const handleSave = async (
   description: string | null,
   link: string | null,
   file: File | null,
+  stock = 0,
+  categoryId: string | null = null,
 ) => {
   try {
     if (editingProduct.value) {
@@ -85,6 +87,8 @@ const handleSave = async (
         description,
         link,
         file,
+        stock,
+        categoryId,
       )
       toast.add({
         severity: 'success',
@@ -93,7 +97,7 @@ const handleSave = async (
         life: 3000,
       })
     } else {
-      await productStore.addProduct(name, price, description, link, file)
+      await productStore.addProduct(name, price, description, link, file, stock, categoryId)
       toast.add({
         severity: 'success',
         summary: 'Berhasil',
