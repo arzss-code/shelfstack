@@ -7,10 +7,26 @@ useSeoMeta({
   description:
     'Masukkan email terdaftar dan kami akan mengirim tautan untuk mengatur ulang kata sandi Anda.',
 })
-definePageMeta({ layout: 'default' })
+definePageMeta({
+  layout: 'default',
+  middleware: 'guest',
+})
 
 const toast = useToast()
+const user = useSupabaseUser()
 const { sendPasswordResetEmail, pending } = useAuth()
+
+if (import.meta.client) {
+  watch(
+    user,
+    (currentUser) => {
+      if (currentUser) {
+        navigateTo('/')
+      }
+    },
+    { immediate: true },
+  )
+}
 
 const email = ref('')
 const emailError = ref('')

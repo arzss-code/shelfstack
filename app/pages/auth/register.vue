@@ -8,10 +8,26 @@ useSeoMeta({
   description:
     'Daftar akun ShelfStack sekarang untuk menikmati promo eksklusif dan belanja produk kurasi terbaik.',
 })
-definePageMeta({ layout: 'default' })
+definePageMeta({
+  layout: 'default',
+  middleware: 'guest',
+})
 
 const toast = useToast()
+const user = useSupabaseUser()
 const { signUp, signInWithGoogle, pending } = useAuth()
+
+if (import.meta.client) {
+  watch(
+    user,
+    (currentUser) => {
+      if (currentUser) {
+        navigateTo('/')
+      }
+    },
+    { immediate: true },
+  )
+}
 
 const fullName = ref('')
 const email = ref('')

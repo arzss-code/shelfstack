@@ -4,7 +4,7 @@ import { useCategories } from '~/composables/useCategories'
 import { useCartStore } from '~/features/cart/stores/cart'
 import AppLogo from './AppLogo.vue'
 
-const { user, profile, isAdmin, fetchProfile, signOut } = useAuth()
+const { user, profile, isAdmin, isLoggedIn, fetchProfile, signOut } = useAuth()
 const cartStore = useCartStore()
 const {
   categories: dynamicCategories,
@@ -240,7 +240,7 @@ const handleLogout = async () => {
 
           <!-- User Authentication Section -->
           <div class="relative">
-            <template v-if="user">
+            <template v-if="isLoggedIn && user">
               <button
                 type="button"
                 class="flex items-center gap-1.5 p-1 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair"
@@ -393,12 +393,36 @@ const handleLogout = async () => {
           Katalog Lengkap
         </NuxtLink>
         <NuxtLink
+          v-if="isLoggedIn"
+          to="/orders"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+          @click="isMobileMenuOpen = false"
+        >
+          Pesanan Saya
+        </NuxtLink>
+        <NuxtLink
           v-if="isAdmin"
           to="/admin/products"
           class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
           @click="isMobileMenuOpen = false"
         >
           Kelola Produk (Admin)
+        </NuxtLink>
+        <button
+          v-if="isLoggedIn"
+          type="button"
+          class="py-2 text-left text-red-600 font-semibold cursor-pointer border-b border-brand-hairsoft"
+          @click="handleLogout"
+        >
+          Keluar
+        </button>
+        <NuxtLink
+          v-else
+          to="/auth/login"
+          class="py-2 text-brand-accent no-underline font-semibold"
+          @click="isMobileMenuOpen = false"
+        >
+          Masuk ke Akun
         </NuxtLink>
       </nav>
     </div>

@@ -8,10 +8,14 @@ useSeoMeta({
   description:
     'Masuk ke akun ShelfStack untuk kemudahan belanja, lacak pesanan, dan penawaran eksklusif.',
 })
-definePageMeta({ layout: 'default' })
+definePageMeta({
+  layout: 'default',
+  middleware: 'guest',
+})
 
 const toast = useToast()
 const route = useRoute()
+const user = useSupabaseUser()
 const { signIn, signInWithGoogle, pending } = useAuth()
 
 const email = ref('')
@@ -19,8 +23,24 @@ const password = ref('')
 const errors = ref<{ email?: string; password?: string }>({})
 
 const redirectTo = computed(() =>
-  typeof route.query.redirect === 'string' ? route.query.redirect : '/',
+  typeof route.query.redirect === 'string' &&
+  route.query.redirect.startsWith('/') &&
+  !route.query.redirect.startsWith('//')
+    ? route.query.redirect
+    : '/',
 )
+
+if (import.meta.client) {
+  watch(
+    user,
+    (currentUser) => {
+      if (currentUser) {
+        navigateTo(redirectTo.value)
+      }
+    },
+    { immediate: true },
+  )
+}
 
 const handleLogin = async () => {
   const parsed = loginSchema.safeParse({ email: email.value, password: password.value })
