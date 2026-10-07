@@ -5,6 +5,7 @@ import type { Order, OrderStatus } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
 import { useToast } from 'primevue/usetoast'
 import { useMidtransSnap } from '~/composables/useMidtransSnap'
+import OrderCancelDialog from '~/features/orders/components/OrderCancelDialog.vue'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 const route = useRoute()
@@ -19,6 +20,8 @@ const orderId = route.params.id as string
 const order = ref<Order | null>(null)
 const loading = ref(true)
 const isPaying = ref(false)
+const isCancelling = ref(false)
+const isCancelModalOpen = ref(false)
 const errorMsg = ref('')
 
 let channel: RealtimeChannel | null = null
@@ -157,6 +160,35 @@ const handlePayNow = async () => {
     })
   } finally {
     isPaying.value = false
+  }
+}
+
+const handleCancelOrder = async (reason: string) => {
+  if (!order.value || isCancelling.value) return
+  isCancelling.value = true
+  try {
+    await $fetch(`/api/orders/${orderId}/cancel`, {
+      method: 'POST',
+      body: { reason },
+    })
+    toast.add({
+      severity: 'success',
+      summary: 'Pesanan Dibatalkan',
+      detail: 'Pesanan berhasil dibatalkan dan persediaan stok telah dikembalikan.',
+      life: 5000,
+    })
+    isCancelModalOpen.value = false
+    await fetchOrderDetail()
+  } catch (err: unknown) {
+    const fetchErr = err as { data?: { message?: string } }
+    toast.add({
+      severity: 'error',
+      summary: 'Gagal Membatalkan',
+      detail: fetchErr.data?.message || 'Terjadi kesalahan saat membatalkan pesanan.',
+      life: 5000,
+    })
+  } finally {
+    isCancelling.value = false
   }
 }
 
@@ -486,9 +518,20 @@ const formatDate = (dateStr: string) => {
               class="w-full justify-center"
               icon="pi-credit-card"
               :loading="isPaying"
+              :disabled="isCancelling"
               @click="handlePayNow"
             >
               Bayar Sekarang (Midtrans)
+            </UiButton>
+            <UiButton
+              variant="outline"
+              size="sm"
+              class="w-full justify-center !text-red-600 hover:!text-red-700 hover:!border-red-300"
+              icon="pi-times-circle"
+              :disabled="isPaying || isCancelling"
+              @click="isCancelModalOpen = true"
+            >
+              Batalkan Pesanan
             </UiButton>
             <p class="text-[11px] text-brand-muted text-center m-0">
               Gunakan simulator Midtrans Sandbox untuk menguji pembayaran.
@@ -507,5 +550,12 @@ const formatDate = (dateStr: string) => {
         </aside>
       </div>
     </div>
+
+    <!-- Modal Konfirmasi Pembatalan -->
+    <OrderCancelDialog
+      v-model:visible="isCancelModalOpen"
+      :loading="isCancelling"
+      @confirm="handleCancelOrder"
+    />
   </div>
 </template>
