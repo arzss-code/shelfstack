@@ -1,9 +1,29 @@
 <script setup lang="ts">
 import type { Product } from '~/types/product'
+import { detectProductCategorySlug } from '~/utils/product-specs'
+import ProductSpecsTable from './ProductSpecsTable.vue'
 
-defineProps<{
+const props = defineProps<{
   product: Product
 }>()
+
+const categorySlug = computed(() => detectProductCategorySlug(props.product))
+
+const warrantyBadge = computed(() => {
+  switch (categorySlug.value) {
+    case 'furniture':
+      return { value: '5 Tahun', label: 'Garansi Rangka' }
+    case 'tech':
+      return { value: '2 Tahun', label: 'Garansi Resmi' }
+    case 'lifestyle':
+      return { value: '1 Tahun', label: 'Garansi Bahan & Zip' }
+    case 'home':
+      return { value: 'Food-Safe', label: 'Bebas BPA & Toksin' }
+    case 'stationery':
+    default:
+      return { value: '100% Presisi', label: 'Jaminan Kepuasan' }
+  }
+})
 </script>
 
 <template>
@@ -37,8 +57,8 @@ defineProps<{
         class="bg-brand-canvas-soft border border-brand-hairsoft p-3.5 rounded-field flex flex-col items-center justify-center text-center shadow-whisper"
       >
         <i class="pi pi-shield text-brand-ink text-lg mb-1" />
-        <span class="font-display font-bold text-sm text-brand-ink">2 Tahun</span>
-        <span class="text-[11px] text-brand-muted">Garansi Resmi</span>
+        <span class="font-display font-bold text-sm text-brand-ink">{{ warrantyBadge.value }}</span>
+        <span class="text-[11px] text-brand-muted">{{ warrantyBadge.label }}</span>
       </div>
       <div
         class="bg-brand-canvas-soft border border-brand-hairsoft p-3.5 rounded-field flex flex-col items-center justify-center text-center shadow-whisper"
@@ -79,5 +99,8 @@ defineProps<{
         </a>
       </div>
     </UiCard>
+
+    <!-- Dynamic Specification Table (FR-3.2) -->
+    <ProductSpecsTable :product="product" class="mt-2" />
   </div>
 </template>
