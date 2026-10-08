@@ -1,6 +1,6 @@
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
-import { mapMidtransStatus } from '~/server/utils/midtrans'
+import { mapMidtransStatus } from '../../../utils/midtrans'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
