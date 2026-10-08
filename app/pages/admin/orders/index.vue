@@ -129,6 +129,20 @@ const formatDate = (dateStr: string) => {
 }
 
 const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize) || 1)
+
+const prevPage = () => {
+  if (page.value > 1) {
+    page.value--
+    fetchOrders()
+  }
+}
+
+const nextPage = () => {
+  if (page.value < totalPages.value) {
+    page.value++
+    fetchOrders()
+  }
+}
 </script>
 
 <template>
@@ -295,10 +309,7 @@ const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize) || 1)
             type="button"
             :disabled="page <= 1"
             class="rounded-full border border-brand-hair px-3 py-1 font-medium disabled:opacity-40"
-            @click="
-              page--
-              fetchOrders()
-            "
+            @click="prevPage"
           >
             Sebelumnya
           </button>
@@ -307,10 +318,7 @@ const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize) || 1)
             type="button"
             :disabled="page >= totalPages"
             class="rounded-full border border-brand-hair px-3 py-1 font-medium disabled:opacity-40"
-            @click="
-              page++
-              fetchOrders()
-            "
+            @click="nextPage"
           >
             Berikutnya
           </button>
