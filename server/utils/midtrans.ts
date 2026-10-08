@@ -65,3 +65,22 @@ export function extractBaseOrderId(orderId: string): string {
   const match = orderId.match(uuidRegex)
   return match ? match[0] : orderId
 }
+
+/**
+ * Detects whether a Midtrans Snap API error is due to an already taken / duplicate order_id.
+ * Supports both Indonesian ("order_id sudah digunakan") and English ("order_id has already been taken").
+ */
+export function isMidtransDuplicateOrderError(err: unknown): boolean {
+  if (!err || typeof err !== 'object') return false
+  const errorObj = err as { data?: { error_messages?: string[] }; message?: string }
+  const messages: string[] = []
+  if (Array.isArray(errorObj.data?.error_messages)) {
+    messages.push(...errorObj.data!.error_messages)
+  }
+  if (errorObj.message) {
+    messages.push(errorObj.message)
+  }
+
+  const pattern = /order_id.*(already been taken|sudah digunakan|duplicate|already exist)/i
+  return messages.some((msg) => pattern.test(msg))
+}

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import crypto from 'node:crypto'
 import {
   extractBaseOrderId,
+  isMidtransDuplicateOrderError,
   mapMidtransStatus,
   verifyMidtransSignature,
 } from '../../server/utils/midtrans'
@@ -93,5 +94,47 @@ describe('extractBaseOrderId', () => {
 
   it('mengembalikan string kosong jika input falsy', () => {
     expect(extractBaseOrderId('')).toBe('')
+  })
+})
+
+describe('isMidtransDuplicateOrderError', () => {
+  it('mendeteksi pesan duplikat versi bahasa Inggris ("transaction_details.order_id has already been taken")', () => {
+    const error = {
+      data: {
+        error_messages: ['transaction_details.order_id has already been taken'],
+      },
+    }
+    expect(isMidtransDuplicateOrderError(error)).toBe(true)
+  })
+
+  it('mendeteksi pesan duplikat versi bahasa Indonesia ("transaction_details.order_id sudah digunakan")', () => {
+    const error = {
+      data: {
+        error_messages: ['transaction_details.order_id sudah digunakan'],
+      },
+    }
+    expect(isMidtransDuplicateOrderError(error)).toBe(true)
+  })
+
+  it('mendeteksi pesan duplikat dari properti message langsung', () => {
+    const error = {
+      message:
+        '[POST] "https://app.sandbox.midtrans.com/snap/v1/transactions": order_id already exists',
+    }
+    expect(isMidtransDuplicateOrderError(error)).toBe(true)
+  })
+
+  it('mengabaikan error lain yang bukan duplikasi order_id', () => {
+    const error = {
+      data: {
+        error_messages: ['gross_amount is invalid'],
+      },
+    }
+    expect(isMidtransDuplicateOrderError(error)).toBe(false)
+  })
+
+  it('menangani input error falsy / null tanpa crash', () => {
+    expect(isMidtransDuplicateOrderError(null)).toBe(false)
+    expect(isMidtransDuplicateOrderError(undefined)).toBe(false)
   })
 })

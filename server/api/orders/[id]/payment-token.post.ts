@@ -1,5 +1,6 @@
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { isMidtransDuplicateOrderError } from '../../../utils/midtrans'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
@@ -100,15 +101,7 @@ export default defineEventHandler(async (event) => {
     try {
       midtransResponse = await requestSnapToken(activeOrderId)
     } catch (primaryErr: unknown) {
-      const fetchErr = primaryErr as { data?: { error_messages?: string[] }; message?: string }
-      const errorMessages = Array.isArray(fetchErr.data?.error_messages)
-        ? fetchErr.data!.error_messages
-        : []
-      const isDuplicateOrderId =
-        errorMessages.some((msg) => msg.includes('order_id sudah digunakan')) ||
-        Boolean(fetchErr.message?.includes('order_id sudah digunakan'))
-
-      if (isDuplicateOrderId) {
+      if (isMidtransDuplicateOrderError(primaryErr)) {
         // Jika order_id sebelumnya sudah terdaftar di Midtrans sandbox/production
         // (misal percobaan ulang checkout atau reset DB), gunakan suffix percobaan unik
         activeOrderId = `${order.id}-R${Date.now().toString().slice(-6)}`
