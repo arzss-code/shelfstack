@@ -47,6 +47,25 @@ const NoirPreset = definePreset(Aura, {
       },
     },
   },
+  components: {
+    toast: {
+      root: {
+        blur: '0',
+      },
+      colorScheme: {
+        light: {
+          root: {
+            blur: '0',
+          },
+        },
+        dark: {
+          root: {
+            blur: '0',
+          },
+        },
+      },
+    },
+  },
 })
 
 export default defineNuxtConfig({
