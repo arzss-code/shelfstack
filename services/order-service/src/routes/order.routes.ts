@@ -76,4 +76,62 @@ export const orderRoutes: FastifyPluginAsync = async (app) => {
       }
     },
   )
+
+  // 4. Endpoint worker untuk membatalkan pesanan kedaluwarsa & restock otomatis
+  app.post(
+    '/api/v1/orders/sweep-expiry',
+    {
+      schema: {
+        body: z
+          .object({
+            expiry_minutes: z.number().min(1).default(30),
+          })
+          .optional(),
+      },
+    },
+    async (request, reply) => {
+      const body = (request.body as { expiry_minutes?: number } | undefined) || {}
+      const expiryMinutes = body.expiry_minutes ?? 30
+
+      try {
+        const { OrderExpiryWorker } = await import('../workers/order-expiry.worker.js')
+        const sweepResult = await OrderExpiryWorker.sweepExpiredOrders(expiryMinutes)
+
+        return reply.status(200).send({
+          status: 'success',
+          message: 'Pemeriksaan pesanan kedaluwarsa selesai',
+          data: sweepResult,
+        })
+      } catch (error: any) {
+        request.log.error({ err: error }, 'Failed to sweep expired orders')
+        return reply.status(500).send({
+          status: 'error',
+          message: error.message || 'Gagal memeriksa pesanan kedaluwarsa',
+          data: null,
+          errors: null,
+        })
+      }
+    },
+  )
+
+  // 5. Endpoint invalidasi cache katalog (O(1) version tag increment)
+  app.post('/api/v1/orders/invalidate-cache', async (_request, reply) => {
+    try {
+      const { CacheService } = await import('../cache/redis.client.js')
+      await CacheService.invalidateCatalog()
+
+      return reply.status(200).send({
+        status: 'success',
+        message: 'Cache katalog berhasil di-invalidasi',
+        data: null,
+      })
+    } catch (error: any) {
+      return reply.status(500).send({
+        status: 'error',
+        message: error.message || 'Gagal menginvalidasi cache katalog',
+        data: null,
+        errors: null,
+      })
+    }
+  })
 }

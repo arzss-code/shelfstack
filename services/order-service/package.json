@@ -12,10 +12,11 @@
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
-    "fastify-type-provider-zod": "^4.0.2",
     "@supabase/supabase-js": "^2.112.2",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
+    "fastify-type-provider-zod": "^4.0.2",
+    "ioredis": "^6.0.0",
     "pino": "^9.6.0",
     "zod": "^3.24.2"
   },

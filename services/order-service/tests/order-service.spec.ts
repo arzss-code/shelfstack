@@ -120,4 +120,86 @@ describe('Order Service (Fastify Pilot)', () => {
       setSupabaseClient(null)
     })
   })
+
+  describe('Redis Cache-Aside & Circuit Breaker', () => {
+    it('gracefully degrades without throwing errors when Redis is not connected', async () => {
+      const { CacheService } = await import('../src/cache/redis.client.js')
+
+      const version = await CacheService.getCatalogVersion()
+      expect(version).toBe('v1')
+
+      const cached = await CacheService.get('any-key')
+      expect(cached).toBeNull()
+
+      const setResult = await CacheService.set('any-key', { foo: 'bar' })
+      expect(setResult).toBe(false)
+
+      const invalidResult = await CacheService.invalidateCatalog()
+      expect(invalidResult).toBe(false)
+    })
+
+    it('should successfully call /api/v1/orders/invalidate-cache', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/orders/invalidate-cache',
+      })
+
+      expect(response.statusCode).toBe(200)
+      const body = response.json()
+      expect(body.status).toBe('success')
+    })
+  })
+
+  describe('POST /api/v1/orders/sweep-expiry (Order Expiry Worker)', () => {
+    it('executes sweep successfully with mocked database', async () => {
+      const expiredOrderId = 'b0000000-0000-0000-0000-000000000002'
+
+      const mockSupabase = {
+        from: (table: string) => {
+          expect(table).toBe('orders')
+          return {
+            select: () => ({
+              eq: () => ({
+                lt: async () => ({
+                  data: [
+                    {
+                      id: expiredOrderId,
+                      created_at: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
+                      status: 'pending',
+                    },
+                  ],
+                  error: null,
+                }),
+              }),
+            }),
+          }
+        },
+        rpc: async (fn: string, args: any) => {
+          expect(fn).toBe('handle_payment_webhook')
+          expect(args.p_order_id).toBe(expiredOrderId)
+          expect(args.p_target_status).toBe('cancelled')
+          return { data: 'UPDATED_TO_cancelled', error: null }
+        },
+      } as any
+
+      setSupabaseClient(mockSupabase)
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/orders/sweep-expiry',
+        payload: {
+          expiry_minutes: 30,
+        },
+      })
+
+      expect(response.statusCode).toBe(200)
+      const body = response.json()
+      expect(body.status).toBe('success')
+      expect(body.data.scannedCount).toBe(1)
+      expect(body.data.cancelledCount).toBe(1)
+      expect(body.data.cancelledOrders).toContain(expiredOrderId)
+
+      setSupabaseClient(null)
+    })
+  })
 })
