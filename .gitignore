@@ -35,6 +35,10 @@ pnpm-debug.log*
 .env.*
 !.env.example
 
-# Agent / AI Tools
+# Agent / AI Tools & Editor configurations
 .gemini
 .kilo/
+.claude/
+.cursor/
+.mcp.json
+.e2e/

@@ -1,3 +1,6 @@
 allowBuilds:
   esbuild: true
   unrs-resolver: false
+minimumReleaseAgeExclude:
+  - '@e2e-dev/web@0.13.0'
+  - e2e@0.18.0
