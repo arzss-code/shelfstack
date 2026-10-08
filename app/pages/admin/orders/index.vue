@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import type { RealtimeChannel } from '@supabase/supabase-js'
+import { useToast } from 'primevue/usetoast'
+import AdminOrderTable, {
+  type AdminOrderRow,
+} from '~/features/orders/components/AdminOrderTable.vue'
+import type { Database } from '~/types/database.types'
 import type { OrderStatus } from '~/types/order'
-import { formatRupiah } from '~/utils/format'
 
 definePageMeta({
   layout: 'admin',
@@ -12,26 +17,10 @@ useSeoMeta({
   description: 'Daftar seluruh transaksi pesanan toko ShelfStack dengan filter status terpadu.',
 })
 
-interface AdminOrderRow {
-  id: string
-  user_id: string
-  status: OrderStatus
-  total_cents: number
-  created_at: string
-  address?: {
-    name?: string
-    phone?: string
-    city?: string
-  }
-  order_items?: Array<{
-    id: string
-    qty: number
-    price_cents: number
-  }>
-}
-
 const route = useRoute()
 const router = useRouter()
+const toast = useToast()
+const supabase = useSupabaseClient<Database>()
 
 const activeStatus = ref<string>((route.query.status as string) || '')
 const searchQuery = ref('')
@@ -42,6 +31,7 @@ const loading = ref(true)
 const orders = ref<AdminOrderRow[]>([])
 const totalOrders = ref(0)
 const errorMessage = ref('')
+let orderChannel: RealtimeChannel | null = null
 
 const statusTabs = [
   { label: 'Semua', value: '' },
@@ -94,40 +84,6 @@ const onSearch = () => {
   fetchOrders()
 }
 
-onMounted(() => {
-  fetchOrders()
-})
-
-const getStatusBadge = (status: OrderStatus) => {
-  switch (status) {
-    case 'paid':
-      return { variant: 'info' as const, label: 'Lunas' }
-    case 'shipped':
-      return { variant: 'info' as const, label: 'Dikirim' }
-    case 'completed':
-      return { variant: 'success' as const, label: 'Selesai' }
-    case 'cancelled':
-      return { variant: 'danger' as const, label: 'Dibatalkan' }
-    case 'pending':
-    default:
-      return { variant: 'warning' as const, label: 'Menunggu' }
-  }
-}
-
-const formatDate = (dateStr: string) => {
-  try {
-    return new Intl.DateTimeFormat('id-ID', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(dateStr))
-  } catch {
-    return dateStr
-  }
-}
-
 const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize) || 1)
 
 const prevPage = () => {
@@ -143,6 +99,78 @@ const nextPage = () => {
     fetchOrders()
   }
 }
+
+const setupRealtime = () => {
+  if (!import.meta.client) return
+
+  orderChannel = supabase
+    .channel('admin-orders-stream')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'orders',
+      },
+      (payload) => {
+        const newRecord = payload.new as Record<string, unknown>
+        const shortId = String(newRecord.id || '').slice(0, 8)
+        toast.add({
+          severity: 'info',
+          summary: 'Pesanan Baru Diterima',
+          detail: `Pesanan #${shortId} baru saja masuk. Memperbarui daftar...`,
+          life: 5000,
+        })
+        fetchOrders()
+      },
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'orders',
+      },
+      (payload) => {
+        const updated = payload.new as Record<string, unknown>
+        const targetId = String(updated.id || '')
+        const targetIndex = orders.value.findIndex((o) => o.id === targetId)
+
+        if (targetIndex !== -1) {
+          const currentOrder = orders.value[targetIndex]
+          if (currentOrder) {
+            orders.value[targetIndex] = {
+              ...currentOrder,
+              status: (updated.status as OrderStatus) || currentOrder.status,
+              total_cents:
+                typeof updated.total_cents === 'number'
+                  ? updated.total_cents
+                  : currentOrder.total_cents,
+            }
+          }
+          toast.add({
+            severity: 'secondary',
+            summary: 'Status Diperbarui',
+            detail: `Pesanan #${targetId.slice(0, 8)} status kini: ${updated.status}.`,
+            life: 4000,
+          })
+        }
+      },
+    )
+    .subscribe()
+}
+
+onMounted(() => {
+  fetchOrders()
+  setupRealtime()
+})
+
+onUnmounted(async () => {
+  if (orderChannel) {
+    await supabase.removeChannel(orderChannel)
+    orderChannel = null
+  }
+})
 </script>
 
 <template>
@@ -150,11 +178,20 @@ const nextPage = () => {
     <!-- Header -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
-          Kelola Pesanan
-        </h1>
+        <div class="flex items-center gap-3">
+          <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
+            Kelola Pesanan
+          </h1>
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700 dark:border-emerald-800/50 dark:bg-emerald-950/40 dark:text-emerald-400"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Live Realtime
+          </span>
+        </div>
         <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1">
-          Pantau seluruh pesanan, verifikasi pembayaran, dan jalankan pembaruan logistik.
+          Pantau seluruh pesanan, verifikasi pembayaran, dan jalankan pembaruan logistik secara
+          langsung.
         </p>
       </div>
 
@@ -216,114 +253,16 @@ const nextPage = () => {
       {{ errorMessage }}
     </div>
 
-    <!-- Orders Table Container -->
-    <div
-      class="overflow-hidden rounded-2xl border border-brand-hair bg-brand-canvas-soft shadow-whisper"
-    >
-      <div v-if="loading" class="space-y-3 p-6">
-        <div
-          v-for="i in 5"
-          :key="i"
-          class="h-12 w-full animate-pulse rounded-xl bg-brand-hairsoft"
-        />
-      </div>
-
-      <div v-else-if="orders.length === 0" class="py-16 text-center">
-        <i class="pi pi-inbox text-3xl text-brand-muted mb-2 block" />
-        <p class="text-xs text-brand-muted m-0">Tidak ada pesanan ditemukan.</p>
-      </div>
-
-      <div v-else class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr
-              class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
-            >
-              <th class="py-3 px-4 font-semibold">ID Pesanan</th>
-              <th class="py-3 px-4 font-semibold">Pelanggan</th>
-              <th class="py-3 px-4 font-semibold">Tanggal</th>
-              <th class="py-3 px-4 font-semibold text-center">Item</th>
-              <th class="py-3 px-4 font-semibold">Status</th>
-              <th class="py-3 px-4 font-semibold text-right">Total</th>
-              <th class="py-3 px-4 font-semibold text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-brand-hairsoft">
-            <tr
-              v-for="order in orders"
-              :key="order.id"
-              class="hover:bg-brand-canvas transition-colors"
-            >
-              <td class="py-3.5 px-4 font-mono font-medium text-brand-ink">
-                #{{ order.id.slice(0, 8) }}
-              </td>
-              <td class="py-3.5 px-4 text-brand-ink">
-                <div class="font-medium truncate max-w-[180px]">
-                  {{ order.address?.name || 'Pelanggan' }}
-                </div>
-                <div class="text-[10px] text-brand-muted truncate max-w-[180px]">
-                  {{ order.address?.city || '-' }}
-                </div>
-              </td>
-              <td class="py-3.5 px-4 text-brand-muted whitespace-nowrap">
-                {{ formatDate(order.created_at) }}
-              </td>
-              <td class="py-3.5 px-4 text-center text-brand-muted">
-                {{ order.order_items?.length || 0 }} item
-              </td>
-              <td class="py-3.5 px-4">
-                <UiBadge
-                  :label="getStatusBadge(order.status).label"
-                  :variant="getStatusBadge(order.status).variant"
-                />
-              </td>
-              <td class="py-3.5 px-4 text-right font-semibold text-brand-ink whitespace-nowrap">
-                {{ formatRupiah(order.total_cents / 100) }}
-              </td>
-              <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                <NuxtLink
-                  :to="`/admin/orders/${order.id}`"
-                  class="inline-flex items-center gap-1.5 rounded-full bg-brand-canvas px-3 py-1 text-xs font-semibold text-brand-ink no-underline border border-brand-hair hover:bg-brand-field"
-                >
-                  <span>Detail</span>
-                  <i class="pi pi-arrow-right text-[9px]" />
-                </NuxtLink>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination Footer -->
-      <div
-        v-if="orders.length > 0"
-        class="flex items-center justify-between border-t border-brand-hair px-4 py-3 text-xs text-brand-muted"
-      >
-        <span>
-          Menampilkan {{ (page - 1) * pageSize + 1 }} -
-          {{ Math.min(page * pageSize, totalOrders) }} dari {{ totalOrders }} pesanan
-        </span>
-
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            :disabled="page <= 1"
-            class="rounded-full border border-brand-hair px-3 py-1 font-medium disabled:opacity-40"
-            @click="prevPage"
-          >
-            Sebelumnya
-          </button>
-          <span>Halaman {{ page }} / {{ totalPages }}</span>
-          <button
-            type="button"
-            :disabled="page >= totalPages"
-            class="rounded-full border border-brand-hair px-3 py-1 font-medium disabled:opacity-40"
-            @click="nextPage"
-          >
-            Berikutnya
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- Modular Orders Table Component -->
+    <AdminOrderTable
+      :orders="orders"
+      :loading="loading"
+      :page="page"
+      :page-size="pageSize"
+      :total-orders="totalOrders"
+      :total-pages="totalPages"
+      @prev-page="prevPage"
+      @next-page="nextPage"
+    />
   </div>
 </template>
