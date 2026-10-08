@@ -38,6 +38,41 @@ describe('productSchema', () => {
     const { description, link, image_url, ...minimal } = validProduct
     expect(productSchema.safeParse(minimal).success).toBe(true)
   })
+
+  it('menerima stok fisik integer valid dan default 0', () => {
+    const resWithStock = productSchema.safeParse({ ...validProduct, stock: 15 })
+    expect(resWithStock.success).toBe(true)
+    if (resWithStock.success) {
+      expect(resWithStock.data.stock).toBe(15)
+    }
+
+    const resDefault = productSchema.safeParse(validProduct)
+    expect(resDefault.success).toBe(true)
+    if (resDefault.success) {
+      expect(resDefault.data.stock).toBe(0)
+    }
+  })
+
+  it('menolak stok negatif atau bukan bilangan bulat', () => {
+    expect(productSchema.safeParse({ ...validProduct, stock: -1 }).success).toBe(false)
+    expect(productSchema.safeParse({ ...validProduct, stock: 2.5 }).success).toBe(false)
+  })
+
+  it('menerima category_id valid UUID dan menolak non-UUID', () => {
+    expect(
+      productSchema.safeParse({
+        ...validProduct,
+        category_id: '28082f15-1fd6-425e-9f6e-ed197c591c39',
+      }).success,
+    ).toBe(true)
+
+    expect(
+      productSchema.safeParse({
+        ...validProduct,
+        category_id: 'bukan-uuid',
+      }).success,
+    ).toBe(false)
+  })
 })
 
 describe('productListQuerySchema', () => {

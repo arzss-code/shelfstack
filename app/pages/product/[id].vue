@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useProductStore } from '~/features/products/stores/product'
+import { useCartStore } from '~/features/cart/stores/cart'
 import type { Product } from '~/types/product'
 import { useToast } from 'primevue/usetoast'
 import ProductGallery from '~/components/product/ProductGallery.vue'
@@ -8,6 +9,7 @@ import ProductConfigurator from '~/components/product/ProductConfigurator.vue'
 const route = useRoute()
 const router = useRouter()
 const productStore = useProductStore()
+const cartStore = useCartStore()
 const toast = useToast()
 
 const product = ref<Product | null>(null)
@@ -25,34 +27,86 @@ useSeoMeta({
 })
 
 onMounted(async () => {
-  const id = Number(route.params.id)
-  if (!isNaN(id)) {
-    try {
-      product.value = await productStore.fetchProductById(id)
-    } catch (error: unknown) {
+  const param = (route.params.id || (route.params as Record<string, string>).slug) as string
+  if (!param) {
+    loading.value = false
+    return
+  }
+
+  // 1. Instant Cache Render: 0ms load transition jika produk sudah dimuat di katalog/home
+  const cached = productStore.products.find((p) => p.slug === param || String(p.id) === param)
+  if (cached) {
+    product.value = cached
+    loading.value = false
+  }
+
+  // 2. Fresh Network Fetch (Stale-While-Revalidate)
+  try {
+    const fresh = await productStore.fetchProductById(param)
+    if (fresh) {
+      product.value = fresh
+
+      // 3. Canonical URL Normalization: jika dibuka via ID numerik, sinkronkan ke slug di URL bar
+      if (/^\d+$/.test(param) && fresh.slug) {
+        router.replace({ path: `/product/${fresh.slug}` })
+      }
+    }
+  } catch (error: unknown) {
+    if (!product.value) {
       toast.add({
         severity: 'error',
         summary: 'Gagal Memuat Produk',
-        detail: error instanceof Error ? error.message : 'Terjadi kesalahan sistem.',
+        detail:
+          error instanceof Error ? error.message : 'Produk tidak ditemukan atau telah diarsipkan.',
         life: 5000,
       })
     }
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 })
 
 const onAddToBag = (payload: { quantity: number; color: string; material: string }) => {
+  if (!product.value) return
+
+  cartStore.addItem({
+    productId: product.value.id,
+    slug: product.value.slug,
+    name: product.value.name,
+    price: product.value.price,
+    imageUrl: product.value.image_url,
+    quantity: payload.quantity,
+    stock: product.value.stock,
+    color: payload.color,
+    material: payload.material,
+    openCartDrawer: true,
+  })
+
   toast.add({
     severity: 'success',
     summary: 'Ditambahkan ke Bag',
-    detail: `${product.value?.name} (${payload.quantity}x) berhasil dimasukkan.`,
+    detail: `${product.value.name} (${payload.quantity}x) berhasil dimasukkan.`,
     life: 3000,
   })
 }
 
 const onBuyNow = (payload: { quantity: number; color: string; material: string }) => {
-  onAddToBag(payload)
-  router.push('/katalog')
+  if (!product.value) return
+
+  cartStore.addItem({
+    productId: product.value.id,
+    slug: product.value.slug,
+    name: product.value.name,
+    price: product.value.price,
+    imageUrl: product.value.image_url,
+    quantity: payload.quantity,
+    stock: product.value.stock,
+    color: payload.color,
+    material: payload.material,
+    openCartDrawer: false,
+  })
+
+  router.push('/checkout')
 }
 </script>
 
@@ -78,13 +132,6 @@ const onBuyNow = (payload: { quantity: number; color: string; material: string }
         {{ product.name }}
       </span>
     </nav>
-
-    <!-- Back Action -->
-    <div class="flex items-center">
-      <UiButton to="/katalog" variant="secondary" size="sm" icon="pi-arrow-left">
-        Kembali ke Katalog
-      </UiButton>
-    </div>
 
     <!-- Loading Skeleton View -->
     <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 animate-pulse">

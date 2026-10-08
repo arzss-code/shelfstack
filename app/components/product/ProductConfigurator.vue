@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Product } from '~/types/product'
 import { formatRupiah } from '~/utils/format'
+import { getProductVariants } from '~/utils/product-specs'
 
 const props = defineProps<{
   product: Product
@@ -11,21 +12,30 @@ const emit = defineEmits<{
   buyNow: [payload: { quantity: number; color: string; material: string }]
 }>()
 
+const variants = computed(() => getProductVariants(props.product))
+
 const quantity = ref(1)
-const selectedColor = ref('Matte Obsidian')
-const selectedMaterial = ref('Anodized 6063 Alloy')
+const selectedColor = ref('')
+const selectedMaterial = ref('')
 
-const colors = [
-  { name: 'Matte Obsidian', class: 'bg-[#141414]' },
-  { name: 'Silver Frost', class: 'bg-[#e2e2e2]' },
-  { name: 'Space Gray', class: 'bg-[#525252]' },
-]
+// Sinkronkan pilihan default saat produk dimuat atau berubah
+watch(
+  () => props.product,
+  () => {
+    const firstColor = variants.value.colors[0]
+    if (firstColor) {
+      selectedColor.value = firstColor.name
+    }
+    const firstOption = variants.value.options[0]
+    if (firstOption) {
+      selectedMaterial.value = firstOption.name
+    }
+  },
+  { immediate: true },
+)
 
-const materials = [
-  { name: 'Anodized 6063 Alloy', note: 'Standard Aerospace' },
-  { name: 'Solid Walnut Wood', note: 'Hand-oiled finish' },
-  { name: 'Merino Wool Felt', note: 'High acoustic absorption' },
-]
+const ratingValue = computed(() => props.product.rating ?? 4.92)
+const reviewCountValue = computed(() => props.product.review_count ?? 148)
 
 const isOutOfStock = computed(() => props.product.stock === 0)
 const maxQuantity = computed(() => Math.max(1, props.product.stock))
@@ -39,6 +49,35 @@ const incrementQty = () => {
 const decrementQty = () => {
   if (quantity.value > 1) {
     quantity.value--
+  }
+}
+
+const handleQuantityInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const sanitized = target.value.replace(/[^0-9]/g, '')
+  target.value = sanitized
+  if (!sanitized) return
+  const val = parseInt(sanitized, 10)
+  if (val > maxQuantity.value) {
+    quantity.value = maxQuantity.value
+    target.value = String(maxQuantity.value)
+  } else if (val >= 1) {
+    quantity.value = val
+  }
+}
+
+const handleQuantityBlur = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const val = parseInt(target.value, 10)
+  if (!target.value || isNaN(val) || val < 1) {
+    quantity.value = 1
+    target.value = '1'
+  } else if (val > maxQuantity.value) {
+    quantity.value = maxQuantity.value
+    target.value = String(maxQuantity.value)
+  } else {
+    quantity.value = val
+    target.value = String(val)
   }
 }
 
@@ -73,7 +112,9 @@ const handleBuyNow = () => {
           variant="warning"
         />
         <UiBadge v-else label="Tersedia · Siap Kirim" variant="success" />
-        <span class="text-xs text-brand-muted"> SKU: SS-MOD-0{{ product.id }} </span>
+        <span class="text-xs text-brand-muted">
+          {{ product.sku ? `SKU: ${product.sku}` : `SKU: SS-MOD-0${product.id}` }}
+        </span>
       </div>
 
       <h1
@@ -94,9 +135,9 @@ const handleBuyNow = () => {
             <i class="pi pi-star-fill text-[11px]" />
             <i class="pi pi-star-fill text-[11px]" />
           </div>
-          <span class="font-bold text-brand-ink ml-1">4.94</span>
+          <span class="font-bold text-brand-ink ml-1">{{ ratingValue.toFixed(2) }}</span>
         </div>
-        <span>486 ulasan terverifikasi</span>
+        <span>{{ reviewCountValue }} ulasan terverifikasi</span>
       </div>
     </div>
 
@@ -115,55 +156,58 @@ const handleBuyNow = () => {
     <!-- Configurator 1: Colorways -->
     <div class="space-y-2">
       <div class="flex items-center justify-between text-xs">
-        <span class="uppercase tracking-wider font-semibold text-brand-muted"> Pilihan Warna </span>
+        <span class="uppercase tracking-wider font-semibold text-brand-muted">
+          {{ variants.colorTitle }}
+        </span>
         <span class="font-bold text-brand-ink">{{ selectedColor }}</span>
       </div>
       <div class="flex items-center gap-2.5">
-        <button
-          v-for="c in colors"
-          :key="c.name"
-          type="button"
-          :title="c.name"
-          :class="[
-            'w-9 h-9 rounded-full border-2 transition-all cursor-pointer flex items-center justify-center',
-            c.class,
-            selectedColor === c.name
-              ? 'border-brand-accent ring-2 ring-brand-accent/30 scale-105'
-              : 'border-brand-hair hover:scale-105',
-          ]"
-          @click="selectedColor = c.name"
-        >
-          <i v-if="selectedColor === c.name" class="pi pi-check text-xs text-white" />
-        </button>
+        <UiTooltip v-for="c in variants.colors" :key="c.name" :text="c.name" position="top">
+          <button
+            type="button"
+            :aria-label="c.name"
+            :class="[
+              'w-9 h-9 rounded-full border-2 transition-all cursor-pointer flex items-center justify-center',
+              c.class,
+              selectedColor === c.name
+                ? 'border-brand-accent ring-2 ring-brand-accent/30 scale-105'
+                : 'border-brand-hair hover:scale-105',
+            ]"
+            @click="selectedColor = c.name"
+          >
+            <i v-if="selectedColor === c.name" class="pi pi-check text-xs text-white" />
+          </button>
+        </UiTooltip>
       </div>
     </div>
 
-    <!-- Configurator 2: Material Finish -->
+    <!-- Configurator 2: Material / Secondary Options -->
     <div class="space-y-2">
       <div class="flex items-center justify-between text-xs">
         <span class="uppercase tracking-wider font-semibold text-brand-muted">
-          Pilihan Material
+          {{ variants.optionTitle }}
         </span>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <button
-          v-for="m in materials"
-          :key="m.name"
+          v-for="opt in variants.options"
+          :key="opt.name"
           type="button"
           :class="[
             'p-3 rounded-field text-left border transition-all cursor-pointer flex flex-col justify-between gap-1',
-            selectedMaterial === m.name
+            selectedMaterial === opt.name
               ? 'bg-brand-ink text-brand-onink border-brand-ink shadow-whisper'
               : 'bg-brand-canvas border-brand-hair text-brand-ink hover:bg-brand-canvas-soft',
           ]"
-          @click="selectedMaterial = m.name"
+          @click="selectedMaterial = opt.name"
         >
-          <span class="text-xs font-bold">{{ m.name }}</span>
+          <span class="text-xs font-bold">{{ opt.name }}</span>
           <span
-            :class="selectedMaterial === m.name ? 'text-brand-muted' : 'text-brand-faint'"
+            v-if="opt.note"
+            :class="selectedMaterial === opt.name ? 'text-brand-muted' : 'text-brand-faint'"
             class="text-[10px]"
           >
-            {{ m.note }}
+            {{ opt.note }}
           </span>
         </button>
       </div>
@@ -185,9 +229,19 @@ const handleBuyNow = () => {
           >
             <i class="pi pi-minus text-xs" />
           </button>
-          <span class="w-10 text-center font-display font-bold text-sm text-brand-ink tabular-nums">
-            {{ quantity }}
-          </span>
+          <input
+            :value="quantity"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            aria-label="Jumlah unit pesanan"
+            :disabled="isOutOfStock"
+            class="w-12 text-center font-display font-bold text-sm text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-white focus:ring-1 focus:ring-brand-accent/40 rounded-sm transition-all py-1 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            @focus="($event.target as HTMLInputElement).select()"
+            @input="handleQuantityInput"
+            @blur="handleQuantityBlur"
+            @keydown.enter="($event.target as HTMLInputElement).blur()"
+          />
           <button
             type="button"
             aria-label="Tambah jumlah"

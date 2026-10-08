@@ -1,5 +1,7 @@
 <script setup lang="ts">
-// Footer E-Commerce Modern: Desain bersih, kontras elegan, ramah pengguna
+import { useAuth } from '~/features/auth/composables/useAuth'
+
+const { isLoggedIn, isAdmin } = useAuth()
 </script>
 
 <template>
@@ -105,19 +107,30 @@
               Akun &amp; Toko
             </span>
             <nav class="flex flex-col gap-2 text-sm" aria-label="Navigasi Akun">
+              <template v-if="!isLoggedIn">
+                <NuxtLink
+                  to="/auth/login"
+                  class="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  Masuk
+                </NuxtLink>
+                <NuxtLink
+                  to="/auth/register"
+                  class="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  Daftar Akun Baru
+                </NuxtLink>
+              </template>
+              <template v-else>
+                <NuxtLink
+                  to="/orders"
+                  class="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  Pesanan Saya
+                </NuxtLink>
+              </template>
               <NuxtLink
-                to="/auth/login"
-                class="text-white/80 hover:text-white transition-colors no-underline"
-              >
-                Masuk
-              </NuxtLink>
-              <NuxtLink
-                to="/auth/register"
-                class="text-white/80 hover:text-white transition-colors no-underline"
-              >
-                Daftar Akun Baru
-              </NuxtLink>
-              <NuxtLink
+                v-if="isAdmin"
                 to="/admin/products"
                 class="text-white/80 hover:text-white transition-colors no-underline"
               >

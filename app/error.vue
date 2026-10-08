@@ -44,14 +44,9 @@ const handleError = () => clearError({ redirect: '/' })
       </p>
 
       <div class="pt-4">
-        <button
-          type="button"
-          class="w-full h-11 px-6 rounded-full bg-brand-ink hover:bg-brand-inkhover text-brand-onink text-xs sm:text-sm font-semibold transition-all shadow-whisper cursor-pointer flex items-center justify-center gap-2 border-0"
-          @click="handleError"
-        >
-          <i class="pi pi-home text-xs" />
-          <span>Kembali ke Beranda</span>
-        </button>
+        <UiButton variant="primary" block icon="pi-home" class="h-11" @click="handleError">
+          Kembali ke Beranda
+        </UiButton>
       </div>
     </div>
   </div>

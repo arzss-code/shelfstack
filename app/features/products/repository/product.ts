@@ -10,6 +10,8 @@ interface ProductPayload {
   description: string | null
   link: string | null
   image_url: string | null
+  stock?: number
+  category_id?: string | null
 }
 
 export const productRepository = {
@@ -27,7 +29,7 @@ export const productRepository = {
     return response.data
   },
 
-  async getProductById(supabase: TypedClient, id: number) {
+  async getProductById(supabase: TypedClient, id: number | string) {
     const response = await $fetch<{ status: string; data: Product }>(`/api/products/${id}`)
     return response.data
   },

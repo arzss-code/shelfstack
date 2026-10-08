@@ -1,3 +1,9 @@
+<script setup lang="ts">
+import { useAuth } from '~/features/auth/composables/useAuth'
+
+const { isLoggedIn } = useAuth()
+</script>
+
 <template>
   <section class="w-full pt-2">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
@@ -29,6 +35,7 @@
           </NuxtLink>
 
           <NuxtLink
+            v-if="!isLoggedIn"
             to="/auth/login"
             class="bg-brand-canvas-soft hover:bg-brand-field text-brand-ink font-semibold text-sm px-6 py-3.5 rounded-full transition-all border border-brand-hair flex items-center gap-2 no-underline shadow-whisper"
           >

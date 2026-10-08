@@ -10,10 +10,13 @@ export interface AuthProfile {
 }
 
 /** Ambil user + profile. Throw 401 jika belum login, 403 jika profil hilang. */
-export async function requireUser(event: H3Event) {
+export async function requireUser(event: H3Event): Promise<{
+  user: NonNullable<Awaited<ReturnType<typeof serverSupabaseUser>>>
+  profile: AuthProfile
+}> {
   const user = await serverSupabaseUser(event)
   if (!user) {
-    return errorResponse(event, 'Unauthorized. Silakan login dulu.', null, 401)
+    errorResponse(event, 'Unauthorized. Silakan login dulu.', null, 401)
   }
 
   const client = await serverSupabaseClient<Database>(event)
@@ -24,7 +27,7 @@ export async function requireUser(event: H3Event) {
     .single()
 
   if (error || !profile) {
-    return errorResponse(event, 'Profil tidak ditemukan.', error, 403)
+    errorResponse(event, 'Profil tidak ditemukan.', error, 403)
   }
 
   return { user, profile: profile as AuthProfile }
@@ -34,7 +37,7 @@ export async function requireUser(event: H3Event) {
 export async function requireAdmin(event: H3Event) {
   const { user, profile } = await requireUser(event)
   if (profile.role !== 'admin') {
-    return errorResponse(event, 'Akses ditolak. Hanya admin.', null, 403)
+    errorResponse(event, 'Akses ditolak. Hanya admin.', null, 403)
   }
   return { user, profile }
 }

@@ -1,8 +1,18 @@
 import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '~/types/database.types'
 
-type ActivityRow = Database['public']['Tables']['activity_logs']['Row']
-export interface ActivityLog extends ActivityRow {
+export interface ActivityLog {
+  id: string
+  action: Database['public']['Enums']['activity_action']
+  browser: string | null
+  created_at: string | null
+  description: string
+  entity_id: number
+  entity_type: string
+  ip_address: string | null
+  new_data: Record<string, unknown> | null
+  old_data: Record<string, unknown> | null
+  platform: string | null
   isNew?: boolean
 }
 
@@ -33,18 +43,21 @@ export function useActivities() {
     channel = supabase
       .channel('public:activity_logs')
       .on(
-        'postgres_changes',
+        'postgres_changes' as any,
         { event: 'INSERT', schema: 'public', table: 'activity_logs' },
-        (payload) => {
+        (payload: { new: Record<string, unknown> }) => {
           // Add temporary 'isNew' flag for UI highlighting
-          const newActivity: ActivityLog = { ...(payload.new as ActivityRow), isNew: true }
+          const newActivity: ActivityLog = {
+            ...(payload.new as unknown as ActivityLog),
+            isNew: true,
+          }
           activities.value.unshift(newActivity)
 
           // Remove highlight flag after 2 seconds
           setTimeout(() => {
             const index = activities.value.findIndex((a) => a.id === newActivity.id)
-            if (index !== -1) {
-              activities.value[index].isNew = false
+            if (index !== -1 && activities.value[index]) {
+              activities.value[index]!.isNew = false
             }
           }, 2000)
         },

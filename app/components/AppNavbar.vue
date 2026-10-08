@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useCategories } from '~/composables/useCategories'
+import { useCartStore } from '~/features/cart/stores/cart'
 import AppLogo from './AppLogo.vue'
 
-const { user, profile, isAdmin, fetchProfile, signOut } = useAuth()
+const { user, profile, isAdmin, isLoggedIn, fetchProfile, signOut } = useAuth()
+const cartStore = useCartStore()
 const {
   categories: dynamicCategories,
   categoryMap: dynamicCategoryMap,
@@ -33,8 +35,8 @@ const subNavCategories = computed(() => [
 ])
 
 onMounted(async () => {
-  fetchProfile()
-  await fetchCategories()
+  fetchProfile().catch(() => {})
+  await fetchCategories().catch(() => {})
 })
 
 const displayName = computed(
@@ -154,52 +156,91 @@ const handleLogout = async () => {
               placeholder="Cari produk kebutuhan kerja, rumah, audio, furnitur..."
             />
 
-            <button
-              type="submit"
-              class="w-8 h-8 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0 hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
-              aria-label="Cari produk"
-            >
-              <i class="pi pi-search text-xs" />
-            </button>
+            <UiTooltip text="Cari produk" position="bottom">
+              <button
+                type="submit"
+                class="w-8 h-8 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0 hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
+                aria-label="Cari produk"
+              >
+                <i class="pi pi-search text-xs" />
+              </button>
+            </UiTooltip>
           </form>
         </div>
 
         <!-- Right Commerce Actions -->
         <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          <!-- Wishlist Button -->
-          <NuxtLink
-            to="/katalog"
-            class="relative p-2 text-brand-muted hover:text-brand-ink rounded-full hover:bg-brand-canvas-soft transition-colors no-underline hidden sm:flex items-center justify-center"
-            title="Disimpan"
+          <!-- Wishlist Button with UiTooltip -->
+          <UiTooltip
+            text="Koleksi Disimpan"
+            position="bottom"
+            align="center"
+            class="hidden sm:inline-flex"
           >
-            <i class="pi pi-heart text-base" />
-            <span
-              class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-brand-ink text-white text-[9px] font-bold flex items-center justify-center leading-none"
+            <NuxtLink
+              to="/katalog"
+              class="relative p-2 text-brand-muted hover:text-brand-ink rounded-full hover:bg-brand-canvas-soft transition-colors no-underline flex items-center justify-center cursor-pointer"
+              aria-label="Koleksi Disimpan"
             >
-              0
-            </span>
-          </NuxtLink>
+              <i class="pi pi-heart text-base" />
+              <span
+                class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-brand-ink text-white text-[9px] font-bold flex items-center justify-center leading-none"
+              >
+                0
+              </span>
+            </NuxtLink>
+          </UiTooltip>
 
-          <!-- Cart Pill -->
-          <NuxtLink
-            to="/katalog"
-            class="flex items-center gap-1.5 bg-brand-field hover:bg-brand-canvas-soft text-brand-ink text-xs font-semibold px-3.5 py-2 rounded-full transition-colors no-underline border border-brand-hair"
-          >
-            <i class="pi pi-shopping-bag text-sm text-brand-ink" />
-            <span class="hidden sm:inline">Keranjang</span>
-            <span
-              class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"
+          <!-- Cart Pill with UiTooltip -->
+          <UiTooltip position="bottom" align="end">
+            <button
+              type="button"
+              class="flex items-center gap-2 bg-brand-field hover:bg-brand-canvas-soft text-brand-ink text-xs font-semibold px-3.5 py-2 rounded-full transition-all border border-brand-hair hover:border-brand-ink/20 cursor-pointer shadow-whisper"
+              aria-label="Buka Keranjang Belanja"
+              @click="cartStore.openDrawer"
             >
-              0
-            </span>
-            <span class="text-brand-muted font-normal text-[11px] hidden lg:inline ml-0.5"
-              >Rp0</span
-            >
-          </NuxtLink>
+              <i class="pi pi-shopping-bag text-sm text-brand-ink" />
+              <span class="hidden sm:inline">Keranjang</span>
+              <span
+                v-if="cartStore.totalItems > 0"
+                class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none min-w-4 text-center tabular-nums"
+              >
+                {{ cartStore.totalItems > 99 ? '99+' : cartStore.totalItems }}
+              </span>
+            </button>
+
+            <!-- Rich Popover Content Slot -->
+            <template #content>
+              <div v-if="cartStore.totalItems > 0" class="space-y-1 min-w-[190px]">
+                <div
+                  class="flex items-center justify-between gap-3 text-[11px] font-medium text-zinc-300"
+                >
+                  <span>Subtotal ({{ cartStore.totalItems }} item)</span>
+                </div>
+                <div class="flex items-baseline justify-between gap-3">
+                  <span
+                    class="font-display text-sm font-bold text-white tabular-nums tracking-tight"
+                  >
+                    {{ cartStore.formattedTotalPrice }}
+                  </span>
+                  <span class="text-[10px] text-blue-400 font-semibold flex items-center gap-0.5">
+                    Buka <i class="pi pi-arrow-right text-[8px]" />
+                  </span>
+                </div>
+              </div>
+              <div
+                v-else
+                class="text-[11px] text-zinc-300 flex items-center gap-2 py-0.5 min-w-[170px]"
+              >
+                <i class="pi pi-shopping-bag text-xs text-zinc-400" />
+                <span>Keranjang belanja kosong</span>
+              </div>
+            </template>
+          </UiTooltip>
 
           <!-- User Authentication Section -->
           <div class="relative">
-            <template v-if="user">
+            <template v-if="isLoggedIn && user">
               <button
                 type="button"
                 class="flex items-center gap-1.5 p-1 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair"
@@ -224,6 +265,13 @@ const handleLogout = async () => {
                   <p class="text-xs font-bold text-brand-ink m-0 truncate">{{ displayName }}</p>
                   <p class="text-[10px] text-brand-muted m-0 truncate">{{ user.email }}</p>
                 </div>
+                <NuxtLink
+                  to="/orders"
+                  class="block px-4 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft no-underline font-medium"
+                  @click="isUserMenuOpen = false"
+                >
+                  Pesanan Saya
+                </NuxtLink>
                 <NuxtLink
                   to="/katalog"
                   class="block px-4 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft no-underline"
@@ -345,12 +393,36 @@ const handleLogout = async () => {
           Katalog Lengkap
         </NuxtLink>
         <NuxtLink
+          v-if="isLoggedIn"
+          to="/orders"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+          @click="isMobileMenuOpen = false"
+        >
+          Pesanan Saya
+        </NuxtLink>
+        <NuxtLink
           v-if="isAdmin"
           to="/admin/products"
           class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
           @click="isMobileMenuOpen = false"
         >
           Kelola Produk (Admin)
+        </NuxtLink>
+        <button
+          v-if="isLoggedIn"
+          type="button"
+          class="py-2 text-left text-red-600 font-semibold cursor-pointer border-b border-brand-hairsoft"
+          @click="handleLogout"
+        >
+          Keluar
+        </button>
+        <NuxtLink
+          v-else
+          to="/auth/login"
+          class="py-2 text-brand-accent no-underline font-semibold"
+          @click="isMobileMenuOpen = false"
+        >
+          Masuk ke Akun
         </NuxtLink>
       </nav>
     </div>

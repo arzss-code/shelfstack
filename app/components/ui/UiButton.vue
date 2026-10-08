@@ -76,17 +76,17 @@ const stateClasses = computed(() => {
   return ''
 })
 
-const componentType = computed(() => (props.to ? NuxtLink : 'button'))
+const buttonClasses = computed(() => [
+  baseClasses,
+  variantClasses.value,
+  sizeClasses.value,
+  stateClasses.value,
+  props.block ? 'w-full' : '',
+])
 </script>
 
 <template>
-  <component
-    :is="componentType"
-    :to="to"
-    :type="to ? undefined : type"
-    :disabled="disabled || loading"
-    :class="[baseClasses, variantClasses, sizeClasses, stateClasses, block ? 'w-full' : '']"
-  >
+  <NuxtLink v-if="to" :to="to" :class="buttonClasses">
     <!-- Left Icon / Loading Spinner -->
     <i v-if="loading" class="pi pi-spin pi-spinner text-xs shrink-0" />
     <i v-else-if="icon && iconPos === 'left'" :class="['pi', icon, 'text-xs shrink-0']" />
@@ -96,5 +96,17 @@ const componentType = computed(() => (props.to ? NuxtLink : 'button'))
 
     <!-- Right Icon -->
     <i v-if="icon && iconPos === 'right' && !loading" :class="['pi', icon, 'text-xs shrink-0']" />
-  </component>
+  </NuxtLink>
+
+  <button v-else :type="type" :disabled="disabled || loading" :class="buttonClasses">
+    <!-- Left Icon / Loading Spinner -->
+    <i v-if="loading" class="pi pi-spin pi-spinner text-xs shrink-0" />
+    <i v-else-if="icon && iconPos === 'left'" :class="['pi', icon, 'text-xs shrink-0']" />
+
+    <!-- Slot Text -->
+    <span><slot /></span>
+
+    <!-- Right Icon -->
+    <i v-if="icon && iconPos === 'right' && !loading" :class="['pi', icon, 'text-xs shrink-0']" />
+  </button>
 </template>

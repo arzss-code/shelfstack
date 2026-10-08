@@ -1,3 +1,9 @@
+<script setup lang="ts">
+import { useAuth } from '~/features/auth/composables/useAuth'
+
+const { isLoggedIn, isAdmin } = useAuth()
+</script>
+
 <template>
   <section class="rounded-card bg-brand-ink text-white p-8 sm:p-12 shadow-floating">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -12,10 +18,27 @@
       </div>
 
       <NuxtLink
+        v-if="!isLoggedIn"
         to="/auth/login"
         class="shrink-0 rounded-full bg-white text-brand-ink px-8 py-3.5 text-sm font-bold no-underline hover:bg-white/90 transition-colors shadow-whisper inline-flex items-center justify-center"
       >
         Masuk
+      </NuxtLink>
+      <NuxtLink
+        v-else-if="isAdmin"
+        to="/admin/products"
+        class="shrink-0 rounded-full bg-white text-brand-ink px-8 py-3.5 text-sm font-bold no-underline hover:bg-white/90 transition-colors shadow-whisper inline-flex items-center justify-center gap-2"
+      >
+        <span>Kelola Produk (Admin)</span>
+        <i class="pi pi-arrow-right text-xs" />
+      </NuxtLink>
+      <NuxtLink
+        v-else
+        to="/katalog"
+        class="shrink-0 rounded-full bg-white text-brand-ink px-8 py-3.5 text-sm font-bold no-underline hover:bg-white/90 transition-colors shadow-whisper inline-flex items-center justify-center gap-2"
+      >
+        <span>Jelajahi Katalog</span>
+        <i class="pi pi-arrow-right text-xs" />
       </NuxtLink>
     </div>
   </section>

@@ -19,7 +19,7 @@ test('form register menolak input kosong (client-side Zod)', async ({ page }) =>
   await expect
     .poll(
       async () => {
-        await page.getByRole('main').getByRole('button', { name: 'Buat Akun' }).click()
+        await page.locator('form').getByRole('button', { name: 'Buat Akun' }).click()
         return await page.getByText('Nama minimal 3 karakter.').count()
       },
       { timeout: 20000 },
@@ -36,7 +36,7 @@ test('form login menolak email invalid', async ({ page }) => {
   await expect
     .poll(
       async () => {
-        await page.getByRole('main').getByRole('button', { name: 'Masuk', exact: true }).click()
+        await page.locator('form').getByRole('button', { name: 'Masuk' }).click()
         return await page.getByText('Email tidak valid.').count()
       },
       { timeout: 20000 },

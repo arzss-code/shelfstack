@@ -175,14 +175,15 @@ const rowClass = (data: ActivityLog) => {
       </Column>
       <Column header="Detail" style="width: 100px; text-align: center">
         <template #body="{ data }">
-          <Button
-            v-if="data.old_data || data.new_data"
-            icon="pi pi-search"
-            text
-            rounded
-            aria-label="View Details"
-            @click="viewDetails(data)"
-          />
+          <UiTooltip v-if="data.old_data || data.new_data" text="Lihat Detail" position="top">
+            <Button
+              icon="pi pi-search"
+              text
+              rounded
+              aria-label="Lihat Detail"
+              @click="viewDetails(data)"
+            />
+          </UiTooltip>
         </template>
       </Column>
     </DataTable>

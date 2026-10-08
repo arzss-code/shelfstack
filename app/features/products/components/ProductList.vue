@@ -17,6 +17,7 @@ const emit = defineEmits<{
   edit: [product: Product]
   delete: [id: number]
   restore: [id: number]
+  resetFilters: []
 }>()
 </script>
 
@@ -26,27 +27,24 @@ const emit = defineEmits<{
     <div
       v-if="loading"
       :class="[
-        'grid gap-6',
+        'grid gap-3 sm:gap-4 md:gap-6',
         density === 'spacious'
-          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-          : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+          ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'
+          : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
       ]"
     >
       <div
         v-for="i in 8"
         :key="i"
-        class="flex flex-col bg-brand-canvas border border-brand-hairsoft rounded-card p-4 overflow-hidden animate-pulse"
+        class="flex flex-col bg-brand-canvas border border-brand-hairsoft/80 rounded-2xl overflow-hidden animate-pulse"
       >
-        <div class="aspect-square w-full bg-brand-field rounded-media mb-4" />
-        <div class="space-y-2 flex-1">
-          <div class="h-3 w-1/3 bg-brand-field rounded-full" />
-          <div class="h-5 w-4/5 bg-brand-field rounded-full" />
-          <div class="h-3 w-full bg-brand-field rounded-full" />
-          <div class="h-3 w-2/3 bg-brand-field rounded-full" />
-        </div>
-        <div class="mt-4 pt-3 border-t border-brand-hairsoft flex items-center justify-between">
-          <div class="h-5 w-24 bg-brand-field rounded-full" />
-          <div class="h-8 w-24 bg-brand-field rounded-full" />
+        <div class="aspect-square w-full bg-brand-field" />
+        <div class="p-3.5 space-y-2 flex-1">
+          <div class="h-3.5 w-3/4 bg-brand-field rounded" />
+          <div class="h-2.5 w-1/3 bg-brand-field rounded" />
+          <div class="pt-2 border-t border-brand-hairsoft/60 flex items-center justify-between">
+            <div class="h-4 w-20 bg-brand-field rounded" />
+          </div>
         </div>
       </div>
     </div>
@@ -64,9 +62,17 @@ const emit = defineEmits<{
         </div>
         <h3 class="font-display m-0 mb-2 text-lg font-bold text-brand-ink">Tidak ada produk</h3>
         <p class="font-body m-0 text-sm text-brand-muted max-w-md leading-relaxed">
-          Belum ada produk aktif yang ditemukan dengan kata kunci pencarian Anda. Coba periksa
-          kembali ejaan atau gunakan istilah lain.
+          Belum ada produk aktif yang ditemukan dengan kata kunci atau filter saat ini.
         </p>
+        <UiButton
+          variant="secondary"
+          size="sm"
+          class="mt-4"
+          icon="pi-refresh"
+          @click="emit('resetFilters')"
+        >
+          Reset Filter &amp; Tampilkan Semua
+        </UiButton>
       </template>
 
       <template v-else-if="isTrash">
@@ -101,10 +107,10 @@ const emit = defineEmits<{
     <div
       v-else
       :class="[
-        'grid gap-6',
+        'grid gap-3 sm:gap-4 md:gap-6',
         density === 'spacious'
-          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-          : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+          ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'
+          : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
       ]"
     >
       <ProductCard

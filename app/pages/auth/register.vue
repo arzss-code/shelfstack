@@ -8,10 +8,26 @@ useSeoMeta({
   description:
     'Daftar akun ShelfStack sekarang untuk menikmati promo eksklusif dan belanja produk kurasi terbaik.',
 })
-definePageMeta({ layout: 'default' })
+definePageMeta({
+  layout: 'default',
+  middleware: 'guest',
+})
 
 const toast = useToast()
+const user = useSupabaseUser()
 const { signUp, signInWithGoogle, pending } = useAuth()
+
+if (import.meta.client) {
+  watch(
+    user,
+    (currentUser) => {
+      if (currentUser) {
+        navigateTo('/')
+      }
+    },
+    { immediate: true },
+  )
+}
 
 const fullName = ref('')
 const email = ref('')
@@ -128,15 +144,17 @@ const handleGoogle = async () => {
     <!-- OAuth -->
     <template #oauth>
       <AuthDivider />
-      <button
+      <UiButton
         type="button"
+        variant="outline"
+        block
         :disabled="pending"
-        class="w-full h-11 rounded-full border border-zinc-300 hover:border-zinc-400 bg-white text-brand-ink text-sm font-semibold hover:bg-zinc-50 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+        icon="pi-google"
+        class="h-11"
         @click="handleGoogle"
       >
-        <i class="pi pi-google text-sm" />
-        <span>Daftar dengan Google</span>
-      </button>
+        Daftar dengan Google
+      </UiButton>
     </template>
 
     <!-- Trust Row -->

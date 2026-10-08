@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { Product } from '~/types/product'
 import { formatRupiah } from '~/utils/format'
+import { useCategories } from '~/composables/useCategories'
+import { useCartStore } from '~/features/cart/stores/cart'
+import { useToast } from 'primevue/usetoast'
 
 const props = withDefaults(
   defineProps<{
@@ -21,130 +24,246 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
+const toast = useToast()
+const cartStore = useCartStore()
+const { categories: dynamicCategories } = useCategories()
+
+const justAdded = ref(false)
+
+const categoryName = computed(() => {
+  if (!props.product.category_id) return null
+  const cat = dynamicCategories.value.find((c) => c.id === props.product.category_id)
+  return cat ? cat.name : null
+})
+
+const formattedRating = computed(() => {
+  const r = props.product.rating
+  if (!r || Number(r) <= 0) return '5.0'
+  return Number(r).toFixed(1)
+})
+
+const soldCountText = computed(() => {
+  const count = props.product.sold_count ?? props.product.review_count ?? 0
+  if (count <= 0) return 'Baru'
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}rb+ terjual`
+  return `${count} terjual`
+})
+
+const badgeInfo = computed(() => {
+  if (props.product.stock === 0) {
+    return { label: 'Habis' }
+  }
+  if (props.product.stock > 0 && props.product.stock <= 3) {
+    return { label: `Sisa ${props.product.stock}` }
+  }
+  if (props.product.is_featured) {
+    return { label: 'Unggulan' }
+  }
+  if ((props.product.sold_count ?? 0) >= 30) {
+    return { label: 'Terlaris' }
+  }
+  return null
+})
 
 const navigateToDetail = () => {
-  router.push(`/product/${props.product.id}`)
+  const target = props.product.slug || props.product.id
+  router.push(`/product/${target}`)
+}
+
+const handleQuickAdd = () => {
+  if (props.product.stock <= 0) return
+
+  cartStore.addItem({
+    productId: props.product.id,
+    slug: props.product.slug,
+    name: props.product.name,
+    price: props.product.price,
+    priceCents: props.product.price_cents ?? Math.round(props.product.price * 100),
+    imageUrl: props.product.image_url,
+    stock: props.product.stock,
+    openCartDrawer: true,
+  })
+
+  justAdded.value = true
+  setTimeout(() => {
+    justAdded.value = false
+  }, 1500)
+
+  toast.add({
+    severity: 'success',
+    summary: 'Ditambahkan ke Keranjang',
+    detail: `${props.product.name} masuk ke pesanan.`,
+    life: 2500,
+  })
 }
 </script>
 
 <template>
   <article
-    class="product-card group flex flex-col bg-brand-canvas border border-brand-hairsoft rounded-card overflow-hidden transition-all duration-300 hover:border-brand-hair hover:shadow-floating cursor-pointer"
+    class="product-card group relative flex flex-col bg-white dark:bg-[#18191b] rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
     @click="navigateToDetail"
   >
-    <!-- Media Container -->
+    <!-- Stretched Semantic Link for Accessibility, Hover URL & SEO -->
+    <NuxtLink
+      :to="`/product/${product.slug || product.id}`"
+      class="absolute inset-0 z-0 rounded-2xl"
+      :aria-label="product.name"
+      tabindex="-1"
+    />
+
+    <!-- 3D Ribbon Badge: Solid Blue, Right-Curved, with Fold Effect Underneath -->
+    <div v-if="badgeInfo" class="absolute top-3 -left-2 z-20 pointer-events-none">
+      <div class="relative flex flex-col items-start">
+        <span
+          class="bg-blue-600 text-white text-[10.5px] font-bold tracking-wider uppercase pl-3 pr-3.5 py-1 rounded-r-full rounded-tl-md shadow-sm"
+        >
+          {{ badgeInfo.label }}
+        </span>
+        <!-- 3D Ribbon fold curve underneath left edge matching user reference -->
+        <span class="w-2 h-2.5 bg-blue-900 rounded-bl-md" />
+      </div>
+    </div>
+
+    <!-- Media Canvas: 1:1 Aspect Ratio with rounded-t-2xl -->
     <div
-      class="relative aspect-square w-full bg-brand-field overflow-hidden flex items-center justify-center p-3 border-b border-brand-hairsoft"
+      class="relative aspect-square w-full bg-[#f6f6f8] dark:bg-[#1f2023] rounded-t-2xl overflow-hidden pointer-events-none"
     >
       <img
         v-if="product.image_url"
         :src="product.image_url"
         :alt="product.name"
         loading="lazy"
-        class="w-full h-full object-cover rounded-media transition-transform duration-500 group-hover:scale-105"
+        :class="[
+          'w-full h-full object-cover block transition-transform duration-500 ease-out group-hover:scale-105',
+          product.stock === 0 ? 'opacity-60 grayscale' : '',
+        ]"
       />
       <div
         v-else
-        class="flex items-center justify-center w-full h-full text-brand-faint bg-brand-canvas-soft rounded-media"
+        class="flex flex-col items-center justify-center w-full h-full text-slate-400 gap-1"
       >
-        <i class="pi pi-image text-3xl" />
+        <i class="pi pi-image text-2xl opacity-30" />
+        <span class="text-[10px] font-medium tracking-widest uppercase opacity-50">ShelfStack</span>
       </div>
 
-      <!-- Stock Status Badge -->
-      <div class="absolute top-3 left-3 pointer-events-none">
-        <UiBadge v-if="product.stock === 0" label="Habis" variant="danger" />
-        <UiBadge v-else-if="product.stock < 5" :label="`Sisa ${product.stock}`" variant="warning" />
-        <UiBadge v-else label="Tersedia" variant="success" />
-      </div>
-
-      <!-- Quick view indicator -->
+      <!-- Floating Quick Add Button (Desktop Hover) -->
       <div
-        class="absolute bottom-3 right-3 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+        v-if="hideActions && product.stock > 0"
+        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
       >
-        <span
-          class="inline-flex items-center gap-1 bg-brand-canvas/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-medium text-brand-ink shadow-whisper"
+        <UiTooltip
+          :text="justAdded ? 'Ditambahkan ke Bag' : 'Tambah ke Bag'"
+          position="top"
+          align="end"
         >
-          <span>Detail</span>
-          <i class="pi pi-arrow-right text-[10px]" />
-        </span>
+          <button
+            type="button"
+            class="w-7 h-7 rounded-full bg-white dark:bg-zinc-800 text-slate-800 dark:text-white shadow-sm flex items-center justify-center active:scale-95 cursor-pointer hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-colors"
+            :aria-label="`Tambah ${product.name} ke Keranjang`"
+            @click.stop.prevent="handleQuickAdd"
+          >
+            <i v-if="justAdded" class="pi pi-check text-[10px] text-emerald-500" />
+            <i v-else class="pi pi-plus text-[10px]" />
+          </button>
+        </UiTooltip>
       </div>
     </div>
 
-    <!-- Content Body -->
-    <div class="p-5 flex flex-col flex-1 justify-between gap-3">
-      <div>
-        <div class="flex items-center justify-between text-xs text-brand-muted mb-1">
-          <span class="font-medium text-[11px] text-brand-muted tracking-tight">
-            Katalog #{{ product.id }}
+    <!-- Compact Content Body: Zero divider lines, small crisp typography -->
+    <div
+      class="p-3 sm:p-3.5 flex flex-col justify-between gap-2 flex-1 relative z-10 pointer-events-none"
+    >
+      <div class="space-y-1">
+        <!-- Top Row: Category (Left) and Rating (Right) -->
+        <div class="flex items-center justify-between gap-1.5 min-h-[16px]">
+          <span
+            v-if="categoryName"
+            class="font-body text-[10px] uppercase font-bold text-slate-500 dark:text-zinc-400 tracking-wider truncate"
+          >
+            {{ categoryName }}
           </span>
-          <span class="text-[11px] text-brand-muted tabular-nums"> Stok: {{ product.stock }} </span>
+          <span v-else class="text-[10px] text-transparent select-none">-</span>
+
+          <div
+            v-if="product.rating && Number(product.rating) > 0"
+            class="flex items-center gap-1 shrink-0 text-[11px] font-bold text-slate-700 dark:text-zinc-300 tabular-nums"
+          >
+            <i class="pi pi-star-fill text-amber-400 text-[10px]" />
+            <span>{{ formattedRating }}</span>
+          </div>
         </div>
 
+        <!-- Product Title: Small, crisp font -->
         <h3
-          class="font-display m-0 text-base sm:text-lg font-bold text-brand-ink line-clamp-1 group-hover:text-brand-accent transition-colors"
+          class="font-display font-semibold text-xs sm:text-[13px] text-slate-900 dark:text-zinc-100 tracking-tight line-clamp-2 group-hover:text-blue-600 transition-colors m-0 leading-snug"
           :title="product.name"
         >
           {{ product.name }}
         </h3>
-
-        <p class="font-body m-0 mt-1.5 text-xs text-brand-muted line-clamp-2 leading-relaxed">
-          {{ product.description || 'Deskripsi kurasi produk esensial untuk kebutuhan modern.' }}
-        </p>
       </div>
 
-      <!-- Price & Action Section -->
-      <div
-        class="mt-2 pt-3 border-t border-brand-hairsoft flex items-center justify-between gap-2"
-        @click.stop
-      >
-        <div>
-          <span class="text-[11px] font-medium text-brand-muted block">Harga</span>
-          <span class="text-base sm:text-lg font-bold tracking-tight text-brand-ink tabular-nums">
-            {{ formatRupiah(product.price) }}
-          </span>
-        </div>
-
-        <!-- Public View Action -->
-        <UiButton
-          v-if="hideActions"
-          :to="`/product/${product.id}`"
-          variant="secondary"
-          size="sm"
-          icon="pi-arrow-right"
-          icon-pos="right"
+      <!-- Price & Terjual Row: Side-by-side, No Lines -->
+      <div class="flex items-baseline justify-between gap-2 pt-0.5 pointer-events-auto" @click.stop>
+        <!-- Price on Left -->
+        <span
+          class="font-display font-bold text-sm sm:text-[15px] text-slate-900 dark:text-white tabular-nums tracking-tight"
         >
-          Detail
-        </UiButton>
+          {{ formatRupiah(product.price) }}
+        </span>
 
-        <!-- Admin Actions -->
-        <div v-else class="flex items-center gap-1">
+        <!-- Terjual on Right (Sejajar dengan harga) -->
+        <span
+          v-if="hideActions"
+          class="text-[11px] font-medium text-slate-500 dark:text-zinc-400 tabular-nums shrink-0"
+        >
+          {{ soldCountText }}
+        </span>
+
+        <!-- Admin Actions (Management Mode) -->
+        <div v-else class="flex items-center gap-1.5">
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+            :class="[
+              product.stock === 0
+                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'
+                : product.stock < 5
+                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+            ]"
+          >
+            Stok: {{ product.stock }}
+          </span>
+
           <template v-if="isTrash">
-            <UiButton
-              variant="secondary"
-              size="sm"
-              icon="pi-refresh"
-              @click="emit('restore', product.id)"
+            <button
+              type="button"
+              class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 transition-colors"
+              @click.stop="emit('restore', product.id)"
             >
               Restore
-            </UiButton>
+            </button>
           </template>
           <template v-else>
-            <button
-              type="button"
-              class="w-8 h-8 rounded-full bg-brand-canvas-soft hover:bg-brand-ink hover:text-brand-onink text-brand-muted transition-colors flex items-center justify-center cursor-pointer border border-brand-hair"
-              title="Ubah Produk"
-              @click="emit('edit', product)"
-            >
-              <i class="pi pi-pencil text-xs" />
-            </button>
-            <button
-              type="button"
-              class="w-8 h-8 rounded-full bg-brand-canvas-soft hover:bg-red-600 hover:text-white text-brand-muted transition-colors flex items-center justify-center cursor-pointer border border-brand-hair"
-              title="Hapus Produk"
-              @click="emit('delete', product.id)"
-            >
-              <i class="pi pi-trash text-xs" />
-            </button>
+            <UiTooltip text="Ubah Produk" position="top">
+              <button
+                type="button"
+                class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Ubah Produk"
+                @click.stop="emit('edit', product)"
+              >
+                <i class="pi pi-pencil text-[10px]" />
+              </button>
+            </UiTooltip>
+            <UiTooltip text="Hapus Produk" position="top" align="end">
+              <button
+                type="button"
+                class="w-7 h-7 rounded-full bg-slate-100 hover:bg-red-600 hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Hapus Produk"
+                @click.stop="emit('delete', product.id)"
+              >
+                <i class="pi pi-trash text-[10px]" />
+              </button>
+            </UiTooltip>
           </template>
         </div>
       </div>

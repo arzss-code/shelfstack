@@ -79,11 +79,11 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
-  // Fetch By ID
-  const fetchProductById = async (id: number): Promise<Product | null> => {
+  // Fetch By ID or Slug
+  const fetchProductById = async (idOrSlug: number | string): Promise<Product | null> => {
     loading.value = true
     try {
-      return await productRepository.getProductById(supabase, id)
+      return await productRepository.getProductById(supabase, idOrSlug)
     } catch (e) {
       throw e
     } finally {
@@ -98,6 +98,8 @@ export const useProductStore = defineStore('product', () => {
     description: string | null,
     link: string | null,
     file: File | null,
+    stock = 0,
+    categoryId: string | null = null,
   ) => {
     loading.value = true
     try {
@@ -113,6 +115,8 @@ export const useProductStore = defineStore('product', () => {
         description,
         link,
         image_url: imageUrl,
+        stock,
+        category_id: categoryId,
       })
 
       if (newProduct) {
@@ -140,6 +144,8 @@ export const useProductStore = defineStore('product', () => {
     description: string | null,
     link: string | null,
     file: File | null,
+    stock?: number,
+    categoryId?: string | null,
   ) => {
     loading.value = true
     try {
@@ -156,6 +162,8 @@ export const useProductStore = defineStore('product', () => {
         description,
         link,
         image_url: imageUrl,
+        stock: stock !== undefined ? stock : existing?.stock,
+        category_id: categoryId !== undefined ? categoryId : existing?.category_id,
       })
 
       if (updatedProduct) {
