@@ -267,11 +267,68 @@ export type Database = {
           },
         ]
       }
+      stock_movements: {
+        Row: {
+          balance_after: number
+          created_at: string
+          delta: number
+          id: string
+          notes: string | null
+          order_id: string | null
+          product_id: number
+          reason: string
+        }
+        Insert: {
+          balance_after: number
+          created_at?: string
+          delta: number
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          product_id: number
+          reason: string
+        }
+        Update: {
+          balance_after?: number
+          created_at?: string
+          delta?: number
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          product_id?: number
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'stock_movements_order_id_fkey'
+            columns: ['order_id']
+            isOneToOne: false
+            referencedRelation: 'orders'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'stock_movements_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      handle_payment_webhook: {
+        Args: {
+          p_order_id: string
+          p_target_status: string
+          p_payment_type?: string | null
+          p_midtrans_id?: string | null
+        }
+        Returns: string
+      }
       cancel_order: {
         Args: {
           p_order_id: string
