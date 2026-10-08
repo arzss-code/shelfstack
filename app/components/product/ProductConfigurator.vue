@@ -22,11 +22,13 @@ const selectedMaterial = ref('')
 watch(
   () => props.product,
   () => {
-    if (variants.value.colors.length > 0) {
-      selectedColor.value = variants.value.colors[0].name
+    const firstColor = variants.value.colors[0]
+    if (firstColor) {
+      selectedColor.value = firstColor.name
     }
-    if (variants.value.options.length > 0) {
-      selectedMaterial.value = variants.value.options[0].name
+    const firstOption = variants.value.options[0]
+    if (firstOption) {
+      selectedMaterial.value = firstOption.name
     }
   },
   { immediate: true },

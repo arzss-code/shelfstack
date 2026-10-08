@@ -44,7 +44,7 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
  */
 export function detectProductCategorySlug(product: Product): string {
   if (product.category_id && CATEGORY_ID_MAP[product.category_id]) {
-    return CATEGORY_ID_MAP[product.category_id]
+    return CATEGORY_ID_MAP[product.category_id] as string
   }
 
   const searchText = `${product.slug || ''} ${product.name || ''}`.toLowerCase()
@@ -294,8 +294,9 @@ export function getProductSpecs(product: Product): ProductSpecItem[] {
         const existingIdx = defaultSpecs.findIndex(
           (s) => s.label.toLowerCase() === key.toLowerCase(),
         )
-        if (existingIdx >= 0) {
-          defaultSpecs[existingIdx] = { ...defaultSpecs[existingIdx], value: String(val) }
+        const existingItem = defaultSpecs[existingIdx]
+        if (existingIdx >= 0 && existingItem) {
+          defaultSpecs[existingIdx] = { ...existingItem, value: String(val) }
         } else {
           defaultSpecs.push({ label: key, value: String(val), icon: 'pi pi-info-circle' })
         }

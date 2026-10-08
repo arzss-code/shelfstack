@@ -272,6 +272,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cancel_order: {
+        Args: {
+          p_order_id: string
+          p_reason?: string
+        }
+        Returns: boolean
+      }
       create_order: {
         Args: {
           p_address: Json
