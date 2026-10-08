@@ -24,8 +24,19 @@ const editingProduct = ref<Product | null>(null)
 const searchQuery = ref('')
 const activeTab = ref('0')
 
+const criticalStockProducts = computed(() => {
+  return productStore.products.filter((p) => (p.stock ?? 0) < 5)
+})
+
 const filteredProducts = computed(() => {
-  const sourceList = activeTab.value === '0' ? productStore.products : productStore.deletedProducts
+  let sourceList: Product[] = []
+  if (activeTab.value === '0') {
+    sourceList = productStore.products
+  } else if (activeTab.value === '1') {
+    sourceList = productStore.deletedProducts
+  } else if (activeTab.value === '2') {
+    sourceList = criticalStockProducts.value
+  }
   if (!searchQuery.value.trim()) return sourceList
   const query = searchQuery.value.toLowerCase()
   return sourceList.filter((p) => p.name.toLowerCase().includes(query))
@@ -107,21 +118,13 @@ const handleSave = async (
     }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan tidak terduga.'
-    if (message.includes('row-level security policy')) {
-      toast.add({
-        severity: 'error',
-        summary: 'Akses Ditolak (RLS)',
-        detail: 'Supabase menolak operasi. Pastikan RLS Policy sudah diatur.',
-        life: 8000,
-      })
-    } else {
-      toast.add({
-        severity: 'error',
-        summary: 'Gagal Menyimpan',
-        detail: message,
-        life: 5000,
-      })
-    }
+    const isRls = message.includes('row-level security policy')
+    toast.add({
+      severity: 'error',
+      summary: isRls ? 'Akses Ditolak (RLS)' : 'Gagal Menyimpan',
+      detail: isRls ? 'Supabase menolak operasi. Pastikan RLS Policy sudah diatur.' : message,
+      life: isRls ? 8000 : 5000,
+    })
   }
 }
 
@@ -169,7 +172,6 @@ const handleRestore = async (id: number) => {
           detail: 'Produk berhasil dikembalikan.',
           life: 3000,
         })
-        // Refresh active list in background if needed
         productStore.fetchProducts()
       } catch (error: unknown) {
         toast.add({
@@ -210,6 +212,17 @@ const handleRestore = async (id: number) => {
     <Tabs v-model:value="activeTab" class="!bg-transparent">
       <TabList class="!bg-transparent">
         <Tab value="0">Produk Aktif</Tab>
+        <Tab value="2">
+          <div class="flex items-center gap-2">
+            <span>Stok Kritis</span>
+            <span
+              v-if="criticalStockProducts.length > 0"
+              class="rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 font-bold px-2 py-0.5 text-[10px]"
+            >
+              {{ criticalStockProducts.length }}
+            </span>
+          </div>
+        </Tab>
         <Tab value="1">Keranjang Sampah</Tab>
       </TabList>
       <TabPanels class="px-0 pb-0 !bg-transparent">
@@ -236,6 +249,16 @@ const handleRestore = async (id: number) => {
               @click="productStore.fetchProducts(true)"
             />
           </div>
+        </TabPanel>
+
+        <TabPanel value="2">
+          <ProductList
+            :products="filteredProducts"
+            :loading="productStore.loading"
+            :is-searching="searchQuery.trim().length > 0"
+            @edit="openEditForm"
+            @delete="handleDelete"
+          />
         </TabPanel>
 
         <TabPanel value="1">
