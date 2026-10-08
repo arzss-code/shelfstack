@@ -1,6 +1,10 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
-import { mapMidtransStatus, verifyMidtransSignature } from '../../utils/midtrans'
+import {
+  extractBaseOrderId,
+  mapMidtransStatus,
+  verifyMidtransSignature,
+} from '../../utils/midtrans'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
@@ -36,7 +40,7 @@ export default defineEventHandler(async (event) => {
     transaction_id: transactionId,
   } = body
 
-  // 1. Verifikasi tanda tangan SHA-512
+  // 1. Verifikasi tanda tangan SHA-512 menggunakan orderId asli dari payload
   const isValidSignature = verifyMidtransSignature({
     orderId,
     statusCode,
@@ -53,11 +57,12 @@ export default defineEventHandler(async (event) => {
   const newStatus = mapMidtransStatus(transactionStatus, fraudStatus)
 
   // 3. Update status pesanan di database dengan RPC atomik handle_payment_webhook (Security Definer / Service Role)
-  //    Melindungi dari benturan pembatalan (phantom stock) dan otomatis restock jika expired/cancelled
+  //    Ekstrak UUID pesanan asli jika order_id Midtrans memiliki suffix percobaan (misal: <uuid>-R123456)
+  const baseOrderId = extractBaseOrderId(orderId)
   const client = serverSupabaseServiceRole<Database>(event)
 
   const { data: resultStatus, error: rpcError } = await client.rpc('handle_payment_webhook', {
-    p_order_id: orderId,
+    p_order_id: baseOrderId,
     p_target_status: newStatus,
     p_payment_type: paymentType || null,
     p_midtrans_id: transactionId || null,
@@ -74,7 +79,7 @@ export default defineEventHandler(async (event) => {
         paid_at: newStatus === 'paid' ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', orderId)
+      .eq('id', baseOrderId)
       .select('id, status')
       .single()
 
@@ -83,13 +88,13 @@ export default defineEventHandler(async (event) => {
     }
 
     return successResponse('Status pesanan berhasil diperbarui', {
-      order_id: orderId,
+      order_id: baseOrderId,
       status: updatedOrder.status,
     })
   }
 
   return successResponse('Status pesanan berhasil diproses', {
-    order_id: orderId,
+    order_id: baseOrderId,
     result: resultStatus,
     target_status: newStatus,
   })

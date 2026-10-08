@@ -2,7 +2,11 @@ import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { config } from '../config.js'
 import { processPaymentWebhook } from '../services/supabase.service.js'
-import { mapMidtransStatus, verifyMidtransSignature } from '../utils/midtrans.js'
+import {
+  extractBaseOrderId,
+  mapMidtransStatus,
+  verifyMidtransSignature,
+} from '../utils/midtrans.js'
 
 export const webhookPayloadSchema = z.object({
   order_id: z.string().min(1, 'order_id wajib diisi'),
@@ -53,8 +57,9 @@ export const orderRoutes: FastifyPluginAsync = async (app) => {
 
       // 3. Proses update order secara atomik di database
       try {
+        const baseOrderId = extractBaseOrderId(payload.order_id)
         const result = await processPaymentWebhook({
-          orderId: payload.order_id,
+          orderId: baseOrderId,
           targetStatus,
           paymentType: payload.payment_type,
           midtransId: payload.transaction_id,

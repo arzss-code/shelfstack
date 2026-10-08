@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { config } from '../config.js'
+import { extractBaseOrderId } from '../utils/midtrans.js'
 
 let supabaseInstance: SupabaseClient | null = null
 
@@ -37,9 +38,10 @@ export interface ProcessWebhookParams {
 
 export async function processPaymentWebhook(params: ProcessWebhookParams) {
   const client = getSupabaseClient()
+  const baseOrderId = extractBaseOrderId(params.orderId)
 
   const { data: rpcResult, error: rpcError } = await client.rpc('handle_payment_webhook', {
-    p_order_id: params.orderId,
+    p_order_id: baseOrderId,
     p_target_status: params.targetStatus,
     p_payment_type: params.paymentType ?? null,
     p_midtrans_id: params.midtransId ?? null,
@@ -56,7 +58,7 @@ export async function processPaymentWebhook(params: ProcessWebhookParams) {
         paid_at: params.targetStatus === 'paid' ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.orderId)
+      .eq('id', baseOrderId)
       .select('id, status')
       .single()
 

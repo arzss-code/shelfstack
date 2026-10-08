@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import crypto from 'node:crypto'
-import { mapMidtransStatus, verifyMidtransSignature } from '../../server/utils/midtrans'
+import {
+  extractBaseOrderId,
+  mapMidtransStatus,
+  verifyMidtransSignature,
+} from '../../server/utils/midtrans'
 
 describe('verifyMidtransSignature', () => {
   const serverKey = 'SB-Mid-server-TESTKEY123'
@@ -69,5 +73,25 @@ describe('mapMidtransStatus', () => {
   it('memetakan status yang belum selesai menjadi pending', () => {
     expect(mapMidtransStatus('pending')).toBe('pending')
     expect(mapMidtransStatus('unknown_status')).toBe('pending')
+  })
+})
+
+describe('extractBaseOrderId', () => {
+  const baseUuid = 'b129f62c-152e-44cf-9fa6-f12a548168d1'
+
+  it('mengembalikan UUID murni jika tanpa suffix', () => {
+    expect(extractBaseOrderId(baseUuid)).toBe(baseUuid)
+  })
+
+  it('mengekstrak UUID murni jika order_id Midtrans memiliki suffix retry (-R123456)', () => {
+    expect(extractBaseOrderId(`${baseUuid}-R123456`)).toBe(baseUuid)
+  })
+
+  it('mengekstrak UUID murni jika order_id Midtrans memiliki suffix timestamp (-1728374829)', () => {
+    expect(extractBaseOrderId(`${baseUuid}-1728374829`)).toBe(baseUuid)
+  })
+
+  it('mengembalikan string kosong jika input falsy', () => {
+    expect(extractBaseOrderId('')).toBe('')
   })
 })

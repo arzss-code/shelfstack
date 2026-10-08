@@ -1,4 +1,4 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 
 export default defineEventHandler(async (event) => {
@@ -72,8 +72,8 @@ export default defineEventHandler(async (event) => {
   const authHeader = 'Basic ' + Buffer.from(serverKey + ':').toString('base64')
   const snapUrl = config.midtransApiUrl || 'https://app.sandbox.midtrans.com/snap/v1/transactions'
 
-  try {
-    const midtransResponse = await $fetch<{ token: string; redirect_url: string }>(snapUrl, {
+  const requestSnapToken = async (orderIdToUse: string) => {
+    return await $fetch<{ token: string; redirect_url: string }>(snapUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ export default defineEventHandler(async (event) => {
       },
       body: {
         transaction_details: {
-          order_id: order.id,
+          order_id: orderIdToUse,
           gross_amount: grossAmount,
         },
         customer_details: {
@@ -91,14 +91,45 @@ export default defineEventHandler(async (event) => {
         },
       },
     })
+  }
 
-    // 5. Simpan snap_token ke database
-    await client.from('orders').update({ snap_token: midtransResponse.token }).eq('id', order.id)
+  let midtransResponse: { token: string; redirect_url: string }
+  let activeOrderId = order.id
+
+  try {
+    try {
+      midtransResponse = await requestSnapToken(activeOrderId)
+    } catch (primaryErr: unknown) {
+      const fetchErr = primaryErr as { data?: { error_messages?: string[] }; message?: string }
+      const errorMessages = Array.isArray(fetchErr.data?.error_messages)
+        ? fetchErr.data!.error_messages
+        : []
+      const isDuplicateOrderId =
+        errorMessages.some((msg) => msg.includes('order_id sudah digunakan')) ||
+        Boolean(fetchErr.message?.includes('order_id sudah digunakan'))
+
+      if (isDuplicateOrderId) {
+        // Jika order_id sebelumnya sudah terdaftar di Midtrans sandbox/production
+        // (misal percobaan ulang checkout atau reset DB), gunakan suffix percobaan unik
+        activeOrderId = `${order.id}-R${Date.now().toString().slice(-6)}`
+        midtransResponse = await requestSnapToken(activeOrderId)
+      } else {
+        throw primaryErr
+      }
+    }
+
+    // 5. Simpan snap_token ke database menggunakan Service Role
+    // Memerlukan service role karena RLS orders membatasi update untuk user biasa
+    const adminClient = serverSupabaseServiceRole<Database>(event)
+    await adminClient
+      .from('orders')
+      .update({ snap_token: midtransResponse.token })
+      .eq('id', order.id)
 
     return successResponse('Token pembayaran Midtrans berhasil dibuat', {
       token: midtransResponse.token,
       redirect_url: midtransResponse.redirect_url,
-      order_id: order.id,
+      order_id: activeOrderId,
     })
   } catch (err: unknown) {
     const fetchErr = err as { data?: unknown; message?: string }

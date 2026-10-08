@@ -119,6 +119,53 @@ describe('Order Service (Fastify Pilot)', () => {
       // Cleanup
       setSupabaseClient(null)
     })
+
+    it('should strip retry suffix from order_id and successfully update original UUID order', async () => {
+      config.MIDTRANS_SERVER_KEY = 'test-server-key'
+      const baseOrderId = 'b129f62c-152e-44cf-9fa6-f12a548168d1'
+      const suffixedOrderId = `${baseOrderId}-R123456`
+      const statusCode = '200'
+      const grossAmount = '250000.00'
+      const serverKey = 'test-server-key'
+
+      const validSignature = crypto
+        .createHash('sha512')
+        .update(`${suffixedOrderId}${statusCode}${grossAmount}${serverKey}`)
+        .digest('hex')
+
+      const mockSupabase = {
+        rpc: async (fnName: string, args: any) => {
+          expect(fnName).toBe('handle_payment_webhook')
+          expect(args.p_order_id).toBe(baseOrderId)
+          expect(args.p_target_status).toBe('paid')
+          return { data: 'UPDATED_TO_paid', error: null }
+        },
+      } as any
+
+      setSupabaseClient(mockSupabase)
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/orders/webhook',
+        payload: {
+          order_id: suffixedOrderId,
+          status_code: statusCode,
+          gross_amount: grossAmount,
+          signature_key: validSignature,
+          transaction_status: 'settlement',
+          payment_type: 'gopay',
+          transaction_id: 'midtrans-trx-gopay-123',
+        },
+      })
+
+      expect(response.statusCode).toBe(200)
+      const body = response.json()
+      expect(body.status).toBe('success')
+      expect(body.data.orderId).toBe(baseOrderId)
+      expect(body.data.status).toBe('paid')
+
+      setSupabaseClient(null)
+    })
   })
 
   describe('Redis Cache-Aside & Circuit Breaker', () => {
