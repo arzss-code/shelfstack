@@ -22,7 +22,9 @@ const order = ref<Order | null>(null)
 const loading = ref(true)
 const isPaying = ref(false)
 const isCancelling = ref(false)
+const isCheckingStatus = ref(false)
 const isCancelModalOpen = ref(false)
+
 const isInvoiceModalOpen = ref(false)
 const errorMsg = ref('')
 
@@ -58,6 +60,11 @@ const fetchOrderDetail = async () => {
 
 onMounted(async () => {
   await fetchOrderDetail()
+
+  // Jika pesanan masih pending saat halaman dimuat, sinkronisasi status dengan Midtrans secara otomatis
+  if (order.value?.status === 'pending') {
+    handleCheckPaymentStatus(true)
+  }
 
   // Langganan pembaruan status realtime via Supabase Realtime Postgres Changes
   if (order.value && import.meta.client) {
@@ -100,6 +107,55 @@ onUnmounted(() => {
   }
 })
 
+const handleCheckPaymentStatus = async (silent = false) => {
+  if (!order.value || isCheckingStatus.value) return
+  isCheckingStatus.value = true
+
+  try {
+    const res = await $fetch<{
+      status: string
+      data: {
+        status: OrderStatus
+        is_paid: boolean
+        transaction_status?: string
+        payment_type?: string
+      }
+    }>(`/api/orders/${order.value.id}/check-payment-status`, {
+      method: 'POST',
+    })
+
+    if (res.data?.is_paid) {
+      await fetchOrderDetail()
+      toast.add({
+        severity: 'success',
+        summary: 'Pembayaran Terkonfirmasi!',
+        detail: 'Status pesanan Anda telah berhasil dikonfirmasi sebagai Lunas (Paid).',
+        life: 5000,
+      })
+    } else if (!silent) {
+      toast.add({
+        severity: 'info',
+        summary: 'Menunggu Pembayaran',
+        detail:
+          'Pembayaran belum terkonfirmasi oleh sistem Midtrans. Silakan selesaikan pembayaran sesuai instruksi.',
+        life: 4000,
+      })
+    }
+  } catch (err: unknown) {
+    if (!silent) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Gagal Memeriksa Status',
+        detail:
+          'Tidak dapat memeriksa status pembayaran ke payment gateway. Silakan coba kembali sesaat lagi.',
+        life: 4000,
+      })
+    }
+  } finally {
+    isCheckingStatus.value = false
+  }
+}
+
 const handlePayNow = async () => {
   if (!order.value || isPaying.value) return
 
@@ -130,17 +186,18 @@ const handlePayNow = async () => {
         toast.add({
           severity: 'success',
           summary: 'Pembayaran Diterima',
-          detail: 'Pembayaran berhasil diproses di Sandbox.',
+          detail: 'Memverifikasi status pembayaran dengan payment gateway...',
           life: 4000,
         })
-        fetchOrderDetail()
+        handleCheckPaymentStatus(true)
       },
       onPending: () => {
         toast.add({
           severity: 'info',
           summary: 'Menunggu Pembayaran',
-          detail: 'Instruksi pembayaran telah aktif.',
-          life: 4000,
+          detail:
+            'Instruksi pembayaran telah aktif. Klik "Cek Status Pembayaran" jika sudah transfer.',
+          life: 5000,
         })
       },
       onError: () => {
@@ -157,8 +214,10 @@ const handlePayNow = async () => {
     toast.add({
       severity: 'error',
       summary: 'Gagal Membuka Pembayaran',
-      detail: fetchErr.data?.message || 'Tidak dapat memuat token pembayaran Midtrans.',
-      life: 4000,
+      detail:
+        fetchErr.data?.message ||
+        'Layanan pembayaran sedang mengalami kendala. Silakan coba beberapa saat lagi.',
+      life: 5000,
     })
   } finally {
     isPaying.value = false
@@ -520,17 +579,28 @@ const formatDate = (dateStr: string) => {
               class="w-full justify-center"
               icon="pi-credit-card"
               :loading="isPaying"
-              :disabled="isCancelling"
+              :disabled="isCancelling || isCheckingStatus"
               @click="handlePayNow"
             >
               Bayar Sekarang (Midtrans)
             </UiButton>
             <UiButton
               variant="outline"
+              size="md"
+              class="w-full justify-center !text-brand-ink hover:!bg-brand-hairsoft font-semibold"
+              icon="pi-sync"
+              :loading="isCheckingStatus"
+              :disabled="isPaying || isCancelling"
+              @click="handleCheckPaymentStatus(false)"
+            >
+              Cek Status Pembayaran
+            </UiButton>
+            <UiButton
+              variant="outline"
               size="sm"
               class="w-full justify-center !text-red-600 hover:!text-red-700 hover:!border-red-300"
               icon="pi-times-circle"
-              :disabled="isPaying || isCancelling"
+              :disabled="isPaying || isCancelling || isCheckingStatus"
               @click="isCancelModalOpen = true"
             >
               Batalkan Pesanan

@@ -2,6 +2,15 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [v0.13.3] - 2026-10-08
+
+### Added
+
+- **Midtrans Payment Status Check & Sync (Shopee/Tokopedia UX Standard)**:
+  - Endpoint baru `POST /api/orders/[id]/check-payment-status` untuk query langsung ke Midtrans Transaction Status API (`/v2/{order_id}/status`) dan sinkronisasi otomatis ke database Supabase via RPC atomik `handle_payment_webhook`.
+  - Tombol _"Cek Status Pembayaran"_ pada halaman detail pesanan pending, memungkinkan pengguna memverifikasi pelunasan transfer bank/VA secara instan tanpa tergantung pada webhook inbound saat testing di localhost.
+  - Auto-synchronization di background saat halaman pesanan dibuka atau saat modal Snap ditutup.
+
 ## [v0.13.2] - 2026-10-08
 
 ### Fixed
