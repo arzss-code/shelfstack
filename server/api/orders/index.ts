@@ -7,7 +7,8 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient<Database>(event)
 
   // Autentikasi wajib untuk semua operasi order pelanggan
-  const { user } = await requireUser(event)
+  const { user, profile } = await requireUser(event)
+  const targetUserId = user.id || profile.user_id
 
   if (method === 'GET') {
     const query = getQuery(event)
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
     const { data, error } = await client
       .from('orders')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', targetUserId)
       .order('created_at', { ascending: false })
       .range(from, to)
 
