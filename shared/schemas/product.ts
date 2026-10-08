@@ -27,8 +27,16 @@ export const productSchema = z.object({
 
 export type ProductInput = z.infer<typeof productSchema>
 
-// Query pagination GET /api/products (from/to dikirim sebagai string query).
+// Query pagination & filter GET /api/products
 export const productListQuerySchema = z.object({
   from: z.coerce.number().int().min(0).default(0),
   to: z.coerce.number().int().min(0).default(11),
+  q: z.string().trim().optional(),
+  category: z.string().trim().optional(),
+  min_price: z.coerce.number().int().min(0).optional(),
+  max_price: z.coerce.number().int().min(0).optional(),
+  stock_status: z.enum(['all', 'in_stock', 'critical']).optional(),
+  sort: z.enum(['featured', 'price-low', 'price-high', 'name-asc', 'popular']).optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
 })

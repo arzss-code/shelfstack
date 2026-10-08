@@ -1,9 +1,10 @@
-export function successResponse(message: string, data: any = null) {
+export function successResponse(message: string, data: any = null, meta?: Record<string, any>) {
   return {
     status: 'success',
     message,
     data,
     errors: null,
+    ...(meta || {}),
   }
 }
 
