@@ -111,13 +111,20 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // 5. Simpan snap_token ke database menggunakan Service Role
-    // Memerlukan service role karena RLS orders membatasi update untuk user biasa
-    const adminClient = serverSupabaseServiceRole<Database>(event)
-    await adminClient
-      .from('orders')
-      .update({ snap_token: midtransResponse.token })
-      .eq('id', order.id)
+    // 5. Simpan snap_token ke database secara defensif (non-blocking)
+    // Kegagalan caching ke DB tidak boleh menggagalkan proses checkout jika token sudah berhasil dibuat oleh Midtrans
+    try {
+      const adminClient = serverSupabaseServiceRole<Database>(event)
+      await adminClient
+        .from('orders')
+        .update({ snap_token: midtransResponse.token })
+        .eq('id', order.id)
+    } catch (dbErr: unknown) {
+      console.warn(
+        '[payment-token] Tidak dapat menyimpan snap_token ke DB (service role key mungkin belum disetel):',
+        dbErr instanceof Error ? dbErr.message : dbErr,
+      )
+    }
 
     return successResponse('Token pembayaran Midtrans berhasil dibuat', {
       token: midtransResponse.token,
@@ -125,11 +132,11 @@ export default defineEventHandler(async (event) => {
       order_id: activeOrderId,
     })
   } catch (err: unknown) {
-    const fetchErr = err as { data?: unknown; message?: string }
+    console.error('[payment-token] Midtrans API communication error:', err)
     return errorResponse(
       event,
-      fetchErr.message || 'Gagal berkomunikasi dengan Midtrans API',
-      fetchErr.data,
+      'Layanan pembayaran sedang mengalami kendala. Silakan coba beberapa saat lagi.',
+      null,
       502,
     )
   }
