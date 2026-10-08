@@ -87,4 +87,34 @@ describe('productListQuerySchema', () => {
   it('menolak from negatif', () => {
     expect(productListQuerySchema.safeParse({ from: -1 }).success).toBe(false)
   })
+
+  it('menerima query filter pencarian, kategori, harga, dan sort', () => {
+    const parsed = productListQuerySchema.parse({
+      q: '  meja kayu  ',
+      category: 'meja-kerja',
+      min_price: '500000',
+      max_price: '2000000',
+      stock_status: 'in_stock',
+      sort: 'popular',
+      page: '2',
+      limit: '12',
+    })
+    expect(parsed).toEqual({
+      from: 0,
+      to: 11,
+      q: 'meja kayu',
+      category: 'meja-kerja',
+      min_price: 500000,
+      max_price: 2000000,
+      stock_status: 'in_stock',
+      sort: 'popular',
+      page: 2,
+      limit: 12,
+    })
+  })
+
+  it('menolak sort dan stock_status yang tidak terdaftar', () => {
+    expect(productListQuerySchema.safeParse({ sort: 'invalid-sort' }).success).toBe(false)
+    expect(productListQuerySchema.safeParse({ stock_status: 'unknown' }).success).toBe(false)
+  })
 })

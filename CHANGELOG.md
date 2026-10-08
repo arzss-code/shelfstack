@@ -2,6 +2,33 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [v0.13.0] - 2026-10-08
+
+### Added
+
+- **Phase 0 (Concurrency Hardening & Tier-1 Catalog)**:
+  - Eliminasi circular deadlock database via deterministic lock ordering (`ORDER BY product_id ASC`) pada stored procedure `create_order`.
+  - Atomic webhook processor RPC `handle_payment_webhook` dengan proteksi phantom stock (`CONFLICT_ALREADY_CANCELLED`) dan auto-restock saat expired/cancelled.
+  - Upgrade etalase katalog: Server-side dynamic query, Full-Text Search tsvector, faceted category counts, dan server pagination.
+- **Phase 1 (Standalone Fastify Pilot Microservice - `@shelfstack/order-service`)**:
+  - Service terpisah berkinerja tinggi menggunakan Fastify 5, Zod Type Provider, dan validasi signature SHA-512 Midtrans.
+  - Telemetry endpoint `GET /health` dan integration test suite via `app.inject()`.
+- **Phase 2 (Relational Architecture & Inventory Movements Ledger)**:
+  - Tabel audit trail abadi `stock_movements` (Double-Entry Inventory Accounting Ledger).
+  - Anti-tamper database triggers pada tabel `products` untuk mencatat setiap mutasi stok secara otomatis tanpa celah manipulasi aplikasi.
+  - Endpoint admin paginasi `/api/admin/products/[id]/stock-movements` untuk melihat riwayat mutasi per barang.
+- **Phase 3 (Containerization Docker & Compose)**:
+  - Multi-stage `Dockerfile` untuk Nuxt (image ramping < 150MB, eksekusi non-root `USER node`).
+  - `Dockerfile` untuk `@shelfstack/order-service`.
+  - Orchestration `docker-compose.yml` dan `docker-compose.dev.yml` menghubungkan Frontend, Order Service, dan Redis 7.
+- **Phase 4 & 5 (Redis Caching & Background Jobs)**:
+  - Redis Cache-Aside Manager dengan resilient Circuit Breaker dan $O(1)$ Versioned Tag Invalidation (`catalog:version`).
+  - Worker otomatis pembatalan pesanan kadaluwarsa (`OrderExpiryWorker`) dengan auto-restock dan cache invalidation.
+- **Phase 6 & 7 (Automated CI/CD Pipeline & Production Gateway)**:
+  - Pipeline GitHub Actions `.github/workflows/ci.yml` (ESLint ➔ Typecheck ➔ Vitest 100 tests ➔ Docker validation).
+  - Reverse proxy gateway Nginx produksi (`deploy/nginx/nginx.conf`) dengan HTTP/2, Gzip kompresi, rate limiting, dan security headers.
+  - Orchestration produksi `deploy/docker-compose.prod.yml` dan health probe probe `/api/health`.
+
 ## [v0.12.0-s4] - 2026-10-08
 
 ### Added

@@ -52,30 +52,45 @@ export default defineEventHandler(async (event) => {
   // 2. Pemetaan status transaksi
   const newStatus = mapMidtransStatus(transactionStatus, fraudStatus)
 
-  // 3. Update status pesanan di database dengan service_role (karena webhook dipanggil oleh server Midtrans)
+  // 3. Update status pesanan di database dengan RPC atomik handle_payment_webhook (Security Definer / Service Role)
+  //    Melindungi dari benturan pembatalan (phantom stock) dan otomatis restock jika expired/cancelled
   const client = serverSupabaseServiceRole<Database>(event)
 
-  const updatePayload = {
-    status: newStatus,
-    payment_type: paymentType || null,
-    midtrans_id: transactionId || null,
-    paid_at: newStatus === 'paid' ? new Date().toISOString() : null,
-    updated_at: new Date().toISOString(),
+  const { data: resultStatus, error: rpcError } = await client.rpc('handle_payment_webhook', {
+    p_order_id: orderId,
+    p_target_status: newStatus,
+    p_payment_type: paymentType || null,
+    p_midtrans_id: transactionId || null,
+  })
+
+  // Fallback defensif jika fungsi RPC belum dimigrasikan di remote
+  if (rpcError) {
+    const { data: updatedOrder, error: updateError } = await client
+      .from('orders')
+      .update({
+        status: newStatus,
+        payment_type: paymentType || null,
+        midtrans_id: transactionId || null,
+        paid_at: newStatus === 'paid' ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', orderId)
+      .select('id, status')
+      .single()
+
+    if (updateError) {
+      return errorResponse(event, 'Gagal memperbarui status order di database', updateError, 500)
+    }
+
+    return successResponse('Status pesanan berhasil diperbarui', {
+      order_id: orderId,
+      status: updatedOrder.status,
+    })
   }
 
-  const { data: updatedOrder, error: updateError } = await client
-    .from('orders')
-    .update(updatePayload)
-    .eq('id', orderId)
-    .select()
-    .single()
-
-  if (updateError) {
-    return errorResponse(event, 'Gagal memperbarui status order di database', updateError, 500)
-  }
-
-  return successResponse('Status pesanan berhasil diperbarui', {
+  return successResponse('Status pesanan berhasil diproses', {
     order_id: orderId,
-    status: updatedOrder.status,
+    result: resultStatus,
+    target_status: newStatus,
   })
 })

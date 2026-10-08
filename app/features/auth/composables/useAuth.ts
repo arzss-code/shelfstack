@@ -36,7 +36,8 @@ export function useAuth() {
   const isAdmin = computed(() => profile.value?.role === 'admin')
 
   const fetchProfile = async (force = false) => {
-    const userId = user.value?.id
+    const rawId = user.value?.id || (user.value as any)?.sub
+    const userId = typeof rawId === 'string' && rawId !== 'undefined' ? rawId : null
     if (!userId) {
       profile.value = null
       return null
@@ -48,9 +49,9 @@ export function useAuth() {
         .from('profiles')
         .select('id, user_id, full_name, role')
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
 
-      if (error) {
+      if (error || !data) {
         profile.value = null
         return null
       }
@@ -65,7 +66,7 @@ export function useAuth() {
   // Auto-fetch profile saat session user terhidrasi di client
   if (import.meta.client) {
     watch(
-      () => user.value?.id,
+      () => user.value?.id || (user.value as any)?.sub,
       (newId) => {
         if (newId) {
           fetchProfile()

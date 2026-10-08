@@ -1,0 +1,21 @@
+services:
+  # Redis 7 standalone for local development & caching experimentation
+  redis:
+    container_name: shelfstack-redis-dev
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-dev-data:/data
+    networks:
+      - shelfstack-dev-net
+    restart: unless-stopped
+
+networks:
+  shelfstack-dev-net:
+    driver: bridge
+
+volumes:
+  redis-dev-data:
+    driver: local

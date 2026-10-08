@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useProductStore } from '~/features/products/stores/product'
-import { useToast } from 'primevue/usetoast'
 import { useCategories } from '~/composables/useCategories'
 import ProductList from '~/features/products/components/ProductList.vue'
 import KatalogToolbar, { type SortOption } from '~/components/katalog/KatalogToolbar.vue'
@@ -15,51 +13,102 @@ useSeoMeta({
     'Jelajahi etalase ShelfStack: peralatan presisi, koleksi meja kerja, furnitur, dan perkakas terkurasi berkualitas tinggi.',
 })
 
-const productStore = useProductStore()
-const toast = useToast()
 const route = useRoute()
 const router = useRouter()
-const { categories: dynamicCategories, fetchCategories, CATEGORY_KEYWORDS } = useCategories()
-
-// SSR-first data fetching: Muat produk di server untuk hilangkan delay skeleton
-const { data: initialProducts } = await useAsyncData(
-  'katalog-products',
-  async () => {
-    const res = await $fetch<{ status: string; data: Product[] }>('/api/products', {
-      params: { from: 0, to: 11 },
-    })
-    return res.data || []
-  },
-  {
-    default: () => [] as Product[],
-  },
-)
-
-// Sinkronkan ke store pinia jika data dari SSR tersedia
-if (initialProducts.value && initialProducts.value.length > 0) {
-  productStore.products = initialProducts.value
-  productStore.loading = false
-}
+const { categories: dynamicCategories, fetchCategories } = useCategories()
 
 const searchQuery = ref((route.query.q as string) || '')
 const selectedCategory = ref((route.query.category as string) || 'all')
 const selectedPriceRange = ref((route.query.price as string) || 'all')
 const selectedSort = ref((route.query.sort as string) || 'featured')
+const currentPage = ref(parseInt((route.query.page as string) || '1', 10) || 1)
 const gridDensity = ref<'compact' | 'spacious'>('compact')
 const showMobileFilterModal = ref(false)
+const itemsPerPage = 12
 
-// Kategori filter chips
+// Susun params server-side secara reaktif
+const queryParams = computed(() => {
+  const params: Record<string, string | number> = {
+    page: currentPage.value,
+    limit: itemsPerPage,
+    sort: selectedSort.value,
+  }
+  if (searchQuery.value.trim()) params.q = searchQuery.value.trim()
+  if (selectedCategory.value !== 'all') params.category = selectedCategory.value
+
+  if (selectedPriceRange.value === 'under500k') {
+    params.max_price = 500000
+  } else if (selectedPriceRange.value === '500k-2m') {
+    params.min_price = 500000
+    params.max_price = 2000000
+  } else if (selectedPriceRange.value === 'above2m') {
+    params.min_price = 2000000
+  }
+
+  return params
+})
+
+interface CatalogApiResponse {
+  status: string
+  message: string
+  data: Product[]
+  total?: number
+  pagination?: {
+    page: number
+    limit: number
+    totalCount: number
+    totalPages: number
+  }
+  facets?: {
+    categoryCounts?: Record<string, number>
+  }
+}
+
+// Fetch katalog di server (SSR-first + reactive updates saat filter berganti)
+const { data: catalogResponse, pending } = await useAsyncData<CatalogApiResponse>(
+  'katalog-products',
+  () => $fetch('/api/products', { params: queryParams.value }),
+  {
+    watch: [queryParams],
+    default: () => ({
+      status: 'success',
+      message: '',
+      data: [] as Product[],
+      total: 0,
+    }),
+  },
+)
+
+const products = computed(() => catalogResponse.value?.data || [])
+const totalProducts = computed(
+  () =>
+    catalogResponse.value?.total ??
+    catalogResponse.value?.pagination?.totalCount ??
+    products.value.length,
+)
+const totalPages = computed(
+  () =>
+    catalogResponse.value?.pagination?.totalPages ||
+    Math.ceil(totalProducts.value / itemsPerPage) ||
+    1,
+)
+const categoryCounts = computed(() => catalogResponse.value?.facets?.categoryCounts || {})
+
+// Kategori filter chips & sidebar dengan Faceted count
 const categories = computed(() => [
-  { id: 'all', label: 'Semua Kategori', keywords: [] as string[] },
-  ...dynamicCategories.value.map((c) => ({
-    id: c.slug,
-    label: c.name,
-    keywords: CATEGORY_KEYWORDS[c.slug] ?? [],
-  })),
+  { id: 'all', label: `Semua Kategori (${totalProducts.value})` },
+  ...dynamicCategories.value.map((c) => {
+    const count = categoryCounts.value[c.id]
+    return {
+      id: c.slug,
+      label: count !== undefined ? `${c.name} (${count})` : c.name,
+    }
+  }),
 ])
 
 const sortOptions: SortOption[] = [
   { id: 'featured', label: 'Pilihan Kurator' },
+  { id: 'popular', label: 'Paling Populer' },
   { id: 'price-low', label: 'Harga: Rendah ke Tinggi' },
   { id: 'price-high', label: 'Harga: Tinggi ke Rendah' },
   { id: 'name-asc', label: 'Nama: A — Z' },
@@ -73,29 +122,8 @@ const priceRanges: PriceRange[] = [
 ]
 
 onMounted(async () => {
-  try {
-    await fetchCategories()
-    // Jika store masih kosong atau belum terhidrasi, fetch dari API
-    if (productStore.products.length === 0) {
-      await productStore.fetchProducts()
-    }
-  } catch (error: unknown) {
-    toast.add({
-      severity: 'error',
-      summary: 'Gagal Memuat Katalog',
-      detail: error instanceof Error ? error.message : 'Gagal mengambil daftar produk.',
-      life: 5000,
-    })
-  }
+  await fetchCategories()
 })
-
-// Sync query params when route changes
-watch(
-  () => route.query.q,
-  (newQ) => {
-    if (typeof newQ === 'string') searchQuery.value = newQ
-  },
-)
 
 const syncQuery = () => {
   const query: Record<string, string> = {}
@@ -103,63 +131,9 @@ const syncQuery = () => {
   if (selectedCategory.value !== 'all') query.category = selectedCategory.value
   if (selectedPriceRange.value !== 'all') query.price = selectedPriceRange.value
   if (selectedSort.value !== 'featured') query.sort = selectedSort.value
+  if (currentPage.value > 1) query.page = String(currentPage.value)
   router.replace({ query })
 }
-
-const filteredProducts = computed(() => {
-  let list = [...productStore.products]
-
-  // 1. Text Search Filter
-  if (searchQuery.value.trim()) {
-    const q = searchQuery.value.toLowerCase().trim()
-    list = list.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        (p.description && p.description.toLowerCase().includes(q)) ||
-        (p.sku && p.sku.toLowerCase().includes(q)),
-    )
-  }
-
-  // 2. Category Filter (Check both DB category_id and keyword matching)
-  if (selectedCategory.value !== 'all') {
-    const normSlug = selectedCategory.value === 'accessories' ? 'lifestyle' : selectedCategory.value
-    const activeCatObj = dynamicCategories.value.find((c) => c.slug === normSlug)
-    const catKeywords = CATEGORY_KEYWORDS[normSlug] ?? []
-
-    list = list.filter((p) => {
-      // Direct category_id match jika ada relasi di DB
-      if (activeCatObj && p.category_id && p.category_id === activeCatObj.id) {
-        return true
-      }
-      // Keyword fallback match pada nama atau deskripsi
-      if (catKeywords.length > 0) {
-        const text = `${p.name} ${p.description || ''}`.toLowerCase()
-        return catKeywords.some((kw) => text.includes(kw))
-      }
-      return false
-    })
-  }
-
-  // 3. Price Range Filter
-  if (selectedPriceRange.value === 'under500k') {
-    list = list.filter((p) => p.price < 500000)
-  } else if (selectedPriceRange.value === '500k-2m') {
-    list = list.filter((p) => p.price >= 500000 && p.price <= 2000000)
-  } else if (selectedPriceRange.value === 'above2m') {
-    list = list.filter((p) => p.price > 2000000)
-  }
-
-  // 4. Sorting
-  if (selectedSort.value === 'price-low') {
-    list.sort((a, b) => a.price - b.price)
-  } else if (selectedSort.value === 'price-high') {
-    list.sort((a, b) => b.price - a.price)
-  } else if (selectedSort.value === 'name-asc') {
-    list.sort((a, b) => a.name.localeCompare(b.name))
-  }
-
-  return list
-})
 
 const activeFiltersCount = computed(() => {
   let count = 0
@@ -172,16 +146,19 @@ const activeFiltersCount = computed(() => {
 
 const selectCategory = (catId: string) => {
   selectedCategory.value = catId
+  currentPage.value = 1
   syncQuery()
 }
 
 const clearSearch = () => {
   searchQuery.value = ''
+  currentPage.value = 1
   syncQuery()
 }
 
 const handleSearchUpdate = (val: string) => {
   searchQuery.value = val
+  currentPage.value = 1
   syncQuery()
 }
 
@@ -192,11 +169,13 @@ const handleSortUpdate = (val: string) => {
 
 const handlePriceRangeUpdate = (val: string) => {
   selectedPriceRange.value = val
+  currentPage.value = 1
   syncQuery()
 }
 
 const handleClearPriceRange = () => {
   selectedPriceRange.value = 'all'
+  currentPage.value = 1
   syncQuery()
 }
 
@@ -205,7 +184,17 @@ const resetAllFilters = () => {
   selectedCategory.value = 'all'
   selectedPriceRange.value = 'all'
   selectedSort.value = 'featured'
+  currentPage.value = 1
   router.replace({ query: {} })
+}
+
+const changePage = (newPage: number) => {
+  if (newPage < 1 || newPage > totalPages.value) return
+  currentPage.value = newPage
+  syncQuery()
+  if (import.meta.client) {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 }
 </script>
 
@@ -237,12 +226,11 @@ const resetAllFilters = () => {
           <span
             class="bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full text-xs font-semibold text-brand-muted tabular-nums"
           >
-            {{ filteredProducts.length }}
+            {{ totalProducts }}
           </span>
         </div>
       </div>
 
-      <!-- Quick subtle assurances -->
       <div class="hidden sm:flex items-center gap-4 text-xs text-brand-muted">
         <span class="flex items-center gap-1.5">
           <i class="pi pi-shield text-brand-accent text-xs" />
@@ -298,27 +286,43 @@ const resetAllFilters = () => {
 
       <section class="lg:col-span-9 space-y-6">
         <ProductList
-          :products="filteredProducts"
-          :loading="productStore.loading && productStore.products.length === 0"
+          :products="products"
+          :loading="pending"
           :is-searching="activeFiltersCount > 0"
           :density="gridDensity"
           hide-actions
           @reset-filters="resetAllFilters"
         />
 
-        <!-- Load More Action -->
+        <!-- Paginasi Server-side (Tier-1 E-Commerce Standard) -->
         <div
-          v-if="productStore.hasMore && activeFiltersCount === 0"
-          class="flex justify-center pt-6"
+          v-if="totalPages > 1"
+          class="flex items-center justify-between border-t border-brand-hairsoft pt-6"
         >
-          <UiButton
-            variant="secondary"
-            :loading="productStore.loading"
-            icon="pi-sync"
-            @click="productStore.fetchProducts(true)"
-          >
-            Muat Lebih Banyak
-          </UiButton>
+          <p class="text-xs text-brand-muted m-0">
+            Halaman <span class="font-semibold text-brand-ink">{{ currentPage }}</span> dari
+            <span class="font-semibold text-brand-ink">{{ totalPages }}</span>
+          </p>
+          <div class="flex items-center gap-1.5">
+            <UiButton
+              variant="secondary"
+              size="sm"
+              icon="pi-chevron-left"
+              :disabled="currentPage <= 1 || pending"
+              @click="changePage(currentPage - 1)"
+            >
+              Sebelumnya
+            </UiButton>
+            <UiButton
+              variant="secondary"
+              size="sm"
+              icon="pi-chevron-right"
+              :disabled="currentPage >= totalPages || pending"
+              @click="changePage(currentPage + 1)"
+            >
+              Selanjutnya
+            </UiButton>
+          </div>
         </div>
       </section>
     </div>
@@ -330,7 +334,7 @@ const resetAllFilters = () => {
       :selected-category="selectedCategory"
       :price-ranges="priceRanges"
       :selected-price-range="selectedPriceRange"
-      :filtered-products-count="filteredProducts.length"
+      :filtered-products-count="totalProducts"
       @close="showMobileFilterModal = false"
       @update:selected-category="selectCategory"
       @update:selected-price-range="handlePriceRangeUpdate"

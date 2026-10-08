@@ -6,6 +6,7 @@ import { formatRupiah } from '~/utils/format'
 import { useToast } from 'primevue/usetoast'
 import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import OrderCancelDialog from '~/features/orders/components/OrderCancelDialog.vue'
+import OrderInvoiceModal from '~/features/orders/components/OrderInvoiceModal.vue'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 const route = useRoute()
@@ -22,6 +23,7 @@ const loading = ref(true)
 const isPaying = ref(false)
 const isCancelling = ref(false)
 const isCancelModalOpen = ref(false)
+const isInvoiceModalOpen = ref(false)
 const errorMsg = ref('')
 
 let channel: RealtimeChannel | null = null
@@ -539,6 +541,16 @@ const formatDate = (dateStr: string) => {
           </div>
 
           <UiButton
+            variant="outline"
+            size="sm"
+            class="w-full justify-center text-xs"
+            icon="pi-print"
+            @click="isInvoiceModalOpen = true"
+          >
+            Cetak Invoice Resmi
+          </UiButton>
+
+          <UiButton
             to="/orders"
             variant="secondary"
             size="sm"
@@ -557,5 +569,8 @@ const formatDate = (dateStr: string) => {
       :loading="isCancelling"
       @confirm="handleCancelOrder"
     />
+
+    <!-- Modal Invoice Resmi & Print Sheet -->
+    <OrderInvoiceModal v-if="order" v-model:visible="isInvoiceModalOpen" :order="order" />
   </div>
 </template>
