@@ -1,0 +1,69 @@
+services:
+  # 1. Nuxt 4 Frontend & Nitro Backend Monolith
+  frontend:
+    container_name: shelfstack-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=3000
+      - NUXT_PUBLIC_SUPABASE_URL=${NUXT_PUBLIC_SUPABASE_URL:-}
+      - NUXT_PUBLIC_SUPABASE_KEY=${NUXT_PUBLIC_SUPABASE_KEY:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      - MIDTRANS_SERVER_KEY=${MIDTRANS_SERVER_KEY:-}
+      - NUXT_PUBLIC_MIDTRANS_CLIENT_KEY=${NUXT_PUBLIC_MIDTRANS_CLIENT_KEY:-}
+      - ORDER_SERVICE_URL=http://order-service:4000
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - order-service
+      - redis
+    networks:
+      - shelfstack-net
+    restart: unless-stopped
+
+  # 2. Fastify Order Service Microservice Pilot
+  order-service:
+    container_name: shelfstack-order-service
+    build:
+      context: ./services/order-service
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=4000
+      - SUPABASE_URL=${NUXT_PUBLIC_SUPABASE_URL:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      - MIDTRANS_SERVER_KEY=${MIDTRANS_SERVER_KEY:-}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+    networks:
+      - shelfstack-net
+    restart: unless-stopped
+
+  # 3. High Performance In-Memory Cache (Redis 7)
+  redis:
+    container_name: shelfstack-redis
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - shelfstack-net
+    restart: unless-stopped
+
+networks:
+  shelfstack-net:
+    driver: bridge
+
+volumes:
+  redis-data:
+    driver: local
