@@ -44,10 +44,11 @@ export default defineEventHandler(async (event) => {
   })
 
   if (rpcErr) {
+    console.error('[cancel_order] RPC execution failed:', rpcErr)
     return errorResponse(
       event,
-      rpcErr.message || 'Gagal memproses pembatalan pesanan di database',
-      rpcErr,
+      'Gagal memproses pembatalan pesanan. Silakan coba beberapa saat lagi.',
+      null,
       500,
     )
   }
