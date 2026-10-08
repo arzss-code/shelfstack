@@ -56,20 +56,35 @@ export default defineEventHandler(async (event) => {
   const authHeader = 'Basic ' + Buffer.from(serverKey + ':').toString('base64')
 
   try {
+    const body = await readBody(event).catch(() => ({}))
+    const candidateOrderIds: string[] = [order.id]
+    if (body?.midtrans_order_id && !candidateOrderIds.includes(body.midtrans_order_id)) {
+      candidateOrderIds.unshift(body.midtrans_order_id)
+    }
+    if (order.midtrans_id && !candidateOrderIds.includes(order.midtrans_id)) {
+      candidateOrderIds.push(order.midtrans_id)
+    }
+
     let midtransData: any = null
-    try {
-      midtransData = await $fetch<any>(`${baseUrl}/${order.id}/status`, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          Authorization: authHeader,
-        },
-      })
-    } catch (fetchErr: any) {
-      console.warn(
-        `[check-payment-status] Lookup Midtrans status untuk order ${order.id} menghasilkan respons:`,
-        fetchErr?.data || fetchErr?.message,
-      )
+    for (const lookupId of candidateOrderIds) {
+      try {
+        const resp = await $fetch<any>(`${baseUrl}/${lookupId}/status`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            Authorization: authHeader,
+          },
+        })
+        if (resp && resp.transaction_status) {
+          midtransData = resp
+          break
+        }
+      } catch (fetchErr: any) {
+        console.warn(
+          `[check-payment-status] Lookup Midtrans status untuk order ${lookupId} menghasilkan respons:`,
+          fetchErr?.data || fetchErr?.message,
+        )
+      }
     }
 
     if (!midtransData || !midtransData.transaction_status) {
