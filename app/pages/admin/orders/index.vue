@@ -45,23 +45,17 @@ const statusTabs = [
 const fetchOrders = async () => {
   loading.value = true
   errorMessage.value = ''
-
   const from = (page.value - 1) * pageSize
   const to = from + pageSize - 1
-
   try {
-    const params: Record<string, string | number> = {
-      from,
-      to,
-    }
+    const params: Record<string, string | number> = { from, to }
     if (activeStatus.value) params.status = activeStatus.value
     if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
 
-    const res = await $fetch<{
-      status: string
-      data: { orders: AdminOrderRow[]; total: number }
-    }>('/api/admin/orders', { params })
-
+    const res = await $fetch<{ status: string; data: { orders: AdminOrderRow[]; total: number } }>(
+      '/api/admin/orders',
+      { params },
+    )
     orders.value = res.data.orders
     totalOrders.value = res.data.total
   } catch (err: unknown) {
@@ -84,15 +78,51 @@ const onSearch = () => {
   fetchOrders()
 }
 
-const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize) || 1)
+const exporting = ref(false)
 
+const handleExportCsv = async () => {
+  exporting.value = true
+  try {
+    const params: Record<string, string> = {}
+    if (activeStatus.value) params.status = activeStatus.value
+    if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
+
+    const res = await $fetch<string>('/api/admin/orders/export', { params, responseType: 'text' })
+    const blob = new Blob([res], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `laporan-pesanan-${new Date().toISOString().slice(0, 10)}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+
+    toast.add({
+      severity: 'success',
+      summary: 'Ekspor Berhasil',
+      detail: 'Laporan CSV pesanan berhasil diunduh.',
+      life: 3000,
+    })
+  } catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Gagal Ekspor',
+      detail: 'Gagal mengunduh laporan CSV pesanan.',
+      life: 5000,
+    })
+  } finally {
+    exporting.value = false
+  }
+}
+
+const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize) || 1)
 const prevPage = () => {
   if (page.value > 1) {
     page.value--
     fetchOrders()
   }
 }
-
 const nextPage = () => {
   if (page.value < totalPages.value) {
     page.value++
@@ -195,15 +225,27 @@ onUnmounted(async () => {
         </p>
       </div>
 
-      <UiButton
-        variant="secondary"
-        size="sm"
-        icon="pi-refresh"
-        :loading="loading"
-        @click="fetchOrders"
-      >
-        Perbarui
-      </UiButton>
+      <div class="flex items-center gap-2">
+        <UiButton
+          variant="outline"
+          size="sm"
+          icon="pi-download"
+          :loading="exporting"
+          @click="handleExportCsv"
+        >
+          Ekspor CSV
+        </UiButton>
+
+        <UiButton
+          variant="secondary"
+          size="sm"
+          icon="pi-refresh"
+          :loading="loading"
+          @click="fetchOrders"
+        >
+          Perbarui
+        </UiButton>
+      </div>
     </div>
 
     <!-- Filter & Search Controls -->
