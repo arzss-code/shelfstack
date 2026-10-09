@@ -2,7 +2,7 @@
 import { useToast } from 'primevue/usetoast'
 import type { Order, OrderStatus } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
-import { getAvailableTransitions } from '../../../../shared/constants/order-transitions'
+import { getAvailableAdminTransitions } from '~~/shared/constants/order-transitions'
 
 definePageMeta({
   layout: 'admin',
@@ -48,7 +48,7 @@ onMounted(() => {
 
 const availableTransitions = computed<OrderStatus[]>(() => {
   if (!order.value) return []
-  return getAvailableTransitions(order.value.status)
+  return getAvailableAdminTransitions(order.value.status)
 })
 
 const openTransitionModal = (status: OrderStatus) => {
@@ -62,13 +62,22 @@ const confirmStatusChange = async () => {
 
   updating.value = true
   try {
-    await $fetch(`/api/orders/${orderId.value}/status`, {
-      method: 'PUT',
-      body: {
-        status: targetStatus.value,
-        reason: updateReason.value || undefined,
-      },
-    })
+    if (targetStatus.value === 'refunded') {
+      await $fetch(`/api/orders/${orderId.value}/refund`, {
+        method: 'POST',
+        body: {
+          reason: updateReason.value || undefined,
+        },
+      })
+    } else {
+      await $fetch(`/api/orders/${orderId.value}/status`, {
+        method: 'PUT',
+        body: {
+          status: targetStatus.value,
+          reason: updateReason.value || undefined,
+        },
+      })
+    }
 
     toast.add({
       severity: 'success',
@@ -102,6 +111,8 @@ const getStatusBadge = (status: OrderStatus) => {
       return { variant: 'success' as const, label: 'Selesai' }
     case 'cancelled':
       return { variant: 'danger' as const, label: 'Dibatalkan' }
+    case 'refunded':
+      return { variant: 'danger' as const, label: 'Dikembalikan (Refund)' }
     case 'pending':
     default:
       return { variant: 'warning' as const, label: 'Menunggu' }
@@ -118,6 +129,8 @@ const getTransitionLabel = (status: OrderStatus) => {
       return 'Selesaikan Pesanan'
     case 'cancelled':
       return 'Batalkan Pesanan'
+    case 'refunded':
+      return 'Refund Pesanan'
     default:
       return status
   }
@@ -192,7 +205,7 @@ const formatDate = (dateStr?: string | null) => {
             <UiButton
               v-for="target in availableTransitions"
               :key="target"
-              :variant="target === 'cancelled' ? 'secondary' : 'primary'"
+              :variant="target === 'cancelled' || target === 'refunded' ? 'secondary' : 'primary'"
               size="sm"
               @click="openTransitionModal(target)"
             >

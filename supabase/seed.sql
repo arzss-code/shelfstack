@@ -58,3 +58,95 @@ insert into public.products (name, price, stock, description, image_url, categor
     (select id from public.categories where slug = 'stationery')
   )
 on conflict do nothing;
+
+-- 3. Seed Akun Demo Deterministik untuk Pengujian & Local Onboarding
+-- PERINGATAN: Akun demo ini HANYA untuk lingkungan lokal / CI testing, DILARANG untuk produksi!
+-- Password default: Password123!
+insert into auth.users (
+  id,
+  instance_id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at,
+  confirmation_token,
+  recovery_token,
+  email_change_token_new,
+  email_change_token_current
+) values
+  (
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    '00000000-0000-0000-0000-000000000000'::uuid,
+    'authenticated',
+    'authenticated',
+    'customer@shelfstack.local',
+    crypt('Password123!', gen_salt('bf')),
+    now(),
+    '{"provider": "email", "providers": ["email"]}'::jsonb,
+    '{"full_name": "Demo Customer"}'::jsonb,
+    now(),
+    now(),
+    '', '', '', ''
+  ),
+  (
+    '00000000-0000-0000-0000-000000000099'::uuid,
+    '00000000-0000-0000-0000-000000000000'::uuid,
+    'authenticated',
+    'authenticated',
+    'admin@shelfstack.local',
+    crypt('Password123!', gen_salt('bf')),
+    now(),
+    '{"provider": "email", "providers": ["email"]}'::jsonb,
+    '{"full_name": "Demo Admin", "role": "admin"}'::jsonb,
+    now(),
+    now(),
+    '', '', '', ''
+  )
+on conflict (id) do nothing;
+
+-- 4. Seed Identitas GoTrue (auth.identities) agar signInWithPassword Supabase Auth berfungsi normal
+insert into auth.identities (
+  id,
+  user_id,
+  identity_data,
+  provider,
+  provider_id,
+  last_sign_in_at,
+  created_at,
+  updated_at
+) values
+  (
+    '00000000-0000-0000-0000-000000000001',
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    '{"sub": "00000000-0000-0000-0000-000000000001", "email": "customer@shelfstack.local"}'::jsonb,
+    'email',
+    'customer@shelfstack.local',
+    now(),
+    now(),
+    now()
+  ),
+  (
+    '00000000-0000-0000-0000-000000000099',
+    '00000000-0000-0000-0000-000000000099'::uuid,
+    '{"sub": "00000000-0000-0000-0000-000000000099", "email": "admin@shelfstack.local"}'::jsonb,
+    'email',
+    'admin@shelfstack.local',
+    now(),
+    now(),
+    now()
+  )
+on conflict (id) do nothing;
+
+-- 5. Pastikan role admin aktif di tabel profiles
+insert into public.profiles (user_id, full_name, role)
+values
+  ('00000000-0000-0000-0000-000000000001'::uuid, 'Demo Customer', 'customer'),
+  ('00000000-0000-0000-0000-000000000099'::uuid, 'Demo Admin', 'admin')
+on conflict (user_id) do update set
+  role = excluded.role,
+  full_name = excluded.full_name;

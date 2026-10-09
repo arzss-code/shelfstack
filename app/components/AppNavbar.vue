@@ -203,7 +203,7 @@ const handleLogout = async () => {
               <span class="hidden sm:inline">Keranjang</span>
               <span
                 v-if="cartStore.totalItems > 0"
-                class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none min-w-4 text-center tabular-nums"
+                class="bg-brand-ink text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none min-w-4 text-center tabular-nums"
               >
                 {{ cartStore.totalItems > 99 ? '99+' : cartStore.totalItems }}
               </span>

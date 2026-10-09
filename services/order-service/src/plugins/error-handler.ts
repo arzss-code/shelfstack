@@ -11,6 +11,7 @@ export function setupErrorHandler(app: FastifyInstance) {
           message: 'Validasi data gagal',
           data: null,
           errors: error.flatten().fieldErrors,
+          requestId: request.id,
         })
       }
 
@@ -21,6 +22,7 @@ export function setupErrorHandler(app: FastifyInstance) {
           message: 'Validasi skema request gagal',
           data: null,
           errors: error.validation,
+          requestId: request.id,
         })
       }
 
@@ -37,6 +39,7 @@ export function setupErrorHandler(app: FastifyInstance) {
         message: error.message || 'Terjadi kesalahan pada server internal',
         data: null,
         errors: statusCode === 500 ? null : error,
+        requestId: request.id,
       })
     },
   )

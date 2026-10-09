@@ -17,6 +17,7 @@ const emit = defineEmits<{
   edit: [product: Product]
   delete: [id: number]
   restore: [id: number]
+  viewStockMovements: [product: Product]
   resetFilters: []
 }>()
 </script>
@@ -36,7 +37,7 @@ const emit = defineEmits<{
       <div
         v-for="i in 8"
         :key="i"
-        class="flex flex-col bg-brand-canvas border border-brand-hairsoft/80 rounded-2xl overflow-hidden animate-pulse"
+        class="flex flex-col bg-brand-canvas border border-brand-hair rounded-card overflow-hidden animate-pulse"
       >
         <div class="aspect-square w-full bg-brand-field" />
         <div class="p-3.5 space-y-2 flex-1">
@@ -122,6 +123,7 @@ const emit = defineEmits<{
         @edit="emit('edit', $event)"
         @delete="emit('delete', $event)"
         @restore="emit('restore', $event)"
+        @view-stock-movements="emit('viewStockMovements', $event)"
       />
     </div>
   </div>

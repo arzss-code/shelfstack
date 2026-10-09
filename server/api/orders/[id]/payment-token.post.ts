@@ -1,6 +1,7 @@
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { isMidtransDuplicateOrderError } from '../../../utils/midtrans'
+import { logger } from '../../../utils/logger'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
@@ -120,9 +121,13 @@ export default defineEventHandler(async (event) => {
         .update({ snap_token: midtransResponse.token })
         .eq('id', order.id)
     } catch (dbErr: unknown) {
-      console.warn(
-        '[payment-token] Tidak dapat menyimpan snap_token ke DB (service role key mungkin belum disetel):',
-        dbErr instanceof Error ? dbErr.message : dbErr,
+      logger.warn(
+        '[payment-token] Tidak dapat menyimpan snap_token ke DB',
+        {
+          requestId: event.context?.requestId,
+          orderId: order.id,
+        },
+        dbErr,
       )
     }
 
@@ -132,7 +137,14 @@ export default defineEventHandler(async (event) => {
       order_id: activeOrderId,
     })
   } catch (err: unknown) {
-    console.error('[payment-token] Midtrans API communication error:', err)
+    logger.error(
+      '[payment-token] Midtrans API communication error',
+      {
+        requestId: event.context?.requestId,
+        orderId: activeOrderId,
+      },
+      err,
+    )
     return errorResponse(
       event,
       'Layanan pembayaran sedang mengalami kendala. Silakan coba beberapa saat lagi.',

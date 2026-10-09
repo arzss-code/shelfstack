@@ -21,42 +21,42 @@
   --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Palet Warna - Light Mode (Near-Black Ink on Pure Canvas + Electric Blue Accent) */
+  /* Palet Warna - Light Mode (Near-Black Ink on Pure Canvas + Refined Subtle Accents) */
   --brand-canvas: #ffffff;
-  --brand-canvas-soft: #f3f3f3;
-  --brand-field: #f0f0f0;
+  --brand-canvas-soft: #f8f8f9;
+  --brand-field: #f2f3f5;
   --brand-ink: #141414;
   --brand-ink-soft: #262626;
   --brand-onink: #ffffff;
   --brand-inkhover: #2e2e2e;
   --brand-body: #141414;
-  --brand-muted: #707070;
-  --brand-faint: #adadad;
-  --brand-hair: #e0e0e0;
-  --brand-hairsoft: #f0f0f0;
-  --brand-soft: #f3f3f3;
+  --brand-muted: #66686d;
+  --brand-faint: #9ea1a8;
+  --brand-hair: #e4e5e7;
+  --brand-hairsoft: #f0f1f3;
+  --brand-soft: #f8f8f9;
   --brand-accent: #0066ff;
   --brand-accent-hover: #0052cc;
   --brand-cobalt: #0066ff;
   --brand-cobaltdeep: #0052cc;
   --brand-strip: #141414;
   --brand-success: #00875a;
-  --brand-warning: #ffab00;
+  --brand-warning: #e28e00;
 
-  /* Geometri & Sudut Lengkung Standar */
-  --radius-sm: 16px;
-  --radius-md: 24px;
-  --radius-lg: 32px;
-  --radius-xl: 48px;
-  --radius-card: 24px;
-  --radius-field: 16px;
-  --radius-media: 18px;
+  /* Geometri & Sudut Lengkung Standar — Refined Architectural Scale (Anti-Bubbly) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-card: 14px;
+  --radius-field: 10px;
+  --radius-media: 12px;
   --radius-full: 9999px;
 
   /* Elevasi Bayangan Berwarna Netral (Tinted Shadows) */
   --shadow-whisper: 0 1px 3px rgba(20, 20, 20, 0.04);
-  --shadow-nav: 0 1px 10px rgba(20, 20, 20, 0.05);
-  --shadow-floating: 0 8px 24px rgba(20, 20, 20, 0.08);
+  --shadow-nav: 0 1px 8px rgba(20, 20, 20, 0.04);
+  --shadow-floating: 0 8px 24px rgba(20, 20, 20, 0.06);
 }
 
 /* Explicit class-based dark mode only if .dark class is added to html */

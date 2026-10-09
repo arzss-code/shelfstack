@@ -672,7 +672,7 @@ const formatDate = (dateStr: string) => {
               Batalkan Pesanan
             </UiButton>
             <p class="text-[11px] text-brand-muted text-center m-0">
-              Gunakan simulator Midtrans Sandbox untuk menguji pembayaran.
+              Pembayaran diproses secara instan dan aman melalui jaringan Midtrans.
             </p>
           </div>
 

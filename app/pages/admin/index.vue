@@ -187,7 +187,9 @@ const formatDate = (dateStr: string) => {
     </div>
 
     <!-- Recent Transactions Section -->
-    <div class="rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper">
+    <div
+      class="rounded-card border border-brand-hair bg-white dark:bg-[#18191b] p-6 shadow-whisper"
+    >
       <div class="mb-5 flex items-center justify-between">
         <div>
           <h2 class="font-display text-base sm:text-lg font-bold text-brand-ink m-0">

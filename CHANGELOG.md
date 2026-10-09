@@ -2,6 +2,36 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [v0.15.0] - 2026-10-09
+
+### Changed
+
+- **Architectural Modernist Design System & Premium Visual Pass**:
+  - **Geometry Scale & Token Unification (`app/assets/css/main.css`)**: Refaktor skala radius dari sudut membulat generik (`>= 24px`) menjadi skala geometri arsitektural terukur (`--radius-sm: 8px`, `--radius-md: 12px`, `--radius-card: 14px`, `--radius-media: 12px`). Warna monokrom ink-first (`#141414`), garis tepi hairline halus (`#e4e5e7`), kanvas sejuk (`#f8f8f9`), dan teks sekunder muted (`#66686d`).
+  - **Product Card Architecture (`ProductCard.vue`)**: Menggantikan pita 3D skeuomorfik dengan badge status pill mengambang yang ringkas; eliminasi fallback rating 5.0 dan angka penjualan statis yang tidak berdasar; penambahan deteksi error gambar pre-hydration SSR untuk mencegah frame gambar rusak.
+  - **Product Detail Polish (`ProductConfigurator.vue` & `ProductGallery.vue`)**: Menghilangkan rating 4.92 default tanpa ulasan nyata; integrasi strip jaminan fulfillment ringkas ("Gudang Jakarta", "Garansi Toko Resmi", "Midtrans Terenkripsi"); penyatuan tombol "Pesan Cepat 1-Klik" menjadi outline elegan tanpa clashing dengan tombol utama; penanganan fallback gambar multi-angle.
+  - **Storefront & Catalog Polish**: Standardisasi toolbar katalog dan active filter pill badge; kanvas harga pada hero mosaic menggunakan tipografi tabular bersih tanpa aksen elektrik; `HomeFlashDeals.vue` kini menggunakan placeholder bermerek yang konsisten saat URL gambar tidak tersedia tanpa gambar jam tangan acak.
+  - **Cart, Checkout, & Admin Surfaces**: Sidebar checkout dan cart diselaraskan dengan token `rounded-card` dan bayangan lembut; KPI dashboard admin (`AdminStatCard.vue`) dan tabel transaksi terintegrasi dengan elevasi monokromatis modern.
+  - **Visual QA Capture Automation (`scripts/capture-visual-qa.mjs`)**: Otomasi Playwright headless yang mendukung `--env-file=.env` dan autentikasi admin sesi penuh untuk verifikasi visual desktop (1440x900 @ 2x) dan mobile (375x812 @ 2x Touch).
+
+## [v0.14.0] - 2026-10-09
+
+### Added
+
+- **Multi-Agent Batch 1 Product Hardening & Enhancements**:
+  - **Isolated Admin Layout & Back-Office Navigation**: Desain ulang `app/layouts/admin.vue` memisahkan header/footer publik, menyediakan topbar breadcrumb dedicated dan mobile drawer navigation.
+  - **Stock Movement Ledger Modal (`/admin/products`)**: Modal riwayat pergerakan stok real-time terhubung ke endpoint `/api/admin/products/:id/stock-movements`.
+  - **Interactive Multi-Angle Gallery (`/product/:id`)**: Komponen `ProductGallery.vue` dengan pemilih thumbnail multi-angle reaktif.
+  - **Deterministic Search Debounce (`/katalog`)**: Debounce 300ms pada pencarian teks katalog untuk mencegah request flooding.
+  - **Local Seed Data Accounts**: Akun demo deterministic (`customer@shelfstack.local` & `admin@shelfstack.local`) dengan guardrails keamanan local-only.
+  - **CI & Build Pipeline**: Menambahkan step typecheck `vue-tsc --noEmit` dan `nuxt build` pada GitHub Actions CI.
+
+- **Multi-Agent Batch 2 Full-Stack Completion**:
+  - **Browser E2E User Journey Suite (Playwright)**: Suite E2E komprehensif `tests/e2e/full-business-journey.spec.ts` dan 6 Page Object Models (`LoginPage`, `CatalogPage`, `CartDrawer`, `CheckoutPage`, `OrderDetailPage`, `AdminDashboardPage`) mencakup 6 journey bisnis inti.
+  - **Persisted Shipping Address Management (Supabase)**: Skema database migrasi `20261117000001_user_addresses.sql` dengan RLS granular per user, validasi Zod `shared/schemas/address.ts`, endpoint REST `/api/addresses`, composable `useAddresses.ts`, serta pemilih alamat tersimpan `SavedAddressSelector.vue` di checkout dengan auto-fill dan opsi simpan.
+  - **Dynamic Real-Data Homepage**: `HomeFlashDeals.vue` kini menggunakan data produk nyata dari store katalog dengan live countdown timer menuju tengah malam; `HomeReviews.vue` ditransformasi menjadi Pusat Jaminan Kualitas & Integritas Produk (anti-fake review); `HomeFeaturedCategories.vue` terhubung ke kategori dinamis.
+  - **Payment & Sandbox Copywriting Truthfulness**: Copywriting checkout dan cart diperbaiki secara dinamis agar tidak mengklaim mode Sandbox sebagai transaksi produksi.
+
 ## [v0.13.5] - 2026-10-08
 
 ### Changed

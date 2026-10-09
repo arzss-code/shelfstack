@@ -41,8 +41,14 @@ jobs:
       - name: Run ESLint
         run: pnpm lint
 
+      - name: Typecheck Root Nuxt App
+        run: pnpm typecheck
+
       - name: Typecheck Order Service
         run: pnpm --filter @shelfstack/order-service typecheck
+
+      - name: Verify Production Build
+        run: pnpm build
 
   test-suites:
     name: Automated Unit & Integration Tests

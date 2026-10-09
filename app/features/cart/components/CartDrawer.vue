@@ -66,7 +66,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
     >
       <div
         v-if="cartStore.isDrawerOpen"
-        class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-[90] transition-opacity"
+        class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[90] transition-opacity"
         @click="close"
       />
     </Transition>
@@ -86,21 +86,21 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
       >
         <!-- Header -->
         <header
-          class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0"
+          class="flex items-center justify-between px-5 py-4 border-b border-brand-hair bg-white dark:bg-zinc-900 shrink-0"
         >
           <div class="flex items-center gap-2.5">
             <div
-              class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center"
+              class="w-8 h-8 rounded-lg bg-brand-canvas-soft border border-brand-hair text-brand-ink dark:text-white flex items-center justify-center"
             >
               <i class="pi pi-shopping-bag text-sm" />
             </div>
             <div>
               <h2
-                class="font-display font-bold text-sm text-slate-900 dark:text-white m-0 flex items-center gap-1.5"
+                class="font-display font-bold text-sm text-brand-ink dark:text-white m-0 flex items-center gap-1.5"
               >
                 Keranjang Belanja
                 <span
-                  class="text-[11px] font-semibold text-blue-600 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full"
+                  class="text-[11px] font-semibold text-brand-ink dark:text-zinc-200 bg-brand-canvas-soft border border-brand-hair px-2 py-0.5 rounded-full"
                 >
                   {{ cartStore.totalItems }}
                 </span>
@@ -308,7 +308,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
             <UiButton
               variant="primary"
               size="md"
-              class="w-full justify-center text-xs font-semibold py-2.5 rounded-xl"
+              class="w-full justify-center text-xs font-semibold py-2.5 rounded-full shadow-whisper"
               icon="pi-lock"
               @click="goToCheckout"
             >

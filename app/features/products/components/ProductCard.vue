@@ -21,6 +21,7 @@ const emit = defineEmits<{
   edit: [product: Product]
   delete: [id: number]
   restore: [id: number]
+  viewStockMovements: [product: Product]
 }>()
 
 const router = useRouter()
@@ -29,6 +30,31 @@ const cartStore = useCartStore()
 const { categories: dynamicCategories } = useCategories()
 
 const justAdded = ref(false)
+const imageLoadError = ref(false)
+const imageEl = ref<HTMLImageElement | null>(null)
+
+const onImgError = () => {
+  imageLoadError.value = true
+}
+
+onMounted(() => {
+  // Catch SSR hydration race condition where image 404 happened before @error listener attached
+  if (imageEl.value && imageEl.value.complete && imageEl.value.naturalWidth === 0) {
+    imageLoadError.value = true
+  }
+})
+
+watch(
+  () => props.product.image_url,
+  () => {
+    imageLoadError.value = false
+    nextTick(() => {
+      if (imageEl.value && imageEl.value.complete && imageEl.value.naturalWidth === 0) {
+        imageLoadError.value = true
+      }
+    })
+  },
+)
 
 const categoryName = computed(() => {
   if (!props.product.category_id) return null
@@ -38,29 +64,39 @@ const categoryName = computed(() => {
 
 const formattedRating = computed(() => {
   const r = props.product.rating
-  if (!r || Number(r) <= 0) return '5.0'
+  if (!r || Number(r) <= 0) return null
   return Number(r).toFixed(1)
 })
 
-const soldCountText = computed(() => {
-  const count = props.product.sold_count ?? props.product.review_count ?? 0
-  if (count <= 0) return 'Baru'
-  if (count >= 1000) return `${(count / 1000).toFixed(1)}rb+ terjual`
-  return `${count} terjual`
+const stockStatusText = computed(() => {
+  if (props.product.stock === 0) return 'Stok Habis'
+  if (props.product.stock <= 3) return `Sisa ${props.product.stock}`
+  if (props.product.sold_count && props.product.sold_count > 0) {
+    return props.product.sold_count >= 1000
+      ? `${(props.product.sold_count / 1000).toFixed(1)}rb+ terjual`
+      : `${props.product.sold_count} terjual`
+  }
+  return 'Tersedia'
 })
 
 const badgeInfo = computed(() => {
   if (props.product.stock === 0) {
-    return { label: 'Habis' }
+    return {
+      label: 'Habis',
+      badgeClass: 'bg-rose-600 text-white',
+    }
   }
   if (props.product.stock > 0 && props.product.stock <= 3) {
-    return { label: `Sisa ${props.product.stock}` }
+    return {
+      label: `Sisa ${props.product.stock}`,
+      badgeClass: 'bg-amber-600 text-white',
+    }
   }
   if (props.product.is_featured) {
-    return { label: 'Unggulan' }
-  }
-  if ((props.product.sold_count ?? 0) >= 30) {
-    return { label: 'Terlaris' }
+    return {
+      label: 'Unggulan',
+      badgeClass: 'bg-brand-ink text-white dark:bg-white dark:text-brand-ink',
+    }
   }
   return null
 })
@@ -100,36 +136,34 @@ const handleQuickAdd = () => {
 
 <template>
   <article
-    class="product-card group relative flex flex-col bg-white dark:bg-[#18191b] rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+    class="product-card group relative flex flex-col bg-white dark:bg-[#18191b] rounded-card border border-brand-hair hover:border-brand-muted/40 shadow-whisper hover:shadow-floating transition-all duration-300 hover:-translate-y-0.5 cursor-pointer overflow-hidden"
     @click="navigateToDetail"
   >
     <!-- Stretched Semantic Link for Accessibility, Hover URL & SEO -->
     <NuxtLink
       :to="`/product/${product.slug || product.id}`"
-      class="absolute inset-0 z-0 rounded-2xl"
+      class="absolute inset-0 z-0 rounded-card"
       :aria-label="product.name"
       tabindex="-1"
     />
 
-    <!-- 3D Ribbon Badge: Solid Blue, Right-Curved, with Fold Effect Underneath -->
-    <div v-if="badgeInfo" class="absolute top-3 -left-2 z-20 pointer-events-none">
-      <div class="relative flex flex-col items-start">
-        <span
-          class="bg-blue-600 text-white text-[10.5px] font-bold tracking-wider uppercase pl-3 pr-3.5 py-1 rounded-r-full rounded-tl-md shadow-sm"
-        >
-          {{ badgeInfo.label }}
-        </span>
-        <!-- 3D Ribbon fold curve underneath left edge matching user reference -->
-        <span class="w-2 h-2.5 bg-blue-900 rounded-bl-md" />
-      </div>
+    <!-- Architectural Floating Pill Badge -->
+    <div v-if="badgeInfo" class="absolute top-2.5 left-2.5 z-20 pointer-events-none">
+      <span
+        class="inline-flex items-center text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full shadow-sm"
+        :class="badgeInfo.badgeClass"
+      >
+        {{ badgeInfo.label }}
+      </span>
     </div>
 
-    <!-- Media Canvas: 1:1 Aspect Ratio with rounded-t-2xl -->
+    <!-- Media Canvas: 1:1 Aspect Ratio with rounded-t-[13px] -->
     <div
-      class="relative aspect-square w-full bg-[#f6f6f8] dark:bg-[#1f2023] rounded-t-2xl overflow-hidden pointer-events-none"
+      class="relative aspect-square w-full bg-[#f6f6f8] dark:bg-[#1f2023] rounded-t-[13px] overflow-hidden pointer-events-none"
     >
       <img
-        v-if="product.image_url"
+        v-if="product.image_url && !imageLoadError"
+        ref="imageEl"
         :src="product.image_url"
         :alt="product.name"
         loading="lazy"
@@ -137,19 +171,22 @@ const handleQuickAdd = () => {
           'w-full h-full object-cover block transition-transform duration-500 ease-out group-hover:scale-105',
           product.stock === 0 ? 'opacity-60 grayscale' : '',
         ]"
+        @error="onImgError"
       />
       <div
         v-else
-        class="flex flex-col items-center justify-center w-full h-full text-slate-400 gap-1"
+        class="flex flex-col items-center justify-center w-full h-full text-slate-400 gap-1.5 bg-[#f4f4f6] dark:bg-[#1c1d20]"
       >
-        <i class="pi pi-image text-2xl opacity-30" />
-        <span class="text-[10px] font-medium tracking-widest uppercase opacity-50">ShelfStack</span>
+        <i class="pi pi-image text-2xl opacity-25" />
+        <span class="text-[10px] font-semibold tracking-widest uppercase opacity-40"
+          >ShelfStack</span
+        >
       </div>
 
-      <!-- Floating Quick Add Button (Desktop Hover) -->
+      <!-- Floating Quick Add Button (Mobile Touch visible, Desktop Hover reveal) -->
       <div
         v-if="hideActions && product.stock > 0"
-        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
+        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto opacity-100 translate-y-0 sm:opacity-0 sm:translate-y-1 sm:group-hover:opacity-100 sm:group-hover:translate-y-0 transition-all duration-200"
       >
         <UiTooltip
           :text="justAdded ? 'Ditambahkan ke Bag' : 'Tambah ke Bag'"
@@ -185,7 +222,7 @@ const handleQuickAdd = () => {
           <span v-else class="text-[10px] text-transparent select-none">-</span>
 
           <div
-            v-if="product.rating && Number(product.rating) > 0"
+            v-if="formattedRating"
             class="flex items-center gap-1 shrink-0 text-[11px] font-bold text-slate-700 dark:text-zinc-300 tabular-nums"
           >
             <i class="pi pi-star-fill text-amber-400 text-[10px]" />
@@ -202,7 +239,7 @@ const handleQuickAdd = () => {
         </h3>
       </div>
 
-      <!-- Price & Terjual Row: Side-by-side, No Lines -->
+      <!-- Price & Status Row: Side-by-side, Clean Alignment -->
       <div class="flex items-baseline justify-between gap-2 pt-0.5 pointer-events-auto" @click.stop>
         <!-- Price on Left -->
         <span
@@ -211,12 +248,17 @@ const handleQuickAdd = () => {
           {{ formatRupiah(product.price) }}
         </span>
 
-        <!-- Terjual on Right (Sejajar dengan harga) -->
+        <!-- Stock Status / Verified Sold on Right -->
         <span
           v-if="hideActions"
-          class="text-[11px] font-medium text-slate-500 dark:text-zinc-400 tabular-nums shrink-0"
+          class="text-[11px] font-medium tabular-nums shrink-0"
+          :class="
+            product.stock === 0
+              ? 'text-rose-600 dark:text-rose-400 font-semibold'
+              : 'text-slate-500 dark:text-zinc-400'
+          "
         >
-          {{ soldCountText }}
+          {{ stockStatusText }}
         </span>
 
         <!-- Admin Actions (Management Mode) -->
@@ -244,6 +286,16 @@ const handleQuickAdd = () => {
             </button>
           </template>
           <template v-else>
+            <UiTooltip text="Riwayat Mutasi Stok" position="top">
+              <button
+                type="button"
+                class="w-7 h-7 rounded-full bg-slate-100 hover:bg-brand-accent hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Riwayat Mutasi Stok"
+                @click.stop="emit('viewStockMovements', product)"
+              >
+                <i class="pi pi-history text-[10px]" />
+              </button>
+            </UiTooltip>
             <UiTooltip text="Ubah Produk" position="top">
               <button
                 type="button"

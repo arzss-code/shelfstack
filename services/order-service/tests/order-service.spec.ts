@@ -48,6 +48,30 @@ describe('Order Service (Fastify Pilot)', () => {
       expect(body.status).toBe('error')
     })
 
+    it('should return 500 when MIDTRANS_SERVER_KEY is missing (fail-closed)', async () => {
+      const origKey = config.MIDTRANS_SERVER_KEY
+      config.MIDTRANS_SERVER_KEY = undefined
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/orders/webhook',
+        payload: {
+          order_id: 'test-order-123',
+          status_code: '200',
+          gross_amount: '150000.00',
+          signature_key: 'any-hash',
+          transaction_status: 'settlement',
+        },
+      })
+
+      expect(response.statusCode).toBe(500)
+      const body = response.json()
+      expect(body.status).toBe('error')
+      expect(body.message).toContain('Midtrans Server Key belum disetel')
+
+      config.MIDTRANS_SERVER_KEY = origKey
+    })
+
     it('should return 403 when signature key is invalid', async () => {
       // Set test server key
       config.MIDTRANS_SERVER_KEY = 'test-server-key'
@@ -198,6 +222,29 @@ describe('Order Service (Fastify Pilot)', () => {
   })
 
   describe('POST /api/v1/orders/sweep-expiry (Order Expiry Worker)', () => {
+    it('blocks request when INTERNAL_SERVICE_KEY is set and secret header is invalid', async () => {
+      config.INTERNAL_SERVICE_KEY = 'secret-guard-token'
+
+      try {
+        const response = await app.inject({
+          method: 'POST',
+          url: '/api/v1/orders/sweep-expiry',
+          headers: {
+            'x-internal-secret': 'wrong-token',
+          },
+          payload: {
+            expiry_minutes: 30,
+          },
+        })
+
+        expect(response.statusCode).toBe(403)
+        const body = response.json()
+        expect(body.message).toContain('x-internal-secret tidak valid')
+      } finally {
+        config.INTERNAL_SERVICE_KEY = undefined
+      }
+    })
+
     it('executes sweep successfully with mocked database', async () => {
       const expiredOrderId = 'b0000000-0000-0000-0000-000000000002'
 
@@ -247,6 +294,106 @@ describe('Order Service (Fastify Pilot)', () => {
       expect(body.data.cancelledOrders).toContain(expiredOrderId)
 
       setSupabaseClient(null)
+    })
+  })
+
+  describe('GET /ready (Readiness Probe)', () => {
+    it('should return 200 OK when database dependency is healthy', async () => {
+      const mockSupabase = {
+        from: () => ({
+          select: () => ({
+            limit: async () => ({ data: [{ id: 1 }], error: null }),
+          }),
+        }),
+      } as any
+      setSupabaseClient(mockSupabase)
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/ready',
+      })
+
+      expect(response.statusCode).toBe(200)
+      const body = response.json()
+      expect(body.status).toBe('success')
+      expect(body.data.status).toBe('ready')
+      expect(body.data.dependencies.database).toBe('up')
+
+      setSupabaseClient(null)
+    })
+
+    it('should return 503 Service Unavailable when database dependency is down', async () => {
+      const mockSupabase = {
+        from: () => ({
+          select: () => ({
+            limit: async () => ({ data: null, error: { message: 'Connection refused' } }),
+          }),
+        }),
+      } as any
+      setSupabaseClient(mockSupabase)
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/ready',
+      })
+
+      expect(response.statusCode).toBe(503)
+      const body = response.json()
+      expect(body.status).toBe('error')
+      expect(body.data.status).toBe('not_ready')
+      expect(body.data.dependencies.database).toBe('down')
+
+      setSupabaseClient(null)
+    })
+  })
+
+  describe('Request ID & Correlation ID Propagation', () => {
+    it('echoes valid x-request-id header and propagates x-correlation-id', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/health',
+        headers: {
+          'x-request-id': 'req-client-pilot-12345',
+          'x-correlation-id': 'corr-pilot-trace-999',
+        },
+      })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.headers['x-request-id']).toBe('req-client-pilot-12345')
+      expect(response.headers['x-correlation-id']).toBe('corr-pilot-trace-999')
+    })
+
+    it('sanitizes malicious x-request-id header and generates a safe UUID', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/health',
+        headers: {
+          'x-request-id': '<script>alert("hack")</script>',
+        },
+      })
+
+      expect(response.statusCode).toBe(200)
+      const returnedId = response.headers['x-request-id'] as string
+      expect(returnedId).not.toContain('<script>')
+      expect(/^[a-zA-Z0-9_-]{1,64}$/.test(returnedId)).toBe(true)
+    })
+
+    it('includes requestId in error responses', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/orders/webhook',
+        headers: {
+          'x-request-id': 'req-error-trace-456',
+        },
+        payload: {
+          order_id: 'invalid-body',
+        },
+      })
+
+      expect(response.statusCode).toBe(400)
+      const body = response.json()
+      expect(body.status).toBe('error')
+      expect(body.requestId).toBe('req-error-trace-456')
     })
   })
 })

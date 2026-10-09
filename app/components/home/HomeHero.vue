@@ -61,12 +61,12 @@ const { isLoggedIn } = useAuth()
           </div>
           <div>
             <p
-              class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tracking-tight flex items-center gap-1"
+              class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tracking-tight flex items-center gap-1 text-emerald-600"
             >
-              <span>4.9</span>
-              <i class="pi pi-star-fill text-xs text-brand-warning" />
+              <span>100%</span>
+              <i class="pi pi-verified text-sm text-emerald-600" />
             </p>
-            <p class="font-body text-xs text-brand-muted m-0 mt-0.5 font-medium">18rb+ Ulasan</p>
+            <p class="font-body text-xs text-brand-muted m-0 mt-0.5 font-medium">Garansi Resmi</p>
           </div>
         </div>
       </div>
@@ -92,7 +92,9 @@ const { isLoggedIn } = useAuth()
                 </p>
                 <p class="text-[11px] text-brand-muted m-0 truncate">Koleksi Terlaris</p>
               </div>
-              <span class="text-xs font-bold text-brand-accent shrink-0">Rp2.680.000</span>
+              <span class="text-xs font-bold text-brand-ink tabular-nums shrink-0"
+                >Rp2.680.000</span
+              >
             </div>
           </div>
 
@@ -116,7 +118,9 @@ const { isLoggedIn } = useAuth()
                   </p>
                   <p class="text-[10px] text-brand-muted m-0 truncate">Pencahayaan</p>
                 </div>
-                <span class="text-[11px] font-bold text-brand-accent shrink-0">Rp850.000</span>
+                <span class="text-[11px] font-bold text-brand-ink tabular-nums shrink-0"
+                  >Rp850.000</span
+                >
               </div>
             </div>
 
@@ -138,7 +142,9 @@ const { isLoggedIn } = useAuth()
                   </p>
                   <p class="text-[10px] text-brand-muted m-0 truncate">Tahan Cuaca</p>
                 </div>
-                <span class="text-[11px] font-bold text-brand-accent shrink-0">Rp1.120.000</span>
+                <span class="text-[11px] font-bold text-brand-ink tabular-nums shrink-0"
+                  >Rp1.120.000</span
+                >
               </div>
             </div>
           </div>

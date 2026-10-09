@@ -315,6 +315,99 @@ export type Database = {
           },
         ]
       }
+      refunds: {
+        Row: {
+          amount_cents: number
+          bank_confirmed_at: string | null
+          created_at: string
+          currency: string
+          failure_reason: string | null
+          gateway: string
+          gateway_refund_id: string | null
+          gateway_transaction_id: string | null
+          id: string
+          idempotency_key: string
+          order_id: string
+          processed_at: string | null
+          reason: string
+          status: 'pending' | 'succeeded' | 'failed'
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          bank_confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          gateway?: string
+          gateway_refund_id?: string | null
+          gateway_transaction_id?: string | null
+          id?: string
+          idempotency_key: string
+          order_id: string
+          processed_at?: string | null
+          reason: string
+          status?: 'pending' | 'succeeded' | 'failed'
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          bank_confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          gateway?: string
+          gateway_refund_id?: string | null
+          gateway_transaction_id?: string | null
+          id?: string
+          idempotency_key?: string
+          order_id?: string
+          processed_at?: string | null
+          reason?: string
+          status?: 'pending' | 'succeeded' | 'failed'
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payment_events: {
+        Row: {
+          created_at: string
+          event_key: string
+          event_type: 'payment' | 'refund'
+          gateway: string
+          id: string
+          order_id: string | null
+          payload_summary: Json
+          processed_at: string
+          status: 'processed' | 'ignored' | 'failed'
+        }
+        Insert: {
+          created_at?: string
+          event_key: string
+          event_type: 'payment' | 'refund'
+          gateway?: string
+          id?: string
+          order_id?: string | null
+          payload_summary?: Json
+          processed_at?: string
+          status: 'processed' | 'ignored' | 'failed'
+        }
+        Update: {
+          created_at?: string
+          event_key?: string
+          event_type?: 'payment' | 'refund'
+          gateway?: string
+          id?: string
+          order_id?: string | null
+          payload_summary?: Json
+          processed_at?: string
+          status: 'processed' | 'ignored' | 'failed'
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -328,6 +421,21 @@ export type Database = {
           p_midtrans_id?: string | null
         }
         Returns: string
+      }
+      handle_refund_webhook: {
+        Args: {
+          p_order_id: string
+          p_refund_key?: string | null
+          p_gateway_refund_id?: string | null
+          p_is_success?: boolean
+          p_failure_reason?: string | null
+          p_event_key?: string | null
+          p_payload_summary?: Json
+          p_stage?: string
+          p_bank_confirmed_at?: string | null
+          p_refund_amount_cents?: number | null
+        }
+        Returns: Json
       }
       cancel_order: {
         Args: {
@@ -343,6 +451,32 @@ export type Database = {
         }
         Returns: string
       }
+      transition_order_status: {
+        Args: {
+          p_order_id: string
+          p_target_status: string
+          p_reason?: string
+        }
+        Returns: Json
+      }
+      create_refund_attempt: {
+        Args: {
+          p_order_id: string
+          p_idempotency_key: string
+          p_reason?: string
+        }
+        Returns: Json
+      }
+      finalize_refund: {
+        Args: {
+          p_refund_id: string
+          p_success: boolean
+          p_gateway_refund_id?: string | null
+          p_failure_reason?: string | null
+          p_bank_confirmed_at?: string | null
+        }
+        Returns: Json
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -350,7 +484,7 @@ export type Database = {
     }
     Enums: {
       activity_action: 'CREATE' | 'UPDATE' | 'DELETE' | 'RESTORE'
-      order_status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled'
+      order_status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled' | 'refunded'
     }
     CompositeTypes: {
       [_ in never]: never

@@ -1,6 +1,8 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { checkoutSchema } from '../../../shared/schemas/order'
+import { calculateCheckoutHash, validateIdempotencyKey } from '../../utils/idempotency'
+import { logger } from '../../utils/logger'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
@@ -30,6 +32,17 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'POST') {
+    // 1. Validasi Header Idempotency-Key (Optional untuk backward compatibility)
+    const rawIdempotencyKey = getHeader(event, 'idempotency-key')
+    const keyValidation = validateIdempotencyKey(rawIdempotencyKey)
+
+    if (!keyValidation.isValid) {
+      return errorResponse(event, keyValidation.error || 'Idempotency-Key tidak valid', null, 400)
+    }
+
+    const idempotencyKey = keyValidation.key
+
+    // 2. Validasi Payload Checkout
     const body = await readBody(event)
     const parsed = checkoutSchema.safeParse(body)
 
@@ -42,19 +55,47 @@ export default defineEventHandler(async (event) => {
       )
     }
 
-    // Panggil RPC create_order yang atomik di Postgres (Security Definer)
+    // 3. Hitung Request Hash Deterministik jika Idempotency-Key disediakan
+    const requestHash = idempotencyKey ? calculateCheckoutHash(parsed.data) : null
+
+    // 4. Panggil RPC create_order yang atomik di Postgres (Security Definer)
     const { data: orderId, error } = await client.rpc('create_order', {
       p_items: parsed.data.items,
       p_address: parsed.data.address,
+      p_idempotency_key: idempotencyKey,
+      p_request_hash: requestHash,
     })
 
     if (error) {
+      if (error.message?.includes('IDEMPOTENCY_CONFLICT')) {
+        logger.warn(`[Checkout] Idempotency conflict for key "${idempotencyKey}"`, {
+          requestId: event.context?.requestId,
+          idempotencyKey,
+          userId: targetUserId,
+        })
+        return errorResponse(
+          event,
+          error.message,
+          { code: 'IDEMPOTENCY_CONFLICT', idempotency_key: idempotencyKey },
+          409,
+        )
+      }
+
       return errorResponse(
         event,
         error.message || 'Gagal memproses pesanan di database',
         error,
         400,
       )
+    }
+
+    if (idempotencyKey) {
+      logger.info(`[Checkout] Order ${orderId} processed with Idempotency-Key: ${idempotencyKey}`, {
+        requestId: event.context?.requestId,
+        orderId,
+        idempotencyKey,
+        userId: targetUserId,
+      })
     }
 
     return successResponse('Pesanan berhasil dibuat', { order_id: orderId })

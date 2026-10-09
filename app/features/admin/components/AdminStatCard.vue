@@ -52,8 +52,11 @@ const colorStyles = computed(() => {
   <component
     :is="to ? 'NuxtLink' : 'div'"
     :to="to || undefined"
-    class="relative overflow-hidden rounded-2xl border p-5 transition-all duration-200 no-underline"
-    :class="[to ? 'hover:-translate-y-0.5 hover:shadow-subtle cursor-pointer' : '', colorStyles.bg]"
+    class="relative overflow-hidden rounded-card border p-5 transition-all duration-200 no-underline shadow-whisper"
+    :class="[
+      to ? 'hover:-translate-y-0.5 hover:shadow-floating cursor-pointer' : '',
+      colorStyles.bg,
+    ]"
   >
     <div class="flex items-start justify-between gap-4">
       <div class="space-y-1.5 flex-1 min-w-0">

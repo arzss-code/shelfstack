@@ -146,6 +146,48 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    // Exempt payment webhook to prevent dropping legitimate gateway notifications/retries
+    '/api/midtrans/notification': {
+      security: {
+        rateLimiter: false,
+      },
+    },
+    // Sensitive mutation endpoints: protected against abuse/fraud attempts
+    '/api/checkout': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 20,
+          interval: 60000,
+        },
+      },
+    },
+    '/api/orders/**/snap-token': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 30,
+          interval: 60000,
+        },
+      },
+    },
+    '/api/orders/**/cancel': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 20,
+          interval: 60000,
+        },
+      },
+    },
+    '/api/orders/**/refund': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 10,
+          interval: 60000,
+        },
+      },
+    },
+  },
+
   tailwindcss: {
     cssPath: '~/assets/css/main.css',
   },

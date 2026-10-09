@@ -237,25 +237,23 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
 
       <!-- Summary Sidebar -->
       <aside
-        class="lg:col-span-4 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.05)] space-y-5 sticky top-28"
+        class="lg:col-span-4 bg-white dark:bg-[#18191b] border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-28"
       >
-        <div
-          class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800"
-        >
-          <h2 class="font-display text-base font-bold text-slate-900 dark:text-white m-0">
+        <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
+          <h2 class="font-display text-base font-bold text-brand-ink dark:text-white m-0">
             Ringkasan Pesanan
           </h2>
           <span
-            class="text-xs font-semibold text-blue-600 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full"
+            class="text-xs font-semibold text-brand-ink dark:text-zinc-200 bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full"
           >
             {{ cartStore.totalItems }} item
           </span>
         </div>
 
-        <div class="space-y-3 text-xs text-slate-600 dark:text-zinc-400">
+        <div class="space-y-3 text-xs text-brand-muted dark:text-zinc-400">
           <div class="flex items-center justify-between">
             <span>Total Barang ({{ cartStore.totalItems }})</span>
-            <span class="font-semibold text-slate-900 dark:text-white tabular-nums">
+            <span class="font-semibold text-brand-ink dark:text-white tabular-nums">
               {{ cartStore.formattedTotalPrice }}
             </span>
           </div>
@@ -265,17 +263,15 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
           </div>
           <div class="flex items-center justify-between">
             <span>Estimasi Pajak (PPN 11%)</span>
-            <span class="font-semibold text-slate-900 dark:text-white">Termasuk</span>
+            <span class="font-semibold text-brand-ink dark:text-white">Termasuk</span>
           </div>
         </div>
 
-        <div
-          class="pt-4 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between"
-        >
-          <span class="font-display font-bold text-sm text-slate-900 dark:text-white"
+        <div class="pt-4 border-t border-brand-hairsoft flex items-center justify-between">
+          <span class="font-display font-bold text-sm text-brand-ink dark:text-white"
             >Total Tagihan</span
           >
-          <span class="font-display text-xl font-bold text-slate-900 dark:text-white tabular-nums">
+          <span class="font-display text-xl font-bold text-brand-ink dark:text-white tabular-nums">
             {{ cartStore.formattedTotalPrice }}
           </span>
         </div>
@@ -283,7 +279,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
         <UiButton
           variant="primary"
           size="md"
-          class="w-full justify-center text-xs font-semibold py-3 rounded-xl shadow-sm"
+          class="w-full justify-center text-xs font-semibold py-3 rounded-full shadow-whisper"
           icon="pi-lock"
           @click="goToCheckout"
         >
@@ -292,18 +288,18 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
 
         <!-- Trust Badges -->
         <div
-          class="pt-3 border-t border-slate-100 dark:border-zinc-800 space-y-2 text-[11px] text-slate-500 dark:text-zinc-400"
+          class="pt-3 border-t border-brand-hairsoft space-y-2 text-[11px] text-brand-muted dark:text-zinc-400"
         >
           <div class="flex items-center gap-2">
-            <i class="pi pi-shield text-blue-600" />
-            <span>Pembayaran Aman Midtrans Sandbox</span>
+            <i class="pi pi-shield text-brand-ink dark:text-zinc-300" />
+            <span>Pembayaran Aman via Midtrans</span>
           </div>
           <div class="flex items-center gap-2">
-            <i class="pi pi-sync text-blue-600" />
+            <i class="pi pi-sync text-brand-ink dark:text-zinc-300" />
             <span>Garansi Pengembalian 30 Hari</span>
           </div>
           <div class="flex items-center gap-2">
-            <i class="pi pi-check-circle text-blue-600" />
+            <i class="pi pi-check-circle text-emerald-600" />
             <span>Koleksi 100% Terkurasi Original</span>
           </div>
         </div>

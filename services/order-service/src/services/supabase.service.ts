@@ -29,6 +29,24 @@ export function setSupabaseClient(client: SupabaseClient | null) {
   supabaseInstance = client
 }
 
+export async function pingSupabase(timeoutMs = 3000): Promise<boolean> {
+  try {
+    const client = getSupabaseClient()
+    const checkPromise = async () => {
+      const { error } = await client.from('categories').select('id').limit(1)
+      if (error) throw new Error(error.message)
+      return true
+    }
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Database connectivity check timed out')), timeoutMs),
+    )
+    await Promise.race([checkPromise(), timeoutPromise])
+    return true
+  } catch {
+    return false
+  }
+}
+
 export interface ProcessWebhookParams {
   orderId: string
   targetStatus: 'pending' | 'paid' | 'cancelled'

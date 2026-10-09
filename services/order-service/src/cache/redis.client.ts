@@ -47,6 +47,10 @@ export function setMockRedisClient(client: Redis | null) {
   isConnected = !!client
 }
 
+export function isRedisReady(): boolean {
+  return isConnected
+}
+
 const DEFAULT_TTL_SECONDS = 300 // 5 minutes
 
 /**

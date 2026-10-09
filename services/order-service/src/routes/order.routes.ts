@@ -32,24 +32,31 @@ export const orderRoutes: FastifyPluginAsync = async (app) => {
     async (request, reply) => {
       const payload = request.body as WebhookPayload
 
-      // 1. Verifikasi Signature jika server key terkonfigurasi
-      if (config.MIDTRANS_SERVER_KEY) {
-        const isValid = verifyMidtransSignature({
-          orderId: payload.order_id,
-          statusCode: payload.status_code,
-          grossAmount: payload.gross_amount,
-          serverKey: config.MIDTRANS_SERVER_KEY,
-          signatureKey: payload.signature_key,
+      // 1. Verifikasi Signature secara fail-closed
+      if (!config.MIDTRANS_SERVER_KEY) {
+        return reply.status(500).send({
+          status: 'error',
+          message: 'Konfigurasi Midtrans Server Key belum disetel di server.',
+          data: null,
+          errors: null,
         })
+      }
 
-        if (!isValid) {
-          return reply.status(403).send({
-            status: 'error',
-            message: 'Signature tidak valid. Akses webhook ditolak.',
-            data: null,
-            errors: null,
-          })
-        }
+      const isValid = verifyMidtransSignature({
+        orderId: payload.order_id,
+        statusCode: payload.status_code,
+        grossAmount: payload.gross_amount,
+        serverKey: config.MIDTRANS_SERVER_KEY,
+        signatureKey: payload.signature_key,
+      })
+
+      if (!isValid) {
+        return reply.status(403).send({
+          status: 'error',
+          message: 'Signature tidak valid. Akses webhook ditolak.',
+          data: null,
+          errors: null,
+        })
       }
 
       // 2. Map Midtrans Status ke Order Status
@@ -82,6 +89,23 @@ export const orderRoutes: FastifyPluginAsync = async (app) => {
     },
   )
 
+  const checkInternalAuth = (request: any, reply: any): boolean => {
+    const secret = config.INTERNAL_SERVICE_KEY || process.env.INTERNAL_SERVICE_KEY
+    if (secret) {
+      const headerSecret = request.headers['x-internal-secret']
+      if (!headerSecret || headerSecret !== secret) {
+        reply.status(403).send({
+          status: 'error',
+          message: 'Akses ditolak. Header x-internal-secret tidak valid.',
+          data: null,
+          errors: null,
+        })
+        return false
+      }
+    }
+    return true
+  }
+
   // 4. Endpoint worker untuk membatalkan pesanan kedaluwarsa & restock otomatis
   app.post(
     '/api/v1/orders/sweep-expiry',
@@ -95,6 +119,8 @@ export const orderRoutes: FastifyPluginAsync = async (app) => {
       },
     },
     async (request, reply) => {
+      if (!checkInternalAuth(request, reply)) return
+
       const body = (request.body as { expiry_minutes?: number } | undefined) || {}
       const expiryMinutes = body.expiry_minutes ?? 30
 
@@ -120,7 +146,9 @@ export const orderRoutes: FastifyPluginAsync = async (app) => {
   )
 
   // 5. Endpoint invalidasi cache katalog (O(1) version tag increment)
-  app.post('/api/v1/orders/invalidate-cache', async (_request, reply) => {
+  app.post('/api/v1/orders/invalidate-cache', async (request, reply) => {
+    if (!checkInternalAuth(request, reply)) return
+
     try {
       const { CacheService } = await import('../cache/redis.client.js')
       await CacheService.invalidateCatalog()

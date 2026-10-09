@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { logger } from '../../../utils/logger'
 
 export default defineEventHandler(async (event) => {
   const { user, profile } = await requireUser(event)
@@ -44,7 +45,14 @@ export default defineEventHandler(async (event) => {
   })
 
   if (rpcErr) {
-    console.error('[cancel_order] RPC execution failed:', rpcErr)
+    logger.error(
+      '[cancel_order] RPC execution failed',
+      {
+        requestId: event.context?.requestId,
+        orderId: id,
+      },
+      rpcErr,
+    )
     return errorResponse(
       event,
       'Gagal memproses pembatalan pesanan. Silakan coba beberapa saat lagi.',

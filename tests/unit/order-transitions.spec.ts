@@ -16,9 +16,9 @@ describe('Order State Machine & Legal Transitions (D-02)', () => {
     expect(isAllowedTransition('pending', 'completed')).toBe(false)
   })
 
-  it('allows paid -> shipped and paid -> cancelled', () => {
+  it('allows paid -> shipped and rejects paid -> cancelled without refund flow', () => {
     expect(isAllowedTransition('paid', 'shipped')).toBe(true)
-    expect(isAllowedTransition('paid', 'cancelled')).toBe(true)
+    expect(isAllowedTransition('paid', 'cancelled')).toBe(false)
   })
 
   it('rejects reverting paid back to pending', () => {
@@ -34,23 +34,29 @@ describe('Order State Machine & Legal Transitions (D-02)', () => {
     expect(isAllowedTransition('shipped', 'pending')).toBe(false)
   })
 
-  it('strictly forbids transitions once order is completed or cancelled (terminal states)', () => {
-    const statuses = ['pending', 'paid', 'shipped', 'completed', 'cancelled'] as const
+  it('strictly forbids transitions once order is completed, cancelled, or refunded (terminal states)', () => {
+    const statuses = ['pending', 'paid', 'shipped', 'completed', 'cancelled', 'refunded'] as const
     for (const target of statuses) {
       expect(isAllowedTransition('completed', target)).toBe(false)
       expect(isAllowedTransition('cancelled', target)).toBe(false)
+      expect(isAllowedTransition('refunded', target)).toBe(false)
     }
+  })
+
+  it('allows paid -> refunded for approved refunds', () => {
+    expect(isAllowedTransition('paid', 'refunded')).toBe(true)
   })
 
   it('returns valid available target transitions for current status', () => {
     expect(getAvailableTransitions('pending')).toEqual(['paid', 'cancelled'])
-    expect(getAvailableTransitions('paid')).toEqual(['shipped', 'cancelled'])
+    expect(getAvailableTransitions('paid')).toEqual(['shipped', 'refunded'])
     expect(getAvailableTransitions('shipped')).toEqual(['completed'])
     expect(getAvailableTransitions('completed')).toEqual([])
     expect(getAvailableTransitions('cancelled')).toEqual([])
+    expect(getAvailableTransitions('refunded')).toEqual([])
   })
 
   it('has immutable state map definitions', () => {
-    expect(Object.keys(ALLOWED_ORDER_TRANSITIONS)).toHaveLength(5)
+    expect(Object.keys(ALLOWED_ORDER_TRANSITIONS)).toHaveLength(6)
   })
 })
