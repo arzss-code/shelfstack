@@ -95,7 +95,7 @@ const badgeInfo = computed(() => {
   if (props.product.is_featured) {
     return {
       label: 'Unggulan',
-      badgeClass: 'bg-brand-ink text-white dark:bg-white dark:text-brand-ink',
+      badgeClass: 'bg-blue-600 text-white shadow-sm',
     }
   }
   return null
@@ -147,10 +147,10 @@ const handleQuickAdd = () => {
       tabindex="-1"
     />
 
-    <!-- Architectural Floating Pill Badge -->
-    <div v-if="badgeInfo" class="absolute top-2.5 left-2.5 z-20 pointer-events-none">
+    <!-- Curved Ribbon Badge: Flush to Left Edge (Kombinasi 2: Rounded right curve, zero clipping) -->
+    <div v-if="badgeInfo" class="absolute top-3 left-0 z-20 pointer-events-none">
       <span
-        class="inline-flex items-center text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full shadow-sm"
+        class="inline-flex items-center text-[10px] font-bold tracking-wider uppercase pl-2.5 pr-3 py-1 rounded-r-full shadow-sm"
         :class="badgeInfo.badgeClass"
       >
         {{ badgeInfo.label }}
