@@ -88,6 +88,7 @@ export type Database = {
           review_count: number
           sku: string | null
           slug: string | null
+          sold_count: number
           specs: Json
           stock: number
           weight_grams: number
@@ -109,6 +110,7 @@ export type Database = {
           review_count?: number
           sku?: string | null
           slug?: string | null
+          sold_count?: number
           specs?: Json
           stock?: number
           weight_grams?: number
@@ -130,6 +132,7 @@ export type Database = {
           review_count?: number
           sku?: string | null
           slug?: string | null
+          sold_count?: number
           specs?: Json
           stock?: number
           weight_grams?: number
@@ -146,17 +149,29 @@ export type Database = {
       }
       categories: {
         Row: {
+          created_at: string | null
+          description: string | null
+          display_order: number | null
           id: string
+          image_url: string | null
           name: string
           slug: string
         }
         Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
           id?: string
+          image_url?: string | null
           name: string
           slug: string
         }
         Update: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
           id?: string
+          image_url?: string | null
           name?: string
           slug?: string
         }
@@ -189,11 +204,14 @@ export type Database = {
       orders: {
         Row: {
           address: Json
+          cancellation_reason: string | null
+          cancelled_at: string | null
           created_at: string | null
           id: string
           midtrans_id: string | null
           paid_at: string | null
           payment_type: string | null
+          refunded_at: string | null
           snap_token: string | null
           status: Database['public']['Enums']['order_status']
           total_cents: number
@@ -202,11 +220,14 @@ export type Database = {
         }
         Insert: {
           address: Json
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           created_at?: string | null
           id?: string
           midtrans_id?: string | null
           paid_at?: string | null
           payment_type?: string | null
+          refunded_at?: string | null
           snap_token?: string | null
           status?: Database['public']['Enums']['order_status']
           total_cents?: number
@@ -215,11 +236,14 @@ export type Database = {
         }
         Update: {
           address?: Json
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           created_at?: string | null
           id?: string
           midtrans_id?: string | null
           paid_at?: string | null
           payment_type?: string | null
+          refunded_at?: string | null
           snap_token?: string | null
           status?: Database['public']['Enums']['order_status']
           total_cents?: number
@@ -408,6 +432,86 @@ export type Database = {
         }
         Relationships: []
       }
+      order_idempotency_keys: {
+        Row: {
+          created_at: string
+          id: string
+          idempotency_key: string
+          order_id: string
+          request_hash: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          order_id: string
+          request_hash: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          order_id?: string
+          request_hash?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'order_idempotency_keys_order_id_fkey'
+            columns: ['order_id']
+            isOneToOne: false
+            referencedRelation: 'orders'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      user_addresses: {
+        Row: {
+          city: string
+          created_at: string | null
+          deleted_at: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          note: string | null
+          phone: string
+          postal: string
+          street: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          city: string
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          note?: string | null
+          phone: string
+          postal: string
+          street: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          city?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          note?: string | null
+          phone?: string
+          postal?: string
+          street?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -446,8 +550,10 @@ export type Database = {
       }
       create_order: {
         Args: {
-          p_address: Json
           p_items: Json
+          p_address: Json
+          p_idempotency_key?: string | null
+          p_request_hash?: string | null
         }
         Returns: string
       }
@@ -610,6 +716,7 @@ export const Constants = {
   public: {
     Enums: {
       activity_action: ['CREATE', 'UPDATE', 'DELETE', 'RESTORE'],
+      order_status: ['pending', 'paid', 'shipped', 'completed', 'cancelled', 'refunded'],
     },
   },
 } as const
