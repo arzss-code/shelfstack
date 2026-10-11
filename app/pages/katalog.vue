@@ -67,7 +67,7 @@ interface CatalogApiResponse {
 // Fetch katalog di server (SSR-first + reactive updates saat filter berganti)
 const { data: catalogResponse, pending } = await useAsyncData<CatalogApiResponse>(
   'katalog-products',
-  () => $fetch('/api/products', { params: queryParams.value }),
+  () => $fetch<CatalogApiResponse>('/api/products', { params: queryParams.value }),
   {
     watch: [queryParams],
     default: () => ({
