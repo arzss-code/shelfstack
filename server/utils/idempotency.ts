@@ -21,7 +21,7 @@ export function validateIdempotencyKey(
     return { isValid: true, key: null }
   }
 
-  const keyStr = Array.isArray(rawKey) ? rawKey[0] : rawKey
+  const keyStr = (Array.isArray(rawKey) ? rawKey[0] : rawKey) ?? ''
   const trimmed = keyStr.trim()
 
   if (trimmed.length === 0) {

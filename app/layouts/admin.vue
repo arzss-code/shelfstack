@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import AppLogo from '~/components/AppLogo.vue'
 import { useAuth } from '~/features/auth/composables/useAuth'
 
-const { user, profile, logout } = useAuth()
+const { user, profile, signOut: logout } = useAuth()
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
 

@@ -27,6 +27,13 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
 - `activities.post.ts`: `entity_id` kini wajib di skema (selaras DB `NOT NULL` + satu-satunya caller selalu mengisi); payload tanpa itu ditolak 400, bukan 500.
 - Koreksi metodologi: `pnpm typecheck` (`vue-tsc --noEmit`) terbukti memeriksa 0 file. Pemeriksa real `pnpm exec nuxi typecheck` menemukan ±29 error pre-existing di 6 file yang tidak tersentuh sesi ini (inventaris di `docs/PROGRESS.md` Known Gaps no. 6). Klaim hijau sebelumnya untuk `typecheck` dicabut.
 
+### Perbaikan error typecheck real (2026-10-12)
+
+- Zod 3 → 4: `required_error` menjadi `error` di `shared/schemas/address.ts` (5 situs).
+- Guard `undefined`: `server/utils/idempotency.ts`, index array di `app/pages/orders/index.vue`.
+- `UiInput` menerima `modelValue` undefined; `admin.vue` memakai alias `signOut` (tombol logout sebelumnya mati); generic eksplisit `$fetch` di `katalog.vue`; `@types/node` masuk root devDependencies.
+- Hasil: `pnpm exec nuxi typecheck` EXIT 0 · `lint` 0 error · `vitest` 33 file/318 test lolos.
+
 ### Changed
 
 - Sinkronisasi docs: `PROGRESS.md` (v0.15.0 + Fase 4 + Known Gaps), `README.md` (11 scripts + stack + CI), `docs/README.md` (indeks baru), `BACKLOG.md` (K-04 sandbox, Q-01 CI ada), `ARCHITECTURE.md` + `DESIGN-ECOMMERCE.md` (Nuxt 4), `package.json` version → `0.15.0`.

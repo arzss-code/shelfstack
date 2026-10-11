@@ -72,11 +72,12 @@ const syncPendingOrders = async () => {
 
           if (res.data?.is_paid) {
             const idx = orders.value.findIndex((o) => o.id === pendingOrder.id)
-            if (idx !== -1) {
+            const current = orders.value[idx]
+            if (idx !== -1 && current) {
               orders.value[idx] = {
-                ...orders.value[idx],
+                ...current,
                 status: res.data.status,
-                payment_type: res.data.payment_type || orders.value[idx].payment_type,
+                payment_type: res.data.payment_type || current.payment_type,
                 paid_at: new Date().toISOString(),
               }
 
@@ -156,21 +157,23 @@ const setupRealtimeSubscription = () => {
           const updated = payload.new as Record<string, unknown>
           const idx = orders.value.findIndex((o) => o.id === updated.id)
           if (idx !== -1) {
-            const prevStatus = orders.value[idx].status
+            const current = orders.value[idx]
+            if (!current) return
+            const prevStatus = current.status
             const nextStatus = updated.status as OrderStatus
 
             orders.value[idx] = {
-              ...orders.value[idx],
+              ...current,
               status: nextStatus,
-              payment_type: (updated.payment_type as string) || orders.value[idx].payment_type,
-              paid_at: (updated.paid_at as string) || orders.value[idx].paid_at,
+              payment_type: (updated.payment_type as string) || current.payment_type,
+              paid_at: (updated.paid_at as string) || current.paid_at,
             }
 
             if (prevStatus === 'pending' && nextStatus === 'paid') {
               toast.add({
                 severity: 'success',
                 summary: 'Status Terkini Realtime',
-                detail: `Pesanan #${orders.value[idx].id.slice(0, 8)} berhasil terkonfirmasi Lunas.`,
+                detail: `Pesanan #${current.id.slice(0, 8)} berhasil terkonfirmasi Lunas.`,
                 life: 5000,
               })
             }

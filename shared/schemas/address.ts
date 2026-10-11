@@ -2,24 +2,24 @@ import { z } from 'zod'
 
 export const addressBaseSchema = z.object({
   name: z
-    .string({ required_error: 'Nama penerima wajib diisi.' })
+    .string({ error: 'Nama penerima wajib diisi.' })
     .min(3, 'Nama penerima minimal 3 karakter.')
     .max(100, 'Nama penerima maksimal 100 karakter.'),
   phone: z
-    .string({ required_error: 'Nomor telepon wajib diisi.' })
+    .string({ error: 'Nomor telepon wajib diisi.' })
     .min(9, 'Nomor telepon minimal 9 digit.')
     .max(15, 'Nomor telepon maksimal 15 digit.')
     .regex(/^[0-9+\-\s]+$/, 'Format nomor telepon tidak valid.'),
   street: z
-    .string({ required_error: 'Alamat lengkap wajib diisi.' })
+    .string({ error: 'Alamat lengkap wajib diisi.' })
     .min(10, 'Alamat lengkap minimal 10 karakter.')
     .max(300, 'Alamat maksimal 300 karakter.'),
   city: z
-    .string({ required_error: 'Kota/Kabupaten wajib diisi.' })
+    .string({ error: 'Kota/Kabupaten wajib diisi.' })
     .min(3, 'Kota/Kabupaten minimal 3 karakter.')
     .max(100, 'Kota/Kabupaten maksimal 100 karakter.'),
   postal: z
-    .string({ required_error: 'Kode pos wajib diisi.' })
+    .string({ error: 'Kode pos wajib diisi.' })
     .min(5, 'Kode pos minimal 5 digit.')
     .max(10, 'Kode pos maksimal 10 karakter.')
     .regex(/^[0-9]+$/, 'Kode pos harus berupa angka.'),
