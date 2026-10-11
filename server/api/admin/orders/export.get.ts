@@ -1,6 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
-import { generateOrdersCsv, type OrderCsvRow } from '~/utils/csv'
+import { generateOrdersCsv, parseExportDateRange, type OrderCsvRow } from '~/utils/csv'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
@@ -11,12 +11,28 @@ export default defineEventHandler(async (event) => {
   const status = (query.status as string) || ''
   const search = (query.search as string) || ''
 
+  const dateResult = parseExportDateRange(query.from, query.to)
+  if (!dateResult.ok) {
+    return errorResponse(event, dateResult.error, null, 400)
+  }
+
   let dbQuery = client
     .from('orders')
     .select('id, created_at, status, total_cents, address, order_items(id)')
 
-  if (status && ['pending', 'paid', 'shipped', 'completed', 'cancelled'].includes(status)) {
+  if (
+    status &&
+    ['pending', 'paid', 'shipped', 'completed', 'cancelled', 'refunded'].includes(status)
+  ) {
     dbQuery = dbQuery.eq('status', status as Database['public']['Enums']['order_status'])
+  }
+
+  if (dateResult.range.fromIso) {
+    dbQuery = dbQuery.gte('created_at', dateResult.range.fromIso)
+  }
+
+  if (dateResult.range.toExclusiveIso) {
+    dbQuery = dbQuery.lt('created_at', dateResult.range.toExclusiveIso)
   }
 
   if (search.trim()) {

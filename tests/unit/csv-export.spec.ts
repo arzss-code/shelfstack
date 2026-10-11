@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { escapeCsvCell, generateOrdersCsv, type OrderCsvRow } from '~/utils/csv'
+import {
+  escapeCsvCell,
+  generateOrdersCsv,
+  parseExportDateRange,
+  type OrderCsvRow,
+} from '~/utils/csv'
 
 describe('CSV Order Export Utility', () => {
   it('escapes cells containing commas, quotes, and special characters', () => {
@@ -53,5 +58,53 @@ describe('CSV Order Export Utility', () => {
     expect(csv).toContain('"Dewi ""Sari"""')
     expect(csv).toContain('"250000"')
     expect(csv).toContain('"100000"')
+  })
+})
+
+describe('Rentang Tanggal Ekspor (parseExportDateRange)', () => {
+  it('menerima rentang valid dan menghitung batas inklusif-akhir dengan benar', () => {
+    const res = parseExportDateRange('2026-10-01', '2026-10-08')
+    expect(res.ok).toBe(true)
+    if (res.ok) {
+      expect(res.range.fromIso).toBe('2026-10-01T00:00:00.000Z')
+      expect(res.range.toExclusiveIso).toBe('2026-10-09T00:00:00.000Z')
+    }
+  })
+
+  it('mengizinkan batas satu sisi (hanya mulai atau hanya akhir)', () => {
+    const onlyFrom = parseExportDateRange('2026-10-01', '')
+    expect(onlyFrom.ok).toBe(true)
+    if (onlyFrom.ok) {
+      expect(onlyFrom.range.fromIso).toBe('2026-10-01T00:00:00.000Z')
+      expect(onlyFrom.range.toExclusiveIso).toBeNull()
+    }
+
+    const onlyTo = parseExportDateRange(undefined, '2026-10-08')
+    expect(onlyTo.ok).toBe(true)
+    if (onlyTo.ok) {
+      expect(onlyTo.range.fromIso).toBeNull()
+      expect(onlyTo.range.toExclusiveIso).toBe('2026-10-09T00:00:00.000Z')
+    }
+  })
+
+  it('menolak format selain YYYY-MM-DD dengan pesan yang jelas', () => {
+    const res = parseExportDateRange('08-10-2026', '2026/10/09')
+    expect(res.ok).toBe(false)
+    if (!res.ok) {
+      expect(res.error).toContain('YYYY-MM-DD')
+    }
+  })
+
+  it('menolak tanggal kalender yang tidak ada (mis. 30 Februari)', () => {
+    const res = parseExportDateRange('2026-02-30', '')
+    expect(res.ok).toBe(false)
+  })
+
+  it('menolak tanggal mulai yang setelah tanggal akhir', () => {
+    const res = parseExportDateRange('2026-10-09', '2026-10-01')
+    expect(res.ok).toBe(false)
+    if (!res.ok) {
+      expect(res.error).toContain('tidak boleh setelah tanggal akhir')
+    }
   })
 })
