@@ -38,6 +38,8 @@
     "@ai-sdk/google": "^4.0.0",
     "@ai-sdk/openai": "^4.0.0",
     "@ai-sdk/openai-compatible": "^3.0.0",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
     "@e2e-dev/web": "^0.13.0",
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/test-utils": "^4.1.0",
