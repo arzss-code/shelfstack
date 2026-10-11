@@ -21,6 +21,12 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
 - T-6: export CSV filter tanggal `from`/`to` (helper murni `parseExportDateRange` + input tanggal di UI + `refunded` di allowlist); +5 unit test.
 - Gate akhir: `typecheck` EXIT 0 · `lint` 0 error/32 warning (tanpa warning baru) · `vitest run` 33 file/**318 test lolos** (+8).
 
+### Follow-up LSP + gate typecheck (2026-10-12)
+
+- `refund.post.ts`: tipe inline `gatewayResult` diganti interface kanonis `MidtransRefundResult` (sudah menampung `bankConfirmedAt`).
+- `activities.post.ts`: `entity_id` kini wajib di skema (selaras DB `NOT NULL` + satu-satunya caller selalu mengisi); payload tanpa itu ditolak 400, bukan 500.
+- Koreksi metodologi: `pnpm typecheck` (`vue-tsc --noEmit`) terbukti memeriksa 0 file. Pemeriksa real `pnpm exec nuxi typecheck` menemukan ±29 error pre-existing di 6 file yang tidak tersentuh sesi ini (inventaris di `docs/PROGRESS.md` Known Gaps no. 6). Klaim hijau sebelumnya untuk `typecheck` dicabut.
+
 ### Changed
 
 - Sinkronisasi docs: `PROGRESS.md` (v0.15.0 + Fase 4 + Known Gaps), `README.md` (11 scripts + stack + CI), `docs/README.md` (indeks baru), `BACKLOG.md` (K-04 sandbox, Q-01 CI ada), `ARCHITECTURE.md` + `DESIGN-ECOMMERCE.md` (Nuxt 4), `package.json` version → `0.15.0`.

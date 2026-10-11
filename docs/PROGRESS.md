@@ -8,7 +8,7 @@
 
 - **Sprint Aktif:** **Sprint 6 (Quality & Launch)** — Fase 4 selesai fungsional, sisa Fase 5
 - **Versi Rilis:** `v0.15.0` (`version.json`, `CHANGELOG.md` — sinkron 2026-10-11)
-- **Baseline Quality Gate (2026-10-11, dijalankan aktual):** `pnpm typecheck` ✅ EXIT 0 · `pnpm lint` ✅ 0 error / 32 warning (`vue/html-self-closing`) · `vitest run` ✅ 33 file / 318 test lolos (+8 regression test baru)
+- **Baseline Quality Gate (2026-10-11, dijalankan aktual):** `pnpm lint` ✅ 0 error / 32 warning (`vue/html-self-closing`) · `vitest run` ✅ 33 file / 318 test lolos (+8 regression test baru) · ⚠️ `pnpm typecheck` (`vue-tsc --noEmit`) terbukti **vacuous** (memeriksa 0 file, selalu EXIT 0) — jangan jadikan bukti. Pemeriksa real adalah `pnpm exec nuxi typecheck`, yang saat ini MERAH (lihat Known Gaps no. 6).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -121,6 +121,7 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
 3. ~~**R-1 rate-limit salah sasaran**~~ ✅ **SELESAI 2026-10-11** — rule menunjuk `/api/orders/**/payment-token` (rule mati `/api/checkout` yang tidak punya endpoint dihapus).
 4. ~~**R-2 inkonsistensi admin `payment-token`**~~ ✅ **SELESAI 2026-10-11** — diputuskan ikut pola mayoritas (owner + admin bypass, konsisten dengan 3 endpoint order lain).
 5. ~~**R-3 pola ganda `addresses/[id].ts`**~~ ✅ **SELESAI 2026-10-11** — query lanjutan memakai `existing.user_id` (pemilik terverifikasi); +3 regression test admin.
+6. **GATE RUSAK + ERROR INVENTARIS (temuan 2026-10-12, belum diperbaiki).** `pnpm typecheck` = `vue-tsc --noEmit` memeriksa 0 file (`--listFiles` kosong) sehingga selalu hijau; termasuk gate CI `.github/workflows/ci.yml`. Pemeriksa real `pnpm exec nuxi typecheck` EXIT 2 dengan ±29 error pre-existing di 6 file yang TIDAK tersentuh sesi ini: `app/pages/orders/index.vue` (7: shape pesanan + possibly-undefined), `shared/schemas/address.ts` (5: `TS2769 No overload` — diduga ketidakcocokan Zod), `app/pages/katalog.vue:70` (`TS2321` stack depth tipe route Nuxt), `server/utils/idempotency.ts:25` (`TS18048`), `app/components/checkout/SavedAddressSelector.vue:264` (`TS2322`), `app/layouts/admin.vue:6` (`TS2339 logout` hilang di tipe `useAuth`). Opsi: (a) perbaiki 6 file lalu arahkan script `typecheck` ke pemeriksa real — CI ikut merah sampai selesai; (b) biarkan gate lama sambil cicil perbaikan. Keputusan butuh pemilik repo.
 
 ---
 
