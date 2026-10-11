@@ -8,7 +8,7 @@
 
 - **Sprint Aktif:** **Sprint 6 (Quality & Launch)** — Fase 4 selesai fungsional, sisa Fase 5
 - **Versi Rilis:** `v0.15.0` (`version.json`, `CHANGELOG.md` — sinkron 2026-10-11)
-- **Baseline Quality Gate (2026-10-11, dijalankan aktual):** `pnpm typecheck` ✅ EXIT 0 · `pnpm lint` ✅ 0 error / 32 warning (`vue/html-self-closing`) · `vitest run` ✅ 33 file / 318 test lolos (+8 regression test baru)
+- **Baseline Quality Gate (2026-10-11, dijalankan aktual):** `pnpm lint` ✅ 0 error / 32 warning (`vue/html-self-closing`) · `vitest run` ✅ 33 file / 318 test lolos (+8 regression test baru) · ⚠️ `pnpm typecheck` (`vue-tsc --noEmit`) terbukti **vacuous** (memeriksa 0 file, selalu EXIT 0) — jangan jadikan bukti. Pemeriksa real adalah `pnpm exec nuxi typecheck`, yang saat ini MERAH (lihat Known Gaps no. 6).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)

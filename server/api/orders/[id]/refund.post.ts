@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
-import { executeMidtransRefund } from '../../../utils/midtrans'
+import { executeMidtransRefund, type MidtransRefundResult } from '../../../utils/midtrans'
 import { logger } from '../../../utils/logger'
 import { metrics } from '../../../utils/metrics'
 
@@ -87,13 +87,7 @@ export default defineEventHandler(async (event) => {
   const refundAmountRupiah = Math.max(1, Math.round(attempt.amount_cents / 100))
   const gatewayTargetId = attempt.gateway_transaction_id || orderId
 
-  let gatewayResult: {
-    success: boolean
-    statusCode: string
-    statusMessage?: string
-    gatewayRefundId?: string
-    error?: string
-  }
+  let gatewayResult: MidtransRefundResult
 
   if (serverKey) {
     gatewayResult = await executeMidtransRefund({
