@@ -198,7 +198,7 @@ describe('Default Address Resolution & Handover Logic', () => {
     mockDatabase = []
   })
 
-  const addAddress = (input: CreateAddressInput) => {
+  const addAddress = (input: Omit<CreateAddressInput, 'note'> & { note?: string }) => {
     const activeAddresses = mockDatabase.filter(
       (a) => a.user_id === userId && a.deleted_at === null,
     )
@@ -492,5 +492,120 @@ describe('Simulated API Endpoint Handlers (GET, POST, PUT, DELETE)', () => {
 
     const resGet = handleGet(userId)
     expect(resGet.data).toHaveLength(0)
+  })
+})
+
+describe('Cakupan Admin pada Alamat Milik Pengguna Lain (R-3)', () => {
+  const ownerId = '33333333-3333-4333-8333-333333333333'
+  const adminId = '99999999-9999-4999-8999-999999999999'
+  const strangerId = '44444444-4444-4444-8444-444444444444'
+
+  let db: UserAddress[] = []
+
+  const seed = () => {
+    db = [
+      {
+        id: 'addr-owner-1',
+        user_id: ownerId,
+        name: 'Rumah Pemilik',
+        phone: '081234567890',
+        street: 'Jl. Pemilik No. 1, Menteng',
+        city: 'Jakarta Pusat',
+        postal: '10310',
+        note: null,
+        is_default: true,
+        created_at: new Date('2026-04-01T10:00:00Z').toISOString(),
+        updated_at: new Date('2026-04-01T10:00:00Z').toISOString(),
+        deleted_at: null,
+      },
+      {
+        id: 'addr-owner-2',
+        user_id: ownerId,
+        name: 'Kantor Pemilik',
+        phone: '081234567891',
+        street: 'Jl. Kantor No. 2, Kuningan',
+        city: 'Jakarta Selatan',
+        postal: '12940',
+        note: null,
+        is_default: false,
+        created_at: new Date('2026-04-02T10:00:00Z').toISOString(),
+        updated_at: new Date('2026-04-02T10:00:00Z').toISOString(),
+        deleted_at: null,
+      },
+      {
+        id: 'addr-admin-1',
+        user_id: adminId,
+        name: 'Rumah Admin',
+        phone: '081900000001',
+        street: 'Jl. Admin No. 9, Cibubur',
+        city: 'Jakarta Timur',
+        postal: '13720',
+        note: null,
+        is_default: true,
+        created_at: new Date('2026-04-03T10:00:00Z').toISOString(),
+        updated_at: new Date('2026-04-03T10:00:00Z').toISOString(),
+        deleted_at: null,
+      },
+    ]
+  }
+
+  beforeEach(() => {
+    seed()
+  })
+
+  // Cerminan aturan server/api/addresses/[id].ts:
+  // cek akses membolehkan pemilik ATAU admin, lalu query lanjutan
+  // memakai existing.user_id (pemilik terverifikasi), bukan ID pemanggil.
+  const handlePutAs = (
+    callerId: string,
+    callerRole: 'customer' | 'admin',
+    addressId: string,
+    body: any,
+  ) => {
+    const existing = db.find((a) => a.id === addressId && a.deleted_at === null)
+    if (!existing) return { status: 404, scopeUsed: null as string | null }
+    if (existing.user_id !== callerId && callerRole !== 'admin') {
+      return { status: 403, scopeUsed: null as string | null }
+    }
+
+    const ownerIdResolved = existing.user_id
+    const parsed = updateAddressSchema.safeParse(body)
+    if (!parsed.success) return { status: 400, scopeUsed: ownerIdResolved }
+
+    if (parsed.data.is_default === true) {
+      for (const a of db) {
+        if (a.user_id === ownerIdResolved && a.deleted_at === null) {
+          a.is_default = false
+        }
+      }
+      existing.is_default = true
+    }
+    existing.updated_at = new Date().toISOString()
+    return { status: 200, scopeUsed: ownerIdResolved }
+  }
+
+  it('admin boleh memperbarui alamat milik pengguna lain (200)', () => {
+    const res = handlePutAs(adminId, 'admin', 'addr-owner-2', { city: 'Bogor' })
+    expect(res.status).toBe(200)
+    expect(res.scopeUsed).toBe(ownerId)
+  })
+
+  it('reset is_default oleh admin hanya menyentuh alamat milik pemilik, bukan milik admin', () => {
+    const res = handlePutAs(adminId, 'admin', 'addr-owner-2', { is_default: true })
+    expect(res.status).toBe(200)
+
+    const ownerDefaults = db.filter(
+      (a) => a.user_id === ownerId && a.deleted_at === null && a.is_default,
+    )
+    expect(ownerDefaults).toHaveLength(1)
+    expect(ownerDefaults[0]?.id).toBe('addr-owner-2')
+
+    const adminAddress = db.find((a) => a.id === 'addr-admin-1')
+    expect(adminAddress?.is_default).toBe(true)
+  })
+
+  it('pengguna biasa tetap ditolak saat menyentuh alamat milik orang lain (403)', () => {
+    const res = handlePutAs(strangerId, 'customer', 'addr-owner-1', { city: 'Bogor' })
+    expect(res.status).toBe(403)
   })
 })

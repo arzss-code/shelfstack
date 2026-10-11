@@ -154,15 +154,7 @@ export default defineNuxtConfig({
       },
     },
     // Sensitive mutation endpoints: protected against abuse/fraud attempts
-    '/api/checkout': {
-      security: {
-        rateLimiter: {
-          tokensPerInterval: 20,
-          interval: 60000,
-        },
-      },
-    },
-    '/api/orders/**/snap-token': {
+    '/api/orders/**/payment-token': {
       security: {
         rateLimiter: {
           tokensPerInterval: 30,

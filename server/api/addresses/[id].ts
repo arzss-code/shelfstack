@@ -38,6 +38,10 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Akses alamat ditolak', null, 403)
   }
 
+  // Semua query lanjutan memakai pemilik terverifikasi (existing.user_id),
+  // bukan ID pemanggil, agar jalur admin bekerja benar dan tidak menyentuh data milik admin sendiri.
+  const ownerId = existing.user_id as string
+
   if (method === 'PUT') {
     const body = await readBody(event)
     const parsed = updateAddressSchema.safeParse(body)
@@ -56,7 +60,7 @@ export default defineEventHandler(async (event) => {
       await (client as any)
         .from('user_addresses')
         .update({ is_default: false, updated_at: new Date().toISOString() })
-        .eq('user_id', targetUserId)
+        .eq('user_id', ownerId)
         .eq('is_default', true)
     }
 
@@ -80,7 +84,7 @@ export default defineEventHandler(async (event) => {
       .from('user_addresses')
       .update(updatePayload)
       .eq('id', id)
-      .eq('user_id', targetUserId)
+      .eq('user_id', ownerId)
       .select('*')
       .single()
 
@@ -99,7 +103,7 @@ export default defineEventHandler(async (event) => {
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .eq('user_id', targetUserId)
+      .eq('user_id', ownerId)
       .select('*')
       .single()
 
@@ -112,7 +116,7 @@ export default defineEventHandler(async (event) => {
       const { data: remaining } = await (client as any)
         .from('user_addresses')
         .select('id')
-        .eq('user_id', targetUserId)
+        .eq('user_id', ownerId)
         .is('deleted_at', null)
         .order('created_at', { ascending: false })
         .limit(1)

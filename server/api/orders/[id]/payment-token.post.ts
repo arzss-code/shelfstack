@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Metode HTTP tidak diizinkan', null, 405)
   }
 
-  const { user } = await requireUser(event)
+  const { user, profile } = await requireUser(event)
   const client = await serverSupabaseClient<Database>(event)
   const config = useRuntimeConfig(event)
 
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Pesanan tidak ditemukan', error, 404)
   }
 
-  if (order.user_id !== user.id) {
+  if (order.user_id !== user.id && profile.role !== 'admin') {
     return errorResponse(event, 'Akses pesanan ditolak', null, 403)
   }
 
