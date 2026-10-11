@@ -9,11 +9,14 @@ export class AdminOrdersPage extends BasePage {
   readonly searchInput: Locator
   readonly tableRows: Locator
 
+  readonly exportCsvButton: Locator
+
   constructor(page: Page) {
     super(page)
     this.heading = page.getByRole('heading', { name: 'Kelola Pesanan' })
     this.liveIndicator = page.getByText('Live Realtime')
     this.refreshButton = page.getByRole('button', { name: 'Perbarui' })
+    this.exportCsvButton = page.getByRole('button', { name: 'Ekspor CSV' })
     this.searchInput = page.getByPlaceholder('Cari ID / Nama...')
     this.tableRows = page.locator('table tbody tr')
   }
@@ -23,7 +26,7 @@ export class AdminOrdersPage extends BasePage {
   }
 
   async assertPageLoaded(): Promise<void> {
-    await expect(this.heading).toBeVisible()
+    await expect(this.heading).toBeVisible({ timeout: 15000 })
     await expect(this.liveIndicator).toBeVisible()
     await expect(this.searchInput).toBeVisible()
   }
@@ -40,5 +43,11 @@ export class AdminOrdersPage extends BasePage {
 
   async getOrderRowCount(): Promise<number> {
     return await this.tableRows.count()
+  }
+
+  async openFirstOrderDetail(): Promise<void> {
+    const detailLink = this.tableRows.first().getByRole('link', { name: /detail/i })
+    await expect(detailLink).toBeVisible({ timeout: 10000 })
+    await detailLink.click()
   }
 }

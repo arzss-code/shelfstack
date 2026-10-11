@@ -21,42 +21,42 @@
   --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Palet Warna - Light Mode (Near-Black Ink on Pure Canvas + Electric Blue Accent) */
+  /* Palet Warna - Light Mode (Near-Black Ink on Pure Canvas + Refined Subtle Accents) */
   --brand-canvas: #ffffff;
-  --brand-canvas-soft: #f3f3f3;
-  --brand-field: #f0f0f0;
+  --brand-canvas-soft: #f8f8f9;
+  --brand-field: #f2f3f5;
   --brand-ink: #141414;
   --brand-ink-soft: #262626;
   --brand-onink: #ffffff;
   --brand-inkhover: #2e2e2e;
   --brand-body: #141414;
-  --brand-muted: #707070;
-  --brand-faint: #adadad;
-  --brand-hair: #e0e0e0;
-  --brand-hairsoft: #f0f0f0;
-  --brand-soft: #f3f3f3;
+  --brand-muted: #66686d;
+  --brand-faint: #9ea1a8;
+  --brand-hair: #e4e5e7;
+  --brand-hairsoft: #f0f1f3;
+  --brand-soft: #f8f8f9;
   --brand-accent: #0066ff;
   --brand-accent-hover: #0052cc;
   --brand-cobalt: #0066ff;
   --brand-cobaltdeep: #0052cc;
   --brand-strip: #141414;
   --brand-success: #00875a;
-  --brand-warning: #ffab00;
+  --brand-warning: #e28e00;
 
-  /* Geometri & Sudut Lengkung Standar */
-  --radius-sm: 16px;
-  --radius-md: 24px;
-  --radius-lg: 32px;
-  --radius-xl: 48px;
-  --radius-card: 24px;
-  --radius-field: 16px;
-  --radius-media: 18px;
+  /* Geometri & Sudut Lengkung Standar — Refined Architectural Scale (Anti-Bubbly) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-card: 14px;
+  --radius-field: 10px;
+  --radius-media: 12px;
   --radius-full: 9999px;
 
   /* Elevasi Bayangan Berwarna Netral (Tinted Shadows) */
   --shadow-whisper: 0 1px 3px rgba(20, 20, 20, 0.04);
-  --shadow-nav: 0 1px 10px rgba(20, 20, 20, 0.05);
-  --shadow-floating: 0 8px 24px rgba(20, 20, 20, 0.08);
+  --shadow-nav: 0 1px 8px rgba(20, 20, 20, 0.04);
+  --shadow-floating: 0 8px 24px rgba(20, 20, 20, 0.06);
 }
 
 /* Explicit class-based dark mode only if .dark class is added to html */
@@ -121,5 +121,269 @@ button:active:not(:disabled),
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================================
+   ShelfStack Premium Toast Notifications (Solid Opaque, Zero-Blur, High-Contrast)
+   Standards: Tier-1 E-commerce / Modern Luxury SaaS (Vercel / Sonner / Stripe standard)
+   ========================================================================= */
+.p-toast {
+  width: 24rem;
+  max-width: calc(100vw - 32px);
+  z-index: 99999 !important;
+  font-family: var(--font-body);
+}
+
+.p-toast .p-toast-message {
+  margin: 0 0 12px 0;
+  border-radius: 16px !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+  background-color: #ffffff !important;
+  box-shadow:
+    0 12px 28px -4px rgba(15, 23, 42, 0.14),
+    0 4px 10px -2px rgba(15, 23, 42, 0.06),
+    0 0 0 1px rgba(15, 23, 42, 0.06) !important;
+  overflow: hidden;
+  position: relative;
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.p-toast .p-toast-message:hover {
+  box-shadow:
+    0 20px 35px -6px rgba(15, 23, 42, 0.18),
+    0 6px 14px -3px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Inner content layout */
+.p-toast .p-toast-message-content {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+}
+
+/* Message icon pill container */
+.p-toast .p-toast-message-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  border-radius: 9999px !important;
+  font-size: 15px !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+.p-toast .p-toast-message-icon svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Text block */
+.p-toast .p-toast-message-text {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  margin: 0 !important;
+  padding-top: 1px !important;
+  min-width: 0 !important;
+}
+
+/* Summary / Title */
+.p-toast .p-toast-summary {
+  font-family: var(--font-display) !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.015em !important;
+  word-break: break-word !important;
+}
+
+/* Detail / Body text */
+.p-toast .p-toast-detail {
+  font-family: var(--font-body) !important;
+  font-size: 12px !important;
+  font-weight: 450 !important;
+  color: #475569 !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+  word-break: break-word !important;
+}
+
+/* Close action button */
+.p-toast .p-toast-close-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  border-radius: 9999px !important;
+  background: transparent !important;
+  border: none !important;
+  color: #94a3b8 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  margin: -2px -4px 0 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+.p-toast .p-toast-close-button:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.p-toast .p-toast-close-button svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* --- Severity: Success (Solid Emerald Accent) --- */
+.p-toast .p-toast-message-success {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-left: 5px solid #10b981 !important;
+}
+
+.p-toast .p-toast-message-success .p-toast-message-icon {
+  background-color: #ecfdf5 !important;
+  color: #059669 !important;
+  border: 1px solid #a7f3d0 !important;
+}
+
+/* --- Severity: Error (Solid Rose/Red Accent) --- */
+.p-toast .p-toast-message-error {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-left: 5px solid #ef4444 !important;
+}
+
+.p-toast .p-toast-message-error .p-toast-message-icon {
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+}
+
+/* --- Severity: Info (Solid Brand Blue Accent) --- */
+.p-toast .p-toast-message-info {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-left: 5px solid #0066ff !important;
+}
+
+.p-toast .p-toast-message-info .p-toast-message-icon {
+  background-color: #eff6ff !important;
+  color: #0066ff !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+/* --- Severity: Warn (Solid Amber Accent) --- */
+.p-toast .p-toast-message-warn {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-left: 5px solid #f59e0b !important;
+}
+
+.p-toast .p-toast-message-warn .p-toast-message-icon {
+  background-color: #fffbeb !important;
+  color: #d97706 !important;
+  border: 1px solid #fde68a !important;
+}
+
+/* --- Dark Mode Support --- */
+.dark .p-toast .p-toast-message {
+  background-color: #141416 !important;
+  box-shadow:
+    0 16px 32px -4px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .p-toast .p-toast-summary {
+  color: #f8fafc !important;
+}
+
+.dark .p-toast .p-toast-detail {
+  color: #cbd5e1 !important;
+}
+
+.dark .p-toast .p-toast-close-button {
+  color: #64748b !important;
+}
+
+.dark .p-toast .p-toast-close-button:hover {
+  background-color: #27272a !important;
+  color: #f8fafc !important;
+}
+
+.dark .p-toast .p-toast-message-success {
+  border-color: #27272a !important;
+  border-left: 5px solid #10b981 !important;
+}
+
+.dark .p-toast .p-toast-message-success .p-toast-message-icon {
+  background-color: rgba(16, 185, 129, 0.14) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+.dark .p-toast .p-toast-message-error {
+  border-color: #27272a !important;
+  border-left: 5px solid #ef4444 !important;
+}
+
+.dark .p-toast .p-toast-message-error .p-toast-message-icon {
+  background-color: rgba(239, 68, 68, 0.14) !important;
+  color: #f87171 !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+.dark .p-toast .p-toast-message-info {
+  border-color: #27272a !important;
+  border-left: 5px solid #3b82f6 !important;
+}
+
+.dark .p-toast .p-toast-message-info .p-toast-message-icon {
+  background-color: rgba(59, 130, 246, 0.14) !important;
+  color: #60a5fa !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+.dark .p-toast .p-toast-message-warn {
+  border-color: #27272a !important;
+  border-left: 5px solid #f59e0b !important;
+}
+
+.dark .p-toast .p-toast-message-warn .p-toast-message-icon {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 640px) {
+  .p-toast {
+    width: calc(100vw - 32px) !important;
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 16px !important;
+    margin: 0 auto !important;
   }
 }

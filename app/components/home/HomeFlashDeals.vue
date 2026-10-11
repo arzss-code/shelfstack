@@ -1,124 +1,316 @@
 <script setup lang="ts">
-// Flash deals mockup data (statis saat ini, siap dihubungkan ke backend database)
-const flashDeals = [
+import type { Product } from '~/types/product'
+import { formatRupiah } from '~/utils/format'
+import { calculateCountdownUntil, type CountdownTime } from '~/utils/countdown'
+import { useProductStore } from '~/features/products/stores/product'
+
+const props = withDefaults(
+  defineProps<{
+    products?: Product[]
+    loading?: boolean
+    /**
+     * Waktu berakhir promo resmi yang ditentukan oleh database atau campaign.
+     * Jika null/undefined, timer TIDAK AKAN ditampilkan untuk mencegah urgensi palsu.
+     */
+    promoEndsAt?: string | Date | null
+  }>(),
   {
-    id: 'deal-1',
-    name: 'Headphone Nirkabel Studio ANC',
-    category: 'Audio',
-    discount: 'HEMAT 20%',
-    rating: '4.9',
-    reviews: '320',
-    price: 2790000,
-    originalPrice: 3490000,
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAynKifeGh812agpR-N5vrbzYrObnMBGBpKqOt5BuB8nzQSr3hRM2QiC8Es4mJ6TZryn6kp3D-34nzApSaNKo6bZiB1f6-2uwYTAANz5M1-ozj1kzcmJc4MPgN0GOYc-xyMkK-fmzpQWwrqxTtJ2DgOso0KwutBsnXS4ij7LnjLtCruiTCVDHWkH-Wj2tQ5i-SDX1dj3rI3HRyzpGuAkJFRvs8Ssem43I8fz-D6nOJbVH8zBxp0Hs7I',
+    products: undefined,
+    loading: undefined,
+    promoEndsAt: null,
   },
-  {
-    id: 'deal-2',
-    name: 'Teko Leher Angsa Presisi Matte',
-    category: 'Dapur',
-    discount: 'HEMAT 15%',
-    rating: '4.8',
-    reviews: '194',
-    price: 1390000,
-    originalPrice: 1650000,
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAlVHdoo0TBYH_29rzh60ZaJN1zAp3FM5XY4LsF_uNFymSb0KJeLCCj39PwJuAOs0hWip88VsrQrMxHOYqDiy1DFtpIPoN8S1wcV33KEpPivlgegL1rCYjxgfVfYEGvufmoAzyXKuW42Jg9tjaU4rxf4PETHL2D2nquOW83Mch-6pil3L49VlyYuf1L1HXHO5f0o7iRYqG750DfVR0svuzT0Ad2czpMhRObhAtfeWjLbf7hROElsBRl',
+)
+
+let productStore: ReturnType<typeof useProductStore> | null = null
+try {
+  productStore = useProductStore()
+} catch {
+  productStore = null
+}
+
+const countdownData = ref<CountdownTime | null>(
+  props.promoEndsAt ? calculateCountdownUntil(props.promoEndsAt) : null,
+)
+let timerInterval: ReturnType<typeof setInterval> | null = null
+
+const updateCountdown = () => {
+  if (props.promoEndsAt) {
+    countdownData.value = calculateCountdownUntil(props.promoEndsAt)
+  } else {
+    countdownData.value = null
+  }
+}
+
+onMounted(() => {
+  updateCountdown()
+  if (props.promoEndsAt) {
+    timerInterval = setInterval(updateCountdown, 1000)
+  }
+})
+
+watch(
+  () => props.promoEndsAt,
+  (newVal) => {
+    if (timerInterval) {
+      clearInterval(timerInterval)
+      timerInterval = null
+    }
+    updateCountdown()
+    if (newVal) {
+      timerInterval = setInterval(updateCountdown, 1000)
+    }
   },
-  {
-    id: 'deal-3',
-    name: 'Tas Ransel Komuter Tahan Air',
-    category: 'Aksesoris',
-    discount: 'HEMAT 25%',
-    rating: '5.0',
-    reviews: '142',
-    price: 2150000,
-    originalPrice: 2850000,
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCadIIQO11giIAUD132e7ZegJ34KKp0iYv606GF2tsBOjKa0pr_kzvpQNQn7xyuWLhuceoyYjmGzTQBfSqWlR3LKlXZ3LWlitc_jnvtlV6UWKNjOftbu32cotcD4v-MfNIBqAeY1-CvkM53Q86F-kLP-8jxcmrcJO5PWZQ15FpNfLMpX8ElpBV85rYw9rG7OkCXFjbPCb9O3szD7-mk3ZCDsQKHPojIrXgxR3E_-89VhZ_vYXSgVJLD',
-  },
-  {
-    id: 'deal-4',
-    name: 'Pena Presisi Titanium & Kuningan',
-    category: 'Alat Tulis',
-    discount: 'HEMAT 30%',
-    rating: '4.8',
-    reviews: '96',
-    price: 720000,
-    originalPrice: 1050000,
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCtGtrTCVBPJytnec8yoiKZ2iY9yzFgcAGMVbDl8vffvV6ZEoNZFfgeDAQvYGDQ9PHSAAxfVK2j8hKUAZ8b8VxmoAnLrSjVNR8ihTPjQ6pP4gUAImGZd2tG7Lzf12mjzZ9daMM6X8wl7uLjiCTNo0sgJqsJX1aqeuE6NGKVIOcdjxjMbFEaL7kqquFVa0SMIXQWDpPCysw4-xUBBBhXrgB7_alEgVQ5G1N_PIViWD7Wd3vqGT2JE6cr',
-  },
-]
+)
+
+onUnmounted(() => {
+  if (timerInterval) {
+    clearInterval(timerInterval)
+    timerInterval = null
+  }
+})
+
+const isLoading = computed(() => {
+  if (props.loading !== undefined) return props.loading
+  return productStore?.loading ?? false
+})
+
+const displayProducts = computed<Product[]>(() => {
+  if (props.products) {
+    return props.products.slice(0, 4)
+  }
+
+  const source = productStore?.products ?? []
+  if (!source || source.length === 0) return []
+
+  const activeProducts = source.filter((p) => !p.deleted_at)
+
+  // Prioritaskan produk featured atau stok tersedia saat membaca dari store
+  const featured = activeProducts.filter((p) => p.is_featured && p.stock > 0)
+  if (featured.length >= 4) {
+    return featured.slice(0, 4)
+  }
+
+  const inStock = activeProducts.filter((p) => p.stock > 0)
+  if (inStock.length > 0) {
+    return inStock.slice(0, 4)
+  }
+
+  return activeProducts.slice(0, 4)
+})
+
+const getProductBadge = (product: Product): string => {
+  if (product.stock === 0) {
+    return 'Habis'
+  }
+  if (product.stock > 0 && product.stock <= 3) {
+    return `Sisa ${product.stock}`
+  }
+  if (product.is_featured) {
+    return 'Pilihan Unggulan'
+  }
+  if ((product.sold_count ?? 0) >= 30) {
+    return 'Terlaris'
+  }
+  return 'Kurasi Pilihan'
+}
+
+const failedDealImages = ref<Record<number, boolean>>({})
+
+const onImageError = (productId: number) => {
+  failedDealImages.value[productId] = true
+}
+
+const flashSectionRef = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  if (flashSectionRef.value) {
+    const imgs = flashSectionRef.value.querySelectorAll('img[data-product-id]')
+    imgs.forEach((img) => {
+      const htmlImg = img as HTMLImageElement
+      if (htmlImg.complete && htmlImg.naturalWidth === 0) {
+        const id = htmlImg.getAttribute('data-product-id')
+        if (id) {
+          failedDealImages.value[Number(id)] = true
+        }
+      }
+    })
+  }
+})
 </script>
 
 <template>
-  <section class="w-full bg-brand-ink text-white rounded-card p-6 sm:p-10 shadow-floating">
+  <section
+    ref="flashSectionRef"
+    class="w-full bg-brand-ink text-white rounded-card p-6 sm:p-10 shadow-floating"
+  >
     <div
       class="flex flex-col lg:flex-row lg:items-center justify-between pb-8 gap-4 border-b border-white/10"
     >
       <div>
         <div class="flex items-center gap-2 mb-1.5 text-brand-accent">
           <i class="pi pi-bolt text-base" />
-          <span class="text-xs font-bold tracking-wide uppercase">Penawaran Spesial Hari Ini</span>
+          <span class="text-xs font-bold tracking-wide uppercase">Penawaran Pilihan Toko</span>
         </div>
         <h2 class="font-display text-2xl sm:text-3xl font-bold text-white m-0">
-          Penawaran Terbatas
+          Koleksi Pilihan Terbatas
         </h2>
         <p class="text-xs sm:text-sm text-white/70 m-0 mt-1">
-          Potongan harga eksklusif untuk produk pilihan dengan alokasi stok terbatas.
+          Koleksi kurasi produk unggulan dengan harga langsung dari katalog resmi ShelfStack.
         </p>
       </div>
 
-      <!-- Countdown Unit -->
+      <!-- Countdown HANYA TAMPIL jika ada promoEndsAt nyata dari data backend -->
       <div
+        v-if="countdownData"
         class="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-card border border-white/10 shrink-0"
       >
         <span class="text-xs text-white/70">Berakhir dalam</span>
-        <span class="text-base font-bold text-white tracking-widest">07 : 42 : 08</span>
+        <span
+          data-testid="flash-deals-timer"
+          class="text-base font-bold text-white tracking-widest font-mono"
+        >
+          {{ countdownData.formatted }}
+        </span>
+      </div>
+
+      <!-- Badge Kurasi Jujur jika tidak ada timer promo data-driven (anti fake urgency) -->
+      <div
+        v-else
+        data-testid="flash-deals-curated-badge"
+        class="flex items-center gap-2 bg-white/10 px-3.5 py-2 rounded-card border border-white/10 shrink-0 text-white/90 text-xs font-medium"
+      >
+        <i class="pi pi-verified text-brand-accent text-sm" />
+        <span>Koleksi Pilihan Resmi</span>
       </div>
     </div>
 
-    <!-- 4 Deal Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-8">
+    <!-- Loading Skeleton Grid -->
+    <div
+      v-if="isLoading"
+      data-testid="flash-deals-skeleton"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-8 animate-pulse"
+    >
       <div
-        v-for="deal in flashDeals"
-        :key="deal.id"
-        class="bg-white text-brand-ink rounded-card p-4 flex flex-col justify-between gap-3 shadow-whisper"
+        v-for="i in 4"
+        :key="i"
+        class="bg-white/10 rounded-card p-4 flex flex-col justify-between gap-3 border border-white/5"
+      >
+        <div class="aspect-square rounded-media bg-white/20 w-full" />
+        <div class="space-y-2 mt-2">
+          <div class="h-3 bg-white/20 rounded w-1/3" />
+          <div class="h-4 bg-white/30 rounded w-3/4" />
+          <div class="h-4 bg-white/20 rounded w-1/2" />
+        </div>
+        <div class="h-9 bg-white/20 rounded-full w-full mt-2" />
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div
+      v-else-if="displayProducts.length === 0"
+      data-testid="flash-deals-empty"
+      class="pt-8 pb-4 text-center flex flex-col items-center justify-center py-10"
+    >
+      <div
+        class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-brand-accent mb-3"
+      >
+        <i class="pi pi-bolt text-xl" />
+      </div>
+      <h3 class="font-display text-lg font-bold text-white m-0">Penawaran Spesial Segera Hadir</h3>
+      <p class="text-xs sm:text-sm text-white/70 max-w-md m-0 mt-1">
+        Saat ini penawaran terbatas sedang dipersiapkan. Pantau terus halaman ini untuk alokasi
+        produk pilihan berikutnya.
+      </p>
+      <NuxtLink
+        to="/katalog"
+        class="mt-4 inline-flex items-center gap-2 bg-brand-accent hover:bg-brand-accent-hover text-white text-xs font-semibold px-5 py-2.5 rounded-full no-underline transition-colors shadow-whisper"
+      >
+        <span>Jelajahi Semua Produk</span>
+        <i class="pi pi-arrow-right text-xs" />
+      </NuxtLink>
+    </div>
+
+    <!-- Real Deal Cards Grid -->
+    <div
+      v-else
+      data-testid="flash-deals-grid"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-8"
+    >
+      <div
+        v-for="product in displayProducts"
+        :key="product.id"
+        class="bg-white text-brand-ink rounded-card p-4 flex flex-col justify-between gap-3 shadow-whisper group"
+        data-testid="flash-deal-card"
       >
         <div
-          class="relative aspect-square rounded-media overflow-hidden bg-brand-canvas-soft border border-brand-hair"
+          class="relative aspect-square rounded-media overflow-hidden bg-brand-canvas-soft border border-brand-hair flex items-center justify-center"
         >
-          <img :src="deal.image" :alt="deal.name" class="w-full h-full object-cover" />
-          <span
-            class="absolute top-2 left-2 bg-brand-accent text-white text-[10px] font-bold px-2 py-0.5 rounded-full"
+          <img
+            v-if="product.image_url && !failedDealImages[product.id]"
+            :src="product.image_url"
+            :alt="product.name"
+            :data-product-id="product.id"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            @error="onImageError(product.id)"
+          />
+          <div
+            v-else
+            class="flex flex-col items-center justify-center w-full h-full text-slate-400 gap-1.5 bg-[#f4f4f6]"
           >
-            {{ deal.discount }}
+            <i class="pi pi-image text-2xl opacity-25" />
+            <span class="text-[10px] font-semibold tracking-widest uppercase opacity-40"
+              >ShelfStack</span
+            >
+          </div>
+          <span
+            data-testid="deal-badge"
+            class="absolute top-2 left-2 bg-brand-ink text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm"
+          >
+            {{ getProductBadge(product) }}
           </span>
         </div>
 
         <div>
-          <div class="flex items-center gap-1 text-[11px] text-brand-muted mb-1">
-            <i class="pi pi-star-fill text-[10px] text-brand-warning" />
-            <span class="font-bold text-brand-ink">{{ deal.rating }}</span>
-            <span>({{ deal.reviews }})</span>
+          <!-- Hanya tampilkan rating jika data rating nyata > 0 -->
+          <div
+            v-if="product.rating && Number(product.rating) > 0"
+            class="flex items-center gap-1 text-[11px] text-brand-muted mb-1"
+          >
+            <i class="pi pi-star-fill text-[10px] text-amber-500" />
+            <span class="font-bold text-brand-ink">{{ Number(product.rating).toFixed(1) }}</span>
+            <span v-if="product.review_count">({{ product.review_count }})</span>
+            <span v-else-if="product.sold_count">· {{ product.sold_count }} terjual</span>
           </div>
-          <h4 class="font-display text-sm font-bold text-brand-ink m-0 line-clamp-1">
-            {{ deal.name }}
+          <!-- Jika tidak ada rating terverifikasi, tampilkan ketersediaan stok fisik -->
+          <div v-else class="flex items-center gap-1 text-[11px] text-brand-muted mb-1">
+            <span
+              v-if="product.stock > 0"
+              class="text-emerald-600 font-medium flex items-center gap-1"
+            >
+              <i class="pi pi-check-circle text-[10px]" />
+              Stok Tersedia
+            </span>
+            <span v-else class="text-rose-600 font-medium">Stok Habis</span>
+          </div>
+
+          <h4
+            class="font-display text-sm font-bold text-brand-ink m-0 line-clamp-1"
+            :title="product.name"
+          >
+            {{ product.name }}
           </h4>
           <div class="flex items-baseline gap-2 mt-1.5">
-            <span class="text-base font-bold text-brand-ink"
-              >Rp {{ deal.price.toLocaleString('id-ID') }}</span
-            >
-            <span class="text-xs text-brand-faint line-through"
-              >Rp {{ deal.originalPrice.toLocaleString('id-ID') }}</span
-            >
+            <span data-testid="deal-price" class="text-base font-bold text-brand-ink">
+              {{ formatRupiah(product.price) }}
+            </span>
           </div>
         </div>
 
         <NuxtLink
-          to="/katalog"
-          class="w-full bg-brand-accent hover:bg-brand-accent-hover text-white text-xs font-semibold py-2.5 rounded-full text-center no-underline transition-colors shadow-whisper"
+          :to="`/product/${product.id}`"
+          data-testid="deal-link"
+          class="w-full bg-brand-ink hover:bg-black text-white text-xs font-semibold py-2.5 rounded-full text-center no-underline transition-colors shadow-whisper inline-block"
         >
           Lihat Produk
         </NuxtLink>

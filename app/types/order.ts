@@ -34,6 +34,8 @@ export interface Order {
   payment_type?: string | null
   midtrans_id?: string | null
   paid_at?: string | null
+  cancelled_at?: string | null
+  cancellation_reason?: string | null
   created_at: string
   updated_at?: string | null
   items?: OrderItem[]

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useCartStore } from '~/features/cart/stores/cart'
-import { checkoutAddressSchema } from '../../shared/schemas/order'
+import { checkoutAddressSchema } from '~~/shared/schemas/order'
 import { formatRupiah } from '~/utils/format'
 import { useToast } from 'primevue/usetoast'
 import { useMidtransSnap } from '~/composables/useMidtransSnap'
+import { useAddresses } from '~/composables/useAddresses'
+import type { UserAddress } from '~~/shared/schemas/address'
+import SavedAddressSelector from '~/components/checkout/SavedAddressSelector.vue'
 
 const { user, profile } = useAuth()
 const cartStore = useCartStore()
@@ -15,7 +18,8 @@ const { pay: openSnapModal } = useMidtransSnap()
 
 useSeoMeta({
   title: 'Checkout & Pembayaran — ShelfStack',
-  description: 'Selesaikan pemesanan produk pilihan Anda dengan aman melalui Midtrans Sandbox.',
+  description:
+    'Selesaikan pemesanan produk pilihan Anda dengan aman melalui gateway resmi Midtrans.',
 })
 
 const address = ref({
@@ -40,6 +44,42 @@ watch(
 const errors = ref<Record<string, string>>({})
 const isSubmitting = ref(false)
 const generalError = ref('')
+const checkoutIdempotencyKey = ref<string>('')
+
+const { saveAddress } = useAddresses()
+const selectedSavedAddressId = ref<string | null>(null)
+const saveAddressForNextOrder = ref(false)
+
+const handleSelectSavedAddress = (saved: UserAddress) => {
+  selectedSavedAddressId.value = saved.id
+  address.value.name = saved.name
+  address.value.phone = saved.phone
+  address.value.street = saved.street
+  address.value.city = saved.city
+  address.value.postal = saved.postal
+  address.value.note = saved.note || ''
+  errors.value = {}
+}
+
+const getOrCreateCheckoutKey = () => {
+  if (!checkoutIdempotencyKey.value) {
+    checkoutIdempotencyKey.value =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `chk-${Date.now()}-${Math.random().toString(36).slice(2)}`
+  }
+  return checkoutIdempotencyKey.value
+}
+
+// Reset Idempotency-Key jika user memodifikasi isi keranjang atau rincian alamat
+// sehingga checkout baru yang disengaja memiliki kunci baru dan terhindar dari conflict 409
+watch(
+  [() => cartStore.items, address],
+  () => {
+    checkoutIdempotencyKey.value = ''
+  },
+  { deep: true },
+)
 
 const validateForm = () => {
   errors.value = {}
@@ -92,15 +132,40 @@ const handleCreateOrder = async () => {
       },
     }
 
+    // Gunakan Idempotency-Key persisten per logical attempt untuk mencegah order ganda
+    const idempotencyKey = getOrCreateCheckoutKey()
+
     const response = await $fetch<{ status: string; data: { order_id: string } }>('/api/orders', {
       method: 'POST',
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
       body: orderPayload,
     })
 
     const orderId = response.data.order_id
 
+    // Reset key setelah logical checkout berhasil dibuat
+    checkoutIdempotencyKey.value = ''
+
     // Kosongkan keranjang belanja
     cartStore.clearCart()
+
+    // Simpan alamat jika opsi "Simpan alamat ini untuk pesanan berikutnya" dicentang
+    if (saveAddressForNextOrder.value && user.value) {
+      try {
+        await saveAddress({
+          name: address.value.name.trim(),
+          phone: address.value.phone.trim(),
+          street: address.value.street.trim(),
+          city: address.value.city.trim(),
+          postal: address.value.postal.trim(),
+          note: address.value.note ? address.value.note.trim() : undefined,
+        })
+      } catch (saveErr) {
+        console.warn('[Checkout] Gagal menyimpan alamat ke daftar tersimpan:', saveErr)
+      }
+    }
 
     // 2. Jika Midtrans Sandbox aktif, minta token Snap dan buka modal pembayaran
     if (config.public.enableMidtransSandbox) {
@@ -265,6 +330,14 @@ const handleCreateOrder = async () => {
             </h2>
           </div>
 
+          <!-- Saved Address Selector if User is Logged In -->
+          <div v-if="user" class="pb-4 border-b border-brand-hairsoft">
+            <SavedAddressSelector
+              :selected-id="selectedSavedAddressId"
+              @select="handleSelectSavedAddress"
+            />
+          </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Nama Penerima -->
             <div class="space-y-1">
@@ -276,9 +349,6 @@ const handleCreateOrder = async () => {
                 placeholder="cth. Arya Santoso"
                 :error="errors.name"
               />
-              <span v-if="errors.name" class="text-[11px] text-red-600 block">{{
-                errors.name
-              }}</span>
             </div>
 
             <!-- Nomor Telepon -->
@@ -291,9 +361,6 @@ const handleCreateOrder = async () => {
                 placeholder="cth. 081234567890"
                 :error="errors.phone"
               />
-              <span v-if="errors.phone" class="text-[11px] text-red-600 block">{{
-                errors.phone
-              }}</span>
             </div>
           </div>
 
@@ -308,9 +375,6 @@ const handleCreateOrder = async () => {
               placeholder="cth. Jl. Sudirman No. 42, RT 01/RW 04, Menteng"
               :error="errors.street"
             />
-            <span v-if="errors.street" class="text-[11px] text-red-600 block">{{
-              errors.street
-            }}</span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -324,9 +388,6 @@ const handleCreateOrder = async () => {
                 placeholder="cth. Jakarta Pusat"
                 :error="errors.city"
               />
-              <span v-if="errors.city" class="text-[11px] text-red-600 block">{{
-                errors.city
-              }}</span>
             </div>
 
             <!-- Kode Pos -->
@@ -335,9 +396,6 @@ const handleCreateOrder = async () => {
                 Kode Pos <span class="text-red-500">*</span>
               </label>
               <UiInput v-model="address.postal" placeholder="cth. 10220" :error="errors.postal" />
-              <span v-if="errors.postal" class="text-[11px] text-red-600 block">{{
-                errors.postal
-              }}</span>
             </div>
           </div>
 
@@ -351,7 +409,22 @@ const handleCreateOrder = async () => {
               placeholder="cth. Titipkan ke satpam jika penerima tidak ada di tempat"
               :error="errors.note"
             />
-            <span v-if="errors.note" class="text-[11px] text-red-600 block">{{ errors.note }}</span>
+          </div>
+
+          <!-- Option Checkbox: Simpan alamat ini untuk pesanan berikutnya -->
+          <div v-if="user" class="flex items-center gap-2 pt-3 border-t border-brand-hairsoft">
+            <input
+              id="save_address_checkbox"
+              v-model="saveAddressForNextOrder"
+              type="checkbox"
+              class="rounded border-zinc-300 text-brand-accent focus:ring-brand-accent w-4 h-4 cursor-pointer"
+            />
+            <label
+              for="save_address_checkbox"
+              class="text-xs text-brand-ink font-medium cursor-pointer select-none"
+            >
+              Simpan alamat ini untuk pesanan berikutnya
+            </label>
           </div>
         </div>
 
@@ -368,11 +441,21 @@ const handleCreateOrder = async () => {
             <i class="pi pi-check-circle text-brand-accent text-lg mt-0.5" />
             <div>
               <p class="font-display font-bold text-xs text-brand-ink m-0">
-                Midtrans Snap Sandbox Gateway
+                {{
+                  config.public.enableMidtransSandbox
+                    ? 'Simulasi Pembayaran Midtrans Snap (Sandbox)'
+                    : 'Midtrans Snap Payment Gateway'
+                }}
               </p>
               <p class="text-[11px] text-brand-muted m-0 mt-0.5 leading-relaxed">
-                Mendukung QRIS, GoPay, ShopeePay, serta Virtual Account Bank Mandiri, BCA, BNI, dan
-                BRI di lingkungan simulasi Sandbox.
+                <template v-if="config.public.enableMidtransSandbox">
+                  Mode simulasi sandbox aktif untuk pengujian. Mendukung simulasi QRIS, GoPay, dan
+                  Virtual Account tanpa memotong saldo nyata.
+                </template>
+                <template v-else>
+                  Mendukung transaksi aman QRIS, GoPay, ShopeePay, serta Virtual Account Bank
+                  Mandiri, BCA, BNI, dan BRI.
+                </template>
               </p>
             </div>
           </div>
@@ -381,23 +464,21 @@ const handleCreateOrder = async () => {
 
       <!-- Right Column: Order Summary & Pay Action -->
       <aside
-        class="lg:col-span-5 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.05)] space-y-5 sticky top-28"
+        class="lg:col-span-5 bg-white dark:bg-[#18191b] border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-28"
       >
-        <div
-          class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800"
-        >
-          <h2 class="font-display text-base font-bold text-slate-900 dark:text-white m-0">
+        <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
+          <h2 class="font-display text-base font-bold text-brand-ink dark:text-white m-0">
             Item Pesanan
           </h2>
           <span
-            class="text-xs font-semibold text-blue-600 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full"
+            class="text-xs font-semibold text-brand-ink dark:text-zinc-200 bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full"
           >
             {{ cartStore.totalItems }} item
           </span>
         </div>
 
         <!-- Items Preview Scrollable -->
-        <div class="max-h-64 overflow-y-auto divide-y divide-slate-100 dark:divide-zinc-800 pr-1">
+        <div class="max-h-64 overflow-y-auto divide-y divide-brand-hairsoft pr-1">
           <div
             v-for="item in cartStore.items"
             :key="`${item.productId}-${item.color}-${item.material}`"
@@ -405,7 +486,7 @@ const handleCreateOrder = async () => {
           >
             <div class="flex items-center gap-3 min-w-0">
               <div
-                class="w-12 h-12 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700/60 overflow-hidden shrink-0 flex items-center justify-center"
+                class="w-12 h-12 rounded-lg bg-brand-field dark:bg-zinc-800 border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center"
               >
                 <img
                   v-if="item.imageUrl"
@@ -413,18 +494,18 @@ const handleCreateOrder = async () => {
                   :alt="item.name"
                   class="w-full h-full object-cover"
                 />
-                <i v-else class="pi pi-image text-slate-300 text-sm" />
+                <i v-else class="pi pi-image text-brand-faint text-sm" />
               </div>
               <div class="min-w-0">
-                <p class="font-semibold text-slate-900 dark:text-white m-0 truncate">
+                <p class="font-semibold text-brand-ink dark:text-white m-0 truncate">
                   {{ item.name }}
                 </p>
-                <p class="text-[10.5px] text-slate-500 dark:text-zinc-400 m-0">
+                <p class="text-[10.5px] text-brand-muted dark:text-zinc-400 m-0">
                   {{ item.quantity }}x @ {{ formatRupiah(item.price) }}
                 </p>
               </div>
             </div>
-            <span class="font-bold text-slate-900 dark:text-white tabular-nums shrink-0">
+            <span class="font-bold text-brand-ink dark:text-white tabular-nums shrink-0">
               {{ formatRupiah(item.price * item.quantity) }}
             </span>
           </div>
@@ -432,11 +513,11 @@ const handleCreateOrder = async () => {
 
         <!-- Bill Details -->
         <div
-          class="pt-4 border-t border-slate-100 dark:border-zinc-800 space-y-2.5 text-xs text-slate-600 dark:text-zinc-400"
+          class="pt-4 border-t border-brand-hairsoft space-y-2.5 text-xs text-brand-muted dark:text-zinc-400"
         >
           <div class="flex items-center justify-between">
             <span>Subtotal Produk</span>
-            <span class="font-semibold text-slate-900 dark:text-white tabular-nums">
+            <span class="font-semibold text-brand-ink dark:text-white tabular-nums">
               {{ cartStore.formattedTotalPrice }}
             </span>
           </div>
@@ -446,16 +527,14 @@ const handleCreateOrder = async () => {
           </div>
           <div class="flex items-center justify-between">
             <span>Pajak PPN (11%)</span>
-            <span class="font-semibold text-slate-900 dark:text-white">Termasuk</span>
+            <span class="font-semibold text-brand-ink dark:text-white">Termasuk</span>
           </div>
-          <div
-            class="pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between"
-          >
-            <span class="font-display font-bold text-sm text-slate-900 dark:text-white"
+          <div class="pt-3 border-t border-brand-hairsoft flex items-center justify-between">
+            <span class="font-display font-bold text-sm text-brand-ink dark:text-white"
               >Total Tagihan</span
             >
             <span
-              class="font-display text-xl font-bold text-slate-900 dark:text-white tabular-nums"
+              class="font-display text-xl font-bold text-brand-ink dark:text-white tabular-nums"
             >
               {{ cartStore.formattedTotalPrice }}
             </span>
@@ -466,7 +545,7 @@ const handleCreateOrder = async () => {
         <UiButton
           variant="primary"
           size="md"
-          class="w-full justify-center text-xs font-semibold py-3 rounded-xl shadow-sm"
+          class="w-full justify-center text-xs font-semibold py-3 rounded-full shadow-whisper"
           icon="pi-lock"
           :loading="isSubmitting"
           :disabled="isSubmitting"
@@ -475,7 +554,7 @@ const handleCreateOrder = async () => {
           {{ isSubmitting ? 'Memproses Pesanan...' : 'Bayar Sekarang' }}
         </UiButton>
 
-        <p class="text-[10.5px] text-center text-slate-400 dark:text-zinc-500 m-0">
+        <p class="text-[10.5px] text-center text-brand-muted dark:text-zinc-500 m-0">
           Transaksi aman terlindungi enkripsi Midtrans Payment Gateway.
         </p>
       </aside>

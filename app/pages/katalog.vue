@@ -150,7 +150,18 @@ const selectCategory = (catId: string) => {
   syncQuery()
 }
 
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
+onUnmounted(() => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+  }
+})
+
 const clearSearch = () => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+  }
   searchQuery.value = ''
   currentPage.value = 1
   syncQuery()
@@ -159,7 +170,12 @@ const clearSearch = () => {
 const handleSearchUpdate = (val: string) => {
   searchQuery.value = val
   currentPage.value = 1
-  syncQuery()
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+  }
+  searchDebounceTimer = setTimeout(() => {
+    syncQuery()
+  }, 300)
 }
 
 const handleSortUpdate = (val: string) => {

@@ -8,7 +8,7 @@ useHead({
 
 <template>
   <div>
-    <Toast position="bottom-left" />
+    <Toast position="bottom-right" />
     <ConfirmDialog />
     <NuxtRouteAnnouncer />
     <NuxtLayout>

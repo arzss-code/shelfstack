@@ -24,6 +24,8 @@ const supabase = useSupabaseClient<Database>()
 
 const activeStatus = ref<string>((route.query.status as string) || '')
 const searchQuery = ref('')
+const fromDate = ref('')
+const toDate = ref('')
 const page = ref(1)
 const pageSize = 15
 
@@ -86,6 +88,8 @@ const handleExportCsv = async () => {
     const params: Record<string, string> = {}
     if (activeStatus.value) params.status = activeStatus.value
     if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
+    if (fromDate.value) params.from = fromDate.value
+    if (toDate.value) params.to = toDate.value
 
     const res = await $fetch<string>('/api/admin/orders/export', { params, responseType: 'text' })
     const blob = new Blob([res], { type: 'text/csv;charset=utf-8;' })
@@ -271,7 +275,7 @@ onUnmounted(async () => {
       </div>
 
       <!-- Search Input -->
-      <form class="flex items-center gap-2" @submit.prevent="onSearch">
+      <form class="flex flex-wrap items-center gap-2" @submit.prevent="onSearch">
         <div class="relative w-full sm:w-64">
           <i
             class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-muted"
@@ -283,6 +287,21 @@ onUnmounted(async () => {
             class="w-full rounded-full border border-brand-hair bg-brand-canvas py-1.5 pl-8 pr-3 text-xs text-brand-ink placeholder:text-brand-muted focus:border-brand-ink focus:outline-none"
           />
         </div>
+        <input
+          v-model="fromDate"
+          type="date"
+          aria-label="Tanggal mulai"
+          title="Tanggal mulai"
+          class="rounded-full border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs text-brand-ink focus:border-brand-ink focus:outline-none"
+        />
+        <span class="text-xs text-brand-muted">s.d.</span>
+        <input
+          v-model="toDate"
+          type="date"
+          aria-label="Tanggal akhir"
+          title="Tanggal akhir"
+          class="rounded-full border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs text-brand-ink focus:border-brand-ink focus:outline-none"
+        />
         <UiButton variant="secondary" size="sm" type="submit">Cari</UiButton>
       </form>
     </div>

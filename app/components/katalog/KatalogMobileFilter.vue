@@ -21,7 +21,7 @@ const emit = defineEmits<{
 <template>
   <div
     v-if="show"
-    class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 lg:hidden select-none"
+    class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 lg:hidden select-none"
     @click.self="emit('close')"
   >
     <div

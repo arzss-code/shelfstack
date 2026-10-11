@@ -10,6 +10,7 @@ const envSchema = z.object({
   SUPABASE_URL: z.string().url().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   MIDTRANS_SERVER_KEY: z.string().optional(),
+  INTERNAL_SERVICE_KEY: z.string().optional(),
   REDIS_URL: z.string().optional(),
 })
 

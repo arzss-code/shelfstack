@@ -204,8 +204,8 @@ end;
 $$;
 
 -- 7. Propagate Session Context in cancel_order (Order Cancellation Restock)
-create or replace function public.cancel_order(p_order_id uuid, p_reason text)
-returns text
+create or replace function public.cancel_order(p_order_id uuid, p_reason text default 'Dibatalkan oleh pelanggan')
+returns boolean
 language plpgsql
 security definer
 set search_path = public
@@ -263,7 +263,7 @@ begin
     updated_at = now()
   where id = p_order_id;
 
-  return 'Pesanan berhasil dibatalkan dan stok telah dikembalikan ke etalase.';
+  return true;
 end;
 $$;
 

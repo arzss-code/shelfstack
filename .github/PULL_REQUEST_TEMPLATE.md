@@ -5,19 +5,22 @@
 ---
 
 ## Deskripsi
-Melakukan *refactoring* pada entitas Produk untuk mematuhi standar *Feature-Sliced Design* dan arsitektur Nuxt/Vue best practices sesuai `SOP-CODING-REPO.md`.
+
+Melakukan _refactoring_ pada entitas Produk untuk mematuhi standar _Feature-Sliced Design_ dan arsitektur Nuxt/Vue best practices sesuai `SOP-CODING-REPO.md`.
 
 **Perubahan Utama:**
-1. **Repository Layer**: Memindahkan logika *query* Supabase (Fetch, Insert, Update, Delete) dari Pinia Store ke `app/repository/product.ts`.
+
+1. **Repository Layer**: Memindahkan logika _query_ Supabase (Fetch, Insert, Update, Delete) dari Pinia Store ke `app/repository/product.ts`.
 2. **Feature Isolation**: Memindahkan komponen UI spesifik produk dari `app/components/` ke `app/features/products/components/`.
 3. **Store Abstraction**: Memodifikasi `app/stores/product.ts` agar hanya mengelola state, sedangkan pengolahan data mendelegasikan tugas ke Repository.
 
 ## Referensi Tiket
-*Jira / Trello ID*: (Silakan isi jika ada)
+
+_Jira / Trello ID_: (Silakan isi jika ada)
 
 ## Syarat Sah Merge Request (Definition of Done)
 
-- [x] **No Merge Conflict**: Branch ini *up-to-date* dan siap digabung.
+- [x] **No Merge Conflict**: Branch ini _up-to-date_ dan siap digabung.
 - [ ] **Reviewer Approval**: (Menunggu persetujuan dari Tech Lead / Peer).
 - [x] **API Docs Updated**: Tidak ada perubahan struktur Endpoint/API yang terekspos (N/A).
 - [x] **Self-Tested**: Fungsionalitas UI telah dites secara lokal dan komponen berhasil dimuat dengan susunan direktori yang baru.
@@ -25,9 +28,9 @@ Melakukan *refactoring* pada entitas Produk untuk mematuhi standar *Feature-Slic
 ### Bukti Self-Tested (Screenshot)
 
 **1. Halaman Utama (Daftar Produk)**
-*(Komponen berhasil di-load dari folder features, meski saat ini terdapat error RLS dari Supabase lokal)*
+_(Komponen berhasil di-load dari folder features, meski saat ini terdapat error RLS dari Supabase lokal)_
 <!-- Silakan drag & drop screenshot halaman utama di sini -->
 
 **2. Modal Form Produk**
-*(Modal Form berhasil dibuka)*
+_(Modal Form berhasil dibuka)_
 <!-- Silakan drag & drop screenshot modal form di sini -->

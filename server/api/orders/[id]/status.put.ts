@@ -1,9 +1,6 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
-import {
-  isAllowedTransition,
-  type OrderStatus,
-} from '../../../../shared/constants/order-transitions'
+import type { OrderStatus } from '../../../../shared/constants/order-transitions'
 
 export default defineEventHandler(async (event) => {
   // Hanya administrator yang dapat memperbarui status pesanan secara manual
@@ -22,90 +19,67 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Status target wajib disertakan', null, 400)
   }
 
-  const client = await serverSupabaseClient<Database>(event)
-
-  // 1. Ambil status pesanan saat ini
-  const { data: currentOrder, error: fetchError } = await client
-    .from('orders')
-    .select('id, status, user_id, total_cents')
-    .eq('id', orderId)
-    .single()
-
-  if (fetchError || !currentOrder) {
-    return errorResponse(event, 'Pesanan tidak ditemukan', fetchError, 404)
+  const validStatuses: OrderStatus[] = [
+    'pending',
+    'paid',
+    'shipped',
+    'completed',
+    'cancelled',
+    'refunded',
+  ]
+  if (!validStatuses.includes(targetStatus)) {
+    return errorResponse(event, `Status target tidak valid: ${targetStatus}`, null, 400)
   }
 
-  // 2. Validasi transisi status hukum (legal transition state machine)
-  const currentStatus = currentOrder.status as OrderStatus
-  if (!isAllowedTransition(currentStatus, targetStatus)) {
-    return errorResponse(
-      event,
-      `Transisi status tidak diizinkan: ${currentStatus} -> ${targetStatus}`,
-      { current_status: currentStatus, target_status: targetStatus },
-      400,
-    )
-  }
+  // Task 07.4: Jalur admin terisolasi menggunakan service role setelah otorisasi requireAdmin lulus
+  const client = serverSupabaseServiceRole<Database>(event)
 
-  // 3. Jika target pembatalan ('cancelled'), delegasikan ke RPC atomik cancel_order (restock otomatis)
-  if (targetStatus === 'cancelled') {
-    const { error: cancelError } = await client.rpc('cancel_order', {
-      p_order_id: orderId,
-      p_reason: reason || 'Pesanan dibatalkan oleh Admin',
-    })
+  // Eksekusi transisi status atomik via database RPC transition_order_status
+  // RPC mengunci baris order dengan FOR UPDATE untuk mencegah TOCTOU race conditions
+  const { data, error: rpcError } = await client.rpc('transition_order_status', {
+    p_order_id: orderId,
+    p_target_status: targetStatus,
+    p_reason: reason || undefined,
+  })
 
-    if (cancelError) {
-      return errorResponse(
-        event,
-        cancelError.message || 'Gagal membatalkan pesanan',
-        cancelError,
-        400,
-      )
+  if (rpcError) {
+    const errorMsg = rpcError.message || 'Gagal memperbarui status pesanan'
+
+    if (errorMsg.includes('ORDER_NOT_FOUND')) {
+      return errorResponse(event, 'Pesanan tidak ditemukan', rpcError, 404)
     }
 
-    return successResponse('Pesanan berhasil dibatalkan dan stok produk dikembalikan', {
+    if (errorMsg.includes('FORBIDDEN_NOT_ADMIN')) {
+      return errorResponse(event, 'Akses ditolak. Hanya admin.', rpcError, 403)
+    }
+
+    if (
+      errorMsg.includes('INVALID_ORDER_TRANSITION') ||
+      errorMsg.includes('ADMIN_PAYMENT_OVERRIDE_DISABLED') ||
+      errorMsg.includes('DIRECT_STATUS_MUTATION_FORBIDDEN') ||
+      errorMsg.includes('TERMINAL_ORDER_STATE')
+    ) {
+      return errorResponse(event, errorMsg, rpcError, 409)
+    }
+
+    return errorResponse(event, errorMsg, rpcError, 500)
+  }
+
+  const result = data as {
+    order_id: string
+    current_status: string
+    previous_status: string
+    no_op: boolean
+    message: string
+  }
+
+  return successResponse(
+    result.message || `Status pesanan berhasil diperbarui menjadi ${targetStatus}`,
+    {
       order_id: orderId,
-      status: 'cancelled',
-    })
-  }
-
-  // 4. Update status ke database
-  const updatePayload: Database['public']['Tables']['orders']['Update'] = {
-    status: targetStatus,
-    updated_at: new Date().toISOString(),
-  }
-
-  if (targetStatus === 'paid') {
-    updatePayload.paid_at = new Date().toISOString()
-  }
-
-  const { error: updateError } = await client.from('orders').update(updatePayload).eq('id', orderId)
-
-  if (updateError) {
-    return errorResponse(event, 'Gagal memperbarui status pesanan', updateError, 500)
-  }
-
-  // 5. Catat audit log di activity_logs
-  try {
-    const deviceInfo = getDeviceInfo(event)
-    await client.from('activity_logs').insert({
-      entity_type: 'order',
-      entity_id: 0,
-      action: 'UPDATE',
-      description:
-        reason ||
-        `Status pesanan diubah dari ${currentStatus} ke ${targetStatus} oleh Administrator`,
-      old_data: { order_id: orderId, status: currentStatus },
-      new_data: { order_id: orderId, status: targetStatus },
-      ip_address: deviceInfo.ipAddress,
-      browser: deviceInfo.browser,
-      platform: deviceInfo.platform,
-    })
-  } catch {
-    // Audit log failure shouldn't rollback status update
-  }
-
-  return successResponse(`Status pesanan berhasil diperbarui menjadi ${targetStatus}`, {
-    order_id: orderId,
-    status: targetStatus,
-  })
+      status: result.current_status,
+      previous_status: result.previous_status,
+      no_op: result.no_op,
+    },
+  )
 })

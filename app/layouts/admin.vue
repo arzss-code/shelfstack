@@ -1,15 +1,35 @@
 <script setup lang="ts">
-import AppNavbar from '~/components/AppNavbar.vue'
-import AppFooter from '~/components/AppFooter.vue'
+import { ref } from 'vue'
+import AppLogo from '~/components/AppLogo.vue'
+import { useAuth } from '~/features/auth/composables/useAuth'
+
+const { user, profile, logout } = useAuth()
+const isMobileMenuOpen = ref(false)
+const route = useRoute()
+
+const navLinks = [
+  { to: '/admin', label: 'Dashboard', icon: 'pi-chart-bar', exact: true },
+  { to: '/admin/orders', label: 'Kelola Pesanan', icon: 'pi-shopping-bag', exact: false },
+  { to: '/admin/products', label: 'Kelola Produk', icon: 'pi-th-large', exact: false },
+  { to: '/admin/activities', label: 'Activity Log', icon: 'pi-history', exact: false },
+]
+
+// Close mobile menu on route change
+watch(
+  () => route.fullPath,
+  () => {
+    isMobileMenuOpen.value = false
+  },
+)
 </script>
 
 <template>
   <div
     class="flex min-h-screen bg-brand-canvas text-brand-ink selection:bg-brand-accent selection:text-white transition-colors duration-200"
   >
-    <!-- Modernist Admin Sidebar -->
+    <!-- Desktop Modernist Admin Sidebar -->
     <aside
-      class="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-2 border-r border-brand-hair bg-brand-canvas-soft p-5 md:flex"
+      class="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-2 border-r border-brand-hair bg-brand-canvas-soft p-5 md:flex z-30"
     >
       <NuxtLink
         to="/"
@@ -26,45 +46,21 @@ import AppFooter from '~/components/AppFooter.vue'
         </div>
       </NuxtLink>
 
-      <nav class="flex flex-col gap-1.5" aria-label="Navigasi Menu Admin">
+      <nav class="flex flex-col gap-1.5" aria-label="Navigasi Menu Admin Desktop">
         <NuxtLink
-          to="/admin"
+          v-for="item in navLinks"
+          :key="item.to"
+          :to="item.to"
           class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center gap-2.5 text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
-          exact-active-class="!bg-brand-ink !text-brand-onink shadow-whisper"
+          :exact-active-class="item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
+          :active-class="!item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
         >
-          <i class="pi pi-chart-bar text-xs" />
-          <span>Dashboard</span>
-        </NuxtLink>
-
-        <NuxtLink
-          to="/admin/orders"
-          class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center gap-2.5 text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
-          active-class="!bg-brand-ink !text-brand-onink shadow-whisper"
-        >
-          <i class="pi pi-shopping-bag text-xs" />
-          <span>Kelola Pesanan</span>
-        </NuxtLink>
-
-        <NuxtLink
-          to="/admin/products"
-          class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center gap-2.5 text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
-          active-class="!bg-brand-ink !text-brand-onink shadow-whisper"
-        >
-          <i class="pi pi-th-large text-xs" />
-          <span>Kelola Produk</span>
-        </NuxtLink>
-
-        <NuxtLink
-          to="/admin/activities"
-          class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center gap-2.5 text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
-          active-class="!bg-brand-ink !text-brand-onink shadow-whisper"
-        >
-          <i class="pi pi-history text-xs" />
-          <span>Activity Log</span>
+          <i :class="['pi text-xs', item.icon]" />
+          <span>{{ item.label }}</span>
         </NuxtLink>
       </nav>
 
-      <div class="mt-auto pt-4 border-t border-brand-hairsoft">
+      <div class="mt-auto pt-4 border-t border-brand-hairsoft flex flex-col gap-2">
         <NuxtLink
           to="/"
           class="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-brand-muted no-underline hover:bg-brand-canvas hover:text-brand-ink transition-colors"
@@ -72,15 +68,167 @@ import AppFooter from '~/components/AppFooter.vue'
           <i class="pi pi-arrow-left text-xs" />
           <span>Kembali ke Etalase</span>
         </NuxtLink>
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 no-underline hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-left border-0 bg-transparent cursor-pointer"
+          @click="logout"
+        >
+          <i class="pi pi-sign-out text-xs" />
+          <span>Keluar Sesi Admin</span>
+        </button>
       </div>
     </aside>
 
+    <!-- Mobile Slide-over Drawer -->
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="isMobileMenuOpen"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 md:hidden"
+        @click="isMobileMenuOpen = false"
+      />
+    </Transition>
+
+    <Transition
+      enter-active-class="transform transition duration-300 ease-out"
+      enter-from-class="-translate-x-full"
+      enter-to-class="translate-x-0"
+      leave-active-class="transform transition duration-200 ease-in"
+      leave-from-class="translate-x-0"
+      leave-to-class="-translate-x-full"
+    >
+      <aside
+        v-if="isMobileMenuOpen"
+        class="fixed inset-y-0 left-0 w-72 bg-brand-canvas-soft border-r border-brand-hair p-5 flex flex-col z-50 md:hidden shadow-floating"
+      >
+        <div class="flex items-center justify-between pb-4 border-b border-brand-hairsoft mb-4">
+          <NuxtLink to="/" class="flex items-center gap-2.5 no-underline text-brand-ink">
+            <AppLogo variant="mark-only" size="sm" />
+            <span class="font-display text-sm font-bold tracking-tight text-brand-ink"
+              >ShelfStack Admin</span
+            >
+          </NuxtLink>
+          <button
+            type="button"
+            class="w-8 h-8 rounded-full border border-brand-hair flex items-center justify-center text-brand-ink hover:bg-brand-canvas"
+            aria-label="Tutup navigasi"
+            @click="isMobileMenuOpen = false"
+          >
+            <i class="pi pi-times text-xs" />
+          </button>
+        </div>
+
+        <nav class="flex flex-col gap-1.5" aria-label="Navigasi Menu Admin Mobile">
+          <NuxtLink
+            v-for="item in navLinks"
+            :key="item.to"
+            :to="item.to"
+            class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center gap-2.5 text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
+            :exact-active-class="item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
+            :active-class="!item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
+            @click="isMobileMenuOpen = false"
+          >
+            <i :class="['pi text-xs', item.icon]" />
+            <span>{{ item.label }}</span>
+          </NuxtLink>
+        </nav>
+
+        <div class="mt-auto pt-4 border-t border-brand-hairsoft flex flex-col gap-2">
+          <NuxtLink
+            to="/"
+            class="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-brand-muted no-underline hover:bg-brand-canvas hover:text-brand-ink transition-colors"
+            @click="isMobileMenuOpen = false"
+          >
+            <i class="pi pi-arrow-left text-xs" />
+            <span>Kembali ke Etalase</span>
+          </NuxtLink>
+          <button
+            type="button"
+            class="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 no-underline hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-left border-0 bg-transparent cursor-pointer"
+            @click="logout"
+          >
+            <i class="pi pi-sign-out text-xs" />
+            <span>Keluar Sesi Admin</span>
+          </button>
+        </div>
+      </aside>
+    </Transition>
+
+    <!-- Main Admin Body with Dedicated Back-Office Header -->
     <div class="flex min-w-0 flex-1 flex-col">
-      <AppNavbar />
+      <!-- Dedicated Admin Header Bar (No Consumer Navbar Bleed) -->
+      <header
+        class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-brand-hair bg-brand-canvas/90 backdrop-blur-md px-4 sm:px-6 lg:px-8"
+      >
+        <div class="flex items-center gap-3">
+          <!-- Mobile Hamburger Toggle -->
+          <button
+            type="button"
+            class="flex h-9 w-9 items-center justify-center rounded-lg border border-brand-hair text-brand-ink hover:bg-brand-canvas-soft md:hidden"
+            aria-label="Buka menu navigasi admin"
+            @click="isMobileMenuOpen = true"
+          >
+            <i class="pi pi-bars text-sm" />
+          </button>
+          <div class="flex items-center gap-2">
+            <span class="font-display text-sm font-bold text-brand-ink">ShelfStack</span>
+            <span class="text-xs text-brand-muted hidden sm:inline">/</span>
+            <span class="text-xs font-medium text-brand-muted hidden sm:inline"
+              >Back-Office Command</span
+            >
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <NuxtLink
+            to="/"
+            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-brand-hair text-xs font-medium text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft no-underline transition-colors"
+          >
+            <i class="pi pi-external-link text-[10px]" />
+            <span>Lihat Etalase</span>
+          </NuxtLink>
+
+          <!-- Admin Profile Badge -->
+          <div
+            class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-canvas-soft border border-brand-hair"
+          >
+            <div
+              class="w-6 h-6 rounded-full bg-brand-accent text-white flex items-center justify-center text-[10px] font-bold"
+            >
+              {{ profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'A' }}
+            </div>
+            <span class="text-xs font-semibold text-brand-ink max-w-[120px] truncate">
+              {{ profile?.full_name || user?.email || 'Admin' }}
+            </span>
+            <span
+              class="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400"
+            >
+              Admin
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Admin Content Slot -->
       <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <slot />
       </main>
-      <AppFooter />
+
+      <!-- Minimal Admin Footer -->
+      <footer
+        class="border-t border-brand-hairsoft py-4 px-4 sm:px-6 lg:px-8 text-center text-xs text-brand-muted"
+      >
+        <span
+          >ShelfStack Admin Workspace &copy; {{ new Date().getFullYear() }} — Strict Operations
+          Mode</span
+        >
+      </footer>
     </div>
   </div>
 </template>

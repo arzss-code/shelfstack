@@ -1,13 +1,10 @@
+import { checkLiveness } from '../utils/health'
+
 export default defineEventHandler(() => {
+  const telemetry = checkLiveness()
   return {
     status: 'success',
-    message: 'ShelfStack Frontend is healthy',
-    data: {
-      service: 'shelfstack-frontend',
-      uptime: process.uptime(),
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
-      nodeVersion: process.version,
-    },
+    message: 'ShelfStack Frontend is live',
+    data: telemetry,
   }
 })

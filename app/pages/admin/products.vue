@@ -5,6 +5,7 @@ import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import ProductList from '~/features/products/components/ProductList.vue'
 import ProductForm from '~/features/products/components/ProductForm.vue'
+import StockMovementsModal from '~/features/products/components/StockMovementsModal.vue'
 
 useSeoMeta({
   title: 'Kelola Produk',
@@ -21,8 +22,15 @@ const confirm = useConfirm()
 
 const isFormVisible = ref(false)
 const editingProduct = ref<Product | null>(null)
+const isStockModalVisible = ref(false)
+const stockAuditProduct = ref<Product | null>(null)
 const searchQuery = ref('')
 const activeTab = ref('0')
+
+const openStockMovements = (product: Product) => {
+  stockAuditProduct.value = product
+  isStockModalVisible.value = true
+}
 
 const criticalStockProducts = computed(() => {
   return productStore.products.filter((p) => (p.stock ?? 0) < 5)
@@ -233,6 +241,7 @@ const handleRestore = async (id: number) => {
             :is-searching="searchQuery.trim().length > 0"
             @edit="openEditForm"
             @delete="handleDelete"
+            @view-stock-movements="openStockMovements"
           />
 
           <!-- Load More Button -->
@@ -258,6 +267,7 @@ const handleRestore = async (id: number) => {
             :is-searching="searchQuery.trim().length > 0"
             @edit="openEditForm"
             @delete="handleDelete"
+            @view-stock-movements="openStockMovements"
           />
         </TabPanel>
 
@@ -294,6 +304,13 @@ const handleRestore = async (id: number) => {
       :initial-data="editingProduct"
       :loading="productStore.loading"
       @save="handleSave"
+    />
+
+    <!-- Container for Stock Movements Audit Modal -->
+    <StockMovementsModal
+      :show="isStockModalVisible"
+      :product="stockAuditProduct"
+      @close="isStockModalVisible = false"
     />
   </div>
 </template>

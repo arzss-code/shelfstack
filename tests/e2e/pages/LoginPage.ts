@@ -40,6 +40,14 @@ export class LoginPage extends BasePage {
     await this.submit()
   }
 
+  async loginAsCustomer(password = 'Password123!'): Promise<void> {
+    await this.login('customer@shelfstack.local', password)
+  }
+
+  async loginAsAdmin(password = 'Password123!'): Promise<void> {
+    await this.login('admin@shelfstack.local', password)
+  }
+
   async assertErrorMessageVisible(message: string): Promise<void> {
     await expect(this.page.getByText(message)).toBeVisible({ timeout: 10000 })
   }

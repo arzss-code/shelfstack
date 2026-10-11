@@ -29,7 +29,12 @@ describe('Concurrency Hardening & Webhook State Guard (Phase 0)', () => {
   type OrderStatus = 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled'
 
   interface WebhookTransitionResult {
-    action: 'PROCEED_UPDATE' | 'CONFLICT_ALREADY_CANCELLED' | 'IDEMPOTENT_NOOP'
+    action:
+      | 'PROCEED_UPDATE'
+      | 'CONFLICT_ALREADY_CANCELLED'
+      | 'IDEMPOTENT_NOOP'
+      | 'IGNORED_STALE_CANCEL'
+      | 'IGNORED_ROLLBACK'
     restockNeeded: boolean
     finalStatus: OrderStatus
   }
@@ -41,6 +46,29 @@ describe('Concurrency Hardening & Webhook State Guard (Phase 0)', () => {
     // Idempotency: status sama
     if (currentStatus === targetStatus) {
       return { action: 'IDEMPOTENT_NOOP', restockNeeded: false, finalStatus: currentStatus }
+    }
+
+    // Proteksi Pesanan Terminal / Progresif (paid, shipped, completed):
+    if (['paid', 'shipped', 'completed'].includes(currentStatus)) {
+      if (targetStatus === 'cancelled') {
+        return {
+          action: 'IGNORED_STALE_CANCEL',
+          restockNeeded: false,
+          finalStatus: currentStatus,
+        }
+      }
+      if (targetStatus === 'paid') {
+        return {
+          action: 'IGNORED_ROLLBACK',
+          restockNeeded: false,
+          finalStatus: currentStatus,
+        }
+      }
+      return {
+        action: 'IDEMPOTENT_NOOP',
+        restockNeeded: false,
+        finalStatus: currentStatus,
+      }
     }
 
     // Phantom Stock Protection: Jika order sudah cancelled, jangan biarkan webhook menimpa jadi paid
@@ -62,7 +90,7 @@ describe('Concurrency Hardening & Webhook State Guard (Phase 0)', () => {
       return { action: 'PROCEED_UPDATE', restockNeeded: true, finalStatus: 'cancelled' }
     }
 
-    return { action: 'PROCEED_UPDATE', restockNeeded: false, finalStatus: targetStatus }
+    return { action: 'IDEMPOTENT_NOOP', restockNeeded: false, finalStatus: currentStatus }
   }
 
   it('rejects overwriting cancelled order with late paid webhook (prevents phantom stock)', () => {
@@ -90,5 +118,36 @@ describe('Concurrency Hardening & Webhook State Guard (Phase 0)', () => {
     expect(result.action).toBe('PROCEED_UPDATE')
     expect(result.finalStatus).toBe('cancelled')
     expect(result.restockNeeded).toBe(true)
+  })
+
+  it('ignores stale cancel/expire webhook on paid order without restock', () => {
+    const result = resolveWebhookState('paid', 'cancelled')
+    expect(result.action).toBe('IGNORED_STALE_CANCEL')
+    expect(result.finalStatus).toBe('paid')
+    expect(result.restockNeeded).toBe(false)
+  })
+
+  it('ignores stale cancel/expire webhook on shipped order without modifying status or stock', () => {
+    const result = resolveWebhookState('shipped', 'cancelled')
+    expect(result.action).toBe('IGNORED_STALE_CANCEL')
+    expect(result.finalStatus).toBe('shipped')
+    expect(result.restockNeeded).toBe(false)
+  })
+
+  it('ignores stale cancel/expire webhook on completed order without modifying status or stock', () => {
+    const result = resolveWebhookState('completed', 'cancelled')
+    expect(result.action).toBe('IGNORED_STALE_CANCEL')
+    expect(result.finalStatus).toBe('completed')
+    expect(result.restockNeeded).toBe(false)
+  })
+
+  it('prevents downgrading shipped/completed order back to paid on duplicate paid webhook', () => {
+    const resultShipped = resolveWebhookState('shipped', 'paid')
+    expect(resultShipped.action).toBe('IGNORED_ROLLBACK')
+    expect(resultShipped.finalStatus).toBe('shipped')
+
+    const resultCompleted = resolveWebhookState('completed', 'paid')
+    expect(resultCompleted.action).toBe('IGNORED_ROLLBACK')
+    expect(resultCompleted.finalStatus).toBe('completed')
   })
 })

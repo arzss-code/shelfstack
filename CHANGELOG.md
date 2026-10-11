@@ -2,6 +2,112 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [Unreleased] — audit docs & agent rules (2026-10-11)
+
+### Audit (read-only, terverifikasi file:line)
+
+- Baseline aktual: `typecheck` EXIT 0 · `lint` 0 error/32 warning · `vitest run` 33 file/310 test lolos.
+- Auth endpoints: tidak ada mutasi tanpa auth; 3 inkonsistensi rendah dicatat di `docs/PROGRESS.md` Known Gaps (R-1 rate-limit `snap-token` vs `payment-token`, R-2 admin ditolak di `payment-token`, R-3 pola admin di `addresses/[id].ts`).
+- F0-01 SELESAI: `database.types.ts` disinkron manual dari migrasi (2 tabel + 7 kolom + signature `create_order` + enum `order_status` di Constants); `typecheck` tetap EXIT 0 tanpa fallout. `supabase gen types` ulang tetap disarankan saat CLI terautentikasi.
+- F0-02 SEBAGIAN: klaim "seed rusak" DICABUT setelah verifikasi byte-level — sintaks `DO UPDATE SET` valid; flag indexer adalah keterbatasan grammar. AC jumlah seed dikoreksi ke 5/5/2. Runtime (`pgcrypto`, `auth.*`) belum terverifikasi tanpa DB live.
+- Koreksi temuan: `.github/workflows/ci.yml` ADA (bukan kosong); payment = Midtrans Sandbox asli (bukan mock).
+
+### Eksekusi temuan audit (2026-10-11)
+
+- T-7: `transition_order_status` kanonis **terbukti** menulis `activity_logs` transaksional — AC D-02 terpenuhi tanpa perubahan kode.
+- T-3: rate-limit menunjuk `payment-token`; rule mati `/api/checkout` dihapus.
+- T-4: `payment-token` ikut pola owner + admin bypass (konsisten 3 endpoint lain).
+- T-5: `addresses/[id].ts` memakai `existing.user_id` untuk semua query lanjutan; +3 regression test admin; perbaiki 1 tipe helper test lama.
+- T-6: export CSV filter tanggal `from`/`to` (helper murni `parseExportDateRange` + input tanggal di UI + `refunded` di allowlist); +5 unit test.
+- Gate akhir: `typecheck` EXIT 0 · `lint` 0 error/32 warning (tanpa warning baru) · `vitest run` 33 file/**318 test lolos** (+8).
+
+### Changed
+
+- Sinkronisasi docs: `PROGRESS.md` (v0.15.0 + Fase 4 + Known Gaps), `README.md` (11 scripts + stack + CI), `docs/README.md` (indeks baru), `BACKLOG.md` (K-04 sandbox, Q-01 CI ada), `ARCHITECTURE.md` + `DESIGN-ECOMMERCE.md` (Nuxt 4), `package.json` version → `0.15.0`.
+- `AGENTS.md`: stack jujur (BullMQ = TODO), section Commands + Documentation Hierarchy + MCP Tooling.
+- `docs/PULL_REQUEST_TEMPLATE.md` → `.github/PULL_REQUEST_TEMPLATE.md` (agar dibaca GitHub).
+
+### Removed
+
+- `GEMINI.md` (duplikat identik AGENTS.md), `docs/PROMPT.md`, `docs/SUPABASE-CRUD-TUTORIAL.md`, `docs/observability.md` (stub rusak), `docs/stitch_*/design.md` (duplikat mobbin).
+
+## [v0.15.0] - 2026-10-09
+
+### Changed
+
+- **Architectural Modernist Design System & Premium Visual Pass**:
+  - **Geometry Scale & Token Unification (`app/assets/css/main.css`)**: Refaktor skala radius dari sudut membulat generik (`>= 24px`) menjadi skala geometri arsitektural terukur (`--radius-sm: 8px`, `--radius-md: 12px`, `--radius-card: 14px`, `--radius-media: 12px`). Warna monokrom ink-first (`#141414`), garis tepi hairline halus (`#e4e5e7`), kanvas sejuk (`#f8f8f9`), dan teks sekunder muted (`#66686d`).
+  - **Product Card Architecture (`ProductCard.vue`)**: Menggantikan pita 3D skeuomorfik dengan badge status pill mengambang yang ringkas; eliminasi fallback rating 5.0 dan angka penjualan statis yang tidak berdasar; penambahan deteksi error gambar pre-hydration SSR untuk mencegah frame gambar rusak.
+  - **Product Detail Polish (`ProductConfigurator.vue` & `ProductGallery.vue`)**: Menghilangkan rating 4.92 default tanpa ulasan nyata; integrasi strip jaminan fulfillment ringkas ("Gudang Jakarta", "Garansi Toko Resmi", "Midtrans Terenkripsi"); penyatuan tombol "Pesan Cepat 1-Klik" menjadi outline elegan tanpa clashing dengan tombol utama; penanganan fallback gambar multi-angle.
+  - **Storefront & Catalog Polish**: Standardisasi toolbar katalog dan active filter pill badge; kanvas harga pada hero mosaic menggunakan tipografi tabular bersih tanpa aksen elektrik; `HomeFlashDeals.vue` kini menggunakan placeholder bermerek yang konsisten saat URL gambar tidak tersedia tanpa gambar jam tangan acak.
+  - **Cart, Checkout, & Admin Surfaces**: Sidebar checkout dan cart diselaraskan dengan token `rounded-card` dan bayangan lembut; KPI dashboard admin (`AdminStatCard.vue`) dan tabel transaksi terintegrasi dengan elevasi monokromatis modern.
+  - **Visual QA Capture Automation (`scripts/capture-visual-qa.mjs`)**: Otomasi Playwright headless yang mendukung `--env-file=.env` dan autentikasi admin sesi penuh untuk verifikasi visual desktop (1440x900 @ 2x) dan mobile (375x812 @ 2x Touch).
+
+## [v0.14.0] - 2026-10-09
+
+### Added
+
+- **Multi-Agent Batch 1 Product Hardening & Enhancements**:
+  - **Isolated Admin Layout & Back-Office Navigation**: Desain ulang `app/layouts/admin.vue` memisahkan header/footer publik, menyediakan topbar breadcrumb dedicated dan mobile drawer navigation.
+  - **Stock Movement Ledger Modal (`/admin/products`)**: Modal riwayat pergerakan stok real-time terhubung ke endpoint `/api/admin/products/:id/stock-movements`.
+  - **Interactive Multi-Angle Gallery (`/product/:id`)**: Komponen `ProductGallery.vue` dengan pemilih thumbnail multi-angle reaktif.
+  - **Deterministic Search Debounce (`/katalog`)**: Debounce 300ms pada pencarian teks katalog untuk mencegah request flooding.
+  - **Local Seed Data Accounts**: Akun demo deterministic (`customer@shelfstack.local` & `admin@shelfstack.local`) dengan guardrails keamanan local-only.
+  - **CI & Build Pipeline**: Menambahkan step typecheck `vue-tsc --noEmit` dan `nuxt build` pada GitHub Actions CI.
+
+- **Multi-Agent Batch 2 Full-Stack Completion**:
+  - **Browser E2E User Journey Suite (Playwright)**: Suite E2E komprehensif `tests/e2e/full-business-journey.spec.ts` dan 6 Page Object Models (`LoginPage`, `CatalogPage`, `CartDrawer`, `CheckoutPage`, `OrderDetailPage`, `AdminDashboardPage`) mencakup 6 journey bisnis inti.
+  - **Persisted Shipping Address Management (Supabase)**: Skema database migrasi `20261117000001_user_addresses.sql` dengan RLS granular per user, validasi Zod `shared/schemas/address.ts`, endpoint REST `/api/addresses`, composable `useAddresses.ts`, serta pemilih alamat tersimpan `SavedAddressSelector.vue` di checkout dengan auto-fill dan opsi simpan.
+  - **Dynamic Real-Data Homepage**: `HomeFlashDeals.vue` kini menggunakan data produk nyata dari store katalog dengan live countdown timer menuju tengah malam; `HomeReviews.vue` ditransformasi menjadi Pusat Jaminan Kualitas & Integritas Produk (anti-fake review); `HomeFeaturedCategories.vue` terhubung ke kategori dinamis.
+  - **Payment & Sandbox Copywriting Truthfulness**: Copywriting checkout dan cart diperbaiki secara dinamis agar tidak mengklaim mode Sandbox sebagai transaksi produksi.
+
+## [v0.13.5] - 2026-10-08
+
+### Changed
+
+- **Premium Toast Notification Redesign (Zero-Blur & High-Contrast)**:
+  - Menggantikan default blur & transparansi pucat (Aura theme 84% transparency & backdrop-blur) pada PrimeVue Toast dengan card solid opaque 100% berstandar modern luxury e-commerce (Vercel/Stripe/Sonner standard).
+  - Indikator aksen ketegasan warna solid (border kiri 5px & badge pill melingkar) untuk setiap severity: Hijau zamrud (`#10b981`) untuk Sukses, Merah (`#ef4444`) untuk Error, Biru Elektrik (`#0066ff`) untuk Info, dan Amber (`#f59e0b`) untuk Warning.
+  - Tipografi tajam dengan font DM Sans (headline bold 13.5px `#0f172a`, teks deskripsi 12px `#475569`, bebas dari efek kabur/milky).
+  - Reposisi default Toast dari `bottom-left` ke `bottom-right` yang lebih ergonomis pada desktop dan adaptif full-width pada mobile (<640px).
+
+## [v0.13.4] - 2026-10-08
+
+### Added
+
+- **Zero-Refresh Real-Time Status Synchronization (`/orders` & `/orders/[id]`)**:
+  - Implementasi background active sync polling (interval 3.5s - 4s) pada pesanan dengan status `pending` di kedua halaman (`/orders` dan `/orders/[id]`), berhenti otomatis begitu status berubah menjadi `paid` atau `cancelled`.
+  - Event listener `visibilitychange` dan window `focus` yang secara instan memicu pemeriksaan status pembayaran saat pengguna kembali ke tab ShelfStack setelah menyelesaikan transfer di simulator Midtrans atau mobile banking.
+  - Supabase Realtime channel subscription pada `/orders` (filter `user_id=eq.${user.id}`) dan `/orders/[id]` (filter `id=eq.${orderId}`) untuk update reaktif instan ke status `paid` tanpa memerlukan reload atau penyegaran browser manual.
+  - Multi-candidate order ID lookup pada `POST /api/orders/[id]/check-payment-status` untuk mendukung query order ID asli, retry suffix, maupun `midtrans_id`.
+
+## [v0.13.3] - 2026-10-08
+
+### Added
+
+- **Midtrans Payment Status Check & Sync (Shopee/Tokopedia UX Standard)**:
+  - Endpoint baru `POST /api/orders/[id]/check-payment-status` untuk query langsung ke Midtrans Transaction Status API (`/v2/{order_id}/status`) dan sinkronisasi otomatis ke database Supabase via RPC atomik `handle_payment_webhook`.
+  - Tombol _"Cek Status Pembayaran"_ pada halaman detail pesanan pending, memungkinkan pengguna memverifikasi pelunasan transfer bank/VA secara instan tanpa tergantung pada webhook inbound saat testing di localhost.
+  - Auto-synchronization di background saat halaman pesanan dibuka atau saat modal Snap ditutup.
+
+## [v0.13.2] - 2026-10-08
+
+### Fixed
+
+- **Order Cancellation Schema & Error Sanitization**:
+  - Menambahkan kolom `cancelled_at` dan `cancellation_reason` pada tabel `public.orders` via migrasi `20261102000001_add_cancellation_fields_to_orders.sql`, memperbaiki error `42703: column "cancelled_at" of relation "orders" does not exist` saat memanggil RPC `cancel_order`.
+  - Sanitasi pesan error pembatalan pesanan pada `server/api/orders/[id]/cancel.post.ts` agar pesan teknis database internal tidak bocor ke antarmuka pengguna (UX hygiene).
+
+## [v0.13.1] - 2026-10-08
+
+### Fixed
+
+- **CSP WebSocket Violation**: Menambahkan `wss://*.supabase.co` serta endpoint Midtrans ke CSP `connect-src`, `script-src`, dan `frame-src` pada `nuxt.config.ts`, memperbaiki koneksi realtime status pesanan.
+- **Midtrans Duplicate Order ID Resiliency**:
+  - Menyimpan `snap_token` menggunakan `serverSupabaseServiceRole` sehingga token tersimpan secara permanen di database tanpa terblokir aturan RLS.
+  - Menambahkan retry fallback otomatis dengan unique attempt suffix (`${order.id}-R${timestamp}`) ketika Midtrans menolak pembuatan token dengan pesan error `order_id sudah digunakan`.
+  - Normalisasi `order_id` pada webhook Nuxt dan `@shelfstack/order-service` via `extractBaseOrderId` agar RPC atomik `handle_payment_webhook` selalu menerima UUID pesanan yang valid.
+
 ## [v0.13.0] - 2026-10-08
 
 ### Added

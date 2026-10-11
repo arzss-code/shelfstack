@@ -34,8 +34,11 @@ watch(
   { immediate: true },
 )
 
-const ratingValue = computed(() => props.product.rating ?? 4.92)
-const reviewCountValue = computed(() => props.product.review_count ?? 148)
+const ratingValue = computed(() => {
+  const r = props.product.rating
+  return r && Number(r) > 0 ? Number(r) : null
+})
+const reviewCountValue = computed(() => props.product.review_count ?? null)
 
 const isOutOfStock = computed(() => props.product.stock === 0)
 const maxQuantity = computed(() => Math.max(1, props.product.stock))
@@ -123,21 +126,23 @@ const handleBuyNow = () => {
         {{ product.name }}
       </h1>
 
-      <!-- Reviews Social Proof -->
-      <div class="flex items-center gap-3 text-xs text-brand-muted">
+      <!-- Reviews Social Proof / Curatorial Assurance -->
+      <div v-if="ratingValue" class="flex items-center gap-3 text-xs text-brand-muted">
         <div
           class="inline-flex items-center gap-1 bg-brand-canvas-soft border border-brand-hair px-2.5 py-1 rounded-full"
         >
-          <div class="flex text-brand-warning">
-            <i class="pi pi-star-fill text-[11px]" />
-            <i class="pi pi-star-fill text-[11px]" />
-            <i class="pi pi-star-fill text-[11px]" />
-            <i class="pi pi-star-fill text-[11px]" />
+          <div class="flex text-amber-500">
             <i class="pi pi-star-fill text-[11px]" />
           </div>
-          <span class="font-bold text-brand-ink ml-1">{{ ratingValue.toFixed(2) }}</span>
+          <span class="font-bold text-brand-ink ml-1">{{ ratingValue.toFixed(1) }}</span>
         </div>
-        <span>{{ reviewCountValue }} ulasan terverifikasi</span>
+        <span v-if="reviewCountValue">{{ reviewCountValue }} ulasan terverifikasi</span>
+      </div>
+      <div v-else class="flex items-center gap-2 text-xs text-brand-muted">
+        <i class="pi pi-verified text-emerald-600 text-xs" />
+        <span class="font-medium text-brand-ink">Kurasi Fisik Terjamin</span>
+        <span class="text-brand-faint">·</span>
+        <span>ShelfStack Official</span>
       </div>
     </div>
 
@@ -266,9 +271,9 @@ const handleBuyNow = () => {
         </UiButton>
       </div>
 
-      <!-- Instant 1-Click Buy Action using UiButton -->
+      <!-- Instant 1-Click Buy Action using UiButton (Clean Architectural Secondary) -->
       <UiButton
-        variant="accent"
+        variant="outline"
         block
         :disabled="isOutOfStock"
         icon="pi-bolt"
@@ -278,21 +283,21 @@ const handleBuyNow = () => {
       </UiButton>
     </div>
 
-    <!-- Reassurance Triad -->
+    <!-- Fulfillment & Dispatch Assurance Strip (Deduplicated with Gallery) -->
     <div
-      class="pt-4 border-t border-brand-hairsoft grid grid-cols-3 gap-2 text-center text-xs text-brand-muted"
+      class="pt-4 border-t border-brand-hairsoft flex items-center justify-between text-xs text-brand-muted"
     >
-      <div>
-        <span class="block font-bold text-brand-ink">Gratis Ongkir</span>
-        <span class="text-[11px] text-brand-faint">Pesanan &gt; Rp 200rb</span>
+      <div class="flex items-center gap-1.5">
+        <i class="pi pi-truck text-brand-ink text-xs" />
+        <span>Gudang Jakarta</span>
       </div>
-      <div>
-        <span class="block font-bold text-brand-ink">30 Hari Garansi</span>
-        <span class="text-[11px] text-brand-faint">Retur mudah tanpa ribet</span>
+      <div class="flex items-center gap-1.5">
+        <i class="pi pi-shield text-emerald-600 text-xs" />
+        <span>Garansi Toko Resmi</span>
       </div>
-      <div>
-        <span class="block font-bold text-brand-ink">100% Original</span>
-        <span class="text-[11px] text-brand-faint">Jaminan kurasi resmi</span>
+      <div class="flex items-center gap-1.5">
+        <i class="pi pi-lock text-brand-ink text-xs" />
+        <span>Midtrans Terenkripsi</span>
       </div>
     </div>
   </div>

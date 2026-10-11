@@ -23,7 +23,7 @@ const emit = defineEmits<{
 
 <template>
   <section
-    class="sticky top-20 z-20 bg-brand-canvas/95 backdrop-blur-md py-3 px-4 rounded-2xl border border-brand-hairsoft shadow-whisper flex flex-wrap items-center justify-between gap-3"
+    class="sticky top-20 z-20 bg-brand-canvas/95 backdrop-blur-md py-3 px-4 rounded-card border border-brand-hair shadow-whisper flex flex-wrap items-center justify-between gap-3"
   >
     <!-- Search Input Field -->
     <div class="relative w-full sm:w-80">
@@ -67,7 +67,7 @@ const emit = defineEmits<{
         <span>Filter</span>
         <span
           v-if="activeFiltersCount > 0"
-          class="w-4 h-4 rounded-full bg-brand-accent text-white text-[10px] flex items-center justify-center font-bold"
+          class="w-4 h-4 rounded-full bg-brand-ink text-white text-[10px] flex items-center justify-center font-bold"
         >
           {{ activeFiltersCount }}
         </span>

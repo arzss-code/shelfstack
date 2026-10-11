@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { config } from '../config.js'
+import { extractBaseOrderId } from '../utils/midtrans.js'
 
 let supabaseInstance: SupabaseClient | null = null
 
@@ -28,6 +29,24 @@ export function setSupabaseClient(client: SupabaseClient | null) {
   supabaseInstance = client
 }
 
+export async function pingSupabase(timeoutMs = 3000): Promise<boolean> {
+  try {
+    const client = getSupabaseClient()
+    const checkPromise = async () => {
+      const { error } = await client.from('categories').select('id').limit(1)
+      if (error) throw new Error(error.message)
+      return true
+    }
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Database connectivity check timed out')), timeoutMs),
+    )
+    await Promise.race([checkPromise(), timeoutPromise])
+    return true
+  } catch {
+    return false
+  }
+}
+
 export interface ProcessWebhookParams {
   orderId: string
   targetStatus: 'pending' | 'paid' | 'cancelled'
@@ -37,9 +56,10 @@ export interface ProcessWebhookParams {
 
 export async function processPaymentWebhook(params: ProcessWebhookParams) {
   const client = getSupabaseClient()
+  const baseOrderId = extractBaseOrderId(params.orderId)
 
   const { data: rpcResult, error: rpcError } = await client.rpc('handle_payment_webhook', {
-    p_order_id: params.orderId,
+    p_order_id: baseOrderId,
     p_target_status: params.targetStatus,
     p_payment_type: params.paymentType ?? null,
     p_midtrans_id: params.midtransId ?? null,
@@ -56,7 +76,7 @@ export async function processPaymentWebhook(params: ProcessWebhookParams) {
         paid_at: params.targetStatus === 'paid' ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.orderId)
+      .eq('id', baseOrderId)
       .select('id, status')
       .single()
 

@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { useAuth } from '~/features/auth/composables/useAuth'
+import type { Database } from '~/types/database.types'
 import type { Order, OrderStatus } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
+import { useToast } from 'primevue/usetoast'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 const { user } = useAuth()
 const router = useRouter()
+const supabase = useSupabaseClient<Database>()
+const toast = useToast()
 
 useSeoMeta({
   title: 'Riwayat Pesanan — ShelfStack',
@@ -13,30 +18,204 @@ useSeoMeta({
 
 const orders = ref<Order[]>([])
 const loading = ref(true)
+const isSyncingPending = ref(false)
 const errorMsg = ref('')
 
-const fetchOrders = async () => {
+let channel: RealtimeChannel | null = null
+let pollInterval: ReturnType<typeof setInterval> | null = null
+
+const startPendingPolling = () => {
+  if (pollInterval || !import.meta.client) return
+  pollInterval = setInterval(async () => {
+    const hasPending = orders.value.some((o) => o.status === 'pending')
+    if (!hasPending) {
+      stopPendingPolling()
+      return
+    }
+    if (document.visibilityState === 'visible') {
+      await syncPendingOrders()
+    }
+  }, 4000)
+}
+
+const stopPendingPolling = () => {
+  if (pollInterval) {
+    clearInterval(pollInterval)
+    pollInterval = null
+  }
+}
+
+const syncPendingOrders = async () => {
+  if (isSyncingPending.value) return
+  const pendingOrders = orders.value.filter((o) => o.status === 'pending')
+  if (pendingOrders.length === 0) {
+    stopPendingPolling()
+    return
+  }
+
+  isSyncingPending.value = true
+  try {
+    await Promise.all(
+      pendingOrders.map(async (pendingOrder) => {
+        try {
+          const res = await $fetch<{
+            status: string
+            data: {
+              status: OrderStatus
+              is_paid: boolean
+              transaction_status?: string
+              payment_type?: string
+            }
+          }>(`/api/orders/${pendingOrder.id}/check-payment-status`, {
+            method: 'POST',
+          })
+
+          if (res.data?.is_paid) {
+            const idx = orders.value.findIndex((o) => o.id === pendingOrder.id)
+            if (idx !== -1) {
+              orders.value[idx] = {
+                ...orders.value[idx],
+                status: res.data.status,
+                payment_type: res.data.payment_type || orders.value[idx].payment_type,
+                paid_at: new Date().toISOString(),
+              }
+
+              toast.add({
+                severity: 'success',
+                summary: 'Pembayaran Diterima!',
+                detail: `Pesanan #${pendingOrder.id.slice(0, 8)} otomatis terkonfirmasi Lunas.`,
+                life: 5000,
+              })
+            }
+          }
+        } catch {
+          // Background sync failures are gracefully ignored to prevent disruption
+        }
+      }),
+    )
+  } finally {
+    isSyncingPending.value = false
+    if (!orders.value.some((o) => o.status === 'pending')) {
+      stopPendingPolling()
+    }
+  }
+}
+
+const handleVisibilityOrFocusChange = () => {
+  if (document.visibilityState === 'visible' && orders.value.some((o) => o.status === 'pending')) {
+    syncPendingOrders()
+  }
+}
+
+const fetchOrders = async (silent = false) => {
   if (!user.value) {
     router.push('/auth/login?redirect=/orders')
     return
   }
 
-  loading.value = true
+  if (!silent) {
+    loading.value = true
+  }
   errorMsg.value = ''
 
   try {
     const res = await $fetch<{ status: string; data: Order[] }>('/api/orders')
     orders.value = res.data || []
+
+    if (orders.value.some((o) => o.status === 'pending')) {
+      startPendingPolling()
+      syncPendingOrders()
+    } else {
+      stopPendingPolling()
+    }
   } catch (err: unknown) {
     const fetchErr = err as { data?: { message?: string } }
     errorMsg.value = fetchErr.data?.message || 'Gagal memuat riwayat pesanan.'
   } finally {
-    loading.value = false
+    if (!silent) {
+      loading.value = false
+    }
   }
 }
 
-onMounted(() => {
-  fetchOrders()
+const setupRealtimeSubscription = () => {
+  if (!user.value || !import.meta.client) return
+
+  channel = supabase
+    .channel(`orders-user-${user.value.id}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'orders',
+        filter: `user_id=eq.${user.value.id}`,
+      },
+      (payload) => {
+        if (payload.new) {
+          const updated = payload.new as Record<string, unknown>
+          const idx = orders.value.findIndex((o) => o.id === updated.id)
+          if (idx !== -1) {
+            const prevStatus = orders.value[idx].status
+            const nextStatus = updated.status as OrderStatus
+
+            orders.value[idx] = {
+              ...orders.value[idx],
+              status: nextStatus,
+              payment_type: (updated.payment_type as string) || orders.value[idx].payment_type,
+              paid_at: (updated.paid_at as string) || orders.value[idx].paid_at,
+            }
+
+            if (prevStatus === 'pending' && nextStatus === 'paid') {
+              toast.add({
+                severity: 'success',
+                summary: 'Status Terkini Realtime',
+                detail: `Pesanan #${orders.value[idx].id.slice(0, 8)} berhasil terkonfirmasi Lunas.`,
+                life: 5000,
+              })
+            }
+
+            if (!orders.value.some((o) => o.status === 'pending')) {
+              stopPendingPolling()
+            }
+          }
+        }
+      },
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'orders',
+        filter: `user_id=eq.${user.value.id}`,
+      },
+      () => {
+        fetchOrders(true)
+      },
+    )
+    .subscribe()
+}
+
+onMounted(async () => {
+  await fetchOrders()
+  setupRealtimeSubscription()
+
+  if (import.meta.client) {
+    document.addEventListener('visibilitychange', handleVisibilityOrFocusChange)
+    window.addEventListener('focus', handleVisibilityOrFocusChange)
+  }
+})
+
+onUnmounted(() => {
+  stopPendingPolling()
+  if (channel) {
+    supabase.removeChannel(channel)
+  }
+  if (import.meta.client) {
+    document.removeEventListener('visibilitychange', handleVisibilityOrFocusChange)
+    window.removeEventListener('focus', handleVisibilityOrFocusChange)
+  }
 })
 
 const getStatusBadge = (status: OrderStatus) => {
@@ -86,7 +265,7 @@ const formatDate = (dateStr: string) => {
     </nav>
 
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <h1 class="font-display text-2xl sm:text-3xl font-bold text-brand-ink m-0">Pesanan Saya</h1>
         <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1">
@@ -94,15 +273,32 @@ const formatDate = (dateStr: string) => {
         </p>
       </div>
 
-      <UiButton
-        variant="secondary"
-        size="sm"
-        icon="pi-refresh"
-        :loading="loading"
-        @click="fetchOrders"
-      >
-        Segarkan
-      </UiButton>
+      <div class="flex items-center gap-3">
+        <div
+          v-if="orders.some((o) => o.status === 'pending')"
+          class="flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-800 rounded-full border border-amber-200 text-xs font-medium"
+        >
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+          <span>Sinkronisasi Otomatis Aktif</span>
+        </div>
+        <div
+          v-else-if="orders.length > 0"
+          class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200 text-xs font-medium"
+        >
+          <span class="w-2 h-2 rounded-full bg-emerald-500" />
+          <span>Realtime Aktif</span>
+        </div>
+
+        <UiButton
+          variant="secondary"
+          size="sm"
+          icon="pi-refresh"
+          :loading="loading || isSyncingPending"
+          @click="() => fetchOrders(false)"
+        >
+          Segarkan
+        </UiButton>
+      </div>
     </div>
 
     <!-- Error Alert -->

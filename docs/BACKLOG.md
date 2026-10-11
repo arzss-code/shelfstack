@@ -2,6 +2,7 @@
 
 > Sumber kebenaran scope. Prioritas MoSCoW. Setiap story punya acceptance criteria (AC) yang bisa diuji.
 > ID stabil: jangan ganti ID setelah sprint berjalan. Status awal semua `Todo`.
+> Status pengerjaan riil ada di `PROGRESS.md` (termasuk "Known Gaps" hasil audit 2026-10-11 untuk F0-01/F0-02).
 
 ## Legenda
 
@@ -12,13 +13,13 @@
 
 ## EPIC 0 — Foundation (Fase 0)
 
-| ID    | Story                                                          | Prioritas | AC                                                               |
-| ----- | -------------------------------------------------------------- | --------- | ---------------------------------------------------------------- |
-| F0-01 | Sebagai dev, saya regenerate `database.types.ts` bertipe penuh | Must      | `useSupabaseClient<Database>()`, tidak ada `any` di product flow |
-| F0-02 | Sebagai dev, saya punya `seed.sql` + akun demo                 | Must      | `supabase db reset` menghasilkan 4 kategori, 8 produk, 2 user    |
-| F0-03 | Sebagai dev, saya punya Zod server untuk products              | Must      | POST invalid → 400 dengan format `response.ts`, ada unit test    |
-| F0-04 | Sebagai dev, saya migrasi store/repo ke `features/products/`   | Should    | Import lama jadi alias, tidak ada dual logic                     |
-| F0-05 | Sebagai dev, saya rapikan README + CHANGELOG + version         | Must      | README tidak lagi bilang Nuxt 3                                  |
+| ID    | Story                                                          | Prioritas | AC                                                                                                                                                              |
+| ----- | -------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F0-01 | Sebagai dev, saya regenerate `database.types.ts` bertipe penuh | Must      | `useSupabaseClient<Database>()`, tidak ada `any` di product flow                                                                                                |
+| F0-02 | Sebagai dev, saya punya `seed.sql` + akun demo                 | Must      | `supabase db reset` menghasilkan 5 kategori kanonik, 5 produk kurasi, 2 user demo (sinkron dengan migrasi `20260921000001`, dikoreksi dari 4/8 pada 2026-10-11) |
+| F0-03 | Sebagai dev, saya punya Zod server untuk products              | Must      | POST invalid → 400 dengan format `response.ts`, ada unit test                                                                                                   |
+| F0-04 | Sebagai dev, saya migrasi store/repo ke `features/products/`   | Should    | Import lama jadi alias, tidak ada dual logic                                                                                                                    |
+| F0-05 | Sebagai dev, saya rapikan README + CHANGELOG + version         | Must      | README tidak lagi bilang Nuxt 3                                                                                                                                 |
 
 ## EPIC 1 — Auth & Security (Fase 1)
 
@@ -46,14 +47,14 @@
 
 ## EPIC 3 — Cart & Orders (Fase 3)
 
-| ID   | Story                                                        | Prioritas | AC                                                                                           |
-| ---- | ------------------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------- |
-| K-01 | Sebagai pembeli, saya tambah/ubah/hapus cart persisten       | Must      | Refresh tidak hilang (localStorage), badge navbar update realtime                            |
-| K-02 | Sebagai pembeli, saya checkout dengan alamat tervalidasi     | Must      | Zod alamat; stok dicek server; gagal stok → error jelas per item                             |
-| K-03 | Sebagai sistem, checkout atomik via RPC                      | Must      | `create_order()` 1 transaksi: insert order+items, decrement stock, rollback jika stok kurang |
-| K-04 | Sebagai pembeli, saya bayar simulasi + lihat status realtime | Must      | `pending→paid` mock; channel `orders:user_<id>` update tanpa refresh                         |
-| K-05 | Sebagai pembeli, saya lihat riwayat + detail order           | Must      | `/orders`, `/orders/[id]` hanya milik sendiri (RLS buktikan)                                 |
-| K-06 | Sebagai pembeli, saya batalkan order pending                 | Should    | `pending→cancelled`, stok dikembalikan via RPC                                               |
+| ID   | Story                                                                    | Prioritas | AC                                                                                           |
+| ---- | ------------------------------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------- |
+| K-01 | Sebagai pembeli, saya tambah/ubah/hapus cart persisten                   | Must      | Refresh tidak hilang (localStorage), badge navbar update realtime                            |
+| K-02 | Sebagai pembeli, saya checkout dengan alamat tervalidasi                 | Must      | Zod alamat; stok dicek server; gagal stok → error jelas per item                             |
+| K-03 | Sebagai sistem, checkout atomik via RPC                                  | Must      | `create_order()` 1 transaksi: insert order+items, decrement stock, rollback jika stok kurang |
+| K-04 | Sebagai pembeli, saya bayar via Midtrans Sandbox + lihat status realtime | Must      | `pending→paid` via Snap sandbox; channel realtime update tanpa refresh                       |
+| K-05 | Sebagai pembeli, saya lihat riwayat + detail order                       | Must      | `/orders`, `/orders/[id]` hanya milik sendiri (RLS buktikan)                                 |
+| K-06 | Sebagai pembeli, saya batalkan order pending                             | Should    | `pending→cancelled`, stok dikembalikan via RPC                                               |
 
 ## EPIC 4 — Admin Ops (Fase 4)
 
@@ -67,13 +68,13 @@
 
 ## EPIC 5 — Quality & Launch (Fase 5)
 
-| ID   | Story                                             | Prioritas | AC                                                                                                 |
-| ---- | ------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------- |
-| Q-01 | Sebagai dev, CI hijau                             | Must      | `lint → typecheck → vitest → playwright → preview` di `.github/workflows/ci.yml` (sekarang kosong) |
-| Q-02 | Sebagai dev, coverage kritis                      | Should    | Unit schema/store/RPC mock + e2e happy path + 403 path                                             |
-| Q-03 | Sebagai visitor, saya buka demo live cepat + aman | Must      | Vercel + Supabase Cloud, header `nuxt-security`, `/api/version` OK                                 |
-| Q-04 | Sebagai perekrut, saya paham repo dalam 3 menit   | Must      | README baru + GIF + arsitektur diagram + akun demo (lihat `PORTFOLIO-PACKAGING.md`)                |
-| Q-05 | Sebagai dev, saya ukur a11y + perf                | Should    | Lighthouse ≥90 perf/a11y/best-practice, tab order logis                                            |
+| ID   | Story                                             | Prioritas | AC                                                                                                                    |
+| ---- | ------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------- |
+| Q-01 | Sebagai dev, CI hijau                             | Must      | `lint → typecheck → vitest → docker compose validate` di `.github/workflows/ci.yml` (sudah ada; pastikan tetap hijau) |
+| Q-02 | Sebagai dev, coverage kritis                      | Should    | Unit schema/store/RPC mock + e2e happy path + 403 path                                                                |
+| Q-03 | Sebagai visitor, saya buka demo live cepat + aman | Must      | Vercel + Supabase Cloud, header `nuxt-security`, `/api/version` OK                                                    |
+| Q-04 | Sebagai perekrut, saya paham repo dalam 3 menit   | Must      | README baru + GIF + arsitektur diagram + akun demo (lihat `PORTFOLIO-PACKAGING.md`)                                   |
+| Q-05 | Sebagai dev, saya ukur a11y + perf                | Should    | Lighthouse ≥90 perf/a11y/best-practice, tab order logis                                                               |
 
 ## Out of Scope (12 minggu ini)
 

@@ -9,6 +9,43 @@ const props = defineProps<{
 
 const categorySlug = computed(() => detectProductCategorySlug(props.product))
 
+const activeImage = ref(props.product.image_url || '')
+const imageFailed = ref(false)
+const mainImgEl = ref<HTMLImageElement | null>(null)
+
+watch(
+  () => props.product.image_url,
+  (newUrl) => {
+    if (newUrl) activeImage.value = newUrl
+  },
+  { immediate: true },
+)
+
+watch(activeImage, () => {
+  imageFailed.value = false
+})
+
+onMounted(() => {
+  if (mainImgEl.value && mainImgEl.value.complete && mainImgEl.value.naturalWidth === 0) {
+    imageFailed.value = true
+  }
+})
+
+const galleryImages = computed(() => {
+  const list: string[] = []
+  if (props.product.image_url) {
+    list.push(props.product.image_url)
+  }
+  if (props.product.gallery_urls && Array.isArray(props.product.gallery_urls)) {
+    for (const url of props.product.gallery_urls) {
+      if (url && !list.includes(url)) {
+        list.push(url)
+      }
+    }
+  }
+  return list
+})
+
 const warrantyBadge = computed(() => {
   switch (categorySlug.value) {
     case 'furniture':
@@ -33,10 +70,12 @@ const warrantyBadge = computed(() => {
       class="relative w-full aspect-[4/3] rounded-card bg-brand-field border border-brand-hair overflow-hidden flex items-center justify-center p-6 shadow-whisper group"
     >
       <img
-        v-if="product.image_url"
-        :src="product.image_url"
+        v-if="activeImage && !imageFailed"
+        ref="mainImgEl"
+        :src="activeImage"
         :alt="product.name"
-        class="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
+        class="w-full h-full object-contain mix-blend-multiply transition-all duration-300 group-hover:scale-105"
+        @error="imageFailed = true"
       />
       <div v-else class="flex flex-col items-center justify-center text-brand-faint">
         <i class="pi pi-image text-5xl mb-2" />
@@ -49,6 +88,33 @@ const warrantyBadge = computed(() => {
       >
         ShelfStack Original
       </div>
+    </div>
+
+    <!-- Multi-Angle Thumbnail Switcher (Stitch Prototype Spec) -->
+    <div
+      v-if="galleryImages.length > 1"
+      class="flex items-center gap-2.5 overflow-x-auto py-1"
+      aria-label="Sudut Foto Produk"
+    >
+      <button
+        v-for="(img, idx) in galleryImages"
+        :key="idx"
+        type="button"
+        class="w-16 h-16 rounded-xl border p-1 bg-brand-field shrink-0 transition-all cursor-pointer overflow-hidden focus:outline-none"
+        :class="[
+          activeImage === img
+            ? 'border-brand-ink ring-2 ring-brand-ink/20 shadow-whisper scale-105'
+            : 'border-brand-hair hover:border-brand-muted opacity-70 hover:opacity-100',
+        ]"
+        :aria-label="`Pilih sudut gambar ${idx + 1}`"
+        @click="activeImage = img"
+      >
+        <img
+          :src="img"
+          :alt="`${product.name} thumbnail ${idx + 1}`"
+          class="w-full h-full object-contain mix-blend-multiply"
+        />
+      </button>
     </div>
 
     <!-- Micro-Showcase Spec Grid (3 Triad Boxes) -->

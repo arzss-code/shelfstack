@@ -54,3 +54,14 @@ export function mapMidtransStatus(
 
   return 'pending'
 }
+
+/**
+ * Extracts base order UUID from Midtrans order_id in case a retry/timestamp suffix was used.
+ * Example: "b129f62c-152e-44cf-9fa6-f12a548168d1-R123456" -> "b129f62c-152e-44cf-9fa6-f12a548168d1"
+ */
+export function extractBaseOrderId(orderId: string): string {
+  if (!orderId) return ''
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
+  const match = orderId.match(uuidRegex)
+  return match ? match[0] : orderId
+}
