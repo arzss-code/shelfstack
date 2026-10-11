@@ -6,7 +6,7 @@ import { errorResponse, successResponse } from '../utils/response'
 
 const activityLogSchema = z.object({
   entity_type: z.string().min(1).max(50),
-  entity_id: z.coerce.number().optional().nullable(),
+  entity_id: z.coerce.number(),
   action: z.enum(['CREATE', 'UPDATE', 'DELETE', 'RESTORE']),
   description: z.string().min(1).max(500),
   old_data: z.any().optional().nullable(),
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     .from('activity_logs')
     .insert({
       entity_type: validData.entity_type,
-      entity_id: validData.entity_id ?? null,
+      entity_id: validData.entity_id,
       action: validData.action,
       description: validData.description,
       old_data: validData.old_data || null,
