@@ -44,3 +44,10 @@ pnpm-debug.log*
 .cursor/
 .mcp.json
 .e2e/
+
+# MCP secrets (never commit tokens)
+.secrets/
+*.token.txt
+
+# NOTE: opencode.json is intentionally TRACKED (project MCP wiring).
+# It must only contain public refs + {env:}/{file:} placeholders, never secrets.
