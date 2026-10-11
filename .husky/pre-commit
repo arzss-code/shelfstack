@@ -32,4 +32,4 @@ fi
 echo -e ">> Finish checking branch name / Selesai mengecek nama branch.\n==="
 
 # Run Linters and Formatters
-npx lint-staged -r --max-arg-length 4000
+pnpm exec lint-staged -r --max-arg-length 4000

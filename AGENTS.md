@@ -18,15 +18,49 @@ Use proven patterns appropriate to the current workload and architecture.
 - Nitro
 - Supabase / PostgreSQL
 - Redis
-- BullMQ
+- BullMQ (TODO — belum diimplementasi; order-expiry worker masih direct sweep, tanpa queue/DLQ)
 - Fastify
 - Zod
 - Pino
 - Docker / Docker Compose
-- GitHub Actions
+- GitHub Actions (`.github/workflows/ci.yml`: lint → typecheck → build → vitest → compose validate)
 - Vitest
 - Playwright
-- Midtrans
+- Midtrans (Sandbox; tidak ada lapisan mock di kode)
+
+## Commands
+
+- `pnpm typecheck` — `vue-tsc --noEmit`, harus EXIT 0
+- `pnpm lint` / `pnpm lint:fix` — ESLint (0 error; warning `vue/html-self-closing` masih ada ~32)
+- `pnpm exec vitest run` — unit suite (33 file / 310 test, semua lolos per 2026-10-11). Jangan `pnpm test` untuk sekali jalan (itu watch mode)
+- `pnpm test:e2e` — Playwright (`tests/e2e/`)
+- `pnpm build` — verifikasi production build
+
+## Package Manager
+
+Repo ini memakai **pnpm saja**. Aturan keras, tanpa pengecualian:
+
+- Jangan pernah memakai `npm`, `npx`, `yarn`, atau `bun` — di perintah, script, hook, config MCP, maupun dokumentasi.
+- Tool sekali jalan: `pnpm dlx <paket>` (pengganti `npx`).
+- Binary lokal project: `pnpm exec <bin>` (pengganti `npx <bin>`).
+- Workspace/service: `pnpm --filter <nama-paket> <script>`.
+- Install/CI: `pnpm install --frozen-lockfile`. Jangan commit tanpa `pnpm-lock.yaml` yang sinkron.
+
+## Documentation Hierarchy
+
+Sumber kebenaran berlapis (jangan mengarang klaim di luar ini):
+
+1. `docs/PROGRESS.md` — status pengerjaan terkini + "Known Gaps". Wajib dibaca sebelum kerja.
+2. `docs/BACKLOG.md` — scope + acceptance criteria (ID stabil, jangan diganti).
+3. `docs/README.md` — indeks semua dokumen.
+4. `DESIGN.md` (root) — design system aktif. `docs/DESIGN.md` dan `docs/DESIGN-ECOMMERCE.md` adalah legacy, bukan acuan implementasi.
+5. `docs/MCP-SETUP.md` — setup tooling OpenCode (global vs per-project).
+6. `docs/ADR/` — keputusan arsitektur yang sudah disahkan.
+
+## MCP Tooling
+
+- Supabase MCP selalu `--read-only`. Jangan tulis skema/data lewat MCP; perubahan skema hanya via migrasi `supabase/migrations/`.
+- `project-ref` per project hidup di `opencode.json` masing-masing repo; token tidak pernah masuk repo/chat.
 
 ## Mandatory Workflow
 
@@ -279,3 +313,26 @@ Known gaps.
 ### Follow-up
 
 Recommended next work.
+
+<!-- antislop:start -->
+
+## antislop
+
+Mode: DURING (ditetapkan pemilik repo — terapkan aturan saat bekerja, bukan sesudah).
+
+Untuk kerja UI, copywriting, aksesibilitas, layout mobile, atau komentar kode, baca filter inti
+`C:\Users\ARYA\.opencode\skills\antislop\SKILL.md` lalu skill sesuai tugas (bila tersedia di rilis yang sama):
+
+- UI / visual: `skills/antislop-ui/SKILL.md`
+- Copy & text: `skills/antislop-copywriting/SKILL.md`
+- Orang & aksesibilitas: `skills/antislop-human/SKILL.md`
+- Layout mobile: `skills/antislop-layoutmobile/SKILL.md`
+- Komentar kode: `skills/antislop-code/SKILL.md` (hapus komentar generik AI-slop, pertahankan yang bernilai, jangan sentuh kode)
+
+Aturan keras yang selalu berlaku di repo ini, tanpa perlu diminta ulang:
+
+- Tanpa em dash (—) di teks user-facing dan komentar kode. Pakai koma, titik, titik dua, atau kurung.
+- Tanpa klaim fabrikasi (angka, testimoni, status tanpa bukti).
+- Setiap klaim bukti-backup (file:line) dan setiap perubahan terverifikasi eksekusi sebelum dilaporkan.
+
+<!-- antislop:end -->
