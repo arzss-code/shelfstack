@@ -9,11 +9,13 @@ nge-handle list produk, tambah/edit data, dan pastinya state management yang rap
 
 ## Tech Stack
 
-- **Nuxt 4** (Vue 3)
+- **Nuxt 4** (Vue 3) + **Nitro** (server API)
 - **PrimeVue 4** (UI Components) + **Tailwind CSS** (Styling)
 - **Pinia** (State Management)
-- **Supabase** (Database & Storage)
+- **Supabase** (PostgreSQL + Auth + Storage + Realtime)
 - **Zod** (Schema Validation, client + server via `shared/schemas/`)
+- **Midtrans Sandbox** (Payment Snap)
+- Dev/infra: **Vitest + Playwright** (testing), **nuxt-security + @nuxt/image**, **Docker + Nginx** (deploy), **Fastify + Redis 7** (`services/order-service`, pilot)
 
 ## Cara Setup
 
@@ -29,5 +31,14 @@ nge-handle list produk, tambah/edit data, dan pastinya state management yang rap
 - `pnpm dev` - Jalanin server local untuk development
 - `pnpm build` - Build project untuk production
 - `pnpm preview` - Preview hasil build lokal
+- `pnpm generate` - Generate static
+- `pnpm typecheck` - Cek tipe (`vue-tsc --noEmit`)
+- `pnpm lint` / `pnpm lint:fix` - ESLint
+- `pnpm test` - Unit test (Vitest, watch mode)
+- `pnpm test:e2e` - E2E (Playwright)
 
-> **Note:** Pastikan RLS (Row Level Security) di Supabase udah di-setup dengan bener buat table `products` dan storage bucket `product-images`, kalau nggak nanti bakal kena error 403 / Access Denied.
+> **CI:** `.github/workflows/ci.yml` menjalankan `lint → typecheck → build → vitest → docker compose validate` di setiap push/PR.
+>
+> **Docs:** indeks dokumentasi di `docs/README.md`; status terkini di `docs/PROGRESS.md` (wajib dibaca sebelum kerja); scope di `docs/BACKLOG.md`.
+>
+> **Note:** Pastikan RLS (Row Level Security) di Supabase udah di-setup dengan bener buat table `products`, `orders`/`order_items`, `profiles`, `activity_logs` dan storage bucket `product-images`, kalau nggak nanti bakal kena error 403 / Access Denied.

@@ -1,6 +1,6 @@
 # Panduan Arsitektur: Feature-Scoped Development (FSD-Lite)
 
-Repositori ini mengadopsi pola **Feature-Scoped Development (FSD-lite)** yang dikombinasikan dengan standar arsitektur **Nuxt 3**. Tujuannya adalah menjaga agar _codebase_ tetap bersih, skalabel, dan modul-modul tidak saling tumpang tindih (_high cohesion, low coupling_).
+Repositori ini mengadopsi pola **Feature-Scoped Development (FSD-lite)** yang dikombinasikan dengan standar arsitektur **Nuxt 4**. Tujuannya adalah menjaga agar _codebase_ tetap bersih, skalabel, dan modul-modul tidak saling tumpang tindih (_high cohesion, low coupling_).
 
 ## Struktur Direktori Utama
 

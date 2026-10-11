@@ -4,7 +4,7 @@
 
 ### 1. Tech Stack & Architecture
 
-- **Framework**: Nuxt 3 (Vue 3 Composition API).
+- **Framework**: Nuxt 4 (Vue 3 Composition API).
 - **UI Library**: PrimeVue (Aura Theme) + Tailwind CSS.
 - **Backend as a Service (BaaS)**: Supabase (PostgreSQL, Auth, Storage).
 - **State Management**: Pinia (menyimpan data _Cart_ dan _Auth Session_).

@@ -6,7 +6,7 @@
 
 ## Aturan Main Sprint
 
-- Branch: `feat/s1-foundation`, `feat/s2-auth`, `feat/s3-catalog`, `feat/s4-cart-orders`, `feat/s5-admin`, `feat/s6-launch`. PR kecil (<400 baris) + template `docs/PULL_REQUEST_TEMPLATE.md`.
+- Branch: `feat/s1-foundation`, `feat/s2-auth`, `feat/s3-catalog`, `feat/s4-cart-orders`, `feat/s5-admin`, `feat/s6-launch`. PR kecil (<400 baris) + template `.github/PULL_REQUEST_TEMPLATE.md`.
 - Commit: `feat(auth): ...`, `fix(rls): ...`, `docs(sprint-2): ...`, `test(orders): ...`.
 - Demo tiap akhir sprint direkam 2–5 menit (bukti portofolio + bahan README GIF).
 - Kapasitas refactor maksimal 20% per sprint. Bug RLS = prioritas tertinggi.
@@ -22,7 +22,7 @@
 **Task file-by-file:**
 
 1. `app/types/database.types.ts` — regenerate: `supabase gen types typescript --linked > app/types/database.types.ts`. Ganti `useSupabaseClient<any>()` di `app/stores/product.ts:6`.
-2. `supabase/seed.sql` (baru) — 4 categories, 8 products (campur stok 0/3/50), 2 profiles dummy. Pastikan `supabase db reset --local` hijau.
+2. `supabase/seed.sql` (baru) — 5 kategori kanonik, 5 produk kurasi, 2 user demo. Pastikan `supabase db reset --local` hijau.
 3. `app/features/products/schema.ts` (baru) — Zod: `name 3–120, price_cents int >0, stock int >=0, description max 2000 nullable, link url nullable, category_id uuid nullable`.
 4. `server/api/products/index.ts` — tambah `safeParse` GET (from/to/q/cat/sort) + POST. Pakai `server/utils/response.ts`. Tambah `tests/unit/product-schema.spec.ts`.
 5. Migrasi FSD: copy `app/stores/product.ts` → `app/features/products/stores/product.ts`, `app/repository/product.ts` → `app/features/products/repository/product.ts`. Update `app/pages/index.vue:2-6` ke path baru. Path lama jadi re-export alias 1 sprint, lalu hapus.

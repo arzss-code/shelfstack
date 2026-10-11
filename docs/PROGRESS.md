@@ -6,14 +6,15 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** Transisi dari **Sprint 3 (Katalog Pro)** menuju **Sprint 4 (Cart & Checkout)**
-- **Versi Rilis:** `v0.11.0-s3` (Roadmap Target: 6 Sprint / 12 Minggu)
+- **Sprint Aktif:** **Sprint 6 (Quality & Launch)** — Fase 4 selesai fungsional, sisa Fase 5
+- **Versi Rilis:** `v0.15.0` (`version.json`, `CHANGELOG.md` — sinkron 2026-10-11)
+- **Baseline Quality Gate (2026-10-11, dijalankan aktual):** `pnpm typecheck` ✅ EXIT 0 · `pnpm lint` ✅ 0 error / 32 warning (`vue/html-self-closing`) · `vitest run` ✅ 33 file / 318 test lolos (+8 regression test baru)
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
-  - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect)
+  - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
   - UI Language: **Bahasa Indonesia** konsisten di seluruh etalase publik
-  - Realtime Engine: **Supabase Realtime** (Postgres Changes untuk order tracking)
-  - Deployment Target: **Vercel** (SSR Nuxt 4 native)
+  - Realtime Engine: **Supabase Realtime** (Postgres Changes untuk order tracking) + polling sync 3.5–4s untuk order `pending`
+  - Deployment Target: **Docker + Nginx** (multi-stage build, `deploy/docker-compose.prod.yml`; Vercel tidak lagi jadi target)
 
 ---
 
@@ -84,6 +85,42 @@
 - [x] **Order History & Realtime Tracking**:
   - Halaman riwayat `app/pages/orders/index.vue`.
   - Halaman detail `app/pages/orders/[id].vue` dengan timeline visual dan langganan Supabase Realtime channel `order-realtime-<id>` untuk pembaruan status live.
+
+---
+
+### ✅ Fase 4: Admin Ops (Sprint 5) — selesai fungsional ~90%, 2 parsial
+
+Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
+
+- [x] **KPI Dashboard (`app/pages/admin/index.vue`, `server/api/admin/stats.get.ts`)**:
+  - Revenue, order pending, low-stock (<5), total customers, 8 recent orders.
+- [x] **Manajemen Order + FSM (`app/pages/admin/orders/`, `server/api/orders/[id]/status.put.ts`, `shared/constants/order-transitions.ts`)**:
+  - Hanya transisi legal via RPC `transition_order_status`; admin `pending→paid` dilarang.
+  - Ekstra di luar spek: refund (`server/api/orders/[id]/refund.post.ts`), `check-payment-status`, refund-webhook.
+- [x] **CRUD Produk + Ledger Stok (`app/pages/admin/products.vue`, `server/api/admin/products/[id]/stock-movements.get.ts`)**:
+  - Tabel `stock_movements` (double-entry ledger), modal riwayat per produk.
+- [x] **Audit Aktivitas (`app/pages/admin/activities.vue`, channel `public:activity_logs`)**:
+  - ✅ Terverifikasi 2026-10-11: `transition_order_status` kanonis (`20261115000001:411-429`) menulis `activity_logs` transaksional (fail-safe) — `status.put.ts` memang tidak perlu insert langsung.
+- [x] **Export CSV (`server/api/admin/orders/export.get.ts`, tombol di `app/pages/admin/orders/index.vue`)**:
+  - ✅ Filter tanggal + status selesai 2026-10-11: param `from`/`to` (YYYY-MM-DD, 400 jika invalid), batas akhir inklusif, input tanggal di filter bar, +5 unit test. Status `refunded` ditambahkan ke allowlist filter.
+
+### 🔄 Fase 5: Quality & Launch (Sprint 6) — berjalan
+
+- [x] **CI (`/.github/workflows/ci.yml`)**: lint → typecheck (root + order-service) → build → vitest (root + order-service) → validasi docker compose.
+- [x] **E2E Suite Playwright** (`tests/e2e/full-business-journey.spec.ts` + 12 Page Object Models).
+- [x] **Deployment Docker+Nginx** (`Dockerfile`, `deploy/docker-compose.prod.yml`, `deploy/nginx/nginx.conf`).
+- [ ] **Packaging portofolio** (README baru + GIF + diagram + akun demo — lihat `docs/PORTFOLIO-PACKAGING.md`).
+- [ ] **Lighthouse ≥90** perf/a11y (belum diukur — jangan klaim).
+
+---
+
+## ⚠️ Known Gaps (sisa setelah eksekusi 2026-10-11 — yang selesai dicoret)
+
+1. ~~**F0-01: `database.types.ts` basi**~~ ✅ **SELESAI 2026-10-11** — sinkron manual dari migrasi (tabel `order_idempotency_keys` + `user_addresses`, 7 kolom, signature `create_order`, enum `order_status` di Constants); `typecheck` EXIT 0 tanpa fallout. `supabase gen types` ulang tetap disarankan saat CLI terautentikasi (tidak ada token di sesi ini).
+2. **F0-02 SEBAGIAN (koreksi temuan audit).** Klaim "PASTI GAGAL" **dicabut** — verifikasi byte-level membuktikan `DO UPDATE SET` valid (baris 12/150 + migrasi `20260921000001:69`); flag `parse_partial` indexer adalah keterbatasan grammar tree-sitter untuk upsert. AC jumlah seed dikoreksi ke 5/5/2. Sisa: runtime (`pgcrypto`, `auth.*`) butuh `supabase db reset` sekali untuk vonis final.
+3. ~~**R-1 rate-limit salah sasaran**~~ ✅ **SELESAI 2026-10-11** — rule menunjuk `/api/orders/**/payment-token` (rule mati `/api/checkout` yang tidak punya endpoint dihapus).
+4. ~~**R-2 inkonsistensi admin `payment-token`**~~ ✅ **SELESAI 2026-10-11** — diputuskan ikut pola mayoritas (owner + admin bypass, konsisten dengan 3 endpoint order lain).
+5. ~~**R-3 pola ganda `addresses/[id].ts`**~~ ✅ **SELESAI 2026-10-11** — query lanjutan memakai `existing.user_id` (pemilik terverifikasi); +3 regression test admin.
 
 ---
 
