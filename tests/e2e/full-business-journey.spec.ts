@@ -164,6 +164,12 @@ test.describe('ShelfStack Full Business Journey [SHF-E2E]', () => {
     const catalogPage = new CatalogPage(page)
     const pdp = new ProductDetailPage(page)
     const checkoutPage = new CheckoutPage(page)
+    const loginPage = new LoginPage(page)
+
+    // 0. Login dulu: halaman checkout hanya tampil penuh untuk user terautentikasi
+    await loginPage.goto()
+    await loginPage.loginAsCustomer()
+    await expect(page).not.toHaveURL(/\/auth\/login/)
 
     // 1. Siapkan keranjang dengan 1 produk terlebih dahulu
     await catalogPage.goto()
@@ -219,6 +225,12 @@ test.describe('ShelfStack Full Business Journey [SHF-E2E]', () => {
   }) => {
     const checkoutPage = new CheckoutPage(page)
     const orderDetailPage = new OrderDetailPage(page)
+    const loginPage = new LoginPage(page)
+
+    // 0. Login dulu: halaman detail pesanan mengarahkan tamu ke halaman login
+    await loginPage.goto()
+    await loginPage.loginAsCustomer()
+    await expect(page).not.toHaveURL(/\/auth\/login/)
 
     /**
      * CATATAN COMPLIANCE SHELFSTACK & TALENAVI:

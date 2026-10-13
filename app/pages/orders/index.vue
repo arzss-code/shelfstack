@@ -11,6 +11,10 @@ const router = useRouter()
 const supabase = useSupabaseClient<Database>()
 const toast = useToast()
 
+definePageMeta({
+  middleware: 'auth',
+})
+
 useSeoMeta({
   title: 'Riwayat Pesanan — ShelfStack',
   description: 'Daftar riwayat dan status transaksi pesanan resmi Anda di ShelfStack.',
