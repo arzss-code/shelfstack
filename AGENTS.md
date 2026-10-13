@@ -30,7 +30,7 @@ Use proven patterns appropriate to the current workload and architecture.
 
 ## Commands
 
-- `pnpm typecheck` — `vue-tsc --noEmit`. PERHATIAN (temuan 2026-10-12): script ini **vacuous**, memeriksa 0 file dan selalu EXIT 0. Jangan pakai sebagai bukti. Pemeriksa real: `pnpm exec nuxi typecheck` (saat ini merah — lihat `docs/PROGRESS.md` Known Gaps no. 6).
+- `pnpm typecheck` — `nuxi typecheck` (pemeriksa real atas proyek app + server, harus EXIT 0)
 - `pnpm lint` / `pnpm lint:fix` — ESLint (0 error; warning `vue/html-self-closing` masih ada ~32)
 - `pnpm exec vitest run` — unit suite (33 file / 310 test, semua lolos per 2026-10-11). Jangan `pnpm test` untuk sekali jalan (itu watch mode)
 - `pnpm test:e2e` — Playwright (`tests/e2e/`)
