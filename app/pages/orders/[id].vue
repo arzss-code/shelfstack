@@ -28,6 +28,10 @@ const isCancelModalOpen = ref(false)
 const isInvoiceModalOpen = ref(false)
 const errorMsg = ref('')
 
+definePageMeta({
+  middleware: 'auth',
+})
+
 let channel: RealtimeChannel | null = null
 let pollInterval: ReturnType<typeof setInterval> | null = null
 
