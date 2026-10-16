@@ -59,11 +59,14 @@
 - **Etalase belum disatukan geometrinya.** Primitive baru hanya dipakai admin. Halaman publik masih
   memakai komponen lama. Token warnanya sudah satu, jadi tidak rusak, tapi geometri (radius,
   ukuran kontrol) belum konsisten antara admin dan etalase.
-- **21 em dash tersisa** di halaman etalase, `AppNavbar`, dan komponen auth. Semua di luar
-  scope redesign admin.
-- `AdminStatCard` masih memakai union `color` warisan
-  (`'emerald' | 'amber' | 'rose' | 'indigo' | 'brand'`) yang dipetakan ke ramp brand. Nama propnya
-  tidak diubah demi menjaga kontrak, jadi kosakata internal belum seragam.
+- [x] **Em dash repo-wide selesai (2026-10-16).** 20 em dash di luar admin diganti: judul SEO memakai
+      `-` (selaras `Kelola Pesanan - Admin ShelfStack`), komentar kode memakai `:`, tombol
+      `Tambah ke Bag` memakai `·` (selaras pita promo), label sortir memakai `A-Z`. Nol em dash tersisa
+      di `app/`, satu-satunya assertion judul E2E (`/ShelfStack/`) tetap lolos.
+- [x] **`AdminStatCard` memakai union semantik (2026-10-16).** Prop `color` kini
+      `'success' | 'warning' | 'danger' | 'info' | 'neutral'` dengan tipe ekspor `AdminStatTone`.
+      Kelas ramp brand tidak berubah, hanya nama kontraknya. Empat call site di `admin/index.vue`
+      dimigrasi, tidak ada test yang mengikat nama lama.
 
 ### ✅ Fase 1: Auth & Security (Sprint 2)
 

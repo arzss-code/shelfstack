@@ -2,6 +2,23 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [Unreleased] - vocabulary completion (2026-10-16)
+
+### Perubahan
+
+- `AdminStatCard` prop `color` memakai union semantik
+  `'success' | 'warning' | 'danger' | 'info' | 'neutral'` (tipe ekspor `AdminStatTone`).
+  Pemetaan ke ramp brand tidak berubah, hanya nama kontraknya. Empat call site
+  di `app/pages/admin/index.vue` dimigrasi. Tidak ada test yang mengikat nama lama.
+- 20 em dash di luar admin dihapus: 13 judul SEO memakai `-` (selaras judul admin),
+  4 komentar kode memakai `:`, tombol `Tambah ke Bag` memakai `·` (selaras pita promo),
+  label sortir memakai `A-Z`. Nol em dash tersisa di `app/`.
+
+### Gate (dijalankan aktual 2026-10-16)
+
+`pnpm typecheck` EXIT 0, `pnpm lint` 0 error / 32 warning (pre-existing),
+`pnpm exec vitest run` 37 file / 357 test lolos, detector impeccable `[]`.
+
 ## [Unreleased] - redesign admin ke primitif brand (2026-10-16)
 
 ### Keputusan
@@ -9,7 +26,7 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
 PrimeVue dihapus sepenuhnya dari aplikasi. Penyebabnya bukan selera: `darkModeSelector: 'system'`
 di `nuxt.config.ts` membuat komponen PrimeVue mengikuti dark mode OS, sementara token Tailwind
 `brand-*` mengikuti class `.dark` yang tidak pernah dipasang. Kedua sistem theming hidup
-bersamaan danmenghasilkan halaman setengah gelap (tab tak terlihat, dialog gelap di atas form terang).
+bersamaan dan menghasilkan halaman setengah gelap (tab tak terlihat, dialog gelap di atas form terang).
 Satu kosakata komponen menghapus dual theming itu.
 
 `primeicons` tetap dipakai. Itu font ikon, bukan pustaka komponen, dan dipakai lintas etalase.
