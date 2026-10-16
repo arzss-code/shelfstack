@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-// Dev server butuh beberapa detik untuk hidrasi Vue (cold start + bundle PrimeVue).
+// Dev server butuh beberapa detik untuk hidrasi Vue (cold start + bundel klien).
 // Tanpa ini, klik terjadi pre-hydration: form submit native (reload) atau @click tak jalan.
 // Lihat investigasi Sprint 2: __vue_app__ muncul ~4.4s setelah load di mesin dev.
 // Revisi: kehadiran __vue_app__ saja tidak cukup, root component harus sudah

@@ -10,7 +10,8 @@ nge-handle list produk, tambah/edit data, dan pastinya state management yang rap
 ## Tech Stack
 
 - **Nuxt 4** (Vue 3) + **Nitro** (server API)
-- **PrimeVue 4** (UI Components) + **Tailwind CSS** (Styling)
+- **Tailwind CSS** (Styling) + **PrimeIcons** (icon font)
+- **Primitif UI sendiri** di `app/components/ui/` (bukan pustaka komponen pihak ketiga)
 - **Pinia** (State Management)
 - **Supabase** (PostgreSQL + Auth + Storage + Realtime)
 - **Zod** (Schema Validation, client + server via `shared/schemas/`)
