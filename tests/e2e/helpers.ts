@@ -11,11 +11,10 @@ export async function waitForHydration(page: Page, timeout = 60000) {
     () => {
       const el = document.getElementById('__nuxt') as unknown as {
         __vue_app__?: { _instance?: { isMounted?: boolean } | null }
-      }
-      const app = el.__vue_app__
-      if (!app) return false
-      if (!app._instance) return true
-      return app._instance.isMounted === true
+      } | null
+      if (!el || !el.__vue_app__) return false
+      if (!el.__vue_app__._instance) return true
+      return el.__vue_app__._instance.isMounted === true
     },
     { timeout },
   )
