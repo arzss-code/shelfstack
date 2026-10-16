@@ -34,6 +34,15 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
 - `UiInput` menerima `modelValue` undefined; `admin.vue` memakai alias `signOut` (tombol logout sebelumnya mati); generic eksplisit `$fetch` di `katalog.vue`; `@types/node` masuk root devDependencies.
 - Hasil: `pnpm exec nuxi typecheck` EXIT 0 · `lint` 0 error · `vitest` 33 file/318 test lolos.
 
+### Penjaga env server (2026-10-12)
+
+- Diagnosis kegagalan E2E CI: tanpa Supabase URL/Key, plugin server `@nuxtjs/supabase`
+  melempar saat setup sehingga setup pinia terlewat dan hook `app:rendered`
+  crash (`.state` of undefined) di semua halaman SSR, menutupi error asli.
+- Plugin Nitro `server/plugins/00.env-guard.ts` + `shared/utils/env-guard.ts`
+  (+4 unit test): server menolak boot dengan pesan jelas bila konfigurasi
+  belum lengkap. Terbukti: tanpa env → fatal eksplisit; dengan env → 200.
+
 ### Gate typecheck jujur (2026-10-12)
 
 - Script `pnpm typecheck` diganti dari `vue-tsc --noEmit` (terbukti memeriksa 0 file)
