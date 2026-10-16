@@ -1,17 +1,19 @@
 <script setup lang="ts">
+export type AdminStatTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'
+
 interface Props {
   title: string
   value: string
   subtitle?: string
   icon: string
-  color?: 'emerald' | 'amber' | 'rose' | 'indigo' | 'brand'
+  color?: AdminStatTone
   to?: string
   loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   subtitle: '',
-  color: 'brand',
+  color: 'neutral',
   to: '',
   loading: false,
 })
@@ -22,27 +24,27 @@ const props = withDefaults(defineProps<Props>(), {
  */
 const colorStyles = computed(() => {
   switch (props.color) {
-    case 'emerald':
+    case 'success':
       return {
         bg: 'bg-brand-success-tint text-brand-success-text border-brand-success-edge',
         badge: 'text-brand-success-text',
       }
-    case 'amber':
+    case 'warning':
       return {
         bg: 'bg-brand-warning-tint text-brand-warning-text border-brand-warning-edge',
         badge: 'text-brand-warning-text',
       }
-    case 'rose':
+    case 'danger':
       return {
         bg: 'bg-brand-danger-tint text-brand-danger-text border-brand-danger-edge',
         badge: 'text-brand-danger-text',
       }
-    case 'indigo':
+    case 'info':
       return {
         bg: 'bg-brand-accent-tint text-brand-accent-text border-brand-accent-edge',
         badge: 'text-brand-accent-text',
       }
-    case 'brand':
+    case 'neutral':
     default:
       return {
         bg: 'bg-brand-canvas-soft text-brand-ink border-brand-hairsoft',

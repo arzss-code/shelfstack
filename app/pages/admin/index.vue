@@ -149,7 +149,7 @@ const formatDate = (dateStr: string) => {
         :value="stats ? formatRupiah(stats.revenue.monthly_cents / 100) : 'Rp 0'"
         subtitle="Dari pesanan lunas & selesai"
         icon="pi-wallet"
-        color="emerald"
+        color="success"
         :loading="loading"
       />
 
@@ -158,7 +158,7 @@ const formatDate = (dateStr: string) => {
         :value="stats ? String(stats.counts.pending_orders) : '0'"
         subtitle="Membutuhkan pembayaran/tindakan"
         icon="pi-clock"
-        color="amber"
+        color="warning"
         to="/admin/orders?status=pending"
         :loading="loading"
       />
@@ -168,7 +168,7 @@ const formatDate = (dateStr: string) => {
         :value="stats ? String(stats.counts.low_stock_products) : '0'"
         subtitle="Varian produk perlu restock"
         icon="pi-exclamation-triangle"
-        color="rose"
+        color="danger"
         to="/admin/products"
         :loading="loading"
       />
@@ -178,7 +178,7 @@ const formatDate = (dateStr: string) => {
         :value="stats ? String(stats.counts.total_customers) : '0'"
         subtitle="Akun pembeli terdaftar"
         icon="pi-users"
-        color="indigo"
+        color="info"
         :loading="loading"
       />
     </div>
