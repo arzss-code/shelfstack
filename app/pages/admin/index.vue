@@ -140,7 +140,7 @@ const formatDate = (dateStr: string) => {
     <!-- Error Alert -->
     <div
       v-if="errorMessage"
-      class="rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/20 dark:text-rose-400"
+      class="rounded-xl border border-rose-200 dark:border-rose-800/40 bg-rose-50 dark:bg-rose-950/40 p-4 text-xs text-rose-700 dark:text-rose-400"
     >
       {{ errorMessage }}
     </div>
@@ -187,9 +187,7 @@ const formatDate = (dateStr: string) => {
     </div>
 
     <!-- Recent Transactions Section -->
-    <div
-      class="rounded-card border border-brand-hair bg-white dark:bg-[#18191b] p-6 shadow-whisper"
-    >
+    <div class="rounded-card border border-brand-hair bg-brand-canvas p-6 shadow-whisper">
       <div class="mb-5 flex items-center justify-between">
         <div>
           <h2 class="font-display text-base sm:text-lg font-bold text-brand-ink m-0">

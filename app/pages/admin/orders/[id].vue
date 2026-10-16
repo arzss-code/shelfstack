@@ -172,7 +172,7 @@ const formatDate = (dateStr?: string | null) => {
     <!-- Error State -->
     <div
       v-else-if="errorMessage"
-      class="rounded-xl border border-rose-200 bg-rose-50 p-6 text-center text-xs text-rose-700"
+      class="rounded-xl border border-rose-200 dark:border-rose-800/40 bg-rose-50 dark:bg-rose-950/40 p-6 text-center text-xs text-rose-700 dark:text-rose-400"
     >
       <p class="m-0 font-medium">{{ errorMessage }}</p>
       <UiButton variant="secondary" size="sm" class="mt-3" @click="fetchOrderDetail">

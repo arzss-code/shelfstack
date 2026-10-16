@@ -84,7 +84,7 @@ const rowClass = (data: ActivityLog) => {
     <div class="mb-8 flex items-center justify-between">
       <div>
         <h1
-          class="m-0 mb-1 flex items-center gap-3 text-3xl font-bold tracking-tight text-surface-900 dark:text-surface-0"
+          class="m-0 mb-1 flex items-center gap-3 text-3xl font-bold tracking-tight text-brand-ink"
         >
           Activity Log
           <span
@@ -99,15 +99,13 @@ const rowClass = (data: ActivityLog) => {
             Live
           </span>
         </h1>
-        <p class="m-0 text-surface-500 dark:text-surface-400">
-          Riwayat lengkap aktivitas dan perubahan sistem.
-        </p>
+        <p class="m-0 text-brand-muted">Riwayat lengkap aktivitas dan perubahan sistem.</p>
       </div>
     </div>
 
     <!-- Filter Bar -->
     <div
-      class="mb-4 flex flex-col gap-3 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900 p-4 md:flex-row md:items-center md:justify-between"
+      class="mb-4 flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-4 md:flex-row md:items-center md:justify-between"
     >
       <div class="flex flex-wrap items-center gap-1.5">
         <button
@@ -115,8 +113,8 @@ const rowClass = (data: ActivityLog) => {
           class="rounded-full px-3 py-1.5 text-xs font-semibold transition-all"
           :class="[
             selectedAction === ''
-              ? 'bg-surface-900 text-surface-0 dark:bg-surface-0 dark:text-surface-900'
-              : 'text-surface-500 hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-surface-0',
+              ? 'bg-brand-ink text-brand-onink'
+              : 'text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink',
           ]"
           @click="selectedAction = ''"
         >
@@ -129,8 +127,8 @@ const rowClass = (data: ActivityLog) => {
           class="rounded-full px-3 py-1.5 text-xs font-semibold transition-all"
           :class="[
             selectedAction === action
-              ? 'bg-surface-900 text-surface-0 dark:bg-surface-0 dark:text-surface-900'
-              : 'text-surface-500 hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-surface-0',
+              ? 'bg-brand-ink text-brand-onink'
+              : 'text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink',
           ]"
           @click="selectedAction = action"
         >
@@ -139,13 +137,13 @@ const rowClass = (data: ActivityLog) => {
       </div>
 
       <div class="flex items-center gap-2">
-        <span v-if="!loading" class="text-xs text-surface-500 dark:text-surface-400">
+        <span v-if="!loading" class="text-xs text-brand-muted">
           Menampilkan {{ filteredActivities.length }} dari {{ activities.length }}
         </span>
         <select
           v-model="selectedEntity"
           aria-label="Filter entitas"
-          class="rounded-full border border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900 px-3 py-1.5 text-xs text-surface-900 dark:text-surface-0 focus:outline-none"
+          class="rounded-full border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs text-brand-ink focus:outline-none"
         >
           <option value="">Semua entitas</option>
           <option v-for="entity in entityOptions" :key="entity" :value="entity">
@@ -161,19 +159,17 @@ const rowClass = (data: ActivityLog) => {
     <!-- Empty State -->
     <div
       v-if="!loading && filteredActivities.length === 0"
-      class="flex flex-col items-center justify-center py-20 px-8 bg-surface-0 dark:bg-surface-900 rounded-xl border border-dashed border-surface-200 dark:border-surface-800 shadow-sm"
+      class="flex flex-col items-center justify-center py-20 px-8 bg-brand-canvas rounded-card border border-dashed border-brand-hair shadow-whisper"
     >
       <div
-        class="w-16 h-16 rounded-full bg-surface-100 dark:bg-surface-800 flex items-center justify-center mb-6"
+        class="w-16 h-16 rounded-full bg-brand-canvas-soft flex items-center justify-center mb-6"
       >
-        <i class="pi pi-history text-2xl text-surface-400 dark:text-surface-500" />
+        <i class="pi pi-history text-2xl text-brand-faint" />
       </div>
-      <h3 class="m-0 mb-2 text-surface-900 dark:text-surface-0 font-semibold text-lg">
+      <h3 class="m-0 mb-2 text-brand-ink font-semibold text-lg">
         {{ filteringActive ? 'Tidak ada hasil' : 'Belum ada aktivitas' }}
       </h3>
-      <p
-        class="m-0 text-surface-500 dark:text-surface-400 text-sm max-w-md text-center leading-relaxed"
-      >
+      <p class="m-0 text-brand-muted text-sm max-w-md text-center leading-relaxed">
         {{
           filteringActive
             ? 'Tidak ada aktivitas yang cocok dengan filter. Ubah filter atau reset untuk melihat semua.'
@@ -196,7 +192,7 @@ const rowClass = (data: ActivityLog) => {
       v-else-if="loading"
       :value="Array(5).fill({})"
       striped-rows
-      class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden"
+      class="border border-brand-hair rounded-card overflow-hidden"
     >
       <Column header="Waktu" style="min-width: 180px">
         <template #body>
@@ -236,7 +232,7 @@ const rowClass = (data: ActivityLog) => {
       :value="filteredActivities"
       :row-class="rowClass"
       striped-rows
-      class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden"
+      class="border border-brand-hair rounded-card overflow-hidden"
     >
       <Column field="created_at" header="Waktu" style="min-width: 180px">
         <template #body="{ data }">
@@ -260,9 +256,7 @@ const rowClass = (data: ActivityLog) => {
       <Column field="ip_address" header="IP Address" />
       <Column field="browser" header="Browser / OS">
         <template #body="{ data }">
-          <span class="text-xs text-surface-500 dark:text-surface-400"
-            >{{ data.browser }} • {{ data.platform }}</span
-          >
+          <span class="text-xs text-brand-muted">{{ data.browser }} • {{ data.platform }}</span>
         </template>
       </Column>
       <Column header="Detail" style="width: 100px; text-align: center">

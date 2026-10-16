@@ -63,63 +63,46 @@ const contextItems = computed(() => {
       <template #header>
         <div class="flex flex-col gap-1.5 pb-2">
           <div
-            class="flex items-center text-[11px] font-medium uppercase tracking-[0.05em] text-zinc-500 dark:text-zinc-400"
+            class="flex items-center text-[11px] font-medium uppercase tracking-[0.05em] text-brand-muted"
           >
-            <span
-              class="hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+            <span class="hover:text-brand-ink transition-colors cursor-pointer"
               >Admin Activity Log</span
             >
             <i class="pi pi-angle-right text-[9px] mx-2" />
-            <span class="text-zinc-400 dark:text-zinc-500">View</span>
+            <span class="text-brand-faint">View</span>
           </div>
-          <h2 class="m-0 text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <h2 class="m-0 text-xl font-bold tracking-tight text-brand-ink">
             View Admin Activity Log
           </h2>
         </div>
       </template>
 
-      <div v-if="activity" class="flex flex-col gap-6 font-sans text-[13px] pt-2">
+      <div v-if="activity" class="flex flex-col gap-6 text-[13px] pt-2">
         <!-- Context Card -->
         <div
-          class="rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-[#18181b] overflow-hidden shadow-sm"
+          class="rounded-card border border-brand-hair bg-brand-canvas overflow-hidden shadow-whisper"
         >
-          <div
-            class="px-5 py-3.5 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-transparent"
-          >
-            <h3
-              class="m-0 text-sm font-bold text-zinc-900 dark:text-zinc-100 font-sans tracking-tight"
-            >
-              Context
-            </h3>
+          <div class="px-5 py-3.5 border-b border-brand-hair bg-brand-canvas-soft">
+            <h3 class="m-0 text-sm font-bold text-brand-ink tracking-tight">Context</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left whitespace-nowrap border-collapse">
-              <thead class="border-b border-zinc-200 dark:border-zinc-800/80">
+              <thead class="border-b border-brand-hair">
                 <tr>
-                  <th
-                    class="px-5 py-3 font-semibold w-1/3 text-zinc-900 dark:text-zinc-100 bg-transparent"
-                  >
-                    Key
-                  </th>
-                  <th
-                    class="px-5 py-3 font-semibold w-2/3 text-zinc-900 dark:text-zinc-100 bg-transparent"
-                  >
-                    Value
-                  </th>
+                  <th class="px-5 py-3 font-semibold w-1/3 text-brand-ink bg-transparent">Key</th>
+                  <th class="px-5 py-3 font-semibold w-2/3 text-brand-ink bg-transparent">Value</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800/50">
+              <tbody class="divide-y divide-brand-hairsoft">
                 <tr
                   v-for="(item, index) in contextItems"
                   :key="index"
-                  class="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors group"
+                  class="hover:bg-brand-canvas-soft transition-colors group"
                 >
-                  <td
-                    class="px-5 py-3.5 text-zinc-600 dark:text-zinc-300 font-medium group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors"
-                  >
+                  <td class="px-5 py-3.5 text-brand-ink font-medium transition-colors">
                     {{ item.key }}
                   </td>
-                  <td class="px-5 py-3.5 text-zinc-600 dark:text-zinc-300 truncate max-w-md">
+                  <td class="px-5 py-3.5 text-brand-muted truncate max-w-md">
                     {{ item.value }}
                   </td>
                 </tr>
@@ -130,44 +113,25 @@ const contextItems = computed(() => {
 
         <!-- Changes Card -->
         <div
-          class="rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-[#18181b] overflow-hidden shadow-sm"
+          class="rounded-card border border-brand-hair bg-brand-canvas overflow-hidden shadow-whisper"
         >
-          <div
-            class="px-5 py-3.5 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-transparent"
-          >
-            <h3
-              class="m-0 text-sm font-bold text-zinc-900 dark:text-zinc-100 font-sans tracking-tight"
-            >
-              Changes
-            </h3>
+          <div class="px-5 py-3.5 border-b border-brand-hair bg-brand-canvas-soft">
+            <h3 class="m-0 text-sm font-bold text-brand-ink tracking-tight">Changes</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left whitespace-nowrap border-collapse">
-              <thead class="border-b border-zinc-200 dark:border-zinc-800/80">
+              <thead class="border-b border-brand-hair">
                 <tr>
-                  <th
-                    class="px-5 py-3 font-semibold w-1/4 text-zinc-900 dark:text-zinc-100 bg-transparent"
-                  >
-                    Field
-                  </th>
-                  <th
-                    class="px-5 py-3 font-semibold w-3/8 text-zinc-900 dark:text-zinc-100 bg-transparent"
-                  >
+                  <th class="px-5 py-3 font-semibold w-1/4 text-brand-ink bg-transparent">Field</th>
+                  <th class="px-5 py-3 font-semibold w-3/8 text-brand-ink bg-transparent">
                     Before
                   </th>
-                  <th
-                    class="px-5 py-3 font-semibold w-3/8 text-zinc-900 dark:text-zinc-100 bg-transparent"
-                  >
-                    After
-                  </th>
+                  <th class="px-5 py-3 font-semibold w-3/8 text-brand-ink bg-transparent">After</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800/50">
+              <tbody class="divide-y divide-brand-hairsoft">
                 <tr v-if="selectedActivityChanges.length === 0">
-                  <td
-                    colspan="3"
-                    class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 font-sans"
-                  >
+                  <td colspan="3" class="px-5 py-8 text-center text-brand-faint">
                     Tidak ada perubahan field tercatat (Payload kosong).
                   </td>
                 </tr>
@@ -175,21 +139,19 @@ const contextItems = computed(() => {
                   v-for="(change, index) in selectedActivityChanges"
                   v-else
                   :key="index"
-                  class="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors group"
+                  class="hover:bg-brand-canvas-soft transition-colors group"
                 >
-                  <td
-                    class="px-5 py-3.5 text-zinc-600 dark:text-zinc-300 font-medium group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors"
-                  >
+                  <td class="px-5 py-3.5 text-brand-ink font-medium transition-colors">
                     {{ change.field }}
                   </td>
                   <td
-                    class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 max-w-[200px] truncate"
+                    class="px-5 py-3.5 text-brand-muted max-w-[200px] truncate"
                     :title="change.before"
                   >
                     {{ change.before }}
                   </td>
                   <td
-                    class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 max-w-[200px] truncate"
+                    class="px-5 py-3.5 text-brand-muted max-w-[200px] truncate"
                     :title="change.after"
                   >
                     {{ change.after }}

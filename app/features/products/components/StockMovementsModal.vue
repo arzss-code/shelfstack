@@ -220,7 +220,7 @@ watch(
           <!-- Error State -->
           <div
             v-else-if="error"
-            class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-400 text-xs flex items-center gap-2"
+            class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/40 text-rose-700 dark:text-rose-400 text-xs flex items-center gap-2"
           >
             <i class="pi pi-exclamation-circle text-base" />
             <span>{{ error }}</span>
@@ -270,8 +270,8 @@ watch(
                       class="px-2 py-0.5 rounded-full text-[11px] inline-flex items-center gap-1"
                       :class="[
                         item.delta > 0
-                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
-                          : 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400',
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+                          : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400',
                       ]"
                     >
                       <i
