@@ -13,7 +13,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Kelola Pesanan — Admin ShelfStack',
+  title: 'Kelola Pesanan - Admin ShelfStack',
   description: 'Daftar seluruh transaksi pesanan toko ShelfStack dengan filter status terpadu.',
 })
 

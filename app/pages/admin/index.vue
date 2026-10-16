@@ -9,7 +9,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Dashboard Analytics — Admin ShelfStack',
+  title: 'Dashboard Analytics - Admin ShelfStack',
   description: 'Ringkasan eksekutif KPI bisnis, pendapatan, dan transaksi toko ShelfStack.',
 })
 
