@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { useActivities } from '~/features/activities/composables/useActivities'
 import type { ActivityLog } from '~/features/activities/composables/useActivities'
+import {
+  ACTIVITY_ACTIONS,
+  NO_FILTER,
+  distinctEntityTypes,
+  filterActivities,
+  isFiltering,
+} from '~/features/activities/utils/activity-filter'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import ActivityDetailDialog from '~/features/activities/components/ActivityDetailDialog.vue'
@@ -17,6 +24,26 @@ definePageMeta({
 const { activities, loading, fetchActivities, subscribeToRealtime } = useActivities()
 const isDialogVisible = ref(false)
 const selectedActivity = ref<ActivityLog | null>(null)
+const selectedEntity = ref(NO_FILTER.entity)
+const selectedAction = ref(NO_FILTER.action)
+
+const entityOptions = computed(() => distinctEntityTypes(activities.value))
+
+const filteredActivities = computed(() =>
+  filterActivities(activities.value, {
+    entity: selectedEntity.value,
+    action: selectedAction.value,
+  }),
+)
+
+const filteringActive = computed(() =>
+  isFiltering({ entity: selectedEntity.value, action: selectedAction.value }),
+)
+
+const resetFilters = () => {
+  selectedEntity.value = NO_FILTER.entity
+  selectedAction.value = NO_FILTER.action
+}
 
 onMounted(() => {
   fetchActivities()
@@ -78,9 +105,62 @@ const rowClass = (data: ActivityLog) => {
       </div>
     </div>
 
+    <!-- Filter Bar -->
+    <div
+      class="mb-4 flex flex-col gap-3 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900 p-4 md:flex-row md:items-center md:justify-between"
+    >
+      <div class="flex flex-wrap items-center gap-1.5">
+        <button
+          type="button"
+          class="rounded-full px-3 py-1.5 text-xs font-semibold transition-all"
+          :class="[
+            selectedAction === ''
+              ? 'bg-surface-900 text-surface-0 dark:bg-surface-0 dark:text-surface-900'
+              : 'text-surface-500 hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-surface-0',
+          ]"
+          @click="selectedAction = ''"
+        >
+          Semua
+        </button>
+        <button
+          v-for="action in ACTIVITY_ACTIONS"
+          :key="action"
+          type="button"
+          class="rounded-full px-3 py-1.5 text-xs font-semibold transition-all"
+          :class="[
+            selectedAction === action
+              ? 'bg-surface-900 text-surface-0 dark:bg-surface-0 dark:text-surface-900'
+              : 'text-surface-500 hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-surface-0',
+          ]"
+          @click="selectedAction = action"
+        >
+          {{ action }}
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span v-if="!loading" class="text-xs text-surface-500 dark:text-surface-400">
+          Menampilkan {{ filteredActivities.length }} dari {{ activities.length }}
+        </span>
+        <select
+          v-model="selectedEntity"
+          aria-label="Filter entitas"
+          class="rounded-full border border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900 px-3 py-1.5 text-xs text-surface-900 dark:text-surface-0 focus:outline-none"
+        >
+          <option value="">Semua entitas</option>
+          <option v-for="entity in entityOptions" :key="entity" :value="entity">
+            {{ entity }}
+          </option>
+        </select>
+        <UiButton v-if="filteringActive" variant="ghost" size="sm" @click="resetFilters">
+          Reset
+        </UiButton>
+      </div>
+    </div>
+
     <!-- Empty State -->
     <div
-      v-if="!loading && activities.length === 0"
+      v-if="!loading && filteredActivities.length === 0"
       class="flex flex-col items-center justify-center py-20 px-8 bg-surface-0 dark:bg-surface-900 rounded-xl border border-dashed border-surface-200 dark:border-surface-800 shadow-sm"
     >
       <div
@@ -89,14 +169,26 @@ const rowClass = (data: ActivityLog) => {
         <i class="pi pi-history text-2xl text-surface-400 dark:text-surface-500" />
       </div>
       <h3 class="m-0 mb-2 text-surface-900 dark:text-surface-0 font-semibold text-lg">
-        Belum ada aktivitas
+        {{ filteringActive ? 'Tidak ada hasil' : 'Belum ada aktivitas' }}
       </h3>
       <p
         class="m-0 text-surface-500 dark:text-surface-400 text-sm max-w-md text-center leading-relaxed"
       >
-        Sistem belum mencatat aktivitas apa pun. Lakukan aksi pada produk untuk melihat jejak rekam
-        di sini.
+        {{
+          filteringActive
+            ? 'Tidak ada aktivitas yang cocok dengan filter. Ubah filter atau reset untuk melihat semua.'
+            : 'Sistem belum mencatat aktivitas apa pun. Lakukan aksi pada produk untuk melihat jejak rekam di sini.'
+        }}
       </p>
+      <UiButton
+        v-if="filteringActive"
+        variant="secondary"
+        size="sm"
+        class="mt-4"
+        @click="resetFilters"
+      >
+        Tampilkan semua
+      </UiButton>
     </div>
 
     <!-- Skeleton Loading (Shimmer) -->
@@ -141,7 +233,7 @@ const rowClass = (data: ActivityLog) => {
     <!-- Data Table -->
     <DataTable
       v-else
-      :value="activities"
+      :value="filteredActivities"
       :row-class="rowClass"
       striped-rows
       class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden"

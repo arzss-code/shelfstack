@@ -49,6 +49,13 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
   ke `nuxi typecheck`, sehingga gate lokal dan CI memeriksa proyek app + server
   secara nyata. Terverifikasi EXIT 0 sebelum diganti.
 
+### Filter audit aktivitas D-04 (2026-10-16)
+
+- Halaman `/admin/activities` kini punya filter aksi (tab Semua/CREATE/UPDATE/DELETE/RESTORE)
+  dan filter entitas (dropdown dinamis dari data), penghitung hasil, dan tombol reset.
+- Logika filter murni di `app/features/activities/utils/activity-filter.ts` (+10 unit test).
+  Realtime tetap jalan karena filter berupa computed di atas data yang sama.
+
 ### Changed
 
 - Sinkronisasi docs: `PROGRESS.md` (v0.15.0 + Fase 4 + Known Gaps), `README.md` (11 scripts + stack + CI), `docs/README.md` (indeks baru), `BACKLOG.md` (K-04 sandbox, Q-01 CI ada), `ARCHITECTURE.md` + `DESIGN-ECOMMERCE.md` (Nuxt 4), `package.json` version → `0.15.0`.
