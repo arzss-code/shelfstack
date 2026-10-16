@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * AuthSubmitButton — Primary CTA button for auth forms.
+ * AuthSubmitButton: Primary CTA button for auth forms.
  * Handles loading spinner, disabled state, and icon in one place.
  */
 withDefaults(

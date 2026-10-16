@@ -3,7 +3,7 @@ import { registerSchema } from '~~/shared/schemas/auth'
 import { useAuth } from '~/features/auth/composables/useAuth'
 
 useSeoMeta({
-  title: 'Buat Akun Baru — ShelfStack',
+  title: 'Buat Akun Baru - ShelfStack',
   description:
     'Daftar akun ShelfStack sekarang untuk menikmati promo eksklusif dan belanja produk kurasi terbaik.',
 })

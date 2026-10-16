@@ -37,8 +37,8 @@ let pollInterval: ReturnType<typeof setInterval> | null = null
 useSeoMeta({
   title: () =>
     order.value
-      ? `Pesanan #${order.value.id.slice(0, 8)} — ShelfStack`
-      : 'Detail Pesanan — ShelfStack',
+      ? `Pesanan #${order.value.id.slice(0, 8)} - ShelfStack`
+      : 'Detail Pesanan - ShelfStack',
   description: 'Detail informasi dan status pemesanan produk resmi di ShelfStack.',
 })
 

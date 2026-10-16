@@ -16,10 +16,10 @@ const loading = ref(true)
 
 useSeoMeta({
   title: () =>
-    product.value ? `${product.value.name} — ShelfStack` : 'Detail Produk — ShelfStack',
+    product.value ? `${product.value.name} - ShelfStack` : 'Detail Produk - ShelfStack',
   description: () =>
     product.value?.description || 'Beli produk berkualitas tinggi terkurasi resmi di ShelfStack.',
-  ogTitle: () => (product.value ? `${product.value.name} — ShelfStack` : 'Detail Produk'),
+  ogTitle: () => (product.value ? `${product.value.name} - ShelfStack` : 'Detail Produk'),
   ogDescription: () =>
     product.value?.description || 'Beli produk berkualitas tinggi terkurasi resmi di ShelfStack.',
   ogImage: () => product.value?.image_url || undefined,

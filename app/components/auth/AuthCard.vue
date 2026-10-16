@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * AuthCard — Shell container card for all authentication pages.
+ * AuthCard: Shell container card for all authentication pages.
  * Provides logo, heading, sub-text, and back-to-home link in one wrapper.
  */
 defineProps<{

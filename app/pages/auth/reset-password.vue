@@ -2,7 +2,7 @@
 import { useAuth } from '~/features/auth/composables/useAuth'
 
 useSeoMeta({
-  title: 'Atur Ulang Kata Sandi — ShelfStack',
+  title: 'Atur Ulang Kata Sandi - ShelfStack',
   description: 'Buat kata sandi baru untuk akun ShelfStack Anda.',
 })
 definePageMeta({ layout: 'default' })

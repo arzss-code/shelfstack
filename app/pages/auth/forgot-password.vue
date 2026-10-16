@@ -2,7 +2,7 @@
 import { useAuth } from '~/features/auth/composables/useAuth'
 
 useSeoMeta({
-  title: 'Lupa Kata Sandi — ShelfStack',
+  title: 'Lupa Kata Sandi - ShelfStack',
   description:
     'Masukkan email terdaftar dan kami akan mengirim tautan untuk mengatur ulang kata sandi Anda.',
 })

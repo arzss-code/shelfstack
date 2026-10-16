@@ -267,7 +267,7 @@ const handleBuyNow = () => {
           @click="handleAddToBag"
         >
           <span v-if="isOutOfStock">Stok Habis</span>
-          <span v-else> Tambah ke Bag — {{ formatRupiah(product.price * quantity) }} </span>
+          <span v-else> Tambah ke Bag · {{ formatRupiah(product.price * quantity) }} </span>
         </UiButton>
       </div>
 

@@ -6,7 +6,7 @@ const cartStore = useCartStore()
 const router = useRouter()
 
 useSeoMeta({
-  title: 'Keranjang Belanja — ShelfStack',
+  title: 'Keranjang Belanja - ShelfStack',
   description: 'Tinjau produk kurasi pilihan Anda sebelum melanjutkan ke pembayaran.',
 })
 

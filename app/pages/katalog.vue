@@ -8,7 +8,7 @@ import KatalogMobileFilter from '~/components/katalog/KatalogMobileFilter.vue'
 import type { Product } from '~/types/product'
 
 useSeoMeta({
-  title: 'Katalog Produk — ShelfStack',
+  title: 'Katalog Produk - ShelfStack',
   description:
     'Jelajahi etalase ShelfStack: peralatan presisi, koleksi meja kerja, furnitur, dan perkakas terkurasi berkualitas tinggi.',
 })
@@ -111,7 +111,7 @@ const sortOptions: SortOption[] = [
   { id: 'popular', label: 'Paling Populer' },
   { id: 'price-low', label: 'Harga: Rendah ke Tinggi' },
   { id: 'price-high', label: 'Harga: Tinggi ke Rendah' },
-  { id: 'name-asc', label: 'Nama: A — Z' },
+  { id: 'name-asc', label: 'Nama: A-Z' },
 ]
 
 const priceRanges: PriceRange[] = [

@@ -16,7 +16,7 @@ const config = useRuntimeConfig()
 const { pay: openSnapModal } = useMidtransSnap()
 
 useSeoMeta({
-  title: 'Checkout & Pembayaran — ShelfStack',
+  title: 'Checkout & Pembayaran - ShelfStack',
   description:
     'Selesaikan pemesanan produk pilihan Anda dengan aman melalui gateway resmi Midtrans.',
 })

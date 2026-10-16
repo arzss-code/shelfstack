@@ -25,7 +25,7 @@ const dropdownCategories = computed(() => [
   ...dynamicCategories.value.map((c) => c.name),
 ])
 
-// Sub-nav pita kategori — dibangun dinamis dari data
+// Sub-nav pita kategori: dibangun dinamis dari data
 const subNavCategories = computed(() => [
   { name: 'Semua Produk', path: '/katalog' },
   ...dynamicCategories.value.map((c) => ({

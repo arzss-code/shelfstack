@@ -5,7 +5,7 @@ import { useProductStore } from '~/features/products/stores/product'
 // seperti: HomeHero, HomeAssurances, HomeFeaturedCategories, dsb.
 
 useSeoMeta({
-  title: 'ShelfStack — Toko Produk Esensial & Perlengkapan Modern',
+  title: 'ShelfStack - Toko Produk Esensial & Perlengkapan Modern',
   description:
     'ShelfStack: Toko online kebutuhan kerja, rumah tangga, audio studio, dan furnitur minimalis modern. Belanja aman, original, dan bergaransi.',
 })

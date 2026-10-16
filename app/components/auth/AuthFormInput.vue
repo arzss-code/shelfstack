@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * AuthFormInput — Reusable input field for authentication forms.
+ * AuthFormInput: Reusable input field for authentication forms.
  * Handles label, error display, and dynamic border styling in one place.
  */
 const props = withDefaults(

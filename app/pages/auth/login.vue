@@ -3,7 +3,7 @@ import { loginSchema } from '~~/shared/schemas/auth'
 import { useAuth } from '~/features/auth/composables/useAuth'
 
 useSeoMeta({
-  title: 'Masuk ke Akun — ShelfStack',
+  title: 'Masuk ke Akun - ShelfStack',
   description:
     'Masuk ke akun ShelfStack untuk kemudahan belanja, lacak pesanan, dan penawaran eksklusif.',
 })

@@ -15,7 +15,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Riwayat Pesanan — ShelfStack',
+  title: 'Riwayat Pesanan - ShelfStack',
   description: 'Daftar riwayat dan status transaksi pesanan resmi Anda di ShelfStack.',
 })
 
