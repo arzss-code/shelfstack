@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import type { Locator, Page } from '@playwright/test'
 import { expect } from '@playwright/test'
 import { BasePage } from './BasePage'
@@ -38,14 +39,36 @@ export class LoginPage extends BasePage {
     await this.fillEmail(email)
     await this.fillPassword(password)
     await this.submit()
+    await this.awaitLoginResult()
   }
 
-  async loginAsCustomer(password = 'Password123!'): Promise<void> {
-    await this.login('customer@shelfstack.local', password)
+  /**
+   * Tunggu hasil login. Jika halaman stagnan di /auth/login tanpa toast error
+   * (klik jatuh pre-hydration dan tidak memicu submit), kirim ulang sekali
+   * secara terbatas. Kegagalan kredensial asli tetap dilempar sebagai error.
+   */
+  async awaitLoginResult(): Promise<void> {
+    try {
+      await expect(this.page).not.toHaveURL(/\/auth\/login/, { timeout: 10000 })
+      return
+    } catch {
+      const rejected = await this.page.getByText('Gagal Masuk').count()
+      if (rejected > 0) {
+        throw new Error('Login ditolak server. Periksa kredensial E2E.')
+      }
+      await this.submit()
+      await expect(this.page).not.toHaveURL(/\/auth\/login/, { timeout: 15000 })
+    }
   }
 
-  async loginAsAdmin(password = 'Password123!'): Promise<void> {
-    await this.login('admin@shelfstack.local', password)
+  async loginAsCustomer(
+    password = process.env.E2E_CUSTOMER_PASSWORD || 'Password123!',
+  ): Promise<void> {
+    await this.login(process.env.E2E_CUSTOMER_EMAIL || 'customer@shelfstack.local', password)
+  }
+
+  async loginAsAdmin(password = process.env.E2E_ADMIN_PASSWORD || 'Password123!'): Promise<void> {
+    await this.login(process.env.E2E_ADMIN_EMAIL || 'admin@shelfstack.local', password)
   }
 
   async assertErrorMessageVisible(message: string): Promise<void> {
