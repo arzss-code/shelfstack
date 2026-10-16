@@ -68,6 +68,15 @@
       Kelas ramp brand tidak berubah, hanya nama kontraknya. Empat call site di `admin/index.vue`
       dimigrasi, tidak ada test yang mengikat nama lama.
 
+### Fase 1 unifikasi etalase: area auth (2026-10-16)
+
+- [x] `AuthFormInput` menjadi adapter tipis di atas `UiInput`. Pola ini sudah diuji dua model
+      (Muse Spark 1.3 vs Space Bunny, hasil seri di semua gate) sebelum diimplementasikan.
+- [x] Radius kartu, tinggi tombol, dan status sukses disatukan ke token brand.
+- [x] Gate: typecheck EXIT 0, lint 0 error / 31 warning, vitest 357 lolos, detector `[]`,
+      screenshot login + register desktop dan mobile lolos (satu 404 pre-existing
+      `apple-touch-icon.png`, dicatat sebagai follow-up aset statis).
+
 ### ✅ Fase 1: Auth & Security (Sprint 2)
 
 - [x] Autentikasi Supabase: Register, Login, Logout, Session persist, dan role guard.

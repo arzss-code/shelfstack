@@ -2,6 +2,28 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [Unreleased] - unify auth area (2026-10-16)
+
+### Perubahan
+
+- Fase 1 unifikasi etalase: area auth memakai primitif brand penuh.
+  `AuthFormInput` menjadi adapter tipis di atas `UiInput` (kontrak props dan emit
+  `clearError` dipertahankan, slot `label` yang tidak dipakai siapa pun dibuang).
+- `AuthCard` memakai `rounded-card` tunggal (sebelumnya `rounded-2xl` di mobile dan
+  `rounded-3xl` di desktop). `AuthSubmitButton` dan tombol Google login/register
+  melepas override `h-11` sehingga geometrinya milik `UiButton` sepenuhnya.
+- Tombol pill hand-rolled di success state reset-password menjadi
+  `UiButton to="/auth/login"`, ikon `text-green-500` menjadi `text-brand-success-text`.
+- Efek samping: satu warning `vue/html-self-closing` hilang (32 menjadi 31).
+
+### Gate (dijalankan aktual 2026-10-16)
+
+`pnpm typecheck` EXIT 0, `pnpm lint` 0 error / 31 warning (pre-existing),
+`pnpm exec vitest run` 37 file / 357 test lolos, detector impeccable `[]`,
+screenshot login + register desktop 1440x900 dan mobile 390x844 lolos.
+Satu-satunya console error adalah 404 `apple-touch-icon.png` (pre-existing,
+aset statis hilang, di luar scope).
+
 ## [Unreleased] - vocabulary completion (2026-10-16)
 
 ### Perubahan
