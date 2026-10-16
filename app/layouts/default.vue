@@ -2,6 +2,15 @@
 import AppNavbar from '~/components/AppNavbar.vue'
 import AppFooter from '~/components/AppFooter.vue'
 import CartDrawer from '~/features/cart/components/CartDrawer.vue'
+import { useCartStore } from '~/features/cart/stores/cart'
+
+// Sinkron ulang keranjang dari localStorage setiap mount layout.
+// initCart di setup store tidak cukup untuk full page load (SSR + hidrasi),
+// sehingga refresh atau URL langsung ke /cart dan /checkout tampil kosong
+// meski data tersimpan. Idempoten: hanya membaca dan menetapkan ulang.
+onMounted(() => {
+  useCartStore().initCart()
+})
 </script>
 
 <template>
