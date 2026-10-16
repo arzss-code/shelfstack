@@ -3,39 +3,34 @@ import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    /** Teks di dalam badge */
     label: string
-    /** Varian warna: 'default', 'success', 'warning', 'danger', 'info' */
+    /** Resep warna status, satu ramp yang sama dipakai badge, alert, dan toast. */
     variant?: 'default' | 'success' | 'warning' | 'danger' | 'info'
   }>(),
-  {
-    variant: 'default',
-  },
+  { variant: 'default' },
 )
 
 const variantClasses = computed(() => {
   switch (props.variant) {
     case 'success':
-      return 'bg-green-100 text-green-700 border-green-200'
+      return 'bg-brand-success-tint text-brand-success-text border-brand-success-edge'
     case 'warning':
-      return 'bg-amber-100 text-amber-700 border-amber-200'
+      return 'bg-brand-warning-tint text-brand-warning-text border-brand-warning-edge'
     case 'danger':
-      return 'bg-red-100 text-red-700 border-red-200'
+      return 'bg-brand-danger-tint text-brand-danger-text border-brand-danger-edge'
     case 'info':
-      return 'bg-blue-100 text-blue-700 border-blue-200'
+      return 'bg-brand-accent-tint text-brand-accent-text border-brand-accent-edge'
     case 'default':
     default:
-      return 'bg-brand-canvas-soft text-brand-muted border-brand-hair'
+      return 'bg-brand-neutral-tint text-brand-muted border-brand-hair'
   }
 })
 </script>
 
 <template>
   <span
-    :class="[
-      'inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border',
-      variantClasses,
-    ]"
+    class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+    :class="variantClasses"
   >
     {{ label }}
   </span>

@@ -2,6 +2,75 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [Unreleased] - redesign admin ke primitif brand (2026-10-16)
+
+### Keputusan
+
+PrimeVue dihapus sepenuhnya dari aplikasi. Penyebabnya bukan selera: `darkModeSelector: 'system'`
+di `nuxt.config.ts` membuat komponen PrimeVue mengikuti dark mode OS, sementara token Tailwind
+`brand-*` mengikuti class `.dark` yang tidak pernah dipasang. Kedua sistem theming hidup
+bersamaan danmenghasilkan halaman setengah gelap (tab tak terlihat, dialog gelap di atas form terang).
+Satu kosakata komponen menghapus dual theming itu.
+
+`primeicons` tetap dipakai. Itu font ikon, bukan pustaka komponen, dan dipakai lintas etalase.
+
+### Primitif baru (`app/components/ui/`)
+
+- `UiModal`: teleport ke body, focus trap, scroll lock, tombol Escape, `aria-modal`. Wrapper `ClientOnly` supaya aman SSR.
+- `UiSelect`, `UiTextarea`, `UiFileField`: kontrol formulir brand. `UiFileField` menegakkan JPEG/PNG/WebP dan batas 5 MB di dalam komponen.
+- `UiTabs`: pil ter-segmentasi dengan `role="tablist"`, navigasi panah, Home/End.
+- `UiSortHeader`, `UiSkeleton`, `UiIconButton`, `UiEmptyState`, `UiAlert`.
+- `UiToastHost` + `useUiToast`, `UiConfirmHost` + `useUiConfirm`: menggantikan `<Toast>` dan `<ConfirmDialog>` global.
+- `UiBadge`, `UiButton`, `UiInput` ditulis ulang ke token semantik dan `useId()` (sebelumnya `Math.random()` sebagai id, tidak aman SSR).
+
+### Ramp status semantik (satu resep untuk badge, alert, toast, KPI)
+
+Tiap status punya tiga lapis: warna teks, latar, garis tepi.
+`--brand-success`, `--brand-warning`, `--brand-danger`, `--brand-accent`, masing-masing dengan
+`-tint`, `-edge`, dan `-text`. Lapisan `-text` dipilih gelap supaya rasio kontras di atas
+tint tetap di atas 4.5:1. Palet `surface-*` dan `primary-*` (yang diturunkan dari `--p-*` PrimeVue)
+dihapus dari `tailwind.config.js`.
+
+`--brand-muted` digelapkan ke `#5c5f64` dan `--brand-faint` ke `#6f7279` supaya teks pendukung
+dan placeholder naik dari 2.56:1 ke di atas 4.5:1.
+
+### Browser surfaces
+
+Blok CSS `.p-toast` sepanjang 260 baris (hex hardcoded, `border-left: 5px`) dihapus, digantikan
+tema scrollbar, `::selection`, caret, autofill, dan `.tabular` untuk kolom rupiah.
+
+### Perbaikan fokus dan hydration
+
+- Indikator fokus kini satu aturan global `:focus-visible` memakai `outline`, bukan `ring`.
+  Sebelumnya tiap primitif membawa `focus-visible:ring-2` sehingga `UiInput` menampilkan dua
+  cincin fokus bertumpuk. `outline-none` pada `UiInput`/`UiSelect`/`UiTextarea` ikut dibuang
+  karena menindih aturan global.
+- `UiModal` dan `UiToastHost` dibungkus `ClientOnly`. Log dev server menunjukkan
+  "Hydration children mismatch" dan "Hydration class mismatch" pada kedua host sebelum perbaikan ini.
+- `app/pages/auth/callback.vue` masih memuat `<ProgressSpinner>` PrimeVue yang tidak lagi ter-resolve
+  setelah modul dicabut. Diganti spinner CSS brand.
+
+### Skrip sekali jalan
+
+Empat skrip `scripts/*.mjs` dipakai untuk transformasi massal dan sudah dihapus setelah dipakai.
+Catatan operasional: `Set-Content`/`Out-File` PowerShell merusak UTF-8 di repo ini (em dash jadi
+mojibake plus BOM). Semua transformasi massal harus lewat Node.
+
+### Gate (dijalankan aktual 2026-10-16)
+
+`pnpm typecheck` EXIT 0, `pnpm lint` 0 error / 32 warning (`vue/html-self-closing`, pre-existing),
+`pnpm exec vitest run` 37 file / 357 test lolos, detector impeccable `[]`.
+Screendesktop 1440x900 dan mobile 390x844 untuk 4 halaman admin plus dialog Tambah Produk:
+2 passed, 0 console error.
+
+### Di luar scope
+
+Redesign ini hanya menyentuh admin. Etalase publik masih memakai komponen lamanya
+(`AppNavbar`, `ProductList`, `KatalogToolbar`, dan lain-lain) yang sekarang tidak punya
+pasangan primitif. Token `brand-*` sudah menjadi satu-satunya sumber warna, jadi etalase tidak
+rusak, tapi belum disatukan geometrinya. Ada 21 em dash tersisa di halaman etalase, `AppNavbar`,
+dan komponen auth yang belum disentuh.
+
 ## [Unreleased] — audit docs & agent rules (2026-10-11)
 
 ### Audit (read-only, terverifikasi file:line)

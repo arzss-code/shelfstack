@@ -3,7 +3,6 @@ import { useAuth } from '~/features/auth/composables/useAuth'
 import type { Database } from '~/types/database.types'
 import type { Order, OrderStatus } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
-import { useToast } from 'primevue/usetoast'
 import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import OrderCancelDialog from '~/features/orders/components/OrderCancelDialog.vue'
 import OrderInvoiceModal from '~/features/orders/components/OrderInvoiceModal.vue'
@@ -13,7 +12,7 @@ const route = useRoute()
 const router = useRouter()
 const { user } = useAuth()
 const supabase = useSupabaseClient<Database>()
-const toast = useToast()
+const toast = useUiToast()
 const config = useRuntimeConfig()
 const { pay: openSnapModal } = useMidtransSnap()
 

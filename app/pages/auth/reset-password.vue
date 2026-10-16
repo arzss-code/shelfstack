@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast'
 import { useAuth } from '~/features/auth/composables/useAuth'
 
 useSeoMeta({
@@ -8,7 +7,7 @@ useSeoMeta({
 })
 definePageMeta({ layout: 'default' })
 
-const toast = useToast()
+const toast = useUiToast()
 const { updatePassword, pending } = useAuth()
 
 const newPassword = ref('')

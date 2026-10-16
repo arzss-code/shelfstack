@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast'
 import type { Order, OrderStatus } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
 import { getAvailableAdminTransitions } from '~~/shared/constants/order-transitions'
@@ -11,7 +10,7 @@ definePageMeta({
 
 const route = useRoute()
 const router = useRouter()
-const toast = useToast()
+const toast = useUiToast()
 
 const orderId = computed(() => route.params.id as string)
 
@@ -25,7 +24,7 @@ const targetStatus = ref<OrderStatus | null>(null)
 const updateReason = ref('')
 
 useSeoMeta({
-  title: computed(() => `Detail Pesanan #${orderId.value.slice(0, 8)} — Admin ShelfStack`),
+  title: computed(() => `Detail Pesanan #${orderId.value.slice(0, 8)} - Admin ShelfStack`),
 })
 
 const fetchOrderDetail = async () => {
@@ -136,6 +135,10 @@ const getTransitionLabel = (status: OrderStatus) => {
   }
 }
 
+const confirmVariant = computed<'danger' | 'primary'>(() =>
+  targetStatus.value === 'cancelled' || targetStatus.value === 'refunded' ? 'danger' : 'primary',
+)
+
 const formatDate = (dateStr?: string | null) => {
   if (!dateStr) return '-'
   try {
@@ -160,7 +163,7 @@ const formatDate = (dateStr?: string | null) => {
         Kelola Pesanan
       </NuxtLink>
       <span>/</span>
-      <span class="font-mono text-brand-ink">#{{ orderId.slice(0, 8) }}</span>
+      <span class="font-mono text-brand-ink tabular">#{{ orderId.slice(0, 8) }}</span>
     </div>
 
     <!-- Loading State -->
@@ -170,15 +173,12 @@ const formatDate = (dateStr?: string | null) => {
     </div>
 
     <!-- Error State -->
-    <div
-      v-else-if="errorMessage"
-      class="rounded-xl border border-rose-200 dark:border-rose-800/40 bg-rose-50 dark:bg-rose-950/40 p-6 text-center text-xs text-rose-700 dark:text-rose-400"
-    >
+    <UiAlert v-else-if="errorMessage" tone="danger" class="mx-auto max-w-md">
       <p class="m-0 font-medium">{{ errorMessage }}</p>
       <UiButton variant="secondary" size="sm" class="mt-3" @click="fetchOrderDetail">
         Coba Lagi
       </UiButton>
-    </div>
+    </UiAlert>
 
     <!-- Main Content -->
     <div v-else-if="order" class="space-y-6">
@@ -188,7 +188,7 @@ const formatDate = (dateStr?: string | null) => {
       >
         <div class="space-y-1">
           <div class="flex items-center gap-3">
-            <h1 class="font-mono text-xl sm:text-2xl font-bold text-brand-ink m-0">
+            <h1 class="m-0 font-mono text-xl font-bold tabular text-brand-ink sm:text-2xl">
               #{{ order.id }}
             </h1>
             <UiBadge
@@ -236,11 +236,13 @@ const formatDate = (dateStr?: string | null) => {
                 <p class="font-medium text-xs sm:text-sm text-brand-ink m-0 truncate">
                   {{ item.product?.name || `Produk #${item.product_id}` }}
                 </p>
-                <p class="text-[11px] text-brand-muted m-0 mt-0.5">
+                <p class="m-0 mt-0.5 text-[11px] tabular text-brand-muted">
                   {{ item.qty }} x {{ formatRupiah(item.price_cents / 100) }}
                 </p>
               </div>
-              <p class="text-xs sm:text-sm font-semibold text-brand-ink m-0 whitespace-nowrap">
+              <p
+                class="m-0 whitespace-nowrap text-xs font-semibold tabular text-brand-ink sm:text-sm"
+              >
                 {{ formatRupiah((item.price_cents * item.qty) / 100) }}
               </p>
             </div>
@@ -248,7 +250,7 @@ const formatDate = (dateStr?: string | null) => {
 
           <div class="flex items-center justify-between pt-2">
             <span class="text-xs font-medium text-brand-muted">Total Pembayaran</span>
-            <span class="text-lg font-bold text-brand-ink">
+            <span class="text-lg font-bold tabular text-brand-ink">
               {{ formatRupiah(order.total_cents / 100) }}
             </span>
           </div>
@@ -300,48 +302,39 @@ const formatDate = (dateStr?: string | null) => {
     </div>
 
     <!-- Confirm Transition Modal -->
-    <div
-      v-if="isConfirmModalOpen && targetStatus"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-    >
-      <div
-        class="w-full max-w-md rounded-2xl border border-brand-hair bg-brand-canvas p-6 shadow-floating space-y-4"
-      >
-        <h3 class="font-display text-base font-bold text-brand-ink m-0">
-          Konfirmasi Perubahan Status
-        </h3>
-        <p class="text-xs text-brand-muted m-0">
-          Ubah status pesanan ke
-          <strong class="text-brand-ink font-semibold uppercase">{{ targetStatus }}</strong
-          >? Aksi ini akan dicatat ke dalam audit log aktivitas admin.
-        </p>
+    <UiModal v-model:visible="isConfirmModalOpen" title="Konfirmasi Perubahan Status" size="sm">
+      <p class="m-0 text-xs leading-relaxed text-brand-muted">
+        Ubah status pesanan ke
+        <strong class="font-semibold uppercase text-brand-ink">{{ targetStatus }}</strong
+        >? Aksi ini akan dicatat ke dalam audit log aktivitas admin.
+      </p>
 
-        <div>
-          <label class="block text-[11px] font-semibold text-brand-muted uppercase mb-1">
-            Catatan / Alasan (Opsional)
-          </label>
-          <textarea
-            v-model="updateReason"
-            rows="2"
-            placeholder="Contoh: No resi pengiriman / konfirmasi transfer manual..."
-            class="w-full rounded-xl border border-brand-hair bg-brand-canvas-soft p-2.5 text-xs text-brand-ink placeholder:text-brand-muted focus:border-brand-ink focus:outline-none"
-          />
-        </div>
+      <UiTextarea
+        v-model="updateReason"
+        class="mt-4"
+        label="Catatan / Alasan (Opsional)"
+        placeholder="Contoh: No resi pengiriman / konfirmasi transfer manual..."
+        :rows="2"
+      />
 
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <UiButton
-            variant="secondary"
-            size="sm"
-            :disabled="updating"
-            @click="isConfirmModalOpen = false"
-          >
-            Batal
-          </UiButton>
-          <UiButton variant="primary" size="sm" :loading="updating" @click="confirmStatusChange">
-            Konfirmasi
-          </UiButton>
-        </div>
-      </div>
-    </div>
+      <template #footer>
+        <UiButton
+          variant="secondary"
+          size="sm"
+          :disabled="updating"
+          @click="isConfirmModalOpen = false"
+        >
+          Batal
+        </UiButton>
+        <UiButton
+          :variant="confirmVariant"
+          size="sm"
+          :loading="updating"
+          @click="confirmStatusChange"
+        >
+          Konfirmasi
+        </UiButton>
+      </template>
+    </UiModal>
   </div>
 </template>

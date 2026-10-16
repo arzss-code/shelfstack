@@ -3,7 +3,6 @@ import { useAuth } from '~/features/auth/composables/useAuth'
 import { useCartStore } from '~/features/cart/stores/cart'
 import { checkoutAddressSchema } from '~~/shared/schemas/order'
 import { formatRupiah } from '~/utils/format'
-import { useToast } from 'primevue/usetoast'
 import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import { useAddresses } from '~/composables/useAddresses'
 import type { UserAddress } from '~~/shared/schemas/address'
@@ -12,7 +11,7 @@ import SavedAddressSelector from '~/components/checkout/SavedAddressSelector.vue
 const { user, profile } = useAuth()
 const cartStore = useCartStore()
 const router = useRouter()
-const toast = useToast()
+const toast = useUiToast()
 const config = useRuntimeConfig()
 const { pay: openSnapModal } = useMidtransSnap()
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useProductStore } from '~/features/products/stores/product'
-import { useToast } from 'primevue/usetoast'
 
 // Komponen otomatis ter-import oleh Nuxt dari folder app/components/home/
 // seperti: HomeHero, HomeAssurances, HomeFeaturedCategories, dsb.
@@ -12,7 +11,7 @@ useSeoMeta({
 })
 
 const productStore = useProductStore()
-const toast = useToast()
+const toast = useUiToast()
 
 const featured = computed(() => productStore.products.slice(0, 4))
 

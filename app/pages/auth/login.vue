@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast'
 import { loginSchema } from '~~/shared/schemas/auth'
 import { useAuth } from '~/features/auth/composables/useAuth'
 
@@ -13,7 +12,7 @@ definePageMeta({
   middleware: 'guest',
 })
 
-const toast = useToast()
+const toast = useUiToast()
 const route = useRoute()
 const user = useSupabaseUser()
 const { signIn, signInWithGoogle, pending } = useAuth()

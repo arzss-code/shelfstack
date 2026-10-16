@@ -16,27 +16,31 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
 })
 
+/*
+ * Semua warna KPI memakai satu ramp status brand yang sama dengan UiBadge, UiAlert,
+ * dan toast, jadi kartu sekelompok selalu terbaca sebagai satu keluarga.
+ */
 const colorStyles = computed(() => {
   switch (props.color) {
     case 'emerald':
       return {
-        bg: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/40',
-        badge: 'text-emerald-700 dark:text-emerald-400',
+        bg: 'bg-brand-success-tint text-brand-success-text border-brand-success-edge',
+        badge: 'text-brand-success-text',
       }
     case 'amber':
       return {
-        bg: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800/40',
-        badge: 'text-amber-700 dark:text-amber-400',
+        bg: 'bg-brand-warning-tint text-brand-warning-text border-brand-warning-edge',
+        badge: 'text-brand-warning-text',
       }
     case 'rose':
       return {
-        bg: 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800/40',
-        badge: 'text-rose-700 dark:text-rose-400',
+        bg: 'bg-brand-danger-tint text-brand-danger-text border-brand-danger-edge',
+        badge: 'text-brand-danger-text',
       }
     case 'indigo':
       return {
-        bg: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800/40',
-        badge: 'text-indigo-700 dark:text-indigo-400',
+        bg: 'bg-brand-accent-tint text-brand-accent-text border-brand-accent-edge',
+        badge: 'text-brand-accent-text',
       }
     case 'brand':
     default:
@@ -60,16 +64,16 @@ const colorStyles = computed(() => {
   >
     <div class="flex items-start justify-between gap-4">
       <div class="space-y-1.5 flex-1 min-w-0">
-        <p class="text-xs font-medium uppercase tracking-wider text-brand-muted m-0 truncate">
+        <p class="text-xs font-medium uppercase tracking-wider text-brand-muted m-0">
           {{ title }}
         </p>
 
         <div v-if="loading" class="h-8 w-28 animate-pulse rounded bg-brand-hairsoft" />
-        <h3 v-else class="text-2xl font-bold tracking-tight text-brand-ink m-0 truncate">
+        <h3 v-else class="text-2xl font-bold tracking-tight tabular text-brand-ink m-0">
           {{ value }}
         </h3>
 
-        <p v-if="subtitle" class="text-xs text-brand-muted m-0 truncate">
+        <p v-if="subtitle" class="text-xs leading-relaxed text-brand-muted m-0">
           {{ subtitle }}
         </p>
       </div>

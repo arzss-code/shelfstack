@@ -8,8 +8,8 @@ useHead({
 
 <template>
   <div>
-    <Toast position="bottom-right" />
-    <ConfirmDialog />
+    <UiToastHost />
+    <UiConfirmHost />
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />

@@ -27,6 +27,44 @@
 - [x] Migrasi FSD: repositori dan store terpusat di `app/features/products/`.
 - [x] Validasi server produk menggunakan Zod schema dengan unit test lengkap (`tests/unit/`).
 
+### ✅ Redesign Admin: PrimeVue ke Primitif Brand (2026-10-16)
+
+- [x] **PrimeVue dihapus dari aplikasi.** `primevue`, `@primevue/nuxt-module`, dan `@primeuix/themes`
+      dicabut dari `package.json` dan `nuxt.config.ts`. Penyebab: `darkModeSelector: 'system'`
+      membuat komponen PrimeVue ikut dark mode OS sementara token `brand-*` mengikuti class `.dark`
+      yang tidak pernah dipasang, sehingga halaman tercampur terang dan gelap.
+- [x] **11 primitif baru di `app/components/ui/`**: `UiModal`, `UiSelect`, `UiTextarea`,
+      `UiFileField`, `UiTabs`, `UiSortHeader`, `UiSkeleton`, `UiIconButton`, `UiEmptyState`,
+      `UiAlert`, plus `UiToastHost`/`UiConfirmHost` dan composable `useUiToast`/`useUiConfirm`.
+- [x] **Ramp status semantik**: `--brand-{success,warning,danger,accent}` masing-masing dengan
+      `-tint`, `-edge`, `-text`. Satu resep dipakai badge, alert, toast, kartu KPI, dan badge tabel.
+      Palet `surface-*` dan `primary-*` dihapus dari `tailwind.config.js`.
+- [x] **Kontras teks pendukung dinaikkan**: `--brand-muted` ke `#5c5f64`, `--brand-faint` ke
+      `#6f7279`. `--brand-faint` sebelumnya 2.56:1, di bawah ambang 4.5:1.
+- [x] **Seluruh permukaan admin dikonversi**: 4 halaman admin, layout `admin.vue`,
+      `ProductForm`, `StockMovementsModal`, `ActivityDetailDialog`, `OrderCancelDialog`,
+      `OrderInvoiceModal`, `AdminOrderTable`, `AdminStatCard`. Tabel memakai satu resep geometri
+      yang sama di semua halaman.
+- [x] **Browser surface bertema**: scrollbar, `::selection`, autofill, `.tabular` untuk kolom
+      rupiah. Blok `.p-toast` 260 baris dengan hex hardcoded dihapus.
+- [x] **Indikator fokus tunggal**: satu aturan `:focus-visible` global memakai `outline`.
+      `UiInput` sebelumnya menampilkan dua cincin fokus bertumpuk.
+- [x] **Hydration mismatch diperbaiki**: `UiModal` dan `UiToastHost` dibungkus `ClientOnly`.
+- [x] **Gate**: `pnpm typecheck` EXIT 0, `pnpm lint` 0 error / 32 warning (pre-existing),
+      `pnpm exec vitest run` 37 file / 357 test lolos, detector impeccable `[]`,
+      screenshot desktop 1440x900 + mobile 390x844 (4 halaman + dialog) 2 passed / 0 console error.
+
+### Known Gap baru (admin)
+
+- **Etalase belum disatukan geometrinya.** Primitive baru hanya dipakai admin. Halaman publik masih
+  memakai komponen lama. Token warnanya sudah satu, jadi tidak rusak, tapi geometri (radius,
+  ukuran kontrol) belum konsisten antara admin dan etalase.
+- **21 em dash tersisa** di halaman etalase, `AppNavbar`, dan komponen auth. Semua di luar
+  scope redesign admin.
+- `AdminStatCard` masih memakai union `color` warisan
+  (`'emerald' | 'amber' | 'rose' | 'indigo' | 'brand'`) yang dipetakan ke ramp brand. Nama propnya
+  tidak diubah demi menjaga kontrak, jadi kosakata internal belum seragam.
+
 ### ✅ Fase 1: Auth & Security (Sprint 2)
 
 - [x] Autentikasi Supabase: Register, Login, Logout, Session persist, dan role guard.

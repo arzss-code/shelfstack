@@ -3,7 +3,6 @@ import type { Product } from '~/types/product'
 import { formatRupiah } from '~/utils/format'
 import { useCategories } from '~/composables/useCategories'
 import { useCartStore } from '~/features/cart/stores/cart'
-import { useToast } from 'primevue/usetoast'
 
 const props = withDefaults(
   defineProps<{
@@ -25,7 +24,7 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
-const toast = useToast()
+const toast = useUiToast()
 const cartStore = useCartStore()
 const { categories: dynamicCategories } = useCategories()
 

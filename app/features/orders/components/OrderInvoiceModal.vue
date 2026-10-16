@@ -42,82 +42,63 @@ const handlePrint = () => {
 </script>
 
 <template>
-  <Dialog
-    v-model:visible="isOpen"
-    modal
-    dismissable-mask
-    :header="`Invoice #${order.id.slice(0, 8)}`"
-    :style="{ width: '850px', maxWidth: '95vw' }"
-    :pt="{
-      root: {
-        class:
-          '!rounded-2xl !bg-white dark:!bg-brand-canvas-soft border !border-brand-hair shadow-whisper overflow-hidden',
-      },
-      header: { class: '!p-4 !border-b !border-brand-hair text-brand-ink no-print' },
-      content: { class: '!p-0' },
-    }"
-  >
+  <UiModal v-model:visible="isOpen" :title="`Invoice #${order.id.slice(0, 8)}`" size="lg">
     <!-- Action Bar (No Print) -->
     <div
-      class="no-print bg-brand-canvas/60 px-6 py-3 border-b border-brand-hair flex items-center justify-between"
+      class="no-print mb-5 flex items-center justify-between gap-3 rounded-field border border-brand-hair bg-brand-canvas-soft px-4 py-3"
     >
       <span class="text-xs text-brand-muted">
         Invoice resmi transaksi e-commerce ShelfStack Indonesia.
       </span>
-      <div class="flex items-center gap-2">
-        <UiButton variant="secondary" size="sm" icon="pi-print" @click="handlePrint">
-          Cetak / Simpan PDF
-        </UiButton>
-      </div>
     </div>
 
     <!-- Printable Invoice Sheet -->
-    <div class="invoice-sheet p-6 sm:p-10 font-sans text-brand-ink space-y-8 bg-white">
+    <div class="invoice-sheet space-y-8 bg-white p-6 font-sans text-brand-ink sm:p-10">
       <!-- Invoice Header -->
       <div
-        class="flex flex-col sm:flex-row sm:items-start justify-between gap-6 border-b border-brand-hair pb-6"
+        class="flex flex-col justify-between gap-6 border-b border-brand-hair pb-6 sm:flex-row sm:items-start"
       >
         <div>
-          <div class="flex items-center gap-2 mb-2">
-            <span class="font-display font-black text-xl tracking-tight text-brand-ink">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="font-display text-xl font-black tracking-tight text-brand-ink">
               SHELF<span class="text-brand-accent">STACK</span>
             </span>
           </div>
-          <p class="text-xs text-brand-muted m-0 leading-relaxed">
+          <p class="m-0 text-xs leading-relaxed text-brand-muted">
             PT ShelfStack Niaga Digital<br />
             Menara Karya Lt. 18, Jakarta Selatan<br />
             NPWP: 01.234.567.8-012.000
           </p>
         </div>
 
-        <div class="sm:text-right space-y-1">
+        <div class="space-y-1 sm:text-right">
           <div
-            class="inline-block bg-brand-canvas px-3 py-1 rounded-full border border-brand-hair text-[11px] font-bold uppercase tracking-wider text-brand-ink"
+            class="inline-block rounded-full border border-brand-hair bg-brand-canvas px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-brand-ink"
           >
             FAKTUR PENJUALAN
           </div>
-          <h2 class="font-mono text-base font-bold text-brand-ink m-0">
+          <h2 class="m-0 font-mono text-base font-bold tabular text-brand-ink">
             {{ invoiceNumber }}
           </h2>
-          <p class="text-xs text-brand-muted m-0">Tanggal: {{ formatDate(order.created_at) }}</p>
-          <div v-if="order.paid_at" class="text-xs font-semibold text-emerald-600">
+          <p class="m-0 text-xs text-brand-muted">Tanggal: {{ formatDate(order.created_at) }}</p>
+          <div v-if="order.paid_at" class="text-xs font-semibold text-brand-success-text">
             LUNAS ({{ formatDate(order.paid_at) }})
           </div>
         </div>
       </div>
 
       <!-- Customer & Shipping Details -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs border-b border-brand-hair pb-6">
+      <div class="grid grid-cols-1 gap-6 border-b border-brand-hair pb-6 text-xs sm:grid-cols-2">
         <div>
           <span
-            class="font-semibold text-brand-muted uppercase text-[10px] tracking-wider block mb-1"
+            class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-brand-muted"
           >
             DITAGIHKAN KEPADA:
           </span>
-          <div class="font-bold text-sm text-brand-ink mb-1">
+          <div class="mb-1 text-sm font-bold text-brand-ink">
             {{ order.address?.name || 'Pelanggan ShelfStack' }}
           </div>
-          <p class="text-brand-muted m-0 leading-relaxed">
+          <p class="m-0 leading-relaxed text-brand-muted">
             No. Telepon: {{ order.address?.phone || '-' }}<br />
             Kota: {{ order.address?.city || '-' }}<br />
             {{ order.address?.street || '' }}
@@ -126,49 +107,51 @@ const handlePrint = () => {
 
         <div class="sm:text-right">
           <span
-            class="font-semibold text-brand-muted uppercase text-[10px] tracking-wider block mb-1"
+            class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-brand-muted"
           >
             STATUS & METODE BAYAR:
           </span>
-          <p class="text-brand-muted m-0 leading-relaxed">
-            Status: <span class="font-bold text-brand-ink uppercase">{{ order.status }}</span
+          <p class="m-0 leading-relaxed text-brand-muted">
+            Status: <span class="font-bold uppercase text-brand-ink">{{ order.status }}</span
             ><br />
             Metode:
-            <span class="font-bold text-brand-ink uppercase">{{
+            <span class="font-bold uppercase text-brand-ink">{{
               order.payment_type || 'Midtrans Payment Gateway'
             }}</span
             ><br />
             Pengiriman:
-            <span class="text-emerald-600 font-semibold">Gratis Ongkir Se-Indonesia</span>
+            <span class="font-semibold text-brand-success-text">Gratis Ongkir Se-Indonesia</span>
           </p>
         </div>
       </div>
 
       <!-- Items Table -->
       <div>
-        <table class="w-full text-left text-xs border-collapse">
+        <table class="w-full border-collapse text-left text-xs">
           <thead>
             <tr
-              class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
+              class="border-b border-brand-hair bg-brand-canvas/60 text-[11px] uppercase tracking-wider text-brand-muted"
             >
-              <th class="py-2.5 px-3 font-semibold">No</th>
-              <th class="py-2.5 px-3 font-semibold">Deskripsi Produk</th>
-              <th class="py-2.5 px-3 font-semibold text-center">Jumlah</th>
-              <th class="py-2.5 px-3 font-semibold text-right">Harga Satuan</th>
-              <th class="py-2.5 px-3 font-semibold text-right">Subtotal</th>
+              <th class="px-3 py-2.5 font-semibold">No</th>
+              <th class="px-3 py-2.5 font-semibold">Deskripsi Produk</th>
+              <th class="px-3 py-2.5 text-center font-semibold">Jumlah</th>
+              <th class="px-3 py-2.5 text-right font-semibold">Harga Satuan</th>
+              <th class="px-3 py-2.5 text-right font-semibold">Subtotal</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-brand-hairsoft">
             <tr v-for="(item, idx) in order.items || []" :key="item.id">
-              <td class="py-3 px-3 text-brand-muted font-mono">{{ idx + 1 }}</td>
-              <td class="py-3 px-3 font-medium text-brand-ink">
+              <td class="px-3 py-3 font-mono text-brand-muted tabular">{{ idx + 1 }}</td>
+              <td class="px-3 py-3 font-medium text-brand-ink">
                 {{ item.product?.name || `Item #${item.id.slice(0, 8)}` }}
               </td>
-              <td class="py-3 px-3 text-center text-brand-muted font-mono">{{ item.qty }}</td>
-              <td class="py-3 px-3 text-right text-brand-muted">
+              <td class="px-3 py-3 text-center font-mono tabular text-brand-muted">
+                {{ item.qty }}
+              </td>
+              <td class="px-3 py-3 text-right tabular text-brand-muted">
                 {{ formatRupiah(item.price_cents / 100) }}
               </td>
-              <td class="py-3 px-3 text-right font-semibold text-brand-ink">
+              <td class="px-3 py-3 text-right font-semibold tabular text-brand-ink">
                 {{ formatRupiah((item.price_cents * item.qty) / 100) }}
               </td>
             </tr>
@@ -177,28 +160,30 @@ const handlePrint = () => {
       </div>
 
       <!-- Financial Calculation Summary -->
-      <div class="flex justify-end pt-4 border-t border-brand-hair">
-        <div class="w-full sm:w-64 space-y-2 text-xs">
+      <div class="flex justify-end border-t border-brand-hair pt-4">
+        <div class="w-full space-y-2 text-xs sm:w-64">
           <div class="flex justify-between text-brand-muted">
             <span>Biaya Pengiriman:</span>
-            <span class="text-emerald-600 font-medium">Rp 0 (Gratis)</span>
+            <span class="font-medium tabular text-brand-success-text">Rp 0 (Gratis)</span>
           </div>
           <div class="flex justify-between text-brand-muted">
             <span>PPN 11%:</span>
             <span class="font-medium text-brand-ink">Termasuk</span>
           </div>
           <div
-            class="flex justify-between items-center pt-2 border-t border-brand-hair font-bold text-sm text-brand-ink"
+            class="flex items-center justify-between border-t border-brand-hair pt-2 text-sm font-bold text-brand-ink"
           >
             <span>Total Tagihan:</span>
-            <span class="font-mono text-base">{{ formatRupiah(order.total_cents / 100) }}</span>
+            <span class="font-mono text-base tabular">{{
+              formatRupiah(order.total_cents / 100)
+            }}</span>
           </div>
         </div>
       </div>
 
       <!-- Invoice Footer Note -->
       <div
-        class="pt-6 border-t border-brand-hairsoft text-center text-[10px] text-brand-muted space-y-1"
+        class="space-y-1 border-t border-brand-hairsoft pt-6 text-center text-[10px] text-brand-muted"
       >
         <p class="m-0">
           Terima kasih telah berbelanja di ShelfStack. Bukti pembayaran ini sah dan diterbitkan
@@ -209,16 +194,56 @@ const handlePrint = () => {
         </p>
       </div>
     </div>
-  </Dialog>
+
+    <template #footer>
+      <UiButton variant="secondary" size="sm" class="no-print" icon="pi-print" @click="handlePrint">
+        Cetak / Simpan PDF
+      </UiButton>
+    </template>
+  </UiModal>
 </template>
 
-<style scoped>
+<style>
+/*
+ * Pratinjau cetak: hanya lembar invoice yang dicetak.
+ * Gate `body:has(.invoice-sheet)` membuat aturan ini hanya aktif selama modal terbuka,
+ * sehingga kerangka aplikasi dan chrome modal (header, footer, overlay) tidak ikut tercetak.
+ * Dibuat global karena chrome modal dirender di dalam UiModal, di luar scope komponen ini.
+ */
 @media print {
-  /* Sembunyikan elemen non-invoice saat dialog print browser aktif */
-  .no-print {
+  body:has(.invoice-sheet) #__nuxt {
     display: none !important;
   }
-  .invoice-sheet {
+
+  body:has(.invoice-sheet) > div {
+    position: static !important;
+    display: block !important;
+    padding: 0 !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    overflow: visible !important;
+  }
+
+  body:has(.invoice-sheet) > div > div {
+    max-width: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  body:has(.invoice-sheet) > div > div > header,
+  body:has(.invoice-sheet) > div > div > footer,
+  body:has(.invoice-sheet) .no-print {
+    display: none !important;
+  }
+
+  body:has(.invoice-sheet) > div > div > div {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  body:has(.invoice-sheet) .invoice-sheet {
     padding: 0 !important;
     background: white !important;
   }

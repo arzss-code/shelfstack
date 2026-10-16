@@ -29,6 +29,11 @@ const selectedAction = ref(NO_FILTER.action)
 
 const entityOptions = computed(() => distinctEntityTypes(activities.value))
 
+const actionTabs = computed(() => [
+  { value: NO_FILTER.action, label: 'Semua' },
+  ...ACTIVITY_ACTIONS.map((action) => ({ value: action, label: action })),
+])
+
 const filteredActivities = computed(() =>
   filterActivities(activities.value, {
     entity: selectedEntity.value,
@@ -50,11 +55,15 @@ onMounted(() => {
   subscribeToRealtime()
 })
 
-const formatDate = (dateStr: string) => {
+/** Waktu bisa null bila kolom kosong, tampilkan placeholder ringkas. */
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return '-'
   return format(new Date(dateStr), 'dd MMM yyyy, HH:mm', { locale: id })
 }
 
-const getActionSeverity = (action: string) => {
+const getActionVariant = (
+  action: string,
+): 'default' | 'success' | 'warning' | 'danger' | 'info' => {
   switch (action) {
     case 'CREATE':
       return 'success'
@@ -63,9 +72,9 @@ const getActionSeverity = (action: string) => {
     case 'DELETE':
       return 'danger'
     case 'RESTORE':
-      return 'warn'
+      return 'warning'
     default:
-      return 'secondary'
+      return 'default'
   }
 }
 
@@ -74,9 +83,9 @@ const viewDetails = (activity: ActivityLog) => {
   isDialogVisible.value = true
 }
 
-const rowClass = (data: ActivityLog) => {
-  return [{ 'bg-emerald-50 dark:bg-emerald-900/20 transition-colors duration-1000': data.isNew }]
-}
+/** Baris baru dari realtime memakai tint sukses selama 2 detik, lalu composable menurunkan flag. */
+const rowClass = (data: ActivityLog) =>
+  data.isNew ? 'bg-brand-success-tint transition-colors duration-1000' : ''
 </script>
 
 <template>
@@ -88,13 +97,13 @@ const rowClass = (data: ActivityLog) => {
         >
           Activity Log
           <span
-            class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20"
+            class="inline-flex items-center gap-1.5 rounded-full bg-brand-success-tint px-2 py-1 text-xs font-medium text-brand-success-text ring-1 ring-inset ring-brand-success-edge"
           >
             <span class="relative flex h-2 w-2">
               <span
-                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-success opacity-75"
               />
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-success" />
             </span>
             Live
           </span>
@@ -107,49 +116,25 @@ const rowClass = (data: ActivityLog) => {
     <div
       class="mb-4 flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-4 md:flex-row md:items-center md:justify-between"
     >
-      <div class="flex flex-wrap items-center gap-1.5">
-        <button
-          type="button"
-          class="rounded-full px-3 py-1.5 text-xs font-semibold transition-all"
-          :class="[
-            selectedAction === ''
-              ? 'bg-brand-ink text-brand-onink'
-              : 'text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink',
-          ]"
-          @click="selectedAction = ''"
-        >
-          Semua
-        </button>
-        <button
-          v-for="action in ACTIVITY_ACTIONS"
-          :key="action"
-          type="button"
-          class="rounded-full px-3 py-1.5 text-xs font-semibold transition-all"
-          :class="[
-            selectedAction === action
-              ? 'bg-brand-ink text-brand-onink'
-              : 'text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink',
-          ]"
-          @click="selectedAction = action"
-        >
-          {{ action }}
-        </button>
-      </div>
+      <UiTabs v-model="selectedAction" :items="actionTabs" aria-label="Filter jenis aksi" />
 
       <div class="flex items-center gap-2">
         <span v-if="!loading" class="text-xs text-brand-muted">
           Menampilkan {{ filteredActivities.length }} dari {{ activities.length }}
         </span>
-        <select
+        <label for="activity-entity-filter" class="sr-only">Filter entitas</label>
+        <UiSelect
+          id="activity-entity-filter"
           v-model="selectedEntity"
+          size="sm"
           aria-label="Filter entitas"
-          class="rounded-full border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs text-brand-ink focus:outline-none"
+          class="max-w-[190px]"
         >
           <option value="">Semua entitas</option>
           <option v-for="entity in entityOptions" :key="entity" :value="entity">
             {{ entity }}
           </option>
-        </select>
+        </UiSelect>
         <UiButton v-if="filteringActive" variant="ghost" size="sm" @click="resetFilters">
           Reset
         </UiButton>
@@ -157,122 +142,84 @@ const rowClass = (data: ActivityLog) => {
     </div>
 
     <!-- Empty State -->
-    <div
+    <UiEmptyState
       v-if="!loading && filteredActivities.length === 0"
-      class="flex flex-col items-center justify-center py-20 px-8 bg-brand-canvas rounded-card border border-dashed border-brand-hair shadow-whisper"
-    >
-      <div
-        class="w-16 h-16 rounded-full bg-brand-canvas-soft flex items-center justify-center mb-6"
-      >
-        <i class="pi pi-history text-2xl text-brand-faint" />
-      </div>
-      <h3 class="m-0 mb-2 text-brand-ink font-semibold text-lg">
-        {{ filteringActive ? 'Tidak ada hasil' : 'Belum ada aktivitas' }}
-      </h3>
-      <p class="m-0 text-brand-muted text-sm max-w-md text-center leading-relaxed">
-        {{
-          filteringActive
-            ? 'Tidak ada aktivitas yang cocok dengan filter. Ubah filter atau reset untuk melihat semua.'
-            : 'Sistem belum mencatat aktivitas apa pun. Lakukan aksi pada produk untuk melihat jejak rekam di sini.'
-        }}
-      </p>
-      <UiButton
-        v-if="filteringActive"
-        variant="secondary"
-        size="sm"
-        class="mt-4"
-        @click="resetFilters"
-      >
-        Tampilkan semua
-      </UiButton>
-    </div>
+      icon="pi-history"
+      :title="filteringActive ? 'Tidak ada hasil' : 'Belum ada aktivitas'"
+      :description="
+        filteringActive
+          ? 'Tidak ada aktivitas yang cocok dengan filter. Ubah filter atau reset untuk melihat semua.'
+          : 'Sistem belum mencatat aktivitas apa pun. Lakukan aksi pada produk untuk melihat jejak rekam di sini.'
+      "
+      :action-label="filteringActive ? 'Tampilkan semua' : ''"
+      @action="resetFilters"
+    />
 
-    <!-- Skeleton Loading (Shimmer) -->
-    <DataTable
-      v-else-if="loading"
-      :value="Array(5).fill({})"
-      striped-rows
-      class="border border-brand-hair rounded-card overflow-hidden"
-    >
-      <Column header="Waktu" style="min-width: 180px">
-        <template #body>
-          <Skeleton width="120px" height="1rem" />
-        </template>
-      </Column>
-      <Column header="Aksi">
-        <template #body>
-          <Skeleton width="60px" height="1.5rem" border-radius="16px" />
-        </template>
-      </Column>
-      <Column header="Deskripsi" style="min-width: 250px">
-        <template #body>
-          <Skeleton width="100%" height="1rem" />
-        </template>
-      </Column>
-      <Column header="IP Address">
-        <template #body>
-          <Skeleton width="100px" height="1rem" />
-        </template>
-      </Column>
-      <Column header="Browser / OS">
-        <template #body>
-          <Skeleton width="120px" height="1rem" />
-        </template>
-      </Column>
-      <Column header="Detail" style="width: 100px; text-align: center">
-        <template #body>
-          <Skeleton shape="circle" size="2rem" class="mx-auto" />
-        </template>
-      </Column>
-    </DataTable>
-
-    <!-- Data Table -->
-    <DataTable
+    <!-- Tabel aktivitas: shimmer saat memuat, data setelahnya -->
+    <div
       v-else
-      :value="filteredActivities"
-      :row-class="rowClass"
-      striped-rows
-      class="border border-brand-hair rounded-card overflow-hidden"
+      class="overflow-hidden rounded-2xl border border-brand-hair bg-brand-canvas-soft shadow-whisper"
     >
-      <Column field="created_at" header="Waktu" style="min-width: 180px">
-        <template #body="{ data }">
-          <span class="text-sm font-medium">{{ formatDate(data.created_at) }}</span>
-        </template>
-      </Column>
-      <Column field="action" header="Aksi">
-        <template #body="{ data }">
-          <Tag
-            :severity="getActionSeverity(data.action)"
-            :value="data.action"
-            class="text-xs tracking-wider"
-          />
-        </template>
-      </Column>
-      <Column field="description" header="Deskripsi" style="min-width: 250px">
-        <template #body="{ data }">
-          <span class="text-sm">{{ data.description }}</span>
-        </template>
-      </Column>
-      <Column field="ip_address" header="IP Address" />
-      <Column field="browser" header="Browser / OS">
-        <template #body="{ data }">
-          <span class="text-xs text-brand-muted">{{ data.browser }} • {{ data.platform }}</span>
-        </template>
-      </Column>
-      <Column header="Detail" style="width: 100px; text-align: center">
-        <template #body="{ data }">
-          <UiTooltip v-if="data.old_data || data.new_data" text="Lihat Detail" position="top">
-            <Button
-              icon="pi pi-search"
-              text
-              rounded
-              aria-label="Lihat Detail"
-              @click="viewDetails(data)"
-            />
-          </UiTooltip>
-        </template>
-      </Column>
-    </DataTable>
+      <!-- Skeleton Loading (Shimmer) -->
+      <div v-if="loading" class="space-y-3 p-4" aria-busy="true">
+        <div v-for="i in 5" :key="i" class="flex items-center gap-4">
+          <UiSkeleton width="w-44" height="h-4" />
+          <UiSkeleton width="w-20" height="h-6" shape="pill" />
+          <div class="min-w-0 flex-1">
+            <UiSkeleton width="w-full" height="h-4" />
+          </div>
+          <UiSkeleton width="w-24" height="h-4" />
+          <UiSkeleton width="w-32" height="h-4" />
+          <UiSkeleton width="w-7" height="h-7" shape="pill" />
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div v-else class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr
+              class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
+            >
+              <th class="py-3 px-4 font-semibold whitespace-nowrap w-[180px]">Waktu</th>
+              <th class="py-3 px-4 font-semibold">Aksi</th>
+              <th class="py-3 px-4 font-semibold min-w-[250px]">Deskripsi</th>
+              <th class="py-3 px-4 font-semibold whitespace-nowrap">IP Address</th>
+              <th class="py-3 px-4 font-semibold whitespace-nowrap">Browser / OS</th>
+              <th class="py-3 px-4 font-semibold text-center w-[100px]">Detail</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-brand-hairsoft">
+            <tr
+              v-for="row in filteredActivities"
+              :key="row.id"
+              class="hover:bg-brand-canvas transition-colors"
+              :class="rowClass(row)"
+            >
+              <td class="py-3.5 px-4 font-medium text-brand-ink whitespace-nowrap">
+                {{ formatDate(row.created_at) }}
+              </td>
+              <td class="py-3.5 px-4">
+                <UiBadge :label="row.action" :variant="getActionVariant(row.action)" />
+              </td>
+              <td class="py-3.5 px-4 text-brand-ink">{{ row.description }}</td>
+              <td class="py-3.5 px-4 text-brand-muted whitespace-nowrap">
+                {{ row.ip_address || '-' }}
+              </td>
+              <td class="py-3.5 px-4 text-brand-muted whitespace-nowrap">
+                {{ row.browser || '-' }} • {{ row.platform || '-' }}
+              </td>
+              <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                <UiTooltip v-if="row.old_data || row.new_data" text="Lihat Detail" position="top">
+                  <UiIconButton icon="pi-search" label="Lihat Detail" @click="viewDetails(row)" />
+                </UiTooltip>
+                <span v-else class="text-brand-faint">Tidak ada</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
     <!-- Detail Dialog Component -->
     <ActivityDetailDialog v-model:visible="isDialogVisible" :activity="selectedActivity" />

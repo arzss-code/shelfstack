@@ -3,13 +3,12 @@ import { useAuth } from '~/features/auth/composables/useAuth'
 import type { Database } from '~/types/database.types'
 import type { Order, OrderStatus } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
-import { useToast } from 'primevue/usetoast'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 const { user } = useAuth()
 const router = useRouter()
 const supabase = useSupabaseClient<Database>()
-const toast = useToast()
+const toast = useUiToast()
 
 definePageMeta({
   middleware: 'auth',

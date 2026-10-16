@@ -70,7 +70,7 @@ watch(
         </NuxtLink>
         <button
           type="button"
-          class="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 no-underline hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-left border-0 bg-transparent cursor-pointer"
+          class="flex cursor-pointer items-center gap-2 rounded-full border-0 bg-transparent px-4 py-2 text-left text-xs font-medium text-brand-danger-text no-underline transition-colors hover:bg-brand-danger-tint"
           @click="logout"
         >
           <i class="pi pi-sign-out text-xs" />
@@ -150,7 +150,7 @@ watch(
           </NuxtLink>
           <button
             type="button"
-            class="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 no-underline hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-left border-0 bg-transparent cursor-pointer"
+            class="flex cursor-pointer items-center gap-2 rounded-full border-0 bg-transparent px-4 py-2 text-left text-xs font-medium text-brand-danger-text no-underline transition-colors hover:bg-brand-danger-tint"
             @click="logout"
           >
             <i class="pi pi-sign-out text-xs" />
@@ -207,7 +207,7 @@ watch(
               {{ profile?.full_name || user?.email || 'Admin' }}
             </span>
             <span
-              class="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400"
+              class="rounded bg-brand-accent-tint px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-brand-accent-text"
             >
               Admin
             </span>
@@ -225,7 +225,7 @@ watch(
         class="border-t border-brand-hairsoft py-4 px-4 sm:px-6 lg:px-8 text-center text-xs text-brand-muted"
       >
         <span
-          >ShelfStack Admin Workspace &copy; {{ new Date().getFullYear() }} — Strict Operations
+          >ShelfStack Admin Workspace &copy; {{ new Date().getFullYear() }}, Strict Operations
           Mode</span
         >
       </footer>

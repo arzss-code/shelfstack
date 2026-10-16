@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast'
 import { compressImage } from '~/utils/image'
 import { z } from 'zod'
 import { useCategories } from '~/composables/useCategories'
@@ -53,7 +52,7 @@ const emit = defineEmits<{
 }>()
 
 const visible = defineModel<boolean>('visible', { default: false })
-const toast = useToast()
+const toast = useUiToast()
 const { categories, fetchCategories } = useCategories()
 
 const name = ref('')
@@ -62,7 +61,10 @@ const stock = ref<number>(0)
 const categoryId = ref<string | null>(null)
 const description = ref<string | null>(null)
 const link = ref<string | null>(null)
+/** File hasil kompresi yang benar-benar dikirim ke server. */
 const imageFile = shallowRef<File | null>(null)
+/** File mentah hasil pilihan pengguna, dipakai sebagai sumber kompresi. */
+const selectedFile = shallowRef<File | null>(null)
 
 const errors = ref<{
   name?: string
@@ -71,6 +73,48 @@ const errors = ref<{
   category_id?: string
   link?: string
 }>({})
+
+// UiInput dan UiSelect selalu mengirim string, jadi ref numerik dan nullable dijembatani adapter.
+const priceModel = computed({
+  get: () => (price.value === null ? '' : String(price.value)),
+  set: (value: string) => {
+    const parsed = Number(value)
+    price.value = value.trim() === '' || Number.isNaN(parsed) ? null : parsed
+  },
+})
+
+const stockModel = computed({
+  get: () => String(stock.value),
+  set: (value: string) => {
+    const parsed = Number(value)
+    stock.value = value.trim() === '' || Number.isNaN(parsed) ? 0 : parsed
+  },
+})
+
+const categoryIdModel = computed({
+  get: () => categoryId.value ?? '',
+  set: (value: string) => {
+    categoryId.value = value === '' ? null : value
+  },
+})
+
+const linkModel = computed({
+  get: () => link.value ?? '',
+  set: (value: string) => {
+    link.value = value
+  },
+})
+
+const descriptionModel = computed({
+  get: () => description.value ?? '',
+  set: (value: string) => {
+    description.value = value
+  },
+})
+
+const imageHint = computed(() =>
+  props.initialData?.image_url ? '* Biarkan kosong jika tidak ingin mengubah gambar.' : '',
+)
 
 onMounted(() => {
   fetchCategories()
@@ -95,43 +139,42 @@ watch(
       link.value = null
     }
     imageFile.value = null
+    selectedFile.value = null
     errors.value = {}
   },
   { immediate: true },
 )
 
-const onFileSelect = async (event: any) => {
-  const file = event.files[0] as File
-  if (!file) return
-
-  const allowedFormats = ['image/jpeg', 'image/png', 'image/webp']
-  if (!allowedFormats.includes(file.type)) {
+// UiFileField sudah menolak format dan ukuran di dalam dirinya, di sini hanya pesannya yang ditampilkan.
+const onFileReject = (reason: 'format' | 'size') => {
+  if (reason === 'format') {
     toast.add({
       severity: 'error',
       summary: 'Format Ditolak',
       detail: 'Hanya format JPEG, PNG, dan WebP yang diizinkan sesuai SOP.',
       life: 5000,
     })
-    event.options.clear()
     return
   }
 
-  const maxSize = 5 * 1024 * 1024
-  if (file.size > maxSize) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ukuran Berlebih',
-      detail: 'Ukuran maksimal file mentah adalah 5 MB.',
-      life: 5000,
-    })
-    event.options.clear()
+  toast.add({
+    severity: 'error',
+    summary: 'Ukuran Berlebih',
+    detail: 'Ukuran maksimal file mentah adalah 5 MB.',
+    life: 5000,
+  })
+}
+
+watch(selectedFile, async (file) => {
+  if (!file) {
+    imageFile.value = null
     return
   }
 
   try {
-    const compressed = await compressImage(file)
-    imageFile.value = compressed
+    imageFile.value = await compressImage(file)
   } catch {
+    imageFile.value = null
     toast.add({
       severity: 'error',
       summary: 'Gagal Memproses',
@@ -139,7 +182,7 @@ const onFileSelect = async (event: any) => {
       life: 5000,
     })
   }
-}
+})
 
 const validateForm = (): boolean => {
   errors.value = {}
@@ -187,143 +230,88 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <Dialog
+  <UiModal
     v-model:visible="visible"
-    modal
-    :header="initialData ? 'Edit Produk' : 'Tambah Produk'"
-    :style="{ width: '32rem' }"
+    size="md"
+    :title="initialData ? 'Edit Produk' : 'Tambah Produk'"
   >
-    <div class="grid grid-cols-1 gap-4 mt-4 w-full">
+    <div class="grid w-full grid-cols-1 gap-4">
       <!-- Nama Produk -->
-      <div class="flex flex-col gap-1.5">
-        <label for="name" class="text-[0.95rem] font-semibold text-surface-900 dark:text-surface-0">
-          Nama Produk
-        </label>
-        <InputText
-          id="name"
-          v-model="name"
-          autofocus
-          autocomplete="off"
-          placeholder="Contoh: Kemeja Linen Vintage"
-          :class="[{ 'p-invalid': errors.name }, 'w-full']"
-        />
-        <small v-if="errors.name" class="text-red-500 font-medium">{{ errors.name }}</small>
-      </div>
+      <UiInput
+        id="name"
+        v-model="name"
+        label="Nama Produk"
+        type="text"
+        autocomplete="off"
+        placeholder="Contoh: Kemeja Linen Vintage"
+        :error="errors.name"
+      />
 
       <!-- Kategori Produk Dropdown -->
-      <div class="flex flex-col gap-1.5">
-        <label
-          for="category"
-          class="text-[0.95rem] font-semibold text-surface-900 dark:text-surface-0"
-        >
-          Kategori Produk
-        </label>
-        <select
-          id="category"
-          v-model="categoryId"
-          class="w-full rounded-lg border border-brand-hair bg-brand-canvas p-2.5 text-xs text-brand-ink focus:border-brand-ink focus:outline-none"
-        >
-          <option :value="null">-- Pilih Kategori --</option>
-          <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-            {{ cat.name }}
-          </option>
-        </select>
-        <small v-if="errors.category_id" class="text-red-500 font-medium">{{
-          errors.category_id
-        }}</small>
-      </div>
+      <UiSelect
+        id="category"
+        v-model="categoryIdModel"
+        label="Kategori Produk"
+        block
+        :error="errors.category_id"
+      >
+        <option value="">-- Pilih Kategori --</option>
+        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+          {{ cat.name }}
+        </option>
+      </UiSelect>
 
       <!-- Harga & Stok (Grid 2 Kolom) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="flex flex-col gap-1.5">
-          <label
-            for="price"
-            class="text-[0.95rem] font-semibold text-surface-900 dark:text-surface-0"
-          >
-            Harga (IDR)
-          </label>
-          <InputNumber
-            id="price"
-            v-model="price"
-            mode="currency"
-            currency="IDR"
-            locale="id-ID"
-            class="w-full"
-            :class="{ 'p-invalid': errors.price }"
-          />
-          <small v-if="errors.price" class="text-red-500 font-medium">{{ errors.price }}</small>
-        </div>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <UiInput
+          id="price"
+          v-model="priceModel"
+          label="Harga (IDR)"
+          type="number"
+          numeric
+          :step="1"
+          placeholder="Contoh: 150000"
+          :error="errors.price"
+        />
 
-        <div class="flex flex-col gap-1.5">
-          <label
-            for="stock"
-            class="text-[0.95rem] font-semibold text-surface-900 dark:text-surface-0"
-          >
-            Stok Fisik
-          </label>
-          <InputNumber
-            id="stock"
-            v-model="stock"
-            :min="0"
-            show-buttons
-            class="w-full"
-            :class="{ 'p-invalid': errors.stock }"
-          />
-          <small v-if="errors.stock" class="text-red-500 font-medium">{{ errors.stock }}</small>
-        </div>
+        <UiInput
+          id="stock"
+          v-model="stockModel"
+          label="Stok Fisik"
+          type="number"
+          numeric
+          :min="0"
+          :step="1"
+          :error="errors.stock"
+        />
       </div>
 
       <!-- Deskripsi -->
-      <div class="flex flex-col gap-1.5">
-        <label
-          for="description"
-          class="text-[0.95rem] font-semibold text-surface-900 dark:text-surface-0"
-        >
-          Deskripsi
-        </label>
-        <Textarea id="description" v-model="description" rows="3" auto-resize class="w-full" />
-      </div>
+      <UiTextarea id="description" v-model="descriptionModel" label="Deskripsi" :rows="3" />
 
       <!-- Tautan Referensi -->
-      <div class="grid grid-cols-1 gap-1.5">
-        <label for="link" class="text-[0.95rem] font-semibold text-surface-900 dark:text-surface-0">
-          Tautan Referensi (Opsional)
-        </label>
-        <InputText
-          id="link"
-          v-model="link"
-          placeholder="https://..."
-          :class="[{ 'p-invalid': errors.link }, 'w-full']"
-        />
-        <small v-if="errors.link" class="text-red-500 font-medium">{{ errors.link }}</small>
-      </div>
+      <UiInput
+        id="link"
+        v-model="linkModel"
+        label="Tautan Referensi (Opsional)"
+        type="text"
+        placeholder="https://..."
+        :error="errors.link"
+      />
 
       <!-- Upload Gambar -->
-      <div class="grid grid-cols-1 gap-1.5">
-        <label class="text-[0.95rem] font-semibold text-surface-900 dark:text-surface-0">
-          Gambar Produk
-        </label>
-        <FileUpload
-          mode="basic"
-          name="image"
-          accept="image/*"
-          custom-upload
-          :auto="false"
-          choose-label="Unggah Gambar"
-          @select="onFileSelect"
-        />
-        <small
-          v-if="initialData && initialData.image_url"
-          class="text-[color:var(--p-text-muted-color)] mt-1"
-        >
-          * Biarkan kosong jika tidak ingin mengubah gambar.
-        </small>
-      </div>
+      <UiFileField
+        v-model="selectedFile"
+        label="Gambar Produk"
+        accept="image/jpeg,image/png,image/webp"
+        :hint="imageHint"
+        @reject="onFileReject"
+      />
     </div>
 
-    <div class="flex justify-end gap-2 mt-8">
-      <Button type="button" label="Batal" severity="secondary" @click="handleCancel" />
-      <Button type="button" label="Simpan" :loading="loading" @click="handleSave" />
-    </div>
-  </Dialog>
+    <template #footer>
+      <UiButton variant="secondary" @click="handleCancel">Batal</UiButton>
+      <UiButton variant="primary" :loading="loading" @click="handleSave">Simpan</UiButton>
+    </template>
+  </UiModal>
 </template>
