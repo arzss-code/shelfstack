@@ -28,6 +28,14 @@ const fromDate = ref('')
 const toDate = ref('')
 const page = ref(1)
 const pageSize = 15
+const sortKey = ref<string | null>(null)
+const sortDirection = ref<'desc' | 'asc' | null>(null)
+
+const sortParam = computed(() => {
+  if (!sortKey.value || !sortDirection.value) return ''
+  const col = sortKey.value === 'id' ? 'created_at' : sortKey.value
+  return `${col}_${sortDirection.value}`
+})
 
 const loading = ref(true)
 const orders = ref<AdminOrderRow[]>([])
@@ -53,6 +61,7 @@ const fetchOrders = async () => {
     const params: Record<string, string | number> = { from, to }
     if (activeStatus.value) params.status = activeStatus.value
     if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
+    if (sortParam.value) params.sort = sortParam.value
 
     const res = await $fetch<{ status: string; data: { orders: AdminOrderRow[]; total: number } }>(
       '/api/admin/orders',
@@ -80,6 +89,13 @@ const onSearch = () => {
   fetchOrders()
 }
 
+const onSortChange = (payload: { key: string | null; direction: 'desc' | 'asc' | null }) => {
+  sortKey.value = payload.key
+  sortDirection.value = payload.direction
+  page.value = 1
+  fetchOrders()
+}
+
 const exporting = ref(false)
 
 const handleExportCsv = async () => {
@@ -90,6 +106,7 @@ const handleExportCsv = async () => {
     if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
     if (fromDate.value) params.from = fromDate.value
     if (toDate.value) params.to = toDate.value
+    if (sortParam.value) params.sort = sortParam.value
 
     const res = await $fetch<string>('/api/admin/orders/export', { params, responseType: 'text' })
     const blob = new Blob([res], { type: 'text/csv;charset=utf-8;' })
@@ -309,7 +326,7 @@ onUnmounted(async () => {
     <!-- Error Alert -->
     <div
       v-if="errorMessage"
-      class="rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/20 dark:text-rose-400"
+      class="rounded-xl border border-rose-200 dark:border-rose-800/40 bg-rose-50 dark:bg-rose-950/40 p-4 text-xs text-rose-700 dark:text-rose-400"
     >
       {{ errorMessage }}
     </div>
@@ -322,8 +339,11 @@ onUnmounted(async () => {
       :page-size="pageSize"
       :total-orders="totalOrders"
       :total-pages="totalPages"
+      :sort-key="sortKey"
+      :sort-direction="sortDirection"
       @prev-page="prevPage"
       @next-page="nextPage"
+      @sort-change="onSortChange"
     />
   </div>
 </template>

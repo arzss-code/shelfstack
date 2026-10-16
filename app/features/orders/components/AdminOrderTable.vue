@@ -20,19 +20,40 @@ export interface AdminOrderRow {
   }>
 }
 
-defineProps<{
-  orders: AdminOrderRow[]
-  loading: boolean
-  page: number
-  pageSize: number
-  totalOrders: number
-  totalPages: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    orders: AdminOrderRow[]
+    loading: boolean
+    page: number
+    pageSize: number
+    totalOrders: number
+    totalPages: number
+    sortKey?: string | null
+    sortDirection?: 'desc' | 'asc' | null
+  }>(),
+  { sortKey: null, sortDirection: null },
+)
 
 const emit = defineEmits<{
   prevPage: []
   nextPage: []
+  sortChange: [payload: { key: string | null; direction: 'desc' | 'asc' | null }]
 }>()
+
+const sortIconClass = (key: string) => {
+  if (props.sortKey !== key || !props.sortDirection) return 'pi pi-sort'
+  return props.sortDirection === 'desc' ? 'pi pi-sort-down' : 'pi pi-sort-up'
+}
+
+const handleSortClick = (key: string) => {
+  if (props.sortKey !== key || !props.sortDirection) {
+    emit('sortChange', { key, direction: 'desc' })
+  } else if (props.sortDirection === 'desc') {
+    emit('sortChange', { key, direction: 'asc' })
+  } else {
+    emit('sortChange', { key: null, direction: null })
+  }
+}
 
 const getStatusBadge = (status: OrderStatus) => {
   switch (status) {
@@ -87,12 +108,52 @@ const formatDate = (dateStr: string) => {
           <tr
             class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
           >
-            <th class="py-3 px-4 font-semibold">ID Pesanan</th>
-            <th class="py-3 px-4 font-semibold">Pelanggan</th>
-            <th class="py-3 px-4 font-semibold">Tanggal</th>
+            <th class="py-3 px-4 font-semibold">
+              <button
+                type="button"
+                class="inline-flex items-center gap-1 font-semibold uppercase tracking-wider text-[11px] hover:text-brand-ink transition-colors"
+                aria-label="Urutkan berdasarkan ID pesanan"
+                @click="handleSortClick('id')"
+              >
+                <span>ID Pesanan</span>
+                <i :class="sortIconClass('id')" class="text-[10px] text-brand-muted" />
+              </button>
+            </th>
+            <th class="py-3 px-4 font-semibold">
+              <button
+                type="button"
+                class="inline-flex items-center gap-1 font-semibold uppercase tracking-wider text-[11px] hover:text-brand-ink transition-colors"
+                aria-label="Urutkan berdasarkan pelanggan"
+                @click="handleSortClick('name')"
+              >
+                <span>Pelanggan</span>
+                <i :class="sortIconClass('name')" class="text-[10px] text-brand-muted" />
+              </button>
+            </th>
+            <th class="py-3 px-4 font-semibold">
+              <button
+                type="button"
+                class="inline-flex items-center gap-1 font-semibold uppercase tracking-wider text-[11px] hover:text-brand-ink transition-colors"
+                aria-label="Urutkan berdasarkan tanggal"
+                @click="handleSortClick('created_at')"
+              >
+                <span>Tanggal</span>
+                <i :class="sortIconClass('created_at')" class="text-[10px] text-brand-muted" />
+              </button>
+            </th>
             <th class="py-3 px-4 font-semibold text-center">Item</th>
             <th class="py-3 px-4 font-semibold">Status</th>
-            <th class="py-3 px-4 font-semibold text-right">Total</th>
+            <th class="py-3 px-4 font-semibold text-right">
+              <button
+                type="button"
+                class="inline-flex items-center justify-end gap-1 font-semibold uppercase tracking-wider text-[11px] hover:text-brand-ink transition-colors w-full text-right"
+                aria-label="Urutkan berdasarkan total"
+                @click="handleSortClick('total')"
+              >
+                <span>Total</span>
+                <i :class="sortIconClass('total')" class="text-[10px] text-brand-muted" />
+              </button>
+            </th>
             <th class="py-3 px-4 font-semibold text-center">Aksi</th>
           </tr>
         </thead>

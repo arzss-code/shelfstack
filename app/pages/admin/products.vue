@@ -6,6 +6,7 @@ import { useConfirm } from 'primevue/useconfirm'
 import ProductList from '~/features/products/components/ProductList.vue'
 import ProductForm from '~/features/products/components/ProductForm.vue'
 import StockMovementsModal from '~/features/products/components/StockMovementsModal.vue'
+import { sortProducts, type SortDir, type SortKey } from '~/features/products/utils/product-sort'
 
 useSeoMeta({
   title: 'Kelola Produk',
@@ -26,28 +27,28 @@ const isStockModalVisible = ref(false)
 const stockAuditProduct = ref<Product | null>(null)
 const searchQuery = ref('')
 const activeTab = ref('0')
+const sortOption = ref('name-asc')
 
 const openStockMovements = (product: Product) => {
   stockAuditProduct.value = product
   isStockModalVisible.value = true
 }
 
-const criticalStockProducts = computed(() => {
-  return productStore.products.filter((p) => (p.stock ?? 0) < 5)
-})
+const criticalStockProducts = computed(() =>
+  productStore.products.filter((p) => (p.stock ?? 0) < 5),
+)
 
 const filteredProducts = computed(() => {
-  let sourceList: Product[] = []
-  if (activeTab.value === '0') {
-    sourceList = productStore.products
-  } else if (activeTab.value === '1') {
-    sourceList = productStore.deletedProducts
-  } else if (activeTab.value === '2') {
-    sourceList = criticalStockProducts.value
-  }
-  if (!searchQuery.value.trim()) return sourceList
-  const query = searchQuery.value.toLowerCase()
-  return sourceList.filter((p) => p.name.toLowerCase().includes(query))
+  const src =
+    activeTab.value === '1'
+      ? productStore.deletedProducts
+      : activeTab.value === '2'
+        ? criticalStockProducts.value
+        : productStore.products
+  const q = searchQuery.value.trim().toLowerCase()
+  const list = !q ? src : src.filter((p) => p.name.toLowerCase().includes(q))
+  const [k, d] = sortOption.value.split('-') as [SortKey, SortDir]
+  return sortProducts(list, k, d)
 })
 
 watch(activeTab, async (newVal) => {
@@ -212,7 +213,17 @@ const handleRestore = async (id: number) => {
           <InputIcon class="pi pi-search text-surface-400 dark:text-surface-500" />
           <InputText v-model="searchQuery" placeholder="Cari produk..." class="w-[280px]" />
         </IconField>
-
+        <select
+          v-model="sortOption"
+          aria-label="Urutkan tampilan saat ini"
+          title="Mengurutkan tampilan saat ini"
+          class="rounded-lg border border-brand-hair bg-brand-canvas px-3 py-2 text-sm text-brand-ink"
+        >
+          <option value="name-asc">Nama A-Z</option>
+          <option value="price-asc">Termurah</option>
+          <option value="price-desc">Termahal</option>
+          <option value="stock-asc">Stok tersedikit</option>
+        </select>
         <Button label="Tambah Produk" icon="pi pi-plus" severity="primary" @click="openAddForm" />
       </div>
     </div>

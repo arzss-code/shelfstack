@@ -56,6 +56,18 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
 - Logika filter murni di `app/features/activities/utils/activity-filter.ts` (+10 unit test).
   Realtime tetap jalan karena filter berupa computed di atas data yang sama.
 
+### Redesign konsistensi dashboard admin (2026-10-16)
+
+- Seluruh permukaan admin disatukan ke token `brand-*`: `activities.vue` dan
+  `ActivityDetailDialog.vue` lepas dari palet `surface/zinc` dan hex hardcoded,
+  resep error/danger/success satu rasa, radius `rounded-card/2xl`, shadow whisper.
+- Tabel pesanan: header ID Pesanan, Pelanggan, Tanggal, Total bisa diklik untuk
+  sort (siklus desc, asc, mati) via param `sort` allowlist di `GET /api/admin/orders`
+  (+11 unit test). Ekspor CSV mengikuti sort aktif.
+- Tabel produk: sort client (Nama A-Z, Termurah, Termahal, Stok tersedikit) via
+  helper murni `product-sort.ts` (+11 unit test), tanpa ubah store/API/kontrak publik.
+- `font-mono` untuk ID/SKU dipertahankan (back-office, bukan elemen commerce).
+
 ### Changed
 
 - Sinkronisasi docs: `PROGRESS.md` (v0.15.0 + Fase 4 + Known Gaps), `README.md` (11 scripts + stack + CI), `docs/README.md` (indeks baru), `BACKLOG.md` (K-04 sandbox, Q-01 CI ada), `ARCHITECTURE.md` + `DESIGN-ECOMMERCE.md` (Nuxt 4), `package.json` version → `0.15.0`.
