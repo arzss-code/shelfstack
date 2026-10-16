@@ -13,7 +13,7 @@ defineProps<{
   <div class="min-h-[75vh] flex flex-col items-center justify-center py-8 sm:py-12 px-4">
     <!-- Card Container -->
     <div
-      class="w-full max-w-[460px] bg-brand-canvas border border-brand-hair rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-floating"
+      class="w-full max-w-[460px] bg-brand-canvas border border-brand-hair rounded-card p-6 sm:p-10 shadow-floating"
     >
       <!-- Brand Header -->
       <div class="flex flex-col items-center text-center mb-8">

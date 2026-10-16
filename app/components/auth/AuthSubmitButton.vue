@@ -25,7 +25,7 @@ withDefaults(
     block
     :loading="loading"
     :icon="loading ? undefined : icon"
-    class="mt-2 h-11"
+    class="mt-2"
   >
     {{ loading ? loadingLabel : label }}
   </UiButton>

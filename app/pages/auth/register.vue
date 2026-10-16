@@ -149,7 +149,6 @@ const handleGoogle = async () => {
         block
         :disabled="pending"
         icon="pi-google"
-        class="h-11"
         @click="handleGoogle"
       >
         Daftar dengan Google
