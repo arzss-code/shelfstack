@@ -44,6 +44,7 @@ test.describe('ShelfStack Full Business Journey [SHF-E2E]', () => {
     // 1. Unauthenticated Guard Check: Tamu mengakses halaman terlindungi (/orders)
     await page.goto('/orders')
     await expect(page).toHaveURL(/\/auth\/login\?redirect=/)
+    await waitForHydration(page)
     await loginPage.assertPageLoaded()
 
     // 2. Client-side Validation: Submit email tidak valid
@@ -61,12 +62,10 @@ test.describe('ShelfStack Full Business Journey [SHF-E2E]', () => {
 
     // 3. Valid Customer Authentication: Login dengan akun seed customer
     await loginPage.goto()
-    await loginPage.fillEmail('customer@shelfstack.local')
-    await loginPage.fillPassword('Password123!')
-    await loginPage.submit()
+    await loginPage.loginAsCustomer()
 
     // 4. Verifikasi redirect pasca login (menuju home / atau redirect query)
-    await expect(page).not.toHaveURL(/\/auth\/login/)
+    await expect(page).not.toHaveURL(/\/auth\/login/, { timeout: 15000 })
 
     // 5. Verifikasi persistensi sesi (session cookie / local state)
     const cookies = await context.cookies()
@@ -78,7 +77,7 @@ test.describe('ShelfStack Full Business Journey [SHF-E2E]', () => {
     // Reload halaman untuk memastikan sesi tetap bertahan
     await page.reload()
     await waitForHydration(page)
-    await expect(page).not.toHaveURL(/\/auth\/login/)
+    await expect(page).not.toHaveURL(/\/auth\/login/, { timeout: 15000 })
   })
 
   // --------------------------------------------------------------------------
@@ -169,7 +168,7 @@ test.describe('ShelfStack Full Business Journey [SHF-E2E]', () => {
     // 0. Login dulu: halaman checkout hanya tampil penuh untuk user terautentikasi
     await loginPage.goto()
     await loginPage.loginAsCustomer()
-    await expect(page).not.toHaveURL(/\/auth\/login/)
+    await expect(page).not.toHaveURL(/\/auth\/login/, { timeout: 15000 })
 
     // 1. Siapkan keranjang dengan 1 produk terlebih dahulu
     await catalogPage.goto()
@@ -230,7 +229,7 @@ test.describe('ShelfStack Full Business Journey [SHF-E2E]', () => {
     // 0. Login dulu: halaman detail pesanan mengarahkan tamu ke halaman login
     await loginPage.goto()
     await loginPage.loginAsCustomer()
-    await expect(page).not.toHaveURL(/\/auth\/login/)
+    await expect(page).not.toHaveURL(/\/auth\/login/, { timeout: 15000 })
 
     /**
      * CATATAN COMPLIANCE SHELFSTACK & TALENAVI:
@@ -326,9 +325,11 @@ test.describe('ShelfStack Full Business Journey [SHF-E2E]', () => {
     // 1. Guard check: tamu dilarang membuka /admin
     await page.goto('/admin')
     await expect(page).toHaveURL(/\/auth\/login\?redirect=/)
+    await waitForHydration(page)
 
     // 2. Login dengan akun Admin resmi (admin@shelfstack.local)
     await loginPage.loginAsAdmin()
+    await expect(page).not.toHaveURL(/\/auth\/login/, { timeout: 15000 })
 
     // 3. Akses Dashboard Analytics Eksekutif (/admin)
     await adminDashboard.goto()

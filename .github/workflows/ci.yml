@@ -102,6 +102,10 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.NUXT_SUPABASE_SECRET_KEY }}
       MIDTRANS_SERVER_KEY: ${{ secrets.MIDTRANS_SERVER_KEY }}
       NUXT_PUBLIC_MIDTRANS_CLIENT_KEY: ${{ secrets.NUXT_PUBLIC_MIDTRANS_CLIENT_KEY }}
+      E2E_CUSTOMER_EMAIL: ${{ secrets.E2E_CUSTOMER_EMAIL }}
+      E2E_CUSTOMER_PASSWORD: ${{ secrets.E2E_CUSTOMER_PASSWORD }}
+      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

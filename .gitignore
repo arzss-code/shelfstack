@@ -36,6 +36,7 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+.account
 
 # Agent / AI Tools & Editor configurations
 .gemini

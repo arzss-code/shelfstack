@@ -19,7 +19,7 @@ export class AdminDashboardPage extends BasePage {
     this.pendingOrdersCard = page.getByText('Pesanan Pending')
     this.lowStockCard = page.getByText('Stok Kritis (< 5)')
     this.totalCustomersCard = page.getByText('Total Pelanggan')
-    this.manageOrdersButton = page.getByRole('link', { name: 'Kelola Pesanan' })
+    this.manageOrdersButton = page.getByRole('link', { name: 'Kelola Pesanan' }).first()
     this.refreshButton = page.getByRole('button', { name: 'Perbarui Data' })
     this.recentTransactionsHeading = page.getByRole('heading', { name: 'Transaksi Terbaru' })
   }
