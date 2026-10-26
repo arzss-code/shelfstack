@@ -13,12 +13,14 @@ withDefaults(
     placeholder?: string
     autocomplete?: string
     error?: string
+    showPasswordToggle?: boolean
   }>(),
   {
     type: 'text',
     placeholder: '',
     autocomplete: 'off',
     error: '',
+    showPasswordToggle: true,
   },
 )
 
@@ -37,6 +39,7 @@ const emit = defineEmits<{
     :placeholder="placeholder"
     :autocomplete="autocomplete"
     :error="error"
+    :show-password-toggle="type === 'password' ? showPasswordToggle : false"
     @update:model-value="emit('update:modelValue', $event)"
     @focus="emit('clearError')"
   />
