@@ -21,7 +21,8 @@ const order = ref<Order | null>(null)
 const loading = ref(true)
 const isPaying = ref(false)
 const isCancelling = ref(false)
-const isCheckingStatus = ref(false)
+const isManualChecking = ref(false)
+const isSilentChecking = ref(false)
 const isCancelModalOpen = ref(false)
 
 const isInvoiceModalOpen = ref(false)
@@ -162,8 +163,14 @@ onUnmounted(() => {
 })
 
 const handleCheckPaymentStatus = async (silent = false) => {
-  if (!order.value || isCheckingStatus.value) return
-  isCheckingStatus.value = true
+  if (!order.value) return
+  if (silent) {
+    if (isSilentChecking.value) return
+    isSilentChecking.value = true
+  } else {
+    if (isManualChecking.value) return
+    isManualChecking.value = true
+  }
 
   try {
     const res = await $fetch<{
@@ -214,7 +221,11 @@ const handleCheckPaymentStatus = async (silent = false) => {
       })
     }
   } finally {
-    isCheckingStatus.value = false
+    if (silent) {
+      isSilentChecking.value = false
+    } else {
+      isManualChecking.value = false
+    }
   }
 }
 
@@ -352,6 +363,72 @@ const formatDate = (dateStr: string) => {
     return dateStr
   }
 }
+
+interface OrderStep {
+  title: string
+  description: string
+  timestamp?: string
+  isCompleted: boolean
+  isActive: boolean
+}
+
+const orderSteps = computed<OrderStep[]>(() => {
+  if (!order.value) return []
+
+  const status = order.value.status
+  const isPaid = ['paid', 'shipped', 'completed'].includes(status)
+  const isShipped = ['shipped', 'completed'].includes(status)
+  const isCompleted = status === 'completed'
+  const isPending = status === 'pending'
+
+  return [
+    {
+      title: 'Dipesan',
+      description: 'Pesanan resmi dibuat',
+      timestamp: formatDate(order.value.created_at),
+      isCompleted: true,
+      isActive: isPending,
+    },
+    {
+      title: 'Dibayar',
+      description: isPaid ? 'Pembayaran terverifikasi' : 'Menunggu pembayaran',
+      timestamp: order.value.paid_at ? formatDate(order.value.paid_at) : undefined,
+      isCompleted: isPaid,
+      isActive: isPending,
+    },
+    {
+      title: 'Dikirim',
+      description: isShipped
+        ? 'Pesanan dalam pengiriman'
+        : isPaid
+          ? 'Sedang disiapkan seller'
+          : 'Menunggu diproses',
+      isCompleted: isShipped,
+      isActive: isPaid && !isShipped,
+    },
+    {
+      title: 'Selesai',
+      description: isCompleted ? 'Pesanan telah diterima' : 'Konfirmasi penerimaan',
+      isCompleted: isCompleted,
+      isActive: isShipped && !isCompleted,
+    },
+  ]
+})
+
+const progressLineWidth = computed(() => {
+  if (!order.value || order.value.status === 'cancelled') return '0%'
+  switch (order.value.status) {
+    case 'completed':
+      return '100%'
+    case 'shipped':
+      return '66.66%'
+    case 'paid':
+      return '33.33%'
+    case 'pending':
+    default:
+      return '16.66%'
+  }
+})
 </script>
 
 <template>
@@ -416,109 +493,104 @@ const formatDate = (dateStr: string) => {
             <span v-if="order.paid_at"> · Dibayar pada {{ formatDate(order.paid_at) }}</span>
           </p>
         </div>
-
-        <!-- Realtime Pulse Pill -->
-        <div
-          class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200 text-[11px] self-start sm:self-center font-medium"
-        >
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-          <span>Realtime Status Aktif</span>
-        </div>
       </div>
 
       <!-- Timeline Status Progress -->
       <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper">
-        <h2 class="font-display text-sm font-bold text-brand-ink m-0 mb-4">
-          Status Alur Transaksi
-        </h2>
-
-        <div
-          v-if="order.status === 'cancelled'"
-          class="p-4 bg-red-50 text-red-700 rounded-card text-xs flex items-center gap-2"
-        >
-          <i class="pi pi-times-circle text-base" />
-          <span>Pesanan ini telah dibatalkan atau waktu pembayaran telah kedaluwarsa.</span>
+        <div class="flex items-center justify-between pb-4 mb-6 border-b border-brand-hairsoft">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-compass text-brand-accent text-sm" />
+            <h2 class="font-display text-sm font-bold text-brand-ink m-0">Status Alur Transaksi</h2>
+          </div>
+          <span class="text-[11px] text-brand-muted">
+            {{
+              order.status === 'cancelled'
+                ? 'Transaksi Dibatalkan'
+                : getStatusBadge(order.status).label
+            }}
+          </span>
         </div>
 
-        <div v-else class="grid grid-cols-4 gap-2 text-center text-xs">
-          <!-- Step 1: Dipesan -->
-          <div class="space-y-2">
-            <div
-              class="w-8 h-8 rounded-full mx-auto flex items-center justify-center font-bold text-xs bg-emerald-600 text-white"
-            >
-              <i class="pi pi-check text-xs" />
-            </div>
-            <p class="font-semibold text-brand-ink m-0 text-[11px]">Dipesan</p>
-          </div>
-
-          <!-- Step 2: Dibayar -->
-          <div class="space-y-2">
-            <div
-              class="w-8 h-8 rounded-full mx-auto flex items-center justify-center font-bold text-xs transition-colors"
-              :class="
-                order.status !== 'pending'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-brand-field text-brand-muted border border-brand-hair'
-              "
-            >
-              <i v-if="order.status !== 'pending'" class="pi pi-check text-xs" />
-              <span v-else>2</span>
-            </div>
-            <p
-              class="font-semibold m-0 text-[11px]"
-              :class="order.status !== 'pending' ? 'text-brand-ink' : 'text-brand-muted'"
-            >
-              Dibayar
+        <!-- Cancelled State Alert -->
+        <div
+          v-if="order.status === 'cancelled'"
+          class="p-4 bg-red-50 text-red-700 border border-red-200 rounded-card text-xs flex items-center gap-3"
+        >
+          <i class="pi pi-times-circle text-lg shrink-0 text-red-600" />
+          <div>
+            <p class="font-semibold m-0">Pesanan Dibatalkan</p>
+            <p class="text-[11px] text-red-600/90 m-0 mt-0.5">
+              Pesanan ini telah dibatalkan atau waktu pembayaran telah kedaluwarsa.
             </p>
           </div>
+        </div>
 
-          <!-- Step 3: Dikirim -->
-          <div class="space-y-2">
-            <div
-              class="w-8 h-8 rounded-full mx-auto flex items-center justify-center font-bold text-xs transition-colors"
-              :class="
-                ['shipped', 'completed'].includes(order.status)
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-brand-field text-brand-muted border border-brand-hair'
-              "
-            >
-              <i
-                v-if="['shipped', 'completed'].includes(order.status)"
-                class="pi pi-check text-xs"
-              />
-              <span v-else>3</span>
-            </div>
-            <p
-              class="font-semibold m-0 text-[11px]"
-              :class="
-                ['shipped', 'completed'].includes(order.status)
-                  ? 'text-brand-ink'
-                  : 'text-brand-muted'
-              "
-            >
-              Dikirim
-            </p>
-          </div>
+        <!-- Active Stepper -->
+        <div v-else class="relative pt-2 pb-1">
+          <!-- Background Connecting Track -->
+          <div
+            class="absolute top-6 left-12 right-12 h-1 bg-brand-hairsoft -translate-y-1/2 z-0 rounded-full hidden sm:block"
+          />
 
-          <!-- Step 4: Selesai -->
-          <div class="space-y-2">
+          <!-- Filled Connecting Progress Line -->
+          <div
+            class="absolute top-6 left-12 h-1 bg-emerald-600 transition-all duration-500 ease-out -translate-y-1/2 z-0 rounded-full hidden sm:block"
+            :style="{ width: `calc(${progressLineWidth} - 24px)` }"
+          />
+
+          <!-- Stepper Nodes Grid -->
+          <div class="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-2">
             <div
-              class="w-8 h-8 rounded-full mx-auto flex items-center justify-center font-bold text-xs transition-colors"
-              :class="
-                order.status === 'completed'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-brand-field text-brand-muted border border-brand-hair'
-              "
+              v-for="(step, idx) in orderSteps"
+              :key="step.title"
+              class="flex sm:flex-col items-center sm:text-center gap-3 sm:gap-2.5"
             >
-              <i v-if="order.status === 'completed'" class="pi pi-check text-xs" />
-              <span v-else>4</span>
+              <!-- Node Circle -->
+              <div
+                class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-all duration-300"
+                :class="[
+                  step.isCompleted
+                    ? 'bg-emerald-600 text-white shadow-sm ring-4 ring-emerald-50'
+                    : step.isActive && order.status === 'pending'
+                      ? 'bg-amber-500 text-white shadow-sm ring-4 ring-amber-100 animate-pulse'
+                      : step.isActive
+                        ? 'bg-brand-accent text-white shadow-sm ring-4 ring-brand-accent/20'
+                        : 'bg-white border-2 border-brand-hair text-brand-muted',
+                ]"
+              >
+                <i v-if="step.isCompleted" class="pi pi-check text-xs" />
+                <i
+                  v-else-if="step.isActive && order.status === 'pending'"
+                  class="pi pi-clock text-xs"
+                />
+                <span v-else>{{ idx + 1 }}</span>
+              </div>
+
+              <!-- Step Info -->
+              <div class="min-w-0">
+                <p
+                  class="font-display font-bold text-xs m-0 truncate"
+                  :class="[
+                    step.isCompleted || step.isActive ? 'text-brand-ink' : 'text-brand-muted',
+                  ]"
+                >
+                  {{ step.title }}
+                </p>
+                <p
+                  class="text-[11px] m-0 mt-0.5 leading-snug"
+                  :class="[
+                    step.isActive && order.status === 'pending'
+                      ? 'text-amber-700 font-medium'
+                      : 'text-brand-muted',
+                  ]"
+                >
+                  {{ step.description }}
+                </p>
+                <p v-if="step.timestamp" class="text-[10px] text-brand-faint m-0 mt-0.5 truncate">
+                  {{ step.timestamp }}
+                </p>
+              </div>
             </div>
-            <p
-              class="font-semibold m-0 text-[11px]"
-              :class="order.status === 'completed' ? 'text-brand-ink' : 'text-brand-muted'"
-            >
-              Selesai
-            </p>
           </div>
         </div>
       </div>
@@ -648,7 +720,7 @@ const formatDate = (dateStr: string) => {
               class="w-full justify-center"
               icon="pi-credit-card"
               :loading="isPaying"
-              :disabled="isCancelling || isCheckingStatus"
+              :disabled="isCancelling || isManualChecking"
               @click="handlePayNow"
             >
               Bayar Sekarang (Midtrans)
@@ -658,7 +730,7 @@ const formatDate = (dateStr: string) => {
               size="md"
               class="w-full justify-center !text-brand-ink hover:!bg-brand-hairsoft font-semibold"
               icon="pi-sync"
-              :loading="isCheckingStatus"
+              :loading="isManualChecking"
               :disabled="isPaying || isCancelling"
               @click="handleCheckPaymentStatus(false)"
             >
@@ -669,7 +741,7 @@ const formatDate = (dateStr: string) => {
               size="sm"
               class="w-full justify-center !text-red-600 hover:!text-red-700 hover:!border-red-300"
               icon="pi-times-circle"
-              :disabled="isPaying || isCancelling || isCheckingStatus"
+              :disabled="isPaying || isCancelling || isManualChecking"
               @click="isCancelModalOpen = true"
             >
               Batalkan Pesanan
