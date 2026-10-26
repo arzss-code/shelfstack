@@ -387,7 +387,7 @@ const orderSteps = computed<OrderStep[]>(() => {
       description: 'Pesanan resmi dibuat',
       timestamp: formatDate(order.value.created_at),
       isCompleted: true,
-      isActive: isPending,
+      isActive: false,
     },
     {
       title: 'Dibayar',
@@ -415,20 +415,27 @@ const orderSteps = computed<OrderStep[]>(() => {
   ]
 })
 
-const progressLineWidth = computed(() => {
-  if (!order.value || order.value.status === 'cancelled') return '0%'
-  switch (order.value.status) {
-    case 'completed':
-      return '100%'
-    case 'shipped':
-      return '66.66%'
-    case 'paid':
-      return '33.33%'
-    case 'pending':
-    default:
-      return '16.66%'
+const getSegmentColor = (idx: number) => {
+  if (!order.value || order.value.status === 'cancelled') {
+    return 'bg-brand-hairsoft'
   }
-})
+  const status = order.value.status
+  if (idx === 0) {
+    // Jalur Step 1 (Dipesan) -> Step 2 (Dibayar)
+    return 'bg-emerald-600'
+  }
+  if (idx === 1) {
+    // Jalur Step 2 (Dibayar) -> Step 3 (Dikirim)
+    return ['paid', 'shipped', 'completed'].includes(status)
+      ? 'bg-emerald-600'
+      : 'bg-brand-hairsoft'
+  }
+  if (idx === 2) {
+    // Jalur Step 3 (Dikirim) -> Step 4 (Selesai)
+    return ['shipped', 'completed'].includes(status) ? 'bg-emerald-600' : 'bg-brand-hairsoft'
+  }
+  return 'bg-brand-hairsoft'
+}
 </script>
 
 <template>
@@ -527,49 +534,48 @@ const progressLineWidth = computed(() => {
 
         <!-- Active Stepper -->
         <div v-else class="relative pt-2 pb-1">
-          <!-- Background Connecting Track -->
-          <div
-            class="absolute top-6 left-12 right-12 h-1 bg-brand-hairsoft -translate-y-1/2 z-0 rounded-full hidden sm:block"
-          />
-
-          <!-- Filled Connecting Progress Line -->
-          <div
-            class="absolute top-6 left-12 h-1 bg-emerald-600 transition-all duration-500 ease-out -translate-y-1/2 z-0 rounded-full hidden sm:block"
-            :style="{ width: `calc(${progressLineWidth} - 24px)` }"
-          />
-
-          <!-- Stepper Nodes Grid -->
-          <div class="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-2">
+          <!-- Stepper Grid: 4 columns without gap so lines span center-to-center seamlessly -->
+          <div class="grid grid-cols-4">
             <div
               v-for="(step, idx) in orderSteps"
               :key="step.title"
-              class="flex sm:flex-col items-center sm:text-center gap-3 sm:gap-2.5"
+              class="relative flex flex-col items-center text-center"
             >
-              <!-- Node Circle -->
-              <div
-                class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-all duration-300"
-                :class="[
-                  step.isCompleted
-                    ? 'bg-emerald-600 text-white shadow-sm ring-4 ring-emerald-50'
-                    : step.isActive && order.status === 'pending'
-                      ? 'bg-amber-500 text-white shadow-sm ring-4 ring-amber-100 animate-pulse'
-                      : step.isActive
-                        ? 'bg-brand-accent text-white shadow-sm ring-4 ring-brand-accent/20'
-                        : 'bg-white border-2 border-brand-hair text-brand-muted',
-                ]"
-              >
-                <i v-if="step.isCompleted" class="pi pi-check text-xs" />
-                <i
-                  v-else-if="step.isActive && order.status === 'pending'"
-                  class="pi pi-clock text-xs"
+              <!-- Circle and Connector Row -->
+              <div class="relative flex items-center justify-center w-full">
+                <!-- Discrete Connector Line to Next Step (Starts at this circle center, ends at next circle center) -->
+                <div
+                  v-if="idx < orderSteps.length - 1"
+                  class="absolute left-1/2 w-full top-1/2 -translate-y-1/2 h-0.5 z-0 transition-colors duration-300"
+                  :class="getSegmentColor(idx)"
                 />
-                <span v-else>{{ idx + 1 }}</span>
+
+                <!-- Step Circle (z-10 masks the connector line underneath) -->
+                <div
+                  class="relative z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-all duration-200"
+                  :class="[
+                    step.isCompleted
+                      ? 'bg-emerald-600 text-white shadow-sm ring-4 ring-emerald-50'
+                      : step.isActive && order.status === 'pending'
+                        ? 'bg-amber-500 text-white shadow-sm ring-4 ring-amber-100'
+                        : step.isActive
+                          ? 'bg-brand-accent text-white shadow-sm ring-4 ring-brand-accent/20'
+                          : 'bg-white border-2 border-brand-hair text-brand-muted',
+                  ]"
+                >
+                  <i v-if="step.isCompleted" class="pi pi-check text-xs" />
+                  <i
+                    v-else-if="step.isActive && order.status === 'pending'"
+                    class="pi pi-clock text-xs"
+                  />
+                  <span v-else>{{ idx + 1 }}</span>
+                </div>
               </div>
 
               <!-- Step Info -->
-              <div class="min-w-0">
+              <div class="mt-3 px-1 w-full max-w-[160px] mx-auto">
                 <p
-                  class="font-display font-bold text-xs m-0 truncate"
+                  class="font-display font-bold text-[11px] sm:text-xs m-0 truncate"
                   :class="[
                     step.isCompleted || step.isActive ? 'text-brand-ink' : 'text-brand-muted',
                   ]"
@@ -577,7 +583,7 @@ const progressLineWidth = computed(() => {
                   {{ step.title }}
                 </p>
                 <p
-                  class="text-[11px] m-0 mt-0.5 leading-snug"
+                  class="text-[10px] sm:text-[11px] m-0 mt-0.5 leading-snug"
                   :class="[
                     step.isActive && order.status === 'pending'
                       ? 'text-amber-700 font-medium'
@@ -586,7 +592,10 @@ const progressLineWidth = computed(() => {
                 >
                   {{ step.description }}
                 </p>
-                <p v-if="step.timestamp" class="text-[10px] text-brand-faint m-0 mt-0.5 truncate">
+                <p
+                  v-if="step.timestamp"
+                  class="text-[9px] sm:text-[10px] text-brand-faint m-0 mt-0.5 truncate"
+                >
                   {{ step.timestamp }}
                 </p>
               </div>
