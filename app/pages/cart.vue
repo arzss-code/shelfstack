@@ -74,7 +74,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
         variant="ghost"
         size="sm"
         icon="pi-trash"
-        class="text-xs text-red-600 hover:text-red-700"
+        class="text-xs text-brand-danger hover:text-brand-danger"
         @click="cartStore.clearCart"
       >
         Kosongkan Keranjang
@@ -108,7 +108,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
       <!-- Items List -->
       <div class="lg:col-span-8 space-y-4">
         <div
-          class="bg-white border border-brand-hair rounded-card shadow-whisper divide-y divide-brand-hairsoft overflow-hidden"
+          class="bg-brand-canvas border border-brand-hair rounded-card shadow-whisper divide-y divide-brand-hairsoft overflow-hidden"
         >
           <article
             v-for="item in cartStore.items"
@@ -161,7 +161,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
               >
                 <button
                   type="button"
-                  class="w-6 h-6 flex items-center justify-center text-brand-ink hover:bg-white rounded-full transition-colors cursor-pointer text-xs"
+                  class="w-6 h-6 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs"
                   aria-label="Kurangi kuantitas"
                   @click="
                     cartStore.updateQuantity(
@@ -180,7 +180,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                   inputmode="numeric"
                   pattern="[0-9]*"
                   aria-label="Kuantitas produk"
-                  class="w-10 text-center text-xs font-semibold text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-white focus:ring-1 focus:ring-brand-accent/50 rounded-full transition-all p-0 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  class="w-10 text-center text-xs font-semibold text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-brand-canvas focus:ring-1 focus:ring-brand-accent/50 rounded-full transition-all p-0 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   @focus="($event.target as HTMLInputElement).select()"
                   @input="handleManualQuantityInput($event, item)"
                   @blur="handleManualQuantityBlur($event, item)"
@@ -188,7 +188,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                 />
                 <button
                   type="button"
-                  class="w-6 h-6 flex items-center justify-center text-brand-ink hover:bg-white rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed"
+                  class="w-6 h-6 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed"
                   :disabled="item.quantity >= item.stock"
                   aria-label="Tambah kuantitas"
                   @click="
@@ -217,7 +217,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
               <UiTooltip text="Hapus item" position="top" align="end">
                 <button
                   type="button"
-                  class="text-brand-faint hover:text-red-600 transition-colors p-1.5 cursor-pointer rounded-full hover:bg-red-50"
+                  class="text-brand-faint hover:text-brand-danger transition-colors p-1.5 cursor-pointer rounded-full hover:bg-brand-danger-tint"
                   aria-label="Hapus produk"
                   @click="cartStore.removeItem(item.productId, item.color, item.material)"
                 >
@@ -237,41 +237,37 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
 
       <!-- Summary Sidebar -->
       <aside
-        class="lg:col-span-4 bg-white dark:bg-[#18191b] border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-28"
+        class="lg:col-span-4 bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-28"
       >
         <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
-          <h2 class="font-display text-base font-bold text-brand-ink dark:text-white m-0">
-            Ringkasan Pesanan
-          </h2>
+          <h2 class="font-display text-base font-bold text-brand-ink m-0">Ringkasan Pesanan</h2>
           <span
-            class="text-xs font-semibold text-brand-ink dark:text-zinc-200 bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full"
+            class="text-xs font-semibold text-brand-ink bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full"
           >
             {{ cartStore.totalItems }} item
           </span>
         </div>
 
-        <div class="space-y-3 text-xs text-brand-muted dark:text-zinc-400">
+        <div class="space-y-3 text-xs text-brand-muted">
           <div class="flex items-center justify-between">
             <span>Total Barang ({{ cartStore.totalItems }})</span>
-            <span class="font-semibold text-brand-ink dark:text-white tabular-nums">
+            <span class="font-semibold text-brand-ink tabular-nums">
               {{ cartStore.formattedTotalPrice }}
             </span>
           </div>
           <div class="flex items-center justify-between">
             <span>Biaya Pengiriman</span>
-            <span class="text-emerald-600 font-semibold">Gratis Ongkir</span>
+            <span class="text-brand-success font-semibold">Gratis Ongkir</span>
           </div>
           <div class="flex items-center justify-between">
             <span>Estimasi Pajak (PPN 11%)</span>
-            <span class="font-semibold text-brand-ink dark:text-white">Termasuk</span>
+            <span class="font-semibold text-brand-ink">Termasuk</span>
           </div>
         </div>
 
         <div class="pt-4 border-t border-brand-hairsoft flex items-center justify-between">
-          <span class="font-display font-bold text-sm text-brand-ink dark:text-white"
-            >Total Tagihan</span
-          >
-          <span class="font-display text-xl font-bold text-brand-ink dark:text-white tabular-nums">
+          <span class="font-display font-bold text-sm text-brand-ink">Total Tagihan</span>
+          <span class="font-display text-xl font-bold text-brand-ink tabular-nums">
             {{ cartStore.formattedTotalPrice }}
           </span>
         </div>
@@ -287,19 +283,17 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
         </UiButton>
 
         <!-- Trust Badges -->
-        <div
-          class="pt-3 border-t border-brand-hairsoft space-y-2 text-[11px] text-brand-muted dark:text-zinc-400"
-        >
+        <div class="pt-3 border-t border-brand-hairsoft space-y-2 text-[11px] text-brand-muted">
           <div class="flex items-center gap-2">
-            <i class="pi pi-shield text-brand-ink dark:text-zinc-300" />
+            <i class="pi pi-shield text-brand-ink" />
             <span>Pembayaran Aman via Midtrans</span>
           </div>
           <div class="flex items-center gap-2">
-            <i class="pi pi-sync text-brand-ink dark:text-zinc-300" />
+            <i class="pi pi-sync text-brand-ink" />
             <span>Garansi Pengembalian 30 Hari</span>
           </div>
           <div class="flex items-center gap-2">
-            <i class="pi pi-check-circle text-emerald-600" />
+            <i class="pi pi-check-circle text-brand-success" />
             <span>Koleksi 100% Terkurasi Original</span>
           </div>
         </div>

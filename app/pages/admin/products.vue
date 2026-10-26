@@ -26,6 +26,12 @@ const stockAuditProduct = ref<Product | null>(null)
 const searchQuery = ref('')
 const activeTab = ref('0')
 const sortOption = ref('name-asc')
+const sortOptionsList = [
+  { value: 'name-asc', label: 'Nama A-Z' },
+  { value: 'price-asc', label: 'Termurah' },
+  { value: 'price-desc', label: 'Termahal' },
+  { value: 'stock-asc', label: 'Stok tersedikit' },
+]
 
 const openStockMovements = (product: Product) => {
   stockAuditProduct.value = product
@@ -235,14 +241,10 @@ const handleRestore = async (id: number) => {
           <UiSelect
             id="product-sort"
             v-model="sortOption"
+            :options="sortOptionsList"
             size="sm"
             title="Mengurutkan tampilan saat ini"
-          >
-            <option value="name-asc">Nama A-Z</option>
-            <option value="price-asc">Termurah</option>
-            <option value="price-desc">Termahal</option>
-            <option value="stock-asc">Stok tersedikit</option>
-          </UiSelect>
+          />
         </div>
 
         <UiButton variant="primary" icon="pi-plus" @click="openAddForm">Tambah Produk</UiButton>

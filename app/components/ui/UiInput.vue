@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed, ref, useId } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -22,6 +22,8 @@ const props = withDefaults(
     min?: number
     /** Kenaikan spinner untuk input angka. */
     step?: number
+    /** Tampilkan tombol toggle tampilkan/sembunyikan kata sandi saat type="password". */
+    showPasswordToggle?: boolean
   }>(),
   {
     id: undefined,
@@ -38,6 +40,7 @@ const props = withDefaults(
     autocomplete: undefined,
     min: undefined,
     step: undefined,
+    showPasswordToggle: false,
   },
 )
 
@@ -52,6 +55,14 @@ const fieldId = computed(() => props.id ?? `ui-input-${uid}`)
 const helpId = computed(() => `${fieldId.value}-help`)
 const describedBy = computed(() => (props.error || props.hint ? helpId.value : undefined))
 
+const isPasswordVisible = ref(false)
+const effectiveType = computed(() => {
+  if (props.type === 'password' && props.showPasswordToggle) {
+    return isPasswordVisible.value ? 'text' : 'password'
+  }
+  return props.type
+})
+
 const controlClass = computed(() => {
   const geometry =
     props.size === 'sm'
@@ -61,7 +72,12 @@ const controlClass = computed(() => {
     ? 'border-rose-300 focus:border-rose-500'
     : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink'
   const padding = props.leftIcon ? '' : props.size === 'sm' ? 'pl-3' : 'pl-3.5'
-  const trailing = props.rightIcon ? (props.size === 'sm' ? 'pr-8' : 'pr-10') : ''
+  const trailing =
+    props.rightIcon || (props.showPasswordToggle && props.type === 'password')
+      ? props.size === 'sm'
+        ? 'pr-8'
+        : 'pr-10'
+      : ''
 
   return [
     'w-full border bg-brand-canvas text-brand-ink transition-colors',
@@ -95,7 +111,7 @@ const controlClass = computed(() => {
 
       <input
         :id="fieldId"
-        :type="type"
+        :type="effectiveType"
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
@@ -110,8 +126,25 @@ const controlClass = computed(() => {
         @focus="emit('focus')"
       />
 
+      <button
+        v-if="showPasswordToggle && type === 'password'"
+        type="button"
+        tabindex="-1"
+        :class="[
+          'absolute top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-ink transition-colors p-1.5 flex items-center justify-center focus-visible:outline-brand-accent rounded-field',
+          size === 'sm' ? 'right-2' : 'right-2.5',
+        ]"
+        :aria-label="isPasswordVisible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
+        @click="isPasswordVisible = !isPasswordVisible"
+      >
+        <i
+          :class="['pi text-xs sm:text-sm', isPasswordVisible ? 'pi-eye-slash' : 'pi-eye']"
+          aria-hidden="true"
+        />
+      </button>
+
       <i
-        v-if="rightIcon"
+        v-else-if="rightIcon"
         :class="[
           'pi',
           rightIcon,

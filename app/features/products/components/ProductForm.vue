@@ -98,6 +98,11 @@ const categoryIdModel = computed({
   },
 })
 
+const categorySelectOptions = computed(() => [
+  { value: '', label: 'Pilih Kategori' },
+  ...categories.value.map((cat) => ({ value: String(cat.id), label: cat.name })),
+])
+
 const linkModel = computed({
   get: () => link.value ?? '',
   set: (value: string) => {
@@ -251,15 +256,12 @@ const handleCancel = () => {
       <UiSelect
         id="category"
         v-model="categoryIdModel"
+        :options="categorySelectOptions"
         label="Kategori Produk"
+        placeholder="Pilih Kategori"
         block
         :error="errors.category_id"
-      >
-        <option value="">-- Pilih Kategori --</option>
-        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-          {{ cat.name }}
-        </option>
-      </UiSelect>
+      />
 
       <!-- Harga & Stok (Grid 2 Kolom) -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

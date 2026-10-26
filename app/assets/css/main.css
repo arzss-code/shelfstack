@@ -217,3 +217,12 @@ textarea:-webkit-autofill {
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+/* Sembunyikan scrollbar bawaan untuk swipeable horizontal strips */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

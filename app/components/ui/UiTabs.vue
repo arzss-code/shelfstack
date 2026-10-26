@@ -16,8 +16,10 @@ const props = withDefaults(
     items: UiTabItem[]
     /** Label untuk announce oleh screen reader. */
     ariaLabel?: string
+    /** Membentang penuh 100% lebar kontainer secara proporsional. */
+    fullWidth?: boolean
   }>(),
-  { ariaLabel: '' },
+  { ariaLabel: '', fullWidth: false },
 )
 
 const emit = defineEmits<{
@@ -61,7 +63,13 @@ const onKeydown = (event: KeyboardEvent) => {
     :id="tablistId"
     role="tablist"
     :aria-label="ariaLabel || undefined"
-    class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-brand-hair bg-brand-canvas-soft p-1"
+    class="rounded-full border border-brand-hair bg-brand-canvas-soft p-1 transition-all"
+    :class="[
+      fullWidth
+        ? 'flex w-full items-center gap-1 overflow-x-auto no-scrollbar scroll-smooth'
+        : 'inline-flex max-w-full flex-wrap items-center gap-1',
+    ]"
+    style="scrollbar-width: none; -ms-overflow-style: none"
     @keydown="onKeydown"
   >
     <button
@@ -73,12 +81,13 @@ const onKeydown = (event: KeyboardEvent) => {
       :aria-selected="item.value === modelValue"
       :aria-controls="`${tablistId}-panel-${item.value}`"
       :tabindex="index === activeIndex ? 0 : -1"
-      class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors"
-      :class="
+      class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap select-none cursor-pointer border-0"
+      :class="[
+        fullWidth ? 'shrink-0 sm:flex-1 sm:justify-center' : '',
         item.value === modelValue
           ? 'bg-brand-ink text-brand-onink shadow-whisper'
-          : 'text-brand-muted hover:bg-brand-canvas hover:text-brand-ink'
-      "
+          : 'text-brand-muted hover:bg-brand-canvas hover:text-brand-ink',
+      ]"
       @click="select(item.value)"
     >
       <span>{{ item.label }}</span>

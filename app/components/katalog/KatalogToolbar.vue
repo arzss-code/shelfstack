@@ -23,7 +23,7 @@ const emit = defineEmits<{
 
 <template>
   <section
-    class="sticky top-20 z-20 bg-brand-canvas/95 backdrop-blur-md py-3 px-4 rounded-card border border-brand-hair shadow-whisper flex flex-wrap items-center justify-between gap-3"
+    class="sticky top-20 z-30 bg-brand-canvas/95 backdrop-blur-md py-3 px-4 rounded-card border border-brand-hair shadow-whisper flex flex-wrap items-center justify-between gap-3"
   >
     <!-- Search Input Field -->
     <div class="relative w-full sm:w-80">
@@ -73,25 +73,16 @@ const emit = defineEmits<{
         </span>
       </button>
 
-      <!-- Sort Select -->
-      <div
-        class="flex items-center gap-2 bg-brand-field border border-transparent focus-within:border-brand-hair rounded-full px-3 h-10 text-xs text-brand-ink"
-      >
-        <span
-          class="text-brand-muted text-[11px] uppercase tracking-wider font-semibold hidden md:inline"
-        >
-          Urutkan:
-        </span>
-        <select
-          :value="selectedSort"
-          class="bg-transparent border-0 outline-none text-xs font-medium text-brand-ink cursor-pointer pr-1"
-          @change="emit('update:selectedSort', ($event.target as HTMLSelectElement).value)"
-        >
-          <option v-for="s in sortOptions" :key="s.id" :value="s.id">
-            {{ s.label }}
-          </option>
-        </select>
-      </div>
+      <!-- Sort Select Dropdown -->
+      <UiSelect
+        :model-value="selectedSort"
+        :options="sortOptions.map((s) => ({ value: s.id, label: s.label }))"
+        prefix="Urutkan:"
+        size="sm"
+        pill
+        align="right"
+        @update:model-value="emit('update:selectedSort', String($event))"
+      />
 
       <!-- Grid Density Switcher (Desktop only) -->
       <div

@@ -356,7 +356,7 @@ const handleCreateOrder = async () => {
         <!-- Error Alert -->
         <div
           v-if="generalError"
-          class="p-4 bg-red-50 border border-red-200 rounded-card flex items-start gap-3 text-red-700 text-xs"
+          class="p-4 bg-brand-danger-tint border border-brand-danger-edge rounded-card flex items-start gap-3 text-brand-danger-text text-xs"
         >
           <i class="pi pi-exclamation-circle text-base shrink-0 mt-0.5" />
           <span>{{ generalError }}</span>
@@ -365,15 +365,15 @@ const handleCreateOrder = async () => {
         <!-- Payment Preparation Banner -->
         <div
           v-if="isOrderPlaced && createdOrderId"
-          class="p-4 bg-emerald-50 border border-emerald-200 rounded-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-emerald-800 text-xs"
+          class="p-4 bg-brand-success-tint border border-brand-success-edge rounded-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-brand-success-text text-xs"
         >
           <div class="flex items-center gap-3">
-            <i class="pi pi-spin pi-spinner text-base shrink-0 text-emerald-600" />
+            <i class="pi pi-spin pi-spinner text-base shrink-0 text-brand-success" />
             <span>Pesanan berhasil dibuat. Menyiapkan popup pembayaran resmi Midtrans...</span>
           </div>
           <NuxtLink
             :to="`/orders/${createdOrderId}`"
-            class="font-semibold text-emerald-700 hover:text-emerald-900 underline shrink-0"
+            class="font-semibold text-brand-success-text hover:text-brand-ink underline shrink-0"
           >
             Buka Pesanan &rarr;
           </NuxtLink>
@@ -384,7 +384,9 @@ const handleCreateOrder = async () => {
           :disabled="isSubmitting || isOrderPlaced"
           class="border-0 p-0 m-0 min-w-0 space-y-6"
         >
-          <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-4">
+          <div
+            class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-4"
+          >
             <div class="flex items-center gap-2 pb-3 border-b border-brand-hairsoft">
               <i class="pi pi-map-marker text-brand-accent text-base" />
               <h2 id="shipping-heading" class="font-display text-base font-bold text-brand-ink m-0">
@@ -479,7 +481,7 @@ const handleCreateOrder = async () => {
                 id="save_address_checkbox"
                 v-model="saveAddressForNextOrder"
                 type="checkbox"
-                class="rounded border-zinc-300 text-brand-accent focus:ring-brand-accent w-4 h-4 cursor-pointer"
+                class="rounded border-brand-hair text-brand-accent focus:ring-brand-accent w-4 h-4 cursor-pointer"
               />
               <label
                 for="save_address_checkbox"
@@ -492,7 +494,9 @@ const handleCreateOrder = async () => {
         </fieldset>
 
         <!-- Payment Method Notice -->
-        <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-3">
+        <div
+          class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-3"
+        >
           <div class="flex items-center gap-2 pb-3 border-b border-brand-hairsoft">
             <i class="pi pi-credit-card text-brand-accent text-base" />
             <h2 class="font-display text-base font-bold text-brand-ink m-0">Metode Pembayaran</h2>
@@ -527,14 +531,12 @@ const handleCreateOrder = async () => {
 
       <!-- Right Column: Order Summary & Pay Action -->
       <aside
-        class="lg:col-span-5 bg-white dark:bg-[#18191b] border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-28"
+        class="lg:col-span-5 bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-28"
       >
         <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
-          <h2 class="font-display text-base font-bold text-brand-ink dark:text-white m-0">
-            Item Pesanan
-          </h2>
+          <h2 class="font-display text-base font-bold text-brand-ink m-0">Item Pesanan</h2>
           <span
-            class="text-xs font-semibold text-brand-ink dark:text-zinc-200 bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full"
+            class="text-xs font-semibold text-brand-ink bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full"
           >
             {{ displayTotalItems }} item
           </span>
@@ -549,7 +551,7 @@ const handleCreateOrder = async () => {
           >
             <div class="flex items-center gap-3 min-w-0">
               <div
-                class="w-12 h-12 rounded-lg bg-brand-field dark:bg-zinc-800 border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center"
+                class="w-12 h-12 rounded-field bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center"
               >
                 <img
                   v-if="item.imageUrl"
@@ -560,45 +562,39 @@ const handleCreateOrder = async () => {
                 <i v-else class="pi pi-image text-brand-faint text-sm" />
               </div>
               <div class="min-w-0">
-                <p class="font-semibold text-brand-ink dark:text-white m-0 truncate">
+                <p class="font-semibold text-brand-ink m-0 truncate">
                   {{ item.name }}
                 </p>
-                <p class="text-[10.5px] text-brand-muted dark:text-zinc-400 m-0">
+                <p class="text-[10.5px] text-brand-muted m-0">
                   {{ item.quantity }}x @ {{ formatRupiah(item.price) }}
                 </p>
               </div>
             </div>
-            <span class="font-bold text-brand-ink dark:text-white tabular-nums shrink-0">
+            <span class="font-bold text-brand-ink tabular-nums shrink-0">
               {{ formatRupiah(item.price * item.quantity) }}
             </span>
           </div>
         </div>
 
         <!-- Bill Details -->
-        <div
-          class="pt-4 border-t border-brand-hairsoft space-y-2.5 text-xs text-brand-muted dark:text-zinc-400"
-        >
+        <div class="pt-4 border-t border-brand-hairsoft space-y-2.5 text-xs text-brand-muted">
           <div class="flex items-center justify-between">
             <span>Subtotal Produk</span>
-            <span class="font-semibold text-brand-ink dark:text-white tabular-nums">
+            <span class="font-semibold text-brand-ink tabular-nums">
               {{ displayTotalPrice }}
             </span>
           </div>
           <div class="flex items-center justify-between">
             <span>Biaya Pengiriman</span>
-            <span class="text-emerald-600 font-semibold">Gratis Ongkir</span>
+            <span class="text-brand-success font-semibold">Gratis Ongkir</span>
           </div>
           <div class="flex items-center justify-between">
             <span>Pajak PPN (11%)</span>
-            <span class="font-semibold text-brand-ink dark:text-white">Termasuk</span>
+            <span class="font-semibold text-brand-ink">Termasuk</span>
           </div>
           <div class="pt-3 border-t border-brand-hairsoft flex items-center justify-between">
-            <span class="font-display font-bold text-sm text-brand-ink dark:text-white"
-              >Total Tagihan</span
-            >
-            <span
-              class="font-display text-xl font-bold text-brand-ink dark:text-white tabular-nums"
-            >
+            <span class="font-display font-bold text-sm text-brand-ink">Total Tagihan</span>
+            <span class="font-display text-xl font-bold text-brand-ink tabular-nums">
               {{ displayTotalPrice }}
             </span>
           </div>
@@ -617,7 +613,7 @@ const handleCreateOrder = async () => {
           {{ submitButtonLabel }}
         </UiButton>
 
-        <p class="text-[10.5px] text-center text-brand-muted dark:text-zinc-500 m-0">
+        <p class="text-[10.5px] text-center text-brand-muted m-0">
           Transaksi aman terlindungi enkripsi Midtrans Payment Gateway.
         </p>
       </aside>

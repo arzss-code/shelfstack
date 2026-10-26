@@ -52,7 +52,7 @@ const emit = defineEmits<{
             :key="cat.id"
             type="button"
             :class="[
-              'text-left px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer border-0 flex items-center justify-between',
+              'text-left px-3 py-2 rounded-field text-xs font-medium transition-all cursor-pointer border-0 flex items-center justify-between',
               selectedCategory === cat.id
                 ? 'bg-brand-ink text-white font-semibold shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:bg-brand-canvas-soft hover:text-brand-ink',
@@ -76,7 +76,7 @@ const emit = defineEmits<{
             :key="range.id"
             type="button"
             :class="[
-              'text-left px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer border-0 flex items-center justify-between',
+              'text-left px-3 py-2 rounded-field text-xs font-medium transition-all cursor-pointer border-0 flex items-center justify-between',
               selectedPriceRange === range.id
                 ? 'bg-brand-ink text-white font-semibold shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:bg-brand-canvas-soft hover:text-brand-ink',

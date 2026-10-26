@@ -28,6 +28,10 @@ const selectedEntity = ref(NO_FILTER.entity)
 const selectedAction = ref(NO_FILTER.action)
 
 const entityOptions = computed(() => distinctEntityTypes(activities.value))
+const entitySelectOptions = computed(() => [
+  { value: '', label: 'Semua entitas' },
+  ...entityOptions.value.map((entity) => ({ value: entity, label: entity })),
+])
 
 const actionTabs = computed(() => [
   { value: NO_FILTER.action, label: 'Semua' },
@@ -126,15 +130,11 @@ const rowClass = (data: ActivityLog) =>
         <UiSelect
           id="activity-entity-filter"
           v-model="selectedEntity"
+          :options="entitySelectOptions"
           size="sm"
           aria-label="Filter entitas"
           class="max-w-[190px]"
-        >
-          <option value="">Semua entitas</option>
-          <option v-for="entity in entityOptions" :key="entity" :value="entity">
-            {{ entity }}
-          </option>
-        </UiSelect>
+        />
         <UiButton v-if="filteringActive" variant="ghost" size="sm" @click="resetFilters">
           Reset
         </UiButton>

@@ -143,7 +143,7 @@ const handleSaveNewAddress = async () => {
       <div
         v-for="i in 2"
         :key="i"
-        class="border border-brand-hairsoft rounded-xl p-4 bg-brand-canvas-soft/40 animate-pulse space-y-3"
+        class="border border-brand-hairsoft rounded-card p-4 bg-brand-canvas-soft/40 animate-pulse space-y-3"
       >
         <div class="flex items-center justify-between">
           <div class="h-4 w-28 bg-brand-hair rounded" />
@@ -157,13 +157,18 @@ const handleSaveNewAddress = async () => {
     <!-- Error State -->
     <div
       v-else-if="error"
-      class="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between text-xs text-red-700"
+      class="p-3 bg-brand-danger-tint border border-brand-danger-edge rounded-card flex items-center justify-between text-xs text-brand-danger-text"
     >
       <div class="flex items-center gap-2">
         <i class="pi pi-exclamation-triangle shrink-0" />
         <span>{{ error }}</span>
       </div>
-      <UiButton variant="ghost" size="sm" class="text-xs text-red-700" @click="fetchAddresses">
+      <UiButton
+        variant="ghost"
+        size="sm"
+        class="text-xs text-brand-danger-text"
+        @click="fetchAddresses"
+      >
         Coba Lagi
       </UiButton>
     </div>
@@ -171,7 +176,7 @@ const handleSaveNewAddress = async () => {
     <!-- Form Tambah Alamat Baru Inline -->
     <div
       v-if="isAddingNew"
-      class="bg-brand-canvas-soft/60 border border-brand-hair rounded-xl p-4 sm:p-5 space-y-4"
+      class="bg-brand-canvas-soft border border-brand-hair rounded-card p-4 sm:p-5 space-y-4"
     >
       <div class="flex items-center justify-between border-b border-brand-hairsoft pb-2">
         <h4
@@ -191,7 +196,7 @@ const handleSaveNewAddress = async () => {
 
       <div
         v-if="addFormError"
-        class="p-2.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 flex items-center gap-2"
+        class="p-2.5 bg-brand-danger-tint border border-brand-danger-edge rounded-field text-xs text-brand-danger-text flex items-center gap-2"
       >
         <i class="pi pi-exclamation-circle shrink-0" />
         <span>{{ addFormError }}</span>
@@ -272,7 +277,7 @@ const handleSaveNewAddress = async () => {
           id="is_default_checkbox"
           v-model="newAddressForm.is_default"
           type="checkbox"
-          class="rounded border-zinc-300 text-brand-accent focus:ring-brand-accent w-4 h-4 cursor-pointer"
+          class="rounded border-brand-hair text-brand-accent focus:ring-brand-accent w-4 h-4 cursor-pointer"
         />
         <label for="is_default_checkbox" class="text-xs text-brand-ink cursor-pointer select-none">
           Jadikan sebagai alamat utama
@@ -304,7 +309,7 @@ const handleSaveNewAddress = async () => {
     <!-- Empty State -->
     <div
       v-else-if="!loading && addresses.length === 0"
-      class="p-6 border border-dashed border-brand-hair rounded-xl text-center bg-brand-canvas-soft/30 space-y-2"
+      class="p-6 border border-dashed border-brand-hair rounded-card text-center bg-brand-canvas-soft space-y-2"
     >
       <i class="pi pi-map text-2xl text-brand-muted" />
       <h4 class="font-display font-semibold text-xs sm:text-sm text-brand-ink m-0">
@@ -326,10 +331,10 @@ const handleSaveNewAddress = async () => {
         v-for="addr in addresses"
         :key="addr.id"
         :class="[
-          'relative p-4 rounded-xl border transition-all text-left cursor-pointer flex flex-col justify-between gap-3',
+          'relative p-4 rounded-card border transition-all text-left cursor-pointer flex flex-col justify-between gap-3',
           selectedId === addr.id
-            ? 'border-brand-accent bg-blue-50/20 ring-2 ring-brand-accent shadow-sm'
-            : 'border-brand-hair bg-white hover:border-brand-ink/40 hover:shadow-whisper',
+            ? 'border-brand-accent bg-brand-accent-tint/30 ring-2 ring-brand-accent shadow-whisper'
+            : 'border-brand-hair bg-brand-canvas hover:border-brand-ink/40 hover:shadow-whisper',
         ]"
         @click="handleSelect(addr)"
       >
@@ -348,14 +353,14 @@ const handleSaveNewAddress = async () => {
             <div class="flex items-center gap-1.5 shrink-0">
               <span
                 v-if="addr.is_default"
-                class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"
+                class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-success-tint text-brand-success-text border border-brand-success-edge"
               >
                 Utama
               </span>
               <button
                 v-else
                 type="button"
-                class="text-[10px] text-brand-muted hover:text-brand-ink hover:underline transition-colors"
+                class="text-[10px] text-brand-muted hover:text-brand-ink hover:underline transition-colors border-0 bg-transparent cursor-pointer p-0"
                 title="Jadikan Alamat Utama"
                 @click="(e) => handleSetDefault(addr, e)"
               >
@@ -365,7 +370,7 @@ const handleSaveNewAddress = async () => {
           </div>
 
           <!-- Street & City -->
-          <p class="text-xs text-zinc-700 m-0 leading-relaxed line-clamp-2">
+          <p class="text-xs text-brand-ink m-0 leading-relaxed line-clamp-2">
             {{ addr.street }}
           </p>
           <p class="text-[11px] text-brand-muted m-0">{{ addr.city }}, {{ addr.postal }}</p>
