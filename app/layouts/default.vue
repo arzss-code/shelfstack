@@ -3,13 +3,13 @@ import AppNavbar from '~/components/AppNavbar.vue'
 import AppFooter from '~/components/AppFooter.vue'
 import CartDrawer from '~/features/cart/components/CartDrawer.vue'
 import { useCartStore } from '~/features/cart/stores/cart'
+import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
 
-// Sinkron ulang keranjang dari localStorage setiap mount layout.
-// initCart di setup store tidak cukup untuk full page load (SSR + hidrasi),
-// sehingga refresh atau URL langsung ke /cart dan /checkout tampil kosong
-// meski data tersimpan. Idempoten: hanya membaca dan menetapkan ulang.
+// Sinkron ulang keranjang & wishlist dari localStorage / database setiap mount layout.
+// Di Nuxt 4 SSR, hidrasi browser memerlukan pemulihan state persisten pada lifecycle onMounted.
 onMounted(() => {
   useCartStore().initCart()
+  useWishlistStore().initWishlist()
 })
 </script>
 

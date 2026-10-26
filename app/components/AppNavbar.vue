@@ -2,10 +2,12 @@
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useCategories } from '~/composables/useCategories'
 import { useCartStore } from '~/features/cart/stores/cart'
+import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
 import AppLogo from './AppLogo.vue'
 
 const { user, profile, isAdmin, isLoggedIn, fetchProfile, signOut } = useAuth()
 const cartStore = useCartStore()
+const wishlistStore = useWishlistStore()
 const {
   categories: dynamicCategories,
   categoryMap: dynamicCategoryMap,
@@ -64,6 +66,32 @@ const selectCategory = (cat: string) => {
   }
 }
 
+const categoryDropdownRef = ref<HTMLElement | null>(null)
+const userMenuRef = ref<HTMLElement | null>(null)
+
+function handleNavClickOutside(event: MouseEvent) {
+  const target = event.target as Node | null
+  if (!target) return
+  if (
+    isCategoryDropdownOpen.value &&
+    categoryDropdownRef.value &&
+    !categoryDropdownRef.value.contains(target)
+  ) {
+    isCategoryDropdownOpen.value = false
+  }
+  if (isUserMenuOpen.value && userMenuRef.value && !userMenuRef.value.contains(target)) {
+    isUserMenuOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', handleNavClickOutside, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', handleNavClickOutside)
+})
+
 const handleLogout = async () => {
   isUserMenuOpen.value = false
   await signOut()
@@ -74,8 +102,8 @@ const handleLogout = async () => {
 <template>
   <header class="w-full bg-white sticky top-0 z-50 shadow-[0_1px_3px_rgba(0,0,0,0.05)] select-none">
     <!-- LAYER 1: Top Announcement Bar (Inverted Ink Strip) -->
-    <div class="bg-brand-ink text-white py-1.5 px-4 sm:px-6 lg:px-8 border-b border-white/10">
-      <div class="max-w-7xl mx-auto flex items-center justify-between text-xs">
+    <div class="bg-brand-ink text-white py-1.5 border-b border-white/10 hidden sm:block">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between text-xs">
         <div class="flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" />
           <p class="tracking-wide m-0 text-[11px] sm:text-xs">
@@ -116,35 +144,56 @@ const handleLogout = async () => {
             @submit.prevent="handleSearch"
           >
             <!-- Single Category Dropdown Button -->
-            <div class="relative shrink-0">
+            <div ref="categoryDropdownRef" class="relative shrink-0">
               <button
                 type="button"
                 class="whitespace-nowrap flex items-center gap-1.5 text-xs text-brand-ink font-semibold px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors cursor-pointer"
                 @click="isCategoryDropdownOpen = !isCategoryDropdownOpen"
               >
                 <span>{{ selectedCategory }}</span>
-                <i class="pi pi-chevron-down text-[9px] text-brand-muted" />
+                <svg
+                  class="w-3 h-3 text-brand-muted shrink-0 transition-transform duration-200 origin-center"
+                  :class="{ 'rotate-180': isCategoryDropdownOpen }"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
               </button>
 
               <!-- Category Dropdown List -->
-              <div
-                v-if="isCategoryDropdownOpen"
-                class="absolute left-0 top-full mt-2 w-56 bg-white border border-brand-hair rounded-card shadow-floating py-2 z-50"
+              <Transition
+                enter-active-class="transition duration-150 ease-out"
+                enter-from-class="transform scale-95 opacity-0 -translate-y-1"
+                enter-to-class="transform scale-100 opacity-100 translate-y-0"
+                leave-active-class="transition duration-100 ease-in"
+                leave-from-class="transform scale-100 opacity-100 translate-y-0"
+                leave-to-class="transform scale-95 opacity-0 -translate-y-1"
               >
-                <button
-                  v-for="cat in dropdownCategories"
-                  :key="cat"
-                  type="button"
-                  class="w-full text-left px-4 py-2 text-xs font-medium text-brand-ink hover:bg-brand-canvas-soft transition-colors flex items-center justify-between cursor-pointer"
-                  @click="selectCategory(cat)"
+                <div
+                  v-if="isCategoryDropdownOpen"
+                  class="absolute left-0 top-full mt-2 w-56 max-h-64 overflow-y-auto bg-brand-canvas border border-brand-hair rounded-card shadow-floating p-1.5 z-50"
                 >
-                  <span>{{ cat }}</span>
-                  <i
-                    v-if="selectedCategory === cat"
-                    class="pi pi-check text-[10px] text-brand-accent"
-                  />
-                </button>
-              </div>
+                  <button
+                    v-for="cat in dropdownCategories"
+                    :key="cat"
+                    type="button"
+                    class="w-full text-left px-3 py-2 text-xs font-medium text-brand-ink hover:bg-brand-canvas-soft rounded-field transition-colors flex items-center justify-between cursor-pointer border-0"
+                    @click="selectCategory(cat)"
+                  >
+                    <span>{{ cat }}</span>
+                    <i
+                      v-if="selectedCategory === cat"
+                      class="pi pi-check text-[10px] text-brand-accent font-bold"
+                    />
+                  </button>
+                </div>
+              </Transition>
             </div>
 
             <span class="w-px h-5 bg-brand-hair mx-1 shrink-0" />
@@ -171,22 +220,18 @@ const handleLogout = async () => {
         <!-- Right Commerce Actions -->
         <div class="flex items-center gap-2 sm:gap-3 shrink-0">
           <!-- Wishlist Button with UiTooltip -->
-          <UiTooltip
-            text="Koleksi Disimpan"
-            position="bottom"
-            align="center"
-            class="hidden sm:inline-flex"
-          >
+          <UiTooltip text="Wishlist" position="bottom" align="center" class="hidden sm:inline-flex">
             <NuxtLink
-              to="/katalog"
+              to="/wishlist"
               class="relative p-2 text-brand-muted hover:text-brand-ink rounded-full hover:bg-brand-canvas-soft transition-colors no-underline flex items-center justify-center cursor-pointer"
-              aria-label="Koleksi Disimpan"
+              aria-label="Wishlist"
             >
               <i class="pi pi-heart text-base" />
               <span
-                class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-brand-ink text-white text-[9px] font-bold flex items-center justify-center leading-none"
+                v-if="wishlistStore.totalItems > 0"
+                class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-rose-600 text-white text-[9px] font-bold flex items-center justify-center leading-none"
               >
-                0
+                {{ wishlistStore.totalItems > 99 ? '99+' : wishlistStore.totalItems }}
               </span>
             </NuxtLink>
           </UiTooltip>
@@ -239,62 +284,81 @@ const handleLogout = async () => {
           </UiTooltip>
 
           <!-- User Authentication Section -->
-          <div class="relative">
+          <div ref="userMenuRef" class="relative">
             <template v-if="isLoggedIn && user">
               <button
                 type="button"
-                class="flex items-center gap-1.5 p-1 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair"
+                class="flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair"
                 @click="isUserMenuOpen = !isUserMenuOpen"
               >
                 <span
-                  class="w-7 h-7 rounded-full bg-brand-ink text-white text-xs font-bold flex items-center justify-center"
+                  class="w-7 h-7 rounded-full bg-brand-ink text-white text-xs font-bold flex items-center justify-center shrink-0"
                 >
                   {{ initial }}
                 </span>
-                <i
-                  class="pi pi-chevron-down text-[10px] text-brand-muted pr-1.5 hidden sm:inline"
-                />
+                <svg
+                  class="w-3 h-3 text-brand-muted shrink-0 transition-transform duration-200 hidden sm:block"
+                  :class="{ 'rotate-180': isUserMenuOpen }"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
               </button>
 
               <!-- User Popup Menu -->
-              <div
-                v-if="isUserMenuOpen"
-                class="absolute right-0 top-full mt-2 w-48 bg-white border border-brand-hair rounded-card shadow-floating py-2 z-50"
+              <Transition
+                enter-active-class="transition duration-150 ease-out"
+                enter-from-class="transform scale-95 opacity-0 -translate-y-1"
+                enter-to-class="transform scale-100 opacity-100 translate-y-0"
+                leave-active-class="transition duration-100 ease-in"
+                leave-from-class="transform scale-100 opacity-100 translate-y-0"
+                leave-to-class="transform scale-95 opacity-0 -translate-y-1"
               >
-                <div class="px-4 py-2 border-b border-brand-hairsoft">
-                  <p class="text-xs font-bold text-brand-ink m-0 truncate">{{ displayName }}</p>
-                  <p class="text-[10px] text-brand-muted m-0 truncate">{{ user.email }}</p>
+                <div
+                  v-if="isUserMenuOpen"
+                  class="absolute right-0 top-full mt-2 w-48 bg-brand-canvas border border-brand-hair rounded-card shadow-floating p-1.5 z-50"
+                >
+                  <div class="px-3 py-2 border-b border-brand-hairsoft mb-1">
+                    <p class="text-xs font-bold text-brand-ink m-0 truncate">{{ displayName }}</p>
+                    <p class="text-[10px] text-brand-muted m-0 truncate">{{ user.email }}</p>
+                  </div>
+                  <NuxtLink
+                    to="/orders"
+                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
+                    @click="isUserMenuOpen = false"
+                  >
+                    Pesanan Saya
+                  </NuxtLink>
+                  <NuxtLink
+                    to="/katalog"
+                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline transition-colors"
+                    @click="isUserMenuOpen = false"
+                  >
+                    Katalog Belanja
+                  </NuxtLink>
+                  <NuxtLink
+                    v-if="isAdmin"
+                    to="/admin/products"
+                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-semibold transition-colors"
+                    @click="isUserMenuOpen = false"
+                  >
+                    Dashboard Admin
+                  </NuxtLink>
+                  <button
+                    type="button"
+                    class="w-full text-left px-3 py-2 text-xs text-brand-danger hover:bg-brand-danger-tint rounded-field cursor-pointer border-t border-brand-hairsoft mt-1 transition-colors border-0"
+                    @click="handleLogout"
+                  >
+                    Keluar
+                  </button>
                 </div>
-                <NuxtLink
-                  to="/orders"
-                  class="block px-4 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft no-underline font-medium"
-                  @click="isUserMenuOpen = false"
-                >
-                  Pesanan Saya
-                </NuxtLink>
-                <NuxtLink
-                  to="/katalog"
-                  class="block px-4 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft no-underline"
-                  @click="isUserMenuOpen = false"
-                >
-                  Katalog Belanja
-                </NuxtLink>
-                <NuxtLink
-                  v-if="isAdmin"
-                  to="/admin/products"
-                  class="block px-4 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft no-underline font-semibold"
-                  @click="isUserMenuOpen = false"
-                >
-                  Dashboard Admin
-                </NuxtLink>
-                <button
-                  type="button"
-                  class="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-brand-canvas-soft cursor-pointer border-t border-brand-hairsoft"
-                  @click="handleLogout"
-                >
-                  Keluar
-                </button>
-              </div>
+              </Transition>
             </template>
 
             <template v-else>
@@ -322,9 +386,9 @@ const handleLogout = async () => {
 
     <!-- LAYER 3: Sub-Navigation Category Ribbon Bar -->
     <div
-      class="w-full bg-brand-canvas-soft border-b border-brand-hairsoft py-2 px-4 sm:px-6 lg:px-8 overflow-x-auto [scrollbar-width:none]"
+      class="w-full bg-brand-canvas-soft border-b border-brand-hairsoft py-2 overflow-x-auto [scrollbar-width:none]"
     >
-      <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         <nav
           class="flex items-center gap-1 sm:gap-2 whitespace-nowrap text-xs font-medium"
           aria-label="Kategori Utama"
@@ -391,6 +455,19 @@ const handleLogout = async () => {
           @click="isMobileMenuOpen = false"
         >
           Katalog Lengkap
+        </NuxtLink>
+        <NuxtLink
+          to="/wishlist"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft flex items-center justify-between"
+          @click="isMobileMenuOpen = false"
+        >
+          <span>Wishlist</span>
+          <span
+            v-if="wishlistStore.totalItems > 0"
+            class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold"
+          >
+            {{ wishlistStore.totalItems }}
+          </span>
         </NuxtLink>
         <NuxtLink
           v-if="isLoggedIn"
