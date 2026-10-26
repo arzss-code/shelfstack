@@ -5,6 +5,23 @@ export default defineNuxtConfig({
     enabled: true,
   },
 
+  app: {
+    head: {
+      title: 'ShelfStack',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'ShelfStack: Curated Archival Department Store' },
+        { name: 'theme-color', content: '#141414' },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg?v=2' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png?v=2' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png?v=2' },
+      ],
+    },
+  },
+
   css: ['primeicons/primeicons.css'],
 
   modules: [
