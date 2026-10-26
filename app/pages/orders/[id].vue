@@ -7,6 +7,7 @@ import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import OrderCancelDialog from '~/features/orders/components/OrderCancelDialog.vue'
 import OrderInvoiceModal from '~/features/orders/components/OrderInvoiceModal.vue'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import { useCartStore } from '~/features/cart/stores/cart'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,6 +15,7 @@ const { user } = useAuth()
 const supabase = useSupabaseClient<Database>()
 const toast = useUiToast()
 const config = useRuntimeConfig()
+const cartStore = useCartStore()
 const { pay: openSnapModal } = useMidtransSnap()
 
 const orderId = route.params.id as string
@@ -312,6 +314,7 @@ const handleCancelOrder = async (reason: string) => {
       method: 'POST',
       body: { reason },
     })
+    stopPolling()
     toast.add({
       severity: 'success',
       summary: 'Pesanan Dibatalkan',
@@ -333,20 +336,59 @@ const handleCancelOrder = async (reason: string) => {
   }
 }
 
+const handleReorder = () => {
+  if (!order.value?.items || order.value.items.length === 0) return
+
+  for (const item of order.value.items) {
+    cartStore.addItem({
+      productId: item.product_id,
+      name: item.product?.name || `Produk #${item.product_id}`,
+      price: item.price_cents / 100,
+      priceCents: item.price_cents,
+      imageUrl: item.product?.image_url ?? null,
+      quantity: item.qty,
+      stock: 99,
+      openCartDrawer: false,
+    })
+  }
+
+  toast.add({
+    severity: 'success',
+    summary: 'Produk Ditambahkan',
+    detail: 'Item dari pesanan ini telah dimasukkan kembali ke keranjang belanja Anda.',
+    life: 4000,
+  })
+
+  router.push('/cart')
+}
+
 const getStatusBadge = (status: OrderStatus) => {
   switch (status) {
     case 'paid':
-      return { variant: 'success' as const, label: 'Lunas' }
+      return { variant: 'info' as const, label: 'Diproses' }
     case 'shipped':
-      return { variant: 'info' as const, label: 'Sedang Dikirim' }
+      return { variant: 'info' as const, label: 'Dikirim' }
     case 'completed':
-      return { variant: 'success' as const, label: 'Pesanan Selesai' }
+      return { variant: 'success' as const, label: 'Selesai' }
     case 'cancelled':
       return { variant: 'danger' as const, label: 'Dibatalkan' }
     case 'pending':
     default:
       return { variant: 'warning' as const, label: 'Menunggu Pembayaran' }
   }
+}
+
+const getPaymentStatusBadge = (orderData: Order) => {
+  if (orderData.status === 'refunded') {
+    return { variant: 'default' as const, label: 'Dikembalikan' }
+  }
+  if (orderData.status === 'cancelled') {
+    return { variant: 'default' as const, label: 'Belum Dibayar' }
+  }
+  if (orderData.paid_at || ['paid', 'shipped', 'completed'].includes(orderData.status)) {
+    return { variant: 'success' as const, label: 'Lunas' }
+  }
+  return { variant: 'warning' as const, label: 'Menunggu Pembayaran' }
 }
 
 const formatDate = (dateStr: string) => {
@@ -443,7 +485,7 @@ const getSegmentColor = (idx: number) => {
     <!-- Breadcrumbs -->
     <nav
       aria-label="Breadcrumbs"
-      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 border-b border-brand-hairsoft overflow-x-auto"
+      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 overflow-x-auto"
     >
       <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
         ShelfStack
@@ -507,27 +549,27 @@ const getSegmentColor = (idx: number) => {
         <div class="flex items-center justify-between pb-4 mb-6 border-b border-brand-hairsoft">
           <div class="flex items-center gap-2">
             <i class="pi pi-compass text-brand-accent text-sm" />
-            <h2 class="font-display text-sm font-bold text-brand-ink m-0">Status Alur Transaksi</h2>
+            <h2 class="font-display text-sm font-bold text-brand-ink m-0">
+              Alur Pesanan & Pengiriman
+            </h2>
           </div>
-          <span class="text-[11px] text-brand-muted">
-            {{
-              order.status === 'cancelled'
-                ? 'Transaksi Dibatalkan'
-                : getStatusBadge(order.status).label
-            }}
-          </span>
         </div>
 
-        <!-- Cancelled State Alert -->
+        <!-- Cancelled State Alert: Pure informative notification without duplicated action button -->
         <div
           v-if="order.status === 'cancelled'"
-          class="p-4 bg-red-50 text-red-700 border border-red-200 rounded-card text-xs flex items-center gap-3"
+          class="p-4 bg-red-50 text-red-700 border border-red-200 rounded-card text-xs flex items-start gap-3"
         >
-          <i class="pi pi-times-circle text-lg shrink-0 text-red-600" />
-          <div>
-            <p class="font-semibold m-0">Pesanan Dibatalkan</p>
-            <p class="text-[11px] text-red-600/90 m-0 mt-0.5">
-              Pesanan ini telah dibatalkan atau waktu pembayaran telah kedaluwarsa.
+          <i class="pi pi-times-circle text-lg shrink-0 text-red-600 mt-0.5" />
+          <div class="space-y-1">
+            <p class="font-semibold text-sm m-0">Pesanan Dibatalkan</p>
+            <p v-if="order.cancellation_reason" class="text-xs text-red-700 m-0">
+              Alasan: <span class="font-medium text-red-800">{{ order.cancellation_reason }}</span>
+            </p>
+            <p class="text-[11px] text-red-600/90 m-0">
+              Dibatalkan pada
+              {{ formatDate(order.cancelled_at || order.updated_at || order.created_at) }}. Stok
+              produk telah dikembalikan ke etalase.
             </p>
           </div>
         </div>
@@ -664,19 +706,15 @@ const getSegmentColor = (idx: number) => {
               <h2 class="font-display text-base font-bold text-brand-ink m-0">Tujuan Pengiriman</h2>
             </div>
 
-            <div class="text-xs text-brand-muted space-y-1">
+            <div v-if="order.address" class="text-xs text-brand-muted space-y-1">
               <p class="font-bold text-brand-ink m-0">
-                {{ (order.address as any)?.name }} ({{ (order.address as any)?.phone }})
+                {{ order.address.name }} ({{ order.address.phone }})
               </p>
               <p class="m-0 leading-relaxed">
-                {{ (order.address as any)?.street }}, {{ (order.address as any)?.city }}
-                {{ (order.address as any)?.postal }}
+                {{ order.address.street }}, {{ order.address.city }} {{ order.address.postal }}
               </p>
-              <p
-                v-if="(order.address as any)?.note"
-                class="italic text-[11px] text-brand-muted pt-1 m-0"
-              >
-                Catatan: "{{ (order.address as any)?.note }}"
+              <p v-if="order.address.note" class="italic text-[11px] text-brand-muted pt-1 m-0">
+                Catatan: "{{ order.address.note }}"
               </p>
             </div>
           </div>
@@ -696,8 +734,8 @@ const getSegmentColor = (idx: number) => {
             <div class="flex items-center justify-between">
               <span>Status Pembayaran</span>
               <UiBadge
-                :variant="getStatusBadge(order.status).variant"
-                :label="getStatusBadge(order.status).label"
+                :variant="getPaymentStatusBadge(order).variant"
+                :label="getPaymentStatusBadge(order).label"
               />
             </div>
             <div v-if="order.payment_type" class="flex items-center justify-between">
@@ -760,7 +798,22 @@ const getSegmentColor = (idx: number) => {
             </p>
           </div>
 
+          <!-- Action Button if cancelled: Single primary CTA for reorder -->
+          <div v-else-if="order.status === 'cancelled'" class="space-y-3 pt-2">
+            <UiButton
+              variant="primary"
+              size="md"
+              class="w-full justify-center"
+              icon="pi-refresh"
+              @click="handleReorder"
+            >
+              Beli Lagi
+            </UiButton>
+          </div>
+
+          <!-- Invoice is only available for confirmed/paid/shipped/completed orders -->
           <UiButton
+            v-if="['paid', 'shipped', 'completed'].includes(order.status)"
             variant="outline"
             size="sm"
             class="w-full justify-center text-xs"
