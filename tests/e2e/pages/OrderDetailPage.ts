@@ -16,7 +16,9 @@ export class OrderDetailPage extends BasePage {
   constructor(page: Page) {
     super(page)
     this.heading = page.locator('h1')
-    this.timelineCard = page.getByRole('heading', { name: 'Status Alur Transaksi' })
+    this.timelineCard = page.getByRole('heading', {
+      name: /(status alur transaksi|alur pesanan & pengiriman)/i,
+    })
     this.payNowButton = page.getByRole('button', { name: /bayar sekarang \(midtrans\)/i })
     this.checkStatusButton = page.getByRole('button', { name: /cek status pembayaran/i })
     this.cancelOrderButton = page.getByRole('button', { name: /batalkan pesanan/i })
