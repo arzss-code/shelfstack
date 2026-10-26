@@ -2,6 +2,7 @@
 import type { Product } from '~/types/product'
 import { formatRupiah } from '~/utils/format'
 import { getProductVariants } from '~/utils/product-specs'
+import WishlistButton from '~/components/wishlist/WishlistButton.vue'
 
 const props = defineProps<{
   product: Product
@@ -131,7 +132,7 @@ const handleBuyNow = () => {
         <div
           class="inline-flex items-center gap-1 bg-brand-canvas-soft border border-brand-hair px-2.5 py-1 rounded-full"
         >
-          <div class="flex text-amber-500">
+          <div class="flex text-brand-warning">
             <i class="pi pi-star-fill text-[11px]" />
           </div>
           <span class="font-bold text-brand-ink ml-1">{{ ratingValue.toFixed(1) }}</span>
@@ -139,7 +140,7 @@ const handleBuyNow = () => {
         <span v-if="reviewCountValue">{{ reviewCountValue }} ulasan terverifikasi</span>
       </div>
       <div v-else class="flex items-center gap-2 text-xs text-brand-muted">
-        <i class="pi pi-verified text-emerald-600 text-xs" />
+        <i class="pi pi-verified text-brand-success text-xs" />
         <span class="font-medium text-brand-ink">Kurasi Fisik Terjamin</span>
         <span class="text-brand-faint">·</span>
         <span>ShelfStack Official</span>
@@ -241,7 +242,7 @@ const handleBuyNow = () => {
             pattern="[0-9]*"
             aria-label="Jumlah unit pesanan"
             :disabled="isOutOfStock"
-            class="w-12 text-center font-display font-bold text-sm text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-white focus:ring-1 focus:ring-brand-accent/40 rounded-sm transition-all py-1 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            class="w-12 text-center font-display font-bold text-sm text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-brand-canvas focus:ring-1 focus:ring-brand-accent/40 rounded-sm transition-all py-1 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             @focus="($event.target as HTMLInputElement).select()"
             @input="handleQuantityInput"
             @blur="handleQuantityBlur"
@@ -267,8 +268,11 @@ const handleBuyNow = () => {
           @click="handleAddToBag"
         >
           <span v-if="isOutOfStock">Stok Habis</span>
-          <span v-else> Tambah ke Bag — {{ formatRupiah(product.price * quantity) }} </span>
+          <span v-else> Tambah ke Bag · {{ formatRupiah(product.price * quantity) }} </span>
         </UiButton>
+
+        <!-- Wishlist Action Button -->
+        <WishlistButton :product="product" variant="inline" class="shrink-0" />
       </div>
 
       <!-- Instant 1-Click Buy Action using UiButton (Clean Architectural Secondary) -->
@@ -292,7 +296,7 @@ const handleBuyNow = () => {
         <span>Gudang Jakarta</span>
       </div>
       <div class="flex items-center gap-1.5">
-        <i class="pi pi-shield text-emerald-600 text-xs" />
+        <i class="pi pi-shield text-brand-success text-xs" />
         <span>Garansi Toko Resmi</span>
       </div>
       <div class="flex items-center gap-1.5">

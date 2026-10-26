@@ -50,5 +50,11 @@ pnpm-debug.log*
 .secrets/
 *.token.txt
 
+# Temporary local scratch & backup files
+.temp/
+*.tmp
+*.bak
+
 # NOTE: opencode.json is intentionally TRACKED (project MCP wiring).
 # It must only contain public refs + {env:}/{file:} placeholders, never secrets.
+

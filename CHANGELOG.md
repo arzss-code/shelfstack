@@ -2,6 +2,196 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.16.0] - 2026-10-26
+
+### Penyatuan Geometri & Primitif Etalase Publik
+
+- **Unifikasi Geometri & Token Semantik**:
+  - Penyatuan skala radius ke `rounded-card` (14px) dan `rounded-field` (10px) di seluruh etalase:
+    `KatalogToolbar`, `KatalogSidebar`, `KatalogMobileFilter`, `ProductCard`, `ProductGallery`,
+    `ProductConfigurator`, `CartDrawer`, `cart.vue`, `checkout.vue`, `SavedAddressSelector.vue`, dan `AppNavbar`.
+  - Migrasi palet hardcoded (`slate-*`, `zinc-*`, `rose-*`, `emerald-*`, `#18191b`) menjadi token semantik brand:
+    `bg-brand-canvas`, `bg-brand-canvas-soft`, `text-brand-ink`, `text-brand-muted`, `border-brand-hair`,
+    `bg-brand-danger-tint`, `bg-brand-success-tint`, `bg-brand-warning-tint`, dan `text-brand-success-text`.
+  - Penanganan void tag ESLint: eliminasi warning `vue/html-self-closing` pada void element `<img/>` dan `<input/>`
+    di komponen etalase publik (berkurang dari 32 menjadi 18 warning pre-existing).
+  - Perbaikan kontrak heading SEO dan Playwright: penambahan semantic `<h1>Katalog</h1>` pada header `app/pages/katalog.vue`.
+
+### Arsitektur Pesanan & Pembayaran (ADR 005)
+
+- **Pemisahan State Pesanan dan State Pembayaran**:
+  - Dokumentasi ADR 005 (`docs/ADR/005-order-state-payment-state-separation.md`) yang menetapkan pemisahan mutlak
+    antara status pesanan bisnis (`pending`, `processing`, `shipped`, `delivered`, `cancelled`) dan status pembayaran (`pending`, `paid`, `failed`, `refunded`, `expired`).
+  - Ekstraksi kartu pesanan mandiri (`app/features/orders/components/OrderCard.vue`) dengan visual status ganda
+    yang jelas dan pemisahan tombol aksi Bayar (Snap Popup langsung) dan Lihat Detail.
+  - Alur Beli Lagi (`reorder`): menyalin item pesanan terdahulu ke keranjang belanja aktif dan mengarahkan ke `/cart`.
+  - Gating cetak invoice: dibatasi hanya untuk pesanan dengan status lunas, dikirim, atau selesai (`paid`, `shipped`, `delivered`).
+  - Pencegahan polling flicker pada halaman `/orders/[id]`: pemisahan flag `isSilentChecking` (polling 3.5 detik)
+    dan `isManualChecking` (tombol Cek Status oleh pengguna) agar interaktivitas tombol stabil.
+  - Restock atomik pada pembatalan pesanan oleh pengguna dengan validasi alasan pembatalan dan pencatatan audit log.
+
+### Dropdown Primitif Kustom (`UiSelect`)
+
+- Penggantian elemen `<select>` native di etalase dan panel back-office dengan primitif kustom `UiSelect`.
+- Dukungan penuh navigasi keyboard (Arrow Down/Up, Enter, Escape, Space, Home, End) serta penanganan penumpukan z-index
+  terisolasi (`isolation: isolate`) pada kartu katalog.
+
+### Domain Glossary
+
+- Inisialisasi `GLOSSARY.md` di root repositori untuk membakukan definisi istilah domain (On-hand Stock, Reserved Stock,
+  Available Stock, Snap Token, Order Expiry Sweep, Double-entry Ledger, Soft Delete).
+
+### Redesign Split Layout Halaman Autentikasi
+
+- **Penyusunan Ulang Tampilan Login & Register (`AuthCard.vue`, `login.vue`, `register.vue`)**:
+  - Transformasi kartu form menjadi layout split 2-kolom: kolom kiri memuat visual arsitektural kurasi galeri ShelfStack (`/images/auth-showcase.jpg`) dan wordmark insignia resmi, kolom kanan memuat formulir autentikasi.
+  - Kompak pada viewport: penataan form yang efisien dan grid 2-kolom untuk sandi pada registrasi sehingga halaman muat tanpa scrolling berlebih pada resolusi desktop standar.
+  - Eliminasi trust badges redundan: penghapusan ikon 'Belanja Aman • Privasi Terjaga' dan 'Keamanan Terjamin • Checkout Lebih Cepat'.
+  - Show Password Toggle: penambahan fitur interaktif tampilkan/sembunyikan kata sandi pada `UiInput` dan `AuthFormInput` dengan status aria-label yang aksesibel (+4 unit test di `tests/unit/auth-redesign.spec.ts`).
+
+### Wishlist System (Koleksi Produk Tersimpan)
+
+- **Implementasi Store & UI Wishlist**:
+  - Store Pinia `useWishlistStore` (`app/features/wishlist/stores/wishlist.ts`) dengan arsitektur hybrid: local-first untuk guest dan otomatis sinkronisasi dua arah ke database saat login.
+  - Komponen `WishlistButton.vue` dengan micro-animation spring physics, toggle state, aria-label aksesibel, dan integrasi primitif `UiTooltip` konsisten (posisi bottom, align end) yang terisolasi di dalam batas kartu produk tanpa clipping.
+  - Integrasi kartu produk (`ProductCard.vue`): tombol love overlay di pojok kanan atas dengan stop propagation dan tooltip yang aman dari clipping `overflow-hidden`.
+  - Integrasi konfigurator detail produk (`ProductConfigurator.vue`): tombol love inline sejajar dengan aksi Tambah ke Bag.
+  - Integrasi navbar (`AppNavbar.vue`): navigasi langsung ke `/wishlist` dan dynamic badge counter item pada desktop dan mobile menu.
+  - Halaman mandiri `/wishlist` (`app/pages/wishlist.vue`): tata letak gallery modernist, breadcrumbs ringkas, margin dan padding selaras dengan halaman pesanan, grid kartu produk tersimpan, aksi "Pindahkan ke Bag" per item maupun sekaligus (`moveAllToCart`), serta empty state elegan.
+- **Integrasi Database Supabase & Server Nitro**:
+  - Migrasi skema database `supabase/migrations/20261118000001_user_wishlists.sql` dengan relasi `user_id` ke `auth.users`, `product_id` ke `public.products`, composite unique constraint `(user_id, product_id)`, serta RLS policies terisolasi per user (`(select auth.uid()) = user_id`).
+  - Skema Zod validasi input `shared/schemas/wishlist.ts` (`WishlistAddInput`, `WishlistDeleteInput`, `WishlistSyncInput`).
+  - Nitro API route handlers: `GET /api/wishlist`, `POST /api/wishlist`, `DELETE /api/wishlist`, dan `POST /api/wishlist/sync` menggunakan query selektif non-destruktif yang 100% kompatibel dengan RLS policies.
+  - Ketahanan Hard Refresh: penambahan watcher reaktif sesi auth Supabase pada hidrasi client dan inisialisasi store pada lifecycle mount agar item wishlist tidak hilang saat pengguna melakukan hard reload (`Ctrl + Shift + R`).
+  - Penyeragaman seluruh istilah antarmuka dan pesan respon server menjadi "Wishlist".
+- **Pengujian Unit**:
+  - Penambahan 9 unit test di `tests/unit/wishlist-store.spec.ts` (menguji inisialisasi, penambahan, pencegahan duplikat, toggle, pemindahan ke keranjang, dan persistensi).
+  - Penambahan 9 unit test di `tests/unit/api-wishlist.spec.ts` (menguji validasi skema Zod dan invariant keamanan isolasi data RLS per tenant).
+
+### Peningkatan Tab Bar Favicon & Tata Arsip Dokumentasi
+
+- **Aset Favicon Browser**:
+  - Desain ulang ikon tab browser `public/favicon.svg` dengan proporsi diperbesar (zoomed squircle), kontras rak tebal, dan aksen biru kobalt ShelfStack.
+  - Pembuatan bundel aset produksi: `favicon-32x32.png`, `apple-touch-icon.png`, dan `favicon.ico`.
+  - Integrasi cache-busting `?v=2` pada `nuxt.config.ts` dan `app/app.vue`.
+- **Restrukturisasi Dokumentasi Proyek**:
+  - Pembersihan folder `docs/`: merelokasi berkas usang dan artefak Stitch ke `docs/archive/` dilengkapi `docs/archive/README.md`.
+  - Pembaharuan master index `docs/README.md` dan ringkasan standup `docs/standup/README.md`.
+
+### Gate Kualitas (dijalankan aktual 2026-10-26)
+
+- `pnpm typecheck` (`nuxi typecheck`): EXIT 0 (0 error).
+- `pnpm lint`: EXIT 0 (0 error, 0 warning, 100% clean).
+- `pnpm exec vitest run`: 45 test files, 408 test lolos (100% pass).
+
+## [Unreleased] - unify auth area (2026-10-16)
+
+### Perubahan
+
+- Fase 1 unifikasi etalase: area auth memakai primitif brand penuh.
+  `AuthFormInput` menjadi adapter tipis di atas `UiInput` (kontrak props dan emit
+  `clearError` dipertahankan, slot `label` yang tidak dipakai siapa pun dibuang).
+- `AuthCard` memakai `rounded-card` tunggal (sebelumnya `rounded-2xl` di mobile dan
+  `rounded-3xl` di desktop). `AuthSubmitButton` dan tombol Google login/register
+  melepas override `h-11` sehingga geometrinya milik `UiButton` sepenuhnya.
+- Tombol pill hand-rolled di success state reset-password menjadi
+  `UiButton to="/auth/login"`, ikon `text-green-500` menjadi `text-brand-success-text`.
+- Efek samping: satu warning `vue/html-self-closing` hilang (32 menjadi 31).
+
+### Gate (dijalankan aktual 2026-10-16)
+
+`pnpm typecheck` EXIT 0, `pnpm lint` 0 error / 31 warning (pre-existing),
+`pnpm exec vitest run` 37 file / 357 test lolos, detector impeccable `[]`,
+screenshot login + register desktop 1440x900 dan mobile 390x844 lolos.
+Satu-satunya console error adalah 404 `apple-touch-icon.png` (pre-existing,
+aset statis hilang, di luar scope).
+
+## [Unreleased] - vocabulary completion (2026-10-16)
+
+### Perubahan
+
+- `AdminStatCard` prop `color` memakai union semantik
+  `'success' | 'warning' | 'danger' | 'info' | 'neutral'` (tipe ekspor `AdminStatTone`).
+  Pemetaan ke ramp brand tidak berubah, hanya nama kontraknya. Empat call site
+  di `app/pages/admin/index.vue` dimigrasi. Tidak ada test yang mengikat nama lama.
+- 20 em dash di luar admin dihapus: 13 judul SEO memakai `-` (selaras judul admin),
+  4 komentar kode memakai `:`, tombol `Tambah ke Bag` memakai `·` (selaras pita promo),
+  label sortir memakai `A-Z`. Nol em dash tersisa di `app/`.
+
+### Gate (dijalankan aktual 2026-10-16)
+
+`pnpm typecheck` EXIT 0, `pnpm lint` 0 error / 32 warning (pre-existing),
+`pnpm exec vitest run` 37 file / 357 test lolos, detector impeccable `[]`.
+
+## [Unreleased] - redesign admin ke primitif brand (2026-10-16)
+
+### Keputusan
+
+PrimeVue dihapus sepenuhnya dari aplikasi. Penyebabnya bukan selera: `darkModeSelector: 'system'`
+di `nuxt.config.ts` membuat komponen PrimeVue mengikuti dark mode OS, sementara token Tailwind
+`brand-*` mengikuti class `.dark` yang tidak pernah dipasang. Kedua sistem theming hidup
+bersamaan dan menghasilkan halaman setengah gelap (tab tak terlihat, dialog gelap di atas form terang).
+Satu kosakata komponen menghapus dual theming itu.
+
+`primeicons` tetap dipakai. Itu font ikon, bukan pustaka komponen, dan dipakai lintas etalase.
+
+### Primitif baru (`app/components/ui/`)
+
+- `UiModal`: teleport ke body, focus trap, scroll lock, tombol Escape, `aria-modal`. Wrapper `ClientOnly` supaya aman SSR.
+- `UiSelect`, `UiTextarea`, `UiFileField`: kontrol formulir brand. `UiFileField` menegakkan JPEG/PNG/WebP dan batas 5 MB di dalam komponen.
+- `UiTabs`: pil ter-segmentasi dengan `role="tablist"`, navigasi panah, Home/End.
+- `UiSortHeader`, `UiSkeleton`, `UiIconButton`, `UiEmptyState`, `UiAlert`.
+- `UiToastHost` + `useUiToast`, `UiConfirmHost` + `useUiConfirm`: menggantikan `<Toast>` dan `<ConfirmDialog>` global.
+- `UiBadge`, `UiButton`, `UiInput` ditulis ulang ke token semantik dan `useId()` (sebelumnya `Math.random()` sebagai id, tidak aman SSR).
+
+### Ramp status semantik (satu resep untuk badge, alert, toast, KPI)
+
+Tiap status punya tiga lapis: warna teks, latar, garis tepi.
+`--brand-success`, `--brand-warning`, `--brand-danger`, `--brand-accent`, masing-masing dengan
+`-tint`, `-edge`, dan `-text`. Lapisan `-text` dipilih gelap supaya rasio kontras di atas
+tint tetap di atas 4.5:1. Palet `surface-*` dan `primary-*` (yang diturunkan dari `--p-*` PrimeVue)
+dihapus dari `tailwind.config.js`.
+
+`--brand-muted` digelapkan ke `#5c5f64` dan `--brand-faint` ke `#6f7279` supaya teks pendukung
+dan placeholder naik dari 2.56:1 ke di atas 4.5:1.
+
+### Browser surfaces
+
+Blok CSS `.p-toast` sepanjang 260 baris (hex hardcoded, `border-left: 5px`) dihapus, digantikan
+tema scrollbar, `::selection`, caret, autofill, dan `.tabular` untuk kolom rupiah.
+
+### Perbaikan fokus dan hydration
+
+- Indikator fokus kini satu aturan global `:focus-visible` memakai `outline`, bukan `ring`.
+  Sebelumnya tiap primitif membawa `focus-visible:ring-2` sehingga `UiInput` menampilkan dua
+  cincin fokus bertumpuk. `outline-none` pada `UiInput`/`UiSelect`/`UiTextarea` ikut dibuang
+  karena menindih aturan global.
+- `UiModal` dan `UiToastHost` dibungkus `ClientOnly`. Log dev server menunjukkan
+  "Hydration children mismatch" dan "Hydration class mismatch" pada kedua host sebelum perbaikan ini.
+- `app/pages/auth/callback.vue` masih memuat `<ProgressSpinner>` PrimeVue yang tidak lagi ter-resolve
+  setelah modul dicabut. Diganti spinner CSS brand.
+
+### Skrip sekali jalan
+
+Empat skrip `scripts/*.mjs` dipakai untuk transformasi massal dan sudah dihapus setelah dipakai.
+Catatan operasional: `Set-Content`/`Out-File` PowerShell merusak UTF-8 di repo ini (em dash jadi
+mojibake plus BOM). Semua transformasi massal harus lewat Node.
+
+### Gate (dijalankan aktual 2026-10-16)
+
+`pnpm typecheck` EXIT 0, `pnpm lint` 0 error / 32 warning (`vue/html-self-closing`, pre-existing),
+`pnpm exec vitest run` 37 file / 357 test lolos, detector impeccable `[]`.
+Screendesktop 1440x900 dan mobile 390x844 untuk 4 halaman admin plus dialog Tambah Produk:
+2 passed, 0 console error.
+
+### Di luar scope
+
+Redesign ini hanya menyentuh admin. Etalase publik masih memakai komponen lamanya
+(`AppNavbar`, `ProductList`, `KatalogToolbar`, dan lain-lain) yang sekarang tidak punya
+pasangan primitif. Token `brand-*` sudah menjadi satu-satunya sumber warna, jadi etalase tidak
+rusak, tapi belum disatukan geometrinya. Ada 21 em dash tersisa di halaman etalase, `AppNavbar`,
+dan komponen auth yang belum disentuh.
+
 ## [Unreleased] — audit docs & agent rules (2026-10-11)
 
 ### Audit (read-only, terverifikasi file:line)
@@ -48,6 +238,25 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
 - Script `pnpm typecheck` diganti dari `vue-tsc --noEmit` (terbukti memeriksa 0 file)
   ke `nuxi typecheck`, sehingga gate lokal dan CI memeriksa proyek app + server
   secara nyata. Terverifikasi EXIT 0 sebelum diganti.
+
+### Filter audit aktivitas D-04 (2026-10-16)
+
+- Halaman `/admin/activities` kini punya filter aksi (tab Semua/CREATE/UPDATE/DELETE/RESTORE)
+  dan filter entitas (dropdown dinamis dari data), penghitung hasil, dan tombol reset.
+- Logika filter murni di `app/features/activities/utils/activity-filter.ts` (+10 unit test).
+  Realtime tetap jalan karena filter berupa computed di atas data yang sama.
+
+### Redesign konsistensi dashboard admin (2026-10-16)
+
+- Seluruh permukaan admin disatukan ke token `brand-*`: `activities.vue` dan
+  `ActivityDetailDialog.vue` lepas dari palet `surface/zinc` dan hex hardcoded,
+  resep error/danger/success satu rasa, radius `rounded-card/2xl`, shadow whisper.
+- Tabel pesanan: header ID Pesanan, Pelanggan, Tanggal, Total bisa diklik untuk
+  sort (siklus desc, asc, mati) via param `sort` allowlist di `GET /api/admin/orders`
+  (+11 unit test). Ekspor CSV mengikuti sort aktif.
+- Tabel produk: sort client (Nama A-Z, Termurah, Termahal, Stok tersedikit) via
+  helper murni `product-sort.ts` (+11 unit test), tanpa ubah store/API/kontrak publik.
+- `font-mono` untuk ID/SKU dipertahankan (back-office, bukan elemen commerce).
 
 ### Changed
 

@@ -15,20 +15,63 @@ export default defineEventHandler(async (event) => {
   if (method === 'GET') {
     const query = getQuery(event)
     const from = query.from ? Math.max(0, parseInt(query.from as string, 10)) : 0
-    const to = query.to ? Math.max(from, parseInt(query.to as string, 10)) : from + 9
+    const to = query.to ? Math.max(from, parseInt(query.to as string, 10)) : from + 4
+    const status = query.status as string | undefined
 
-    const { data, error } = await client
+    let dbQuery = client
       .from('orders')
-      .select('*')
+      .select(
+        `
+        *,
+        items:order_items (
+          id,
+          order_id,
+          product_id,
+          qty,
+          price_cents,
+          product:products (
+            id,
+            name,
+            image_url
+          )
+        )
+      `,
+      )
       .eq('user_id', targetUserId)
-      .order('created_at', { ascending: false })
-      .range(from, to)
+
+    if (status && status !== 'all') {
+      dbQuery = dbQuery.eq('status', status as Database['public']['Enums']['order_status'])
+    }
+
+    const { data, error } = await dbQuery.order('created_at', { ascending: false }).range(from, to)
 
     if (error) {
       return errorResponse(event, 'Gagal memuat riwayat pesanan', error, 500)
     }
 
-    return successResponse('Riwayat pesanan berhasil dimuat', data)
+    // Ambil ringkasan jumlah status pesanan milik pengguna
+    const { data: statusRows } = await client
+      .from('orders')
+      .select('status')
+      .eq('user_id', targetUserId)
+
+    const counts = {
+      all: statusRows?.length || 0,
+      pending: statusRows?.filter((o) => o.status === 'pending').length || 0,
+      paid: statusRows?.filter((o) => o.status === 'paid').length || 0,
+      shipped: statusRows?.filter((o) => o.status === 'shipped').length || 0,
+      completed: statusRows?.filter((o) => o.status === 'completed').length || 0,
+      cancelled: statusRows?.filter((o) => o.status === 'cancelled').length || 0,
+    }
+
+    const requestedLimit = to - from + 1
+    const hasMore = (data?.length || 0) === requestedLimit
+
+    return successResponse('Riwayat pesanan berhasil dimuat', {
+      orders: data || [],
+      counts,
+      has_more: hasMore,
+    })
   }
 
   if (method === 'POST') {

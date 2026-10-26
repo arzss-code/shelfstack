@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast'
 import { registerSchema } from '~~/shared/schemas/auth'
 import { useAuth } from '~/features/auth/composables/useAuth'
 
 useSeoMeta({
-  title: 'Buat Akun Baru — ShelfStack',
+  title: 'Buat Akun Baru - ShelfStack',
   description:
     'Daftar akun ShelfStack sekarang untuk menikmati promo eksklusif dan belanja produk kurasi terbaik.',
 })
@@ -13,7 +12,7 @@ definePageMeta({
   middleware: 'guest',
 })
 
-const toast = useToast()
+const toast = useUiToast()
 const user = useSupabaseUser()
 const { signUp, signInWithGoogle, pending } = useAuth()
 
@@ -86,10 +85,10 @@ const handleGoogle = async () => {
 <template>
   <AuthCard
     title="Buat Akun"
-    subtitle="Daftar gratis dan mulai belanja produk kurasi terbaik ShelfStack."
+    subtitle="Daftar akun untuk menyimpan alamat dan belanja produk kurasi."
   >
     <!-- Register Form -->
-    <form novalidate class="flex flex-col gap-4" @submit.prevent="handleRegister">
+    <form novalidate class="flex flex-col gap-3 sm:gap-3.5" @submit.prevent="handleRegister">
       <AuthFormInput
         id="full_name"
         v-model="fullName"
@@ -111,27 +110,29 @@ const handleGoogle = async () => {
         @clear-error="errors.email = undefined"
       />
 
-      <AuthFormInput
-        id="password"
-        v-model="password"
-        label="Kata Sandi"
-        type="password"
-        placeholder="Minimal 8 karakter"
-        autocomplete="new-password"
-        :error="errors.password"
-        @clear-error="errors.password = undefined"
-      />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
+        <AuthFormInput
+          id="password"
+          v-model="password"
+          label="Kata Sandi"
+          type="password"
+          placeholder="Min. 8 karakter"
+          autocomplete="new-password"
+          :error="errors.password"
+          @clear-error="errors.password = undefined"
+        />
 
-      <AuthFormInput
-        id="confirm_password"
-        v-model="confirmPassword"
-        label="Konfirmasi Kata Sandi"
-        type="password"
-        placeholder="Ulangi kata sandi"
-        autocomplete="new-password"
-        :error="errors.confirm_password"
-        @clear-error="errors.confirm_password = undefined"
-      />
+        <AuthFormInput
+          id="confirm_password"
+          v-model="confirmPassword"
+          label="Konfirmasi Sandi"
+          type="password"
+          placeholder="Ulangi kata sandi"
+          autocomplete="new-password"
+          :error="errors.confirm_password"
+          @clear-error="errors.confirm_password = undefined"
+        />
+      </div>
 
       <AuthSubmitButton
         :loading="pending"
@@ -150,33 +151,15 @@ const handleGoogle = async () => {
         block
         :disabled="pending"
         icon="pi-google"
-        class="h-11"
         @click="handleGoogle"
       >
         Daftar dengan Google
       </UiButton>
     </template>
 
-    <!-- Trust Row -->
-    <template #trust>
-      <div
-        class="mt-6 pt-5 border-t border-brand-hairsoft flex items-center justify-center gap-4 text-[11px] text-brand-muted"
-      >
-        <span class="inline-flex items-center gap-1.5">
-          <i class="pi pi-shield text-brand-accent text-xs" />
-          <span>Keamanan Terjamin</span>
-        </span>
-        <span class="text-brand-faint">•</span>
-        <span class="inline-flex items-center gap-1.5">
-          <i class="pi pi-bolt text-brand-accent text-xs" />
-          <span>Checkout Lebih Cepat</span>
-        </span>
-      </div>
-    </template>
-
     <!-- Footer -->
     <template #footer>
-      <p class="mt-6 text-center text-xs sm:text-sm text-brand-muted m-0">
+      <p class="mt-4 sm:mt-5 text-center text-xs sm:text-sm text-brand-muted m-0">
         Sudah punya akun?
         <NuxtLink to="/auth/login" class="font-bold text-brand-accent hover:underline ml-1">
           Masuk

@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast'
 import { loginSchema } from '~~/shared/schemas/auth'
 import { useAuth } from '~/features/auth/composables/useAuth'
 
 useSeoMeta({
-  title: 'Masuk ke Akun — ShelfStack',
+  title: 'Masuk ke Akun - ShelfStack',
   description:
     'Masuk ke akun ShelfStack untuk kemudahan belanja, lacak pesanan, dan penawaran eksklusif.',
 })
@@ -13,7 +12,7 @@ definePageMeta({
   middleware: 'guest',
 })
 
-const toast = useToast()
+const toast = useUiToast()
 const route = useRoute()
 const user = useSupabaseUser()
 const { signIn, signInWithGoogle, pending } = useAuth()
@@ -80,12 +79,9 @@ const handleGoogle = async () => {
 </script>
 
 <template>
-  <AuthCard
-    title="Masuk"
-    subtitle="Silakan masuk untuk melanjutkan transaksi dan kelola akun belanja Anda."
-  >
+  <AuthCard title="Masuk" subtitle="Masuk ke akun Anda untuk melanjutkan pesanan belanja.">
     <!-- Login Form -->
-    <form novalidate class="flex flex-col gap-4" @submit.prevent="handleLogin">
+    <form novalidate class="flex flex-col gap-3.5" @submit.prevent="handleLogin">
       <AuthFormInput
         id="email"
         v-model="email"
@@ -139,33 +135,15 @@ const handleGoogle = async () => {
         block
         :disabled="pending"
         icon="pi-google"
-        class="h-11"
         @click="handleGoogle"
       >
         Masuk dengan Google
       </UiButton>
     </template>
 
-    <!-- Trust Row -->
-    <template #trust>
-      <div
-        class="mt-6 pt-5 border-t border-brand-hairsoft flex items-center justify-center gap-4 text-[11px] text-brand-muted"
-      >
-        <span class="inline-flex items-center gap-1.5">
-          <i class="pi pi-shield text-brand-accent text-xs" />
-          <span>Belanja Aman</span>
-        </span>
-        <span class="text-brand-faint">•</span>
-        <span class="inline-flex items-center gap-1.5">
-          <i class="pi pi-check-circle text-brand-success text-xs" />
-          <span>Privasi Terjaga</span>
-        </span>
-      </div>
-    </template>
-
     <!-- Footer -->
     <template #footer>
-      <p class="mt-6 text-center text-xs sm:text-sm text-brand-muted m-0">
+      <p class="mt-5 text-center text-xs sm:text-sm text-brand-muted m-0">
         Belum punya akun?
         <NuxtLink to="/auth/register" class="font-bold text-brand-accent hover:underline ml-1">
           Daftar sekarang

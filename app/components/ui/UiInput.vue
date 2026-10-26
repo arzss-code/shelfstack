@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, ref, useId } from 'vue'
+
 const props = withDefaults(
   defineProps<{
     id?: string
@@ -7,19 +9,38 @@ const props = withDefaults(
     type?: string
     placeholder?: string
     error?: string
+    hint?: string
     disabled?: boolean
     leftIcon?: string
     rightIcon?: string
+    /** `sm` untuk strip filter admin, `md` untuk field formulir. */
+    size?: 'sm' | 'md'
+    /** Angka currency dan stok: digit sejajar secara optik. */
+    numeric?: boolean
+    autocomplete?: string
+    /** Batas bawah untuk input angka. Root komponen adalah div, jadi atribut ini wajib dideklarasikan agar mendarat di input. */
+    min?: number
+    /** Kenaikan spinner untuk input angka. */
+    step?: number
+    /** Tampilkan tombol toggle tampilkan/sembunyikan kata sandi saat type="password". */
+    showPasswordToggle?: boolean
   }>(),
   {
-    id: () => `input-${Math.random().toString(36).substring(2, 9)}`,
+    id: undefined,
     label: '',
     type: 'text',
     placeholder: '',
     error: '',
+    hint: '',
     disabled: false,
     leftIcon: '',
     rightIcon: '',
+    size: 'md',
+    numeric: false,
+    autocomplete: undefined,
+    min: undefined,
+    step: undefined,
+    showPasswordToggle: false,
   },
 )
 
@@ -28,67 +49,115 @@ const emit = defineEmits<{
   blur: []
   focus: []
 }>()
+
+const uid = useId()
+const fieldId = computed(() => props.id ?? `ui-input-${uid}`)
+const helpId = computed(() => `${fieldId.value}-help`)
+const describedBy = computed(() => (props.error || props.hint ? helpId.value : undefined))
+
+const isPasswordVisible = ref(false)
+const effectiveType = computed(() => {
+  if (props.type === 'password' && props.showPasswordToggle) {
+    return isPasswordVisible.value ? 'text' : 'password'
+  }
+  return props.type
+})
+
+const controlClass = computed(() => {
+  const geometry =
+    props.size === 'sm'
+      ? 'h-8 rounded-full pl-8 pr-3 text-xs'
+      : 'h-11 rounded-field pl-3.5 pr-3.5 text-sm'
+  const border = props.error
+    ? 'border-rose-300 focus:border-rose-500'
+    : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink'
+  const padding = props.leftIcon ? '' : props.size === 'sm' ? 'pl-3' : 'pl-3.5'
+  const trailing =
+    props.rightIcon || (props.showPasswordToggle && props.type === 'password')
+      ? props.size === 'sm'
+        ? 'pr-8'
+        : 'pr-10'
+      : ''
+
+  return [
+    'w-full border bg-brand-canvas text-brand-ink transition-colors',
+    'placeholder:text-brand-faint',
+    'disabled:cursor-not-allowed disabled:bg-brand-field disabled:text-brand-muted',
+    geometry,
+    padding,
+    trailing,
+    border,
+  ].join(' ')
+})
 </script>
 
 <template>
-  <div class="flex flex-col gap-1.5 w-full">
-    <!-- Label -->
-    <label v-if="label" :for="id" class="text-xs sm:text-sm font-semibold text-brand-ink">
+  <div class="flex w-full flex-col gap-1.5">
+    <label v-if="label" :for="fieldId" class="text-xs font-semibold text-brand-ink sm:text-sm">
       {{ label }}
     </label>
 
-    <!-- Input Wrapper -->
     <div class="relative w-full">
-      <!-- Left Icon -->
-      <div v-if="leftIcon" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-muted">
-        <i :class="['pi', leftIcon, 'text-sm']" />
-      </div>
+      <i
+        v-if="leftIcon"
+        :class="[
+          'pi',
+          leftIcon,
+          'pointer-events-none absolute top-1/2 -translate-y-1/2 text-[11px] text-brand-muted',
+          size === 'sm' ? 'left-3' : 'left-3.5',
+        ]"
+        aria-hidden="true"
+      />
 
       <input
-        :id="id"
-        :type="type"
+        :id="fieldId"
+        :type="effectiveType"
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        :class="[
-          'w-full h-11 rounded-xl border text-sm bg-white transition-all outline-none',
-          'placeholder:text-zinc-400',
-          leftIcon ? 'pl-10' : 'pl-4',
-          rightIcon ? 'pr-10' : 'pr-4',
-          disabled
-            ? 'opacity-60 bg-brand-canvas-soft cursor-not-allowed text-brand-muted'
-            : 'text-brand-ink',
-          error
-            ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-200'
-            : 'border-zinc-300 focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/10',
-        ]"
+        :autocomplete="autocomplete"
+        :min="min"
+        :step="step"
+        :aria-invalid="error ? 'true' : undefined"
+        :aria-describedby="describedBy"
+        :class="[controlClass, numeric ? 'tabular' : '']"
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
         @blur="emit('blur')"
         @focus="emit('focus')"
       />
 
-      <!-- Right Icon -->
-      <div v-if="rightIcon" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted">
-        <i :class="['pi', rightIcon, 'text-sm']" />
-      </div>
+      <button
+        v-if="showPasswordToggle && type === 'password'"
+        type="button"
+        tabindex="-1"
+        :class="[
+          'absolute top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-ink transition-colors p-1.5 flex items-center justify-center focus-visible:outline-brand-accent rounded-field',
+          size === 'sm' ? 'right-2' : 'right-2.5',
+        ]"
+        :aria-label="isPasswordVisible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
+        @click="isPasswordVisible = !isPasswordVisible"
+      >
+        <i
+          :class="['pi text-xs sm:text-sm', isPasswordVisible ? 'pi-eye-slash' : 'pi-eye']"
+          aria-hidden="true"
+        />
+      </button>
+
+      <i
+        v-else-if="rightIcon"
+        :class="[
+          'pi',
+          rightIcon,
+          'pointer-events-none absolute top-1/2 -translate-y-1/2 text-[11px] text-brand-muted',
+          size === 'sm' ? 'right-3' : 'right-3.5',
+        ]"
+        aria-hidden="true"
+      />
     </div>
 
-    <!-- Error Message -->
-    <Transition name="fade">
-      <span v-if="error" class="text-red-500 text-[11px] font-medium leading-tight">
-        {{ error }}
-      </span>
-    </Transition>
+    <p v-if="error" :id="helpId" class="m-0 text-[11px] font-medium text-rose-600">
+      {{ error }}
+    </p>
+    <p v-else-if="hint" :id="helpId" class="m-0 text-[11px] text-brand-muted">{{ hint }}</p>
   </div>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.15s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

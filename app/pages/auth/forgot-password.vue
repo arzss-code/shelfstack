@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast'
 import { useAuth } from '~/features/auth/composables/useAuth'
 
 useSeoMeta({
-  title: 'Lupa Kata Sandi — ShelfStack',
+  title: 'Lupa Kata Sandi - ShelfStack',
   description:
     'Masukkan email terdaftar dan kami akan mengirim tautan untuk mengatur ulang kata sandi Anda.',
 })
@@ -12,7 +11,7 @@ definePageMeta({
   middleware: 'guest',
 })
 
-const toast = useToast()
+const toast = useUiToast()
 const user = useSupabaseUser()
 const { sendPasswordResetEmail, pending } = useAuth()
 

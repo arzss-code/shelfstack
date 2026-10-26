@@ -1,0 +1,114 @@
+import { serverSupabaseClient } from '#supabase/server'
+import { wishlistMutationSchema } from '../../../shared/schemas/wishlist'
+import { requireUser } from '../../utils/auth'
+import { errorResponse, successResponse } from '../../utils/response'
+
+export default defineEventHandler(async (event) => {
+  const method = getMethod(event)
+  const client = await serverSupabaseClient(event)
+
+  // Autentikasi wajib untuk seluruh operasi wishlist berbasis database
+  const { user, profile } = await requireUser(event)
+  const targetUserId = user.id || profile.user_id
+
+  if (method === 'GET') {
+    const { data, error } = await (client as any)
+      .from('wishlists')
+      .select(
+        `
+        id,
+        product_id,
+        created_at,
+        product:products (
+          id,
+          name,
+          slug,
+          price,
+          price_cents,
+          image_url,
+          stock,
+          category_id
+        )
+      `,
+      )
+      .eq('user_id', targetUserId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      return errorResponse(event, 'Gagal memuat wishlist', error, 500)
+    }
+
+    return successResponse('Wishlist berhasil dimuat', data || [])
+  }
+
+  if (method === 'POST') {
+    const body = await readBody(event)
+    const parsed = wishlistMutationSchema.safeParse(body)
+
+    if (!parsed.success) {
+      return errorResponse(event, 'Validasi produk gagal', parsed.error.flatten().fieldErrors, 400)
+    }
+
+    // Periksa apakah item sudah tersimpan sebelumnya
+    const { data: existing } = await (client as any)
+      .from('wishlists')
+      .select('id, product_id, created_at')
+      .eq('user_id', targetUserId)
+      .eq('product_id', parsed.data.productId)
+      .maybeSingle()
+
+    if (existing) {
+      return successResponse('Produk berhasil disimpan ke wishlist', existing)
+    }
+
+    const { data, error } = await (client as any)
+      .from('wishlists')
+      .insert({
+        user_id: targetUserId,
+        product_id: parsed.data.productId,
+      })
+      .select()
+      .maybeSingle()
+
+    if (error) {
+      return errorResponse(event, 'Gagal menyimpan ke wishlist', error, 500)
+    }
+
+    return successResponse('Produk berhasil disimpan ke wishlist', data)
+  }
+
+  if (method === 'DELETE') {
+    let productId: number | undefined
+
+    const query = getQuery(event)
+    if (query.productId) {
+      productId = Number(query.productId)
+    } else {
+      const body = await readBody(event).catch(() => null)
+      if (body?.productId) {
+        productId = Number(body.productId)
+      }
+    }
+
+    const parsed = wishlistMutationSchema.safeParse({ productId })
+    if (!parsed.success) {
+      return errorResponse(event, 'ID produk tidak valid', parsed.error.flatten().fieldErrors, 400)
+    }
+
+    const { error } = await (client as any)
+      .from('wishlists')
+      .delete()
+      .eq('user_id', targetUserId)
+      .eq('product_id', parsed.data.productId)
+
+    if (error) {
+      return errorResponse(event, 'Gagal menghapus produk dari wishlist', error, 500)
+    }
+
+    return successResponse('Produk berhasil dihapus dari wishlist', {
+      productId: parsed.data.productId,
+    })
+  }
+
+  return errorResponse(event, 'Metode HTTP tidak didukung', null, 405)
+})

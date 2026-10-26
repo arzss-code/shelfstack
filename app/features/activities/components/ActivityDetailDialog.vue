@@ -53,74 +53,56 @@ const contextItems = computed(() => {
 
 <template>
   <ClientOnly>
-    <Dialog
-      v-model:visible="visible"
-      modal
-      :style="{ width: '55rem' }"
-      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-    >
-      <!-- Custom Header mimicking breadcrumbs -->
+    <UiModal v-model:visible="visible" size="lg" title="View Admin Activity Log">
+      <!-- Custom Header mimicking breadcrumbs. UiModal tetap merender satu tombol tutup di kanan header. -->
       <template #header>
-        <div class="flex flex-col gap-1.5 pb-2">
+        <div class="flex flex-col gap-1.5">
           <div
-            class="flex items-center text-[11px] font-medium uppercase tracking-[0.05em] text-zinc-500 dark:text-zinc-400"
+            class="flex items-center text-[11px] font-medium uppercase tracking-[0.05em] text-brand-muted"
           >
-            <span
-              class="hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+            <span class="hover:text-brand-ink transition-colors cursor-pointer"
               >Admin Activity Log</span
             >
             <i class="pi pi-angle-right text-[9px] mx-2" />
-            <span class="text-zinc-400 dark:text-zinc-500">View</span>
+            <span class="text-brand-faint">View</span>
           </div>
-          <h2 class="m-0 text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <h2 class="m-0 text-xl font-bold tracking-tight text-brand-ink">
             View Admin Activity Log
           </h2>
         </div>
       </template>
 
-      <div v-if="activity" class="flex flex-col gap-6 font-sans text-[13px] pt-2">
+      <div v-if="activity" class="flex flex-col gap-6 text-[13px]">
         <!-- Context Card -->
         <div
-          class="rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-[#18181b] overflow-hidden shadow-sm"
+          class="overflow-hidden rounded-2xl border border-brand-hair bg-brand-canvas-soft shadow-whisper"
         >
-          <div
-            class="px-5 py-3.5 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-transparent"
-          >
-            <h3
-              class="m-0 text-sm font-bold text-zinc-900 dark:text-zinc-100 font-sans tracking-tight"
-            >
-              Context
-            </h3>
+          <div class="border-b border-brand-hair bg-brand-canvas/60 px-4 py-3">
+            <h3 class="m-0 text-sm font-bold tracking-tight text-brand-ink">Context</h3>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left whitespace-nowrap border-collapse">
-              <thead class="border-b border-zinc-200 dark:border-zinc-800/80">
-                <tr>
-                  <th
-                    class="px-5 py-3 font-semibold w-1/3 text-zinc-900 dark:text-zinc-100 bg-transparent"
-                  >
-                    Key
-                  </th>
-                  <th
-                    class="px-5 py-3 font-semibold w-2/3 text-zinc-900 dark:text-zinc-100 bg-transparent"
-                  >
-                    Value
-                  </th>
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr
+                  class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
+                >
+                  <th class="py-3 px-4 font-semibold w-1/3 whitespace-nowrap">Key</th>
+                  <th class="py-3 px-4 font-semibold w-2/3">Value</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800/50">
+              <tbody class="divide-y divide-brand-hairsoft">
                 <tr
                   v-for="(item, index) in contextItems"
                   :key="index"
-                  class="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors group"
+                  class="hover:bg-brand-canvas transition-colors"
                 >
-                  <td
-                    class="px-5 py-3.5 text-zinc-600 dark:text-zinc-300 font-medium group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors"
-                  >
+                  <td class="py-3.5 px-4 font-medium text-brand-ink whitespace-nowrap">
                     {{ item.key }}
                   </td>
-                  <td class="px-5 py-3.5 text-zinc-600 dark:text-zinc-300 truncate max-w-md">
-                    {{ item.value }}
+                  <td class="py-3.5 px-4 text-brand-muted">
+                    <span class="block max-w-md truncate" :title="item.value">
+                      {{ item.value }}
+                    </span>
                   </td>
                 </tr>
               </tbody>
@@ -130,76 +112,56 @@ const contextItems = computed(() => {
 
         <!-- Changes Card -->
         <div
-          class="rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-[#18181b] overflow-hidden shadow-sm"
+          class="overflow-hidden rounded-2xl border border-brand-hair bg-brand-canvas-soft shadow-whisper"
         >
-          <div
-            class="px-5 py-3.5 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-transparent"
-          >
-            <h3
-              class="m-0 text-sm font-bold text-zinc-900 dark:text-zinc-100 font-sans tracking-tight"
-            >
-              Changes
-            </h3>
+          <div class="border-b border-brand-hair bg-brand-canvas/60 px-4 py-3">
+            <h3 class="m-0 text-sm font-bold tracking-tight text-brand-ink">Changes</h3>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left whitespace-nowrap border-collapse">
-              <thead class="border-b border-zinc-200 dark:border-zinc-800/80">
-                <tr>
-                  <th
-                    class="px-5 py-3 font-semibold w-1/4 text-zinc-900 dark:text-zinc-100 bg-transparent"
-                  >
-                    Field
-                  </th>
-                  <th
-                    class="px-5 py-3 font-semibold w-3/8 text-zinc-900 dark:text-zinc-100 bg-transparent"
-                  >
-                    Before
-                  </th>
-                  <th
-                    class="px-5 py-3 font-semibold w-3/8 text-zinc-900 dark:text-zinc-100 bg-transparent"
-                  >
-                    After
-                  </th>
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr
+                  class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
+                >
+                  <th class="py-3 px-4 font-semibold w-1/4 whitespace-nowrap">Field</th>
+                  <th class="py-3 px-4 font-semibold w-3/8">Before</th>
+                  <th class="py-3 px-4 font-semibold w-3/8">After</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800/50">
+              <tbody class="divide-y divide-brand-hairsoft">
                 <tr v-if="selectedActivityChanges.length === 0">
-                  <td
-                    colspan="3"
-                    class="px-5 py-8 text-center text-zinc-400 dark:text-zinc-500 font-sans"
-                  >
+                  <td colspan="3" class="py-8 px-4 text-center text-brand-faint">
                     Tidak ada perubahan field tercatat (Payload kosong).
                   </td>
                 </tr>
-                <tr
-                  v-for="(change, index) in selectedActivityChanges"
-                  v-else
-                  :key="index"
-                  class="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors group"
-                >
-                  <td
-                    class="px-5 py-3.5 text-zinc-600 dark:text-zinc-300 font-medium group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors"
+                <template v-else>
+                  <tr
+                    v-for="(change, index) in selectedActivityChanges"
+                    :key="index"
+                    class="hover:bg-brand-canvas transition-colors"
                   >
-                    {{ change.field }}
-                  </td>
-                  <td
-                    class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 max-w-[200px] truncate"
-                    :title="change.before"
-                  >
-                    {{ change.before }}
-                  </td>
-                  <td
-                    class="px-5 py-3.5 text-zinc-500 dark:text-zinc-400 max-w-[200px] truncate"
-                    :title="change.after"
-                  >
-                    {{ change.after }}
-                  </td>
-                </tr>
+                    <td class="py-3.5 px-4 font-medium text-brand-ink whitespace-nowrap">
+                      {{ change.field }}
+                    </td>
+                    <td
+                      class="py-3.5 px-4 font-mono text-brand-danger-text max-w-[220px] truncate"
+                      :title="change.before"
+                    >
+                      {{ change.before }}
+                    </td>
+                    <td
+                      class="py-3.5 px-4 font-mono text-brand-success-text max-w-[220px] truncate"
+                      :title="change.after"
+                    >
+                      {{ change.after }}
+                    </td>
+                  </tr>
+                </template>
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </Dialog>
+    </UiModal>
   </ClientOnly>
 </template>

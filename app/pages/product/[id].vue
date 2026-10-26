@@ -2,7 +2,6 @@
 import { useProductStore } from '~/features/products/stores/product'
 import { useCartStore } from '~/features/cart/stores/cart'
 import type { Product } from '~/types/product'
-import { useToast } from 'primevue/usetoast'
 import ProductGallery from '~/components/product/ProductGallery.vue'
 import ProductConfigurator from '~/components/product/ProductConfigurator.vue'
 
@@ -10,17 +9,17 @@ const route = useRoute()
 const router = useRouter()
 const productStore = useProductStore()
 const cartStore = useCartStore()
-const toast = useToast()
+const toast = useUiToast()
 
 const product = ref<Product | null>(null)
 const loading = ref(true)
 
 useSeoMeta({
   title: () =>
-    product.value ? `${product.value.name} — ShelfStack` : 'Detail Produk — ShelfStack',
+    product.value ? `${product.value.name} - ShelfStack` : 'Detail Produk - ShelfStack',
   description: () =>
     product.value?.description || 'Beli produk berkualitas tinggi terkurasi resmi di ShelfStack.',
-  ogTitle: () => (product.value ? `${product.value.name} — ShelfStack` : 'Detail Produk'),
+  ogTitle: () => (product.value ? `${product.value.name} - ShelfStack` : 'Detail Produk'),
   ogDescription: () =>
     product.value?.description || 'Beli produk berkualitas tinggi terkurasi resmi di ShelfStack.',
   ogImage: () => product.value?.image_url || undefined,

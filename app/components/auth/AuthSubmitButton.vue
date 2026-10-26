@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * AuthSubmitButton — Primary CTA button for auth forms.
+ * AuthSubmitButton: Primary CTA button for auth forms.
  * Handles loading spinner, disabled state, and icon in one place.
  */
 withDefaults(
@@ -25,7 +25,7 @@ withDefaults(
     block
     :loading="loading"
     :icon="loading ? undefined : icon"
-    class="mt-2 h-11"
+    class="mt-2"
   >
     {{ loading ? loadingLabel : label }}
   </UiButton>

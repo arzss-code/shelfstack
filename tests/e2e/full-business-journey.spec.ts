@@ -347,7 +347,11 @@ test.describe('ShelfStack Full Business Journey [SHF-E2E]', () => {
     // 6. Verifikasi Tab Filter Status Siklus Transaksi
     const statusTabs = ['Semua', 'Menunggu', 'Lunas', 'Dikirim', 'Selesai', 'Dibatalkan']
     for (const tab of statusTabs) {
-      await expect(page.getByRole('button', { name: tab, exact: true })).toBeVisible()
+      await expect(
+        page
+          .getByRole('tab', { name: tab, exact: true })
+          .or(page.getByRole('button', { name: tab, exact: true })),
+      ).toBeVisible()
     }
 
     // 7. Simulasikan pengujian detail order dan State Machine

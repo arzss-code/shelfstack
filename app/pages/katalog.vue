@@ -8,7 +8,7 @@ import KatalogMobileFilter from '~/components/katalog/KatalogMobileFilter.vue'
 import type { Product } from '~/types/product'
 
 useSeoMeta({
-  title: 'Katalog Produk — ShelfStack',
+  title: 'Katalog Produk - ShelfStack',
   description:
     'Jelajahi etalase ShelfStack: peralatan presisi, koleksi meja kerja, furnitur, dan perkakas terkurasi berkualitas tinggi.',
 })
@@ -111,7 +111,7 @@ const sortOptions: SortOption[] = [
   { id: 'popular', label: 'Paling Populer' },
   { id: 'price-low', label: 'Harga: Rendah ke Tinggi' },
   { id: 'price-high', label: 'Harga: Tinggi ke Rendah' },
-  { id: 'name-asc', label: 'Nama: A — Z' },
+  { id: 'name-asc', label: 'Nama: A-Z' },
 ]
 
 const priceRanges: PriceRange[] = [
@@ -215,11 +215,9 @@ const changePage = (newPage: number) => {
 </script>
 
 <template>
-  <div class="space-y-6 pb-16 pt-2">
+  <div class="space-y-6 pb-16">
     <!-- Clean Minimalist Header -->
-    <header
-      class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-brand-hairsoft"
-    >
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
       <div>
         <nav
           aria-label="Breadcrumb"
@@ -234,29 +232,7 @@ const changePage = (newPage: number) => {
           <span class="text-brand-faint">/</span>
           <span class="text-brand-ink font-semibold">Katalog</span>
         </nav>
-
-        <div class="flex items-center gap-2.5">
-          <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
-            Katalog Produk
-          </h1>
-          <span
-            class="bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full text-xs font-semibold text-brand-muted tabular-nums"
-          >
-            {{ totalProducts }}
-          </span>
-        </div>
-      </div>
-
-      <div class="hidden sm:flex items-center gap-4 text-xs text-brand-muted">
-        <span class="flex items-center gap-1.5">
-          <i class="pi pi-shield text-brand-accent text-xs" />
-          <span>Garansi 2 Tahun</span>
-        </span>
-        <span class="text-brand-faint">·</span>
-        <span class="flex items-center gap-1.5">
-          <i class="pi pi-truck text-brand-ink text-xs" />
-          <span>Siap Kirim</span>
-        </span>
+        <h1 class="font-display text-2xl sm:text-3xl font-bold text-brand-ink m-0">Katalog</h1>
       </div>
     </header>
 

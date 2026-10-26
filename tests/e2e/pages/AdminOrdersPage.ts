@@ -32,7 +32,9 @@ export class AdminOrdersPage extends BasePage {
   }
 
   async clickStatusTab(statusLabel: string): Promise<void> {
-    const tabButton = this.page.getByRole('button', { name: statusLabel, exact: true })
+    const tabButton = this.page
+      .getByRole('tab', { name: statusLabel, exact: true })
+      .or(this.page.getByRole('button', { name: statusLabel, exact: true }))
     await tabButton.click()
   }
 

@@ -10,6 +10,16 @@ export default defineEventHandler(async (event) => {
 
   const status = (query.status as string) || ''
   const search = (query.search as string) || ''
+  const rawSort = (query.sort as string) || ''
+  const sortAllowlist: readonly string[] = [
+    'created_at_desc',
+    'created_at_asc',
+    'total_desc',
+    'total_asc',
+    'name_asc',
+    'name_desc',
+  ]
+  const sort = sortAllowlist.includes(rawSort) ? rawSort : 'created_at_desc'
 
   const dateResult = parseExportDateRange(query.from, query.to)
   if (!dateResult.ok) {
@@ -39,7 +49,23 @@ export default defineEventHandler(async (event) => {
     dbQuery = dbQuery.or(`id.ilike.%${search.trim()}%,address->>name.ilike.%${search.trim()}%`)
   }
 
-  const { data, error } = await dbQuery.order('created_at', { ascending: false }).limit(1000)
+  const { data, error } = await (() => {
+    switch (sort) {
+      case 'created_at_asc':
+        return dbQuery.order('created_at', { ascending: true }).limit(1000)
+      case 'total_desc':
+        return dbQuery.order('total_cents', { ascending: false }).limit(1000)
+      case 'total_asc':
+        return dbQuery.order('total_cents', { ascending: true }).limit(1000)
+      case 'name_asc':
+        return dbQuery.order('address->>name', { ascending: true }).limit(1000)
+      case 'name_desc':
+        return dbQuery.order('address->>name', { ascending: false }).limit(1000)
+      case 'created_at_desc':
+      default:
+        return dbQuery.order('created_at', { ascending: false }).limit(1000)
+    }
+  })()
 
   if (error) {
     return errorResponse(event, 'Gagal mengekspor data pesanan', error, 500)

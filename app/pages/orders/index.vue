@@ -2,31 +2,69 @@
 import { useAuth } from '~/features/auth/composables/useAuth'
 import type { Database } from '~/types/database.types'
 import type { Order, OrderStatus } from '~/types/order'
-import { formatRupiah } from '~/utils/format'
-import { useToast } from 'primevue/usetoast'
+import OrderCard from '~/features/orders/components/OrderCard.vue'
+import type { UiTabItem } from '~/components/ui/UiTabs.vue'
+import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 const { user } = useAuth()
 const router = useRouter()
 const supabase = useSupabaseClient<Database>()
-const toast = useToast()
+const toast = useUiToast()
+const config = useRuntimeConfig()
+const { pay: openSnapModal } = useMidtransSnap()
 
 definePageMeta({
   middleware: 'auth',
 })
 
 useSeoMeta({
-  title: 'Riwayat Pesanan — ShelfStack',
+  title: 'Riwayat Pesanan - ShelfStack',
   description: 'Daftar riwayat dan status transaksi pesanan resmi Anda di ShelfStack.',
 })
 
+// Pagination & Infinite Loading configuration
+const BATCH_SIZE = 5
 const orders = ref<Order[]>([])
 const loading = ref(true)
+const isLoadingMore = ref(false)
+const hasMore = ref(true)
 const isSyncingPending = ref(false)
 const errorMsg = ref('')
 
+const activeTab = ref<string>('all')
+const searchQuery = ref('')
+const payingOrderId = ref<string | null>(null)
+
+interface OrderStatusCounts {
+  all: number
+  pending: number
+  paid: number
+  shipped: number
+  completed: number
+  cancelled: number
+  [key: string]: number
+}
+
+const statusCounts = ref<OrderStatusCounts>({
+  all: 0,
+  pending: 0,
+  paid: 0,
+  shipped: 0,
+  completed: 0,
+  cancelled: 0,
+})
+
+const sentinelEl = ref<HTMLElement | null>(null)
+let observer: IntersectionObserver | null = null
 let channel: RealtimeChannel | null = null
 let pollInterval: ReturnType<typeof setInterval> | null = null
+
+interface OrdersApiPayload {
+  orders: Order[]
+  counts: OrderStatusCounts
+  has_more: boolean
+}
 
 const startPendingPolling = () => {
   if (pollInterval || !import.meta.client) return
@@ -85,16 +123,22 @@ const syncPendingOrders = async () => {
                 paid_at: new Date().toISOString(),
               }
 
+              // Update cached count
+              if (statusCounts.value.pending && statusCounts.value.pending > 0) {
+                statusCounts.value.pending -= 1
+              }
+              statusCounts.value.paid = (statusCounts.value.paid || 0) + 1
+
               toast.add({
                 severity: 'success',
-                summary: 'Pembayaran Diterima!',
-                detail: `Pesanan #${pendingOrder.id.slice(0, 8)} otomatis terkonfirmasi Lunas.`,
+                summary: 'Pembayaran Diterima',
+                detail: `Pesanan #${pendingOrder.id.slice(0, 8).toUpperCase()} terkonfirmasi dan sedang diproses.`,
                 life: 5000,
               })
             }
           }
         } catch {
-          // Background sync failures are gracefully ignored to prevent disruption
+          // Background sync failures are gracefully ignored
         }
       }),
     )
@@ -112,7 +156,8 @@ const handleVisibilityOrFocusChange = () => {
   }
 }
 
-const fetchOrders = async (silent = false) => {
+// Fetch Initial Orders (Page 1)
+const fetchInitialOrders = async (silent = false) => {
   if (!user.value) {
     router.push('/auth/login?redirect=/orders')
     return
@@ -124,8 +169,32 @@ const fetchOrders = async (silent = false) => {
   errorMsg.value = ''
 
   try {
-    const res = await $fetch<{ status: string; data: Order[] }>('/api/orders')
-    orders.value = res.data || []
+    const params: Record<string, string | number> = {
+      from: 0,
+      to: BATCH_SIZE - 1,
+    }
+    if (activeTab.value !== 'all') {
+      params.status = activeTab.value
+    }
+
+    const res = await $fetch<{
+      status: string
+      data: OrdersApiPayload | Order[]
+    }>('/api/orders', { params })
+
+    let incomingOrders: Order[] = []
+    if (Array.isArray(res.data)) {
+      incomingOrders = res.data
+      hasMore.value = incomingOrders.length >= BATCH_SIZE
+    } else if (res.data) {
+      incomingOrders = res.data.orders || []
+      hasMore.value = res.data.has_more ?? incomingOrders.length >= BATCH_SIZE
+      if (res.data.counts) {
+        statusCounts.value = res.data.counts
+      }
+    }
+
+    orders.value = incomingOrders
 
     if (orders.value.some((o) => o.status === 'pending')) {
       startPendingPolling()
@@ -140,6 +209,164 @@ const fetchOrders = async (silent = false) => {
     if (!silent) {
       loading.value = false
     }
+  }
+}
+
+// Lazy Load More Orders on Scroll (Infinite Scroll)
+const loadMoreOrders = async () => {
+  if (isLoadingMore.value || !hasMore.value || loading.value) return
+
+  isLoadingMore.value = true
+  try {
+    const currentCount = orders.value.length
+    const params: Record<string, string | number> = {
+      from: currentCount,
+      to: currentCount + BATCH_SIZE - 1,
+    }
+    if (activeTab.value !== 'all') {
+      params.status = activeTab.value
+    }
+
+    const res = await $fetch<{
+      status: string
+      data: OrdersApiPayload | Order[]
+    }>('/api/orders', { params })
+
+    let nextBatch: Order[] = []
+    if (Array.isArray(res.data)) {
+      nextBatch = res.data
+      hasMore.value = nextBatch.length >= BATCH_SIZE
+    } else if (res.data) {
+      nextBatch = res.data.orders || []
+      hasMore.value = res.data.has_more ?? nextBatch.length >= BATCH_SIZE
+      if (res.data.counts) {
+        statusCounts.value = res.data.counts
+      }
+    }
+
+    if (nextBatch.length > 0) {
+      const existingIds = new Set(orders.value.map((o) => o.id))
+      const uniqueNewOrders = nextBatch.filter((o) => !existingIds.has(o.id))
+      orders.value.push(...uniqueNewOrders)
+    } else {
+      hasMore.value = false
+    }
+  } catch {
+    // Fail silently on lazy-load scroll to avoid disruptive error alerts
+  } finally {
+    isLoadingMore.value = false
+  }
+}
+
+const setupIntersectionObserver = () => {
+  if (!import.meta.client || !('IntersectionObserver' in window)) return
+
+  if (observer) {
+    observer.disconnect()
+  }
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      const firstEntry = entries[0]
+      if (
+        firstEntry &&
+        firstEntry.isIntersecting &&
+        hasMore.value &&
+        !isLoadingMore.value &&
+        !loading.value
+      ) {
+        loadMoreOrders()
+      }
+    },
+    { rootMargin: '200px' },
+  )
+
+  if (sentinelEl.value) {
+    observer.observe(sentinelEl.value)
+  }
+}
+
+// Watch Active Tab to reload Page 1 for selected status
+watch(activeTab, async () => {
+  orders.value = []
+  hasMore.value = true
+  await fetchInitialOrders()
+  nextTick(() => {
+    if (sentinelEl.value && observer) {
+      observer.observe(sentinelEl.value)
+    }
+  })
+})
+
+// Direct Payment Trigger (Snap Modal)
+const handlePayNow = async (orderToPay: Order) => {
+  if (payingOrderId.value) return
+
+  if (!config.public.enableMidtransSandbox) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Sandbox Nonaktif',
+      detail: 'Fitur pembayaran Midtrans Sandbox saat ini dinonaktifkan.',
+      life: 4000,
+    })
+    return
+  }
+
+  payingOrderId.value = orderToPay.id
+
+  try {
+    const res = await $fetch<{
+      status: string
+      data: { token: string; redirect_url?: string }
+    }>(`/api/orders/${orderToPay.id}/payment-token`, {
+      method: 'POST',
+    })
+
+    const snapToken = res.data.token
+
+    openSnapModal(snapToken, {
+      onSuccess: () => {
+        toast.add({
+          severity: 'success',
+          summary: 'Pembayaran Diterima',
+          detail: 'Memverifikasi status pembayaran dengan payment gateway...',
+          life: 4000,
+        })
+        syncPendingOrders()
+      },
+      onPending: () => {
+        toast.add({
+          severity: 'info',
+          summary: 'Menunggu Pembayaran',
+          detail: 'Instruksi pembayaran telah aktif. Silakan selesaikan transaksi Anda.',
+          life: 5000,
+        })
+        startPendingPolling()
+      },
+      onError: () => {
+        toast.add({
+          severity: 'error',
+          summary: 'Pembayaran Gagal',
+          detail: 'Terjadi kendala saat memproses pembayaran Sandbox.',
+          life: 4000,
+        })
+      },
+      onClose: () => {
+        syncPendingOrders()
+      },
+    })
+  } catch (err: unknown) {
+    const fetchErr = err as { data?: { message?: string } }
+    toast.add({
+      severity: 'error',
+      summary: 'Gagal Membuka Pembayaran',
+      detail:
+        fetchErr.data?.message ||
+        'Layanan pembayaran sedang mengalami kendala. Silakan coba kembali sesaat lagi.',
+      life: 5000,
+    })
+  } finally {
+    payingOrderId.value = null
   }
 }
 
@@ -176,8 +403,8 @@ const setupRealtimeSubscription = () => {
             if (prevStatus === 'pending' && nextStatus === 'paid') {
               toast.add({
                 severity: 'success',
-                summary: 'Status Terkini Realtime',
-                detail: `Pesanan #${current.id.slice(0, 8)} berhasil terkonfirmasi Lunas.`,
+                summary: 'Status Diperbarui',
+                detail: `Pesanan #${current.id.slice(0, 8).toUpperCase()} terkonfirmasi dan sedang diproses.`,
                 life: 5000,
               })
             }
@@ -198,14 +425,15 @@ const setupRealtimeSubscription = () => {
         filter: `user_id=eq.${user.value.id}`,
       },
       () => {
-        fetchOrders(true)
+        fetchInitialOrders(true)
       },
     )
     .subscribe()
 }
 
 onMounted(async () => {
-  await fetchOrders()
+  await fetchInitialOrders()
+  setupIntersectionObserver()
   setupRealtimeSubscription()
 
   if (import.meta.client) {
@@ -216,6 +444,10 @@ onMounted(async () => {
 
 onUnmounted(() => {
   stopPendingPolling()
+  if (observer) {
+    observer.disconnect()
+    observer = null
+  }
   if (channel) {
     supabase.removeChannel(channel)
   }
@@ -225,35 +457,52 @@ onUnmounted(() => {
   }
 })
 
-const getStatusBadge = (status: OrderStatus) => {
-  switch (status) {
-    case 'paid':
-      return { variant: 'success' as const, label: 'Lunas' }
-    case 'shipped':
-      return { variant: 'info' as const, label: 'Dikirim' }
-    case 'completed':
-      return { variant: 'success' as const, label: 'Selesai' }
-    case 'cancelled':
-      return { variant: 'danger' as const, label: 'Dibatalkan' }
-    case 'pending':
-    default:
-      return { variant: 'warning' as const, label: 'Menunggu Pembayaran' }
-  }
-}
+// Tab Definitions with Live Counts from Database
+const tabItems = computed<UiTabItem[]>(() => {
+  const countPending = statusCounts.value.pending || 0
+  const countPaid = statusCounts.value.paid || 0
+  const countShipped = statusCounts.value.shipped || 0
+  const countCompleted = statusCounts.value.completed || 0
+  const countCancelled = statusCounts.value.cancelled || 0
+  const countAll = statusCounts.value.all || 0
 
-const formatDate = (dateStr: string) => {
-  try {
-    const date = new Date(dateStr)
-    return new Intl.DateTimeFormat('id-ID', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date)
-  } catch {
-    return dateStr
+  return [
+    { value: 'all', label: 'Semua', count: countAll },
+    {
+      value: 'pending',
+      label: 'Belum Bayar',
+      count: countPending,
+      countTone: countPending > 0 ? 'danger' : 'neutral',
+    },
+    { value: 'paid', label: 'Diproses', count: countPaid },
+    { value: 'shipped', label: 'Dikirim', count: countShipped },
+    { value: 'completed', label: 'Selesai', count: countCompleted },
+    { value: 'cancelled', label: 'Dibatalkan', count: countCancelled },
+  ]
+})
+
+// Client search query filter on loaded orders
+const filteredOrders = computed(() => {
+  let result = orders.value
+
+  const query = searchQuery.value.trim().toLowerCase()
+  if (query) {
+    result = result.filter((o) => {
+      const matchId = o.id.toLowerCase().includes(query)
+      const matchAddress =
+        o.address?.name?.toLowerCase().includes(query) ||
+        o.address?.city?.toLowerCase().includes(query)
+      const matchItems = o.items?.some((item) => item.product?.name?.toLowerCase().includes(query))
+      return matchId || matchAddress || matchItems
+    })
   }
+
+  return result
+})
+
+const resetFilters = () => {
+  searchQuery.value = ''
+  activeTab.value = 'all'
 }
 </script>
 
@@ -262,48 +511,46 @@ const formatDate = (dateStr: string) => {
     <!-- Breadcrumbs -->
     <nav
       aria-label="Breadcrumbs"
-      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 border-b border-brand-hairsoft overflow-x-auto"
+      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 overflow-x-auto"
     >
       <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
         ShelfStack
       </NuxtLink>
       <span class="text-brand-faint">/</span>
-      <span class="text-brand-ink font-semibold">Riwayat Pesanan</span>
+      <span class="text-brand-ink font-semibold">Pesanan Saya</span>
     </nav>
 
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="font-display text-2xl sm:text-3xl font-bold text-brand-ink m-0">Pesanan Saya</h1>
-        <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1">
-          Pantau status pengiriman dan riwayat pembayaran produk kurasi Anda secara realtime.
-        </p>
+    <!-- Full-Width Controls: Filter Tabs & Search Bar -->
+    <div v-if="statusCounts.all > 0 || orders.length > 0 || loading" class="w-full space-y-4">
+      <!-- Full-Width Tabs Filter -->
+      <div class="w-full">
+        <UiTabs
+          v-model="activeTab"
+          :items="tabItems"
+          full-width
+          aria-label="Filter status pesanan"
+        />
       </div>
 
-      <div class="flex items-center gap-3">
-        <div
-          v-if="orders.some((o) => o.status === 'pending')"
-          class="flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-800 rounded-full border border-amber-200 text-xs font-medium"
-        >
-          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-          <span>Sinkronisasi Otomatis Aktif</span>
+      <!-- Full-Width Search Field -->
+      <div class="w-full flex items-center gap-2">
+        <div class="relative w-full">
+          <UiInput
+            v-model="searchQuery"
+            placeholder="Cari berdasarkan No. Pesanan atau nama produk..."
+            left-icon="pi-search"
+            size="sm"
+            class="w-full"
+          />
         </div>
-        <div
-          v-else-if="orders.length > 0"
-          class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200 text-xs font-medium"
-        >
-          <span class="w-2 h-2 rounded-full bg-emerald-500" />
-          <span>Realtime Aktif</span>
-        </div>
-
         <UiButton
-          variant="secondary"
+          v-if="searchQuery"
+          variant="ghost"
           size="sm"
-          icon="pi-refresh"
-          :loading="loading || isSyncingPending"
-          @click="() => fetchOrders(false)"
+          icon="pi-times"
+          @click="searchQuery = ''"
         >
-          Segarkan
+          Hapus
         </UiButton>
       </div>
     </div>
@@ -314,31 +561,30 @@ const formatDate = (dateStr: string) => {
       class="p-4 bg-red-50 border border-red-200 rounded-card flex items-center justify-between text-red-700 text-xs"
     >
       <span>{{ errorMsg }}</span>
-      <UiButton variant="ghost" size="sm" @click="fetchOrders">Coba Lagi</UiButton>
+      <UiButton variant="ghost" size="sm" @click="() => fetchInitialOrders()">Coba Lagi</UiButton>
     </div>
 
-    <!-- Loading Skeleton -->
+    <!-- Initial Loading Skeleton -->
     <div v-if="loading" class="space-y-4 animate-pulse">
-      <div v-for="i in 3" :key="i" class="h-28 bg-brand-field rounded-card" />
+      <div v-for="i in 3" :key="i" class="h-36 bg-brand-field rounded-card" />
     </div>
 
-    <!-- Empty State -->
+    <!-- Empty State: Belum pernah ada pesanan sama sekali -->
     <div
-      v-else-if="orders.length === 0"
+      v-else-if="statusCounts.all === 0 && orders.length === 0"
       class="text-center py-16 px-6 bg-brand-canvas-soft border border-dashed border-brand-hair rounded-card max-w-lg mx-auto space-y-4"
     >
       <div
         class="w-14 h-14 rounded-full bg-brand-canvas border border-brand-hair flex items-center justify-center mx-auto text-brand-muted shadow-whisper"
       >
-        <i class="pi pi-inbox text-2xl text-brand-muted" />
+        <i class="pi pi-inbox text-2xl text-brand-muted" aria-hidden="true" />
       </div>
       <div>
         <h2 class="font-display text-base font-bold text-brand-ink m-0">
           Belum Ada Riwayat Pesanan
         </h2>
         <p class="font-body text-xs text-brand-muted m-0 mt-1">
-          Anda belum pernah melakukan pemesanan. Kunjungi katalog kami dan pilih koleksi produk
-          terbaik.
+          Anda belum pernah melakukan pemesanan. Jelajahi katalog dan temukan produk pilihan Anda.
         </p>
       </div>
       <UiButton to="/katalog" variant="primary" size="sm" icon="pi-arrow-right" icon-pos="right">
@@ -346,71 +592,55 @@ const formatDate = (dateStr: string) => {
       </UiButton>
     </div>
 
-    <!-- Orders List -->
-    <div v-else class="space-y-4">
-      <article
-        v-for="order in orders"
-        :key="order.id"
-        class="bg-white border border-brand-hair rounded-card p-5 sm:p-6 shadow-whisper hover:border-brand-ink/30 transition-all cursor-pointer space-y-4"
-        @click="router.push(`/orders/${order.id}`)"
+    <!-- Empty State: Filter / Search tidak menemukan hasil -->
+    <div
+      v-else-if="filteredOrders.length === 0"
+      class="text-center py-12 px-6 bg-brand-canvas-soft border border-dashed border-brand-hair rounded-card max-w-md mx-auto space-y-3"
+    >
+      <div
+        class="w-12 h-12 rounded-full bg-brand-canvas border border-brand-hair flex items-center justify-center mx-auto text-brand-muted shadow-whisper"
       >
-        <!-- Top Metadata Row -->
-        <div
-          class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-brand-hairsoft"
-        >
-          <div class="flex items-center gap-3">
-            <span class="font-display font-bold text-xs sm:text-sm text-brand-ink tracking-tight">
-              Order #{{ order.id.slice(0, 8) }}
-            </span>
-            <span class="text-brand-faint">·</span>
-            <span class="text-[11px] text-brand-muted">
-              {{ formatDate(order.created_at) }}
-            </span>
-          </div>
+        <i class="pi pi-search text-xl text-brand-muted" aria-hidden="true" />
+      </div>
+      <div>
+        <h2 class="font-display text-sm font-bold text-brand-ink m-0">
+          Tidak Ada Pesanan Ditemukan
+        </h2>
+        <p class="font-body text-xs text-brand-muted m-0 mt-1">
+          Tidak ada pesanan yang sesuai dengan filter atau kata kunci pencarian Anda.
+        </p>
+      </div>
+      <UiButton variant="secondary" size="sm" icon="pi-filter-slash" @click="resetFilters">
+        Reset Filter
+      </UiButton>
+    </div>
 
-          <UiBadge
-            :variant="getStatusBadge(order.status).variant"
-            :label="getStatusBadge(order.status).label"
-          />
+    <!-- Orders List with Lazy/Infinite Scroll Sentinel -->
+    <div v-else class="space-y-4">
+      <OrderCard
+        v-for="order in filteredOrders"
+        :key="order.id"
+        :order="order"
+        :is-paying="payingOrderId === order.id"
+        @select="router.push(`/orders/${$event.id}`)"
+        @pay="handlePayNow"
+      />
+
+      <!-- Infinite Scroll Trigger Sentinel -->
+      <div ref="sentinelEl" class="h-10 w-full flex items-center justify-center">
+        <!-- Skeleton when fetching next batch -->
+        <div v-if="isLoadingMore" class="w-full space-y-3 animate-pulse pt-2">
+          <div class="h-28 bg-brand-field rounded-card" />
         </div>
+      </div>
 
-        <!-- Middle Summary Row -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div class="space-y-1 text-xs">
-            <p class="text-brand-muted m-0">
-              Penerima:
-              <strong class="text-brand-ink">{{
-                (order.address as any)?.name || 'Pelanggan'
-              }}</strong>
-            </p>
-            <p class="text-[11px] text-brand-muted m-0 truncate max-w-md">
-              {{ (order.address as any)?.street }}, {{ (order.address as any)?.city }}
-            </p>
-          </div>
-
-          <div
-            class="flex items-center justify-between sm:justify-end gap-6 pt-2 sm:pt-0 border-t sm:border-t-0 border-brand-hairsoft"
-          >
-            <div class="text-left sm:text-right">
-              <span class="text-[11px] text-brand-muted block">Total Belanja</span>
-              <span class="font-display text-base font-bold text-brand-ink tabular-nums">
-                {{ formatRupiah(order.total_cents / 100) }}
-              </span>
-            </div>
-
-            <UiButton
-              :to="`/orders/${order.id}`"
-              variant="secondary"
-              size="sm"
-              icon="pi-chevron-right"
-              icon-pos="right"
-              @click.stop
-            >
-              Detail
-            </UiButton>
-          </div>
-        </div>
-      </article>
+      <!-- End of List Indicator -->
+      <p
+        v-if="!hasMore && orders.length >= BATCH_SIZE"
+        class="text-xs text-brand-faint text-center py-4 m-0"
+      >
+        Semua pesanan telah ditampilkan
+      </p>
     </div>
   </div>
 </template>

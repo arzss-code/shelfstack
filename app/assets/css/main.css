@@ -11,7 +11,7 @@
 }
 
 /*
- * Gallery Modernist (v1.0.0-PROD) — ShelfStack Design System
+ * Gallery Modernist (v1.0.0-PROD), ShelfStack Design System
  * Semua nilai styling didefinisikan sebagai CSS Custom Properties (Variables)
  * DILARANG HARDCODE styling di template: gunakan utility class yang merujuk variabel ini.
  */
@@ -30,8 +30,8 @@
   --brand-onink: #ffffff;
   --brand-inkhover: #2e2e2e;
   --brand-body: #141414;
-  --brand-muted: #66686d;
-  --brand-faint: #9ea1a8;
+  --brand-muted: #5c5f64;
+  --brand-faint: #6f7279;
   --brand-hair: #e4e5e7;
   --brand-hairsoft: #f0f1f3;
   --brand-soft: #f8f8f9;
@@ -42,8 +42,27 @@
   --brand-strip: #141414;
   --brand-success: #00875a;
   --brand-warning: #e28e00;
+  --brand-danger: #e41e3f;
 
-  /* Geometri & Sudut Lengkung Standar — Refined Architectural Scale (Anti-Bubbly) */
+  /* Status ramp: satu resep untuk badge, alert, toast, dan tint tabel.
+     Tiap status punya tiga lapis, yaitu warna teks, latar, dan garis tepi. */
+  --brand-success-tint: #e6f4ee;
+  --brand-success-edge: #c2e3d5;
+  --brand-warning-tint: #fdf2e0;
+  --brand-warning-edge: #f2ddb5;
+  --brand-danger-tint: #fdecef;
+  --brand-danger-edge: #f6ccd5;
+  --brand-accent-tint: #e9f1ff;
+  --brand-accent-edge: #c9ddff;
+  --brand-neutral-tint: #f2f3f5;
+
+  /* Teks status di atas tint, langkah lebih gelap agar kontras tetap di atas 4.5:1. */
+  --brand-success-text: #006b47;
+  --brand-warning-text: #8a5a00;
+  --brand-danger-text: #b3152f;
+  --brand-accent-text: #0044b3;
+
+  /* Geometri & Sudut Lengkung Standar: Refined Architectural Scale (Anti-Bubbly) */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -59,7 +78,7 @@
   --shadow-floating: 0 8px 24px rgba(20, 20, 20, 0.06);
 }
 
-/* Explicit class-based dark mode only if .dark class is added to html */
+/* Mode gelap hanya aktif bila class .dark disematkan eksplisit ke elemen html */
 .dark {
   --brand-canvas: #0c0d0e;
   --brand-canvas-soft: #17181a;
@@ -81,6 +100,22 @@
   --brand-strip: #000000;
   --brand-success: #00a86b;
   --brand-warning: #ffb822;
+  --brand-danger: #ff5c78;
+
+  --brand-success-tint: rgb(0 168 107 / 0.16);
+  --brand-success-edge: rgb(0 168 107 / 0.4);
+  --brand-warning-tint: rgb(255 184 34 / 0.16);
+  --brand-warning-edge: rgb(255 184 34 / 0.4);
+  --brand-danger-tint: rgb(255 92 120 / 0.16);
+  --brand-danger-edge: rgb(255 92 120 / 0.4);
+  --brand-accent-tint: rgb(0 102 255 / 0.16);
+  --brand-accent-edge: rgb(0 102 255 / 0.44);
+  --brand-neutral-tint: #1e2022;
+
+  --brand-success-text: #4ade9f;
+  --brand-warning-text: #ffc65c;
+  --brand-danger-text: #ff8fa3;
+  --brand-accent-text: #7fb0ff;
 
   --shadow-whisper: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-nav: 0 1px 12px rgba(0, 0, 0, 0.4);
@@ -125,265 +160,69 @@ button:active:not(:disabled),
 }
 
 /* =========================================================================
-   ShelfStack Premium Toast Notifications (Solid Opaque, Zero-Blur, High-Contrast)
-   Standards: Tier-1 E-commerce / Modern Luxury SaaS (Vercel / Sonner / Stripe standard)
+   Browser surfaces
+   Bagian yang tidak digambar tetap harus memakai palet produk:
+   scrollbar, seleksi teks, caret, autofill, dan focus ring.
    ========================================================================= */
-.p-toast {
-  width: 24rem;
-  max-width: calc(100vw - 32px);
-  z-index: 99999 !important;
-  font-family: var(--font-body);
-}
 
-.p-toast .p-toast-message {
-  margin: 0 0 12px 0;
-  border-radius: 16px !important;
-  border-width: 1px !important;
-  border-style: solid !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  opacity: 1 !important;
-  background-color: #ffffff !important;
-  box-shadow:
-    0 12px 28px -4px rgba(15, 23, 42, 0.14),
-    0 4px 10px -2px rgba(15, 23, 42, 0.06),
-    0 0 0 1px rgba(15, 23, 42, 0.06) !important;
-  overflow: hidden;
-  position: relative;
-  transition:
-    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.p-toast .p-toast-message:hover {
-  box-shadow:
-    0 20px 35px -6px rgba(15, 23, 42, 0.18),
-    0 6px 14px -3px rgba(15, 23, 42, 0.08),
-    0 0 0 1px rgba(15, 23, 42, 0.08) !important;
-}
-
-/* Inner content layout */
-.p-toast .p-toast-message-content {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: 12px !important;
-  padding: 14px 16px !important;
-  box-sizing: border-box !important;
-}
-
-/* Message icon pill container */
-.p-toast .p-toast-message-icon {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px !important;
-  min-height: 32px !important;
-  border-radius: 9999px !important;
-  font-size: 15px !important;
-  margin: 0 !important;
-  flex-shrink: 0 !important;
-}
-
-.p-toast .p-toast-message-icon svg {
-  width: 16px !important;
-  height: 16px !important;
-}
-
-/* Text block */
-.p-toast .p-toast-message-text {
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  gap: 3px !important;
-  margin: 0 !important;
-  padding-top: 1px !important;
-  min-width: 0 !important;
-}
-
-/* Summary / Title */
-.p-toast .p-toast-summary {
-  font-family: var(--font-display) !important;
-  font-size: 13.5px !important;
-  font-weight: 700 !important;
-  color: #0f172a !important;
-  line-height: 1.35 !important;
-  letter-spacing: -0.015em !important;
-  word-break: break-word !important;
-}
-
-/* Detail / Body text */
-.p-toast .p-toast-detail {
-  font-family: var(--font-body) !important;
-  font-size: 12px !important;
-  font-weight: 450 !important;
-  color: #475569 !important;
-  line-height: 1.45 !important;
-  margin: 0 !important;
-  word-break: break-word !important;
-}
-
-/* Close action button */
-.p-toast .p-toast-close-button {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 26px !important;
-  height: 26px !important;
-  min-width: 26px !important;
-  min-height: 26px !important;
-  border-radius: 9999px !important;
-  background: transparent !important;
-  border: none !important;
-  color: #94a3b8 !important;
-  cursor: pointer !important;
-  transition: all 0.15s ease !important;
-  margin: -2px -4px 0 0 !important;
-  padding: 0 !important;
-  flex-shrink: 0 !important;
-}
-
-.p-toast .p-toast-close-button:hover {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-
-.p-toast .p-toast-close-button svg {
-  width: 12px !important;
-  height: 12px !important;
-}
-
-/* --- Severity: Success (Solid Emerald Accent) --- */
-.p-toast .p-toast-message-success {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  border-left: 5px solid #10b981 !important;
-}
-
-.p-toast .p-toast-message-success .p-toast-message-icon {
-  background-color: #ecfdf5 !important;
-  color: #059669 !important;
-  border: 1px solid #a7f3d0 !important;
-}
-
-/* --- Severity: Error (Solid Rose/Red Accent) --- */
-.p-toast .p-toast-message-error {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  border-left: 5px solid #ef4444 !important;
-}
-
-.p-toast .p-toast-message-error .p-toast-message-icon {
-  background-color: #fef2f2 !important;
-  color: #dc2626 !important;
-  border: 1px solid #fecaca !important;
-}
-
-/* --- Severity: Info (Solid Brand Blue Accent) --- */
-.p-toast .p-toast-message-info {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  border-left: 5px solid #0066ff !important;
-}
-
-.p-toast .p-toast-message-info .p-toast-message-icon {
-  background-color: #eff6ff !important;
-  color: #0066ff !important;
-  border: 1px solid #bfdbfe !important;
-}
-
-/* --- Severity: Warn (Solid Amber Accent) --- */
-.p-toast .p-toast-message-warn {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  border-left: 5px solid #f59e0b !important;
-}
-
-.p-toast .p-toast-message-warn .p-toast-message-icon {
-  background-color: #fffbeb !important;
-  color: #d97706 !important;
-  border: 1px solid #fde68a !important;
-}
-
-/* --- Dark Mode Support --- */
-.dark .p-toast .p-toast-message {
-  background-color: #141416 !important;
-  box-shadow:
-    0 16px 32px -4px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(255, 255, 255, 0.1) !important;
-}
-
-.dark .p-toast .p-toast-summary {
-  color: #f8fafc !important;
-}
-
-.dark .p-toast .p-toast-detail {
-  color: #cbd5e1 !important;
-}
-
-.dark .p-toast .p-toast-close-button {
-  color: #64748b !important;
-}
-
-.dark .p-toast .p-toast-close-button:hover {
-  background-color: #27272a !important;
-  color: #f8fafc !important;
-}
-
-.dark .p-toast .p-toast-message-success {
-  border-color: #27272a !important;
-  border-left: 5px solid #10b981 !important;
-}
-
-.dark .p-toast .p-toast-message-success .p-toast-message-icon {
-  background-color: rgba(16, 185, 129, 0.14) !important;
-  color: #34d399 !important;
-  border-color: rgba(16, 185, 129, 0.35) !important;
-}
-
-.dark .p-toast .p-toast-message-error {
-  border-color: #27272a !important;
-  border-left: 5px solid #ef4444 !important;
-}
-
-.dark .p-toast .p-toast-message-error .p-toast-message-icon {
-  background-color: rgba(239, 68, 68, 0.14) !important;
-  color: #f87171 !important;
-  border-color: rgba(239, 68, 68, 0.35) !important;
-}
-
-.dark .p-toast .p-toast-message-info {
-  border-color: #27272a !important;
-  border-left: 5px solid #3b82f6 !important;
-}
-
-.dark .p-toast .p-toast-message-info .p-toast-message-icon {
-  background-color: rgba(59, 130, 246, 0.14) !important;
-  color: #60a5fa !important;
-  border-color: rgba(59, 130, 246, 0.35) !important;
-}
-
-.dark .p-toast .p-toast-message-warn {
-  border-color: #27272a !important;
-  border-left: 5px solid #f59e0b !important;
-}
-
-.dark .p-toast .p-toast-message-warn .p-toast-message-icon {
-  background-color: rgba(245, 158, 11, 0.14) !important;
-  color: #fbbf24 !important;
-  border-color: rgba(245, 158, 11, 0.35) !important;
-}
-
-/* --- Mobile Responsiveness --- */
-@media (max-width: 640px) {
-  .p-toast {
-    width: calc(100vw - 32px) !important;
-    left: 16px !important;
-    right: 16px !important;
-    bottom: 16px !important;
-    margin: 0 auto !important;
+@supports (scrollbar-color: auto) {
+  html {
+    scrollbar-color: var(--brand-hair) var(--brand-canvas);
+    scrollbar-width: thin;
   }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--brand-canvas);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--brand-hair);
+  border: 3px solid var(--brand-canvas);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--brand-faint);
+}
+::-webkit-scrollbar-corner {
+  background: var(--brand-canvas);
+}
+
+::selection {
+  background-color: var(--brand-accent);
+  color: var(--brand-onink);
+}
+
+/* Satu-satunya indikator fokus di seluruh aplikasi. Memakai outline, bukan
+   ring, supaya bentuknya mengikuti border-radius tiap kontrol dan tidak
+   bertumpuk dengan gaya fokus milik komponen. */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--brand-ink);
+  outline-offset: 2px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--brand-ink);
+  -webkit-box-shadow: 0 0 0 1000px var(--brand-canvas) inset;
+  caret-color: var(--brand-ink);
+}
+
+/* Angka tabular: kolom rupiah dan ID pesanan sejajar optically. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sembunyikan scrollbar bawaan untuk swipeable horizontal strips */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

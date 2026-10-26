@@ -3,7 +3,7 @@ import type { Product } from '~/types/product'
 import { formatRupiah } from '~/utils/format'
 import { useCategories } from '~/composables/useCategories'
 import { useCartStore } from '~/features/cart/stores/cart'
-import { useToast } from 'primevue/usetoast'
+import WishlistButton from '~/components/wishlist/WishlistButton.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -25,7 +25,7 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
-const toast = useToast()
+const toast = useUiToast()
 const cartStore = useCartStore()
 const { categories: dynamicCategories } = useCategories()
 
@@ -83,19 +83,19 @@ const badgeInfo = computed(() => {
   if (props.product.stock === 0) {
     return {
       label: 'Habis',
-      badgeClass: 'bg-rose-600 text-white',
+      badgeClass: 'bg-brand-danger text-white',
     }
   }
   if (props.product.stock > 0 && props.product.stock <= 3) {
     return {
       label: `Sisa ${props.product.stock}`,
-      badgeClass: 'bg-amber-600 text-white',
+      badgeClass: 'bg-brand-warning text-white',
     }
   }
   if (props.product.is_featured) {
     return {
       label: 'Unggulan',
-      badgeClass: 'bg-blue-600 text-white shadow-sm',
+      badgeClass: 'bg-brand-ink text-brand-onink shadow-sm',
     }
   }
   return null
@@ -136,7 +136,7 @@ const handleQuickAdd = () => {
 
 <template>
   <article
-    class="product-card group relative flex flex-col bg-white dark:bg-[#18191b] rounded-card border border-brand-hair hover:border-brand-muted/40 shadow-whisper hover:shadow-floating transition-all duration-300 hover:-translate-y-0.5 cursor-pointer overflow-hidden"
+    class="product-card group relative isolate flex flex-col bg-brand-canvas rounded-card border border-brand-hair hover:border-brand-muted/40 shadow-whisper hover:shadow-floating transition-shadow duration-200 cursor-pointer overflow-hidden"
     @click="navigateToDetail"
   >
     <!-- Stretched Semantic Link for Accessibility, Hover URL & SEO -->
@@ -147,8 +147,8 @@ const handleQuickAdd = () => {
       tabindex="-1"
     />
 
-    <!-- Curved Ribbon Badge: Flush to Left Edge (Kombinasi 2: Rounded right curve, zero clipping) -->
-    <div v-if="badgeInfo" class="absolute top-3 left-0 z-20 pointer-events-none">
+    <!-- Curved Ribbon Badge: Flush to Left Edge -->
+    <div v-if="badgeInfo" class="absolute top-3 left-0 z-10 pointer-events-none">
       <span
         class="inline-flex items-center text-[10px] font-bold tracking-wider uppercase pl-2.5 pr-3 py-1 rounded-r-full shadow-sm"
         :class="badgeInfo.badgeClass"
@@ -157,9 +157,14 @@ const handleQuickAdd = () => {
       </span>
     </div>
 
-    <!-- Media Canvas: 1:1 Aspect Ratio with rounded-t-[13px] -->
+    <!-- Wishlist Button: Top Right Corner Overlay -->
+    <div v-if="hideActions" class="absolute top-2.5 right-2.5 z-10 pointer-events-auto">
+      <WishlistButton :product="product" :category-name="categoryName" variant="overlay" />
+    </div>
+
+    <!-- Media Canvas: 1:1 Aspect Ratio with rounded-t-card -->
     <div
-      class="relative aspect-square w-full bg-[#f6f6f8] dark:bg-[#1f2023] rounded-t-[13px] overflow-hidden pointer-events-none"
+      class="relative aspect-square w-full bg-brand-canvas-soft rounded-t-card overflow-hidden pointer-events-none border-b border-brand-hairsoft"
     >
       <img
         v-if="product.image_url && !imageLoadError"
@@ -175,7 +180,7 @@ const handleQuickAdd = () => {
       />
       <div
         v-else
-        class="flex flex-col items-center justify-center w-full h-full text-slate-400 gap-1.5 bg-[#f4f4f6] dark:bg-[#1c1d20]"
+        class="flex flex-col items-center justify-center w-full h-full text-brand-muted gap-1.5 bg-brand-canvas-soft"
       >
         <i class="pi pi-image text-2xl opacity-25" />
         <span class="text-[10px] font-semibold tracking-widest uppercase opacity-40"
@@ -183,39 +188,34 @@ const handleQuickAdd = () => {
         >
       </div>
 
-      <!-- Floating Quick Add Button (Mobile Touch visible, Desktop Hover reveal) -->
+      <!-- Floating Quick Add Button (Smooth fade without any vertical translation/geser) -->
       <div
         v-if="hideActions && product.stock > 0"
-        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto opacity-100 translate-y-0 sm:opacity-0 sm:translate-y-1 sm:group-hover:opacity-100 sm:group-hover:translate-y-0 transition-all duration-200"
+        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150"
       >
-        <UiTooltip
-          :text="justAdded ? 'Ditambahkan ke Bag' : 'Tambah ke Bag'"
-          position="top"
-          align="end"
+        <button
+          type="button"
+          class="w-8 h-8 rounded-full bg-white text-brand-ink shadow-sm flex items-center justify-center cursor-pointer hover:bg-brand-ink hover:text-white transition-colors duration-150 active:scale-95"
+          :title="justAdded ? 'Ditambahkan ke Bag' : `Tambah ${product.name} ke Bag`"
+          :aria-label="`Tambah ${product.name} ke Keranjang`"
+          @click.stop.prevent="handleQuickAdd"
         >
-          <button
-            type="button"
-            class="w-7 h-7 rounded-full bg-white dark:bg-zinc-800 text-slate-800 dark:text-white shadow-sm flex items-center justify-center active:scale-95 cursor-pointer hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-colors"
-            :aria-label="`Tambah ${product.name} ke Keranjang`"
-            @click.stop.prevent="handleQuickAdd"
-          >
-            <i v-if="justAdded" class="pi pi-check text-[10px] text-emerald-500" />
-            <i v-else class="pi pi-plus text-[10px]" />
-          </button>
-        </UiTooltip>
+          <i v-if="justAdded" class="pi pi-check text-xs text-brand-success" />
+          <i v-else class="pi pi-plus text-xs" />
+        </button>
       </div>
     </div>
 
     <!-- Compact Content Body: Zero divider lines, small crisp typography -->
     <div
-      class="p-3 sm:p-3.5 flex flex-col justify-between gap-2 flex-1 relative z-10 pointer-events-none"
+      class="p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 flex-1 relative z-10 pointer-events-none"
     >
       <div class="space-y-1">
         <!-- Top Row: Category (Left) and Rating (Right) -->
         <div class="flex items-center justify-between gap-1.5 min-h-[16px]">
           <span
             v-if="categoryName"
-            class="font-body text-[10px] uppercase font-bold text-slate-500 dark:text-zinc-400 tracking-wider truncate"
+            class="font-body text-[10px] uppercase font-bold text-brand-muted tracking-wider truncate"
           >
             {{ categoryName }}
           </span>
@@ -223,16 +223,16 @@ const handleQuickAdd = () => {
 
           <div
             v-if="formattedRating"
-            class="flex items-center gap-1 shrink-0 text-[11px] font-bold text-slate-700 dark:text-zinc-300 tabular-nums"
+            class="flex items-center gap-1 shrink-0 text-[11px] font-bold text-brand-ink tabular-nums"
           >
             <i class="pi pi-star-fill text-amber-400 text-[10px]" />
             <span>{{ formattedRating }}</span>
           </div>
         </div>
 
-        <!-- Product Title: Small, crisp font -->
+        <!-- Product Title: Small, crisp font without raw blue hyperlink color -->
         <h3
-          class="font-display font-semibold text-xs sm:text-[13px] text-slate-900 dark:text-zinc-100 tracking-tight line-clamp-2 group-hover:text-blue-600 transition-colors m-0 leading-snug"
+          class="font-display font-semibold text-xs sm:text-[13px] text-brand-ink tracking-tight line-clamp-2 transition-colors m-0 leading-snug"
           :title="product.name"
         >
           {{ product.name }}
@@ -243,7 +243,7 @@ const handleQuickAdd = () => {
       <div class="flex items-baseline justify-between gap-2 pt-0.5 pointer-events-auto" @click.stop>
         <!-- Price on Left -->
         <span
-          class="font-display font-bold text-sm sm:text-[15px] text-slate-900 dark:text-white tabular-nums tracking-tight"
+          class="font-display font-bold text-sm sm:text-[15px] text-brand-ink tabular-nums tracking-tight"
         >
           {{ formatRupiah(product.price) }}
         </span>
@@ -254,8 +254,10 @@ const handleQuickAdd = () => {
           class="text-[11px] font-medium tabular-nums shrink-0"
           :class="
             product.stock === 0
-              ? 'text-rose-600 dark:text-rose-400 font-semibold'
-              : 'text-slate-500 dark:text-zinc-400'
+              ? 'text-brand-danger font-semibold'
+              : product.stock <= 3
+                ? 'text-brand-warning-text font-semibold'
+                : 'text-brand-muted'
           "
         >
           {{ stockStatusText }}
@@ -264,13 +266,13 @@ const handleQuickAdd = () => {
         <!-- Admin Actions (Management Mode) -->
         <div v-else class="flex items-center gap-1.5">
           <span
-            class="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+            class="px-2 py-0.5 rounded-full text-[10px] font-semibold border"
             :class="[
               product.stock === 0
-                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'
+                ? 'bg-brand-danger-tint text-brand-danger-text border-brand-danger-edge'
                 : product.stock < 5
-                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
-                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+                  ? 'bg-brand-warning-tint text-brand-warning-text border-brand-warning-edge'
+                  : 'bg-brand-success-tint text-brand-success-text border-brand-success-edge',
             ]"
           >
             Stok: {{ product.stock }}
@@ -279,7 +281,7 @@ const handleQuickAdd = () => {
           <template v-if="isTrash">
             <button
               type="button"
-              class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 transition-colors"
+              class="px-2 py-0.5 rounded-field text-[11px] font-medium bg-brand-field hover:bg-brand-ink hover:text-brand-onink text-brand-ink border border-brand-hairsoft transition-colors cursor-pointer"
               @click.stop="emit('restore', product.id)"
             >
               Restore
@@ -289,7 +291,7 @@ const handleQuickAdd = () => {
             <UiTooltip text="Riwayat Mutasi Stok" position="top">
               <button
                 type="button"
-                class="w-7 h-7 rounded-full bg-slate-100 hover:bg-brand-accent hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
+                class="w-7 h-7 rounded-full bg-brand-field hover:bg-brand-accent hover:text-white text-brand-muted hover:border-brand-accent border border-brand-hairsoft transition-colors flex items-center justify-center cursor-pointer"
                 aria-label="Riwayat Mutasi Stok"
                 @click.stop="emit('viewStockMovements', product)"
               >
@@ -299,7 +301,7 @@ const handleQuickAdd = () => {
             <UiTooltip text="Ubah Produk" position="top">
               <button
                 type="button"
-                class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
+                class="w-7 h-7 rounded-full bg-brand-field hover:bg-brand-ink hover:text-brand-onink text-brand-muted border border-brand-hairsoft transition-colors flex items-center justify-center cursor-pointer"
                 aria-label="Ubah Produk"
                 @click.stop="emit('edit', product)"
               >
@@ -309,7 +311,7 @@ const handleQuickAdd = () => {
             <UiTooltip text="Hapus Produk" position="top" align="end">
               <button
                 type="button"
-                class="w-7 h-7 rounded-full bg-slate-100 hover:bg-red-600 hover:text-white text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
+                class="w-7 h-7 rounded-full bg-brand-field hover:bg-brand-danger hover:text-white text-brand-muted border border-brand-hairsoft transition-colors flex items-center justify-center cursor-pointer"
                 aria-label="Hapus Produk"
                 @click.stop="emit('delete', product.id)"
               >

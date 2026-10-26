@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast'
 import { useAuth } from '~/features/auth/composables/useAuth'
 
 useSeoMeta({
-  title: 'Atur Ulang Kata Sandi — ShelfStack',
+  title: 'Atur Ulang Kata Sandi - ShelfStack',
   description: 'Buat kata sandi baru untuk akun ShelfStack Anda.',
 })
 definePageMeta({ layout: 'default' })
 
-const toast = useToast()
+const toast = useUiToast()
 const { updatePassword, pending } = useAuth()
 
 const newPassword = ref('')
@@ -59,7 +58,7 @@ const handleSubmit = async () => {
       <div
         class="w-14 h-14 rounded-full bg-brand-canvas-soft flex items-center justify-center border border-brand-hair"
       >
-        <i class="pi pi-check-circle text-2xl text-green-500" />
+        <i class="pi pi-check-circle text-2xl text-brand-success-text" />
       </div>
       <div>
         <p class="text-sm font-semibold text-brand-ink m-0">Password berhasil diperbarui!</p>
@@ -67,13 +66,9 @@ const handleSubmit = async () => {
           Gunakan password baru Anda untuk masuk ke akun ShelfStack.
         </p>
       </div>
-      <NuxtLink
-        to="/auth/login"
-        class="mt-2 inline-flex items-center justify-center gap-2 h-11 px-8 rounded-full bg-brand-ink text-white text-sm font-bold hover:bg-black transition-all"
-      >
-        <i class="pi pi-sign-in text-xs" />
-        <span>Masuk Sekarang</span>
-      </NuxtLink>
+      <UiButton to="/auth/login" variant="primary" icon="pi-sign-in" class="mt-2">
+        Masuk Sekarang
+      </UiButton>
     </div>
 
     <!-- Form State -->

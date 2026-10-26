@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-// Dev server butuh beberapa detik untuk hidrasi Vue (cold start + bundle PrimeVue).
+// Dev server butuh beberapa detik untuk hidrasi Vue (cold start + bundel klien).
 // Tanpa ini, klik terjadi pre-hydration: form submit native (reload) atau @click tak jalan.
 // Lihat investigasi Sprint 2: __vue_app__ muncul ~4.4s setelah load di mesin dev.
 // Revisi: kehadiran __vue_app__ saja tidak cukup, root component harus sudah
@@ -11,11 +11,10 @@ export async function waitForHydration(page: Page, timeout = 60000) {
     () => {
       const el = document.getElementById('__nuxt') as unknown as {
         __vue_app__?: { _instance?: { isMounted?: boolean } | null }
-      }
-      const app = el.__vue_app__
-      if (!app) return false
-      if (!app._instance) return true
-      return app._instance.isMounted === true
+      } | null
+      if (!el || !el.__vue_app__) return false
+      if (!el.__vue_app__._instance) return true
+      return el.__vue_app__._instance.isMounted === true
     },
     { timeout },
   )

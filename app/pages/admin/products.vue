@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { useProductStore } from '~/features/products/stores/product'
 import type { Product } from '~/types/product'
-import { useToast } from 'primevue/usetoast'
-import { useConfirm } from 'primevue/useconfirm'
 import ProductList from '~/features/products/components/ProductList.vue'
 import ProductForm from '~/features/products/components/ProductForm.vue'
 import StockMovementsModal from '~/features/products/components/StockMovementsModal.vue'
+import { sortProducts, type SortDir, type SortKey } from '~/features/products/utils/product-sort'
 
 useSeoMeta({
   title: 'Kelola Produk',
@@ -17,8 +16,8 @@ definePageMeta({
 })
 
 const productStore = useProductStore()
-const toast = useToast()
-const confirm = useConfirm()
+const toast = useUiToast()
+const confirm = useUiConfirm()
 
 const isFormVisible = ref(false)
 const editingProduct = ref<Product | null>(null)
@@ -26,28 +25,45 @@ const isStockModalVisible = ref(false)
 const stockAuditProduct = ref<Product | null>(null)
 const searchQuery = ref('')
 const activeTab = ref('0')
+const sortOption = ref('name-asc')
+const sortOptionsList = [
+  { value: 'name-asc', label: 'Nama A-Z' },
+  { value: 'price-asc', label: 'Termurah' },
+  { value: 'price-desc', label: 'Termahal' },
+  { value: 'stock-asc', label: 'Stok tersedikit' },
+]
 
 const openStockMovements = (product: Product) => {
   stockAuditProduct.value = product
   isStockModalVisible.value = true
 }
 
-const criticalStockProducts = computed(() => {
-  return productStore.products.filter((p) => (p.stock ?? 0) < 5)
-})
+const criticalStockProducts = computed(() =>
+  productStore.products.filter((p) => (p.stock ?? 0) < 5),
+)
+
+const tabItems = computed(() => [
+  { value: '0', label: 'Produk Aktif' },
+  {
+    value: '2',
+    label: 'Stok Kritis',
+    count: criticalStockProducts.value.length,
+    countTone: 'danger' as const,
+  },
+  { value: '1', label: 'Keranjang Sampah' },
+])
 
 const filteredProducts = computed(() => {
-  let sourceList: Product[] = []
-  if (activeTab.value === '0') {
-    sourceList = productStore.products
-  } else if (activeTab.value === '1') {
-    sourceList = productStore.deletedProducts
-  } else if (activeTab.value === '2') {
-    sourceList = criticalStockProducts.value
-  }
-  if (!searchQuery.value.trim()) return sourceList
-  const query = searchQuery.value.toLowerCase()
-  return sourceList.filter((p) => p.name.toLowerCase().includes(query))
+  const src =
+    activeTab.value === '1'
+      ? productStore.deletedProducts
+      : activeTab.value === '2'
+        ? criticalStockProducts.value
+        : productStore.products
+  const q = searchQuery.value.trim().toLowerCase()
+  const list = !q ? src : src.filter((p) => p.name.toLowerCase().includes(q))
+  const [k, d] = sortOption.value.split('-') as [SortKey, SortDir]
+  return sortProducts(list, k, d)
 })
 
 watch(activeTab, async (newVal) => {
@@ -140,9 +156,9 @@ const handleDelete = async (id: number) => {
   confirm.require({
     message: 'Apakah Anda yakin ingin menghapus produk ini?',
     header: 'Konfirmasi Penghapusan',
-    icon: 'pi pi-exclamation-triangle',
-    acceptProps: { label: 'Hapus', severity: 'danger' },
-    rejectProps: { label: 'Batal', severity: 'secondary', outlined: true },
+    tone: 'danger',
+    acceptLabel: 'Hapus',
+    rejectLabel: 'Batal',
     accept: async () => {
       try {
         await productStore.deleteProduct(id)
@@ -168,9 +184,9 @@ const handleRestore = async (id: number) => {
   confirm.require({
     message: 'Apakah Anda yakin ingin mengembalikan produk ini dari keranjang sampah?',
     header: 'Konfirmasi Restore',
-    icon: 'pi pi-info-circle',
-    acceptProps: { label: 'Restore', severity: 'success' },
-    rejectProps: { label: 'Batal', severity: 'secondary', outlined: true },
+    tone: 'success',
+    acceptLabel: 'Restore',
+    rejectLabel: 'Batal',
     accept: async () => {
       try {
         await productStore.restoreProduct(id)
@@ -197,106 +213,107 @@ const handleRestore = async (id: number) => {
 <template>
   <div>
     <!-- Header & Search & Add Button -->
-    <div class="flex justify-between items-end mb-10 flex-wrap gap-6">
+    <div class="flex flex-wrap items-end justify-between gap-6 mb-10">
       <div>
-        <h1 class="m-0 mb-1 text-4xl font-bold tracking-tight text-surface-900 dark:text-surface-0">
+        <h1
+          class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0 mb-1"
+        >
           Kelola Produk
         </h1>
-        <p class="m-0 text-lg text-surface-500 dark:text-surface-400">
+        <p class="text-xs sm:text-sm text-brand-muted m-0">
           Tambah, ubah, dan arsipkan katalog ShelfStack.
         </p>
       </div>
 
-      <div class="flex gap-4 items-center flex-wrap">
-        <IconField icon-position="left">
-          <InputIcon class="pi pi-search text-surface-400 dark:text-surface-500" />
-          <InputText v-model="searchQuery" placeholder="Cari produk..." class="w-[280px]" />
-        </IconField>
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="w-full sm:w-[280px]">
+          <UiInput
+            v-model="searchQuery"
+            size="sm"
+            left-icon="pi-search"
+            placeholder="Cari produk..."
+            autocomplete="off"
+          />
+        </div>
 
-        <Button label="Tambah Produk" icon="pi pi-plus" severity="primary" @click="openAddForm" />
+        <div class="w-full sm:w-[170px]">
+          <label for="product-sort" class="sr-only">Urutkan tampilan saat ini</label>
+          <UiSelect
+            id="product-sort"
+            v-model="sortOption"
+            :options="sortOptionsList"
+            size="sm"
+            title="Mengurutkan tampilan saat ini"
+          />
+        </div>
+
+        <UiButton variant="primary" icon="pi-plus" @click="openAddForm">Tambah Produk</UiButton>
       </div>
     </div>
 
-    <Tabs v-model:value="activeTab" class="!bg-transparent">
-      <TabList class="!bg-transparent">
-        <Tab value="0">Produk Aktif</Tab>
-        <Tab value="2">
-          <div class="flex items-center gap-2">
-            <span>Stok Kritis</span>
-            <span
-              v-if="criticalStockProducts.length > 0"
-              class="rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 font-bold px-2 py-0.5 text-[10px]"
-            >
-              {{ criticalStockProducts.length }}
-            </span>
-          </div>
-        </Tab>
-        <Tab value="1">Keranjang Sampah</Tab>
-      </TabList>
-      <TabPanels class="px-0 pb-0 !bg-transparent">
-        <TabPanel value="0">
-          <ProductList
-            :products="filteredProducts"
-            :loading="productStore.loading"
-            :is-searching="searchQuery.trim().length > 0"
-            @edit="openEditForm"
-            @delete="handleDelete"
-            @view-stock-movements="openStockMovements"
-          />
+    <UiTabs v-model="activeTab" :items="tabItems" aria-label="Tampilan katalog produk" />
 
-          <!-- Load More Button -->
-          <div
-            v-if="productStore.hasMore && !searchQuery.trim()"
-            class="flex justify-center mt-8 mb-4"
-          >
-            <Button
-              label="Muat Lebih Banyak"
-              icon="pi pi-sync"
-              :loading="productStore.loading"
-              severity="secondary"
-              rounded
-              @click="productStore.fetchProducts(true)"
-            />
-          </div>
-        </TabPanel>
+    <!-- Produk Aktif -->
+    <div v-if="activeTab === '0'" class="mt-6">
+      <ProductList
+        :products="filteredProducts"
+        :loading="productStore.loading"
+        :is-searching="searchQuery.trim().length > 0"
+        @edit="openEditForm"
+        @delete="handleDelete"
+        @view-stock-movements="openStockMovements"
+      />
 
-        <TabPanel value="2">
-          <ProductList
-            :products="filteredProducts"
-            :loading="productStore.loading"
-            :is-searching="searchQuery.trim().length > 0"
-            @edit="openEditForm"
-            @delete="handleDelete"
-            @view-stock-movements="openStockMovements"
-          />
-        </TabPanel>
+      <!-- Load More Button -->
+      <div v-if="productStore.hasMore && !searchQuery.trim()" class="flex justify-center mt-8 mb-4">
+        <UiButton
+          variant="secondary"
+          icon="pi-sync"
+          :loading="productStore.loading"
+          @click="productStore.fetchProducts(true)"
+        >
+          Muat Lebih Banyak
+        </UiButton>
+      </div>
+    </div>
 
-        <TabPanel value="1">
-          <ProductList
-            :products="filteredProducts"
-            :loading="productStore.loading"
-            :is-searching="searchQuery.trim().length > 0"
-            is-trash
-            @restore="handleRestore"
-          />
+    <!-- Stok Kritis -->
+    <div v-else-if="activeTab === '2'" class="mt-6">
+      <ProductList
+        :products="filteredProducts"
+        :loading="productStore.loading"
+        :is-searching="searchQuery.trim().length > 0"
+        @edit="openEditForm"
+        @delete="handleDelete"
+        @view-stock-movements="openStockMovements"
+      />
+    </div>
 
-          <!-- Load More Button (Trash) -->
-          <div
-            v-if="productStore.hasMoreDeleted && !searchQuery.trim()"
-            class="flex justify-center mt-8 mb-4"
-          >
-            <Button
-              label="Muat Lebih Banyak"
-              icon="pi pi-sync"
-              :loading="productStore.loading"
-              severity="secondary"
-              rounded
-              @click="productStore.fetchDeletedProducts(true)"
-            />
-          </div>
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+    <!-- Keranjang Sampah -->
+    <div v-else class="mt-6">
+      <ProductList
+        :products="filteredProducts"
+        :loading="productStore.loading"
+        :is-searching="searchQuery.trim().length > 0"
+        is-trash
+        @restore="handleRestore"
+      />
+
+      <!-- Load More Button (Trash) -->
+      <div
+        v-if="productStore.hasMoreDeleted && !searchQuery.trim()"
+        class="flex justify-center mt-8 mb-4"
+      >
+        <UiButton
+          variant="secondary"
+          icon="pi-sync"
+          :loading="productStore.loading"
+          @click="productStore.fetchDeletedProducts(true)"
+        >
+          Muat Lebih Banyak
+        </UiButton>
+      </div>
+    </div>
 
     <!-- Container for Product Form Modal -->
     <ProductForm

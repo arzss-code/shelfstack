@@ -100,7 +100,7 @@ const warrantyBadge = computed(() => {
         v-for="(img, idx) in galleryImages"
         :key="idx"
         type="button"
-        class="w-16 h-16 rounded-xl border p-1 bg-brand-field shrink-0 transition-all cursor-pointer overflow-hidden focus:outline-none"
+        class="w-16 h-16 rounded-field border p-1 bg-brand-field shrink-0 transition-all cursor-pointer overflow-hidden focus:outline-none"
         :class="[
           activeImage === img
             ? 'border-brand-ink ring-2 ring-brand-ink/20 shadow-whisper scale-105'

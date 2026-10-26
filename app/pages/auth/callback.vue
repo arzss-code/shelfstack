@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Landing OAuth: modul Supabase menukar `code` jadi session otomatis,
 // lalu kita arahkan sesuai role.
-useSeoMeta({ title: 'Menghubungkan…' })
+useSeoMeta({ title: 'Menghubungkan' })
 
 const user = useSupabaseUser()
 const { fetchProfile, isAdmin } = useAuth()
@@ -20,7 +20,11 @@ watch(
 
 <template>
   <div class="mx-auto flex w-full max-w-[440px] flex-col items-center gap-4 py-20 text-center">
-    <ProgressSpinner style="width: 48px; height: 48px" />
-    <p class="m-0 text-surface-500">Menghubungkan akun Google…</p>
+    <span
+      class="h-12 w-12 animate-spin rounded-full border-2 border-brand-hair border-t-brand-ink"
+      role="status"
+      aria-label="Memproses"
+    />
+    <p class="m-0 text-sm text-brand-muted">Menghubungkan akun Google.</p>
   </div>
 </template>

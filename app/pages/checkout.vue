@@ -3,7 +3,6 @@ import { useAuth } from '~/features/auth/composables/useAuth'
 import { useCartStore } from '~/features/cart/stores/cart'
 import { checkoutAddressSchema } from '~~/shared/schemas/order'
 import { formatRupiah } from '~/utils/format'
-import { useToast } from 'primevue/usetoast'
 import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import { useAddresses } from '~/composables/useAddresses'
 import type { UserAddress } from '~~/shared/schemas/address'
@@ -12,12 +11,12 @@ import SavedAddressSelector from '~/components/checkout/SavedAddressSelector.vue
 const { user, profile } = useAuth()
 const cartStore = useCartStore()
 const router = useRouter()
-const toast = useToast()
+const toast = useUiToast()
 const config = useRuntimeConfig()
 const { pay: openSnapModal } = useMidtransSnap()
 
 useSeoMeta({
-  title: 'Checkout & Pembayaran — ShelfStack',
+  title: 'Checkout & Pembayaran - ShelfStack',
   description:
     'Selesaikan pemesanan produk pilihan Anda dengan aman melalui gateway resmi Midtrans.',
 })
@@ -43,8 +42,35 @@ watch(
 
 const errors = ref<Record<string, string>>({})
 const isSubmitting = ref(false)
+const isOrderPlaced = ref(false)
+const createdOrderId = ref<string | null>(null)
 const generalError = ref('')
 const checkoutIdempotencyKey = ref<string>('')
+
+// Snapshot isi keranjang agar UI ringkasan dan preview item tetap utuh saat popup Midtrans dibuka
+const placedOrderSnapshot = ref<{
+  items: typeof cartStore.items
+  totalItems: number
+  totalPriceFormatted: string
+} | null>(null)
+
+const displayItems = computed(() => placedOrderSnapshot.value?.items ?? cartStore.items)
+const displayTotalItems = computed(
+  () => placedOrderSnapshot.value?.totalItems ?? cartStore.totalItems,
+)
+const displayTotalPrice = computed(
+  () => placedOrderSnapshot.value?.totalPriceFormatted ?? cartStore.formattedTotalPrice,
+)
+
+const submitButtonLabel = computed(() => {
+  if (isOrderPlaced.value) {
+    return 'Membuka Pembayaran...'
+  }
+  if (isSubmitting.value) {
+    return 'Memproses Pesanan...'
+  }
+  return 'Bayar Sekarang'
+})
 
 const { saveAddress } = useAddresses()
 const selectedSavedAddressId = ref<string | null>(null)
@@ -97,6 +123,10 @@ const validateForm = () => {
 }
 
 const handleCreateOrder = async () => {
+  if (isSubmitting.value || isOrderPlaced.value) {
+    return
+  }
+
   if (!user.value) {
     router.push('/auth/login?redirect=/checkout')
     return
@@ -144,6 +174,15 @@ const handleCreateOrder = async () => {
     })
 
     const orderId = response.data.order_id
+    createdOrderId.value = orderId
+
+    // Simpan snapshot keranjang agar rincian pesanan tetap tampil stabil saat popup pembayaran disiapkan
+    placedOrderSnapshot.value = {
+      items: [...cartStore.items],
+      totalItems: cartStore.totalItems,
+      totalPriceFormatted: cartStore.formattedTotalPrice,
+    }
+    isOrderPlaced.value = true
 
     // Reset key setelah logical checkout berhasil dibuat
     checkoutIdempotencyKey.value = ''
@@ -231,6 +270,8 @@ const handleCreateOrder = async () => {
     const fetchErr = err as { data?: { message?: string } }
     generalError.value =
       fetchErr.data?.message || 'Terjadi kesalahan saat memproses pesanan Anda. Silakan coba lagi.'
+    isOrderPlaced.value = false
+    placedOrderSnapshot.value = null
   } finally {
     isSubmitting.value = false
   }
@@ -297,7 +338,7 @@ const handleCreateOrder = async () => {
 
     <!-- Empty Cart Check -->
     <div
-      v-else-if="cartStore.isEmpty"
+      v-else-if="cartStore.isEmpty && !isOrderPlaced && !isSubmitting"
       class="text-center py-16 px-6 bg-brand-canvas-soft border border-dashed border-brand-hair rounded-card max-w-md mx-auto space-y-4"
     >
       <i class="pi pi-shopping-bag text-3xl text-brand-muted" />
@@ -315,121 +356,147 @@ const handleCreateOrder = async () => {
         <!-- Error Alert -->
         <div
           v-if="generalError"
-          class="p-4 bg-red-50 border border-red-200 rounded-card flex items-start gap-3 text-red-700 text-xs"
+          class="p-4 bg-brand-danger-tint border border-brand-danger-edge rounded-card flex items-start gap-3 text-brand-danger-text text-xs"
         >
           <i class="pi pi-exclamation-circle text-base shrink-0 mt-0.5" />
           <span>{{ generalError }}</span>
         </div>
 
-        <!-- Address Card -->
-        <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-4">
-          <div class="flex items-center gap-2 pb-3 border-b border-brand-hairsoft">
-            <i class="pi pi-map-marker text-brand-accent text-base" />
-            <h2 id="shipping-heading" class="font-display text-base font-bold text-brand-ink m-0">
-              Alamat Pengiriman
-            </h2>
+        <!-- Payment Preparation Banner -->
+        <div
+          v-if="isOrderPlaced && createdOrderId"
+          class="p-4 bg-brand-success-tint border border-brand-success-edge rounded-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-brand-success-text text-xs"
+        >
+          <div class="flex items-center gap-3">
+            <i class="pi pi-spin pi-spinner text-base shrink-0 text-brand-success" />
+            <span>Pesanan berhasil dibuat. Menyiapkan popup pembayaran resmi Midtrans...</span>
           </div>
-
-          <!-- Saved Address Selector if User is Logged In -->
-          <div v-if="user" class="pb-4 border-b border-brand-hairsoft">
-            <SavedAddressSelector
-              :selected-id="selectedSavedAddressId"
-              @select="handleSelectSavedAddress"
-            />
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Nama Penerima -->
-            <div class="space-y-1">
-              <label class="block text-xs font-semibold text-brand-ink">
-                Nama Penerima <span class="text-red-500">*</span>
-              </label>
-              <UiInput
-                v-model="address.name"
-                placeholder="cth. Arya Santoso"
-                :error="errors.name"
-              />
-            </div>
-
-            <!-- Nomor Telepon -->
-            <div class="space-y-1">
-              <label class="block text-xs font-semibold text-brand-ink">
-                Nomor Telepon / WhatsApp <span class="text-red-500">*</span>
-              </label>
-              <UiInput
-                v-model="address.phone"
-                placeholder="cth. 081234567890"
-                :error="errors.phone"
-              />
-            </div>
-          </div>
-
-          <!-- Alamat Lengkap -->
-          <div class="space-y-1">
-            <label class="block text-xs font-semibold text-brand-ink">
-              Alamat Lengkap (Jalan, No. Rumah, RT/RW, Kelurahan)
-              <span class="text-red-500">*</span>
-            </label>
-            <UiInput
-              v-model="address.street"
-              placeholder="cth. Jl. Sudirman No. 42, RT 01/RW 04, Menteng"
-              :error="errors.street"
-            />
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Kota / Kabupaten -->
-            <div class="space-y-1">
-              <label class="block text-xs font-semibold text-brand-ink">
-                Kota / Kabupaten <span class="text-red-500">*</span>
-              </label>
-              <UiInput
-                v-model="address.city"
-                placeholder="cth. Jakarta Pusat"
-                :error="errors.city"
-              />
-            </div>
-
-            <!-- Kode Pos -->
-            <div class="space-y-1">
-              <label class="block text-xs font-semibold text-brand-ink">
-                Kode Pos <span class="text-red-500">*</span>
-              </label>
-              <UiInput v-model="address.postal" placeholder="cth. 10220" :error="errors.postal" />
-            </div>
-          </div>
-
-          <!-- Catatan Pengiriman -->
-          <div class="space-y-1">
-            <label class="block text-xs font-semibold text-brand-ink">
-              Catatan untuk Kurir (Opsional)
-            </label>
-            <UiInput
-              v-model="address.note"
-              placeholder="cth. Titipkan ke satpam jika penerima tidak ada di tempat"
-              :error="errors.note"
-            />
-          </div>
-
-          <!-- Option Checkbox: Simpan alamat ini untuk pesanan berikutnya -->
-          <div v-if="user" class="flex items-center gap-2 pt-3 border-t border-brand-hairsoft">
-            <input
-              id="save_address_checkbox"
-              v-model="saveAddressForNextOrder"
-              type="checkbox"
-              class="rounded border-zinc-300 text-brand-accent focus:ring-brand-accent w-4 h-4 cursor-pointer"
-            />
-            <label
-              for="save_address_checkbox"
-              class="text-xs text-brand-ink font-medium cursor-pointer select-none"
-            >
-              Simpan alamat ini untuk pesanan berikutnya
-            </label>
-          </div>
+          <NuxtLink
+            :to="`/orders/${createdOrderId}`"
+            class="font-semibold text-brand-success-text hover:text-brand-ink underline shrink-0"
+          >
+            Buka Pesanan &rarr;
+          </NuxtLink>
         </div>
 
+        <!-- Address Card Form Controls -->
+        <fieldset
+          :disabled="isSubmitting || isOrderPlaced"
+          class="border-0 p-0 m-0 min-w-0 space-y-6"
+        >
+          <div
+            class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-4"
+          >
+            <div class="flex items-center gap-2 pb-3 border-b border-brand-hairsoft">
+              <i class="pi pi-map-marker text-brand-accent text-base" />
+              <h2 id="shipping-heading" class="font-display text-base font-bold text-brand-ink m-0">
+                Alamat Pengiriman
+              </h2>
+            </div>
+
+            <!-- Saved Address Selector if User is Logged In -->
+            <div v-if="user" class="pb-4 border-b border-brand-hairsoft">
+              <SavedAddressSelector
+                :selected-id="selectedSavedAddressId"
+                @select="handleSelectSavedAddress"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Nama Penerima -->
+              <div class="space-y-1">
+                <label class="block text-xs font-semibold text-brand-ink">
+                  Nama Penerima <span class="text-red-500">*</span>
+                </label>
+                <UiInput
+                  v-model="address.name"
+                  placeholder="cth. Arya Santoso"
+                  :error="errors.name"
+                />
+              </div>
+
+              <!-- Nomor Telepon -->
+              <div class="space-y-1">
+                <label class="block text-xs font-semibold text-brand-ink">
+                  Nomor Telepon / WhatsApp <span class="text-red-500">*</span>
+                </label>
+                <UiInput
+                  v-model="address.phone"
+                  placeholder="cth. 081234567890"
+                  :error="errors.phone"
+                />
+              </div>
+            </div>
+
+            <!-- Alamat Lengkap -->
+            <div class="space-y-1">
+              <label class="block text-xs font-semibold text-brand-ink">
+                Alamat Lengkap (Jalan, No. Rumah, RT/RW, Kelurahan)
+                <span class="text-red-500">*</span>
+              </label>
+              <UiInput
+                v-model="address.street"
+                placeholder="cth. Jl. Sudirman No. 42, RT 01/RW 04, Menteng"
+                :error="errors.street"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Kota / Kabupaten -->
+              <div class="space-y-1">
+                <label class="block text-xs font-semibold text-brand-ink">
+                  Kota / Kabupaten <span class="text-red-500">*</span>
+                </label>
+                <UiInput
+                  v-model="address.city"
+                  placeholder="cth. Jakarta Pusat"
+                  :error="errors.city"
+                />
+              </div>
+
+              <!-- Kode Pos -->
+              <div class="space-y-1">
+                <label class="block text-xs font-semibold text-brand-ink">
+                  Kode Pos <span class="text-red-500">*</span>
+                </label>
+                <UiInput v-model="address.postal" placeholder="cth. 10220" :error="errors.postal" />
+              </div>
+            </div>
+
+            <!-- Catatan Pengiriman -->
+            <div class="space-y-1">
+              <label class="block text-xs font-semibold text-brand-ink">
+                Catatan untuk Kurir (Opsional)
+              </label>
+              <UiInput
+                v-model="address.note"
+                placeholder="cth. Titipkan ke satpam jika penerima tidak ada di tempat"
+                :error="errors.note"
+              />
+            </div>
+
+            <!-- Option Checkbox: Simpan alamat ini untuk pesanan berikutnya -->
+            <div v-if="user" class="flex items-center gap-2 pt-3 border-t border-brand-hairsoft">
+              <input
+                id="save_address_checkbox"
+                v-model="saveAddressForNextOrder"
+                type="checkbox"
+                class="rounded border-brand-hair text-brand-accent focus:ring-brand-accent w-4 h-4 cursor-pointer"
+              />
+              <label
+                for="save_address_checkbox"
+                class="text-xs text-brand-ink font-medium cursor-pointer select-none"
+              >
+                Simpan alamat ini untuk pesanan berikutnya
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
         <!-- Payment Method Notice -->
-        <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-3">
+        <div
+          class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-3"
+        >
           <div class="flex items-center gap-2 pb-3 border-b border-brand-hairsoft">
             <i class="pi pi-credit-card text-brand-accent text-base" />
             <h2 class="font-display text-base font-bold text-brand-ink m-0">Metode Pembayaran</h2>
@@ -464,29 +531,27 @@ const handleCreateOrder = async () => {
 
       <!-- Right Column: Order Summary & Pay Action -->
       <aside
-        class="lg:col-span-5 bg-white dark:bg-[#18191b] border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-28"
+        class="lg:col-span-5 bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-28"
       >
         <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
-          <h2 class="font-display text-base font-bold text-brand-ink dark:text-white m-0">
-            Item Pesanan
-          </h2>
+          <h2 class="font-display text-base font-bold text-brand-ink m-0">Item Pesanan</h2>
           <span
-            class="text-xs font-semibold text-brand-ink dark:text-zinc-200 bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full"
+            class="text-xs font-semibold text-brand-ink bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full"
           >
-            {{ cartStore.totalItems }} item
+            {{ displayTotalItems }} item
           </span>
         </div>
 
         <!-- Items Preview Scrollable -->
         <div class="max-h-64 overflow-y-auto divide-y divide-brand-hairsoft pr-1">
           <div
-            v-for="item in cartStore.items"
+            v-for="item in displayItems"
             :key="`${item.productId}-${item.color}-${item.material}`"
             class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs"
           >
             <div class="flex items-center gap-3 min-w-0">
               <div
-                class="w-12 h-12 rounded-lg bg-brand-field dark:bg-zinc-800 border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center"
+                class="w-12 h-12 rounded-field bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center"
               >
                 <img
                   v-if="item.imageUrl"
@@ -497,46 +562,40 @@ const handleCreateOrder = async () => {
                 <i v-else class="pi pi-image text-brand-faint text-sm" />
               </div>
               <div class="min-w-0">
-                <p class="font-semibold text-brand-ink dark:text-white m-0 truncate">
+                <p class="font-semibold text-brand-ink m-0 truncate">
                   {{ item.name }}
                 </p>
-                <p class="text-[10.5px] text-brand-muted dark:text-zinc-400 m-0">
+                <p class="text-[10.5px] text-brand-muted m-0">
                   {{ item.quantity }}x @ {{ formatRupiah(item.price) }}
                 </p>
               </div>
             </div>
-            <span class="font-bold text-brand-ink dark:text-white tabular-nums shrink-0">
+            <span class="font-bold text-brand-ink tabular-nums shrink-0">
               {{ formatRupiah(item.price * item.quantity) }}
             </span>
           </div>
         </div>
 
         <!-- Bill Details -->
-        <div
-          class="pt-4 border-t border-brand-hairsoft space-y-2.5 text-xs text-brand-muted dark:text-zinc-400"
-        >
+        <div class="pt-4 border-t border-brand-hairsoft space-y-2.5 text-xs text-brand-muted">
           <div class="flex items-center justify-between">
             <span>Subtotal Produk</span>
-            <span class="font-semibold text-brand-ink dark:text-white tabular-nums">
-              {{ cartStore.formattedTotalPrice }}
+            <span class="font-semibold text-brand-ink tabular-nums">
+              {{ displayTotalPrice }}
             </span>
           </div>
           <div class="flex items-center justify-between">
             <span>Biaya Pengiriman</span>
-            <span class="text-emerald-600 font-semibold">Gratis Ongkir</span>
+            <span class="text-brand-success font-semibold">Gratis Ongkir</span>
           </div>
           <div class="flex items-center justify-between">
             <span>Pajak PPN (11%)</span>
-            <span class="font-semibold text-brand-ink dark:text-white">Termasuk</span>
+            <span class="font-semibold text-brand-ink">Termasuk</span>
           </div>
           <div class="pt-3 border-t border-brand-hairsoft flex items-center justify-between">
-            <span class="font-display font-bold text-sm text-brand-ink dark:text-white"
-              >Total Tagihan</span
-            >
-            <span
-              class="font-display text-xl font-bold text-brand-ink dark:text-white tabular-nums"
-            >
-              {{ cartStore.formattedTotalPrice }}
+            <span class="font-display font-bold text-sm text-brand-ink">Total Tagihan</span>
+            <span class="font-display text-xl font-bold text-brand-ink tabular-nums">
+              {{ displayTotalPrice }}
             </span>
           </div>
         </div>
@@ -547,14 +606,14 @@ const handleCreateOrder = async () => {
           size="md"
           class="w-full justify-center text-xs font-semibold py-3 rounded-full shadow-whisper"
           icon="pi-lock"
-          :loading="isSubmitting"
-          :disabled="isSubmitting"
+          :loading="isSubmitting || isOrderPlaced"
+          :disabled="isSubmitting || isOrderPlaced"
           @click="handleCreateOrder"
         >
-          {{ isSubmitting ? 'Memproses Pesanan...' : 'Bayar Sekarang' }}
+          {{ submitButtonLabel }}
         </UiButton>
 
-        <p class="text-[10.5px] text-center text-brand-muted dark:text-zinc-500 m-0">
+        <p class="text-[10.5px] text-center text-brand-muted m-0">
           Transaksi aman terlindungi enkripsi Midtrans Payment Gateway.
         </p>
       </aside>

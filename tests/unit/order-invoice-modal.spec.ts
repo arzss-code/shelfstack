@@ -33,9 +33,10 @@ describe('OrderInvoiceModal Component', () => {
   }
 
   const globalStubs = {
-    Dialog: {
-      template: '<div class="dialog-stub"><slot name="header" /><slot /></div>',
-      props: ['visible', 'header'],
+    UiModal: {
+      template:
+        '<div class="modal-stub"><slot name="header" /><slot /><slot name="footer" /></div>',
+      props: ['visible', 'title', 'size'],
     },
     UiButton: {
       template: '<button class="ui-button-stub"><slot /></button>',

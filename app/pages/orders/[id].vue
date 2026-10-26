@@ -3,18 +3,19 @@ import { useAuth } from '~/features/auth/composables/useAuth'
 import type { Database } from '~/types/database.types'
 import type { Order, OrderStatus } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
-import { useToast } from 'primevue/usetoast'
 import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import OrderCancelDialog from '~/features/orders/components/OrderCancelDialog.vue'
 import OrderInvoiceModal from '~/features/orders/components/OrderInvoiceModal.vue'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import { useCartStore } from '~/features/cart/stores/cart'
 
 const route = useRoute()
 const router = useRouter()
 const { user } = useAuth()
 const supabase = useSupabaseClient<Database>()
-const toast = useToast()
+const toast = useUiToast()
 const config = useRuntimeConfig()
+const cartStore = useCartStore()
 const { pay: openSnapModal } = useMidtransSnap()
 
 const orderId = route.params.id as string
@@ -22,7 +23,8 @@ const order = ref<Order | null>(null)
 const loading = ref(true)
 const isPaying = ref(false)
 const isCancelling = ref(false)
-const isCheckingStatus = ref(false)
+const isManualChecking = ref(false)
+const isSilentChecking = ref(false)
 const isCancelModalOpen = ref(false)
 
 const isInvoiceModalOpen = ref(false)
@@ -38,8 +40,8 @@ let pollInterval: ReturnType<typeof setInterval> | null = null
 useSeoMeta({
   title: () =>
     order.value
-      ? `Pesanan #${order.value.id.slice(0, 8)} — ShelfStack`
-      : 'Detail Pesanan — ShelfStack',
+      ? `Pesanan #${order.value.id.slice(0, 8)} - ShelfStack`
+      : 'Detail Pesanan - ShelfStack',
   description: 'Detail informasi dan status pemesanan produk resmi di ShelfStack.',
 })
 
@@ -163,8 +165,14 @@ onUnmounted(() => {
 })
 
 const handleCheckPaymentStatus = async (silent = false) => {
-  if (!order.value || isCheckingStatus.value) return
-  isCheckingStatus.value = true
+  if (!order.value) return
+  if (silent) {
+    if (isSilentChecking.value) return
+    isSilentChecking.value = true
+  } else {
+    if (isManualChecking.value) return
+    isManualChecking.value = true
+  }
 
   try {
     const res = await $fetch<{
@@ -215,7 +223,11 @@ const handleCheckPaymentStatus = async (silent = false) => {
       })
     }
   } finally {
-    isCheckingStatus.value = false
+    if (silent) {
+      isSilentChecking.value = false
+    } else {
+      isManualChecking.value = false
+    }
   }
 }
 
@@ -302,6 +314,7 @@ const handleCancelOrder = async (reason: string) => {
       method: 'POST',
       body: { reason },
     })
+    stopPolling()
     toast.add({
       severity: 'success',
       summary: 'Pesanan Dibatalkan',
@@ -323,20 +336,59 @@ const handleCancelOrder = async (reason: string) => {
   }
 }
 
+const handleReorder = () => {
+  if (!order.value?.items || order.value.items.length === 0) return
+
+  for (const item of order.value.items) {
+    cartStore.addItem({
+      productId: item.product_id,
+      name: item.product?.name || `Produk #${item.product_id}`,
+      price: item.price_cents / 100,
+      priceCents: item.price_cents,
+      imageUrl: item.product?.image_url ?? null,
+      quantity: item.qty,
+      stock: 99,
+      openCartDrawer: false,
+    })
+  }
+
+  toast.add({
+    severity: 'success',
+    summary: 'Produk Ditambahkan',
+    detail: 'Item dari pesanan ini telah dimasukkan kembali ke keranjang belanja Anda.',
+    life: 4000,
+  })
+
+  router.push('/cart')
+}
+
 const getStatusBadge = (status: OrderStatus) => {
   switch (status) {
     case 'paid':
-      return { variant: 'success' as const, label: 'Lunas' }
+      return { variant: 'info' as const, label: 'Diproses' }
     case 'shipped':
-      return { variant: 'info' as const, label: 'Sedang Dikirim' }
+      return { variant: 'info' as const, label: 'Dikirim' }
     case 'completed':
-      return { variant: 'success' as const, label: 'Pesanan Selesai' }
+      return { variant: 'success' as const, label: 'Selesai' }
     case 'cancelled':
       return { variant: 'danger' as const, label: 'Dibatalkan' }
     case 'pending':
     default:
       return { variant: 'warning' as const, label: 'Menunggu Pembayaran' }
   }
+}
+
+const getPaymentStatusBadge = (orderData: Order) => {
+  if (orderData.status === 'refunded') {
+    return { variant: 'default' as const, label: 'Dikembalikan' }
+  }
+  if (orderData.status === 'cancelled') {
+    return { variant: 'default' as const, label: 'Belum Dibayar' }
+  }
+  if (orderData.paid_at || ['paid', 'shipped', 'completed'].includes(orderData.status)) {
+    return { variant: 'success' as const, label: 'Lunas' }
+  }
+  return { variant: 'warning' as const, label: 'Menunggu Pembayaran' }
 }
 
 const formatDate = (dateStr: string) => {
@@ -353,6 +405,79 @@ const formatDate = (dateStr: string) => {
     return dateStr
   }
 }
+
+interface OrderStep {
+  title: string
+  description: string
+  timestamp?: string
+  isCompleted: boolean
+  isActive: boolean
+}
+
+const orderSteps = computed<OrderStep[]>(() => {
+  if (!order.value) return []
+
+  const status = order.value.status
+  const isPaid = ['paid', 'shipped', 'completed'].includes(status)
+  const isShipped = ['shipped', 'completed'].includes(status)
+  const isCompleted = status === 'completed'
+  const isPending = status === 'pending'
+
+  return [
+    {
+      title: 'Dipesan',
+      description: 'Pesanan resmi dibuat',
+      timestamp: formatDate(order.value.created_at),
+      isCompleted: true,
+      isActive: false,
+    },
+    {
+      title: 'Dibayar',
+      description: isPaid ? 'Pembayaran terverifikasi' : 'Menunggu pembayaran',
+      timestamp: order.value.paid_at ? formatDate(order.value.paid_at) : undefined,
+      isCompleted: isPaid,
+      isActive: isPending,
+    },
+    {
+      title: 'Dikirim',
+      description: isShipped
+        ? 'Pesanan dalam pengiriman'
+        : isPaid
+          ? 'Sedang disiapkan seller'
+          : 'Menunggu diproses',
+      isCompleted: isShipped,
+      isActive: isPaid && !isShipped,
+    },
+    {
+      title: 'Selesai',
+      description: isCompleted ? 'Pesanan telah diterima' : 'Konfirmasi penerimaan',
+      isCompleted: isCompleted,
+      isActive: isShipped && !isCompleted,
+    },
+  ]
+})
+
+const getSegmentColor = (idx: number) => {
+  if (!order.value || order.value.status === 'cancelled') {
+    return 'bg-brand-hairsoft'
+  }
+  const status = order.value.status
+  if (idx === 0) {
+    // Jalur Step 1 (Dipesan) -> Step 2 (Dibayar)
+    return 'bg-emerald-600'
+  }
+  if (idx === 1) {
+    // Jalur Step 2 (Dibayar) -> Step 3 (Dikirim)
+    return ['paid', 'shipped', 'completed'].includes(status)
+      ? 'bg-emerald-600'
+      : 'bg-brand-hairsoft'
+  }
+  if (idx === 2) {
+    // Jalur Step 3 (Dikirim) -> Step 4 (Selesai)
+    return ['shipped', 'completed'].includes(status) ? 'bg-emerald-600' : 'bg-brand-hairsoft'
+  }
+  return 'bg-brand-hairsoft'
+}
 </script>
 
 <template>
@@ -360,7 +485,7 @@ const formatDate = (dateStr: string) => {
     <!-- Breadcrumbs -->
     <nav
       aria-label="Breadcrumbs"
-      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 border-b border-brand-hairsoft overflow-x-auto"
+      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 overflow-x-auto"
     >
       <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
         ShelfStack
@@ -417,109 +542,106 @@ const formatDate = (dateStr: string) => {
             <span v-if="order.paid_at"> · Dibayar pada {{ formatDate(order.paid_at) }}</span>
           </p>
         </div>
-
-        <!-- Realtime Pulse Pill -->
-        <div
-          class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200 text-[11px] self-start sm:self-center font-medium"
-        >
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-          <span>Realtime Status Aktif</span>
-        </div>
       </div>
 
       <!-- Timeline Status Progress -->
       <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper">
-        <h2 class="font-display text-sm font-bold text-brand-ink m-0 mb-4">
-          Status Alur Transaksi
-        </h2>
-
-        <div
-          v-if="order.status === 'cancelled'"
-          class="p-4 bg-red-50 text-red-700 rounded-card text-xs flex items-center gap-2"
-        >
-          <i class="pi pi-times-circle text-base" />
-          <span>Pesanan ini telah dibatalkan atau waktu pembayaran telah kedaluwarsa.</span>
+        <div class="flex items-center justify-between pb-4 mb-6 border-b border-brand-hairsoft">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-compass text-brand-accent text-sm" />
+            <h2 class="font-display text-sm font-bold text-brand-ink m-0">
+              Alur Pesanan & Pengiriman
+            </h2>
+          </div>
         </div>
 
-        <div v-else class="grid grid-cols-4 gap-2 text-center text-xs">
-          <!-- Step 1: Dipesan -->
-          <div class="space-y-2">
-            <div
-              class="w-8 h-8 rounded-full mx-auto flex items-center justify-center font-bold text-xs bg-emerald-600 text-white"
-            >
-              <i class="pi pi-check text-xs" />
-            </div>
-            <p class="font-semibold text-brand-ink m-0 text-[11px]">Dipesan</p>
-          </div>
-
-          <!-- Step 2: Dibayar -->
-          <div class="space-y-2">
-            <div
-              class="w-8 h-8 rounded-full mx-auto flex items-center justify-center font-bold text-xs transition-colors"
-              :class="
-                order.status !== 'pending'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-brand-field text-brand-muted border border-brand-hair'
-              "
-            >
-              <i v-if="order.status !== 'pending'" class="pi pi-check text-xs" />
-              <span v-else>2</span>
-            </div>
-            <p
-              class="font-semibold m-0 text-[11px]"
-              :class="order.status !== 'pending' ? 'text-brand-ink' : 'text-brand-muted'"
-            >
-              Dibayar
+        <!-- Cancelled State Alert: Pure informative notification without duplicated action button -->
+        <div
+          v-if="order.status === 'cancelled'"
+          class="p-4 bg-red-50 text-red-700 border border-red-200 rounded-card text-xs flex items-start gap-3"
+        >
+          <i class="pi pi-times-circle text-lg shrink-0 text-red-600 mt-0.5" />
+          <div class="space-y-1">
+            <p class="font-semibold text-sm m-0">Pesanan Dibatalkan</p>
+            <p v-if="order.cancellation_reason" class="text-xs text-red-700 m-0">
+              Alasan: <span class="font-medium text-red-800">{{ order.cancellation_reason }}</span>
+            </p>
+            <p class="text-[11px] text-red-600/90 m-0">
+              Dibatalkan pada
+              {{ formatDate(order.cancelled_at || order.updated_at || order.created_at) }}. Stok
+              produk telah dikembalikan ke etalase.
             </p>
           </div>
+        </div>
 
-          <!-- Step 3: Dikirim -->
-          <div class="space-y-2">
+        <!-- Active Stepper -->
+        <div v-else class="relative pt-2 pb-1">
+          <!-- Stepper Grid: 4 columns without gap so lines span center-to-center seamlessly -->
+          <div class="grid grid-cols-4">
             <div
-              class="w-8 h-8 rounded-full mx-auto flex items-center justify-center font-bold text-xs transition-colors"
-              :class="
-                ['shipped', 'completed'].includes(order.status)
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-brand-field text-brand-muted border border-brand-hair'
-              "
+              v-for="(step, idx) in orderSteps"
+              :key="step.title"
+              class="relative flex flex-col items-center text-center"
             >
-              <i
-                v-if="['shipped', 'completed'].includes(order.status)"
-                class="pi pi-check text-xs"
-              />
-              <span v-else>3</span>
-            </div>
-            <p
-              class="font-semibold m-0 text-[11px]"
-              :class="
-                ['shipped', 'completed'].includes(order.status)
-                  ? 'text-brand-ink'
-                  : 'text-brand-muted'
-              "
-            >
-              Dikirim
-            </p>
-          </div>
+              <!-- Circle and Connector Row -->
+              <div class="relative flex items-center justify-center w-full">
+                <!-- Discrete Connector Line to Next Step (Starts at this circle center, ends at next circle center) -->
+                <div
+                  v-if="idx < orderSteps.length - 1"
+                  class="absolute left-1/2 w-full top-1/2 -translate-y-1/2 h-0.5 z-0 transition-colors duration-300"
+                  :class="getSegmentColor(idx)"
+                />
 
-          <!-- Step 4: Selesai -->
-          <div class="space-y-2">
-            <div
-              class="w-8 h-8 rounded-full mx-auto flex items-center justify-center font-bold text-xs transition-colors"
-              :class="
-                order.status === 'completed'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-brand-field text-brand-muted border border-brand-hair'
-              "
-            >
-              <i v-if="order.status === 'completed'" class="pi pi-check text-xs" />
-              <span v-else>4</span>
+                <!-- Step Circle (z-10 masks the connector line underneath) -->
+                <div
+                  class="relative z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-all duration-200"
+                  :class="[
+                    step.isCompleted
+                      ? 'bg-emerald-600 text-white shadow-sm ring-4 ring-emerald-50'
+                      : step.isActive && order.status === 'pending'
+                        ? 'bg-amber-500 text-white shadow-sm ring-4 ring-amber-100'
+                        : step.isActive
+                          ? 'bg-brand-accent text-white shadow-sm ring-4 ring-brand-accent/20'
+                          : 'bg-white border-2 border-brand-hair text-brand-muted',
+                  ]"
+                >
+                  <i v-if="step.isCompleted" class="pi pi-check text-xs" />
+                  <i
+                    v-else-if="step.isActive && order.status === 'pending'"
+                    class="pi pi-clock text-xs"
+                  />
+                  <span v-else>{{ idx + 1 }}</span>
+                </div>
+              </div>
+
+              <!-- Step Info -->
+              <div class="mt-3 px-1 w-full max-w-[160px] mx-auto">
+                <p
+                  class="font-display font-bold text-[11px] sm:text-xs m-0 truncate"
+                  :class="[
+                    step.isCompleted || step.isActive ? 'text-brand-ink' : 'text-brand-muted',
+                  ]"
+                >
+                  {{ step.title }}
+                </p>
+                <p
+                  class="text-[10px] sm:text-[11px] m-0 mt-0.5 leading-snug"
+                  :class="[
+                    step.isActive && order.status === 'pending'
+                      ? 'text-amber-700 font-medium'
+                      : 'text-brand-muted',
+                  ]"
+                >
+                  {{ step.description }}
+                </p>
+                <p
+                  v-if="step.timestamp"
+                  class="text-[9px] sm:text-[10px] text-brand-faint m-0 mt-0.5 truncate"
+                >
+                  {{ step.timestamp }}
+                </p>
+              </div>
             </div>
-            <p
-              class="font-semibold m-0 text-[11px]"
-              :class="order.status === 'completed' ? 'text-brand-ink' : 'text-brand-muted'"
-            >
-              Selesai
-            </p>
           </div>
         </div>
       </div>
@@ -584,19 +706,15 @@ const formatDate = (dateStr: string) => {
               <h2 class="font-display text-base font-bold text-brand-ink m-0">Tujuan Pengiriman</h2>
             </div>
 
-            <div class="text-xs text-brand-muted space-y-1">
+            <div v-if="order.address" class="text-xs text-brand-muted space-y-1">
               <p class="font-bold text-brand-ink m-0">
-                {{ (order.address as any)?.name }} ({{ (order.address as any)?.phone }})
+                {{ order.address.name }} ({{ order.address.phone }})
               </p>
               <p class="m-0 leading-relaxed">
-                {{ (order.address as any)?.street }}, {{ (order.address as any)?.city }}
-                {{ (order.address as any)?.postal }}
+                {{ order.address.street }}, {{ order.address.city }} {{ order.address.postal }}
               </p>
-              <p
-                v-if="(order.address as any)?.note"
-                class="italic text-[11px] text-brand-muted pt-1 m-0"
-              >
-                Catatan: "{{ (order.address as any)?.note }}"
+              <p v-if="order.address.note" class="italic text-[11px] text-brand-muted pt-1 m-0">
+                Catatan: "{{ order.address.note }}"
               </p>
             </div>
           </div>
@@ -616,8 +734,8 @@ const formatDate = (dateStr: string) => {
             <div class="flex items-center justify-between">
               <span>Status Pembayaran</span>
               <UiBadge
-                :variant="getStatusBadge(order.status).variant"
-                :label="getStatusBadge(order.status).label"
+                :variant="getPaymentStatusBadge(order).variant"
+                :label="getPaymentStatusBadge(order).label"
               />
             </div>
             <div v-if="order.payment_type" class="flex items-center justify-between">
@@ -649,7 +767,7 @@ const formatDate = (dateStr: string) => {
               class="w-full justify-center"
               icon="pi-credit-card"
               :loading="isPaying"
-              :disabled="isCancelling || isCheckingStatus"
+              :disabled="isCancelling || isManualChecking"
               @click="handlePayNow"
             >
               Bayar Sekarang (Midtrans)
@@ -659,7 +777,7 @@ const formatDate = (dateStr: string) => {
               size="md"
               class="w-full justify-center !text-brand-ink hover:!bg-brand-hairsoft font-semibold"
               icon="pi-sync"
-              :loading="isCheckingStatus"
+              :loading="isManualChecking"
               :disabled="isPaying || isCancelling"
               @click="handleCheckPaymentStatus(false)"
             >
@@ -670,7 +788,7 @@ const formatDate = (dateStr: string) => {
               size="sm"
               class="w-full justify-center !text-red-600 hover:!text-red-700 hover:!border-red-300"
               icon="pi-times-circle"
-              :disabled="isPaying || isCancelling || isCheckingStatus"
+              :disabled="isPaying || isCancelling || isManualChecking"
               @click="isCancelModalOpen = true"
             >
               Batalkan Pesanan
@@ -680,7 +798,22 @@ const formatDate = (dateStr: string) => {
             </p>
           </div>
 
+          <!-- Action Button if cancelled: Single primary CTA for reorder -->
+          <div v-else-if="order.status === 'cancelled'" class="space-y-3 pt-2">
+            <UiButton
+              variant="primary"
+              size="md"
+              class="w-full justify-center"
+              icon="pi-refresh"
+              @click="handleReorder"
+            >
+              Beli Lagi
+            </UiButton>
+          </div>
+
+          <!-- Invoice is only available for confirmed/paid/shipped/completed orders -->
           <UiButton
+            v-if="['paid', 'shipped', 'completed'].includes(order.status)"
             variant="outline"
             size="sm"
             class="w-full justify-center text-xs"

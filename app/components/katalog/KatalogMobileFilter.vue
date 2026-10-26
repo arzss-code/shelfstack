@@ -25,7 +25,7 @@ const emit = defineEmits<{
     @click.self="emit('close')"
   >
     <div
-      class="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-6 space-y-5 max-h-[85vh] overflow-y-auto shadow-floating"
+      class="w-full sm:max-w-md bg-brand-canvas rounded-t-card sm:rounded-card p-6 space-y-5 max-h-[85vh] overflow-y-auto shadow-floating border border-brand-hair"
     >
       <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
         <h2 class="font-display text-base font-bold text-brand-ink m-0">Filter Katalog</h2>
@@ -49,7 +49,7 @@ const emit = defineEmits<{
             :key="cat.id"
             type="button"
             :class="[
-              'p-2.5 rounded-xl text-xs font-medium border text-center transition-colors cursor-pointer truncate',
+              'p-2.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer truncate',
               selectedCategory === cat.id
                 ? 'bg-brand-ink text-white border-brand-ink font-semibold'
                 : 'bg-brand-canvas-soft border-brand-hair text-brand-muted hover:text-brand-ink',
@@ -72,7 +72,7 @@ const emit = defineEmits<{
             :key="range.id"
             type="button"
             :class="[
-              'p-2.5 rounded-xl text-xs font-medium border text-center transition-colors cursor-pointer truncate',
+              'p-2.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer truncate',
               selectedPriceRange === range.id
                 ? 'bg-brand-ink text-white border-brand-ink font-semibold'
                 : 'bg-brand-canvas-soft border-brand-hair text-brand-muted hover:text-brand-ink',

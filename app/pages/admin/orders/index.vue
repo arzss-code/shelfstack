@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { RealtimeChannel } from '@supabase/supabase-js'
-import { useToast } from 'primevue/usetoast'
 import AdminOrderTable, {
   type AdminOrderRow,
 } from '~/features/orders/components/AdminOrderTable.vue'
@@ -13,13 +12,13 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Kelola Pesanan — Admin ShelfStack',
+  title: 'Kelola Pesanan - Admin ShelfStack',
   description: 'Daftar seluruh transaksi pesanan toko ShelfStack dengan filter status terpadu.',
 })
 
 const route = useRoute()
 const router = useRouter()
-const toast = useToast()
+const toast = useUiToast()
 const supabase = useSupabaseClient<Database>()
 
 const activeStatus = ref<string>((route.query.status as string) || '')
@@ -28,6 +27,14 @@ const fromDate = ref('')
 const toDate = ref('')
 const page = ref(1)
 const pageSize = 15
+const sortKey = ref<string | null>(null)
+const sortDirection = ref<'desc' | 'asc' | null>(null)
+
+const sortParam = computed(() => {
+  if (!sortKey.value || !sortDirection.value) return ''
+  const col = sortKey.value === 'id' ? 'created_at' : sortKey.value
+  return `${col}_${sortDirection.value}`
+})
 
 const loading = ref(true)
 const orders = ref<AdminOrderRow[]>([])
@@ -53,6 +60,7 @@ const fetchOrders = async () => {
     const params: Record<string, string | number> = { from, to }
     if (activeStatus.value) params.status = activeStatus.value
     if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
+    if (sortParam.value) params.sort = sortParam.value
 
     const res = await $fetch<{ status: string; data: { orders: AdminOrderRow[]; total: number } }>(
       '/api/admin/orders',
@@ -80,6 +88,13 @@ const onSearch = () => {
   fetchOrders()
 }
 
+const onSortChange = (payload: { key: string | null; direction: 'desc' | 'asc' | null }) => {
+  sortKey.value = payload.key
+  sortDirection.value = payload.direction
+  page.value = 1
+  fetchOrders()
+}
+
 const exporting = ref(false)
 
 const handleExportCsv = async () => {
@@ -90,6 +105,7 @@ const handleExportCsv = async () => {
     if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
     if (fromDate.value) params.from = fromDate.value
     if (toDate.value) params.to = toDate.value
+    if (sortParam.value) params.sort = sortParam.value
 
     const res = await $fetch<string>('/api/admin/orders/export', { params, responseType: 'text' })
     const blob = new Blob([res], { type: 'text/csv;charset=utf-8;' })
@@ -217,9 +233,9 @@ onUnmounted(async () => {
             Kelola Pesanan
           </h1>
           <span
-            class="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700 dark:border-emerald-800/50 dark:bg-emerald-950/40 dark:text-emerald-400"
+            class="inline-flex items-center gap-1.5 rounded-full border border-brand-success-edge bg-brand-success-tint px-2.5 py-0.5 text-[11px] font-medium text-brand-success-text"
           >
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-success" />
             Live Realtime
           </span>
         </div>
@@ -253,66 +269,61 @@ onUnmounted(async () => {
     </div>
 
     <!-- Filter & Search Controls -->
-    <div
-      class="flex flex-col gap-4 rounded-2xl border border-brand-hair bg-brand-canvas-soft p-4 md:flex-row md:items-center md:justify-between"
-    >
+    <div class="flex flex-col gap-3 rounded-2xl border border-brand-hair bg-brand-canvas-soft p-4">
       <!-- Status Tabs -->
-      <div class="flex flex-wrap items-center gap-1.5">
-        <button
-          v-for="tab in statusTabs"
-          :key="tab.value"
-          type="button"
-          class="rounded-full px-3 py-1.5 text-xs font-semibold transition-all"
-          :class="[
-            activeStatus === tab.value
-              ? 'bg-brand-ink text-brand-onink shadow-whisper'
-              : 'text-brand-muted hover:bg-brand-canvas hover:text-brand-ink',
-          ]"
-          @click="onStatusChange(tab.value)"
-        >
-          {{ tab.label }}
-        </button>
-      </div>
+      <UiTabs
+        :model-value="activeStatus"
+        :items="statusTabs"
+        aria-label="Filter status pesanan"
+        @update:model-value="onStatusChange"
+      />
 
-      <!-- Search Input -->
+      <!-- Search & Filter Form -->
       <form class="flex flex-wrap items-center gap-2" @submit.prevent="onSearch">
-        <div class="relative w-full sm:w-64">
-          <i
-            class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-muted"
-          />
-          <input
+        <label for="admin-orders-search" class="sr-only">Cari ID / Nama</label>
+        <div class="w-full sm:w-56">
+          <UiInput
+            id="admin-orders-search"
             v-model="searchQuery"
             type="search"
+            size="sm"
+            left-icon="pi-search"
             placeholder="Cari ID / Nama..."
-            class="w-full rounded-full border border-brand-hair bg-brand-canvas py-1.5 pl-8 pr-3 text-xs text-brand-ink placeholder:text-brand-muted focus:border-brand-ink focus:outline-none"
           />
         </div>
-        <input
-          v-model="fromDate"
-          type="date"
-          aria-label="Tanggal mulai"
-          title="Tanggal mulai"
-          class="rounded-full border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs text-brand-ink focus:border-brand-ink focus:outline-none"
-        />
-        <span class="text-xs text-brand-muted">s.d.</span>
-        <input
-          v-model="toDate"
-          type="date"
-          aria-label="Tanggal akhir"
-          title="Tanggal akhir"
-          class="rounded-full border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs text-brand-ink focus:border-brand-ink focus:outline-none"
-        />
+
+        <label for="admin-orders-from" class="sr-only">Tanggal mulai</label>
+        <div class="w-full sm:w-36">
+          <UiInput
+            id="admin-orders-from"
+            v-model="fromDate"
+            type="date"
+            size="sm"
+            title="Tanggal mulai"
+          />
+        </div>
+
+        <span class="hidden text-xs text-brand-muted sm:inline">s.d.</span>
+
+        <label for="admin-orders-to" class="sr-only">Tanggal akhir</label>
+        <div class="w-full sm:w-36">
+          <UiInput
+            id="admin-orders-to"
+            v-model="toDate"
+            type="date"
+            size="sm"
+            title="Tanggal akhir"
+          />
+        </div>
+
         <UiButton variant="secondary" size="sm" type="submit">Cari</UiButton>
       </form>
     </div>
 
     <!-- Error Alert -->
-    <div
-      v-if="errorMessage"
-      class="rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/20 dark:text-rose-400"
-    >
+    <UiAlert v-if="errorMessage" tone="danger">
       {{ errorMessage }}
-    </div>
+    </UiAlert>
 
     <!-- Modular Orders Table Component -->
     <AdminOrderTable
@@ -322,8 +333,11 @@ onUnmounted(async () => {
       :page-size="pageSize"
       :total-orders="totalOrders"
       :total-pages="totalPages"
+      :sort-key="sortKey"
+      :sort-direction="sortDirection"
       @prev-page="prevPage"
       @next-page="nextPage"
+      @sort-change="onSortChange"
     />
   </div>
 </template>

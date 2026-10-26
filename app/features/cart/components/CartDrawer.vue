@@ -81,26 +81,26 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
     >
       <aside
         v-if="cartStore.isDrawerOpen"
-        class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white dark:bg-zinc-900 z-[100] shadow-2xl flex flex-col border-l border-slate-100 dark:border-zinc-800 select-none"
+        class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-brand-canvas z-[100] shadow-floating flex flex-col border-l border-brand-hair select-none"
         aria-label="Keranjang Belanja"
       >
         <!-- Header -->
         <header
-          class="flex items-center justify-between px-5 py-4 border-b border-brand-hair bg-white dark:bg-zinc-900 shrink-0"
+          class="flex items-center justify-between px-5 py-4 border-b border-brand-hair bg-brand-canvas shrink-0"
         >
           <div class="flex items-center gap-2.5">
             <div
-              class="w-8 h-8 rounded-lg bg-brand-canvas-soft border border-brand-hair text-brand-ink dark:text-white flex items-center justify-center"
+              class="w-8 h-8 rounded-field bg-brand-canvas-soft border border-brand-hair text-brand-ink flex items-center justify-center"
             >
               <i class="pi pi-shopping-bag text-sm" />
             </div>
             <div>
               <h2
-                class="font-display font-bold text-sm text-brand-ink dark:text-white m-0 flex items-center gap-1.5"
+                class="font-display font-bold text-sm text-brand-ink m-0 flex items-center gap-1.5"
               >
                 Keranjang Belanja
                 <span
-                  class="text-[11px] font-semibold text-brand-ink dark:text-zinc-200 bg-brand-canvas-soft border border-brand-hair px-2 py-0.5 rounded-full"
+                  class="text-[11px] font-semibold text-brand-ink bg-brand-canvas-soft border border-brand-hair px-2 py-0.5 rounded-full"
                 >
                   {{ cartStore.totalItems }}
                 </span>
@@ -110,7 +110,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
           <UiTooltip text="Tutup Keranjang" position="bottom" align="end">
             <button
               type="button"
-              class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              class="w-8 h-8 rounded-field flex items-center justify-center text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft transition-colors cursor-pointer border-0"
               aria-label="Tutup Keranjang"
               @click="close"
             >
@@ -127,17 +127,15 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
             class="h-full flex flex-col items-center justify-center text-center py-16 space-y-4"
           >
             <div
-              class="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700 flex items-center justify-center text-slate-400 shadow-sm"
+              class="w-16 h-16 rounded-card bg-brand-canvas-soft border border-brand-hair flex items-center justify-center text-brand-muted shadow-whisper"
             >
               <i class="pi pi-shopping-cart text-2xl" />
             </div>
             <div>
-              <p class="font-display font-bold text-sm text-slate-900 dark:text-white m-0">
+              <p class="font-display font-bold text-sm text-brand-ink m-0">
                 Keranjang Anda Masih Kosong
               </p>
-              <p
-                class="font-body text-xs text-slate-500 dark:text-zinc-400 m-0 mt-1 max-w-[240px] leading-relaxed"
-              >
+              <p class="font-body text-xs text-brand-muted m-0 mt-1 max-w-[240px] leading-relaxed">
                 Jelajahi katalog produk pilihan kami dan temukan kebutuhan perlengkapan Anda.
               </p>
             </div>
@@ -153,7 +151,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
           </div>
 
           <!-- Items Loop -->
-          <div v-else class="divide-y divide-slate-100 dark:divide-zinc-800">
+          <div v-else class="divide-y divide-brand-hairsoft">
             <article
               v-for="item in cartStore.items"
               :key="`${item.productId}-${item.color}-${item.material}`"
@@ -161,7 +159,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
             >
               <!-- Thumbnail -->
               <div
-                class="w-16 h-16 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700/60 overflow-hidden shrink-0 flex items-center justify-center cursor-pointer"
+                class="w-16 h-16 rounded-field bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center cursor-pointer"
                 @click="
                   () => {
                     close()
@@ -175,7 +173,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                   :alt="item.name"
                   class="w-full h-full object-cover"
                 />
-                <i v-else class="pi pi-image text-slate-300 text-lg" />
+                <i v-else class="pi pi-image text-brand-faint text-lg" />
               </div>
 
               <!-- Info & Stepper -->
@@ -183,7 +181,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0">
                     <h3
-                      class="font-display font-semibold text-xs text-slate-900 dark:text-white line-clamp-1 m-0 hover:text-blue-600 cursor-pointer transition-colors"
+                      class="font-display font-semibold text-xs text-brand-ink line-clamp-1 m-0 hover:text-brand-accent cursor-pointer transition-colors"
                       :title="item.name"
                       @click="
                         () => {
@@ -196,7 +194,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                     </h3>
                     <p
                       v-if="item.color || item.material"
-                      class="font-body text-[10px] text-slate-500 dark:text-zinc-400 m-0 mt-0.5 line-clamp-1"
+                      class="font-body text-[10px] text-brand-muted m-0 mt-0.5 line-clamp-1"
                     >
                       <span v-if="item.color">{{ item.color }}</span>
                       <span v-if="item.color && item.material"> · </span>
@@ -208,7 +206,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                   <UiTooltip text="Hapus item" position="left">
                     <button
                       type="button"
-                      class="text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors p-1 rounded-md cursor-pointer shrink-0 -mr-1"
+                      class="text-brand-faint hover:text-brand-danger hover:bg-brand-danger-tint transition-colors p-1 rounded-field cursor-pointer shrink-0 -mr-1 border-0"
                       aria-label="Hapus item"
                       @click="cartStore.removeItem(item.productId, item.color, item.material)"
                     >
@@ -220,11 +218,11 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                 <div class="flex items-center justify-between pt-1">
                   <!-- Stepper -->
                   <div
-                    class="flex items-center border border-slate-200 dark:border-zinc-700 rounded-lg bg-slate-50 dark:bg-zinc-800 h-7 px-1 gap-0.5"
+                    class="flex items-center border border-brand-hair rounded-full bg-brand-field h-7 px-1 gap-0.5"
                   >
                     <button
                       type="button"
-                      class="w-5 h-5 flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-700 rounded transition-colors cursor-pointer text-xs"
+                      class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs border-0"
                       aria-label="Kurangi kuantitas"
                       @click="
                         cartStore.updateQuantity(
@@ -243,7 +241,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                       inputmode="numeric"
                       pattern="[0-9]*"
                       aria-label="Kuantitas item"
-                      class="w-7 text-center text-xs font-bold text-slate-900 dark:text-white bg-transparent border-0 outline-none tabular-nums focus:bg-white dark:focus:bg-zinc-700 rounded transition-colors p-0 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      class="w-7 text-center text-xs font-bold text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-brand-canvas rounded transition-colors p-0 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       @focus="($event.target as HTMLInputElement).select()"
                       @input="handleManualQuantityInput($event, item)"
                       @blur="handleManualQuantityBlur($event, item)"
@@ -251,7 +249,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                     />
                     <button
                       type="button"
-                      class="w-5 h-5 flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-700 rounded transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed"
+                      class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed border-0"
                       :disabled="item.quantity >= item.stock"
                       aria-label="Tambah kuantitas"
                       @click="
@@ -269,7 +267,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
 
                   <!-- Subtotal Item -->
                   <span
-                    class="font-display text-xs sm:text-[13px] font-bold text-slate-900 dark:text-white tabular-nums"
+                    class="font-display text-xs sm:text-[13px] font-bold text-brand-ink tabular-nums"
                   >
                     {{ formatRupiah(item.price * item.quantity) }}
                   </span>
@@ -282,24 +280,20 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
         <!-- Footer / Checkout Action -->
         <footer
           v-if="!cartStore.isEmpty"
-          class="p-5 border-t border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-3.5 shrink-0"
+          class="p-5 border-t border-brand-hair bg-brand-canvas space-y-3.5 shrink-0"
         >
           <div class="flex items-center justify-between">
-            <span class="text-xs text-slate-500 dark:text-zinc-400 font-medium"
-              >Total Sementara</span
-            >
-            <span
-              class="font-display text-base font-bold text-slate-900 dark:text-white tabular-nums"
-            >
+            <span class="text-xs text-brand-muted font-medium">Total Sementara</span>
+            <span class="font-display text-base font-bold text-brand-ink tabular-nums">
               {{ cartStore.formattedTotalPrice }}
             </span>
           </div>
 
           <div
-            class="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-800/80 border border-slate-100 dark:border-zinc-700/50 flex items-center gap-2"
+            class="p-2.5 rounded-field bg-brand-canvas-soft border border-brand-hairsoft flex items-center gap-2"
           >
-            <i class="pi pi-shield-check text-blue-600 text-xs shrink-0" />
-            <p class="text-[10.5px] text-slate-500 dark:text-zinc-400 m-0 leading-tight">
+            <i class="pi pi-shield-check text-brand-accent text-xs shrink-0" />
+            <p class="text-[10.5px] text-brand-muted m-0 leading-tight">
               Garansi pengiriman resmi &amp; transaksi aman melalui Midtrans.
             </p>
           </div>
@@ -318,7 +312,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
             <UiButton
               variant="ghost"
               size="sm"
-              class="w-full justify-center text-xs text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+              class="w-full justify-center text-xs text-brand-muted hover:text-brand-ink"
               @click="goToCartPage"
             >
               Buka Halaman Keranjang Lengkap

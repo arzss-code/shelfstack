@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { useProductStore } from '~/features/products/stores/product'
-import { useToast } from 'primevue/usetoast'
 
 // Komponen otomatis ter-import oleh Nuxt dari folder app/components/home/
 // seperti: HomeHero, HomeAssurances, HomeFeaturedCategories, dsb.
 
 useSeoMeta({
-  title: 'ShelfStack — Toko Produk Esensial & Perlengkapan Modern',
+  title: 'ShelfStack - Toko Produk Esensial & Perlengkapan Modern',
   description:
     'ShelfStack: Toko online kebutuhan kerja, rumah tangga, audio studio, dan furnitur minimalis modern. Belanja aman, original, dan bergaransi.',
 })
 
 const productStore = useProductStore()
-const toast = useToast()
+const toast = useUiToast()
 
 const featured = computed(() => productStore.products.slice(0, 4))
 
