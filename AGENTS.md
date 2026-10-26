@@ -53,7 +53,7 @@ Sumber kebenaran berlapis (jangan mengarang klaim di luar ini):
 1. `docs/PROGRESS.md` — status pengerjaan terkini + "Known Gaps". Wajib dibaca sebelum kerja.
 2. `docs/BACKLOG.md` — scope + acceptance criteria (ID stabil, jangan diganti).
 3. `docs/README.md` — indeks semua dokumen.
-4. `DESIGN.md` (root) — design system aktif. `docs/DESIGN.md` dan `docs/DESIGN-ECOMMERCE.md` adalah legacy, bukan acuan implementasi.
+4. `DESIGN.md` (root): design system aktif. Dokumen legacy diarsipkan di `docs/archive/`.
 5. `docs/MCP-SETUP.md` — setup tooling OpenCode (global vs per-project).
 6. `docs/ADR/` — keputusan arsitektur yang sudah disahkan.
 

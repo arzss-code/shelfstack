@@ -2,6 +2,88 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.16.0] - 2026-10-26
+
+### Penyatuan Geometri & Primitif Etalase Publik
+
+- **Unifikasi Geometri & Token Semantik**:
+  - Penyatuan skala radius ke `rounded-card` (14px) dan `rounded-field` (10px) di seluruh etalase:
+    `KatalogToolbar`, `KatalogSidebar`, `KatalogMobileFilter`, `ProductCard`, `ProductGallery`,
+    `ProductConfigurator`, `CartDrawer`, `cart.vue`, `checkout.vue`, `SavedAddressSelector.vue`, dan `AppNavbar`.
+  - Migrasi palet hardcoded (`slate-*`, `zinc-*`, `rose-*`, `emerald-*`, `#18191b`) menjadi token semantik brand:
+    `bg-brand-canvas`, `bg-brand-canvas-soft`, `text-brand-ink`, `text-brand-muted`, `border-brand-hair`,
+    `bg-brand-danger-tint`, `bg-brand-success-tint`, `bg-brand-warning-tint`, dan `text-brand-success-text`.
+  - Penanganan void tag ESLint: eliminasi warning `vue/html-self-closing` pada void element `<img/>` dan `<input/>`
+    di komponen etalase publik (berkurang dari 32 menjadi 18 warning pre-existing).
+  - Perbaikan kontrak heading SEO dan Playwright: penambahan semantic `<h1>Katalog</h1>` pada header `app/pages/katalog.vue`.
+
+### Arsitektur Pesanan & Pembayaran (ADR 005)
+
+- **Pemisahan State Pesanan dan State Pembayaran**:
+  - Dokumentasi ADR 005 (`docs/ADR/005-order-state-payment-state-separation.md`) yang menetapkan pemisahan mutlak
+    antara status pesanan bisnis (`pending`, `processing`, `shipped`, `delivered`, `cancelled`) dan status pembayaran (`pending`, `paid`, `failed`, `refunded`, `expired`).
+  - Ekstraksi kartu pesanan mandiri (`app/features/orders/components/OrderCard.vue`) dengan visual status ganda
+    yang jelas dan pemisahan tombol aksi Bayar (Snap Popup langsung) dan Lihat Detail.
+  - Alur Beli Lagi (`reorder`): menyalin item pesanan terdahulu ke keranjang belanja aktif dan mengarahkan ke `/cart`.
+  - Gating cetak invoice: dibatasi hanya untuk pesanan dengan status lunas, dikirim, atau selesai (`paid`, `shipped`, `delivered`).
+  - Pencegahan polling flicker pada halaman `/orders/[id]`: pemisahan flag `isSilentChecking` (polling 3.5 detik)
+    dan `isManualChecking` (tombol Cek Status oleh pengguna) agar interaktivitas tombol stabil.
+  - Restock atomik pada pembatalan pesanan oleh pengguna dengan validasi alasan pembatalan dan pencatatan audit log.
+
+### Dropdown Primitif Kustom (`UiSelect`)
+
+- Penggantian elemen `<select>` native di etalase dan panel back-office dengan primitif kustom `UiSelect`.
+- Dukungan penuh navigasi keyboard (Arrow Down/Up, Enter, Escape, Space, Home, End) serta penanganan penumpukan z-index
+  terisolasi (`isolation: isolate`) pada kartu katalog.
+
+### Domain Glossary
+
+- Inisialisasi `GLOSSARY.md` di root repositori untuk membakukan definisi istilah domain (On-hand Stock, Reserved Stock,
+  Available Stock, Snap Token, Order Expiry Sweep, Double-entry Ledger, Soft Delete).
+
+### Redesign Split Layout Halaman Autentikasi
+
+- **Penyusunan Ulang Tampilan Login & Register (`AuthCard.vue`, `login.vue`, `register.vue`)**:
+  - Transformasi kartu form menjadi layout split 2-kolom: kolom kiri memuat visual arsitektural kurasi galeri ShelfStack (`/images/auth-showcase.jpg`) dan wordmark insignia resmi, kolom kanan memuat formulir autentikasi.
+  - Kompak pada viewport: penataan form yang efisien dan grid 2-kolom untuk sandi pada registrasi sehingga halaman muat tanpa scrolling berlebih pada resolusi desktop standar.
+  - Eliminasi trust badges redundan: penghapusan ikon 'Belanja Aman • Privasi Terjaga' dan 'Keamanan Terjamin • Checkout Lebih Cepat'.
+  - Show Password Toggle: penambahan fitur interaktif tampilkan/sembunyikan kata sandi pada `UiInput` dan `AuthFormInput` dengan status aria-label yang aksesibel (+4 unit test di `tests/unit/auth-redesign.spec.ts`).
+
+### Wishlist System (Koleksi Produk Tersimpan)
+
+- **Implementasi Store & UI Wishlist**:
+  - Store Pinia `useWishlistStore` (`app/features/wishlist/stores/wishlist.ts`) dengan arsitektur hybrid: local-first untuk guest dan otomatis sinkronisasi dua arah ke database saat login.
+  - Komponen `WishlistButton.vue` dengan micro-animation spring physics, toggle state, aria-label aksesibel, dan integrasi primitif `UiTooltip` konsisten (posisi bottom, align end) yang terisolasi di dalam batas kartu produk tanpa clipping.
+  - Integrasi kartu produk (`ProductCard.vue`): tombol love overlay di pojok kanan atas dengan stop propagation dan tooltip yang aman dari clipping `overflow-hidden`.
+  - Integrasi konfigurator detail produk (`ProductConfigurator.vue`): tombol love inline sejajar dengan aksi Tambah ke Bag.
+  - Integrasi navbar (`AppNavbar.vue`): navigasi langsung ke `/wishlist` dan dynamic badge counter item pada desktop dan mobile menu.
+  - Halaman mandiri `/wishlist` (`app/pages/wishlist.vue`): tata letak gallery modernist, breadcrumbs ringkas, margin dan padding selaras dengan halaman pesanan, grid kartu produk tersimpan, aksi "Pindahkan ke Bag" per item maupun sekaligus (`moveAllToCart`), serta empty state elegan.
+- **Integrasi Database Supabase & Server Nitro**:
+  - Migrasi skema database `supabase/migrations/20261118000001_user_wishlists.sql` dengan relasi `user_id` ke `auth.users`, `product_id` ke `public.products`, composite unique constraint `(user_id, product_id)`, serta RLS policies terisolasi per user (`(select auth.uid()) = user_id`).
+  - Skema Zod validasi input `shared/schemas/wishlist.ts` (`WishlistAddInput`, `WishlistDeleteInput`, `WishlistSyncInput`).
+  - Nitro API route handlers: `GET /api/wishlist`, `POST /api/wishlist`, `DELETE /api/wishlist`, dan `POST /api/wishlist/sync` menggunakan query selektif non-destruktif yang 100% kompatibel dengan RLS policies.
+  - Ketahanan Hard Refresh: penambahan watcher reaktif sesi auth Supabase pada hidrasi client dan inisialisasi store pada lifecycle mount agar item wishlist tidak hilang saat pengguna melakukan hard reload (`Ctrl + Shift + R`).
+  - Penyeragaman seluruh istilah antarmuka dan pesan respon server menjadi "Wishlist".
+- **Pengujian Unit**:
+  - Penambahan 9 unit test di `tests/unit/wishlist-store.spec.ts` (menguji inisialisasi, penambahan, pencegahan duplikat, toggle, pemindahan ke keranjang, dan persistensi).
+  - Penambahan 9 unit test di `tests/unit/api-wishlist.spec.ts` (menguji validasi skema Zod dan invariant keamanan isolasi data RLS per tenant).
+
+### Peningkatan Tab Bar Favicon & Tata Arsip Dokumentasi
+
+- **Aset Favicon Browser**:
+  - Desain ulang ikon tab browser `public/favicon.svg` dengan proporsi diperbesar (zoomed squircle), kontras rak tebal, dan aksen biru kobalt ShelfStack.
+  - Pembuatan bundel aset produksi: `favicon-32x32.png`, `apple-touch-icon.png`, dan `favicon.ico`.
+  - Integrasi cache-busting `?v=2` pada `nuxt.config.ts` dan `app/app.vue`.
+- **Restrukturisasi Dokumentasi Proyek**:
+  - Pembersihan folder `docs/`: merelokasi berkas usang dan artefak Stitch ke `docs/archive/` dilengkapi `docs/archive/README.md`.
+  - Pembaharuan master index `docs/README.md` dan ringkasan standup `docs/standup/README.md`.
+
+### Gate Kualitas (dijalankan aktual 2026-10-26)
+
+- `pnpm typecheck` (`nuxi typecheck`): EXIT 0 (0 error).
+- `pnpm lint`: EXIT 0 (0 error, 0 warning, 100% clean).
+- `pnpm exec vitest run`: 45 test files, 408 test lolos (100% pass).
+
 ## [Unreleased] - unify auth area (2026-10-16)
 
 ### Perubahan
