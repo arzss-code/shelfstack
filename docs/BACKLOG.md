@@ -76,6 +76,18 @@
 | Q-04 | Sebagai perekrut, saya paham repo dalam 3 menit   | Must      | README baru + GIF + arsitektur diagram + akun demo (lihat `PORTFOLIO-PACKAGING.md`)                                   |
 | Q-05 | Sebagai dev, saya ukur a11y + perf                | Should    | Lighthouse ≥90 perf/a11y/best-practice, tab order logis                                                               |
 
-## Out of Scope (12 minggu ini)
+## Out of Scope & Backlog Lanjutan (Belum Diimplementasikan)
 
-- Payment gateway real (Midtrans/Stripe live), multi-vendor, kupon/ongkir real, i18n penuh, microservices, mobile native, AI recommendation. Alasan: memperbesar risiko tanpa menaikkan sinyal Fullstack secara proporsional. Payment = mock/sandbox saja.
+Fitur berikut tercatat resmi belum diimplementasikan pada siklus berjalan (alasan: menjaga fokus pada integritas data transaksional, auth strict, dan arsitektur etalase):
+
+1. **Pusat Notifikasi**: In-app notification center & web push notifications.
+2. ~~**Wishlist**~~: ✅ **SELESAI 2026-10-26** (Penyimpanan favorit persisten `useWishlistStore`, `WishlistButton.vue`, badge navbar, `/wishlist`, dan integrasi keranjang).
+3. **Kalkulator Ongkir & Logistik**: Integrasi kurir ekspedisi real (RajaOngkir/Biteship), kalkulasi berat, dan pilihan layanan (saat ini flat gratis ongkir).
+4. **Lacak Pengiriman Ekspedisi**: Nomor resi kurir dan tracking perjalanan paket real-time (saat ini alur internal status pesanan).
+5. **Kupon Promo & Voucher**: Sistem kode voucher promosi di checkout (saat ini hanya diskon per-produk langsung).
+6. **Pusat Bantuan & FAQ**: Halaman `/help` interaktif dan kebijakan pengembalian mandiri (link navbar/footer dialihkan ke katalog).
+7. **Live Chat CS**: Widget bantuan langsung (WhatsApp CS / web live chat).
+8. **Halaman Perusahaan**: Halaman `/about`, `/contact`, `/careers`.
+9. **Ulasan & Rating Pelanggan**: Review pasca-transaksi dan rating bintang nyata (bintang statis sudah dibersihkan).
+10. **Infrastruktur BullMQ**: Worker antrean DLQ Redis untuk order expiry sweep (saat ini sweep direct endpoint).
+11. **Payment Gateway Live**: Transaksi nyata menggunakan kartu kredit/kartu debit live (saat ini Midtrans Sandbox).

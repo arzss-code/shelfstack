@@ -1,8 +1,8 @@
 # Portfolio Plan — product-management → ShelfStack
 
 > Master plan. Status: Fullstack E-Commerce, Deep-dive 2–3 bulan (12 minggu / 6 sprint).
-> Dokumen pendamping: `SPRINT-PLAN.md`, `BACKLOG.md`, `PHASE-0..5-*.md`, `ADR/`, `PORTFOLIO-PACKAGING.md`.
-> Dokumen lama tetap berlaku: `PRD-ECOMMERCE.md`, `SOW-ECOMMERCE.md`, `DESIGN-ECOMMERCE.md`, `ARCHITECTURE.md`, `DESIGN.md`.
+> Dokumen pendamping: `SPRINT-PLAN.md`, `BACKLOG.md`, `PHASE-0..5-*.md`, `ADR/`, `ARCHITECTURE.md`, `PORTFOLIO-PACKAGING.md`.
+> Dokumen legacy & arsip: lihat `docs/archive/` (`DESIGN-OKLCH-LEGACY.md`, `DESIGN-ECOMMERCE.md`, `SOW-ECOMMERCE.md`).
 
 ## 1. Visi & Positioning
 

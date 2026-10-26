@@ -176,8 +176,48 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
 8. **E2E auth + cart hydration (temuan 2026-10-13, SELESAI 2026-10-16, PR #17).** Akar login: akun seed `.local` gagal `signInWithPassword` di cloud (`Database error querying schema`, terbukti via API); akun `.test` (dashboard, profil+role benar) login OK. Baris `.local` yang rusak sudah dihapus dari cloud; seed `.local` tetap local-only, akun kanonis cloud adalah `.test`. E2E baca kredensial dari env (fallback seed lokal), 4 secrets CI sudah diisi dan job E2E hijau (2m37s). Bug nyata diperbaiki: `initCart()` di `onMounted` layout default untuk full page load. Flake submit pre-hydration dimitigasi. Sisa: daftarkan job E2E ke required checks (issue #10) dan verifikasi live issue #12.
 9. **Fix checkout premature empty state flash (SELESAI 2026-10-26).** Pada saat checkout berhasil membuat order di backend dan mengosongkan keranjang di store, template checkout sebelumnya langsung menampilkan empty state "Keranjang Belanja Kosong" sebelum popup Snap Midtrans muncul. Diperbaiki dengan state `isOrderPlaced` dan snapshot keranjang terisolasi (`placedOrderSnapshot`), sehingga rincian item pesanan tetap utuh dan formulir beralih ke state persiapan pembayaran dengan mulus (+3 unit test di `tests/unit/checkout-transition.spec.ts`).
 10. **Fix order detail polling flicker, stepper timeline UX, and remove slop badge (SELESAI 2026-10-26).** Di halaman `/orders/[id]`, sinkronisasi status pembayaran background polling setiap 3.5 detik sebelumnya menggunakan satu variabel `isCheckingStatus` yang terikat pada disabled/loading state tombol aksi, sehingga tombol berkedip aktif/nonaktif secara mengganggu. Masalah diperbaiki dengan memisahkan `isSilentChecking` (background polling) dan `isManualChecking` (tombol Cek Status oleh pengguna). Komponen stepper alur transaksi yang sebelumnya polos dan terputus diganti dengan visual timeline terhubung yang informatif, adaptif terhadap status pesanan, serta badge "Realtime Status Aktif" dibersihkan.
+11. **Migrasi Dropdown Bawaan ke Primitif Kustom UiSelect (SELESAI 2026-10-26).** Audit seluruh dropdown form dan filter di halaman katalog, form produk, serta panel admin. Komponen native `<select>` diganti dengan `<UiSelect>` kustom yang ramah aksesibilitas keyboard (Arrows, Enter, Escape, Space), mendukung prefix, pencarian, dan penataan z-index terisolasi (`isolation: isolate` pada kartu produk) agar popover tidak tertabrak badge produk (+9 unit test di `tests/unit/ui-select.spec.ts`).
+12. **Penyempurnaan Alur dan Tampilan Pesanan Pelanggan (SELESAI 2026-10-26).** Tab filter status pesanan pada `/orders` dibuat full-width responsif tanpa indikator scrollbar visual. Daftar pesanan diekstrak ke `OrderCard.vue` dengan pemisahan aksi Bayar langsung (Snap Popup) dan Detail. Di halaman `/orders/[id]`, pembatalan pesanan terhubung dengan restock atomik RPC, penayangan alasan pembatalan dan timestamp transparan, tombol aksi "Beli Lagi" yang memasukkan item kembali ke keranjang belanja, pembatasan akses cetak invoice hanya untuk status lunas/dikirim/selesai, serta pembersihan type casting `as any` (+10 unit test gabungan di `tests/unit/orders-card.spec.ts` dan `tests/unit/orders-detail-actions.spec.ts`).
+13. **Unifikasi Desain & Geometri Etalase Publik (SELESAI 2026-10-26).** Penyatuan geometri radius (`rounded-card`, `rounded-field`), pembersihan seluruh warna legasi hardcoded (`slate-*`, `zinc-*`, `rose-*`, `emerald-*`) menjadi token semantik brand (`bg-brand-canvas`, `bg-brand-canvas-soft`, `text-brand-ink`, `text-brand-muted`, `brand-danger`, `brand-success`, `brand-warning`), eliminasi 7 warning ESLint `vue/html-self-closing` pada void element `<img/>` dan `<input/>` di komponen etalase publik (`ProductCard`, `ProductGallery`, `ProductConfigurator`, `CartDrawer`, `cart.vue`, `KatalogMobileFilter`, `AppNavbar`), serta sinkronisasi dark mode otomatis melalui CSS variables terpusat.
+14. **Redesign Split Layout Halaman Login & Register (SELESAI 2026-10-26).** Transformasi tampilan autentikasi menjadi layout split 2-kolom: kolom kiri memuat visual arsitektural kurasi ShelfStack dan logo resmi, kolom kanan memuat formulir kompak yang pas di viewport tanpa scroll vertikal berlebih pada desktop. Seluruh badge/icon trust redundan ('Belanja Aman • Privasi Terjaga') dihapus. Penambahan fitur show/hide password toggle interaktif pada input kata sandi yang ramah aksesibilitas (+4 unit test di `tests/unit/auth-redesign.spec.ts`).
+15. **Pencapaian 100% Zero ESLint Warnings (SELESAI 2026-10-26).** Seluruh 16 sisa warning pre-existing `vue/html-self-closing` pada void element `<img/>`, `<input/>`, dan `<br/>` di komponen `AppNavbar.vue`, `HomeHero.vue`, `HomeFeaturedCategories.vue`, `HomeFlashDeals.vue`, `UiFileField.vue`, `OrderCancelDialog.vue`, `OrderInvoiceModal.vue`, dan `admin/orders/[id].vue` telah dibersihkan secara tuntas. Perintah `pnpm lint` kini menghasilkan output bersih: 0 problems (0 errors, 0 warnings).
+16. **Wishlist System Lengkap (SELESAI 2026-10-26).** Implementasi Pinia store persistent `shelfstack-wishlist` (`useWishlistStore`), tombol love interaktif `WishlistButton` di kartu produk (`ProductCard`) dan halaman konfigurasi detail (`ProductConfigurator`), dynamic badge counter pada ikon hati di `AppNavbar` (desktop dan menu mobile), halaman mandiri `/wishlist` dengan grid koleksi tersimpan, aksi "Pindahkan ke Bag" per item maupun kolektif (`moveAllToCart`) dengan filter stok habis, toast notifikasi, serta 9 unit test komprehensif di `tests/unit/wishlist-store.spec.ts`.
 
 ---
+
+## 📌 Inventaris Fitur Belum Diimplementasikan (Backlog Lanjutan)
+
+Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **belum diimplementasikan** atau masih berupa placeholder:
+
+1. **Pusat Notifikasi (In-App Notification Center & Web Push)**:
+   - Status: Belum diimplementasikan.
+   - Keterangan: Belum ada tabel database `notifications`, endpoint `/api/notifications`, maupun ikon lonceng notifikasi di header navbar untuk pembaruan pesanan/sistem. Notifikasi saat ini hanya berupa toast lokal (`useUiToast`).
+2. ~~**Wishlist System (Koleksi Produk Tersimpan)**~~:
+   - Status: ✅ **SELESAI 2026-10-26** (Store persistent `useWishlistStore`, `WishlistButton.vue`, badge navbar, `/wishlist`, integrasi keranjang, sinkronisasi dua arah database Supabase, dan mitigasi hard refresh).
+3. **Kalkulator Ongkir & Integrasi Kurir Ekspedisi (Shipping & Logistics API)**:
+   - Status: Belum diimplementasikan (masih flat / gratis ongkir statis).
+   - Keterangan: Belum terhubung dengan API kurir logistik (RajaOngkir, Biteship, JNE, SiCepat, J&T). Belum ada field berat barang (`weight_grams`), kalkulasi jarak antar-kota, maupun pilihan jenis layanan (Instan, Reguler, Kargo).
+4. **Lacak Pengiriman Ekspedisi (Courier Live Tracking)**:
+   - Status: Belum diimplementasikan.
+   - Keterangan: Alur pesanan saat ini hanya melacak status siklus hidup internal (`pending`, `paid`, `shipped`, `delivered`). Belum ada field nomor resi (`tracking_number`), kurir, maupun linimasa perpindahan paket antar-hub. Link "Lacak Pesanan" di navbar dan footer masih berupa placeholder ke `/katalog`.
+5. **Kupon Promo & Diskon (Voucher Codes & Auto-Discounts)**:
+   - Status: Belum diimplementasikan.
+   - Keterangan: Belum ada modul voucher (tabel `coupons`, input kode promo di keranjang/checkout, validasi kuota klaim, dan potongan harga dinamis). Diskon saat ini hanya potongan langsung berbasis kolom produk (`original_price_cents`).
+6. **Pusat Bantuan & FAQ Interaktif (Help Center / FAQ Page)**:
+   - Status: Belum diimplementasikan.
+   - Keterangan: Belum ada halaman `/help` atau `/faq` mandiri. Link "Pusat Bantuan", "Kebijakan Pengembalian", dan "Informasi Pengiriman" di navbar atas dan footer masih dialihkan ke `/katalog`.
+7. **Live Chat / Bantuan Pelanggan Langsung (Customer Support Chat)**:
+   - Status: Belum diimplementasikan.
+   - Keterangan: Belum ada widget live chat (Tawk.to, Crisp, webhook WhatsApp CS, atau chat real-time interaktif berbasis Supabase). Teks di footer hanya label statis.
+8. **Halaman Profil Perusahaan (Tentang Kami, Kontak, Karier)**:
+   - Status: Belum diimplementasikan.
+   - Keterangan: Belum ada rute halaman `/about`, `/contact`, atau `/careers`. Link di footer saat ini masih mengarah ke `/katalog`.
+9. **Ulasan & Rating Pelanggan (Product Reviews & Ratings)**:
+   - Status: Belum diimplementasikan.
+   - Keterangan: Belum ada tabel `product_reviews`, sistem submit ulasan pasca-pesanan selesai, maupun agregasi rating bintang pelanggan nyata (bintang statis sebelumnya telah dibersihkan demi integritas data).
+10. **Antrean Pekerja Latar Belakang (BullMQ Worker untuk Order Expiry Sweep)**:
+    - Status: Belum diimplementasikan.
+    - Keterangan: Pembatalan pesanan kedaluwarsa saat ini masih dijalankan via direct sweep endpoint berkala, belum menggunakan Redis BullMQ dengan antrean DLQ (Dead Letter Queue).
 
 ## 📋 Catatan Teknis & Konvensi Wajib
 

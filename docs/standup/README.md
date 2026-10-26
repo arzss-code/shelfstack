@@ -50,6 +50,8 @@
 
 ## Arsip
 
-| Tanggal    | Pagi                                         | Sore                                             | Fokus                                              |
-| ---------- | -------------------------------------------- | ------------------------------------------------ | -------------------------------------------------- |
-| 2026-09-18 | [morning-plan](./2026-09-18-morning-plan.md) | [evening-report](./2026-09-18-evening-report.md) | Sprint 2 Auth+RLS, IA storefront, bahasa DESIGN.md |
+| Tanggal    | Pagi                                         | Sore                                             | Fokus                                                            |
+| ---------- | -------------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------- |
+| 2026-09-18 | [morning-plan](./2026-09-18-morning-plan.md) | [evening-report](./2026-09-18-evening-report.md) | Sprint 2 Auth+RLS, IA storefront, bahasa DESIGN.md               |
+| 2026-09-21 | [standup](./2026-09-21-standup.md)           | [standup](./2026-09-21-standup.md)               | Alur auth/reset password, kontras form, refactor beranda modular |
+| 2026-10-01 | -                                            | [evening-report](./2026-10-01-evening-report.md) | Integrasi Midtrans, clean slugs, card anti-slop, fix drawer      |

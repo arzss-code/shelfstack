@@ -1,91 +1,91 @@
 ---
 name: Talenavi Product Hub
 colors:
-  surface: "oklch(0.99 0 0)"
-  surface-dim: "oklch(0.96 0.01 255)"
-  surface-bright: "oklch(1 0 0)"
-  surface-container-lowest: "oklch(1 0 0)"
-  surface-container-low: "oklch(0.97 0.01 255)"
-  surface-container: "oklch(0.95 0.01 255)"
-  surface-container-high: "oklch(0.92 0.02 255)"
-  surface-container-highest: "oklch(0.89 0.02 255)"
-  on-surface: "oklch(0.15 0.02 255)"
-  on-surface-variant: "oklch(0.35 0.03 255)"
-  inverse-surface: "oklch(0.20 0.02 255)"
-  inverse-on-surface: "oklch(0.96 0.01 255)"
-  outline: "oklch(0.55 0.03 255)"
-  outline-variant: "oklch(0.85 0.02 255)"
-  primary: "oklch(0.45 0.16 250)"
-  on-primary: "oklch(0.98 0.02 250)"
-  primary-container: "oklch(0.92 0.05 250)"
-  on-primary-container: "oklch(0.25 0.10 250)"
-  inverse-primary: "oklch(0.75 0.12 250)"
-  secondary: "oklch(0.50 0.06 255)"
-  on-secondary: "oklch(0.98 0 0)"
-  secondary-container: "oklch(0.92 0.03 255)"
-  on-secondary-container: "oklch(0.25 0.05 255)"
-  tertiary: "oklch(0.48 0.05 200)"
-  on-tertiary: "oklch(0.98 0 0)"
-  tertiary-container: "oklch(0.93 0.03 200)"
-  on-tertiary-container: "oklch(0.25 0.04 200)"
-  error: "oklch(0.45 0.15 25)"
-  on-error: "oklch(0.98 0 0)"
-  error-container: "oklch(0.92 0.05 25)"
-  on-error-container: "oklch(0.25 0.10 25)"
-  background: "oklch(0.98 0.01 255)"
-  on-background: "oklch(0.15 0.02 255)"
-  border: "oklch(0.88 0.02 255)"
-  divider: "oklch(0.92 0.02 255)"
+  surface: 'oklch(0.99 0 0)'
+  surface-dim: 'oklch(0.96 0.01 255)'
+  surface-bright: 'oklch(1 0 0)'
+  surface-container-lowest: 'oklch(1 0 0)'
+  surface-container-low: 'oklch(0.97 0.01 255)'
+  surface-container: 'oklch(0.95 0.01 255)'
+  surface-container-high: 'oklch(0.92 0.02 255)'
+  surface-container-highest: 'oklch(0.89 0.02 255)'
+  on-surface: 'oklch(0.15 0.02 255)'
+  on-surface-variant: 'oklch(0.35 0.03 255)'
+  inverse-surface: 'oklch(0.20 0.02 255)'
+  inverse-on-surface: 'oklch(0.96 0.01 255)'
+  outline: 'oklch(0.55 0.03 255)'
+  outline-variant: 'oklch(0.85 0.02 255)'
+  primary: 'oklch(0.45 0.16 250)'
+  on-primary: 'oklch(0.98 0.02 250)'
+  primary-container: 'oklch(0.92 0.05 250)'
+  on-primary-container: 'oklch(0.25 0.10 250)'
+  inverse-primary: 'oklch(0.75 0.12 250)'
+  secondary: 'oklch(0.50 0.06 255)'
+  on-secondary: 'oklch(0.98 0 0)'
+  secondary-container: 'oklch(0.92 0.03 255)'
+  on-secondary-container: 'oklch(0.25 0.05 255)'
+  tertiary: 'oklch(0.48 0.05 200)'
+  on-tertiary: 'oklch(0.98 0 0)'
+  tertiary-container: 'oklch(0.93 0.03 200)'
+  on-tertiary-container: 'oklch(0.25 0.04 200)'
+  error: 'oklch(0.45 0.15 25)'
+  on-error: 'oklch(0.98 0 0)'
+  error-container: 'oklch(0.92 0.05 25)'
+  on-error-container: 'oklch(0.25 0.10 25)'
+  background: 'oklch(0.98 0.01 255)'
+  on-background: 'oklch(0.15 0.02 255)'
+  border: 'oklch(0.88 0.02 255)'
+  divider: 'oklch(0.92 0.02 255)'
 typography:
   font-family:
     sans: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
     mono: "'JetBrains Mono', 'Fira Code', Consolas, monospace"
   scale:
     h1:
-      size: "2.5rem"
-      weight: "600"
-      tracking: "-0.03em"
-      line-height: "1.1"
+      size: '2.5rem'
+      weight: '600'
+      tracking: '-0.03em'
+      line-height: '1.1'
     h2:
-      size: "2rem"
-      weight: "600"
-      tracking: "-0.02em"
-      line-height: "1.2"
+      size: '2rem'
+      weight: '600'
+      tracking: '-0.02em'
+      line-height: '1.2'
     h3:
-      size: "1.5rem"
-      weight: "600"
-      tracking: "-0.01em"
-      line-height: "1.3"
+      size: '1.5rem'
+      weight: '600'
+      tracking: '-0.01em'
+      line-height: '1.3'
     body-lg:
-      size: "1.125rem"
-      weight: "400"
-      tracking: "0"
-      line-height: "1.6"
+      size: '1.125rem'
+      weight: '400'
+      tracking: '0'
+      line-height: '1.6'
     body:
-      size: "1rem"
-      weight: "400"
-      tracking: "0"
-      line-height: "1.5"
+      size: '1rem'
+      weight: '400'
+      tracking: '0'
+      line-height: '1.5'
     small:
-      size: "0.875rem"
-      weight: "400"
-      tracking: "0"
-      line-height: "1.4"
+      size: '0.875rem'
+      weight: '400'
+      tracking: '0'
+      line-height: '1.4'
     label:
-      size: "0.75rem"
-      weight: "500"
-      tracking: "0.01em"
-      line-height: "1.4"
+      size: '0.75rem'
+      weight: '500'
+      tracking: '0.01em'
+      line-height: '1.4'
 spacing:
-  container: "1200px"
-  section-padding: "4rem"
-  grid-gap: "1.5rem"
+  container: '1200px'
+  section-padding: '4rem'
+  grid-gap: '1.5rem'
 rounded:
-  sm: "4px"
-  base: "8px"
-  md: "12px"
-  lg: "16px"
-  full: "9999px"
+  sm: '4px'
+  base: '8px'
+  md: '12px'
+  lg: '16px'
+  full: '9999px'
 ---
 
 # Talenavi Product Hub — Design Specification
