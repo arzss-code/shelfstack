@@ -218,37 +218,36 @@ const handleLogout = async () => {
         </div>
 
         <!-- Right Commerce Actions -->
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          <!-- Wishlist Button with UiTooltip -->
-          <UiTooltip text="Wishlist" position="bottom" align="center" class="hidden sm:inline-flex">
+        <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <!-- Wishlist Icon Button with UiTooltip -->
+          <UiTooltip text="Wishlist" position="bottom" align="center">
             <NuxtLink
               to="/wishlist"
-              class="relative p-2 text-brand-muted hover:text-brand-ink rounded-full hover:bg-brand-canvas-soft transition-colors no-underline flex items-center justify-center cursor-pointer"
+              class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-brand-canvas-soft hover:bg-brand-canvas text-brand-ink border border-brand-hair hover:border-brand-ink/30 transition-all active:scale-95 shadow-whisper no-underline"
               aria-label="Wishlist"
             >
-              <i class="pi pi-heart text-base" />
+              <i class="pi pi-heart text-sm sm:text-base text-brand-ink" />
               <span
                 v-if="wishlistStore.totalItems > 0"
-                class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-rose-600 text-white text-[9px] font-bold flex items-center justify-center leading-none"
+                class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-sm leading-none"
               >
                 {{ wishlistStore.totalItems > 99 ? '99+' : wishlistStore.totalItems }}
               </span>
             </NuxtLink>
           </UiTooltip>
 
-          <!-- Cart Pill with UiTooltip -->
+          <!-- Cart Icon Button with UiTooltip -->
           <UiTooltip position="bottom" align="end">
             <button
               type="button"
-              class="flex items-center gap-2 bg-brand-field hover:bg-brand-canvas-soft text-brand-ink text-xs font-semibold px-3.5 py-2 rounded-full transition-all border border-brand-hair hover:border-brand-ink/20 cursor-pointer shadow-whisper"
+              class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-brand-ink text-white hover:bg-brand-inkhover border border-brand-ink transition-all active:scale-95 shadow-whisper cursor-pointer"
               aria-label="Buka Keranjang Belanja"
               @click="cartStore.openDrawer"
             >
-              <i class="pi pi-shopping-bag text-sm text-brand-ink" />
-              <span class="hidden sm:inline">Keranjang</span>
+              <i class="pi pi-shopping-bag text-sm sm:text-base text-white" />
               <span
                 v-if="cartStore.totalItems > 0"
-                class="bg-brand-ink text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none min-w-4 text-center tabular-nums"
+                class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-accent text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-sm leading-none"
               >
                 {{ cartStore.totalItems > 99 ? '99+' : cartStore.totalItems }}
               </span>
