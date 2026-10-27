@@ -512,6 +512,92 @@ export type Database = {
         }
         Relationships: []
       }
+      wishlists: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'wishlists_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          read_at: string | null
+          reference_id: string | null
+          reference_url: string | null
+          title: string
+          type:
+            | 'order_created'
+            | 'payment_success'
+            | 'order_shipped'
+            | 'order_cancelled'
+            | 'order_completed'
+            | 'system'
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          read_at?: string | null
+          reference_id?: string | null
+          reference_url?: string | null
+          title: string
+          type:
+            | 'order_created'
+            | 'payment_success'
+            | 'order_shipped'
+            | 'order_cancelled'
+            | 'order_completed'
+            | 'system'
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          read_at?: string | null
+          reference_id?: string | null
+          reference_url?: string | null
+          title?: string
+          type?:
+            | 'order_created'
+            | 'payment_success'
+            | 'order_shipped'
+            | 'order_cancelled'
+            | 'order_completed'
+            | 'system'
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
