@@ -129,7 +129,7 @@ const handleLogout = async () => {
             Original
           </p>
         </div>
-        <div class="hidden md:flex items-center gap-5 text-white/70 text-[11px]">
+        <div class="hidden sm:flex items-center gap-4 text-white/70 text-[11px]">
           <NuxtLink to="/katalog" class="hover:text-white transition-colors no-underline">
             Pusat Bantuan
           </NuxtLink>
@@ -137,6 +137,12 @@ const handleLogout = async () => {
             Lacak Pesanan
           </NuxtLink>
           <span class="text-white/40">IDR (Rp)</span>
+
+          <!-- Separator & Notification Bell in Inverted Dark Strip -->
+          <template v-if="isLoggedIn && user">
+            <span class="w-px h-3 bg-white/20" />
+            <NotificationBell variant="dark" />
+          </template>
         </div>
       </div>
     </div>
@@ -300,10 +306,7 @@ const handleLogout = async () => {
             </template>
           </UiTooltip>
 
-          <!-- In-App Notification Bell -->
-          <NotificationBell v-if="isLoggedIn && user" />
-
-          <!-- User Authentication Section -->
+          <!-- User Authentication Section (Compact Right Layout) -->
           <div ref="userMenuRef" class="relative">
             <template v-if="isLoggedIn && user">
               <button
@@ -490,6 +493,23 @@ const handleLogout = async () => {
             class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold"
           >
             {{ wishlistStore.totalItems }}
+          </span>
+        </NuxtLink>
+        <NuxtLink
+          v-if="isLoggedIn"
+          to="/notifications"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft flex items-center justify-between"
+          @click="isMobileMenuOpen = false"
+        >
+          <span class="flex items-center gap-2">
+            <i class="pi pi-bell text-sm text-brand-ink" />
+            <span>Notifikasi</span>
+          </span>
+          <span
+            v-if="notificationStore.unreadCount > 0"
+            class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold tabular-nums"
+          >
+            {{ notificationStore.unreadCount }}
           </span>
         </NuxtLink>
         <NuxtLink

@@ -132,4 +132,62 @@ describe('useNotificationStore', () => {
     await store.markAllAsRead()
     expect(mockFetch).not.toHaveBeenCalled()
   })
+
+  it('memuat notifikasi dan mengisi state cursor pagination', async () => {
+    const store = useNotificationStore()
+    mockFetch.mockResolvedValueOnce({
+      success: true,
+      data: {
+        notifications: [mockNotifA],
+        unread_count: 1,
+        has_more: true,
+        next_cursor: mockNotifA.created_at,
+      },
+    })
+
+    await store.fetchNotifications()
+
+    expect(store.items.length).toBe(1)
+    expect(store.hasMore).toBe(true)
+    expect(store.nextCursor).toBe(mockNotifA.created_at)
+  })
+
+  it('memuat halaman berikutnya via loadMore dan menambahkan item baru tanpa duplikasi', async () => {
+    const store = useNotificationStore()
+    store.items = [JSON.parse(JSON.stringify(mockNotifA))]
+    store.hasMore = true
+    store.nextCursor = mockNotifA.created_at
+
+    mockFetch.mockResolvedValueOnce({
+      success: true,
+      data: {
+        notifications: [mockNotifB],
+        unread_count: 1,
+        has_more: false,
+        next_cursor: null,
+      },
+    })
+
+    await store.loadMore()
+
+    expect(store.items.length).toBe(2)
+    expect(store.hasMore).toBe(false)
+    expect(store.nextCursor).toBeNull()
+  })
+
+  it('mengelola izin notifikasi desktop browser via requestDesktopPermission', async () => {
+    const store = useNotificationStore()
+    const originalNotification = (globalThis as any).Notification
+    const mockRequestPermission = vi.fn().mockResolvedValue('granted')
+    ;(globalThis as any).Notification = {
+      permission: 'default',
+      requestPermission: mockRequestPermission,
+    }
+
+    const permission = await store.requestDesktopPermission()
+    expect(permission).toBe('granted')
+    expect(store.desktopPermission).toBe('granted')
+
+    ;(globalThis as any).Notification = originalNotification
+  })
 })

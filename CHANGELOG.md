@@ -19,13 +19,14 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
     - `order_shipped` & `order_completed`: saat status pesanan diubah oleh admin (`server/api/orders/[id]/status.put.ts`).
     - `order_cancelled`: saat pesanan dibatalkan (`server/api/orders/[id]/cancel.post.ts`).
 - **State Management & Frontend UI/UX**:
-  - Pinia store `useNotificationStore` (`app/features/notifications/stores/notifications.ts`) dengan optimis update dan listener realtime `postgres_changes`.
-  - Komponen `NotificationBell.vue` (`app/components/notifications/NotificationBell.vue`) dengan tombol minimal ghost circular selaras Wishlist dan Cart, dynamic badge counter, dropdown popover interaktif dengan filter tab (Semua / Belum Dibaca), status ikon semantik, formatted timestamp relatif, dan keyboard accessibility (Escape / Click Outside).
-  - Pemasangan `NotificationBell` di `AppNavbar.vue` pada menu navigasi kanan.
+  - Pinia store `useNotificationStore` (`app/features/notifications/stores/notifications.ts`) dengan optimis update, listener realtime `postgres_changes`, cursor-based pagination (`loadMore`, `hasMore`, `nextCursor`), dan integrasi HTML5 Web Notification API untuk notifikasi desktop browser.
+  - Komponen `NotificationBell.vue` (`app/components/notifications/NotificationBell.vue`) diposisikan pada pita atas gelap (_top announcement bar_) dengan varian `dark`, membersihkan kluster kanan navbar utama agar lebih kompak dan lega.
+  - Halaman penuh Pusat Notifikasi (`app/pages/notifications.vue`) dengan filter tab (Semua, Belum Dibaca, Pesanan & Pembayaran, Sistem), kontrol notifikasi browser, dan cursor pagination.
+  - Integrasi menu Notifikasi pada drawer navigasi mobile lengkap dengan badge penghitung belum dibaca.
 - **Quality Gates**:
   - Zero ESLint error dan zero warning (100% clean gate).
   - `nuxi typecheck` EXIT 0 tanpa error tipe data.
-  - 16 unit test baru di `tests/unit/api-notifications.spec.ts` dan `tests/unit/notification-store.spec.ts`, total suite 47 file / 424 test lolos 100%.
+  - 19 unit test terverifikasi di `tests/unit/api-notifications.spec.ts` dan `tests/unit/notification-store.spec.ts`, total suite 47 file / 427 test lolos 100%.
 
 ## [0.16.0] - 2026-10-26
 

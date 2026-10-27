@@ -1,8 +1,26 @@
 <template>
   <div ref="bellRef" class="relative">
-    <!-- Bell Button -->
+    <!-- Bell Button with Dynamic Variant (dark / light) -->
     <UiTooltip text="Notifikasi" position="bottom" align="center">
       <button
+        v-if="variant === 'dark'"
+        type="button"
+        class="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors active:scale-95 cursor-pointer"
+        aria-label="Lihat Notifikasi"
+        :aria-expanded="isOpen"
+        @click="toggleDropdown"
+      >
+        <i class="pi pi-bell text-xs sm:text-sm text-white" />
+        <span
+          v-if="unreadCount > 0"
+          class="absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-1 ring-brand-ink tabular-nums shadow-xs leading-none"
+        >
+          {{ unreadCount > 99 ? '99+' : unreadCount }}
+        </span>
+      </button>
+
+      <button
+        v-else
         type="button"
         class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 cursor-pointer"
         aria-label="Lihat Notifikasi"
@@ -30,7 +48,7 @@
     >
       <div
         v-if="isOpen"
-        class="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-brand-canvas border border-brand-hair rounded-card shadow-floating z-50 overflow-hidden flex flex-col"
+        class="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-brand-canvas border border-brand-hair rounded-card shadow-floating z-50 overflow-hidden flex flex-col text-left"
         role="dialog"
         aria-label="Daftar Notifikasi"
       >
@@ -55,6 +73,24 @@
             @click="notificationStore.markAllAsRead"
           >
             Tandai semua dibaca
+          </button>
+        </div>
+
+        <!-- Desktop Browser Notification Permission Banner (Point 3) -->
+        <div
+          v-if="desktopPermission === 'default'"
+          class="px-3.5 py-2 bg-blue-50/80 border-b border-blue-100 flex items-center justify-between gap-2"
+        >
+          <div class="flex items-center gap-1.5 text-blue-900 text-[11px] min-w-0">
+            <i class="pi pi-bell text-xs text-blue-600 shrink-0" />
+            <span class="truncate">Aktifkan notifikasi desktop browser</span>
+          </div>
+          <button
+            type="button"
+            class="px-2 py-0.5 text-[10px] font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded cursor-pointer transition-colors border-0 shrink-0"
+            @click="handleRequestDesktop"
+          >
+            Aktifkan
           </button>
         </div>
 
@@ -94,7 +130,7 @@
         </div>
 
         <!-- Notification List -->
-        <div class="max-h-[380px] overflow-y-auto divide-y divide-brand-hairsoft">
+        <div class="max-h-[360px] overflow-y-auto divide-y divide-brand-hairsoft">
           <!-- Loading State -->
           <div v-if="isLoading" class="p-6 text-center text-xs text-brand-muted">
             <i class="pi pi-spin pi-spinner text-base mb-1 block" />
@@ -169,16 +205,44 @@
               aria-label="Belum dibaca"
             />
           </button>
+
+          <!-- Cursor Pagination "Muat Lebih Banyak" (Point 4) -->
+          <div
+            v-if="hasMore && activeTab === 'all'"
+            class="p-2 text-center bg-brand-canvas-soft/20"
+          >
+            <button
+              type="button"
+              class="w-full py-1.5 text-[11px] font-semibold text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft rounded transition-colors cursor-pointer border-0 flex items-center justify-center gap-1.5"
+              :disabled="isLoadingMore"
+              @click="notificationStore.loadMore"
+            >
+              <i v-if="isLoadingMore" class="pi pi-spin pi-spinner text-xs" />
+              <span>{{
+                isLoadingMore ? 'Memuat notifikasi...' : 'Muat notifikasi sebelumnya'
+              }}</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Footer / Link to Orders -->
-        <div class="p-2 border-t border-brand-hairsoft bg-brand-canvas-soft/30 text-center">
+        <!-- Footer Links -->
+        <div
+          class="p-2.5 border-t border-brand-hairsoft bg-brand-canvas-soft/30 flex items-center justify-between text-xs"
+        >
           <NuxtLink
-            to="/orders"
-            class="text-[11px] font-semibold text-brand-ink hover:underline no-underline block py-1"
+            to="/notifications"
+            class="text-[11px] font-semibold text-brand-ink hover:underline no-underline flex items-center gap-1"
             @click="closeDropdown"
           >
-            Lihat Semua Pesanan Saya <i class="pi pi-arrow-right text-[9px] ml-1" />
+            <span>Pusat Notifikasi</span>
+            <i class="pi pi-arrow-right text-[9px]" />
+          </NuxtLink>
+          <NuxtLink
+            to="/orders"
+            class="text-[11px] font-medium text-brand-muted hover:text-brand-ink hover:underline no-underline"
+            @click="closeDropdown"
+          >
+            Pesanan Saya
           </NuxtLink>
         </div>
       </div>
@@ -190,8 +254,17 @@
 import type { NotificationItem, NotificationType } from '../../../shared/schemas/notification'
 import { useNotificationStore } from '~/features/notifications/stores/notifications'
 
+interface Props {
+  variant?: 'dark' | 'light'
+}
+
+withDefaults(defineProps<Props>(), {
+  variant: 'dark',
+})
+
 const notificationStore = useNotificationStore()
-const { items, unreadCount, isLoading, isOpen } = storeToRefs(notificationStore)
+const { items, unreadCount, isLoading, isLoadingMore, hasMore, isOpen, desktopPermission } =
+  storeToRefs(notificationStore)
 
 const activeTab = ref<'all' | 'unread'>('all')
 const bellRef = ref<HTMLElement | null>(null)
@@ -205,13 +278,17 @@ const filteredItems = computed<NotificationItem[]>(() => {
 
 const toggleDropdown = () => {
   if (!isOpen.value) {
-    notificationStore.fetchNotifications()
+    notificationStore.fetchNotifications(false)
   }
   notificationStore.toggleDropdown()
 }
 
 const closeDropdown = () => {
   notificationStore.closeDropdown()
+}
+
+const handleRequestDesktop = async () => {
+  await notificationStore.requestDesktopPermission()
 }
 
 const handleNotificationClick = async (item: NotificationItem) => {
