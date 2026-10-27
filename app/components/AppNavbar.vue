@@ -3,11 +3,14 @@ import { useAuth } from '~/features/auth/composables/useAuth'
 import { useCategories } from '~/composables/useCategories'
 import { useCartStore } from '~/features/cart/stores/cart'
 import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
+import { useNotificationStore } from '~/features/notifications/stores/notifications'
+import NotificationBell from '~/components/notifications/NotificationBell.vue'
 import AppLogo from './AppLogo.vue'
 
 const { user, profile, isAdmin, isLoggedIn, fetchProfile, signOut } = useAuth()
 const cartStore = useCartStore()
 const wishlistStore = useWishlistStore()
+const notificationStore = useNotificationStore()
 const {
   categories: dynamicCategories,
   categoryMap: dynamicCategoryMap,
@@ -90,10 +93,25 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('pointerdown', handleNavClickOutside)
+  notificationStore.cleanupRealtimeListener()
 })
+
+watch(
+  () => user.value?.id,
+  (userId) => {
+    if (userId) {
+      notificationStore.fetchNotifications()
+      notificationStore.setupRealtimeListener(userId)
+    } else {
+      notificationStore.cleanupRealtimeListener()
+    }
+  },
+  { immediate: true },
+)
 
 const handleLogout = async () => {
   isUserMenuOpen.value = false
+  notificationStore.cleanupRealtimeListener()
   await signOut()
   router.push('/')
 }
@@ -111,7 +129,7 @@ const handleLogout = async () => {
             Original
           </p>
         </div>
-        <div class="hidden md:flex items-center gap-5 text-white/70 text-[11px]">
+        <div class="hidden sm:flex items-center gap-4 text-white/70 text-[11px]">
           <NuxtLink to="/katalog" class="hover:text-white transition-colors no-underline">
             Pusat Bantuan
           </NuxtLink>
@@ -119,6 +137,12 @@ const handleLogout = async () => {
             Lacak Pesanan
           </NuxtLink>
           <span class="text-white/40">IDR (Rp)</span>
+
+          <!-- Separator & Notification Bell in Inverted Dark Strip -->
+          <template v-if="isLoggedIn && user">
+            <span class="w-px h-3 bg-white/20" />
+            <NotificationBell variant="dark" />
+          </template>
         </div>
       </div>
     </div>
@@ -218,37 +242,36 @@ const handleLogout = async () => {
         </div>
 
         <!-- Right Commerce Actions -->
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          <!-- Wishlist Button with UiTooltip -->
-          <UiTooltip text="Wishlist" position="bottom" align="center" class="hidden sm:inline-flex">
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+          <!-- Wishlist Icon Button with UiTooltip -->
+          <UiTooltip text="Wishlist" position="bottom" align="center">
             <NuxtLink
               to="/wishlist"
-              class="relative p-2 text-brand-muted hover:text-brand-ink rounded-full hover:bg-brand-canvas-soft transition-colors no-underline flex items-center justify-center cursor-pointer"
+              class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 no-underline cursor-pointer"
               aria-label="Wishlist"
             >
-              <i class="pi pi-heart text-base" />
+              <i class="pi pi-heart text-base sm:text-lg text-brand-ink" />
               <span
                 v-if="wishlistStore.totalItems > 0"
-                class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-rose-600 text-white text-[9px] font-bold flex items-center justify-center leading-none"
+                class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-rose-600 text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
               >
                 {{ wishlistStore.totalItems > 99 ? '99+' : wishlistStore.totalItems }}
               </span>
             </NuxtLink>
           </UiTooltip>
 
-          <!-- Cart Pill with UiTooltip -->
+          <!-- Cart Icon Button with UiTooltip -->
           <UiTooltip position="bottom" align="end">
             <button
               type="button"
-              class="flex items-center gap-2 bg-brand-field hover:bg-brand-canvas-soft text-brand-ink text-xs font-semibold px-3.5 py-2 rounded-full transition-all border border-brand-hair hover:border-brand-ink/20 cursor-pointer shadow-whisper"
+              class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 cursor-pointer"
               aria-label="Buka Keranjang Belanja"
               @click="cartStore.openDrawer"
             >
-              <i class="pi pi-shopping-bag text-sm text-brand-ink" />
-              <span class="hidden sm:inline">Keranjang</span>
+              <i class="pi pi-shopping-bag text-base sm:text-lg text-brand-ink" />
               <span
                 v-if="cartStore.totalItems > 0"
-                class="bg-brand-ink text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none min-w-4 text-center tabular-nums"
+                class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-brand-ink text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
               >
                 {{ cartStore.totalItems > 99 ? '99+' : cartStore.totalItems }}
               </span>
@@ -283,12 +306,12 @@ const handleLogout = async () => {
             </template>
           </UiTooltip>
 
-          <!-- User Authentication Section -->
+          <!-- User Authentication Section (Compact Right Layout) -->
           <div ref="userMenuRef" class="relative">
             <template v-if="isLoggedIn && user">
               <button
                 type="button"
-                class="flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair"
+                class="flex items-center gap-1.5 p-1 sm:pl-1 sm:pr-2.5 sm:py-1 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair active:scale-95"
                 @click="isUserMenuOpen = !isUserMenuOpen"
               >
                 <span
@@ -374,11 +397,14 @@ const handleLogout = async () => {
           <!-- Mobile Hamburger Trigger -->
           <button
             type="button"
-            class="md:hidden p-2 rounded-full hover:bg-brand-canvas-soft text-brand-ink transition-colors cursor-pointer"
+            class="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-brand-canvas-soft text-brand-ink transition-colors cursor-pointer active:scale-95"
             aria-label="Buka menu navigasi"
             @click="isMobileMenuOpen = !isMobileMenuOpen"
           >
-            <i :class="isMobileMenuOpen ? 'pi pi-times' : 'pi pi-bars'" class="text-base" />
+            <i
+              :class="isMobileMenuOpen ? 'pi pi-times' : 'pi pi-bars'"
+              class="text-base text-brand-ink"
+            />
           </button>
         </div>
       </div>
@@ -467,6 +493,23 @@ const handleLogout = async () => {
             class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold"
           >
             {{ wishlistStore.totalItems }}
+          </span>
+        </NuxtLink>
+        <NuxtLink
+          v-if="isLoggedIn"
+          to="/notifications"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft flex items-center justify-between"
+          @click="isMobileMenuOpen = false"
+        >
+          <span class="flex items-center gap-2">
+            <i class="pi pi-bell text-sm text-brand-ink" />
+            <span>Notifikasi</span>
+          </span>
+          <span
+            v-if="notificationStore.unreadCount > 0"
+            class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold tabular-nums"
+          >
+            {{ notificationStore.unreadCount }}
           </span>
         </NuxtLink>
         <NuxtLink

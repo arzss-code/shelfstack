@@ -2,6 +2,32 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.17.0] - 2026-10-27
+
+### In-App Notification Center & Realtime Broadcast (SHF-NOTIF-01)
+
+- **Database Migrasi & RLS Strict**:
+  - Penambahan tabel `public.notifications` (`supabase/migrations/20261119000001_in_app_notifications.sql`) dengan relasi cascade ke `auth.users`, constraint tipe notifikasi resmi (`order_created`, `payment_success`, `order_shipped`, `order_cancelled`, `order_completed`, `system`), index komposit `(user_id, is_read, created_at desc)`, dan kebijakan RLS multi-tenant terisolasi.
+  - Integrasi publikasi Supabase Realtime (`alter publication supabase_realtime add table public.notifications`) untuk siaran pembaruan notifikasi live ke pelanggan.
+- **Server Endpoints & Transactional Event Triggers**:
+  - `GET /api/notifications`: memuat 30 notifikasi terbaru milik pengguna terautentikasi dan menghitung unread count secara atomik.
+  - `PATCH /api/notifications/read-all`: menandai semua notifikasi aktif sebagai telah dibaca.
+  - `PATCH /api/notifications/[id]/read`: menandai satu notifikasi spesifik milik pengguna sebagai dibaca.
+  - Pemicu otomatis pada siklus transaksi:
+    - `order_created`: saat pesanan berhasil dibuat di checkout (`server/api/orders/index.ts`).
+    - `payment_success`: saat pembayaran terkonfirmasi via webhook Midtrans (`server/api/midtrans/notification.post.ts`).
+    - `order_shipped` & `order_completed`: saat status pesanan diubah oleh admin (`server/api/orders/[id]/status.put.ts`).
+    - `order_cancelled`: saat pesanan dibatalkan (`server/api/orders/[id]/cancel.post.ts`).
+- **State Management & Frontend UI/UX**:
+  - Pinia store `useNotificationStore` (`app/features/notifications/stores/notifications.ts`) dengan optimis update, listener realtime `postgres_changes`, cursor-based pagination (`loadMore`, `hasMore`, `nextCursor`), dan integrasi HTML5 Web Notification API untuk notifikasi desktop browser.
+  - Komponen `NotificationBell.vue` (`app/components/notifications/NotificationBell.vue`) diposisikan pada pita atas gelap (_top announcement bar_) dengan varian `dark`, membersihkan kluster kanan navbar utama agar lebih kompak dan lega.
+  - Halaman penuh Pusat Notifikasi (`app/pages/notifications.vue`) dengan filter tab (Semua, Belum Dibaca, Pesanan & Pembayaran, Sistem), kontrol notifikasi browser, dan cursor pagination.
+  - Integrasi menu Notifikasi pada drawer navigasi mobile lengkap dengan badge penghitung belum dibaca.
+- **Quality Gates**:
+  - Zero ESLint error dan zero warning (100% clean gate).
+  - `nuxi typecheck` EXIT 0 tanpa error tipe data.
+  - 19 unit test terverifikasi di `tests/unit/api-notifications.spec.ts` dan `tests/unit/notification-store.spec.ts`, total suite 47 file / 427 test lolos 100%.
+
 ## [0.16.0] - 2026-10-26
 
 ### Penyatuan Geometri & Primitif Etalase Publik

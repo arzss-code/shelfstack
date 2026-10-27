@@ -169,6 +169,28 @@ export default defineEventHandler(async (event) => {
   }
 
   metrics.recordWebhook(true)
+
+  if (newStatus === 'paid') {
+    const { data: orderData } = await client
+      .from('orders')
+      .select('user_id')
+      .eq('id', baseOrderId)
+      .maybeSingle()
+
+    if (orderData?.user_id) {
+      await createNotification(client, {
+        user_id: orderData.user_id,
+        title: 'Pembayaran Diterima',
+        message: `Pembayaran untuk pesanan ${baseOrderId} telah kami terima. Pesanan Anda akan segera diproses.`,
+        type: 'payment_success',
+        reference_id: baseOrderId,
+        reference_url: `/orders/${baseOrderId}`,
+      }).catch((err) => {
+        logger.warn('Gagal membuat notifikasi payment_success', {}, err)
+      })
+    }
+  }
+
   return successResponse('Status pesanan berhasil diproses', {
     order_id: baseOrderId,
     result: resultStatus,
