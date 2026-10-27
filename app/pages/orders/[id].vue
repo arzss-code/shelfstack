@@ -8,6 +8,8 @@ import OrderCancelDialog from '~/features/orders/components/OrderCancelDialog.vu
 import OrderInvoiceModal from '~/features/orders/components/OrderInvoiceModal.vue'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { useCartStore } from '~/features/cart/stores/cart'
+import type { ShippingCheckpoint } from '~~/shared/schemas/shipping'
+import OrderTrackingTimeline from '~/components/orders/OrderTrackingTimeline.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -29,6 +31,25 @@ const isCancelModalOpen = ref(false)
 
 const isInvoiceModalOpen = ref(false)
 const errorMsg = ref('')
+
+const customerCheckpoints = ref<ShippingCheckpoint[]>([])
+
+const fetchCustomerTracking = async () => {
+  if (!order.value?.tracking_number) {
+    customerCheckpoints.value = []
+    return
+  }
+  try {
+    const res = await $fetch<{ success: boolean; data: { checkpoints: ShippingCheckpoint[] } }>(
+      `/api/orders/${orderId}/tracking`,
+    )
+    if (res?.data?.checkpoints) {
+      customerCheckpoints.value = res.data.checkpoints
+    }
+  } catch {
+    customerCheckpoints.value = []
+  }
+}
 
 definePageMeta({
   middleware: 'auth',
@@ -86,6 +107,7 @@ const fetchOrderDetail = async (silent = false) => {
   try {
     const res = await $fetch<{ status: string; data: Order }>(`/api/orders/${orderId}`)
     order.value = res.data
+    await fetchCustomerTracking()
   } catch (err: unknown) {
     const fetchErr = err as { data?: { message?: string } }
     errorMsg.value = fetchErr.data?.message || 'Pesanan tidak ditemukan atau akses ditolak.'
@@ -128,11 +150,16 @@ onMounted(async () => {
               status: nextStatus,
               payment_type: (updated.payment_type as string) || order.value.payment_type,
               paid_at: (updated.paid_at as string) || order.value.paid_at,
+              tracking_number: (updated.tracking_number as string) || order.value.tracking_number,
+              courier_name: (updated.courier_name as string) || order.value.courier_name,
+              courier_code: (updated.courier_code as string) || order.value.courier_code,
             }
 
             if (nextStatus !== 'pending') {
               stopPolling()
             }
+
+            fetchCustomerTracking()
 
             if (prevStatus === 'pending' && nextStatus === 'paid') {
               toast.add({
@@ -645,6 +672,18 @@ const getSegmentColor = (idx: number) => {
           </div>
         </div>
       </div>
+
+      <!-- Real-time Logistics & Courier Tracking Timeline -->
+      <OrderTrackingTimeline
+        v-if="order.tracking_number"
+        class="mb-8"
+        :order-id="order.id"
+        :tracking-number="order.tracking_number"
+        :courier-name="order.courier_name || 'JNE Express'"
+        :status="order.status"
+        :destination-city="(order.address as any)?.city"
+        :checkpoints="customerCheckpoints"
+      />
 
       <!-- Main Layout -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

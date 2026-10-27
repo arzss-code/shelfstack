@@ -206,15 +206,20 @@ export type Database = {
           address: Json
           cancellation_reason: string | null
           cancelled_at: string | null
+          courier_code: string | null
+          courier_name: string | null
           created_at: string | null
+          delivered_at: string | null
           id: string
           midtrans_id: string | null
           paid_at: string | null
           payment_type: string | null
           refunded_at: string | null
+          shipped_at: string | null
           snap_token: string | null
           status: Database['public']['Enums']['order_status']
           total_cents: number
+          tracking_number: string | null
           updated_at: string | null
           user_id: string
         }
@@ -222,15 +227,20 @@ export type Database = {
           address: Json
           cancellation_reason?: string | null
           cancelled_at?: string | null
+          courier_code?: string | null
+          courier_name?: string | null
           created_at?: string | null
+          delivered_at?: string | null
           id?: string
           midtrans_id?: string | null
           paid_at?: string | null
           payment_type?: string | null
           refunded_at?: string | null
+          shipped_at?: string | null
           snap_token?: string | null
           status?: Database['public']['Enums']['order_status']
           total_cents?: number
+          tracking_number?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -238,19 +248,83 @@ export type Database = {
           address?: Json
           cancellation_reason?: string | null
           cancelled_at?: string | null
+          courier_code?: string | null
+          courier_name?: string | null
           created_at?: string | null
+          delivered_at?: string | null
           id?: string
           midtrans_id?: string | null
           paid_at?: string | null
           payment_type?: string | null
           refunded_at?: string | null
+          shipped_at?: string | null
           snap_token?: string | null
           status?: Database['public']['Enums']['order_status']
           total_cents?: number
+          tracking_number?: string | null
           updated_at?: string | null
           user_id?: string
         }
         Relationships: []
+      }
+      shipping_checkpoints: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          location: string
+          order_id: string
+          status:
+            | 'manifested'
+            | 'picked_up'
+            | 'in_transit'
+            | 'out_for_delivery'
+            | 'delivered'
+            | 'returned'
+          title: string
+          tracking_number: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          location: string
+          order_id: string
+          status:
+            | 'manifested'
+            | 'picked_up'
+            | 'in_transit'
+            | 'out_for_delivery'
+            | 'delivered'
+            | 'returned'
+          title: string
+          tracking_number: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          location?: string
+          order_id?: string
+          status?:
+            | 'manifested'
+            | 'picked_up'
+            | 'in_transit'
+            | 'out_for_delivery'
+            | 'delivered'
+            | 'returned'
+          title?: string
+          tracking_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'shipping_checkpoints_order_id_fkey'
+            columns: ['order_id']
+            isOneToOne: false
+            referencedRelation: 'orders'
+            referencedColumns: ['id']
+          },
+        ]
       }
       order_items: {
         Row: {

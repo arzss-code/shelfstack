@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 7 (Realtime & Commerce Enhancements)**
-- **Versi Rilis:** `v0.17.0` (`version.json`, `CHANGELOG.md` - sinkron 2026-10-27)
-- **Baseline Quality Gate (2026-10-27, dijalankan aktual):** `pnpm lint` ✅ 0 error / 0 warning · `nuxi typecheck` ✅ EXIT 0 · `vitest run` ✅ 47 file / 424 test lolos 100%.
+- **Versi Rilis:** `v0.18.0` (`version.json`, `CHANGELOG.md` - sinkron 2026-10-27)
+- **Baseline Quality Gate (2026-10-27, dijalankan aktual):** `pnpm lint` ✅ 0 error / 0 warning · `nuxi typecheck` ✅ EXIT 0 · `vitest run` ✅ 48 file / 436 test lolos 100%.
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -182,6 +182,7 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
 14. **Redesign Split Layout Halaman Login & Register (SELESAI 2026-10-26).** Transformasi tampilan autentikasi menjadi layout split 2-kolom: kolom kiri memuat visual arsitektural kurasi ShelfStack dan logo resmi, kolom kanan memuat formulir kompak yang pas di viewport tanpa scroll vertikal berlebih pada desktop. Seluruh badge/icon trust redundan ('Belanja Aman • Privasi Terjaga') dihapus. Penambahan fitur show/hide password toggle interaktif pada input kata sandi yang ramah aksesibilitas (+4 unit test di `tests/unit/auth-redesign.spec.ts`).
 15. **Pencapaian 100% Zero ESLint Warnings (SELESAI 2026-10-26).** Seluruh 16 sisa warning pre-existing `vue/html-self-closing` pada void element `<img/>`, `<input/>`, dan `<br/>` di komponen `AppNavbar.vue`, `HomeHero.vue`, `HomeFeaturedCategories.vue`, `HomeFlashDeals.vue`, `UiFileField.vue`, `OrderCancelDialog.vue`, `OrderInvoiceModal.vue`, dan `admin/orders/[id].vue` telah dibersihkan secara tuntas. Perintah `pnpm lint` kini menghasilkan output bersih: 0 problems (0 errors, 0 warnings).
 16. **Wishlist System Lengkap (SELESAI 2026-10-26).** Implementasi Pinia store persistent `shelfstack-wishlist` (`useWishlistStore`), tombol love interaktif `WishlistButton` di kartu produk (`ProductCard`) dan halaman konfigurasi detail (`ProductConfigurator`), dynamic badge counter pada ikon hati di `AppNavbar` (desktop dan menu mobile), halaman mandiri `/wishlist` dengan grid koleksi tersimpan, aksi "Pindahkan ke Bag" per item maupun kolektif (`moveAllToCart`) dengan filter stok habis, toast notifikasi, serta 9 unit test komprehensif di `tests/unit/wishlist-store.spec.ts`.
+17. **Pelacakan Pengiriman & Ekspedisi Kurir (SELESAI 2026-10-27, SHF-LOG-01).** Implementasi sistem pelacakan logistik terpadu untuk 5 kurir resmi (JNE, SiCepat, J&T, Anteraja, POS Indonesia). Database migrasi `20261120000001_shipping_and_order_tracking.sql` menambahkan field resi pada tabel `orders` dan sub-tabel `shipping_checkpoints` dengan RLS multi-tenant terisolasi dan registrasi `supabase_realtime`. Admin fulfillment modal mendukung pemilihan kurir dan pembuatan resi otomatis 1-klik (`SS-<KURIR>-<TIMESTAMP>`). Halaman publik `/tracking` memungkinkan pengecekan resi oleh pengunjung dengan sensor nama & telepon penerima untuk privasi. Pelanggan dapat memantau linimasa riwayat perjalanan kurir secara langsung di halaman rincian pesanan `/orders/[id]` (+9 unit test di `tests/unit/shipping-tracking.spec.ts`).
 
 ---
 
@@ -196,9 +197,9 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
 3. **Kalkulator Ongkir & Integrasi Kurir Ekspedisi (Shipping & Logistics API)**:
    - Status: Belum diimplementasikan (masih flat / gratis ongkir statis).
    - Keterangan: Belum terhubung dengan API kurir logistik (RajaOngkir, Biteship, JNE, SiCepat, J&T). Belum ada field berat barang (`weight_grams`), kalkulasi jarak antar-kota, maupun pilihan jenis layanan (Instan, Reguler, Kargo).
-4. **Lacak Pengiriman Ekspedisi (Courier Live Tracking)**:
-   - Status: Belum diimplementasikan.
-   - Keterangan: Alur pesanan saat ini hanya melacak status siklus hidup internal (`pending`, `paid`, `shipped`, `delivered`). Belum ada field nomor resi (`tracking_number`), kurir, maupun linimasa perpindahan paket antar-hub. Link "Lacak Pesanan" di navbar dan footer masih berupa placeholder ke `/katalog`.
+4. ~~**Lacak Pengiriman Ekspedisi (Courier Live Tracking)**~~:
+   - Status: ✅ **SELESAI 2026-10-27** (SHF-LOG-01).
+   - Keterangan: Kolom tracking pada `orders`, tabel riwayat `shipping_checkpoints`, RLS strict, publikasi realtime, utilitas generator resi & data masking privasi, modal admin fulfillment dengan pilihan kurir resmi, kartu linimasa pelacakan di `/orders/[id]`, halaman publik pencarian resi di `/tracking` yang terhubung dari navbar dan footer, serta 9 unit test di `tests/unit/shipping-tracking.spec.ts`.
 5. **Kupon Promo & Diskon (Voucher Codes & Auto-Discounts)**:
    - Status: Belum diimplementasikan.
    - Keterangan: Belum ada modul voucher (tabel `coupons`, input kode promo di keranjang/checkout, validasi kuota klaim, dan potongan harga dinamis). Diskon saat ini hanya potongan langsung berbasis kolom produk (`original_price_cents`).

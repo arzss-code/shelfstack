@@ -2,6 +2,30 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.18.0] - 2026-10-27
+
+### Pelacakan Pengiriman & Ekspedisi Kurir (SHF-LOG-01)
+
+- **Database Migrasi & RLS**:
+  - Penambahan kolom pengiriman pada tabel `public.orders` (`supabase/migrations/20261120000001_shipping_and_order_tracking.sql`): `tracking_number`, `courier_code`, `courier_name`, `shipped_at`, `delivered_at`.
+  - Penambahan tabel riwayat checkpoint ekspedisi `public.shipping_checkpoints` dengan index `(order_id, created_at desc)` dan `(tracking_number)`.
+  - Kebijakan RLS terisolasi: pelanggan dapat melihat checkpoint pesanan miliknya, admin memiliki hak kelola penuh, dan penambahan ke publikasi `supabase_realtime` untuk live streaming tracking tanpa polling.
+- **Server Endpoints & Logistics Utilities**:
+  - `server/utils/shipping.ts`: Generator nomor resi otomatis sesuai prefix kurir (`SS-JNE-`, `SS-SCP-`, `SS-JNT-`, `SS-ANTR-`, `SS-POS-`), generator checkpoint otomatis tahap awal dan konfirmasi penerimaan, serta utilitas masking nama dan nomor telepon untuk privasi.
+  - `server/api/orders/[id]/status.put.ts`: Mendukung input kurir dan resi saat status diubah menjadi `shipped`, memicu checkpoint awal dan notifikasi otomatis, serta mencatat checkpoint `delivered` saat status menjadi `completed`.
+  - `server/api/tracking/search.get.ts`: Endpoint pencarian resi publik (mendukung query no resi atau ID order) dengan sensor data penerima (`recipient_name_masked`, `recipient_phone_masked`).
+  - `server/api/orders/[id]/tracking.get.ts`: Endpoint pelacakan autentikasi untuk pelanggan pada pesanan spesifik miliknya.
+- **Frontend & Komponen UI/UX**:
+  - Komponen `OrderTrackingTimeline.vue` (`app/components/orders/OrderTrackingTimeline.vue`): Linimasa vertikal dengan status badge, detail lokasi hub, timestamp, dan tombol salin resi instan.
+  - Halaman publik `/tracking` (`app/pages/tracking.vue`): Formulir pencarian nomor resi dengan deep-link `?q=`, kartu privasi data, dan integrasi navigasi dari header bar atas serta footer.
+  - Integrasi Admin Detail Pesanan (`app/pages/admin/orders/[id].vue`): Modal pengiriman dengan pilihan kurir resmi, tombol 1-klik "Resi Otomatis", dan visualisasi linimasa langsung pada panel admin.
+  - Integrasi Detail Pesanan Pelanggan (`app/pages/orders/[id].vue`): Kartu pelacakan kurir terpadu yang muncul otomatis saat pesanan berstatus `shipped` atau `completed`.
+- **Quality Gates**:
+  - `pnpm lint` 0 error / 0 warning (100% clean).
+  - `pnpm typecheck` EXIT 0 tanpa error tipe data.
+  - 9 unit test komprehensif baru di `tests/unit/shipping-tracking.spec.ts`.
+  - Total test suite: 48 file / 436 test lolos 100%.
+
 ## [0.17.0] - 2026-10-27
 
 ### In-App Notification Center & Realtime Broadcast (SHF-NOTIF-01)

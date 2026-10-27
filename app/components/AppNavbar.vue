@@ -133,7 +133,7 @@ const handleLogout = async () => {
           <NuxtLink to="/katalog" class="hover:text-white transition-colors no-underline">
             Pusat Bantuan
           </NuxtLink>
-          <NuxtLink to="/katalog" class="hover:text-white transition-colors no-underline">
+          <NuxtLink to="/tracking" class="hover:text-white transition-colors no-underline">
             Lacak Pesanan
           </NuxtLink>
           <span class="text-white/40">IDR (Rp)</span>
