@@ -218,18 +218,18 @@ const handleLogout = async () => {
         </div>
 
         <!-- Right Commerce Actions -->
-        <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
           <!-- Wishlist Icon Button with UiTooltip -->
           <UiTooltip text="Wishlist" position="bottom" align="center">
             <NuxtLink
               to="/wishlist"
-              class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-brand-canvas-soft hover:bg-brand-canvas text-brand-ink border border-brand-hair hover:border-brand-ink/30 transition-all active:scale-95 shadow-whisper no-underline"
+              class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 no-underline cursor-pointer"
               aria-label="Wishlist"
             >
-              <i class="pi pi-heart text-sm sm:text-base text-brand-ink" />
+              <i class="pi pi-heart text-base sm:text-lg text-brand-ink" />
               <span
                 v-if="wishlistStore.totalItems > 0"
-                class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-sm leading-none"
+                class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-rose-600 text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
               >
                 {{ wishlistStore.totalItems > 99 ? '99+' : wishlistStore.totalItems }}
               </span>
@@ -240,14 +240,14 @@ const handleLogout = async () => {
           <UiTooltip position="bottom" align="end">
             <button
               type="button"
-              class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-brand-ink text-white hover:bg-brand-inkhover border border-brand-ink transition-all active:scale-95 shadow-whisper cursor-pointer"
+              class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 cursor-pointer"
               aria-label="Buka Keranjang Belanja"
               @click="cartStore.openDrawer"
             >
-              <i class="pi pi-shopping-bag text-sm sm:text-base text-white" />
+              <i class="pi pi-shopping-bag text-base sm:text-lg text-brand-ink" />
               <span
                 v-if="cartStore.totalItems > 0"
-                class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-accent text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-sm leading-none"
+                class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-brand-ink text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
               >
                 {{ cartStore.totalItems > 99 ? '99+' : cartStore.totalItems }}
               </span>
@@ -287,7 +287,7 @@ const handleLogout = async () => {
             <template v-if="isLoggedIn && user">
               <button
                 type="button"
-                class="flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair"
+                class="flex items-center gap-1.5 p-1 sm:pl-1 sm:pr-2.5 sm:py-1 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair active:scale-95"
                 @click="isUserMenuOpen = !isUserMenuOpen"
               >
                 <span
@@ -373,11 +373,14 @@ const handleLogout = async () => {
           <!-- Mobile Hamburger Trigger -->
           <button
             type="button"
-            class="md:hidden p-2 rounded-full hover:bg-brand-canvas-soft text-brand-ink transition-colors cursor-pointer"
+            class="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-brand-canvas-soft text-brand-ink transition-colors cursor-pointer active:scale-95"
             aria-label="Buka menu navigasi"
             @click="isMobileMenuOpen = !isMobileMenuOpen"
           >
-            <i :class="isMobileMenuOpen ? 'pi pi-times' : 'pi pi-bars'" class="text-base" />
+            <i
+              :class="isMobileMenuOpen ? 'pi pi-times' : 'pi pi-bars'"
+              class="text-base text-brand-ink"
+            />
           </button>
         </div>
       </div>
