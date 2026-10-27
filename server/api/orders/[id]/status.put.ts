@@ -73,6 +73,46 @@ export default defineEventHandler(async (event) => {
     message: string
   }
 
+  // Buat notifikasi otomatis ke pelanggan saat status berubah
+  if (!result.no_op && result.current_status !== result.previous_status) {
+    const { data: orderData } = await client
+      .from('orders')
+      .select('user_id')
+      .eq('id', orderId)
+      .maybeSingle()
+
+    if (orderData?.user_id) {
+      let notifTitle = 'Pembaruan Pesanan'
+      let notifMessage = `Status pesanan ${orderId} telah diperbarui menjadi ${result.current_status}.`
+      let notifType: 'order_shipped' | 'order_completed' | 'order_cancelled' | 'system' = 'system'
+
+      if (result.current_status === 'shipped') {
+        notifTitle = 'Pesanan Sedang Dikirim'
+        notifMessage = `Pesanan ${orderId} telah diserahkan ke kurir dan sedang dalam perjalanan.`
+        notifType = 'order_shipped'
+      } else if (result.current_status === 'completed') {
+        notifTitle = 'Pesanan Telah Selesai'
+        notifMessage = `Pesanan ${orderId} telah selesai diterima. Terima kasih!`
+        notifType = 'order_completed'
+      } else if (result.current_status === 'cancelled') {
+        notifTitle = 'Pesanan Dibatalkan'
+        notifMessage = `Pesanan ${orderId} telah dibatalkan.${reason ? ` Alasan: ${reason}` : ''}`
+        notifType = 'order_cancelled'
+      }
+
+      await createNotification(client, {
+        user_id: orderData.user_id,
+        title: notifTitle,
+        message: notifMessage,
+        type: notifType,
+        reference_id: orderId,
+        reference_url: `/orders/${orderId}`,
+      }).catch((err) => {
+        logger.warn('Gagal membuat notifikasi transisi status order', {}, err)
+      })
+    }
+  }
+
   return successResponse(
     result.message || `Status pesanan berhasil diperbarui menjadi ${targetStatus}`,
     {

@@ -141,6 +141,18 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Buat notifikasi otomatis pesanan dibuat
+    await createNotification(client, {
+      user_id: targetUserId,
+      title: 'Pesanan Berhasil Dibuat',
+      message: `Pesanan ${orderId} telah dibuat. Silakan selesaikan pembayaran.`,
+      type: 'order_created',
+      reference_id: String(orderId),
+      reference_url: `/orders/${orderId}`,
+    }).catch((err) => {
+      logger.warn('Gagal membuat notifikasi order_created', {}, err)
+    })
+
     return successResponse('Pesanan berhasil dibuat', { order_id: orderId })
   }
 

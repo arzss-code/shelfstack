@@ -61,6 +61,18 @@ export default defineEventHandler(async (event) => {
     )
   }
 
+  // Buat notifikasi otomatis pembatalan pesanan
+  await createNotification(client, {
+    user_id: order.user_id,
+    title: 'Pesanan Dibatalkan',
+    message: `Pesanan ${id} telah dibatalkan.${reason ? ` Alasan: ${reason}` : ''}`,
+    type: 'order_cancelled',
+    reference_id: id,
+    reference_url: `/orders/${id}`,
+  }).catch((err) => {
+    logger.warn('Gagal membuat notifikasi order_cancelled', {}, err)
+  })
+
   return successResponse('Pesanan berhasil dibatalkan', {
     order_id: id,
     status: 'cancelled',
