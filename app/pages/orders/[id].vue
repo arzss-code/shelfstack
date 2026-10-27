@@ -51,6 +51,53 @@ const fetchCustomerTracking = async () => {
   }
 }
 
+const copiedHeaderResi = ref(false)
+const copyHeaderResi = async (resi?: string | null) => {
+  if (!resi || !import.meta.client) return
+  try {
+    await navigator.clipboard.writeText(resi)
+    copiedHeaderResi.value = true
+    setTimeout(() => {
+      copiedHeaderResi.value = false
+    }, 2000)
+  } catch {
+    // clipboard fallback
+  }
+}
+
+const activeCheckpoints = computed(() => {
+  if (customerCheckpoints.value.length > 0) {
+    return customerCheckpoints.value
+  }
+  return order.value?.checkpoints || []
+})
+
+const activeLatestCheckpoint = computed(() => {
+  if (activeCheckpoints.value.length === 0) return null
+  return [...activeCheckpoints.value].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  )[0]
+})
+
+const activeLatestCheckpointLocation = computed(() => {
+  if (activeLatestCheckpoint.value?.location) {
+    return activeLatestCheckpoint.value.location
+  }
+  if (order.value?.status === 'completed') {
+    const city = (order.value.address as any)?.city
+    return city ? `Diterima di ${city}` : 'Telah Diterima'
+  }
+  if (order.value?.status === 'shipped') {
+    const city = (order.value.address as any)?.city
+    return city ? `Menuju ${city}` : 'Dalam Pengiriman'
+  }
+  return 'Gudang Pengiriman ShelfStack'
+})
+
+const activeLatestCheckpointTitle = computed(() => {
+  return activeLatestCheckpoint.value?.title || ''
+})
+
 definePageMeta({
   middleware: 'auth',
 })
@@ -569,6 +616,46 @@ const getSegmentColor = (idx: number) => {
             <span v-if="order.paid_at"> · Dibayar pada {{ formatDate(order.paid_at) }}</span>
           </p>
         </div>
+
+        <div v-if="order.tracking_number" class="flex flex-wrap items-center gap-2 sm:justify-end">
+          <div
+            class="inline-flex items-center gap-2 bg-blue-50/70 border border-blue-200/80 rounded-field px-3 py-1.5 text-xs"
+          >
+            <span
+              class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white shrink-0"
+            >
+              <i class="pi pi-truck text-[10px]" />
+            </span>
+            <span class="font-bold text-brand-ink uppercase text-[11px]">{{
+              order.courier_name || 'Kurir'
+            }}</span>
+            <span class="text-brand-faint">·</span>
+            <span class="font-mono font-semibold text-brand-ink text-[11px]">{{
+              order.tracking_number
+            }}</span>
+            <button
+              type="button"
+              class="text-[11px] text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 ml-1 transition-colors"
+              :title="copiedHeaderResi ? 'Tersalin!' : 'Salin Resi'"
+              @click="copyHeaderResi(order.tracking_number)"
+            >
+              <i
+                :class="
+                  copiedHeaderResi ? 'pi pi-check text-emerald-600 text-xs' : 'pi pi-copy text-xs'
+                "
+              />
+              <span class="text-[10px]">{{ copiedHeaderResi ? 'Tersalin' : 'Salin' }}</span>
+            </button>
+          </div>
+          <UiButton
+            :to="`/tracking?q=${encodeURIComponent(order.tracking_number)}`"
+            variant="outline"
+            size="sm"
+            icon="pi-compass"
+          >
+            Lacak Publik
+          </UiButton>
+        </div>
       </div>
 
       <!-- Timeline Status Progress -->
@@ -682,7 +769,7 @@ const getSegmentColor = (idx: number) => {
         :courier-name="order.courier_name || 'JNE Express'"
         :status="order.status"
         :destination-city="(order.address as any)?.city"
-        :checkpoints="customerCheckpoints"
+        :checkpoints="activeCheckpoints"
       />
 
       <!-- Main Layout -->
@@ -738,23 +825,121 @@ const getSegmentColor = (idx: number) => {
             </div>
           </div>
 
-          <!-- Address Card -->
-          <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-3">
-            <div class="flex items-center gap-2 pb-3 border-b border-brand-hairsoft">
-              <i class="pi pi-map-marker text-brand-accent text-base" />
-              <h2 class="font-display text-base font-bold text-brand-ink m-0">Tujuan Pengiriman</h2>
+          <!-- Delivery Address & Shipping Logistics -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Address Card -->
+            <div
+              class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-3"
+            >
+              <div class="flex items-center gap-2 pb-3 border-b border-brand-hairsoft">
+                <i class="pi pi-map-marker text-brand-accent text-base" />
+                <h2 class="font-display text-base font-bold text-brand-ink m-0">
+                  Tujuan Pengiriman
+                </h2>
+              </div>
+
+              <div v-if="order.address" class="text-xs text-brand-muted space-y-1">
+                <p class="font-bold text-brand-ink m-0">
+                  {{ order.address.name }} ({{ order.address.phone }})
+                </p>
+                <p class="m-0 leading-relaxed">
+                  {{ order.address.street }}, {{ order.address.city }} {{ order.address.postal }}
+                </p>
+                <p v-if="order.address.note" class="italic text-[11px] text-brand-muted pt-1 m-0">
+                  Catatan: "{{ order.address.note }}"
+                </p>
+              </div>
             </div>
 
-            <div v-if="order.address" class="text-xs text-brand-muted space-y-1">
-              <p class="font-bold text-brand-ink m-0">
-                {{ order.address.name }} ({{ order.address.phone }})
-              </p>
-              <p class="m-0 leading-relaxed">
-                {{ order.address.street }}, {{ order.address.city }} {{ order.address.postal }}
-              </p>
-              <p v-if="order.address.note" class="italic text-[11px] text-brand-muted pt-1 m-0">
-                Catatan: "{{ order.address.note }}"
-              </p>
+            <!-- Shipping Logistics Card -->
+            <div
+              class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-3"
+            >
+              <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-truck text-brand-accent text-base" />
+                  <h2 class="font-display text-base font-bold text-brand-ink m-0">
+                    Ekspedisi & Resi
+                  </h2>
+                </div>
+                <UiBadge
+                  v-if="order.tracking_number"
+                  variant="info"
+                  :label="order.courier_name || 'Kurir'"
+                />
+              </div>
+
+              <div v-if="order.tracking_number" class="text-xs text-brand-muted space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-[11px] text-brand-muted">Nomor Resi</span>
+                  <div class="flex items-center gap-1.5">
+                    <span
+                      class="font-mono font-bold text-brand-ink bg-brand-canvas-soft px-2 py-0.5 rounded border border-brand-hairsoft"
+                    >
+                      {{ order.tracking_number }}
+                    </span>
+                    <button
+                      type="button"
+                      class="text-[11px] text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 transition-colors"
+                      :title="copiedHeaderResi ? 'Tersalin!' : 'Salin Resi'"
+                      @click="copyHeaderResi(order.tracking_number)"
+                    >
+                      <i
+                        :class="
+                          copiedHeaderResi
+                            ? 'pi pi-check text-emerald-600 text-xs'
+                            : 'pi pi-copy text-xs'
+                        "
+                      />
+                      <span>{{ copiedHeaderResi ? 'Tersalin' : 'Salin' }}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="pt-2 border-t border-brand-hairsoft/70 space-y-1">
+                  <div class="flex items-start gap-1.5">
+                    <i class="pi pi-compass text-blue-600 text-xs mt-0.5 shrink-0" />
+                    <div>
+                      <p class="font-semibold text-brand-ink m-0">
+                        Lokasi Terkini:
+                        <span class="text-blue-900 font-bold">{{
+                          activeLatestCheckpointLocation
+                        }}</span>
+                      </p>
+                      <p
+                        v-if="activeLatestCheckpointTitle"
+                        class="text-[11px] text-brand-muted m-0 mt-0.5"
+                      >
+                        {{ activeLatestCheckpointTitle }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pt-2">
+                  <UiButton
+                    :to="`/tracking?q=${encodeURIComponent(order.tracking_number)}`"
+                    variant="outline"
+                    size="sm"
+                    class="w-full justify-center text-xs"
+                    icon="pi-external-link"
+                    icon-pos="right"
+                  >
+                    Buka Halaman Lacak
+                  </UiButton>
+                </div>
+              </div>
+
+              <div v-else class="text-xs text-brand-muted py-2 space-y-1">
+                <p class="font-medium text-brand-ink m-0">Pengiriman Reguler ShelfStack</p>
+                <p class="text-[11px] text-brand-muted m-0">
+                  {{
+                    order.status === 'pending'
+                      ? 'Nomor resi akan diterbitkan setelah pembayaran berhasil terverifikasi.'
+                      : 'Pesanan sedang dipersiapkan di gudang ShelfStack.'
+                  }}
+                </p>
+              </div>
             </div>
           </div>
         </div>

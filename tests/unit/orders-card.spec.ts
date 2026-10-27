@@ -178,4 +178,44 @@ describe('OrderCard Component', () => {
       expect(badge.attributes('data-variant')).toBe(item.expectedVariant)
     }
   })
+
+  it('renders shipping logistics info (courier, resi, and current location) when tracking_number is present', () => {
+    const shippedOrder: Order = {
+      ...mockOrderWithItems,
+      status: 'shipped',
+      tracking_number: 'SS-JNE-9912039123',
+      courier_name: 'JNE Express',
+      courier_code: 'jne',
+      checkpoints: [
+        {
+          id: 'cp-1',
+          order_id: mockOrderWithItems.id,
+          tracking_number: 'SS-JNE-9912039123',
+          status: 'in_transit',
+          title: 'Sedang Transit Menuju Surabaya',
+          description: 'Paket dalam perjalanan via jalur darat.',
+          location: 'Hub Transit Semarang',
+          created_at: '2026-10-21T14:30:00Z',
+        },
+      ],
+    }
+
+    const wrapper = mount(OrderCard, {
+      props: { order: shippedOrder },
+      global: { stubs: globalStubs },
+    })
+
+    expect(wrapper.text()).toContain('JNE Express')
+    expect(wrapper.text()).toContain('SS-JNE-9912039123')
+    expect(wrapper.text()).toContain('Lokasi:')
+    expect(wrapper.text()).toContain('Hub Transit Semarang')
+    expect(wrapper.text()).toContain('Sedang Transit Menuju Surabaya')
+    expect(wrapper.text()).toContain('Salin')
+    expect(wrapper.text()).toContain('Lacak Detail')
+
+    const buttons = wrapper.findAll('.ui-button')
+    const buttonTexts = buttons.map((b) => b.text())
+    expect(buttonTexts).toContain('Lacak')
+    expect(buttonTexts).toContain('Detail')
+  })
 })
