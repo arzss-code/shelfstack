@@ -3,11 +3,14 @@ import { useAuth } from '~/features/auth/composables/useAuth'
 import { useCategories } from '~/composables/useCategories'
 import { useCartStore } from '~/features/cart/stores/cart'
 import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
+import { useNotificationStore } from '~/features/notifications/stores/notifications'
+import NotificationBell from '~/components/notifications/NotificationBell.vue'
 import AppLogo from './AppLogo.vue'
 
 const { user, profile, isAdmin, isLoggedIn, fetchProfile, signOut } = useAuth()
 const cartStore = useCartStore()
 const wishlistStore = useWishlistStore()
+const notificationStore = useNotificationStore()
 const {
   categories: dynamicCategories,
   categoryMap: dynamicCategoryMap,
@@ -90,10 +93,25 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('pointerdown', handleNavClickOutside)
+  notificationStore.cleanupRealtimeListener()
 })
+
+watch(
+  () => user.value?.id,
+  (userId) => {
+    if (userId) {
+      notificationStore.fetchNotifications()
+      notificationStore.setupRealtimeListener(userId)
+    } else {
+      notificationStore.cleanupRealtimeListener()
+    }
+  },
+  { immediate: true },
+)
 
 const handleLogout = async () => {
   isUserMenuOpen.value = false
+  notificationStore.cleanupRealtimeListener()
   await signOut()
   router.push('/')
 }
@@ -281,6 +299,9 @@ const handleLogout = async () => {
               </div>
             </template>
           </UiTooltip>
+
+          <!-- In-App Notification Bell -->
+          <NotificationBell v-if="isLoggedIn && user" />
 
           <!-- User Authentication Section -->
           <div ref="userMenuRef" class="relative">
