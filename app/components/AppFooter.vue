@@ -82,7 +82,7 @@ const { isLoggedIn, isAdmin } = useAuth()
                 Pusat Bantuan
               </NuxtLink>
               <NuxtLink
-                to="/katalog"
+                to="/tracking"
                 class="text-white/80 hover:text-white transition-colors no-underline"
               >
                 Lacak Pesanan

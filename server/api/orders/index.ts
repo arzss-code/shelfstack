@@ -34,6 +34,14 @@ export default defineEventHandler(async (event) => {
             name,
             image_url
           )
+        ),
+        checkpoints:shipping_checkpoints (
+          id,
+          status,
+          title,
+          description,
+          location,
+          created_at
         )
       `,
       )

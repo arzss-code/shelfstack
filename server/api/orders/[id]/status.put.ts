@@ -1,6 +1,7 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import type { OrderStatus } from '../../../../shared/constants/order-transitions'
+import type { CourierCode } from '../../../../shared/schemas/shipping'
 
 export default defineEventHandler(async (event) => {
   // Hanya administrator yang dapat memperbarui status pesanan secara manual
@@ -73,11 +74,11 @@ export default defineEventHandler(async (event) => {
     message: string
   }
 
-  // Buat notifikasi otomatis ke pelanggan saat status berubah
+  // Buat notifikasi otomatis dan kelola checkpoint pengiriman ke pelanggan saat status berubah
   if (!result.no_op && result.current_status !== result.previous_status) {
     const { data: orderData } = await client
       .from('orders')
-      .select('user_id')
+      .select('user_id, address, tracking_number, courier_name, courier_code')
       .eq('id', orderId)
       .maybeSingle()
 
@@ -87,12 +88,76 @@ export default defineEventHandler(async (event) => {
       let notifType: 'order_shipped' | 'order_completed' | 'order_cancelled' | 'system' = 'system'
 
       if (result.current_status === 'shipped') {
+        const courierCode = (body?.courier_code as CourierCode) || 'jne'
+        const courierName = (body?.courier_name as string) || 'JNE Express'
+        const trackingNumber =
+          (body?.tracking_number as string)?.trim() || generateTrackingNumber(courierCode)
+        const shippedAt = new Date().toISOString()
+
+        // 1. Simpan data resi dan kurir ke tabel orders
+        await client
+          .from('orders')
+          .update({
+            tracking_number: trackingNumber,
+            courier_code: courierCode,
+            courier_name: courierName,
+            shipped_at: shippedAt,
+          })
+          .eq('id', orderId)
+
+        // 2. Generate initial checkpoints ekspedisi
+        const destinationCity = (orderData.address as any)?.city || 'Kota Tujuan'
+        const initialCheckpoints = buildInitialShippingCheckpoints(
+          orderId,
+          trackingNumber,
+          courierName,
+          destinationCity,
+        )
+
+        try {
+          await client.from('shipping_checkpoints').insert(initialCheckpoints)
+        } catch (err: unknown) {
+          logger.warn(
+            'Gagal mencatat checkpoint pengiriman awal',
+            {},
+            err instanceof Error ? err.message : String(err),
+          )
+        }
+
         notifTitle = 'Pesanan Sedang Dikirim'
-        notifMessage = `Pesanan ${orderId} telah diserahkan ke kurir dan sedang dalam perjalanan.`
+        notifMessage = `Pesanan Anda telah diserahkan ke kurir ${courierName} dengan no resi ${trackingNumber}. Paket sedang dalam perjalanan.`
         notifType = 'order_shipped'
       } else if (result.current_status === 'completed') {
+        const deliveredAt = new Date().toISOString()
+
+        // 1. Catat timestamp delivered_at di tabel orders
+        await client.from('orders').update({ delivered_at: deliveredAt }).eq('id', orderId)
+
+        // 2. Generate checkpoint delivered jika pesanan memiliki resi
+        const activeTrackingNumber = orderData.tracking_number || (body?.tracking_number as string)
+        if (activeTrackingNumber) {
+          const recipientName = (orderData.address as any)?.name || 'Penerima'
+          const destinationCity = (orderData.address as any)?.city || 'Kota Tujuan'
+          const deliveredCheckpoints = buildDeliveredShippingCheckpoints(
+            orderId,
+            activeTrackingNumber,
+            recipientName,
+            destinationCity,
+          )
+
+          try {
+            await client.from('shipping_checkpoints').insert(deliveredCheckpoints)
+          } catch (err: unknown) {
+            logger.warn(
+              'Gagal mencatat checkpoint delivered',
+              {},
+              err instanceof Error ? err.message : String(err),
+            )
+          }
+        }
+
         notifTitle = 'Pesanan Telah Selesai'
-        notifMessage = `Pesanan ${orderId} telah selesai diterima. Terima kasih!`
+        notifMessage = `Pesanan ${orderId} telah selesai dan paket berhasil diterima. Terima kasih telah berbelanja di ShelfStack!`
         notifType = 'order_completed'
       } else if (result.current_status === 'cancelled') {
         notifTitle = 'Pesanan Dibatalkan'

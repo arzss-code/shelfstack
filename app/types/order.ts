@@ -36,7 +36,13 @@ export interface Order {
   paid_at?: string | null
   cancelled_at?: string | null
   cancellation_reason?: string | null
+  tracking_number?: string | null
+  courier_code?: string | null
+  courier_name?: string | null
+  shipped_at?: string | null
+  delivered_at?: string | null
   created_at: string
   updated_at?: string | null
   items?: OrderItem[]
+  checkpoints?: import('../../shared/schemas/shipping').ShippingCheckpoint[]
 }
