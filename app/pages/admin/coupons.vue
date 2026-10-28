@@ -40,6 +40,9 @@ useSeoMeta({
   title: 'Kelola Voucher - ShelfStack Admin',
 })
 
+const toast = useUiToast()
+const confirm = useUiConfirm()
+
 const coupons = ref<AdminCoupon[]>([])
 const metrics = ref<CouponMetrics>({
   total_coupons: 0,
@@ -59,12 +62,24 @@ const isEditing = ref(false)
 const editingId = ref<string | null>(null)
 const submitting = ref(false)
 const modalError = ref<string | null>(null)
-const feedbackMessage = ref<string | null>(null)
 
-// Delete Dialog State
-const isDeleteModalOpen = ref(false)
-const deletingCoupon = ref<AdminCoupon | null>(null)
-const deleting = ref(false)
+const statusOptions = [
+  { value: 'all', label: 'Semua Status' },
+  { value: 'active', label: 'Aktif' },
+  { value: 'inactive', label: 'Nonaktif' },
+  { value: 'expired', label: 'Kedaluwarsa' },
+]
+
+const typeOptions = [
+  { value: 'all', label: 'Semua Tipe' },
+  { value: 'percentage', label: 'Persen (%)' },
+  { value: 'fixed', label: 'Nominal (Rp)' },
+]
+
+const modalTypeOptions = [
+  { value: 'percentage', label: 'Persentase (%)' },
+  { value: 'fixed', label: 'Nominal Tetap (Rp)' },
+]
 
 // Form State
 const form = ref({
@@ -80,6 +95,42 @@ const form = ref({
   starts_at: '',
   expires_at: '',
   is_active: true,
+})
+
+// Numeric adapters for UiInput
+const discountValueModel = computed({
+  get: () => String(form.value.discount_value ?? ''),
+  set: (val: string) => {
+    form.value.discount_value = Number(val) || 0
+  },
+})
+
+const maxDiscountModel = computed({
+  get: () => (form.value.max_discount_rupiah != null ? String(form.value.max_discount_rupiah) : ''),
+  set: (val: string) => {
+    form.value.max_discount_rupiah = val.trim() ? Number(val) : null
+  },
+})
+
+const minPurchaseModel = computed({
+  get: () => String(form.value.min_purchase_rupiah ?? 0),
+  set: (val: string) => {
+    form.value.min_purchase_rupiah = Number(val) || 0
+  },
+})
+
+const usageLimitModel = computed({
+  get: () => (form.value.usage_limit != null ? String(form.value.usage_limit) : ''),
+  set: (val: string) => {
+    form.value.usage_limit = val.trim() ? Number(val) : null
+  },
+})
+
+const userLimitModel = computed({
+  get: () => String(form.value.user_limit ?? 1),
+  set: (val: string) => {
+    form.value.user_limit = Number(val) || 1
+  },
 })
 
 const fetchCoupons = async () => {
@@ -102,8 +153,12 @@ const fetchCoupons = async () => {
       metrics.value = res.data.metrics
     }
   } catch (err: any) {
-    feedbackMessage.value =
-      err?.data?.message || 'Gagal memuat daftar voucher. Silakan refresh halaman.'
+    toast.add({
+      severity: 'error',
+      summary: 'Gagal Memuat Data',
+      detail: err?.data?.message || 'Gagal memuat daftar voucher. Silakan refresh halaman.',
+      life: 5000,
+    })
   } finally {
     loading.value = false
   }
@@ -139,7 +194,6 @@ const openEditModal = (coupon: AdminCoupon) => {
   editingId.value = coupon.id
   modalError.value = null
 
-  // Convert cents to rupiah for user inputs
   const discountVal =
     coupon.discount_type === 'percentage' ? coupon.discount_value : coupon.discount_value / 100
 
@@ -199,21 +253,27 @@ const handleSubmit = async () => {
         method: 'POST',
         body: payload,
       })
-      feedbackMessage.value = `Voucher "${payload.code}" berhasil dibuat.`
+      toast.add({
+        severity: 'success',
+        summary: 'Voucher Dibuat',
+        detail: `Voucher "${payload.code}" berhasil diterbitkan.`,
+        life: 4000,
+      })
     } else if (editingId.value) {
       await $fetch(`/api/admin/coupons/${editingId.value}`, {
         method: 'PUT',
         body: payload,
       })
-      feedbackMessage.value = `Voucher "${form.value.code}" berhasil diperbarui.`
+      toast.add({
+        severity: 'success',
+        summary: 'Voucher Diperbarui',
+        detail: `Voucher "${form.value.code}" berhasil diperbarui.`,
+        life: 4000,
+      })
     }
 
     closeModal()
     await fetchCoupons()
-
-    setTimeout(() => {
-      feedbackMessage.value = null
-    }, 4000)
   } catch (err: any) {
     modalError.value =
       err?.data?.message || err?.message || 'Gagal menyimpan voucher. Periksa input data Anda.'
@@ -230,41 +290,52 @@ const toggleCouponStatus = async (coupon: AdminCoupon) => {
       body: { is_active: newStatus },
     })
     coupon.is_active = newStatus
-    feedbackMessage.value = `Status voucher "${coupon.code}" diubah menjadi ${newStatus ? 'Aktif' : 'Nonaktif'}.`
-    setTimeout(() => {
-      feedbackMessage.value = null
-    }, 3000)
+    toast.add({
+      severity: 'info',
+      summary: 'Status Diperbarui',
+      detail: `Status voucher "${coupon.code}" diubah menjadi ${newStatus ? 'Aktif' : 'Nonaktif'}.`,
+      life: 3000,
+    })
   } catch (err: any) {
-    feedbackMessage.value = err?.data?.message || 'Gagal memperbarui status voucher.'
+    toast.add({
+      severity: 'error',
+      summary: 'Gagal Memperbarui Status',
+      detail: err?.data?.message || 'Gagal memperbarui status voucher.',
+      life: 4000,
+    })
   }
 }
 
 const confirmDelete = (coupon: AdminCoupon) => {
-  deletingCoupon.value = coupon
-  isDeleteModalOpen.value = true
-}
-
-const handleDelete = async () => {
-  if (!deletingCoupon.value) return
-  deleting.value = true
-
-  try {
-    await $fetch(`/api/admin/coupons/${deletingCoupon.value.id}`, {
-      method: 'DELETE',
-    })
-    feedbackMessage.value = `Voucher "${deletingCoupon.value.code}" berhasil dihapus.`
-    isDeleteModalOpen.value = false
-    deletingCoupon.value = null
-    await fetchCoupons()
-
-    setTimeout(() => {
-      feedbackMessage.value = null
-    }, 4000)
-  } catch (err: any) {
-    feedbackMessage.value = err?.data?.message || 'Gagal menghapus voucher.'
-  } finally {
-    deleting.value = false
-  }
+  confirm.require({
+    header: `Hapus Voucher "${coupon.code}"?`,
+    message:
+      'Voucher ini akan di-arsip (soft delete). Pelanggan tidak akan dapat lagi menggunakan kode ini untuk checkout pesanan baru.',
+    tone: 'danger',
+    acceptLabel: 'Ya, Hapus',
+    rejectLabel: 'Batal',
+    accept: async () => {
+      try {
+        await $fetch(`/api/admin/coupons/${coupon.id}`, {
+          method: 'DELETE',
+        })
+        toast.add({
+          severity: 'success',
+          summary: 'Voucher Dihapus',
+          detail: `Voucher "${coupon.code}" berhasil dihapus.`,
+          life: 4000,
+        })
+        await fetchCoupons()
+      } catch (err: any) {
+        toast.add({
+          severity: 'error',
+          summary: 'Gagal Menghapus',
+          detail: err?.data?.message || 'Gagal menghapus voucher.',
+          life: 4000,
+        })
+      }
+    },
+  })
 }
 </script>
 
@@ -288,42 +359,10 @@ const handleDelete = async () => {
         </p>
       </div>
 
-      <button
-        type="button"
-        class="px-5 py-2.5 rounded-full bg-brand-ink text-white hover:bg-brand-inkhover transition-all text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-whisper active:scale-95"
-        @click="openCreateModal"
-      >
-        <i class="pi pi-plus text-xs" />
-        <span>Buat Voucher Baru</span>
-      </button>
+      <UiButton variant="primary" size="sm" icon="pi-plus" @click="openCreateModal">
+        Buat Voucher Baru
+      </UiButton>
     </div>
-
-    <!-- FEEDBACK TOAST / BANNER -->
-    <Transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="opacity-0 -translate-y-2"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 -translate-y-2"
-    >
-      <div
-        v-if="feedbackMessage"
-        class="p-3.5 rounded-xl bg-brand-ink text-white text-xs font-semibold flex items-center justify-between gap-3 shadow-whisper"
-      >
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-400" />
-          <span>{{ feedbackMessage }}</span>
-        </div>
-        <button
-          type="button"
-          class="text-white/60 hover:text-white cursor-pointer border-0 bg-transparent"
-          @click="feedbackMessage = null"
-        >
-          <i class="pi pi-times text-xs" />
-        </button>
-      </div>
-    </Transition>
 
     <!-- EXECUTIVE METRICS BENTO GRID -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -364,51 +403,50 @@ const handleDelete = async () => {
       </div>
     </div>
 
-    <!-- FILTER & SEARCH BAR -->
+    <!-- FILTER & SEARCH BAR MENGGUNAKAN UiInput & UiSelect -->
     <div
-      class="p-3 bg-white border border-brand-hair rounded-2xl shadow-whisper flex flex-col sm:flex-row items-center justify-between gap-3"
+      class="relative z-20 p-3 bg-white border border-brand-hair rounded-2xl shadow-whisper flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
     >
-      <div class="relative w-full sm:w-72">
-        <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-muted" />
-        <input
+      <div class="w-full sm:w-72">
+        <UiInput
           v-model="searchQuery"
-          type="text"
+          size="sm"
           placeholder="Cari kode atau nama voucher..."
-          class="w-full pl-9 pr-3 py-1.5 rounded-full bg-brand-canvas-soft border border-brand-hair text-xs text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink"
+          left-icon="pi-search"
           @input="fetchCoupons"
         />
       </div>
 
-      <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto">
-        <select
-          v-model="statusFilter"
-          class="px-3 py-1.5 rounded-full bg-brand-canvas-soft border border-brand-hair text-xs font-semibold text-brand-ink focus:outline-none cursor-pointer"
-          @change="fetchCoupons"
-        >
-          <option value="all">Semua Status</option>
-          <option value="active">Aktif</option>
-          <option value="inactive">Nonaktif</option>
-          <option value="expired">Kedaluwarsa</option>
-        </select>
+      <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto">
+        <div class="w-full sm:w-36">
+          <UiSelect
+            v-model="statusFilter"
+            size="sm"
+            block
+            :options="statusOptions"
+            @change="fetchCoupons"
+          />
+        </div>
 
-        <select
-          v-model="typeFilter"
-          class="px-3 py-1.5 rounded-full bg-brand-canvas-soft border border-brand-hair text-xs font-semibold text-brand-ink focus:outline-none cursor-pointer"
-          @change="fetchCoupons"
-        >
-          <option value="all">Semua Tipe</option>
-          <option value="percentage">Persentase (%)</option>
-          <option value="fixed">Nominal Tetap (Rp)</option>
-        </select>
+        <div class="w-full sm:w-44">
+          <UiSelect
+            v-model="typeFilter"
+            size="sm"
+            block
+            align="right"
+            :options="typeOptions"
+            @change="fetchCoupons"
+          />
+        </div>
 
-        <button
-          type="button"
-          class="px-3 py-1.5 rounded-full bg-brand-canvas-soft hover:bg-brand-hair text-xs font-semibold text-brand-ink transition-colors cursor-pointer border border-brand-hair"
-          title="Segarkan data"
+        <UiIconButton
+          icon="pi-sync"
+          label="Segarkan data"
+          variant="neutral"
+          size="sm"
+          :loading="loading"
           @click="fetchCoupons"
-        >
-          <i class="pi pi-sync text-xs" :class="{ 'animate-spin': loading }" />
-        </button>
+        />
       </div>
     </div>
 
@@ -420,14 +458,15 @@ const handleDelete = async () => {
         <p class="text-xs text-brand-muted">Memuat data voucher promosi...</p>
       </div>
 
-      <!-- Empty State -->
-      <div v-else-if="coupons.length === 0" class="p-12 text-center space-y-3">
-        <i class="pi pi-ticket text-3xl text-brand-muted" />
-        <h3 class="font-bold text-sm text-brand-ink">Tidak ada voucher yang cocok</h3>
-        <p class="text-xs text-brand-muted max-w-sm mx-auto">
-          Coba ganti filter status atau klik tombol "Buat Voucher Baru" untuk menambahkan promo
-          pertama Anda.
-        </p>
+      <!-- Empty State Menggunakan UiEmptyState Resmi -->
+      <div v-else-if="coupons.length === 0" class="p-4">
+        <UiEmptyState
+          icon="pi-ticket"
+          title="Tidak ada voucher yang cocok"
+          description="Coba ganti filter status atau klik tombol di bawah untuk membuat voucher baru."
+          action-label="Buat Voucher Baru"
+          @action="openCreateModal"
+        />
       </div>
 
       <!-- Table View -->
@@ -463,20 +502,14 @@ const handleDelete = async () => {
                 </div>
               </td>
 
-              <!-- Nama & Tipe -->
+              <!-- Nama & Tipe Menggunakan UiBadge -->
               <td class="px-4 py-3.5">
-                <div class="space-y-0.5">
+                <div class="space-y-1">
                   <p class="font-semibold text-brand-ink m-0">{{ coupon.name }}</p>
-                  <span
-                    class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                    :class="
-                      coupon.discount_type === 'percentage'
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'bg-emerald-50 text-emerald-700'
-                    "
-                  >
-                    {{ coupon.discount_type === 'percentage' ? 'Diskon Persen' : 'Nominal Tetap' }}
-                  </span>
+                  <UiBadge
+                    :label="coupon.discount_type === 'percentage' ? 'Persen' : 'Nominal'"
+                    :variant="coupon.discount_type === 'percentage' ? 'info' : 'default'"
+                  />
                 </div>
               </td>
 
@@ -512,69 +545,42 @@ const handleDelete = async () => {
                 </div>
               </td>
 
-              <!-- Status -->
+              <!-- Status Menggunakan UiBadge Resmi (Tanpa Glowing Dot) -->
               <td class="px-4 py-3.5">
-                <span
-                  v-if="coupon.is_expired"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                  <span>Kedaluwarsa</span>
-                </span>
-                <span
-                  v-else-if="coupon.is_active"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span>Aktif</span>
-                </span>
-                <span
-                  v-else
-                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-zinc-100 text-zinc-600 border border-zinc-200"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-                  <span>Nonaktif</span>
-                </span>
+                <UiBadge
+                  :label="
+                    coupon.is_expired ? 'Kedaluwarsa' : coupon.is_active ? 'Aktif' : 'Nonaktif'
+                  "
+                  :variant="coupon.is_expired ? 'danger' : coupon.is_active ? 'success' : 'default'"
+                />
               </td>
 
-              <!-- Aksi -->
+              <!-- Aksi Menggunakan UiIconButton Resmi -->
               <td class="px-4 py-3.5 text-right">
-                <div class="inline-flex items-center gap-1">
-                  <!-- Toggle Switch -->
-                  <button
-                    type="button"
-                    class="p-1.5 rounded-lg text-brand-muted hover:text-brand-ink hover:bg-brand-canvas transition-colors cursor-pointer border-0 bg-transparent"
-                    :title="coupon.is_active ? 'Nonaktifkan voucher' : 'Aktifkan voucher'"
+                <div class="inline-flex items-center gap-1.5">
+                  <UiIconButton
+                    :icon="coupon.is_active ? 'pi-eye-slash' : 'pi-eye'"
+                    :label="coupon.is_active ? 'Nonaktifkan voucher' : 'Aktifkan voucher'"
+                    variant="neutral"
+                    size="sm"
                     @click="toggleCouponStatus(coupon)"
-                  >
-                    <i
-                      :class="
-                        coupon.is_active
-                          ? 'pi pi-eye-slash text-xs text-amber-600'
-                          : 'pi pi-eye text-xs text-emerald-600'
-                      "
-                    />
-                  </button>
+                  />
 
-                  <!-- Edit -->
-                  <button
-                    type="button"
-                    class="p-1.5 rounded-lg text-brand-muted hover:text-brand-ink hover:bg-brand-canvas transition-colors cursor-pointer border-0 bg-transparent"
-                    title="Ubah data voucher"
+                  <UiIconButton
+                    icon="pi-pencil"
+                    label="Ubah voucher"
+                    variant="neutral"
+                    size="sm"
                     @click="openEditModal(coupon)"
-                  >
-                    <i class="pi pi-pencil text-xs" />
-                  </button>
+                  />
 
-                  <!-- Delete -->
-                  <button
-                    type="button"
-                    class="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer border-0 bg-transparent"
-                    title="Hapus voucher"
+                  <UiIconButton
+                    icon="pi-trash"
+                    label="Hapus voucher"
+                    variant="danger"
+                    size="sm"
                     @click="confirmDelete(coupon)"
-                  >
-                    <i class="pi pi-trash text-xs" />
-                  </button>
+                  />
                 </div>
               </td>
             </tr>
@@ -583,300 +589,163 @@ const handleDelete = async () => {
       </div>
     </div>
 
-    <!-- MODAL FORM CREATE / EDIT DIALOG -->
-    <Transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
+    <!-- MODAL FORM CREATE / EDIT DIALOG MENGGUNAKAN UiModal -->
+    <UiModal
+      v-model:visible="isModalOpen"
+      size="lg"
+      :title="isEditing ? 'Ubah Voucher Promosi' : 'Buat Voucher Promo Baru'"
+      :description="
+        isEditing
+          ? 'Perbarui parameter diskon dan kuota voucher.'
+          : 'Lengkapi formulir untuk menerbitkan voucher baru.'
+      "
     >
-      <div
-        v-if="isModalOpen"
-        class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto"
-        @click.self="closeModal"
-      >
-        <div
-          class="bg-white rounded-3xl border border-brand-hair shadow-floating w-full max-w-lg p-6 space-y-5 my-8"
-        >
-          <div class="flex items-center justify-between pb-3 border-b border-brand-hair">
-            <div>
-              <h3 class="font-display text-lg font-bold text-brand-ink">
-                {{ isEditing ? 'Ubah Voucher Promosi' : 'Buat Voucher Promo Baru' }}
-              </h3>
-              <p class="text-xs text-brand-muted">
-                {{
-                  isEditing
-                    ? 'Perbarui parameter diskon dan kuota voucher.'
-                    : 'Lengkapi formulir untuk menerbitkan voucher baru.'
-                }}
-              </p>
-            </div>
-            <button
-              type="button"
-              class="w-8 h-8 rounded-full border border-brand-hair flex items-center justify-center text-brand-muted hover:text-brand-ink hover:bg-brand-canvas cursor-pointer"
-              @click="closeModal"
+      <div class="space-y-4">
+        <!-- Error Alert Menggunakan UiAlert -->
+        <UiAlert v-if="modalError" tone="danger" title="Gagal Menyimpan">
+          {{ modalError }}
+        </UiAlert>
+
+        <form id="coupon-form" class="space-y-4" @submit.prevent="handleSubmit">
+          <!-- Kode & Nama -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <UiInput
+              id="coupon-code"
+              v-model="form.code"
+              label="Kode Voucher"
+              placeholder="MISAL: DISKON20"
+              :disabled="isEditing"
+            />
+
+            <UiInput
+              id="coupon-name"
+              v-model="form.name"
+              label="Nama Promo"
+              placeholder="Misal: Promo Awal Bulan"
+            />
+          </div>
+
+          <!-- Deskripsi -->
+          <UiTextarea
+            id="coupon-description"
+            v-model="form.description"
+            label="Deskripsi (Opsional)"
+            placeholder="Penjelasan ringkas ketentuan voucher..."
+            :rows="2"
+          />
+
+          <!-- Tipe Diskon & Nilai -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <UiSelect
+              id="coupon-type"
+              v-model="form.discount_type"
+              label="Tipe Diskon"
+              :options="modalTypeOptions"
+              block
+            />
+
+            <UiInput
+              id="coupon-value"
+              v-model="discountValueModel"
+              type="number"
+              :label="
+                form.discount_type === 'percentage' ? 'Nilai Persen (%)' : 'Potongan (Rupiah)'
+              "
+              numeric
+            />
+          </div>
+
+          <!-- Pagu Maksimal & Min Belanja -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <UiInput
+              id="coupon-max-discount"
+              v-model="maxDiscountModel"
+              type="number"
+              :label="
+                form.discount_type === 'percentage' ? 'Maks. Diskon (Rp) (Pagu)' : 'Maks. Diskon'
+              "
+              placeholder="Kosongkan jika tanpa pagu"
+              numeric
+            />
+
+            <UiInput
+              id="coupon-min-purchase"
+              v-model="minPurchaseModel"
+              type="number"
+              label="Min. Pembelian (Rp)"
+              placeholder="0 (Tanpa minimum)"
+              numeric
+            />
+          </div>
+
+          <!-- Kuota Global & User Limit -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <UiInput
+              id="coupon-usage-limit"
+              v-model="usageLimitModel"
+              type="number"
+              label="Batas Kuota Total"
+              placeholder="Kosongkan jika tak terbatas"
+              numeric
+            />
+
+            <UiInput
+              id="coupon-user-limit"
+              v-model="userLimitModel"
+              type="number"
+              label="Batas Per Pengguna"
+              placeholder="1"
+              numeric
+            />
+          </div>
+
+          <!-- Tanggal Mulai & Kedaluwarsa -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <UiInput
+              id="coupon-starts-at"
+              v-model="form.starts_at"
+              type="datetime-local"
+              label="Mulai Berlaku"
+            />
+
+            <UiInput
+              id="coupon-expires-at"
+              v-model="form.expires_at"
+              type="datetime-local"
+              label="Kedaluwarsa"
+            />
+          </div>
+
+          <!-- Checkbox Aktif -->
+          <div class="flex items-center gap-2 pt-1">
+            <input
+              id="is_active_checkbox"
+              v-model="form.is_active"
+              type="checkbox"
+              class="w-4 h-4 rounded text-brand-ink focus:ring-brand-ink cursor-pointer"
+            />
+            <label
+              for="is_active_checkbox"
+              class="text-xs font-semibold text-brand-ink cursor-pointer"
             >
-              <i class="pi pi-times text-xs" />
-            </button>
+              Aktifkan voucher ini langsung setelah disimpan
+            </label>
           </div>
-
-          <!-- Error Alert -->
-          <div
-            v-if="modalError"
-            class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2"
-          >
-            <i class="pi pi-exclamation-circle text-sm shrink-0" />
-            <span>{{ modalError }}</span>
-          </div>
-
-          <form class="space-y-4" @submit.prevent="handleSubmit">
-            <!-- Kode & Nama -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div class="space-y-1">
-                <label class="block text-xs font-semibold text-brand-ink">
-                  Kode Voucher <span class="text-rose-500">*</span>
-                </label>
-                <input
-                  v-model="form.code"
-                  type="text"
-                  required
-                  :disabled="isEditing"
-                  placeholder="MISAL: DISKON20"
-                  class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair font-mono text-xs uppercase font-bold text-brand-ink focus:outline-none focus:border-brand-ink disabled:opacity-60"
-                />
-              </div>
-
-              <div class="space-y-1">
-                <label class="block text-xs font-semibold text-brand-ink">
-                  Nama Promo <span class="text-rose-500">*</span>
-                </label>
-                <input
-                  v-model="form.name"
-                  type="text"
-                  required
-                  placeholder="Misal: Promo Awal Bulan"
-                  class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair text-xs text-brand-ink focus:outline-none focus:border-brand-ink"
-                />
-              </div>
-            </div>
-
-            <!-- Deskripsi -->
-            <div class="space-y-1">
-              <label class="block text-xs font-semibold text-brand-ink">Deskripsi (Opsional)</label>
-              <textarea
-                v-model="form.description"
-                rows="2"
-                placeholder="Penjelasan ringkas ketentuan voucher..."
-                class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair text-xs text-brand-ink focus:outline-none focus:border-brand-ink resize-none"
-              />
-            </div>
-
-            <!-- Tipe Diskon & Nilai -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div class="space-y-1">
-                <label class="block text-xs font-semibold text-brand-ink">Tipe Diskon</label>
-                <select
-                  v-model="form.discount_type"
-                  class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair text-xs font-semibold text-brand-ink focus:outline-none focus:border-brand-ink"
-                >
-                  <option value="percentage">Persentase (%)</option>
-                  <option value="fixed">Nominal Tetap (Rp)</option>
-                </select>
-              </div>
-
-              <div class="space-y-1">
-                <label class="block text-xs font-semibold text-brand-ink">
-                  {{
-                    form.discount_type === 'percentage' ? 'Nilai Persen (%)' : 'Potongan (Rupiah)'
-                  }}
-                  <span class="text-rose-500">*</span>
-                </label>
-                <input
-                  v-model.number="form.discount_value"
-                  type="number"
-                  required
-                  min="1"
-                  :max="form.discount_type === 'percentage' ? 100 : 100000000"
-                  class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair text-xs font-bold text-brand-ink focus:outline-none focus:border-brand-ink"
-                />
-              </div>
-            </div>
-
-            <!-- Pagu Maksimal & Min Belanja -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div class="space-y-1">
-                <label class="block text-xs font-semibold text-brand-ink">
-                  Maks. Diskon (Rp)
-                  <span
-                    v-if="form.discount_type === 'percentage'"
-                    class="text-[10px] text-brand-muted"
-                    >(Pagu)</span
-                  >
-                </label>
-                <input
-                  v-model.number="form.max_discount_rupiah"
-                  type="number"
-                  min="0"
-                  placeholder="Kosongkan jika tanpa pagu"
-                  class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair text-xs text-brand-ink focus:outline-none focus:border-brand-ink"
-                />
-              </div>
-
-              <div class="space-y-1">
-                <label class="block text-xs font-semibold text-brand-ink"
-                  >Min. Pembelian (Rp)</label
-                >
-                <input
-                  v-model.number="form.min_purchase_rupiah"
-                  type="number"
-                  min="0"
-                  placeholder="0 (Tanpa minimum)"
-                  class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair text-xs text-brand-ink focus:outline-none focus:border-brand-ink"
-                />
-              </div>
-            </div>
-
-            <!-- Kuota Global & User Limit -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div class="space-y-1">
-                <label class="block text-xs font-semibold text-brand-ink">Batas Kuota Total</label>
-                <input
-                  v-model.number="form.usage_limit"
-                  type="number"
-                  min="1"
-                  placeholder="Kosongkan jika tak terbatas"
-                  class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair text-xs text-brand-ink focus:outline-none focus:border-brand-ink"
-                />
-              </div>
-
-              <div class="space-y-1">
-                <label class="block text-xs font-semibold text-brand-ink">Batas Per Pengguna</label>
-                <input
-                  v-model.number="form.user_limit"
-                  type="number"
-                  min="1"
-                  required
-                  class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair text-xs text-brand-ink focus:outline-none focus:border-brand-ink"
-                />
-              </div>
-            </div>
-
-            <!-- Tanggal Mulai & Kedaluwarsa -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div class="space-y-1">
-                <label class="block text-xs font-semibold text-brand-ink">Mulai Berlaku</label>
-                <input
-                  v-model="form.starts_at"
-                  type="datetime-local"
-                  class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair text-xs text-brand-ink focus:outline-none focus:border-brand-ink"
-                />
-              </div>
-
-              <div class="space-y-1">
-                <label class="block text-xs font-semibold text-brand-ink">Kedaluwarsa</label>
-                <input
-                  v-model="form.expires_at"
-                  type="datetime-local"
-                  class="w-full px-3 py-2 rounded-xl bg-brand-canvas-soft border border-brand-hair text-xs text-brand-ink focus:outline-none focus:border-brand-ink"
-                />
-              </div>
-            </div>
-
-            <!-- Checkbox Aktif -->
-            <div class="flex items-center gap-2 pt-1">
-              <input
-                id="is_active_checkbox"
-                v-model="form.is_active"
-                type="checkbox"
-                class="w-4 h-4 rounded text-brand-ink focus:ring-brand-ink cursor-pointer"
-              />
-              <label
-                for="is_active_checkbox"
-                class="text-xs font-semibold text-brand-ink cursor-pointer"
-              >
-                Aktifkan voucher ini langsung setelah disimpan
-              </label>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="flex items-center justify-end gap-2 pt-3 border-t border-brand-hair">
-              <button
-                type="button"
-                class="px-4 py-2 rounded-full border border-brand-hair bg-transparent text-xs font-semibold text-brand-muted hover:text-brand-ink transition-colors cursor-pointer"
-                @click="closeModal"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                :disabled="submitting"
-                class="px-5 py-2 rounded-full bg-brand-ink text-white hover:bg-brand-inkhover transition-all text-xs font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-60 shadow-whisper"
-              >
-                <i v-if="submitting" class="pi pi-spinner animate-spin text-xs" />
-                <span>{{
-                  submitting ? 'Menyimpan...' : isEditing ? 'Perbarui Voucher' : 'Terbitkan Voucher'
-                }}</span>
-              </button>
-            </div>
-          </form>
-        </div>
+        </form>
       </div>
-    </Transition>
 
-    <!-- DELETE CONFIRMATION MODAL -->
-    <Transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div
-        v-if="isDeleteModalOpen && deletingCoupon"
-        class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50"
-      >
-        <div
-          class="bg-white rounded-3xl border border-brand-hair shadow-floating w-full max-w-sm p-6 space-y-4"
+      <template #footer>
+        <UiButton variant="outline" size="sm" @click="closeModal"> Batal </UiButton>
+        <UiButton
+          variant="primary"
+          size="sm"
+          :loading="submitting"
+          type="submit"
+          form="coupon-form"
         >
-          <div
-            class="w-10 h-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center"
-          >
-            <i class="pi pi-trash text-base" />
-          </div>
-
-          <div class="space-y-1">
-            <h3 class="font-display text-base font-bold text-brand-ink">
-              Hapus Voucher "{{ deletingCoupon.code }}"?
-            </h3>
-            <p class="text-xs text-brand-muted leading-relaxed">
-              Voucher ini akan di-arsip (soft delete). Pelanggan tidak akan dapat lagi menggunakan
-              kode ini untuk checkout pesanan baru.
-            </p>
-          </div>
-
-          <div class="flex items-center justify-end gap-2 pt-2">
-            <button
-              type="button"
-              class="px-4 py-2 rounded-full border border-brand-hair bg-transparent text-xs font-semibold text-brand-muted hover:text-brand-ink cursor-pointer"
-              @click="isDeleteModalOpen = false"
-            >
-              Batal
-            </button>
-            <button
-              type="button"
-              :disabled="deleting"
-              class="px-5 py-2 rounded-full bg-rose-600 text-white hover:bg-rose-700 transition-colors text-xs font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-60"
-              @click="handleDelete"
-            >
-              <i v-if="deleting" class="pi pi-spinner animate-spin text-xs" />
-              <span>{{ deleting ? 'Menghapus...' : 'Ya, Hapus' }}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </Transition>
+          {{ isEditing ? 'Perbarui Voucher' : 'Terbitkan Voucher' }}
+        </UiButton>
+      </template>
+    </UiModal>
   </div>
 </template>

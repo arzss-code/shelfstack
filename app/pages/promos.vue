@@ -32,6 +32,7 @@ useSeoMeta({
 })
 
 const cartStore = useCartStore()
+const toast = useUiToast()
 
 const coupons = ref<PromoCoupon[]>([])
 const loading = ref(true)
@@ -41,7 +42,6 @@ const searchQuery = ref('')
 const copiedCode = ref<string | null>(null)
 const claimedCodes = ref<Set<string>>(new Set())
 const expandedTerms = ref<Record<string, boolean>>({})
-const toastMessage = ref<string | null>(null)
 
 const tabItems = computed<UiTabItem[]>(() => [
   { value: 'all', label: 'Semua Voucher', count: coupons.value.length },
@@ -108,12 +108,12 @@ const filteredCoupons = computed(() => {
 })
 
 const showToast = (message: string) => {
-  toastMessage.value = message
-  setTimeout(() => {
-    if (toastMessage.value === message) {
-      toastMessage.value = null
-    }
-  }, 3000)
+  toast.add({
+    severity: 'success',
+    summary: 'Voucher Promo',
+    detail: message,
+    life: 3000,
+  })
 }
 
 const copyCouponCode = async (code: string) => {
@@ -238,7 +238,7 @@ const resetFilters = () => {
           </p>
         </div>
 
-        <!-- Integrated Search Bar di Banner -->
+        <!-- Integrated Search Bar di Banner Menggunakan UiInput -->
         <div class="w-full sm:w-72 lg:w-80 shrink-0">
           <div class="bg-white/10 backdrop-blur-md p-1 rounded-full border border-white/15">
             <UiInput
@@ -257,24 +257,6 @@ const resetFilters = () => {
       <UiTabs v-model="selectedTab" :items="tabItems" aria-label="Kategori Voucher" />
     </div>
 
-    <!-- TOAST NOTIFICATION -->
-    <Transition
-      enter-active-class="transition-opacity duration-200 ease-out"
-      enter-from-class="opacity-0 translate-y-2"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition-opacity duration-150 ease-in"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 translate-y-2"
-    >
-      <div
-        v-if="toastMessage"
-        class="fixed bottom-6 right-6 z-50 bg-brand-ink text-white px-4 py-3 rounded-xl shadow-floating flex items-center gap-2.5 text-xs font-semibold"
-      >
-        <i class="pi pi-check-circle text-emerald-400 text-sm" />
-        <span>{{ toastMessage }}</span>
-      </div>
-    </Transition>
-
     <!-- LOADING STATE (MENGGUNAKAN UiSkeleton RESMI) -->
     <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div
@@ -291,15 +273,14 @@ const resetFilters = () => {
       </div>
     </div>
 
-    <!-- ERROR STATE (MENGGUNAKAN UiButton RESMI) -->
-    <div
-      v-else-if="errorMessage"
-      class="p-8 rounded-2xl border border-rose-200 bg-rose-50/50 text-center space-y-3"
-    >
-      <i class="pi pi-exclamation-circle text-2xl text-rose-600" />
-      <h3 class="font-bold text-sm text-brand-ink">Gagal Memuat Voucher</h3>
-      <p class="text-xs text-brand-muted">{{ errorMessage }}</p>
-      <UiButton variant="primary" size="sm" @click="fetchCoupons"> Coba Lagi </UiButton>
+    <!-- ERROR STATE (MENGGUNAKAN UiAlert RESMI) -->
+    <div v-else-if="errorMessage" class="p-2">
+      <UiAlert tone="danger" title="Gagal Memuat Voucher">
+        <p>{{ errorMessage }}</p>
+        <div class="pt-2">
+          <UiButton variant="outline" size="xs" @click="fetchCoupons"> Coba Lagi </UiButton>
+        </div>
+      </UiAlert>
     </div>
 
     <!-- MAIN VOUCHER CARDS GRID (KOMPAK, NON-REDUNDAN) -->
@@ -337,11 +318,7 @@ const resetFilters = () => {
                 <h2 class="text-xs sm:text-sm font-bold text-brand-ink">
                   Gratis Ongkos Kirim Seluruh Indonesia
                 </h2>
-                <span
-                  class="text-[10px] font-semibold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full"
-                >
-                  Otomatis
-                </span>
+                <UiBadge label="Otomatis" variant="warning" />
               </div>
               <p class="mt-1 text-xs text-brand-muted leading-relaxed">
                 Potongan ongkos kirim otomatis aktif saat total belanja mencapai Rp 500.000 untuk
@@ -377,7 +354,7 @@ const resetFilters = () => {
           />
 
           <div class="flex flex-col sm:flex-row h-full">
-            <!-- LEFT STUB: Nilai Diskon Kompak -->
+            <!-- LEFT STUB: Nilai Diskon Kompak Menggunakan UiBadge -->
             <div
               class="w-full sm:w-28 shrink-0 p-3.5 flex flex-col justify-between items-center text-center border-b sm:border-b-0 sm:border-r border-dashed border-brand-hair"
               :class="coupon.discount_type === 'percentage' ? 'bg-blue-50/60' : 'bg-emerald-50/60'"
