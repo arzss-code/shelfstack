@@ -282,11 +282,31 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
           v-if="!cartStore.isEmpty"
           class="p-5 border-t border-brand-hair bg-brand-canvas space-y-3.5 shrink-0"
         >
-          <div class="flex items-center justify-between">
-            <span class="text-xs text-brand-muted font-medium">Total Sementara</span>
-            <span class="font-display text-base font-bold text-brand-ink tabular-nums">
-              {{ cartStore.formattedTotalPrice }}
-            </span>
+          <!-- Voucher Promo Input -->
+          <CartCouponInput compact />
+
+          <div class="space-y-2 pt-1 border-t border-brand-hairsoft text-xs">
+            <div class="flex items-center justify-between text-brand-muted">
+              <span>Subtotal</span>
+              <span class="font-semibold text-brand-ink tabular-nums">
+                {{ cartStore.formattedTotalPrice }}
+              </span>
+            </div>
+            <div
+              v-if="cartStore.discountCents > 0"
+              class="flex items-center justify-between text-brand-success-text"
+            >
+              <span>Diskon Kupon</span>
+              <span class="font-bold tabular-nums"> -{{ cartStore.formattedDiscountAmount }} </span>
+            </div>
+            <div
+              class="flex items-center justify-between pt-1 border-t border-brand-hairsoft font-bold"
+            >
+              <span class="text-brand-ink">Total Tagihan</span>
+              <span class="font-display text-base text-brand-ink tabular-nums">
+                {{ cartStore.formattedFinalPrice }}
+              </span>
+            </div>
           </div>
 
           <div

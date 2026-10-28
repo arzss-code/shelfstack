@@ -2,6 +2,35 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.19.0] - 2026-10-28
+
+### Sistem Kupon Promo & Voucher Diskon (SHF-VOUCHER)
+
+- **Database Migrasi & RLS Strict**:
+  - Penambahan tabel master kupon `public.coupons` (`supabase/migrations/20261121000001_coupons_and_promo_discounts.sql`) dengan kolom tipe diskon (percentage/fixed), pagu maksimal potongan, syarat minimum belanja, kuota pemakaian global dan per-user, masa berlaku, dan soft delete (`deleted_at`).
+  - Penambahan tabel audit trail `public.coupon_usages` dengan relasi foreign key cascade dan constraint unik `(user_id, coupon_id, order_id)` untuk pencegahan penyalahgunaan kuota berlebih.
+  - Penambahan kolom diskon pada tabel `public.orders`: `subtotal_cents`, `discount_cents`, `coupon_id`, dan `coupon_code`.
+  - Pembaruan fungsi RPC `create_order` menjadi atomik dan aman: validasi kupon, penguncian baris kupon `FOR UPDATE`, kalkulasi diskon di sisi server Postgres, penambahan `usage_count`, dan pencatatan audit pemakaian.
+  - Kebijakan RLS: pembacaan kupon aktif diizinkan untuk publik/authenticated, admin memiliki akses penuh, dan mutasi langsung `coupon_usages` dari sisi client dilarang keras (`with check (false)`).
+- **Server Endpoints & Utilities**:
+  - `shared/schemas/coupon.ts`: Validasi Zod schema untuk validasi kupon (`validateCouponSchema`) dan struktur ringkasan voucher (`couponSummarySchema`).
+  - `server/utils/coupon.ts`: Utilitas kalkulasi diskon (`calculateCouponDiscount`), pengecekan aturan kelayakan kupon (`validateCouponEligibility`), dan penyusunan ringkasan (`buildCouponSummary`).
+  - `POST /api/coupons/validate`: Endpoint validasi kupon terproteksi yang memverifikasi kode voucher terhadap subtotal belanja dan mengembalikan rincian potongan harga nyata.
+  - `server/api/orders/index.ts`: Integrasi parameter `p_coupon_code` pada pemanggilan RPC `create_order`.
+- **Frontend & Komponen UI/UX**:
+  - Store Pinia `useCartStore`: State `appliedCoupon`, getter `discountCents`, `finalPrice`, `formattedFinalPrice`, aksi `applyCoupon()` dan `removeCoupon()`, serta persistensi `localStorage` (`shelfstack-applied-coupon`).
+  - Komponen `CartCouponInput.vue` (`app/components/cart/CartCouponInput.vue`): Form input kode voucher dengan saran kupon cepat (quick pills), chip status kupon aktif, kalkulasi penghematan, tombol hapus voucher, dan peringatan jika subtotal belum mencapai minimum belanja.
+  - Integrasi Cart Drawer (`CartDrawer.vue`) & Halaman Keranjang (`cart.vue`): Input voucher pada ringkasan pesanan dengan rincian Subtotal, Diskon Kupon, dan Total Tagihan yang adaptif.
+  - Integrasi Checkout (`checkout.vue`): Pengiriman kode voucher ke pembuatan pesanan dan sinkronisasi nominal pembayaran Midtrans Snap.
+  - Integrasi Rincian Pesanan Pelanggan (`orders/[id].vue`) dan Admin (`admin/orders/[id].vue`): Penayangan baris rincian potongan diskon kupon.
+- **Quality Gates & Tests**:
+  - `pnpm lint` 0 error / 0 warning (100% clean).
+  - `pnpm typecheck` EXIT 0 tanpa error tipe data.
+  - 16 unit test baru di `tests/unit/coupon-schema.spec.ts` (validasi schema, kalkulasi diskon, dan aturan kupon).
+  - 6 unit test baru di `tests/unit/api-coupons.spec.ts` (integrasi API kupon dan skenario checkout).
+  - 7 unit test baru di `tests/unit/cart-coupon.spec.ts` (integrasi store Pinia cart dan kalkulasi kupon).
+  - Total test suite: 51 file / 466 test lolos 100%.
+
 ## [0.18.0] - 2026-10-27
 
 ### Pelacakan Pengiriman & Ekspedisi Kurir (SHF-LOG-01)

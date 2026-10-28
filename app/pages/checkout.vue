@@ -52,6 +52,9 @@ const placedOrderSnapshot = ref<{
   items: typeof cartStore.items
   totalItems: number
   totalPriceFormatted: string
+  discountFormatted?: string | null
+  couponCode?: string | null
+  finalPriceFormatted?: string
 } | null>(null)
 
 const displayItems = computed(() => placedOrderSnapshot.value?.items ?? cartStore.items)
@@ -61,6 +64,24 @@ const displayTotalItems = computed(
 const displayTotalPrice = computed(
   () => placedOrderSnapshot.value?.totalPriceFormatted ?? cartStore.formattedTotalPrice,
 )
+const displayDiscountAmount = computed(() => {
+  if (placedOrderSnapshot.value) {
+    return placedOrderSnapshot.value.discountFormatted
+  }
+  return cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null
+})
+const displayCouponCode = computed(() => {
+  if (placedOrderSnapshot.value) {
+    return placedOrderSnapshot.value.couponCode
+  }
+  return cartStore.appliedCoupon?.code || null
+})
+const displayFinalPrice = computed(() => {
+  if (placedOrderSnapshot.value) {
+    return (placedOrderSnapshot.value as any).finalPriceFormatted
+  }
+  return cartStore.formattedFinalPrice
+})
 
 const submitButtonLabel = computed(() => {
   if (isOrderPlaced.value) {
@@ -160,6 +181,10 @@ const handleCreateOrder = async () => {
         postal: address.value.postal.trim(),
         note: address.value.note ? address.value.note.trim() : undefined,
       },
+      coupon_code:
+        cartStore.appliedCoupon && cartStore.isCouponValidForCurrentSubtotal
+          ? cartStore.appliedCoupon.code
+          : undefined,
     }
 
     // Gunakan Idempotency-Key persisten per logical attempt untuk mencegah order ganda
@@ -181,6 +206,9 @@ const handleCreateOrder = async () => {
       items: [...cartStore.items],
       totalItems: cartStore.totalItems,
       totalPriceFormatted: cartStore.formattedTotalPrice,
+      discountFormatted: cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null,
+      couponCode: cartStore.appliedCoupon?.code || null,
+      finalPriceFormatted: cartStore.formattedFinalPrice,
     }
     isOrderPlaced.value = true
 
@@ -578,11 +606,24 @@ const handleCreateOrder = async () => {
 
         <!-- Bill Details -->
         <div class="pt-4 border-t border-brand-hairsoft space-y-2.5 text-xs text-brand-muted">
+          <div v-if="!isOrderPlaced" class="pb-2 border-b border-brand-hairsoft">
+            <CartCouponInput compact />
+          </div>
+
           <div class="flex items-center justify-between">
             <span>Subtotal Produk</span>
             <span class="font-semibold text-brand-ink tabular-nums">
               {{ displayTotalPrice }}
             </span>
+          </div>
+          <div
+            v-if="displayDiscountAmount"
+            class="flex items-center justify-between text-brand-success-text font-medium"
+          >
+            <span
+              >Diskon Kupon Promo {{ displayCouponCode ? '(' + displayCouponCode + ')' : '' }}</span
+            >
+            <span class="font-bold tabular-nums"> -{{ displayDiscountAmount }} </span>
           </div>
           <div class="flex items-center justify-between">
             <span>Biaya Pengiriman</span>
@@ -595,7 +636,7 @@ const handleCreateOrder = async () => {
           <div class="pt-3 border-t border-brand-hairsoft flex items-center justify-between">
             <span class="font-display font-bold text-sm text-brand-ink">Total Tagihan</span>
             <span class="font-display text-xl font-bold text-brand-ink tabular-nums">
-              {{ displayTotalPrice }}
+              {{ displayFinalPrice }}
             </span>
           </div>
         </div>

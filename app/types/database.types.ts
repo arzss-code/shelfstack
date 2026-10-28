@@ -201,9 +201,100 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          discount_type: 'percentage' | 'fixed'
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_discount_cents: number | null
+          min_purchase_cents: number
+          name: string
+          starts_at: string | null
+          updated_at: string
+          usage_count: number
+          usage_limit: number | null
+          user_limit: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          discount_type: 'percentage' | 'fixed'
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_discount_cents?: number | null
+          min_purchase_cents?: number
+          name: string
+          starts_at?: string | null
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+          user_limit?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          discount_type?: 'percentage' | 'fixed'
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_discount_cents?: number | null
+          min_purchase_cents?: number
+          name?: string
+          starts_at?: string | null
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+          user_limit?: number | null
+        }
+        Relationships: []
+      }
+      coupon_usages: {
+        Row: {
+          coupon_id: string
+          created_at: string
+          discount_cents: number
+          id: string
+          order_id: string
+          user_id: string
+        }
+        Insert: {
+          coupon_id: string
+          created_at?: string
+          discount_cents: number
+          id?: string
+          order_id: string
+          user_id: string
+        }
+        Update: {
+          coupon_id?: string
+          created_at?: string
+          discount_cents?: number
+          id?: string
+          order_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           address: Json
+          coupon_code: string | null
+          coupon_id: string | null
+          discount_cents: number
+          subtotal_cents: number
           cancellation_reason: string | null
           cancelled_at: string | null
           courier_code: string | null
@@ -225,6 +316,10 @@ export type Database = {
         }
         Insert: {
           address: Json
+          coupon_code?: string | null
+          coupon_id?: string | null
+          discount_cents?: number
+          subtotal_cents?: number
           cancellation_reason?: string | null
           cancelled_at?: string | null
           courier_code?: string | null
@@ -246,6 +341,10 @@ export type Database = {
         }
         Update: {
           address?: Json
+          coupon_code?: string | null
+          coupon_id?: string | null
+          discount_cents?: number
+          subtotal_cents?: number
           cancellation_reason?: string | null
           cancelled_at?: string | null
           courier_code?: string | null
@@ -714,6 +813,7 @@ export type Database = {
           p_address: Json
           p_idempotency_key?: string | null
           p_request_hash?: string | null
+          p_coupon_code?: string | null
         }
         Returns: string
       }

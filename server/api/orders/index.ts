@@ -115,6 +115,7 @@ export default defineEventHandler(async (event) => {
       p_address: parsed.data.address,
       p_idempotency_key: idempotencyKey,
       p_request_hash: requestHash,
+      p_coupon_code: parsed.data.coupon_code || null,
     })
 
     if (error) {

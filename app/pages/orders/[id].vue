@@ -966,6 +966,23 @@ const getSegmentColor = (idx: number) => {
               <span>Metode Pembayaran</span>
               <span class="font-semibold text-brand-ink uppercase">{{ order.payment_type }}</span>
             </div>
+            <div v-if="order.subtotal_cents" class="flex items-center justify-between">
+              <span>Subtotal Produk</span>
+              <span class="font-semibold text-brand-ink tabular-nums">{{
+                formatRupiah(order.subtotal_cents / 100)
+              }}</span>
+            </div>
+            <div
+              v-if="order.discount_cents && order.discount_cents > 0"
+              class="flex items-center justify-between text-brand-success-text font-medium"
+            >
+              <span
+                >Diskon Voucher {{ order.coupon_code ? '(' + order.coupon_code + ')' : '' }}</span
+              >
+              <span class="font-bold tabular-nums"
+                >-{{ formatRupiah(order.discount_cents / 100) }}</span
+              >
+            </div>
             <div class="flex items-center justify-between">
               <span>Biaya Pengiriman</span>
               <span class="text-brand-accent font-semibold">Gratis Ongkir</span>
