@@ -15,7 +15,6 @@ definePageMeta({
 })
 
 const route = useRoute()
-const router = useRouter()
 const toast = useUiToast()
 
 const orderId = computed(() => route.params.id as string)
@@ -182,6 +181,23 @@ const getStatusBadge = (status: OrderStatus) => {
   }
 }
 
+const getTransitionLabel = (status: OrderStatus) => {
+  switch (status) {
+    case 'paid':
+      return 'Tandai Lunas'
+    case 'shipped':
+      return 'Kirim Pesanan'
+    case 'completed':
+      return 'Selesaikan Pesanan'
+    case 'cancelled':
+      return 'Batalkan Pesanan'
+    case 'refunded':
+      return 'Refund Pesanan'
+    default:
+      return status
+  }
+}
+
 const getTransitionBtnVariant = (status: OrderStatus) => {
   switch (status) {
     case 'paid':
@@ -191,7 +207,7 @@ const getTransitionBtnVariant = (status: OrderStatus) => {
       return 'accent' as const
     case 'cancelled':
     case 'refunded':
-      return 'danger' as const
+      return 'secondary' as const
     default:
       return 'secondary' as const
   }
@@ -222,90 +238,84 @@ const formatDate = (dateStr?: string | null) => {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- Back Button & Breadcrumbs -->
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <UiButton
-          variant="secondary"
-          size="sm"
-          class="!p-2 rounded-full"
-          aria-label="Kembali ke daftar pesanan"
-          @click="router.push('/admin/orders')"
-        >
-          <i class="pi pi-arrow-left text-xs" />
-        </UiButton>
-        <div>
-          <h1 class="font-display text-xl font-bold tracking-tight text-brand-ink sm:text-2xl m-0">
-            Pesanan #{{ orderId.slice(0, 8) }}
-          </h1>
-          <p class="text-xs text-brand-muted m-0 mt-0.5">
-            Dibuat pada {{ formatDate(order?.created_at) }}
-          </p>
-        </div>
-      </div>
-
-      <!-- Current Status Badge -->
-      <UiBadge
-        v-if="order"
-        :label="getStatusBadge(order.status).label"
-        :variant="getStatusBadge(order.status).variant"
-        class="capitalize font-semibold"
-      />
+  <div class="space-y-6 pb-20">
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 text-xs text-brand-muted">
+      <NuxtLink
+        to="/admin/orders"
+        class="no-underline text-brand-muted hover:text-brand-ink font-medium transition-colors"
+      >
+        Kelola Pesanan
+      </NuxtLink>
+      <span>/</span>
+      <span class="font-mono text-brand-ink tabular">#{{ orderId.slice(0, 8) }}</span>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="space-y-4">
-      <UiSkeleton height="120px" class="w-full rounded-2xl" />
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <UiSkeleton height="200px" class="col-span-2 rounded-2xl" />
-        <UiSkeleton height="200px" class="col-span-1 rounded-2xl" />
-      </div>
+    <div v-if="loading" class="space-y-4 py-8">
+      <div class="h-10 w-64 animate-pulse rounded bg-brand-hairsoft" />
+      <div class="h-48 w-full animate-pulse rounded-2xl bg-brand-hairsoft" />
     </div>
 
     <!-- Error State -->
-    <UiAlert v-else-if="errorMessage" variant="danger" title="Gagal Memuat Pesanan">
-      {{ errorMessage }}
+    <UiAlert
+      v-else-if="errorMessage"
+      variant="danger"
+      title="Gagal Memuat Pesanan"
+      class="mx-auto max-w-md"
+    >
+      <p class="m-0 font-medium">{{ errorMessage }}</p>
+      <UiButton variant="secondary" size="sm" class="mt-3" @click="fetchOrderDetail">
+        Coba Lagi
+      </UiButton>
     </UiAlert>
 
     <!-- Content State -->
     <div v-else-if="order" class="space-y-6">
-      <!-- Transition Actions Card -->
+      <!-- Header Banner with Status & Actions -->
       <div
-        v-if="availableTransitions.length > 0"
-        class="rounded-2xl border border-brand-hair bg-brand-canvas-soft p-5 shadow-whisper"
+        class="flex flex-col gap-4 rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper sm:flex-row sm:items-center sm:justify-between"
       >
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 class="font-display text-sm font-bold text-brand-ink m-0">Tindakan Admin</h2>
-            <p class="text-xs text-brand-muted m-0 mt-0.5">
-              Ubah status pesanan ke tahap alur selanjutnya sesuai dengan SLA operasional.
-            </p>
+        <div class="space-y-1">
+          <div class="flex items-center gap-3">
+            <h1 class="m-0 font-mono text-xl font-bold tabular text-brand-ink sm:text-2xl">
+              #{{ order.id }}
+            </h1>
+            <UiBadge
+              :label="getStatusBadge(order.status).label"
+              :variant="getStatusBadge(order.status).variant"
+            />
           </div>
-          <div class="flex flex-wrap items-center gap-2">
+          <p class="text-xs text-brand-muted m-0">Dibuat pada {{ formatDate(order.created_at) }}</p>
+        </div>
+
+        <!-- State Machine Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2">
+          <template v-if="availableTransitions.length > 0">
             <UiButton
-              v-for="status in availableTransitions"
-              :key="status"
-              :variant="getTransitionBtnVariant(status)"
+              v-for="target in availableTransitions"
+              :key="target"
+              :variant="getTransitionBtnVariant(target)"
               size="sm"
-              class="capitalize font-semibold"
-              @click="openTransitionModal(status)"
+              class="font-semibold"
+              @click="openTransitionModal(target)"
             >
-              Ubah ke {{ status }}
+              {{ getTransitionLabel(target) }}
             </UiButton>
-          </div>
+          </template>
+          <span v-else class="text-xs font-medium text-brand-muted italic">
+            Status Final (Tidak dapat diubah)
+          </span>
         </div>
       </div>
 
       <!-- Layout 2 Columns -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 items-start">
         <!-- Order Items List (2 cols) -->
         <div
           class="lg:col-span-2 rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper space-y-4"
         >
-          <h2 class="font-display text-base font-bold text-brand-ink m-0">
-            Item Pesanan ({{ order.items?.length || 0 }})
-          </h2>
+          <h2 class="font-display text-base font-bold text-brand-ink m-0">Daftar Produk</h2>
 
           <div class="divide-y divide-brand-hairsoft border-t border-b border-brand-hairsoft">
             <div
@@ -357,7 +367,9 @@ const formatDate = (dateStr?: string | null) => {
           <div
             class="rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper space-y-3"
           >
-            <h2 class="font-display text-base font-bold text-brand-ink m-0">Informasi Penerima</h2>
+            <h2 class="font-display text-base font-bold text-brand-ink m-0">
+              Informasi Pengiriman
+            </h2>
             <div class="text-xs text-brand-ink space-y-1.5 pt-1">
               <p class="font-semibold m-0">{{ order.address.name }}</p>
               <p class="text-brand-muted m-0">{{ order.address.phone }}</p>
