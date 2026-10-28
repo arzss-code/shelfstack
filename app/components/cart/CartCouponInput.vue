@@ -66,7 +66,7 @@ const handleApplyCoupon = async (codeToUse?: string) => {
       toast.add({
         severity: 'success',
         summary: 'Voucher Diterapkan',
-        detail: `Kupon ${res.data.code} berhasil memotong ${res.data.formatted_discount}.`,
+        detail: `Voucher ${res.data.code} berhasil memotong ${res.data.formatted_discount}.`,
         life: 3500,
       })
     }
@@ -85,7 +85,7 @@ const handleRemoveCoupon = () => {
   toast.add({
     severity: 'info',
     summary: 'Voucher Dihapus',
-    detail: 'Kupon promo telah dicabut dari keranjang belanja.',
+    detail: 'Voucher promo telah dilepas dari keranjang belanja.',
     life: 3000,
   })
 }
@@ -126,7 +126,7 @@ const handleQuickSelect = (code: string) => {
         <button
           type="button"
           class="shrink-0 p-1 text-brand-faint hover:text-brand-danger transition-colors cursor-pointer rounded-full hover:bg-brand-danger-tint border-0 bg-transparent"
-          aria-label="Hapus kupon"
+          aria-label="Hapus voucher"
           title="Hapus voucher promo"
           @click="handleRemoveCoupon"
         >

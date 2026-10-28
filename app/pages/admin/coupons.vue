@@ -332,7 +332,7 @@ const handleDelete = async () => {
           Total Voucher
         </p>
         <p class="font-display text-2xl font-bold text-brand-ink">{{ metrics.total_coupons }}</p>
-        <p class="text-[11px] text-brand-muted">Master kupon terdaftar</p>
+        <p class="text-[11px] text-brand-muted">Master voucher terdaftar</p>
       </div>
 
       <div class="p-4 rounded-2xl bg-white border border-brand-hair shadow-whisper space-y-1">
@@ -373,7 +373,7 @@ const handleDelete = async () => {
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Cari kode atau nama kupon..."
+          placeholder="Cari kode atau nama voucher..."
           class="w-full pl-9 pr-3 py-1.5 rounded-full bg-brand-canvas-soft border border-brand-hair text-xs text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink"
           @input="fetchCoupons"
         />
@@ -417,13 +417,13 @@ const handleDelete = async () => {
       <!-- Loading State -->
       <div v-if="loading" class="p-8 text-center space-y-3">
         <i class="pi pi-spinner animate-spin text-2xl text-brand-muted" />
-        <p class="text-xs text-brand-muted">Memuat data kupon promosi...</p>
+        <p class="text-xs text-brand-muted">Memuat data voucher promosi...</p>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="coupons.length === 0" class="p-12 text-center space-y-3">
         <i class="pi pi-ticket text-3xl text-brand-muted" />
-        <h3 class="font-bold text-sm text-brand-ink">Tidak ada kupon yang cocok</h3>
+        <h3 class="font-bold text-sm text-brand-ink">Tidak ada voucher yang cocok</h3>
         <p class="text-xs text-brand-muted max-w-sm mx-auto">
           Coba ganti filter status atau klik tombol "Buat Voucher Baru" untuk menambahkan promo
           pertama Anda.
@@ -437,7 +437,7 @@ const handleDelete = async () => {
             class="bg-brand-canvas-soft border-b border-brand-hair text-[11px] font-semibold text-brand-muted uppercase tracking-wider"
           >
             <tr>
-              <th class="px-4 py-3">Kode Kupon</th>
+              <th class="px-4 py-3">Kode Voucher</th>
               <th class="px-4 py-3">Nama &amp; Tipe</th>
               <th class="px-4 py-3">Nilai Diskon</th>
               <th class="px-4 py-3">Min. Belanja &amp; Pagu</th>
@@ -544,7 +544,7 @@ const handleDelete = async () => {
                   <button
                     type="button"
                     class="p-1.5 rounded-lg text-brand-muted hover:text-brand-ink hover:bg-brand-canvas transition-colors cursor-pointer border-0 bg-transparent"
-                    :title="coupon.is_active ? 'Nonaktifkan kupon' : 'Aktifkan kupon'"
+                    :title="coupon.is_active ? 'Nonaktifkan voucher' : 'Aktifkan voucher'"
                     @click="toggleCouponStatus(coupon)"
                   >
                     <i
@@ -560,7 +560,7 @@ const handleDelete = async () => {
                   <button
                     type="button"
                     class="p-1.5 rounded-lg text-brand-muted hover:text-brand-ink hover:bg-brand-canvas transition-colors cursor-pointer border-0 bg-transparent"
-                    title="Ubah data kupon"
+                    title="Ubah data voucher"
                     @click="openEditModal(coupon)"
                   >
                     <i class="pi pi-pencil text-xs" />
@@ -570,7 +570,7 @@ const handleDelete = async () => {
                   <button
                     type="button"
                     class="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer border-0 bg-transparent"
-                    title="Hapus kupon"
+                    title="Hapus voucher"
                     @click="confirmDelete(coupon)"
                   >
                     <i class="pi pi-trash text-xs" />
@@ -603,13 +603,13 @@ const handleDelete = async () => {
           <div class="flex items-center justify-between pb-3 border-b border-brand-hair">
             <div>
               <h3 class="font-display text-lg font-bold text-brand-ink">
-                {{ isEditing ? 'Ubah Kupon Promosi' : 'Buat Voucher Promo Baru' }}
+                {{ isEditing ? 'Ubah Voucher Promosi' : 'Buat Voucher Promo Baru' }}
               </h3>
               <p class="text-xs text-brand-muted">
                 {{
                   isEditing
-                    ? 'Perbarui parameter diskon dan kuota kupon.'
-                    : 'Lengkapi formulir untuk menerbitkan kupon baru.'
+                    ? 'Perbarui parameter diskon dan kuota voucher.'
+                    : 'Lengkapi formulir untuk menerbitkan voucher baru.'
                 }}
               </p>
             </div>
@@ -636,7 +636,7 @@ const handleDelete = async () => {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div class="space-y-1">
                 <label class="block text-xs font-semibold text-brand-ink">
-                  Kode Kupon <span class="text-rose-500">*</span>
+                  Kode Voucher <span class="text-rose-500">*</span>
                 </label>
                 <input
                   v-model="form.code"
@@ -796,7 +796,7 @@ const handleDelete = async () => {
                 for="is_active_checkbox"
                 class="text-xs font-semibold text-brand-ink cursor-pointer"
               >
-                Aktifkan kupon ini langsung setelah disimpan
+                Aktifkan voucher ini langsung setelah disimpan
               </label>
             </div>
 
@@ -816,7 +816,7 @@ const handleDelete = async () => {
               >
                 <i v-if="submitting" class="pi pi-spinner animate-spin text-xs" />
                 <span>{{
-                  submitting ? 'Menyimpan...' : isEditing ? 'Perbarui Kupon' : 'Terbitkan Kupon'
+                  submitting ? 'Menyimpan...' : isEditing ? 'Perbarui Voucher' : 'Terbitkan Voucher'
                 }}</span>
               </button>
             </div>
@@ -849,10 +849,10 @@ const handleDelete = async () => {
 
           <div class="space-y-1">
             <h3 class="font-display text-base font-bold text-brand-ink">
-              Hapus Kupon "{{ deletingCoupon.code }}"?
+              Hapus Voucher "{{ deletingCoupon.code }}"?
             </h3>
             <p class="text-xs text-brand-muted leading-relaxed">
-              Kupon ini akan di-arsip (soft delete). Pelanggan tidak akan dapat lagi menggunakan
+              Voucher ini akan di-arsip (soft delete). Pelanggan tidak akan dapat lagi menggunakan
               kode ini untuk checkout pesanan baru.
             </p>
           </div>

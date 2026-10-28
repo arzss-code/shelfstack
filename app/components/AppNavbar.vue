@@ -432,7 +432,7 @@ const handleLogout = async () => {
             to="/promos"
             class="px-3 py-1 rounded-full text-brand-accent font-semibold hover:bg-white transition-colors no-underline flex items-center gap-1"
           >
-            <span>Promo &amp; Diskon</span>
+            <span>Voucher &amp; Promo</span>
             <span
               class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"
               >%</span
@@ -481,6 +481,21 @@ const handleLogout = async () => {
           @click="isMobileMenuOpen = false"
         >
           Katalog Lengkap
+        </NuxtLink>
+        <NuxtLink
+          to="/promos"
+          class="py-2 text-brand-accent no-underline border-b border-brand-hairsoft flex items-center justify-between font-semibold"
+          @click="isMobileMenuOpen = false"
+        >
+          <span class="flex items-center gap-2">
+            <i class="pi pi-ticket text-sm" />
+            <span>Voucher &amp; Promo</span>
+          </span>
+          <span
+            class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"
+          >
+            %
+          </span>
         </NuxtLink>
         <NuxtLink
           to="/wishlist"
