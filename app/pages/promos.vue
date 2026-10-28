@@ -61,6 +61,14 @@ const tabItems = computed<UiTabItem[]>(() => [
   { value: 'shipping', label: 'Gratis Ongkir' },
 ])
 
+const formatDiscountBadge = (coupon: PromoCoupon) => {
+  if (coupon.discount_type === 'percentage') {
+    return `${coupon.discount_value}%`
+  }
+  const thousands = Math.floor(coupon.discount_value / 100000)
+  return `${thousands.toLocaleString('id-ID')}rb`
+}
+
 const fetchCoupons = async () => {
   loading.value = true
   errorMessage.value = null
@@ -284,29 +292,21 @@ const resetFilters = () => {
       </UiAlert>
     </div>
 
-    <!-- MAIN VOUCHER CARDS GRID (KOMPAK, NON-REDUNDAN) -->
+    <!-- MAIN VOUCHER CARDS GRID (KOMPAK, SIMETRIS, TANPA CEKUNGAN) -->
     <main v-else class="space-y-4">
       <!-- Special Free Shipping Banner Card -->
       <article
         v-if="selectedTab === 'all' || selectedTab === 'shipping'"
         class="relative bg-white border border-brand-hair hover:border-amber-300 rounded-2xl shadow-whisper overflow-hidden transition-all duration-200 flex"
       >
-        <!-- Notch Top & Bottom: Presisi pada Seam Sambungan Stub -->
-        <div
-          class="absolute -top-3 left-[96px] sm:left-[112px] -translate-x-1/2 w-6 h-6 rounded-full bg-brand-canvas border border-brand-hair z-10 pointer-events-none"
-        />
-        <div
-          class="absolute -bottom-3 left-[96px] sm:left-[112px] -translate-x-1/2 w-6 h-6 rounded-full bg-brand-canvas border border-brand-hair z-10 pointer-events-none"
-        />
-
-        <!-- Left Badge Stub (Tanpa Garis Pemisah Tengah) -->
+        <!-- Left Badge Stub (Tanpa Cekungan, Tanpa Garis Tengah) -->
         <div
           class="w-24 sm:w-28 shrink-0 bg-amber-50/80 p-3 sm:p-3.5 flex flex-col justify-between items-center text-center"
         >
           <UiBadge label="Ekspedisi" variant="warning" />
           <div class="my-auto py-1">
             <p
-              class="text-xl sm:text-2xl font-extrabold text-amber-800 tracking-tight leading-none"
+              class="text-xl sm:text-2xl font-extrabold text-amber-800 tracking-tight leading-none whitespace-nowrap"
             >
               BEBAS
             </p>
@@ -353,15 +353,7 @@ const resetFilters = () => {
           :key="coupon.id"
           class="relative bg-white border border-brand-hair hover:border-brand-ink/40 rounded-2xl shadow-whisper overflow-hidden flex transition-all duration-200"
         >
-          <!-- Notch Top & Bottom: Presisi pada Seam Sambungan Stub (96px mobile, 112px desktop) -->
-          <div
-            class="absolute -top-3 left-[96px] sm:left-[112px] -translate-x-1/2 w-6 h-6 rounded-full bg-brand-canvas border border-brand-hair z-10 pointer-events-none"
-          />
-          <div
-            class="absolute -bottom-3 left-[96px] sm:left-[112px] -translate-x-1/2 w-6 h-6 rounded-full bg-brand-canvas border border-brand-hair z-10 pointer-events-none"
-          />
-
-          <!-- LEFT STUB: Nilai Diskon Kompak (Tanpa Garis Pemisah Tengah) -->
+          <!-- LEFT STUB: Nilai Diskon Kompak, Angka 1 Baris Tanpa Wrap, Bebas Cekungan -->
           <div
             class="w-24 sm:w-28 shrink-0 p-3 sm:p-3.5 flex flex-col justify-between items-center text-center"
             :class="coupon.discount_type === 'percentage' ? 'bg-blue-50/70' : 'bg-emerald-50/70'"
@@ -373,16 +365,12 @@ const resetFilters = () => {
 
             <div class="my-auto py-1">
               <p
-                class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none"
+                class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none whitespace-nowrap"
                 :class="
                   coupon.discount_type === 'percentage' ? 'text-brand-accent' : 'text-emerald-700'
                 "
               >
-                {{
-                  coupon.discount_type === 'percentage'
-                    ? `${coupon.discount_value}%`
-                    : `Rp ${(coupon.discount_value / 100000).toLocaleString('id-ID')}rb`
-                }}
+                {{ formatDiscountBadge(coupon) }}
               </p>
             </div>
 
@@ -394,7 +382,7 @@ const resetFilters = () => {
           </div>
 
           <!-- RIGHT BODY: Detail, Aksi, & Tombol S&K (Format Tokopedia / Shopee) -->
-          <div class="flex-1 p-3 sm:p-3.5 flex flex-col justify-between space-y-2.5 min-w-0">
+          <div class="flex-1 p-3 sm:p-3.5 flex flex-col justify-between space-y-2 min-w-0">
             <div>
               <div class="flex items-center justify-between gap-2">
                 <h2 class="text-xs sm:text-sm font-bold text-brand-ink truncate">
@@ -407,15 +395,16 @@ const resetFilters = () => {
                 </span>
               </div>
 
-              <!-- Baris Info Ringkas & Padat -->
-              <div
-                class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-brand-muted"
-              >
-                <span v-if="coupon.formatted_max_discount" class="font-medium text-brand-ink">
+              <!-- Baris Info Ringkas & Sejajar -->
+              <div class="mt-1 flex items-center gap-1.5 text-[11px] text-brand-muted truncate">
+                <span
+                  v-if="coupon.formatted_max_discount"
+                  class="font-medium text-brand-ink shrink-0"
+                >
                   Maks. {{ coupon.formatted_max_discount }}
                 </span>
                 <span v-if="coupon.formatted_max_discount" class="text-brand-faint">•</span>
-                <span class="inline-flex items-center gap-1">
+                <span class="inline-flex items-center gap-1 shrink-0">
                   <i class="pi pi-clock text-[10px]" />
                   <span>{{
                     coupon.expires_at
@@ -424,7 +413,7 @@ const resetFilters = () => {
                   }}</span>
                 </span>
                 <span v-if="coupon.remaining_quota != null" class="text-brand-faint">•</span>
-                <span v-if="coupon.remaining_quota != null">
+                <span v-if="coupon.remaining_quota != null" class="shrink-0">
                   Sisa {{ coupon.remaining_quota }}
                 </span>
               </div>
@@ -478,7 +467,7 @@ const resetFilters = () => {
       />
     </main>
 
-    <!-- MODAL SYARAT & KETENTUAN (POLA RESMI TOKOPEDIA / SHOPEE: ZERO LAYOUT SHIFT) -->
+    <!-- MODAL SYARAT & KETENTUAN (TERSTRUKTUR: BENTO TILES + KETENTUAN JELAS) -->
     <UiModal
       v-model:visible="isTermsModalOpen"
       size="sm"
@@ -487,86 +476,149 @@ const resetFilters = () => {
       <div v-if="selectedTermsCoupon" class="space-y-4">
         <!-- Header Info Voucher -->
         <div
-          class="flex items-center gap-3 p-3 rounded-2xl bg-brand-canvas-soft border border-brand-hair"
+          class="flex items-center gap-3 p-3.5 rounded-2xl bg-brand-canvas-soft border border-brand-hair"
         >
           <div
-            class="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
+            class="w-12 h-12 rounded-xl flex items-center justify-center font-extrabold text-base shrink-0"
             :class="
               selectedTermsCoupon.discount_type === 'percentage'
                 ? 'bg-blue-100 text-brand-accent'
                 : 'bg-emerald-100 text-emerald-700'
             "
           >
-            {{
-              selectedTermsCoupon.discount_type === 'percentage'
-                ? `${selectedTermsCoupon.discount_value}%`
-                : 'Rp'
-            }}
+            {{ formatDiscountBadge(selectedTermsCoupon) }}
           </div>
           <div class="min-w-0 flex-1">
-            <h3 class="font-bold text-xs sm:text-sm text-brand-ink truncate">
+            <h3 class="font-bold text-sm text-brand-ink truncate">
               {{ selectedTermsCoupon.name }}
             </h3>
-            <div class="flex items-center gap-2 mt-0.5">
+            <div class="flex items-center gap-2 mt-1">
               <span
                 class="font-mono text-[10px] font-bold bg-white text-brand-ink px-2 py-0.5 rounded border border-brand-hair"
               >
                 {{ selectedTermsCoupon.code }}
               </span>
               <UiBadge
-                :label="selectedTermsCoupon.discount_type === 'percentage' ? 'Diskon' : 'Potongan'"
+                :label="
+                  selectedTermsCoupon.discount_type === 'percentage'
+                    ? 'Diskon Belanja'
+                    : 'Potongan Langsung'
+                "
                 :variant="selectedTermsCoupon.discount_type === 'percentage' ? 'info' : 'success'"
               />
             </div>
           </div>
         </div>
 
-        <!-- Ketentuan List -->
-        <div class="space-y-2 text-xs leading-relaxed">
-          <p class="font-semibold text-brand-muted text-[11px] uppercase tracking-wider">
-            Ketentuan Penggunaan
-          </p>
-          <ul class="space-y-2 list-disc list-inside text-brand-muted pl-1">
-            <li>
-              Berlaku dengan nilai minimum transaksi belanja sebesar
-              <strong class="text-brand-ink font-semibold">{{
-                selectedTermsCoupon.formatted_min_purchase
-              }}</strong
-              >.
-            </li>
-            <li v-if="selectedTermsCoupon.formatted_max_discount">
-              Batas maksimal potongan diskon yang dapat dinikmati sebesar
-              <strong class="text-brand-ink font-semibold">{{
-                selectedTermsCoupon.formatted_max_discount
-              }}</strong
-              >.
-            </li>
-            <li>
-              Masa berlaku voucher:
-              <strong class="text-brand-ink font-semibold">{{
+        <!-- Bento Grid Parameter Ringkas & Padat -->
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="p-2.5 rounded-xl bg-brand-canvas border border-brand-hair space-y-0.5">
+            <p class="text-[10px] font-semibold text-brand-muted uppercase tracking-wider">
+              Min. Belanja
+            </p>
+            <p class="font-bold text-brand-ink">
+              {{ selectedTermsCoupon.formatted_min_purchase }}
+            </p>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-brand-canvas border border-brand-hair space-y-0.5">
+            <p class="text-[10px] font-semibold text-brand-muted uppercase tracking-wider">
+              Maks. Diskon
+            </p>
+            <p class="font-bold text-brand-ink">
+              {{ selectedTermsCoupon.formatted_max_discount || 'Tanpa Batas Pagu' }}
+            </p>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-brand-canvas border border-brand-hair space-y-0.5">
+            <p class="text-[10px] font-semibold text-brand-muted uppercase tracking-wider">
+              Masa Berlaku
+            </p>
+            <p class="font-bold text-brand-ink">
+              {{
                 selectedTermsCoupon.expires_at
-                  ? `Hingga ${new Date(selectedTermsCoupon.expires_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`
+                  ? new Date(selectedTermsCoupon.expires_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })
                   : 'Berlaku Seterusnya'
-              }}</strong
-              >.
-            </li>
-            <li>
-              Setiap akun pengguna berhak menggunakan voucher ini sebanyak
-              <strong class="text-brand-ink font-semibold"
-                >{{ selectedTermsCoupon.user_limit }} kali</strong
-              >.
-            </li>
-            <li v-if="selectedTermsCoupon.remaining_quota != null">
-              Sisa kuota nasional saat ini:
-              <strong class="text-brand-ink font-semibold"
-                >{{ selectedTermsCoupon.remaining_quota }} penggunaan</strong
-              >.
-            </li>
-            <li>
-              Potongan akan otomatis dikalkulasikan dan memotong total belanja pada saat proses
-              checkout pesanan di ShelfStack.
-            </li>
-          </ul>
+              }}
+            </p>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-brand-canvas border border-brand-hair space-y-0.5">
+            <p class="text-[10px] font-semibold text-brand-muted uppercase tracking-wider">
+              Batas Kuota
+            </p>
+            <p class="font-bold text-brand-ink">
+              {{
+                selectedTermsCoupon.remaining_quota != null
+                  ? `Sisa ${selectedTermsCoupon.remaining_quota} kuota`
+                  : 'Kuota Tersedia'
+              }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Ketentuan Penggunaan Terstruktur dengan Nomor Rapi -->
+        <div class="space-y-2 text-xs">
+          <p class="font-semibold text-brand-ink text-xs">Ketentuan Penggunaan:</p>
+          <div class="space-y-2 text-brand-muted leading-relaxed">
+            <div class="flex items-start gap-2">
+              <span
+                class="w-4 h-4 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center text-[10px] font-bold text-brand-ink shrink-0 mt-0.5"
+              >
+                1
+              </span>
+              <span>
+                Voucher berlaku untuk transaksi belanja dengan nilai minimal
+                <strong class="text-brand-ink font-semibold">{{
+                  selectedTermsCoupon.formatted_min_purchase
+                }}</strong
+                >.
+              </span>
+            </div>
+
+            <div class="flex items-start gap-2">
+              <span
+                class="w-4 h-4 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center text-[10px] font-bold text-brand-ink shrink-0 mt-0.5"
+              >
+                2
+              </span>
+              <span>
+                Potongan otomatis memotong total belanja pada saat proses checkout setelah syarat
+                terpenuhi.
+              </span>
+            </div>
+
+            <div class="flex items-start gap-2">
+              <span
+                class="w-4 h-4 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center text-[10px] font-bold text-brand-ink shrink-0 mt-0.5"
+              >
+                3
+              </span>
+              <span>
+                Dapat digunakan hingga
+                <strong class="text-brand-ink font-semibold"
+                  >{{ selectedTermsCoupon.user_limit }} kali</strong
+                >
+                per akun pengguna terdaftar.
+              </span>
+            </div>
+
+            <div class="flex items-start gap-2">
+              <span
+                class="w-4 h-4 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center text-[10px] font-bold text-brand-ink shrink-0 mt-0.5"
+              >
+                4
+              </span>
+              <span>
+                Voucher tidak dapat diuangkan dan berlaku selama alokasi kuota promosi masih
+                tersedia di ShelfStack.
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
