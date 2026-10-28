@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
   couponSummarySchema,
+  createCouponSchema,
   discountTypeSchema,
+  updateCouponSchema,
   validateCouponSchema,
 } from '../../shared/schemas/coupon'
 import {
@@ -225,6 +227,69 @@ describe('Coupon & Promo Discount Domain Tests', () => {
       expect(summary.discount_cents).toBe(5000000)
       expect(summary.final_total_cents).toBe(40000000) // Rp 400.000
       expect(summary.formatted_discount).toContain('50.000')
+    })
+  })
+
+  describe('Admin Coupon Schemas (createCouponSchema & updateCouponSchema)', () => {
+    it('memvalidasi pembuatan kupon baru dan mentransformasikan kode ke uppercase', () => {
+      const valid = createCouponSchema.safeParse({
+        code: 'promo_baru',
+        name: 'Promo Awal Bulan',
+        description: 'Potongan spesial',
+        discount_type: 'percentage',
+        discount_value: 15,
+        max_discount_cents: 15000000,
+        min_purchase_cents: 20000000,
+        usage_limit: 100,
+        user_limit: 1,
+        is_active: true,
+      })
+
+      expect(valid.success).toBe(true)
+      if (valid.success) {
+        expect(valid.data.code).toBe('PROMO_BARU')
+        expect(valid.data.discount_value).toBe(15)
+        expect(valid.data.min_purchase_cents).toBe(20000000)
+      }
+    })
+
+    it('menolak kupon persentase jika nilai diskon melebihi 100%', () => {
+      const invalid = createCouponSchema.safeParse({
+        code: 'PROMO150',
+        name: 'Promo Tidak Valid',
+        discount_type: 'percentage',
+        discount_value: 120, // Lebih dari 100%
+      })
+
+      expect(invalid.success).toBe(false)
+      if (!invalid.success) {
+        expect(invalid.error.issues[0]?.message).toContain('100%')
+      }
+    })
+
+    it('menolak kode kupon yang mengandung karakter khusus yang dilarang', () => {
+      const invalid = createCouponSchema.safeParse({
+        code: 'PROMO@HEMAT!',
+        name: 'Promo Error',
+        discount_type: 'fixed',
+        discount_value: 5000000,
+      })
+
+      expect(invalid.success).toBe(false)
+    })
+
+    it('memvalidasi update kupon dengan field parsial', () => {
+      const valid = updateCouponSchema.safeParse({
+        name: 'Nama Promo Diperbarui',
+        is_active: false,
+        usage_limit: 500,
+      })
+
+      expect(valid.success).toBe(true)
+      if (valid.success) {
+        expect(valid.data.name).toBe('Nama Promo Diperbarui')
+        expect(valid.data.is_active).toBe(false)
+      }
     })
   })
 })

@@ -429,7 +429,7 @@ const handleLogout = async () => {
           </NuxtLink>
 
           <NuxtLink
-            to="/katalog"
+            to="/promos"
             class="px-3 py-1 rounded-full text-brand-accent font-semibold hover:bg-white transition-colors no-underline flex items-center gap-1"
           >
             <span>Promo &amp; Diskon</span>
