@@ -408,7 +408,7 @@ const formatDate = (dateStr?: string | null) => {
                 v-if="order.discount_cents && order.discount_cents > 0"
                 class="flex justify-between text-brand-success-text font-semibold"
               >
-                <span>Diskon Kupon ({{ order.coupon_code }}):</span>
+                <span>Diskon Voucher ({{ order.coupon_code }}):</span>
                 <span class="font-bold">-{{ formatRupiah(order.discount_cents / 100) }}</span>
               </div>
               <div class="flex justify-between">

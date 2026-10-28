@@ -262,7 +262,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
             v-if="cartStore.discountCents > 0"
             class="flex items-center justify-between text-brand-success-text font-medium"
           >
-            <span>Diskon Kupon ({{ cartStore.appliedCoupon?.code }})</span>
+            <span>Diskon Voucher ({{ cartStore.appliedCoupon?.code }})</span>
             <span class="font-bold tabular-nums"> -{{ cartStore.formattedDiscountAmount }} </span>
           </div>
           <div class="flex items-center justify-between">

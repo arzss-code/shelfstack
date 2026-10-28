@@ -110,7 +110,7 @@ export const useCartStore = defineStore('cart', () => {
 
   const isEmpty = computed(() => items.value.length === 0)
 
-  // Kalkulasi Diskon Kupon Dinamis
+  // Kalkulasi Diskon Voucher Dinamis
   const discountCents = computed(() => {
     if (!appliedCoupon.value || items.value.length === 0) return 0
     const subtotal = totalPriceCents.value

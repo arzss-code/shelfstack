@@ -94,6 +94,23 @@ const handleQuickSelect = (code: string) => {
   couponCodeInput.value = code
   handleApplyCoupon(code)
 }
+
+const couponExtraInfo = computed(() => {
+  if (!cartStore.appliedCoupon) return ''
+  const name = (cartStore.appliedCoupon.name || '').trim()
+  const discountStr = cartStore.formattedDiscountAmount.replace(/\s+/g, '').toLowerCase()
+  const normName = name.replace(/\s+/g, '').toLowerCase()
+
+  if (
+    normName === `hemat${discountStr}` ||
+    normName === `diskon${discountStr}` ||
+    normName === `potongan${discountStr}` ||
+    normName === cartStore.appliedCoupon.code.toLowerCase()
+  ) {
+    return ''
+  }
+  return name
+})
 </script>
 
 <template>
@@ -101,10 +118,10 @@ const handleQuickSelect = (code: string) => {
     <!-- Active Coupon Pill Card -->
     <div
       v-if="cartStore.appliedCoupon"
-      class="rounded-xl border border-brand-success-edge bg-brand-success-tint p-3 transition-all"
+      class="rounded-xl border border-brand-success-edge bg-brand-success-tint/70 p-2.5 transition-all"
     >
-      <div class="flex items-start justify-between gap-2">
-        <div class="flex items-center gap-2 min-w-0">
+      <div class="flex items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2.5 min-w-0">
           <div
             class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-success text-white shadow-whisper"
           >
@@ -112,35 +129,31 @@ const handleQuickSelect = (code: string) => {
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-mono text-xs font-bold text-brand-ink uppercase">
+              <span class="font-mono text-xs font-bold text-brand-ink uppercase tracking-wider">
                 {{ cartStore.appliedCoupon.code }}
               </span>
-              <UiBadge variant="success" label="Aktif" class="!text-[9px] !py-0 !px-1.5" />
+              <span
+                class="inline-flex items-center rounded px-1.5 py-0.5 text-[10.5px] font-bold text-brand-success-text bg-brand-success/15 tabular"
+              >
+                -{{ cartStore.formattedDiscountAmount }}
+              </span>
             </div>
-            <p class="m-0 mt-0.5 truncate text-[11px] text-brand-muted">
-              {{ cartStore.appliedCoupon.name }}
+            <p v-if="couponExtraInfo" class="m-0 mt-0.5 truncate text-[10.5px] text-brand-muted">
+              {{ couponExtraInfo }}
             </p>
           </div>
         </div>
 
-        <button
-          type="button"
-          class="shrink-0 p-1 text-brand-faint hover:text-brand-danger transition-colors cursor-pointer rounded-full hover:bg-brand-danger-tint border-0 bg-transparent"
-          aria-label="Hapus voucher"
-          title="Hapus voucher promo"
-          @click="handleRemoveCoupon"
-        >
-          <i class="pi pi-times text-xs" />
-        </button>
-      </div>
-
-      <div
-        class="mt-2.5 flex items-center justify-between border-t border-brand-success-edge/50 pt-2 text-xs"
-      >
-        <span class="text-brand-muted font-medium">Hemat:</span>
-        <span class="font-bold tabular text-brand-success-text">
-          -{{ cartStore.formattedDiscountAmount }}
-        </span>
+        <UiTooltip text="Hapus voucher promo" position="left">
+          <button
+            type="button"
+            class="shrink-0 p-1 text-brand-faint hover:text-brand-danger hover:bg-brand-danger-tint transition-colors cursor-pointer rounded-lg border-0 bg-transparent flex items-center justify-center"
+            aria-label="Hapus voucher promo"
+            @click="handleRemoveCoupon"
+          >
+            <i class="pi pi-times text-xs" />
+          </button>
+        </UiTooltip>
       </div>
 
       <!-- Warning if Subtotal Drops Below Minimum Purchase -->

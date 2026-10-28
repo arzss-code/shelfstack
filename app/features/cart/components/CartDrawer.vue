@@ -159,7 +159,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
             >
               <!-- Thumbnail -->
               <div
-                class="w-16 h-16 rounded-field bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center cursor-pointer"
+                class="w-16 h-16 rounded-card bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center cursor-pointer shadow-2xs"
                 @click="
                   () => {
                     close()
@@ -171,17 +171,17 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                   v-if="item.imageUrl"
                   :src="item.imageUrl"
                   :alt="item.name"
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <i v-else class="pi pi-image text-brand-faint text-lg" />
               </div>
 
               <!-- Info & Stepper -->
-              <div class="flex-1 min-w-0 flex flex-col justify-between min-h-[64px] gap-1.5">
+              <div class="flex-1 min-w-0 flex flex-col justify-between min-h-[64px] gap-2">
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0">
                     <h3
-                      class="font-display font-semibold text-xs text-brand-ink line-clamp-1 m-0 hover:text-brand-accent cursor-pointer transition-colors"
+                      class="font-display font-medium text-xs sm:text-sm text-brand-ink line-clamp-2 m-0 hover:text-brand-accent cursor-pointer transition-colors leading-snug"
                       :title="item.name"
                       @click="
                         () => {
@@ -192,21 +192,28 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                     >
                       {{ item.name }}
                     </h3>
-                    <p
-                      v-if="item.color || item.material"
-                      class="font-body text-[10px] text-brand-muted m-0 mt-0.5 line-clamp-1"
-                    >
-                      <span v-if="item.color">{{ item.color }}</span>
-                      <span v-if="item.color && item.material"> · </span>
-                      <span v-if="item.material">{{ item.material }}</span>
-                    </p>
+
+                    <!-- Variant & Unit Price Row -->
+                    <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span
+                        v-if="item.color || item.material"
+                        class="inline-flex items-center rounded bg-brand-canvas-soft border border-brand-hairsoft px-1.5 py-0.5 text-[10px] text-brand-muted font-medium"
+                      >
+                        <span v-if="item.color">{{ item.color }}</span>
+                        <span v-if="item.color && item.material"> · </span>
+                        <span v-if="item.material">{{ item.material }}</span>
+                      </span>
+                      <span class="text-[11px] text-brand-muted tabular-nums">
+                        {{ formatRupiah(item.price) }} / unit
+                      </span>
+                    </div>
                   </div>
 
                   <!-- Remove Button -->
                   <UiTooltip text="Hapus item" position="left">
                     <button
                       type="button"
-                      class="text-brand-faint hover:text-brand-danger hover:bg-brand-danger-tint transition-colors p-1 rounded-field cursor-pointer shrink-0 -mr-1 border-0"
+                      class="text-brand-faint hover:text-brand-danger hover:bg-brand-danger-tint transition-colors p-1 rounded-lg cursor-pointer shrink-0 -mr-1 border-0 bg-transparent flex items-center justify-center"
                       aria-label="Hapus item"
                       @click="cartStore.removeItem(item.productId, item.color, item.material)"
                     >
@@ -222,7 +229,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                   >
                     <button
                       type="button"
-                      class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs border-0"
+                      class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs border-0 bg-transparent"
                       aria-label="Kurangi kuantitas"
                       @click="
                         cartStore.updateQuantity(
@@ -249,7 +256,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                     />
                     <button
                       type="button"
-                      class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed border-0"
+                      class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed border-0 bg-transparent"
                       :disabled="item.quantity >= item.stock"
                       aria-label="Tambah kuantitas"
                       @click="
@@ -296,7 +303,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
               v-if="cartStore.discountCents > 0"
               class="flex items-center justify-between text-brand-success-text"
             >
-              <span>Diskon Kupon</span>
+              <span>Diskon Voucher</span>
               <span class="font-bold tabular-nums"> -{{ cartStore.formattedDiscountAmount }} </span>
             </div>
             <div
