@@ -179,6 +179,11 @@ const claimOrUseCoupon = async (coupon: PromoCoupon) => {
 const toggleTerms = (id: string) => {
   expandedTerms.value[id] = !expandedTerms.value[id]
 }
+
+const resetFilters = () => {
+  searchQuery.value = ''
+  selectedTab.value = 'all'
+}
 </script>
 
 <template>
@@ -580,10 +585,7 @@ const toggleTerms = (id: string) => {
         <button
           type="button"
           class="px-4 py-1.5 rounded-full bg-brand-ink text-white text-xs font-semibold hover:bg-brand-inkhover transition-colors cursor-pointer"
-          @click="
-            searchQuery = ''
-            selectedTab = 'all'
-          "
+          @click="resetFilters"
         >
           Reset Filter
         </button>
