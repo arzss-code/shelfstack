@@ -41,7 +41,10 @@ const selectedTab = ref<'all' | 'percentage' | 'fixed' | 'shipping'>('all')
 const searchQuery = ref('')
 const copiedCode = ref<string | null>(null)
 const claimedCodes = ref<Set<string>>(new Set())
-const expandedTerms = ref<Record<string, boolean>>({})
+
+// Modal S&K State (Pola Tokopedia / Shopee: tidak merusak grid)
+const isTermsModalOpen = ref(false)
+const selectedTermsCoupon = ref<PromoCoupon | null>(null)
 
 const tabItems = computed<UiTabItem[]>(() => [
   { value: 'all', label: 'Semua Voucher', count: coupons.value.length },
@@ -186,8 +189,9 @@ const claimOrUseCoupon = async (coupon: PromoCoupon) => {
   showToast(`Voucher ${coupon.code} berhasil diklaim. Potongan aktif saat checkout.`)
 }
 
-const toggleTerms = (id: string) => {
-  expandedTerms.value[id] = !expandedTerms.value[id]
+const openTermsModal = (coupon: PromoCoupon) => {
+  selectedTermsCoupon.value = coupon
+  isTermsModalOpen.value = true
 }
 
 const resetFilters = () => {
@@ -226,9 +230,6 @@ const resetFilters = () => {
 
       <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div class="space-y-2 max-w-xl">
-          <div class="inline-flex">
-            <UiBadge label="Voucher &amp; Promo Resmi" variant="info" />
-          </div>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Voucher &amp; Promo Belanja
           </h1>
@@ -288,193 +289,180 @@ const resetFilters = () => {
       <!-- Special Free Shipping Banner Card -->
       <article
         v-if="selectedTab === 'all' || selectedTab === 'shipping'"
-        class="relative bg-white border border-brand-hair hover:border-amber-300 rounded-2xl shadow-whisper overflow-hidden transition-colors"
+        class="relative bg-white border border-brand-hair hover:border-amber-300 rounded-2xl shadow-whisper overflow-hidden transition-all duration-200 flex"
       >
-        <div class="flex flex-col sm:flex-row">
-          <!-- Left Badge Stub -->
-          <div
-            class="w-full sm:w-28 shrink-0 bg-amber-50/70 p-3.5 flex flex-col justify-between items-center text-center border-b sm:border-b-0 sm:border-r border-dashed border-brand-hair"
-          >
-            <UiBadge label="Ekspedisi" variant="warning" />
-            <div class="my-auto py-1">
-              <p
-                class="text-xl sm:text-2xl font-extrabold text-amber-800 tracking-tight leading-none"
-              >
-                BEBAS
-              </p>
-              <p class="text-[10px] font-semibold text-amber-700 leading-tight mt-0.5">Ongkir</p>
-            </div>
+        <!-- Notch Top & Bottom: Presisi pada Seam Sambungan Stub -->
+        <div
+          class="absolute -top-3 left-[96px] sm:left-[112px] -translate-x-1/2 w-6 h-6 rounded-full bg-brand-canvas border border-brand-hair z-10 pointer-events-none"
+        />
+        <div
+          class="absolute -bottom-3 left-[96px] sm:left-[112px] -translate-x-1/2 w-6 h-6 rounded-full bg-brand-canvas border border-brand-hair z-10 pointer-events-none"
+        />
+
+        <!-- Left Badge Stub (Tanpa Garis Pemisah Tengah) -->
+        <div
+          class="w-24 sm:w-28 shrink-0 bg-amber-50/80 p-3 sm:p-3.5 flex flex-col justify-between items-center text-center"
+        >
+          <UiBadge label="Ekspedisi" variant="warning" />
+          <div class="my-auto py-1">
             <p
-              class="text-[10px] font-medium text-brand-muted pt-1.5 border-t border-amber-200/50 w-full"
+              class="text-xl sm:text-2xl font-extrabold text-amber-800 tracking-tight leading-none"
             >
-              Min. Rp 500.000
+              BEBAS
+            </p>
+            <p class="text-[10px] font-semibold text-amber-700 leading-tight mt-0.5">Ongkir</p>
+          </div>
+          <p
+            class="text-[10px] font-medium text-brand-muted pt-1.5 border-t border-amber-200/50 w-full truncate"
+          >
+            Min. Rp 500rb
+          </p>
+        </div>
+
+        <!-- Right Details -->
+        <div class="flex-1 p-3 sm:p-3.5 flex flex-col justify-between space-y-2.5 min-w-0">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-xs sm:text-sm font-bold text-brand-ink truncate">
+                Gratis Ongkos Kirim Seluruh Indonesia
+              </h2>
+              <UiBadge label="Otomatis" variant="warning" />
+            </div>
+            <p class="mt-1 text-xs text-brand-muted leading-relaxed line-clamp-2">
+              Potongan ongkos kirim otomatis aktif saat belanja mencapai Rp 500.000 untuk kurir JNE,
+              SiCepat, dan J&amp;T.
             </p>
           </div>
 
-          <!-- Right Details -->
-          <div class="flex-1 p-3.5 flex flex-col justify-between space-y-2.5">
-            <div>
-              <div class="flex items-center justify-between gap-2">
-                <h2 class="text-xs sm:text-sm font-bold text-brand-ink">
-                  Gratis Ongkos Kirim Seluruh Indonesia
-                </h2>
-                <UiBadge label="Otomatis" variant="warning" />
-              </div>
-              <p class="mt-1 text-xs text-brand-muted leading-relaxed">
-                Potongan ongkos kirim otomatis aktif saat total belanja mencapai Rp 500.000 untuk
-                kurir JNE, SiCepat, dan J&amp;T.
-              </p>
-            </div>
-
-            <div
-              class="flex items-center justify-between gap-3 pt-2 border-t border-brand-hairsoft"
-            >
-              <span class="text-[11px] text-brand-muted">
-                Langsung terpotong di formulir pengiriman.
-              </span>
-              <UiButton to="/katalog" variant="accent" size="xs"> Belanja Sekarang </UiButton>
-            </div>
+          <div class="flex items-center justify-between gap-3 pt-2 border-t border-brand-hairsoft">
+            <span class="text-[11px] text-brand-muted">
+              Terpotong otomatis di form pengiriman.
+            </span>
+            <UiButton to="/katalog" variant="accent" size="xs"> Belanja Sekarang </UiButton>
           </div>
         </div>
       </article>
 
-      <!-- Grid of Regular Promo Vouchers (Kompak, Tanpa Duplikasi Teks) -->
-      <div v-if="selectedTab !== 'shipping'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Grid of Regular Promo Vouchers (items-start: Menjamin Kartu Sebelah Tidak Pernah Molor) -->
+      <div
+        v-if="selectedTab !== 'shipping'"
+        class="grid grid-cols-1 md:grid-cols-2 items-start gap-4"
+      >
         <article
           v-for="coupon in filteredCoupons"
           :key="coupon.id"
-          class="relative bg-white border border-brand-hair hover:border-brand-ink/40 rounded-2xl shadow-whisper overflow-hidden flex flex-col justify-between transition-colors"
+          class="relative bg-white border border-brand-hair hover:border-brand-ink/40 rounded-2xl shadow-whisper overflow-hidden flex transition-all duration-200"
         >
-          <!-- Notch Top & Bottom -->
+          <!-- Notch Top & Bottom: Presisi pada Seam Sambungan Stub (96px mobile, 112px desktop) -->
           <div
-            class="hidden sm:block absolute -top-3 left-28 w-6 h-6 rounded-full bg-brand-canvas border-b border-brand-hair z-10"
+            class="absolute -top-3 left-[96px] sm:left-[112px] -translate-x-1/2 w-6 h-6 rounded-full bg-brand-canvas border border-brand-hair z-10 pointer-events-none"
           />
           <div
-            class="hidden sm:block absolute -bottom-3 left-28 w-6 h-6 rounded-full bg-brand-canvas border-t border-brand-hair z-10"
+            class="absolute -bottom-3 left-[96px] sm:left-[112px] -translate-x-1/2 w-6 h-6 rounded-full bg-brand-canvas border border-brand-hair z-10 pointer-events-none"
           />
 
-          <div class="flex flex-col sm:flex-row h-full">
-            <!-- LEFT STUB: Nilai Diskon Kompak Menggunakan UiBadge -->
-            <div
-              class="w-full sm:w-28 shrink-0 p-3.5 flex flex-col justify-between items-center text-center border-b sm:border-b-0 sm:border-r border-dashed border-brand-hair"
-              :class="coupon.discount_type === 'percentage' ? 'bg-blue-50/60' : 'bg-emerald-50/60'"
-            >
-              <UiBadge
-                :label="coupon.discount_type === 'percentage' ? 'Diskon' : 'Potongan'"
-                :variant="coupon.discount_type === 'percentage' ? 'info' : 'success'"
-              />
+          <!-- LEFT STUB: Nilai Diskon Kompak (Tanpa Garis Pemisah Tengah) -->
+          <div
+            class="w-24 sm:w-28 shrink-0 p-3 sm:p-3.5 flex flex-col justify-between items-center text-center"
+            :class="coupon.discount_type === 'percentage' ? 'bg-blue-50/70' : 'bg-emerald-50/70'"
+          >
+            <UiBadge
+              :label="coupon.discount_type === 'percentage' ? 'Diskon' : 'Potongan'"
+              :variant="coupon.discount_type === 'percentage' ? 'info' : 'success'"
+            />
 
-              <div class="my-auto py-1">
-                <p
-                  class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none"
-                  :class="
-                    coupon.discount_type === 'percentage' ? 'text-brand-accent' : 'text-emerald-700'
-                  "
-                >
-                  {{
-                    coupon.discount_type === 'percentage'
-                      ? `${coupon.discount_value}%`
-                      : `Rp ${(coupon.discount_value / 100000).toLocaleString('id-ID')}rb`
-                  }}
-                </p>
-              </div>
-
+            <div class="my-auto py-1">
               <p
-                class="text-[10px] font-medium text-brand-muted pt-1.5 border-t border-brand-hairsoft w-full"
+                class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none"
+                :class="
+                  coupon.discount_type === 'percentage' ? 'text-brand-accent' : 'text-emerald-700'
+                "
               >
-                Min. {{ coupon.formatted_min_purchase }}
+                {{
+                  coupon.discount_type === 'percentage'
+                    ? `${coupon.discount_value}%`
+                    : `Rp ${(coupon.discount_value / 100000).toLocaleString('id-ID')}rb`
+                }}
               </p>
             </div>
 
-            <!-- RIGHT BODY: Detail & Aksi (Bebas Redundansi Teks) -->
-            <div class="flex-1 p-3.5 flex flex-col justify-between space-y-2.5">
-              <div>
-                <div class="flex items-center justify-between gap-2">
-                  <h2 class="text-xs sm:text-sm font-bold text-brand-ink truncate">
-                    {{ coupon.name }}
-                  </h2>
-                  <span
-                    class="shrink-0 font-mono text-[10px] font-bold bg-brand-canvas-soft text-brand-ink px-2 py-0.5 rounded border border-brand-hair"
-                  >
-                    {{ coupon.code }}
-                  </span>
-                </div>
+            <p
+              class="text-[10px] font-medium text-brand-muted pt-1.5 border-t border-brand-hairsoft w-full truncate"
+            >
+              Min. {{ coupon.formatted_min_purchase }}
+            </p>
+          </div>
 
-                <!-- Baris Info Ringkas & Padat -->
-                <div
-                  class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-brand-muted"
+          <!-- RIGHT BODY: Detail, Aksi, & Tombol S&K (Format Tokopedia / Shopee) -->
+          <div class="flex-1 p-3 sm:p-3.5 flex flex-col justify-between space-y-2.5 min-w-0">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h2 class="text-xs sm:text-sm font-bold text-brand-ink truncate">
+                  {{ coupon.name }}
+                </h2>
+                <span
+                  class="shrink-0 font-mono text-[10px] font-bold bg-brand-canvas-soft text-brand-ink px-2 py-0.5 rounded border border-brand-hair"
                 >
-                  <span v-if="coupon.formatted_max_discount" class="font-medium text-brand-ink">
-                    Maks. {{ coupon.formatted_max_discount }}
-                  </span>
-                  <span v-if="coupon.formatted_max_discount" class="text-brand-faint">•</span>
-                  <span class="inline-flex items-center gap-1">
-                    <i class="pi pi-clock text-[10px]" />
-                    <span>{{
-                      coupon.expires_at
-                        ? `Hingga ${new Date(coupon.expires_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`
-                        : 'Berlaku Seterusnya'
-                    }}</span>
-                  </span>
-                  <span v-if="coupon.remaining_quota != null" class="text-brand-faint">•</span>
-                  <span v-if="coupon.remaining_quota != null">
-                    Sisa {{ coupon.remaining_quota }} kuota
-                  </span>
-                </div>
+                  {{ coupon.code }}
+                </span>
               </div>
 
-              <!-- Action Buttons Menggunakan UiButton Resmi -->
-              <div class="flex items-center gap-2 pt-1 border-t border-brand-hairsoft">
+              <!-- Baris Info Ringkas & Padat -->
+              <div
+                class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-brand-muted"
+              >
+                <span v-if="coupon.formatted_max_discount" class="font-medium text-brand-ink">
+                  Maks. {{ coupon.formatted_max_discount }}
+                </span>
+                <span v-if="coupon.formatted_max_discount" class="text-brand-faint">•</span>
+                <span class="inline-flex items-center gap-1">
+                  <i class="pi pi-clock text-[10px]" />
+                  <span>{{
+                    coupon.expires_at
+                      ? `Hingga ${new Date(coupon.expires_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}`
+                      : 'Seterusnya'
+                  }}</span>
+                </span>
+                <span v-if="coupon.remaining_quota != null" class="text-brand-faint">•</span>
+                <span v-if="coupon.remaining_quota != null">
+                  Sisa {{ coupon.remaining_quota }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Action & S&K Row: S&K di kiri, tombol aksi di kanan -->
+            <div
+              class="flex items-center justify-between gap-2 pt-2 border-t border-brand-hairsoft"
+            >
+              <button
+                type="button"
+                class="text-[11px] font-semibold text-brand-muted hover:text-brand-ink flex items-center gap-1 cursor-pointer border-0 bg-transparent p-0 transition-colors"
+                title="Lihat Syarat &amp; Ketentuan Lengkap"
+                @click="openTermsModal(coupon)"
+              >
+                <span>S&amp;K</span>
+                <i class="pi pi-angle-right text-[10px]" />
+              </button>
+
+              <div class="flex items-center gap-1.5 shrink-0">
                 <UiButton
                   variant="outline"
                   size="xs"
-                  class="flex-1"
                   :icon="copiedCode === coupon.code ? 'pi-check' : 'pi-copy'"
                   @click="copyCouponCode(coupon.code)"
                 >
-                  {{ copiedCode === coupon.code ? 'Tersalin' : 'Salin Kode' }}
+                  {{ copiedCode === coupon.code ? 'Tersalin' : 'Salin' }}
                 </UiButton>
 
                 <UiButton
                   :variant="claimedCodes.has(coupon.code) ? 'primary' : 'accent'"
                   size="xs"
-                  class="flex-1"
                   @click="claimOrUseCoupon(coupon)"
                 >
                   {{ claimedCodes.has(coupon.code) ? 'Pakai' : 'Klaim' }}
                 </UiButton>
               </div>
             </div>
-          </div>
-
-          <!-- S&K DROPDOWN ACCORDION (Jujur & Bersih Tanpa Titik Hijau Palsu) -->
-          <div
-            class="border-t border-brand-hairsoft px-4 py-2 bg-brand-canvas-soft/60 flex items-center justify-between text-[11px]"
-          >
-            <button
-              type="button"
-              class="text-brand-muted hover:text-brand-ink font-medium flex items-center gap-1.5 cursor-pointer border-0 bg-transparent"
-              @click="toggleTerms(coupon.id)"
-            >
-              <span>Syarat &amp; Ketentuan</span>
-              <i
-                class="pi pi-chevron-down text-[9px] transition-transform duration-200"
-                :class="{ 'rotate-180': expandedTerms[coupon.id] }"
-              />
-            </button>
-          </div>
-
-          <!-- S&K Expanded Content -->
-          <div
-            v-if="expandedTerms[coupon.id]"
-            class="px-4 py-3 bg-brand-canvas-soft text-xs text-brand-muted border-t border-brand-hairsoft space-y-1"
-          >
-            <p>1. Voucher berlaku dengan transaksi minimal {{ coupon.formatted_min_purchase }}.</p>
-            <p v-if="coupon.formatted_max_discount">
-              2. Batas maksimal potongan sebesar {{ coupon.formatted_max_discount }}.
-            </p>
-            <p>3. Voucher dapat digunakan {{ coupon.user_limit }} kali per akun pengguna.</p>
-            <p>4. Potongan otomatis memotong total belanja saat pembayaran di checkout.</p>
           </div>
         </article>
       </div>
@@ -489,6 +477,118 @@ const resetFilters = () => {
         @action="resetFilters"
       />
     </main>
+
+    <!-- MODAL SYARAT & KETENTUAN (POLA RESMI TOKOPEDIA / SHOPEE: ZERO LAYOUT SHIFT) -->
+    <UiModal
+      v-model:visible="isTermsModalOpen"
+      size="sm"
+      :title="selectedTermsCoupon ? `Syarat & Ketentuan` : 'Syarat & Ketentuan Voucher'"
+    >
+      <div v-if="selectedTermsCoupon" class="space-y-4">
+        <!-- Header Info Voucher -->
+        <div
+          class="flex items-center gap-3 p-3 rounded-2xl bg-brand-canvas-soft border border-brand-hair"
+        >
+          <div
+            class="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
+            :class="
+              selectedTermsCoupon.discount_type === 'percentage'
+                ? 'bg-blue-100 text-brand-accent'
+                : 'bg-emerald-100 text-emerald-700'
+            "
+          >
+            {{
+              selectedTermsCoupon.discount_type === 'percentage'
+                ? `${selectedTermsCoupon.discount_value}%`
+                : 'Rp'
+            }}
+          </div>
+          <div class="min-w-0 flex-1">
+            <h3 class="font-bold text-xs sm:text-sm text-brand-ink truncate">
+              {{ selectedTermsCoupon.name }}
+            </h3>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span
+                class="font-mono text-[10px] font-bold bg-white text-brand-ink px-2 py-0.5 rounded border border-brand-hair"
+              >
+                {{ selectedTermsCoupon.code }}
+              </span>
+              <UiBadge
+                :label="selectedTermsCoupon.discount_type === 'percentage' ? 'Diskon' : 'Potongan'"
+                :variant="selectedTermsCoupon.discount_type === 'percentage' ? 'info' : 'success'"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Ketentuan List -->
+        <div class="space-y-2 text-xs leading-relaxed">
+          <p class="font-semibold text-brand-muted text-[11px] uppercase tracking-wider">
+            Ketentuan Penggunaan
+          </p>
+          <ul class="space-y-2 list-disc list-inside text-brand-muted pl-1">
+            <li>
+              Berlaku dengan nilai minimum transaksi belanja sebesar
+              <strong class="text-brand-ink font-semibold">{{
+                selectedTermsCoupon.formatted_min_purchase
+              }}</strong
+              >.
+            </li>
+            <li v-if="selectedTermsCoupon.formatted_max_discount">
+              Batas maksimal potongan diskon yang dapat dinikmati sebesar
+              <strong class="text-brand-ink font-semibold">{{
+                selectedTermsCoupon.formatted_max_discount
+              }}</strong
+              >.
+            </li>
+            <li>
+              Masa berlaku voucher:
+              <strong class="text-brand-ink font-semibold">{{
+                selectedTermsCoupon.expires_at
+                  ? `Hingga ${new Date(selectedTermsCoupon.expires_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`
+                  : 'Berlaku Seterusnya'
+              }}</strong
+              >.
+            </li>
+            <li>
+              Setiap akun pengguna berhak menggunakan voucher ini sebanyak
+              <strong class="text-brand-ink font-semibold"
+                >{{ selectedTermsCoupon.user_limit }} kali</strong
+              >.
+            </li>
+            <li v-if="selectedTermsCoupon.remaining_quota != null">
+              Sisa kuota nasional saat ini:
+              <strong class="text-brand-ink font-semibold"
+                >{{ selectedTermsCoupon.remaining_quota }} penggunaan</strong
+              >.
+            </li>
+            <li>
+              Potongan akan otomatis dikalkulasikan dan memotong total belanja pada saat proses
+              checkout pesanan di ShelfStack.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <template #footer>
+        <UiButton variant="outline" size="sm" @click="isTermsModalOpen = false"> Tutup </UiButton>
+        <UiButton
+          v-if="selectedTermsCoupon"
+          :variant="claimedCodes.has(selectedTermsCoupon.code) ? 'primary' : 'accent'"
+          size="sm"
+          @click="
+            () => {
+              claimOrUseCoupon(selectedTermsCoupon!)
+              isTermsModalOpen = false
+            }
+          "
+        >
+          {{
+            claimedCodes.has(selectedTermsCoupon.code) ? 'Gunakan di Keranjang' : 'Klaim Voucher'
+          }}
+        </UiButton>
+      </template>
+    </UiModal>
   </div>
 </template>
 
