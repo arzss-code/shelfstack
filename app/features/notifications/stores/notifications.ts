@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import type { NotificationItem } from '../../../../shared/schemas/notification'
+import type { NotificationItem } from '~~/shared/schemas/notification'
+import { extractAuthUserId } from '~~/shared/utils/auth'
 import { useUiToast } from '~/composables/useUiToast'
 
 export const useNotificationStore = defineStore('notifications', () => {
@@ -15,12 +16,12 @@ export const useNotificationStore = defineStore('notifications', () => {
 
   const toast = useUiToast()
 
-  // Helper mendeteksi status login pengguna
+  // Helper mendeteksi status login pengguna secara defensif
   const checkIsLoggedIn = (): boolean => {
     if (import.meta.test) return true
     try {
       const user = useSupabaseUser()
-      return Boolean(user?.value)
+      return Boolean(extractAuthUserId(user?.value))
     } catch {
       return false
     }
@@ -54,6 +55,9 @@ export const useNotificationStore = defineStore('notifications', () => {
 
   // Mengambil daftar notifikasi dari backend Nitro dengan cursor pagination
   const fetchNotifications = async (reset = true) => {
+    // Hindari pemanggilan saat SSR karena $fetch server-side tidak mewarisi cookie autentikasi
+    if (!import.meta.client && !import.meta.test) return
+
     if (!checkIsLoggedIn()) {
       items.value = []
       unreadCount.value = 0
@@ -285,6 +289,15 @@ export const useNotificationStore = defineStore('notifications', () => {
     isOpen.value = false
   }
 
+  // Inisialisasi mandiri di client saat aplikasi pertama kali dimuat
+  const initNotifications = async () => {
+    if (!import.meta.client && !import.meta.test) return
+    initDesktopPermission()
+    if (checkIsLoggedIn()) {
+      await fetchNotifications(true)
+    }
+  }
+
   return {
     items,
     unreadCount,
@@ -295,6 +308,7 @@ export const useNotificationStore = defineStore('notifications', () => {
     isOpen,
     desktopPermission,
     fetchNotifications,
+    initNotifications,
     loadMore,
     initDesktopPermission,
     requestDesktopPermission,
