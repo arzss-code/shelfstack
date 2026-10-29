@@ -77,6 +77,17 @@ const formatExpiryDate = (isoString?: string | null): string => {
   }
 }
 
+const formatDiscountBadge = (coupon: AvailableCoupon): string => {
+  if (coupon.discount_type === 'percentage') {
+    return `${coupon.discount_value}%`
+  }
+  const val = coupon.discount_value / 100
+  if (val >= 1000) {
+    return `${Math.round(val / 1000)}rb`
+  }
+  return formatRupiah(val)
+}
+
 const calculateDiscountCents = (
   coupon: AvailableCoupon | CouponSummary | null,
   subtotalCents: number,
@@ -294,36 +305,18 @@ watch(
   <UiModal
     v-model:visible="visible"
     title="Pilih Voucher & Promo"
-    description="Pilih atau masukkan kode voucher promo untuk mendapatkan potongan harga."
+    description="Gunakan voucher promo untuk mendapatkan potongan harga belanja."
     size="md"
     @closed="handleCancel"
   >
-    <div class="space-y-5">
-      <!-- Basket Subtotal Indicator -->
-      <div
-        class="flex items-center justify-between rounded-xl border border-brand-hair bg-brand-canvas-soft px-3.5 py-2.5 text-xs"
-      >
-        <div class="flex items-center gap-2">
-          <i class="pi pi-shopping-bag text-brand-muted text-xs" />
-          <span class="text-brand-muted">Total Belanja Saat Ini:</span>
-        </div>
-        <span class="font-bold text-brand-ink tabular">
-          {{ cartStore.formattedTotalPrice }}
-        </span>
-      </div>
-
-      <!-- Manual Coupon Input Section -->
-      <div class="rounded-xl border border-brand-hair bg-brand-canvas p-3.5 space-y-3">
-        <div class="flex items-center gap-2 text-xs font-semibold text-brand-ink">
-          <i class="pi pi-tag text-brand-accent text-xs" />
-          <span>Punya kode voucher khusus?</span>
-        </div>
-
+    <div class="space-y-3.5">
+      <!-- Sleek Manual Code Input (Shopee / Tokopedia style) -->
+      <div class="space-y-1.5">
         <div class="flex items-start gap-2">
           <div class="flex-1">
             <UiInput
               v-model="manualCode"
-              placeholder="Contoh: SHELF10"
+              placeholder="Punya kode promo? Masukkan di sini"
               size="sm"
               left-icon="pi-ticket"
               :disabled="isManualValidating"
@@ -354,11 +347,11 @@ watch(
       </div>
 
       <!-- Loading Skeletons -->
-      <div v-if="isLoadingCoupons" class="space-y-3">
+      <div v-if="isLoadingCoupons" class="space-y-2">
         <div
           v-for="idx in 3"
           :key="idx"
-          class="h-24 rounded-xl border border-brand-hairsoft bg-brand-canvas-soft animate-pulse"
+          class="h-16 rounded-xl border border-brand-hairsoft bg-brand-canvas-soft animate-pulse"
         />
       </div>
 
@@ -379,29 +372,42 @@ watch(
       />
 
       <!-- Coupon Lists -->
-      <div v-else class="space-y-6">
+      <div v-else class="space-y-3.5">
         <!-- Section 1: Eligible Coupons -->
-        <div class="space-y-2.5">
-          <div class="flex items-center justify-between">
-            <h3 class="m-0 text-xs font-bold uppercase tracking-wider text-brand-ink">
-              Voucher Yang Bisa Digunakan
-              <span class="ml-1 text-[11px] font-normal text-brand-muted">
-                ({{ eligibleCoupons.length }})
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-xs pt-0.5">
+            <div class="flex items-center gap-1.5">
+              <h3 class="m-0 text-[11px] font-bold uppercase tracking-wider text-brand-ink">
+                Voucher Yang Bisa Digunakan
+              </h3>
+              <span
+                class="rounded bg-brand-canvas-soft px-1.5 py-0.5 text-[10px] font-semibold text-brand-muted border border-brand-hairsoft"
+              >
+                {{ eligibleCoupons.length }}
               </span>
-            </h3>
-            <button
-              v-if="selectedCode"
-              type="button"
-              class="text-[11px] font-semibold text-brand-muted hover:text-brand-danger transition-colors cursor-pointer border-0 bg-transparent p-0"
-              @click="selectedCode = ''"
-            >
-              Lepas Pilihan
-            </button>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="text-[11px] text-brand-muted">
+                Total Belanja:
+                <strong class="font-bold text-brand-ink tabular">{{
+                  cartStore.formattedTotalPrice
+                }}</strong>
+              </span>
+              <button
+                v-if="selectedCode"
+                type="button"
+                class="text-[11px] font-semibold text-brand-muted hover:text-brand-danger transition-colors cursor-pointer border-0 bg-transparent p-0"
+                @click="selectedCode = ''"
+              >
+                Lepas
+              </button>
+            </div>
           </div>
 
           <div
             v-if="eligibleCoupons.length === 0"
-            class="rounded-xl border border-dashed border-brand-hair p-4 text-center"
+            class="rounded-xl border border-dashed border-brand-hair p-3.5 text-center"
           >
             <p class="m-0 text-xs text-brand-muted">
               Belum ada voucher yang memenuhi nilai belanja saat ini. Tambah barang belanjaan Anda
@@ -409,7 +415,7 @@ watch(
             </p>
           </div>
 
-          <div v-else class="space-y-2.5">
+          <div v-else class="space-y-2">
             <div
               v-for="coupon in eligibleCoupons"
               :key="coupon.code"
@@ -417,7 +423,7 @@ watch(
               tabindex="0"
               :aria-pressed="isSelected(coupon.code)"
               :class="[
-                'group relative flex flex-col sm:flex-row items-stretch rounded-xl border transition-all text-left overflow-hidden cursor-pointer select-none',
+                'group relative flex items-stretch rounded-xl border transition-all text-left overflow-hidden cursor-pointer select-none',
                 isSelected(coupon.code)
                   ? 'border-brand-ink ring-2 ring-brand-ink/10 bg-brand-canvas shadow-whisper'
                   : 'border-brand-hair bg-brand-canvas hover:border-brand-ink/60 hover:shadow-whisper',
@@ -426,27 +432,23 @@ watch(
               @keydown.enter.prevent="toggleSelectCoupon(coupon)"
               @keydown.space.prevent="toggleSelectCoupon(coupon)"
             >
-              <!-- Ticket Left Pillar (Discount Stub) -->
+              <!-- Ticket Left Stub -->
               <div
                 :class="[
-                  'p-3 flex sm:flex-col items-center justify-between sm:justify-center text-center shrink-0 border-b sm:border-b-0 sm:border-r border-dashed transition-colors',
+                  'w-20 sm:w-24 p-2 sm:p-2.5 flex flex-col items-center justify-center text-center shrink-0 border-r border-dashed transition-colors',
                   isSelected(coupon.code)
                     ? 'bg-brand-ink text-white border-brand-ink'
                     : 'bg-brand-canvas-soft text-brand-ink border-brand-hair group-hover:bg-brand-field',
-                  'sm:w-28',
                 ]"
               >
-                <div class="flex items-center sm:flex-col gap-1.5 sm:gap-0.5">
-                  <i class="pi pi-ticket text-xs mb-0.5" />
-                  <span
-                    class="font-display font-bold text-xs sm:text-sm tracking-tight leading-tight"
-                  >
-                    {{ coupon.formatted_discount }}
-                  </span>
-                </div>
+                <span
+                  class="font-display font-extrabold text-xs sm:text-sm tracking-tight leading-none"
+                >
+                  {{ formatDiscountBadge(coupon) }}
+                </span>
                 <span
                   :class="[
-                    'text-[9.5px] uppercase font-bold tracking-wider mt-0 sm:mt-1 px-1.5 py-0.5 rounded',
+                    'text-[9px] uppercase font-bold tracking-wider mt-1 px-1.5 py-0.5 rounded',
                     isSelected(coupon.code)
                       ? 'bg-white/20 text-white'
                       : 'bg-brand-hair text-brand-muted',
@@ -457,65 +459,43 @@ watch(
               </div>
 
               <!-- Ticket Body -->
-              <div class="flex-1 p-3 sm:p-3.5 flex flex-col justify-between gap-2 min-w-0">
-                <div class="flex items-start justify-between gap-2">
-                  <div class="min-w-0 flex-1">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                      <span
-                        class="font-mono text-xs font-bold uppercase tracking-wider text-brand-ink bg-brand-canvas-soft px-1.5 py-0.5 rounded border border-brand-hairsoft"
-                      >
-                        {{ coupon.code }}
-                      </span>
-                      <span class="font-semibold text-xs text-brand-ink truncate">
-                        {{ coupon.name }}
-                      </span>
-                    </div>
-
-                    <p
-                      v-if="coupon.description"
-                      class="m-0 mt-1 text-[11px] leading-relaxed text-brand-muted line-clamp-2"
+              <div class="flex-1 p-2.5 px-3 flex flex-col justify-center gap-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-1.5 min-w-0 flex-wrap">
+                    <span
+                      class="font-mono text-[10px] font-bold uppercase tracking-wider text-brand-ink bg-brand-canvas-soft px-1.5 py-0.5 rounded border border-brand-hairsoft shrink-0"
                     >
-                      {{ coupon.description }}
-                    </p>
+                      {{ coupon.code }}
+                    </span>
+                    <span class="font-semibold text-xs text-brand-ink truncate">
+                      {{ coupon.name }}
+                    </span>
                   </div>
 
                   <!-- Radio Selector -->
-                  <div class="shrink-0 pt-0.5">
+                  <div class="shrink-0">
                     <div
                       :class="[
-                        'flex h-5 w-5 items-center justify-center rounded-full border transition-all',
+                        'flex h-4 w-4 items-center justify-center rounded-full border transition-all',
                         isSelected(coupon.code)
                           ? 'border-brand-ink bg-brand-ink text-white'
                           : 'border-brand-hair bg-brand-canvas group-hover:border-brand-ink',
                       ]"
                     >
-                      <i v-if="isSelected(coupon.code)" class="pi pi-check text-[10px]" />
+                      <i v-if="isSelected(coupon.code)" class="pi pi-check text-[8px]" />
                     </div>
                   </div>
                 </div>
 
-                <!-- Terms & Constraints Meta Badges -->
-                <div
-                  class="flex items-center gap-2 flex-wrap pt-1 text-[10.5px] text-brand-muted border-t border-brand-hairsoft"
-                >
-                  <span class="inline-flex items-center gap-1">
-                    <i class="pi pi-shopping-bag text-[9.5px]" />
-                    Min. {{ coupon.formatted_min_purchase }}
-                  </span>
-                  <span v-if="coupon.formatted_max_discount" class="inline-flex items-center gap-1">
-                    <i class="pi pi-arrow-up-right text-[9.5px]" />
-                    Maks. {{ coupon.formatted_max_discount }}
-                  </span>
-                  <span class="inline-flex items-center gap-1">
-                    <i class="pi pi-calendar text-[9.5px]" />
-                    s.d. {{ formatExpiryDate(coupon.expires_at) }}
-                  </span>
-                  <span
-                    v-if="coupon.remaining_quota != null"
-                    class="inline-flex items-center gap-1 text-brand-accent font-medium"
+                <!-- Terms Meta Badges -->
+                <div class="flex items-center gap-1.5 text-[10.5px] text-brand-muted truncate">
+                  <span>Min. {{ coupon.formatted_min_purchase }}</span>
+                  <span v-if="coupon.formatted_max_discount"
+                    >· Maks. {{ coupon.formatted_max_discount }}</span
                   >
-                    <i class="pi pi-clock text-[9.5px]" />
-                    Sisa {{ coupon.remaining_quota }}
+                  <span>· s.d. {{ formatExpiryDate(coupon.expires_at) }}</span>
+                  <span v-if="coupon.remaining_quota != null" class="text-brand-accent font-medium">
+                    · Sisa {{ coupon.remaining_quota }}
                   </span>
                 </div>
               </div>
@@ -526,67 +506,58 @@ watch(
         <!-- Section 2: Ineligible Coupons -->
         <div
           v-if="ineligibleCoupons.length > 0"
-          class="space-y-2.5 pt-2 border-t border-brand-hairsoft"
+          class="space-y-2 pt-2 border-t border-brand-hairsoft"
         >
-          <h3 class="m-0 text-xs font-bold uppercase tracking-wider text-brand-muted">
-            Belum Memenuhi Syarat
-            <span class="ml-1 text-[11px] font-normal text-brand-muted">
-              ({{ ineligibleCoupons.length }})
+          <div class="flex items-center gap-1.5 text-xs">
+            <h3 class="m-0 text-[11px] font-bold uppercase tracking-wider text-brand-muted">
+              Belum Memenuhi Syarat
+            </h3>
+            <span
+              class="rounded bg-brand-canvas-soft px-1.5 py-0.5 text-[10px] font-semibold text-brand-muted border border-brand-hairsoft"
+            >
+              {{ ineligibleCoupons.length }}
             </span>
-          </h3>
+          </div>
 
-          <div class="space-y-2.5">
+          <div class="space-y-2">
             <div
               v-for="coupon in ineligibleCoupons"
               :key="coupon.code"
-              class="relative flex flex-col sm:flex-row items-stretch rounded-xl border border-brand-hair/60 bg-brand-canvas-soft/50 text-left overflow-hidden opacity-75 cursor-not-allowed select-none"
+              class="relative flex items-stretch rounded-xl border border-brand-hair/60 bg-brand-canvas-soft/50 text-left overflow-hidden opacity-75 cursor-not-allowed select-none"
             >
-              <!-- Ticket Left Pillar (Muted) -->
+              <!-- Ticket Left Stub (Muted) -->
               <div
-                class="bg-brand-field text-brand-muted border-b sm:border-b-0 sm:border-r border-dashed border-brand-hair/60 p-3 flex sm:flex-col items-center justify-between sm:justify-center text-center shrink-0 sm:w-28"
+                class="w-20 sm:w-24 bg-brand-field text-brand-muted border-r border-dashed border-brand-hair/60 p-2 sm:p-2.5 flex flex-col items-center justify-center text-center shrink-0"
               >
-                <div class="flex items-center sm:flex-col gap-1.5 sm:gap-0.5">
-                  <i class="pi pi-ticket text-xs mb-0.5" />
-                  <span
-                    class="font-display font-bold text-xs sm:text-sm tracking-tight leading-tight"
-                  >
-                    {{ coupon.formatted_discount }}
-                  </span>
-                </div>
                 <span
-                  class="text-[9.5px] uppercase font-bold tracking-wider mt-0 sm:mt-1 px-1.5 py-0.5 rounded bg-brand-hairsoft text-brand-muted"
+                  class="font-display font-extrabold text-xs sm:text-sm tracking-tight leading-none"
+                >
+                  {{ formatDiscountBadge(coupon) }}
+                </span>
+                <span
+                  class="text-[9px] uppercase font-bold tracking-wider mt-1 px-1.5 py-0.5 rounded bg-brand-hairsoft text-brand-muted"
                 >
                   {{ coupon.discount_type === 'percentage' ? 'Diskon' : 'Potongan' }}
                 </span>
               </div>
 
               <!-- Ticket Body -->
-              <div class="flex-1 p-3 sm:p-3.5 flex flex-col justify-between gap-2 min-w-0">
-                <div class="flex items-start justify-between gap-2">
-                  <div class="min-w-0 flex-1">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                      <span
-                        class="font-mono text-xs font-bold uppercase tracking-wider text-brand-muted bg-brand-field px-1.5 py-0.5 rounded border border-brand-hairsoft"
-                      >
-                        {{ coupon.code }}
-                      </span>
-                      <span class="font-semibold text-xs text-brand-muted truncate">
-                        {{ coupon.name }}
-                      </span>
-                    </div>
-
-                    <p
-                      v-if="coupon.description"
-                      class="m-0 mt-1 text-[11px] leading-relaxed text-brand-muted line-clamp-2"
+              <div class="flex-1 p-2.5 px-3 flex flex-col justify-center gap-1.5 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-1.5 min-w-0 flex-wrap">
+                    <span
+                      class="font-mono text-[10px] font-bold uppercase tracking-wider text-brand-muted bg-brand-field px-1.5 py-0.5 rounded border border-brand-hairsoft shrink-0"
                     >
-                      {{ coupon.description }}
-                    </p>
+                      {{ coupon.code }}
+                    </span>
+                    <span class="font-semibold text-xs text-brand-muted truncate">
+                      {{ coupon.name }}
+                    </span>
                   </div>
 
-                  <!-- Disabled Radio -->
-                  <div class="shrink-0 pt-0.5">
+                  <div class="shrink-0">
                     <div
-                      class="flex h-5 w-5 items-center justify-center rounded-full border border-brand-hair/60 bg-brand-field text-transparent"
+                      class="flex h-4 w-4 items-center justify-center rounded-full border border-brand-hair/60 bg-brand-field text-transparent"
                     />
                   </div>
                 </div>
@@ -594,9 +565,9 @@ watch(
                 <!-- Reason for Ineligibility Warning Banner -->
                 <div
                   v-if="getDeficit(coupon) > 0"
-                  class="flex items-center gap-1.5 rounded-lg border border-brand-warning-edge bg-brand-warning-tint px-2.5 py-1.5 text-[11px] font-medium text-brand-warning-text"
+                  class="flex items-center gap-1.5 rounded-md border border-brand-warning-edge bg-brand-warning-tint px-2 py-1 text-[10.5px] font-medium text-brand-warning-text"
                 >
-                  <i class="pi pi-exclamation-triangle shrink-0 text-[10px]" />
+                  <i class="pi pi-exclamation-triangle shrink-0 text-[9px]" />
                   <span>
                     Kurang {{ formatRupiah(getDeficit(coupon) / 100) }} untuk menggunakan voucher
                     ini.
@@ -604,23 +575,21 @@ watch(
                 </div>
                 <div
                   v-else-if="coupon.is_expired"
-                  class="flex items-center gap-1.5 rounded-lg border border-brand-danger-edge bg-brand-danger-tint px-2.5 py-1.5 text-[11px] font-medium text-brand-danger-text"
+                  class="flex items-center gap-1.5 rounded-md border border-brand-danger-edge bg-brand-danger-tint px-2 py-1 text-[10.5px] font-medium text-brand-danger-text"
                 >
-                  <i class="pi pi-times-circle shrink-0 text-[10px]" />
+                  <i class="pi pi-times-circle shrink-0 text-[9px]" />
                   <span>Voucher telah kedaluwarsa.</span>
                 </div>
                 <div
                   v-else-if="!coupon.is_available"
-                  class="flex items-center gap-1.5 rounded-lg border border-brand-hair bg-brand-field px-2.5 py-1.5 text-[11px] font-medium text-brand-muted"
+                  class="flex items-center gap-1.5 rounded-md border border-brand-hair bg-brand-field px-2 py-1 text-[10.5px] font-medium text-brand-muted"
                 >
-                  <i class="pi pi-ban shrink-0 text-[10px]" />
+                  <i class="pi pi-ban shrink-0 text-[9px]" />
                   <span>Kuota pemakaian voucher telah habis.</span>
                 </div>
 
                 <!-- Terms Meta -->
-                <div
-                  class="flex items-center gap-2 flex-wrap pt-1 text-[10.5px] text-brand-muted border-t border-brand-hairsoft"
-                >
+                <div class="flex items-center gap-1.5 text-[10.5px] text-brand-muted truncate">
                   <span>Min. {{ coupon.formatted_min_purchase }}</span>
                   <span v-if="coupon.formatted_max_discount"
                     >· Maks. {{ coupon.formatted_max_discount }}</span
@@ -636,9 +605,7 @@ watch(
 
     <!-- Modal Footer -->
     <template #footer>
-      <div
-        class="flex w-full flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
-      >
+      <div class="flex w-full items-center justify-between gap-3">
         <!-- Savings Summary -->
         <div class="min-w-0">
           <div v-if="selectedCoupon && selectedDiscountCents > 0" class="flex items-center gap-2">
@@ -648,9 +615,11 @@ watch(
               <i class="pi pi-check text-xs" />
             </div>
             <div>
-              <p class="m-0 text-[10.5px] text-brand-muted">Total Penghematan:</p>
+              <p class="m-0 text-[10px] uppercase font-bold tracking-wider text-brand-muted">
+                Total Penghematan:
+              </p>
               <p
-                class="m-0 font-display text-sm sm:text-base font-bold text-brand-success-text tabular"
+                class="m-0 font-display text-sm font-bold text-brand-success-text tabular leading-none"
               >
                 {{ formatRupiah(selectedDiscountCents / 100) }}
               </p>
