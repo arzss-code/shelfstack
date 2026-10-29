@@ -145,8 +145,11 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                   <span v-if="item.color && item.material"> · </span>
                   <span v-if="item.material">{{ item.material }}</span>
                 </p>
-                <p class="font-body text-xs font-semibold text-brand-ink m-0 mt-1 tabular-nums">
-                  {{ formatRupiah(item.price) }} / unit
+                <p
+                  v-if="item.quantity > 1"
+                  class="font-body text-xs text-brand-muted m-0 mt-1 tabular-nums"
+                >
+                  @ {{ formatRupiah(item.price) }} / unit
                 </p>
               </div>
             </div>

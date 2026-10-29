@@ -176,108 +176,117 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
                 <i v-else class="pi pi-image text-brand-faint text-lg" />
               </div>
 
-              <!-- Info & Stepper -->
-              <div class="flex-1 min-w-0 flex flex-col justify-between min-h-[64px] gap-2">
-                <div class="flex items-start justify-between gap-2">
-                  <div class="min-w-0">
-                    <h3
-                      class="font-display font-medium text-xs sm:text-sm text-brand-ink line-clamp-2 m-0 hover:text-brand-accent cursor-pointer transition-colors leading-snug"
-                      :title="item.name"
-                      @click="
-                        () => {
-                          close()
-                          router.push(`/product/${item.slug || item.productId}`)
-                        }
-                      "
-                    >
-                      {{ item.name }}
-                    </h3>
+              <!-- Info & Actions -->
+              <div class="flex-1 min-w-0 flex flex-col justify-between min-h-[64px]">
+                <div>
+                  <h3
+                    class="font-display font-medium text-xs sm:text-sm text-brand-ink line-clamp-1 m-0 hover:text-brand-accent cursor-pointer transition-colors leading-snug"
+                    :title="item.name"
+                    @click="
+                      () => {
+                        close()
+                        router.push(`/product/${item.slug || item.productId}`)
+                      }
+                    "
+                  >
+                    {{ item.name }}
+                  </h3>
 
-                    <!-- Variant & Unit Price Row -->
-                    <div class="flex items-center gap-1.5 mt-1 flex-wrap">
-                      <span
-                        v-if="item.color || item.material"
-                        class="inline-flex items-center rounded bg-brand-canvas-soft border border-brand-hairsoft px-1.5 py-0.5 text-[10px] text-brand-muted font-medium"
-                      >
-                        <span v-if="item.color">{{ item.color }}</span>
-                        <span v-if="item.color && item.material"> · </span>
-                        <span v-if="item.material">{{ item.material }}</span>
-                      </span>
-                      <span class="text-[11px] text-brand-muted tabular-nums">
-                        {{ formatRupiah(item.price) }} / unit
-                      </span>
-                    </div>
+                  <!-- Variant Pill (if any) -->
+                  <div
+                    v-if="item.color || item.material"
+                    class="flex items-center gap-1.5 mt-0.5 flex-wrap"
+                  >
+                    <span
+                      class="inline-flex items-center rounded bg-brand-canvas-soft border border-brand-hairsoft px-1.5 py-0.5 text-[10px] text-brand-muted font-medium"
+                    >
+                      <span v-if="item.color">{{ item.color }}</span>
+                      <span v-if="item.color && item.material"> · </span>
+                      <span v-if="item.material">{{ item.material }}</span>
+                    </span>
                   </div>
-
-                  <!-- Remove Button -->
-                  <UiTooltip text="Hapus item" position="left">
-                    <button
-                      type="button"
-                      class="text-brand-faint hover:text-brand-danger hover:bg-brand-danger-tint transition-colors p-1 rounded-lg cursor-pointer shrink-0 -mr-1 border-0 bg-transparent flex items-center justify-center"
-                      aria-label="Hapus item"
-                      @click="cartStore.removeItem(item.productId, item.color, item.material)"
-                    >
-                      <i class="pi pi-trash text-xs" />
-                    </button>
-                  </UiTooltip>
                 </div>
 
-                <div class="flex items-center justify-between pt-1">
-                  <!-- Stepper -->
-                  <div
-                    class="flex items-center border border-brand-hair rounded-full bg-brand-field h-7 px-1 gap-0.5"
-                  >
-                    <button
-                      type="button"
-                      class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs border-0 bg-transparent"
-                      aria-label="Kurangi kuantitas"
-                      @click="
-                        cartStore.updateQuantity(
-                          item.productId,
-                          item.quantity - 1,
-                          item.color,
-                          item.material,
-                        )
-                      "
+                <!-- Bottom Row: Price on Left, Actions (Trash + Stepper) on Right -->
+                <div class="flex items-end justify-between pt-2 gap-2">
+                  <!-- Price -->
+                  <div class="min-w-0">
+                    <span
+                      class="font-display text-xs sm:text-[13px] font-bold text-brand-ink tabular-nums block leading-tight"
                     >
-                      <i class="pi pi-minus text-[8px]" />
-                    </button>
-                    <input
-                      :value="item.quantity"
-                      type="text"
-                      inputmode="numeric"
-                      pattern="[0-9]*"
-                      aria-label="Kuantitas item"
-                      class="w-7 text-center text-xs font-bold text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-brand-canvas rounded transition-colors p-0 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      @focus="($event.target as HTMLInputElement).select()"
-                      @input="handleManualQuantityInput($event, item)"
-                      @blur="handleManualQuantityBlur($event, item)"
-                      @keydown.enter="($event.target as HTMLInputElement).blur()"
-                    />
-                    <button
-                      type="button"
-                      class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed border-0 bg-transparent"
-                      :disabled="item.quantity >= item.stock"
-                      aria-label="Tambah kuantitas"
-                      @click="
-                        cartStore.updateQuantity(
-                          item.productId,
-                          item.quantity + 1,
-                          item.color,
-                          item.material,
-                        )
-                      "
+                      {{ formatRupiah(item.price * item.quantity) }}
+                    </span>
+                    <span
+                      v-if="item.quantity > 1"
+                      class="text-[10px] text-brand-muted tabular-nums block font-normal mt-0.5"
                     >
-                      <i class="pi pi-plus text-[8px]" />
-                    </button>
+                      @ {{ formatRupiah(item.price) }}
+                    </span>
                   </div>
 
-                  <!-- Subtotal Item -->
-                  <span
-                    class="font-display text-xs sm:text-[13px] font-bold text-brand-ink tabular-nums"
-                  >
-                    {{ formatRupiah(item.price * item.quantity) }}
-                  </span>
+                  <!-- Actions: Trash Button + Stepper -->
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <!-- Remove Button -->
+                    <UiTooltip text="Hapus item" position="top">
+                      <button
+                        type="button"
+                        class="w-7 h-7 flex items-center justify-center rounded-lg text-brand-faint hover:text-brand-danger hover:bg-brand-danger-tint transition-colors cursor-pointer border-0 bg-transparent"
+                        aria-label="Hapus item"
+                        @click="cartStore.removeItem(item.productId, item.color, item.material)"
+                      >
+                        <i class="pi pi-trash text-xs" />
+                      </button>
+                    </UiTooltip>
+
+                    <!-- Stepper -->
+                    <div
+                      class="flex items-center border border-brand-hair rounded-full bg-brand-field h-7 px-1 gap-0.5"
+                    >
+                      <button
+                        type="button"
+                        class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs border-0 bg-transparent"
+                        aria-label="Kurangi kuantitas"
+                        @click="
+                          cartStore.updateQuantity(
+                            item.productId,
+                            item.quantity - 1,
+                            item.color,
+                            item.material,
+                          )
+                        "
+                      >
+                        <i class="pi pi-minus text-[8px]" />
+                      </button>
+                      <input
+                        :value="item.quantity"
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        aria-label="Kuantitas item"
+                        class="w-7 text-center text-xs font-bold text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-brand-canvas rounded transition-colors p-0 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        @focus="($event.target as HTMLInputElement).select()"
+                        @input="handleManualQuantityInput($event, item)"
+                        @blur="handleManualQuantityBlur($event, item)"
+                        @keydown.enter="($event.target as HTMLInputElement).blur()"
+                      />
+                      <button
+                        type="button"
+                        class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed border-0 bg-transparent"
+                        :disabled="item.quantity >= item.stock"
+                        aria-label="Tambah kuantitas"
+                        @click="
+                          cartStore.updateQuantity(
+                            item.productId,
+                            item.quantity + 1,
+                            item.color,
+                            item.material,
+                          )
+                        "
+                      >
+                        <i class="pi pi-plus text-[8px]" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </article>
