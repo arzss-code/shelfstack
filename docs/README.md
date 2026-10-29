@@ -11,6 +11,7 @@ Direktori ini menyimpan seluruh spesifikasi teknis, dokumen arsitektur, rencana 
 - [`PROGRESS.md`](./PROGRESS.md): Log kemajuan implementasi aktif, verifikasi test, dan daftar Known Gaps terbuka.
 - [`BACKLOG.md`](./BACKLOG.md): Backlog MoSCoW lengkap beserta acceptance criteria stabil (ID C-xx, K-xx, dll.).
 - [`PRD-ECOMMERCE.md`](./PRD-ECOMMERCE.md): Product Requirements Document resmi (v2.0) yang memuat visi kurasi, target persona, dan model bisnis.
+- [`UX-SPEC.md`](./UX-SPEC.md): Spesifikasi pengalaman pengguna (UX), arsitektur informasi, matriks aksi halaman, panduan validasi form, serta standar aksesibilitas.
 
 ---
 
