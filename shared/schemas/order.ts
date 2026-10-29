@@ -34,6 +34,7 @@ export const checkoutAddressSchema = z.object({
 export const checkoutSchema = z.object({
   items: z.array(checkoutItemSchema).min(1, 'Keranjang belanja tidak boleh kosong.'),
   address: checkoutAddressSchema,
+  coupon_code: z.string().trim().optional(),
 })
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>

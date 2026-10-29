@@ -28,6 +28,10 @@ export interface Order {
   id: string
   user_id: string
   total_cents: number
+  subtotal_cents?: number
+  discount_cents?: number
+  coupon_id?: string | null
+  coupon_code?: string | null
   status: OrderStatus
   address: OrderAddress
   snap_token?: string | null

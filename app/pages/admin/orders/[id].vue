@@ -398,6 +398,19 @@ const formatDate = (dateStr?: string | null) => {
                   order.payment_type || 'Midtrans Snap'
                 }}</span>
               </div>
+              <div v-if="order.subtotal_cents" class="flex justify-between">
+                <span>Subtotal:</span>
+                <span class="font-medium text-brand-ink">{{
+                  formatRupiah(order.subtotal_cents / 100)
+                }}</span>
+              </div>
+              <div
+                v-if="order.discount_cents && order.discount_cents > 0"
+                class="flex justify-between text-brand-success-text font-semibold"
+              >
+                <span>Diskon Voucher ({{ order.coupon_code }}):</span>
+                <span class="font-bold">-{{ formatRupiah(order.discount_cents / 100) }}</span>
+              </div>
               <div class="flex justify-between">
                 <span>Waktu Pembayaran:</span>
                 <span class="font-medium text-brand-ink">{{ formatDate(order.paid_at) }}</span>

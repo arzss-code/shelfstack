@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAuth } from '~/features/auth/composables/useAuth'
+import { extractAuthUserId } from '~~/shared/utils/auth'
 import { useCategories } from '~/composables/useCategories'
 import { useCartStore } from '~/features/cart/stores/cart'
 import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
@@ -38,11 +39,6 @@ const subNavCategories = computed(() => [
     path: `/katalog?category=${c.slug}`,
   })),
 ])
-
-onMounted(async () => {
-  fetchProfile().catch(() => {})
-  await fetchCategories().catch(() => {})
-})
 
 const displayName = computed(
   () => profile.value?.full_name || user.value?.email?.split('@')[0] || 'Pengguna',
@@ -87,8 +83,16 @@ function handleNavClickOutside(event: MouseEvent) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener('pointerdown', handleNavClickOutside, { passive: true })
+  fetchProfile().catch(() => {})
+  await fetchCategories().catch(() => {})
+
+  const currentUserId = extractAuthUserId(user.value)
+  if (currentUserId) {
+    await notificationStore.fetchNotifications(true)
+    notificationStore.setupRealtimeListener(currentUserId)
+  }
 })
 
 onBeforeUnmount(() => {
@@ -97,10 +101,10 @@ onBeforeUnmount(() => {
 })
 
 watch(
-  () => user.value?.id,
+  () => extractAuthUserId(user.value),
   (userId) => {
     if (userId) {
-      notificationStore.fetchNotifications()
+      notificationStore.fetchNotifications(true)
       notificationStore.setupRealtimeListener(userId)
     } else {
       notificationStore.cleanupRealtimeListener()
@@ -137,12 +141,6 @@ const handleLogout = async () => {
             Lacak Pesanan
           </NuxtLink>
           <span class="text-white/40">IDR (Rp)</span>
-
-          <!-- Separator & Notification Bell in Inverted Dark Strip -->
-          <template v-if="isLoggedIn && user">
-            <span class="w-px h-3 bg-white/20" />
-            <NotificationBell variant="dark" />
-          </template>
         </div>
       </div>
     </div>
@@ -243,6 +241,11 @@ const handleLogout = async () => {
 
         <!-- Right Commerce Actions -->
         <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+          <!-- Notification Bell in Main Header (when logged in) -->
+          <template v-if="isLoggedIn && user">
+            <NotificationBell variant="light" />
+          </template>
+
           <!-- Wishlist Icon Button with UiTooltip -->
           <UiTooltip text="Wishlist" position="bottom" align="center">
             <NuxtLink
@@ -429,10 +432,10 @@ const handleLogout = async () => {
           </NuxtLink>
 
           <NuxtLink
-            to="/katalog"
+            to="/promos"
             class="px-3 py-1 rounded-full text-brand-accent font-semibold hover:bg-white transition-colors no-underline flex items-center gap-1"
           >
-            <span>Promo &amp; Diskon</span>
+            <span>Voucher &amp; Promo</span>
             <span
               class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"
               >%</span
@@ -481,6 +484,21 @@ const handleLogout = async () => {
           @click="isMobileMenuOpen = false"
         >
           Katalog Lengkap
+        </NuxtLink>
+        <NuxtLink
+          to="/promos"
+          class="py-2 text-brand-accent no-underline border-b border-brand-hairsoft flex items-center justify-between font-semibold"
+          @click="isMobileMenuOpen = false"
+        >
+          <span class="flex items-center gap-2">
+            <i class="pi pi-ticket text-sm" />
+            <span>Voucher &amp; Promo</span>
+          </span>
+          <span
+            class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"
+          >
+            %
+          </span>
         </NuxtLink>
         <NuxtLink
           to="/wishlist"

@@ -30,7 +30,7 @@
         <i class="pi pi-bell text-base sm:text-lg text-brand-ink" />
         <span
           v-if="unreadCount > 0"
-          class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-brand-ink text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
+          class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-rose-600 text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
         >
           {{ unreadCount > 99 ? '99+' : unreadCount }}
         </span>
@@ -251,7 +251,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NotificationItem, NotificationType } from '../../../shared/schemas/notification'
+import type { NotificationItem, NotificationType } from '~~/shared/schemas/notification'
 import { useNotificationStore } from '~/features/notifications/stores/notifications'
 
 interface Props {
@@ -377,10 +377,13 @@ function handleKeydown(event: KeyboardEvent) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (import.meta.client) {
     document.addEventListener('pointerdown', handleClickOutside, { passive: true })
     document.addEventListener('keydown', handleKeydown)
+    if (items.value.length === 0) {
+      await notificationStore.fetchNotifications(true)
+    }
   }
 })
 

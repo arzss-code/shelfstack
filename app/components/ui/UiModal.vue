@@ -11,6 +11,8 @@ const props = withDefaults(
     description?: string
     /** Lebar panel: sm untuk konfirmasi, md default, lg untuk formulir lebar. */
     size?: 'sm' | 'md' | 'lg'
+    /** Batas tinggi maksimum panel modal. Default 'max-h-[90dvh] sm:max-h-[85vh]'. */
+    maxHeight?: string
     /** Tutup saat area gelap di luar panel diklik. */
     closeOnOverlay?: boolean
     /** Tutup saat tombol Escape ditekan. */
@@ -20,6 +22,7 @@ const props = withDefaults(
     title: '',
     description: '',
     size: 'md',
+    maxHeight: 'max-h-[90dvh] sm:max-h-[85vh]',
     closeOnOverlay: true,
     closeOnEscape: true,
   },
@@ -132,6 +135,7 @@ onBeforeUnmount(() => lockBodyScroll(false))
             :class="[
               'relative flex w-full flex-col overflow-hidden border border-brand-hair bg-brand-canvas shadow-floating',
               'rounded-t-card sm:rounded-card',
+              maxHeight,
               panelWidth,
             ]"
             @keydown="handleKeydown"
@@ -139,7 +143,7 @@ onBeforeUnmount(() => lockBodyScroll(false))
             <!-- Header -->
             <header
               v-if="title || $slots.header"
-              class="flex items-start justify-between gap-4 border-b border-brand-hairsoft px-5 py-4 sm:px-6 sm:py-5"
+              class="flex shrink-0 items-start justify-between gap-4 border-b border-brand-hairsoft px-5 py-3.5 sm:px-6 sm:py-4"
             >
               <slot name="header">
                 <div class="min-w-0">
@@ -162,14 +166,14 @@ onBeforeUnmount(() => lockBodyScroll(false))
             </header>
 
             <!-- Body -->
-            <div class="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+            <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6">
               <slot />
             </div>
 
             <!-- Footer -->
             <footer
               v-if="$slots.footer"
-              class="flex flex-col-reverse gap-2 border-t border-brand-hairsoft px-5 py-4 sm:flex-row sm:justify-end sm:px-6"
+              class="flex shrink-0 flex-col-reverse gap-2 border-t border-brand-hairsoft px-5 py-3 sm:flex-row sm:justify-end sm:px-6"
             >
               <slot name="footer" />
             </footer>

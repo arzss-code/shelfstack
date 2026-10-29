@@ -52,6 +52,9 @@ const placedOrderSnapshot = ref<{
   items: typeof cartStore.items
   totalItems: number
   totalPriceFormatted: string
+  discountFormatted?: string | null
+  couponCode?: string | null
+  finalPriceFormatted?: string
 } | null>(null)
 
 const displayItems = computed(() => placedOrderSnapshot.value?.items ?? cartStore.items)
@@ -61,6 +64,24 @@ const displayTotalItems = computed(
 const displayTotalPrice = computed(
   () => placedOrderSnapshot.value?.totalPriceFormatted ?? cartStore.formattedTotalPrice,
 )
+const displayDiscountAmount = computed(() => {
+  if (placedOrderSnapshot.value) {
+    return placedOrderSnapshot.value.discountFormatted
+  }
+  return cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null
+})
+const displayCouponCode = computed(() => {
+  if (placedOrderSnapshot.value) {
+    return placedOrderSnapshot.value.couponCode
+  }
+  return cartStore.appliedCoupon?.code || null
+})
+const displayFinalPrice = computed(() => {
+  if (placedOrderSnapshot.value) {
+    return (placedOrderSnapshot.value as any).finalPriceFormatted
+  }
+  return cartStore.formattedFinalPrice
+})
 
 const submitButtonLabel = computed(() => {
   if (isOrderPlaced.value) {
@@ -160,6 +181,10 @@ const handleCreateOrder = async () => {
         postal: address.value.postal.trim(),
         note: address.value.note ? address.value.note.trim() : undefined,
       },
+      coupon_code:
+        cartStore.appliedCoupon && cartStore.isCouponValidForCurrentSubtotal
+          ? cartStore.appliedCoupon.code
+          : undefined,
     }
 
     // Gunakan Idempotency-Key persisten per logical attempt untuk mencegah order ganda
@@ -181,6 +206,9 @@ const handleCreateOrder = async () => {
       items: [...cartStore.items],
       totalItems: cartStore.totalItems,
       totalPriceFormatted: cartStore.formattedTotalPrice,
+      discountFormatted: cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null,
+      couponCode: cartStore.appliedCoupon?.code || null,
+      finalPriceFormatted: cartStore.formattedFinalPrice,
     }
     isOrderPlaced.value = true
 
@@ -543,15 +571,15 @@ const handleCreateOrder = async () => {
         </div>
 
         <!-- Items Preview Scrollable -->
-        <div class="max-h-64 overflow-y-auto divide-y divide-brand-hairsoft pr-1">
+        <div class="max-h-72 overflow-y-auto divide-y divide-brand-hairsoft pr-1">
           <div
             v-for="item in displayItems"
             :key="`${item.productId}-${item.color}-${item.material}`"
-            class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs"
+            class="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs"
           >
-            <div class="flex items-center gap-3 min-w-0">
+            <div class="flex items-center gap-3.5 min-w-0">
               <div
-                class="w-12 h-12 rounded-field bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center"
+                class="relative w-14 h-14 rounded-card bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center shadow-2xs"
               >
                 <img
                   v-if="item.imageUrl"
@@ -560,17 +588,34 @@ const handleCreateOrder = async () => {
                   class="w-full h-full object-cover"
                 />
                 <i v-else class="pi pi-image text-brand-faint text-sm" />
+                <span
+                  class="absolute -top-1 -right-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-brand-ink px-1 text-[9.5px] font-bold text-white shadow-whisper"
+                >
+                  {{ item.quantity }}
+                </span>
               </div>
               <div class="min-w-0">
-                <p class="font-semibold text-brand-ink m-0 truncate">
+                <p
+                  class="font-medium text-xs sm:text-[13px] text-brand-ink m-0 leading-snug truncate"
+                >
                   {{ item.name }}
                 </p>
-                <p class="text-[10.5px] text-brand-muted m-0">
-                  {{ item.quantity }}x @ {{ formatRupiah(item.price) }}
+                <p
+                  v-if="item.color || item.material"
+                  class="text-[10.5px] text-brand-muted m-0 mt-0.5 line-clamp-1"
+                >
+                  <span v-if="item.color">{{ item.color }}</span>
+                  <span v-if="item.color && item.material"> · </span>
+                  <span v-if="item.material">{{ item.material }}</span>
+                </p>
+                <p class="text-[11px] text-brand-muted m-0 mt-0.5 tabular-nums">
+                  {{ item.quantity }} &times; {{ formatRupiah(item.price) }}
                 </p>
               </div>
             </div>
-            <span class="font-bold text-brand-ink tabular-nums shrink-0">
+            <span
+              class="font-display font-bold text-xs sm:text-[13px] text-brand-ink tabular-nums shrink-0 text-right"
+            >
               {{ formatRupiah(item.price * item.quantity) }}
             </span>
           </div>
@@ -578,11 +623,24 @@ const handleCreateOrder = async () => {
 
         <!-- Bill Details -->
         <div class="pt-4 border-t border-brand-hairsoft space-y-2.5 text-xs text-brand-muted">
+          <div v-if="!isOrderPlaced" class="pb-2 border-b border-brand-hairsoft">
+            <CartCouponInput compact />
+          </div>
+
           <div class="flex items-center justify-between">
             <span>Subtotal Produk</span>
             <span class="font-semibold text-brand-ink tabular-nums">
               {{ displayTotalPrice }}
             </span>
+          </div>
+          <div
+            v-if="displayDiscountAmount"
+            class="flex items-center justify-between text-brand-success-text font-medium"
+          >
+            <span>
+              Diskon Voucher Promo {{ displayCouponCode ? '(' + displayCouponCode + ')' : '' }}
+            </span>
+            <span class="font-bold tabular-nums"> -{{ displayDiscountAmount }} </span>
           </div>
           <div class="flex items-center justify-between">
             <span>Biaya Pengiriman</span>
@@ -595,7 +653,7 @@ const handleCreateOrder = async () => {
           <div class="pt-3 border-t border-brand-hairsoft flex items-center justify-between">
             <span class="font-display font-bold text-sm text-brand-ink">Total Tagihan</span>
             <span class="font-display text-xl font-bold text-brand-ink tabular-nums">
-              {{ displayTotalPrice }}
+              {{ displayFinalPrice }}
             </span>
           </div>
         </div>

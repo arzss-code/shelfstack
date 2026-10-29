@@ -4,12 +4,14 @@ import AppFooter from '~/components/AppFooter.vue'
 import CartDrawer from '~/features/cart/components/CartDrawer.vue'
 import { useCartStore } from '~/features/cart/stores/cart'
 import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
+import { useNotificationStore } from '~/features/notifications/stores/notifications'
 
-// Sinkron ulang keranjang & wishlist dari localStorage / database setiap mount layout.
+// Sinkron ulang keranjang, wishlist, & notifikasi setiap mount layout.
 // Di Nuxt 4 SSR, hidrasi browser memerlukan pemulihan state persisten pada lifecycle onMounted.
 onMounted(() => {
   useCartStore().initCart()
   useWishlistStore().initWishlist()
+  useNotificationStore().initNotifications()
 })
 </script>
 

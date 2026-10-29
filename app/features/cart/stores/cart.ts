@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { formatRupiah } from '~/utils/format'
+import type { DiscountType } from '~~/shared/schemas/coupon'
 
 export interface CartItem {
   productId: number
@@ -14,10 +15,24 @@ export interface CartItem {
   material?: string
 }
 
+export interface AppliedCoupon {
+  code: string
+  name: string
+  description?: string | null
+  discount_type: DiscountType
+  discount_value: number
+  max_discount_cents?: number | null
+  min_purchase_cents: number
+  discount_cents: number
+  formatted_discount: string
+}
+
 const STORAGE_KEY = 'shelfstack-cart'
+const COUPON_STORAGE_KEY = 'shelfstack-applied-coupon'
 
 export const useCartStore = defineStore('cart', () => {
   const items = ref<CartItem[]>([])
+  const appliedCoupon = ref<AppliedCoupon | null>(null)
   const isDrawerOpen = ref(false)
 
   // Inisialisasi dari LocalStorage (Client-only)
@@ -34,6 +49,15 @@ export const useCartStore = defineStore('cart', () => {
       } catch (e) {
         console.error('Failed to parse cart from localStorage:', e)
       }
+
+      try {
+        const storedCoupon = localStorage.getItem(COUPON_STORAGE_KEY)
+        if (storedCoupon) {
+          appliedCoupon.value = JSON.parse(storedCoupon)
+        }
+      } catch (e) {
+        console.error('Failed to parse applied coupon from localStorage:', e)
+      }
     }
   }
 
@@ -44,6 +68,20 @@ export const useCartStore = defineStore('cart', () => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items.value))
       } catch (e) {
         console.error('Failed to save cart to localStorage:', e)
+      }
+    }
+  }
+
+  const saveCoupon = () => {
+    if (import.meta.client) {
+      try {
+        if (appliedCoupon.value) {
+          localStorage.setItem(COUPON_STORAGE_KEY, JSON.stringify(appliedCoupon.value))
+        } else {
+          localStorage.removeItem(COUPON_STORAGE_KEY)
+        }
+      } catch (e) {
+        console.error('Failed to save coupon to localStorage:', e)
       }
     }
   }
@@ -72,6 +110,45 @@ export const useCartStore = defineStore('cart', () => {
 
   const isEmpty = computed(() => items.value.length === 0)
 
+  // Kalkulasi Diskon Voucher Dinamis
+  const discountCents = computed(() => {
+    if (!appliedCoupon.value || items.value.length === 0) return 0
+    const subtotal = totalPriceCents.value
+
+    // Jika subtotal belum mencapai minimum belanja kupon, diskon menjadi 0
+    if (
+      appliedCoupon.value.min_purchase_cents > 0 &&
+      subtotal < appliedCoupon.value.min_purchase_cents
+    ) {
+      return 0
+    }
+
+    if (appliedCoupon.value.discount_type === 'percentage') {
+      let d = Math.floor((subtotal * appliedCoupon.value.discount_value) / 100)
+      if (
+        appliedCoupon.value.max_discount_cents != null &&
+        d > appliedCoupon.value.max_discount_cents
+      ) {
+        d = appliedCoupon.value.max_discount_cents
+      }
+      return Math.min(d, subtotal)
+    }
+
+    return Math.min(appliedCoupon.value.discount_value, subtotal)
+  })
+
+  const discountAmount = computed(() => discountCents.value / 100)
+  const formattedDiscountAmount = computed(() => formatRupiah(discountAmount.value))
+
+  const finalPriceCents = computed(() => Math.max(0, totalPriceCents.value - discountCents.value))
+  const finalPrice = computed(() => finalPriceCents.value / 100)
+  const formattedFinalPrice = computed(() => formatRupiah(finalPrice.value))
+
+  const isCouponValidForCurrentSubtotal = computed(() => {
+    if (!appliedCoupon.value) return false
+    return totalPriceCents.value >= appliedCoupon.value.min_purchase_cents
+  })
+
   // Actions
   const openDrawer = () => {
     isDrawerOpen.value = true
@@ -83,6 +160,16 @@ export const useCartStore = defineStore('cart', () => {
 
   const toggleDrawer = () => {
     isDrawerOpen.value = !isDrawerOpen.value
+  }
+
+  const applyCoupon = (coupon: AppliedCoupon) => {
+    appliedCoupon.value = coupon
+    saveCoupon()
+  }
+
+  const removeCoupon = () => {
+    appliedCoupon.value = null
+    saveCoupon()
   }
 
   const addItem = (payload: {
@@ -177,23 +264,35 @@ export const useCartStore = defineStore('cart', () => {
 
   const clearCart = () => {
     items.value = []
+    appliedCoupon.value = null
     if (import.meta.client) {
       localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(COUPON_STORAGE_KEY)
     }
   }
 
   return {
     items,
+    appliedCoupon,
     isDrawerOpen,
     totalItems,
     totalPrice,
     totalPriceCents,
     formattedTotalPrice,
+    discountCents,
+    discountAmount,
+    formattedDiscountAmount,
+    finalPriceCents,
+    finalPrice,
+    formattedFinalPrice,
+    isCouponValidForCurrentSubtotal,
     isEmpty,
     initCart,
     openDrawer,
     closeDrawer,
     toggleDrawer,
+    applyCoupon,
+    removeCoupon,
     addItem,
     updateQuantity,
     removeItem,
