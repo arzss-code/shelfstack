@@ -92,12 +92,8 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
       <span class="text-[11px] text-brand-muted">Estimasi &amp; Mitra Logistik</span>
     </div>
 
-    <!-- Service Options Radio Group -->
-    <div
-      role="radiogroup"
-      aria-label="Pilihan Layanan Pengiriman"
-      class="grid grid-cols-1 sm:grid-cols-2 gap-3"
-    >
+    <!-- Service Options Radio Group (Stacked Clean Cards) -->
+    <div role="radiogroup" aria-label="Pilihan Layanan Pengiriman" class="space-y-2.5">
       <div
         v-for="(svc, index) in servicesWithPricing"
         :key="svc.key"
@@ -105,69 +101,76 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
         :aria-checked="modelValue === svc.key"
         :tabindex="modelValue === svc.key ? 0 : -1"
         :data-testid="`shipping-option-${svc.key}`"
-        class="relative flex flex-col justify-between p-4 rounded-card border transition-all duration-200 cursor-pointer select-none text-left focus:outline-none focus:ring-2 focus:ring-brand-ink/20"
+        class="group relative flex items-start sm:items-center justify-between p-3.5 sm:p-4 rounded-card border transition-all duration-150 cursor-pointer select-none text-left focus:outline-none focus:ring-2 focus:ring-brand-ink/20"
         :class="[
           modelValue === svc.key
-            ? 'border-brand-ink ring-2 ring-brand-ink/10 bg-brand-canvas-soft/30'
-            : 'border-brand-hair hover:border-brand-ink/40 bg-white',
+            ? 'border-brand-ink bg-brand-canvas-soft/40 shadow-2xs ring-1 ring-brand-ink/10'
+            : 'border-brand-hair hover:border-brand-ink/40 bg-white hover:bg-brand-canvas-soft/20',
         ]"
         @click="selectService(svc.key)"
         @keydown="handleKeydown($event, index)"
       >
-        <div class="flex items-start justify-between gap-2">
-          <div class="flex items-center gap-2.5">
-            <!-- Custom Radio Circle Indicator -->
+        <div class="flex items-start sm:items-center gap-3.5 min-w-0 pr-3">
+          <!-- Refined Radio Button Indicator -->
+          <div
+            class="w-4.5 h-4.5 mt-0.5 sm:mt-0 rounded-full border flex items-center justify-center shrink-0 transition-all duration-150"
+            :class="[
+              modelValue === svc.key
+                ? 'border-2 border-brand-ink bg-white shadow-2xs'
+                : 'border border-brand-hair bg-white group-hover:border-brand-ink/60',
+            ]"
+          >
             <div
-              class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors"
-              :class="[
-                modelValue === svc.key
-                  ? 'border-brand-ink bg-brand-ink'
-                  : 'border-brand-hair bg-white',
-              ]"
-            >
-              <div v-if="modelValue === svc.key" class="w-1.5 h-1.5 rounded-full bg-white" />
-            </div>
-            <div>
-              <p class="font-display font-bold text-xs sm:text-sm text-brand-ink m-0 leading-tight">
-                {{ svc.name }}
-              </p>
-              <p class="text-[11px] text-brand-muted m-0 mt-0.5">Estimasi {{ svc.eta }}</p>
-            </div>
+              v-if="modelValue === svc.key"
+              class="w-2 h-2 rounded-full bg-brand-ink transition-transform duration-150 scale-100"
+            />
           </div>
 
-          <!-- Price or Free Badge -->
-          <div class="shrink-0 text-right">
-            <template v-if="svc.isFree">
-              <UiBadge label="Bebas Ongkir" variant="success" class="text-[10px]" />
-            </template>
-            <template v-else>
-              <span class="font-display font-bold text-xs sm:text-sm text-brand-ink tabular-nums">
-                {{ svc.formattedPrice }}
+          <!-- Service Info -->
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-display font-bold text-xs sm:text-sm text-brand-ink">
+                {{ svc.name }}
               </span>
-            </template>
+              <span class="text-xs text-brand-muted"> · {{ svc.eta }} </span>
+            </div>
+            <p class="text-xs text-brand-muted m-0 mt-0.5 leading-normal">
+              {{ svc.description }}
+            </p>
           </div>
         </div>
 
-        <p
-          class="text-[11px] text-brand-muted m-0 mt-3 pt-2.5 border-t border-brand-hairsoft leading-relaxed"
-        >
-          {{ svc.description }}
-        </p>
+        <!-- Price or Free Badge -->
+        <div class="shrink-0 text-right self-start sm:self-center">
+          <template v-if="svc.isFree">
+            <UiBadge label="Bebas Ongkir" variant="success" class="text-[11px]" />
+          </template>
+          <template v-else>
+            <span class="font-display font-bold text-xs sm:text-sm text-brand-ink tabular-nums">
+              {{ svc.formattedPrice }}
+            </span>
+          </template>
+        </div>
       </div>
     </div>
 
     <!-- Preferred Courier Pills -->
-    <div class="pt-2 border-t border-brand-hairsoft space-y-2.5">
+    <div class="pt-3 border-t border-brand-hairsoft space-y-2.5">
       <div class="flex items-center justify-between">
-        <label class="block text-xs font-semibold text-brand-ink"> Preferensi Mitra Kurir </label>
+        <div>
+          <label class="block text-xs font-semibold text-brand-ink">Preferensi Mitra Kurir</label>
+          <p class="text-[11px] text-brand-muted m-0">
+            Pilih kurir favorit Anda atau biarkan sistem memilihkan yang terbaik
+          </p>
+        </div>
         <span class="text-[11px] text-brand-muted">Opsional</span>
       </div>
 
-      <div class="flex flex-wrap gap-1.5" role="group" aria-label="Preferensi Kurir">
+      <div class="flex flex-wrap gap-2 pt-0.5" role="group" aria-label="Preferensi Kurir">
         <button
           type="button"
           data-testid="courier-chip-auto"
-          class="px-2.5 py-1 text-xs rounded-full border transition-colors cursor-pointer"
+          class="px-3 py-1.5 text-xs rounded-full border transition-all cursor-pointer flex items-center gap-1.5"
           :class="[
             selectedCourier === null || selectedCourier === ''
               ? 'border-brand-ink bg-brand-ink text-white font-medium shadow-2xs'
@@ -176,6 +179,10 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
           :disabled="disabled"
           @click="selectCourier(null)"
         >
+          <i
+            v-if="selectedCourier === null || selectedCourier === ''"
+            class="pi pi-check text-[10px]"
+          />
           Rekomendasi ShelfStack (Otomatis)
         </button>
         <button
@@ -183,7 +190,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
           :key="c.code"
           type="button"
           :data-testid="`courier-chip-${c.code}`"
-          class="px-2.5 py-1 text-xs rounded-full border transition-colors cursor-pointer"
+          class="px-3 py-1.5 text-xs rounded-full border transition-all cursor-pointer flex items-center gap-1.5"
           :class="[
             selectedCourier === c.code
               ? 'border-brand-ink bg-brand-ink text-white font-medium shadow-2xs'
@@ -192,6 +199,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
           :disabled="disabled"
           @click="selectCourier(c.code)"
         >
+          <i v-if="selectedCourier === c.code" class="pi pi-check text-[10px]" />
           {{ c.name.replace(' Express', '').replace(' Ekspres', '') }}
         </button>
       </div>
