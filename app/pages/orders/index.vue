@@ -3,6 +3,7 @@ import { useAuth } from '~/features/auth/composables/useAuth'
 import type { Database } from '~/types/database.types'
 import type { Order, OrderStatus } from '~/types/order'
 import OrderCard from '~/features/orders/components/OrderCard.vue'
+import ReviewFormModal from '~/components/product/ReviewFormModal.vue'
 import type { UiTabItem } from '~/components/ui/UiTabs.vue'
 import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import type { RealtimeChannel } from '@supabase/supabase-js'
@@ -35,6 +36,51 @@ const errorMsg = ref('')
 const activeTab = ref<string>('all')
 const searchQuery = ref('')
 const payingOrderId = ref<string | null>(null)
+
+// Review Modal & Item Picker States
+const isReviewModalOpen = ref(false)
+const isItemPickerOpen = ref(false)
+const selectedReviewOrder = ref<Order | null>(null)
+const selectedReviewProduct = ref<{ id: number | string; name: string } | null>(null)
+
+const handleOpenReview = (order: Order) => {
+  selectedReviewOrder.value = order
+  if (!order.items || order.items.length === 0) {
+    router.push(`/orders/${order.id}`)
+    return
+  }
+
+  if (order.items.length === 1 && order.items[0]) {
+    const item = order.items[0]
+    selectedReviewProduct.value = {
+      id: item.product_id,
+      name: item.product?.name || `Produk #${item.product_id}`,
+    }
+    isReviewModalOpen.value = true
+  } else {
+    isItemPickerOpen.value = true
+  }
+}
+
+const selectItemToReview = (item: {
+  product_id: number | string
+  product?: { name?: string } | null
+}) => {
+  isItemPickerOpen.value = false
+  selectedReviewProduct.value = {
+    id: item.product_id,
+    name: item.product?.name || `Produk #${item.product_id}`,
+  }
+  isReviewModalOpen.value = true
+}
+
+const handleReviewSuccess = () => {
+  toast.show({
+    severity: 'success',
+    summary: 'Ulasan Terkirim',
+    message: 'Terima kasih atas ulasan produk Anda.',
+  })
+}
 
 interface OrderStatusCounts {
   all: number
@@ -624,6 +670,7 @@ const resetFilters = () => {
         :is-paying="payingOrderId === order.id"
         @select="router.push(`/orders/${$event.id}`)"
         @pay="handlePayNow"
+        @review="handleOpenReview"
       />
 
       <!-- Infinite Scroll Trigger Sentinel -->
@@ -642,5 +689,54 @@ const resetFilters = () => {
         Semua pesanan telah ditampilkan
       </p>
     </div>
+
+    <!-- Modal Pemilihan Produk untuk Diulas (jika pesanan memiliki > 1 item) -->
+    <UiModal
+      v-model:visible="isItemPickerOpen"
+      title="Pilih Produk untuk Diulas"
+      description="Pilih salah satu produk dari pesanan ini yang ingin Anda berikan ulasan."
+      size="md"
+    >
+      <div v-if="selectedReviewOrder?.items" class="space-y-3 pt-2">
+        <div
+          v-for="item in selectedReviewOrder.items"
+          :key="item.id"
+          class="flex items-center justify-between gap-3 p-3 rounded-card border border-brand-hair hover:border-brand-ink transition-colors bg-brand-canvas"
+        >
+          <div class="flex items-center gap-3 min-w-0">
+            <div
+              class="w-12 h-12 rounded-media bg-brand-canvas-soft border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center"
+            >
+              <img
+                v-if="item.product?.image_url"
+                :src="item.product.image_url"
+                :alt="item.product.name"
+                class="w-full h-full object-cover"
+              />
+              <i v-else class="pi pi-box text-brand-faint text-lg" aria-hidden="true" />
+            </div>
+            <div class="min-w-0">
+              <p class="font-semibold text-xs sm:text-sm text-brand-ink m-0 truncate">
+                {{ item.product?.name || `Produk #${item.product_id}` }}
+              </p>
+              <p class="text-[11px] text-brand-muted m-0 mt-0.5">{{ item.qty }} barang</p>
+            </div>
+          </div>
+          <UiButton variant="outline" size="sm" icon="pi-pencil" @click="selectItemToReview(item)">
+            Ulas
+          </UiButton>
+        </div>
+      </div>
+    </UiModal>
+
+    <!-- Modal Tulis Ulasan Produk -->
+    <ReviewFormModal
+      v-if="selectedReviewProduct && selectedReviewOrder"
+      v-model="isReviewModalOpen"
+      :product-id="selectedReviewProduct.id"
+      :product-name="selectedReviewProduct.name"
+      :order-id="selectedReviewOrder.id"
+      @success="handleReviewSuccess"
+    />
   </div>
 </template>
