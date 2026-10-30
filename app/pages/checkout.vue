@@ -65,12 +65,17 @@ const {
         <span class="text-brand-ink font-semibold">Checkout</span>
       </nav>
 
-      <div class="flex items-center gap-2 text-[11px] text-brand-muted">
-        <span class="inline-flex items-center gap-1 font-semibold text-brand-ink">
-          <i class="pi pi-check-circle text-xs text-brand-ink" /> Checkout Aman
+      <div class="flex items-center gap-1.5 text-[11px]">
+        <span
+          class="inline-flex items-center gap-1.5 font-semibold text-brand-ink bg-white border border-brand-hair rounded-full px-2.5 py-0.5 shadow-2xs"
+        >
+          <i class="pi pi-check-circle text-xs text-brand-success" /> Checkout Aman
         </span>
-        <span>·</span>
-        <span>Enkripsi Midtrans 256-Bit</span>
+        <span
+          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-canvas-soft border border-brand-hair text-[10.5px] font-medium text-brand-muted"
+        >
+          <i class="pi pi-lock text-[10px]" /> Enkripsi Midtrans 256-Bit
+        </span>
       </div>
     </div>
 

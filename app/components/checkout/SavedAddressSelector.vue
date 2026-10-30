@@ -2,7 +2,9 @@
 import { ref, onMounted } from 'vue'
 import type { UserAddress, CreateAddressInput } from '~~/shared/schemas/address'
 import { createAddressSchema } from '~~/shared/schemas/address'
+import type { LocationSelection } from '~~/shared/schemas/location'
 import { useAddresses } from '~/composables/useAddresses'
+import LocationPickerModal from '~/components/checkout/LocationPickerModal.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -21,8 +23,15 @@ const { addresses, loading, error, fetchAddresses, saveAddress, selectDefault } 
 
 const isAddingNew = ref(false)
 const isSubmittingNew = ref(false)
+const isLocationModalOpen = ref(false)
 const addFormError = ref('')
 const formErrors = ref<Record<string, string>>({})
+
+const handleLocationSelect = (loc: LocationSelection) => {
+  const prefix = loc.type ? `${loc.type} ` : ''
+  newAddressForm.value.city = `${prefix}${loc.cityName}, ${loc.provinceName}`
+  newAddressForm.value.postal = loc.postalCode
+}
 
 const newAddressForm = ref<CreateAddressInput>({
   name: '',
@@ -237,6 +246,28 @@ const handleSaveNewAddress = async () => {
         />
       </div>
 
+      <!-- Master Location Picker Button -->
+      <div>
+        <label class="block text-xs font-semibold text-brand-ink mb-1">
+          Pilih Wilayah Resmi (Provinsi, Kota/Kabupaten &amp; Kode Pos)
+        </label>
+        <button
+          type="button"
+          data-testid="saved-address-location-picker-btn"
+          class="w-full flex items-center justify-between p-2.5 rounded-lg border border-brand-hair hover:border-brand-ink bg-brand-canvas-soft/40 hover:bg-white text-xs transition-colors cursor-pointer"
+          @click="isLocationModalOpen = true"
+        >
+          <span class="flex items-center gap-2 text-brand-muted truncate">
+            <i class="pi pi-map-marker text-brand-ink text-xs shrink-0" />
+            <span v-if="newAddressForm.city" class="text-brand-ink font-medium truncate">
+              {{ newAddressForm.city }} ({{ newAddressForm.postal || '-' }})
+            </span>
+            <span v-else>Pilih dari Master Data Wilayah Indonesia</span>
+          </span>
+          <span class="text-xs font-semibold text-brand-ink shrink-0 ml-2">Pilih Wilayah</span>
+        </button>
+      </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-semibold text-brand-ink mb-1">
@@ -408,5 +439,8 @@ const handleSaveNewAddress = async () => {
         </div>
       </div>
     </div>
+
+    <!-- Indonesian Administrative Address Master Data Selector Modal -->
+    <LocationPickerModal v-model="isLocationModalOpen" @select="handleLocationSelect" />
   </div>
 </template>

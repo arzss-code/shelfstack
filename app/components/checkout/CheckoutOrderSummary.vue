@@ -92,7 +92,7 @@ const emit = defineEmits<{
               class="text-[10.5px] text-brand-muted m-0 mt-0.5 truncate"
             >
               <span v-if="item.color">{{ item.color }}</span>
-              <span v-if="item.color && item.material"> · </span>
+              <span v-if="item.color && item.material">, </span>
               <span v-if="item.material">{{ item.material }}</span>
             </p>
             <p class="text-[11px] text-brand-muted m-0 mt-0.5 tabular-nums">

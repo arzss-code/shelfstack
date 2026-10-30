@@ -2,6 +2,30 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.22.0] - 2026-10-30
+
+### Master Data Alamat Wilayah Administratif Indonesia & Penghapusan Pemisah Titik Tengah (SHF-LOC-01)
+
+- **Master Data Wilayah Kemendagri & BPS**:
+  - `shared/data/locations/indonesia-regions.ts`: Master data komprehensif 38 Provinsi (termasuk 4 DOB baru Papua 2022: Papua Selatan, Papua Tengah, Papua Pegunungan, Papua Barat Daya) dan 535 Kota/Kabupaten resmi dengan pemetaan kode pos standar.
+  - Zero external dependency: Data terindeks cepat, tanpa latensi jaringan eksternal, dan tanpa dependensi API pihak ketiga.
+  - Helper functions teroptimasi: `getCitiesByProvince()`, `searchLocations()`, `getCityById()`.
+- **Server API & Schemas**:
+  - `shared/schemas/location.ts`: Schema validasi Zod `locationQuerySchema` dan `locationSelectionSchema`.
+  - `server/api/locations/index.get.ts`: Endpoint pencarian cepat dengan query filter dan cascading province ID.
+- **Frontend Master Location Picker**:
+  - `app/components/checkout/LocationPickerModal.vue` (290 baris, <= 300 baris): Modal interaktif dual-mode (Pencarian Cepat / Autocomplete + Pilihan Bertingkat Provinsi ke Kota/Kabupaten) dengan chip kota populer dan navigasi keyboard ramah aksesibilitas.
+  - `app/components/checkout/CheckoutAddressForm.vue`: Integrasi pemilih wilayah resmi satu sentuhan yang mengisi nama kota, provinsi, dan kode pos secara otomatis.
+  - `app/components/checkout/SavedAddressSelector.vue`: Integrasi pemilih wilayah resmi pada formulir penambahan alamat baru.
+- **Perbaikan UI/UX Typography & Penghapusan Pemisah Titik Tengah (Interpunct)**:
+  - Mengganti pemisah titik tengah mentah (`·`) pada opsi pengiriman dan rincian varian produk dengan pemisah tanda koma dan pill badge yang lebih clean dan terstruktur.
+  - Menata ulang badge "Checkout Aman" dan "Enkripsi Midtrans 256-Bit" pada header checkout dengan styling chip individual yang rapi dan konsisten.
+- **Testing & Quality Gates**:
+  - `tests/unit/location-master.spec.ts`: 7 unit tests mencakup kelengkapan 38 provinsi, pencarian autocomplete, dan mapping kode pos.
+  - `tests/unit/location-picker-modal.spec.ts`: 6 unit tests mencakup modal rendering, chip populer, tab cascading, dan keyboard navigation.
+  - `tests/unit/checkout-address-form.spec.ts`: 3 unit tests mencakup tombol pemilih master data, kartu wilayah terisi, dan auto-fill.
+  - 65 test files / 621 unit tests lolos 100%. TypeScript typecheck EXIT 0, ESLint 0 error.
+
 ## [0.21.0] - 2026-10-30
 
 ### Pilihan Layanan & Kalkulator Ongkir Checkout (SHF-SHP-01)

@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { UserAddress } from '~~/shared/schemas/address'
+import type { LocationSelection } from '~~/shared/schemas/location'
 import SavedAddressSelector from '~/components/checkout/SavedAddressSelector.vue'
+import LocationPickerModal from '~/components/checkout/LocationPickerModal.vue'
 
 interface AddressModel {
   name: string
@@ -35,10 +38,21 @@ const emit = defineEmits<{
   'select-saved': [saved: UserAddress]
 }>()
 
+const isLocationModalOpen = ref(false)
+
 const updateField = (field: keyof AddressModel, val: string) => {
   emit('update:modelValue', {
     ...props.modelValue,
     [field]: val,
+  })
+}
+
+const handleLocationSelect = (loc: LocationSelection) => {
+  const prefix = loc.type ? `${loc.type} ` : ''
+  emit('update:modelValue', {
+    ...props.modelValue,
+    city: `${prefix}${loc.cityName}, ${loc.provinceName}`,
+    postal: loc.postalCode,
   })
 }
 
@@ -113,11 +127,74 @@ const toggleSave = (e: Event) => {
         />
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Master Data Location Selector Button / Card -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-brand-ink">
+          Wilayah Pengiriman (Provinsi, Kota/Kabupaten &amp; Kode Pos)
+          <span class="text-red-500">*</span>
+        </label>
+
+        <div
+          v-if="modelValue.city"
+          class="p-3 rounded-xl border border-brand-hair bg-brand-canvas-soft/70 flex items-center justify-between gap-3 transition-colors"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div
+              class="w-8 h-8 rounded-lg bg-brand-ink text-white flex items-center justify-center shrink-0"
+            >
+              <i class="pi pi-map-marker text-xs" />
+            </div>
+            <div class="min-w-0">
+              <p class="font-display font-bold text-xs text-brand-ink m-0 truncate">
+                {{ modelValue.city }}
+              </p>
+              <p class="text-[11px] text-brand-muted m-0 mt-0.5">
+                Kode Pos:
+                <span class="font-mono font-medium text-brand-ink">{{
+                  modelValue.postal || '-'
+                }}</span>
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            data-testid="change-location-btn"
+            class="text-xs font-semibold text-brand-ink hover:underline shrink-0 px-2 py-1 rounded cursor-pointer"
+            @click="isLocationModalOpen = true"
+          >
+            Ubah
+          </button>
+        </div>
+
+        <button
+          v-else
+          type="button"
+          data-testid="open-location-picker-btn"
+          class="w-full flex items-center justify-between p-3.5 rounded-xl border border-dashed border-brand-hair hover:border-brand-ink bg-white hover:bg-brand-canvas-soft/30 transition-all text-left group cursor-pointer"
+          @click="isLocationModalOpen = true"
+        >
+          <div
+            class="flex items-center gap-2.5 text-brand-muted group-hover:text-brand-ink transition-colors"
+          >
+            <i class="pi pi-map-marker text-sm text-brand-ink" />
+            <span class="text-xs font-medium">Pilih Provinsi, Kota/Kabupaten &amp; Kode Pos</span>
+          </div>
+          <span class="inline-flex items-center gap-1 text-xs font-semibold text-brand-ink">
+            Cari Wilayah <i class="pi pi-chevron-right text-[10px]" />
+          </span>
+        </button>
+
+        <p v-if="errors.city || errors.postal" class="text-[11px] text-red-600 m-0">
+          {{ errors.city || errors.postal }}
+        </p>
+      </div>
+
+      <!-- Quick manual fine-tuning if needed -->
+      <div v-if="modelValue.city" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <!-- Kota / Kabupaten -->
         <div class="space-y-1">
-          <label class="block text-xs font-semibold text-brand-ink">
-            Kota / Kabupaten <span class="text-red-500">*</span>
+          <label class="block text-[11px] font-medium text-brand-muted">
+            Kota / Kabupaten (Tersimpan)
           </label>
           <UiInput
             :model-value="modelValue.city"
@@ -129,9 +206,7 @@ const toggleSave = (e: Event) => {
 
         <!-- Kode Pos -->
         <div class="space-y-1">
-          <label class="block text-xs font-semibold text-brand-ink">
-            Kode Pos <span class="text-red-500">*</span>
-          </label>
+          <label class="block text-[11px] font-medium text-brand-muted"> Kode Pos </label>
           <UiInput
             :model-value="modelValue.postal"
             placeholder="cth. 10220"
@@ -171,5 +246,8 @@ const toggleSave = (e: Event) => {
         </label>
       </div>
     </div>
+
+    <!-- Indonesian Administrative Address Master Data Selector Modal -->
+    <LocationPickerModal v-model="isLocationModalOpen" @select="handleLocationSelect" />
   </fieldset>
 </template>
