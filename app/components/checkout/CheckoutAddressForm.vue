@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { UserAddress } from '~~/shared/schemas/address'
-import type { LocationSelection } from '~~/shared/schemas/location'
+import type { AdministrativeSelection } from '~~/shared/schemas/location'
+import { formatCityDisplay } from '~~/shared/data/locations/indonesia-regions'
 import SavedAddressSelector from '~/components/checkout/SavedAddressSelector.vue'
 import LocationPickerModal from '~/components/checkout/LocationPickerModal.vue'
 
@@ -47,11 +48,11 @@ const updateField = (field: keyof AddressModel, val: string) => {
   })
 }
 
-const handleLocationSelect = (loc: LocationSelection) => {
-  const prefix = loc.type ? `${loc.type} ` : ''
+const handleLocationSelect = (loc: AdministrativeSelection) => {
+  const cleanCity = formatCityDisplay(loc.cityName)
   emit('update:modelValue', {
     ...props.modelValue,
-    city: `${prefix}${loc.cityName}, ${loc.provinceName}`,
+    city: `${cleanCity}, ${loc.provinceName}`,
     postal: loc.postalCode,
   })
 }
@@ -130,7 +131,7 @@ const toggleSave = (e: Event) => {
       <!-- Master Data Location Selector Button / Card -->
       <div class="space-y-1.5">
         <label class="block text-xs font-semibold text-brand-ink">
-          Wilayah Pengiriman (Provinsi, Kota/Kabupaten &amp; Kode Pos)
+          Wilayah Pengiriman (Provinsi, Kota, Kecamatan &amp; Kode Pos)
           <span class="text-red-500">*</span>
         </label>
 
@@ -177,7 +178,7 @@ const toggleSave = (e: Event) => {
             class="flex items-center gap-2.5 text-brand-muted group-hover:text-brand-ink transition-colors"
           >
             <i class="pi pi-map-marker text-sm text-brand-ink" />
-            <span class="text-xs font-medium">Pilih Provinsi, Kota/Kabupaten &amp; Kode Pos</span>
+            <span class="text-xs font-medium">Pilih Provinsi, Kota, Kecamatan &amp; Kode Pos</span>
           </div>
           <span class="inline-flex items-center gap-1 text-xs font-semibold text-brand-ink">
             Cari Wilayah <i class="pi pi-chevron-right text-[10px]" />

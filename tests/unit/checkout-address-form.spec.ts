@@ -29,7 +29,7 @@ describe('CheckoutAddressForm', () => {
 
     const openBtn = wrapper.find('[data-testid="open-location-picker-btn"]')
     expect(openBtn.exists()).toBe(true)
-    expect(openBtn.text()).toContain('Pilih Provinsi, Kota/Kabupaten & Kode Pos')
+    expect(openBtn.text()).toContain('Pilih Provinsi, Kota, Kecamatan & Kode Pos')
   })
 
   it('renders filled location card and Ubah button when city is populated', () => {
@@ -76,10 +76,12 @@ describe('CheckoutAddressForm', () => {
     await modal.vm.$emit('select', {
       provinceId: '31',
       provinceName: 'DKI Jakarta',
-      cityId: '3174',
-      cityName: 'Jakarta Selatan',
-      type: 'Kota',
-      postalCode: '12110',
+      cityId: '31.74',
+      cityName: 'Kota Jakarta Selatan',
+      districtId: '31.74.01',
+      districtName: 'Tebet',
+      postalCode: '12810',
+      displayLabel: 'Tebet, Kota Jakarta Selatan, DKI Jakarta (12810)',
     })
 
     const emitted = wrapper.emitted('update:modelValue')
@@ -87,7 +89,7 @@ describe('CheckoutAddressForm', () => {
     expect(emitted![0]![0]).toEqual({
       ...defaultAddress,
       city: 'Kota Jakarta Selatan, DKI Jakarta',
-      postal: '12110',
+      postal: '12810',
     })
   })
 })

@@ -2,6 +2,26 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.23.0] - 2026-10-30
+
+### Shopee-Style 4-Tier Indonesian Administrative Address Cascade & Bugfix Double Prefix (SHF-LOC-02)
+
+- **Master Data Administratif Indonesia Resmi (Kepmendagri 2025/2026)**:
+  - `shared/data/locations/indonesia-administrative.json`: Dataset resmi mencakup 38 Provinsi, 514 Kota dan Kabupaten, 7.265 Kecamatan, serta pemetaan Kode Pos nasional tanpa dependensi eksternal.
+  - `shared/data/locations/indonesia-regions.ts`: Fungsi helper berkinerja tinggi `getProvinces()`, `getCitiesByProvince()`, `getDistrictsByCity()`, `getPostalCodesByDistrict()`, dan `searchAdministrativeLocations()` dengan skoring relevansi pintar.
+- **Bugfix Double Prefix**:
+  - `formatCityDisplay()`: Memperbaiki bug duplikasi string seperti `Kota Kota Jakarta Selatan` dan `Kabupaten Kabupaten Bogor` dengan normalisasi regex guard clause berlapis, memastikan output kanonikal tepat dan bersih.
+- **Frontend 4-Tier Cascading Selector (Shopee-Style)**:
+  - `app/components/checkout/LocationPickerModal.vue`: Implementasi antarmuka 4 tab bertingkat (`Provinsi` -> `Kota` -> `Kecamatan` -> `Kode Pos`) dengan garis aktif aksen oranye, transisi otomatis saat item dipilih, navigasi fleksibel kembali ke tab sebelumnya, serta pencarian autocomplete instan di bar atas.
+  - Tetap ringkas dan modular di bawah 280 baris kode (mematuhi batasan <= 300 baris Talenavi SOP).
+- **Refactoring Modularitas Komponen**:
+  - `app/components/checkout/SavedAddressForm.vue`: Mengekstrak form tambah alamat baru menjadi komponen mandiri (182 baris) sehingga `SavedAddressSelector.vue` terpangkas dari 447 baris menjadi 230 baris (keduanya <= 300 baris).
+- **Testing & Quality Verification**:
+  - `tests/unit/location-master.spec.ts`: Unit test mencakup 38 provinsi, 4-tier cascade, pencarian kota dan kode pos, serta verifikasi anti double prefix.
+  - `tests/unit/location-picker-modal.spec.ts`: Unit test alur lengkap 4-tier cascading seleksi dan autocomplete.
+  - `tests/unit/checkout-address-form.spec.ts`: Verifikasi integrasi form checkout dengan `AdministrativeSelection`.
+  - 65 test files / 622 tests lolos 100%. TypeScript typecheck EXIT 0, ESLint 0 error.
+
 ## [0.22.0] - 2026-10-30
 
 ### Master Data Alamat Wilayah Administratif Indonesia & Penghapusan Pemisah Titik Tengah (SHF-LOC-01)

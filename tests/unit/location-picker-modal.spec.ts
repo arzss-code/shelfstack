@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import LocationPickerModal from '~/components/checkout/LocationPickerModal.vue'
 
-describe('LocationPickerModal Component (SHF-LOC-01)', () => {
+describe('LocationPickerModal Component (Shopee-Style 4-Tier Cascade)', () => {
   const mountComponent = (props = {}) => {
     return mount(LocationPickerModal, {
       props: {
@@ -22,43 +22,77 @@ describe('LocationPickerModal Component (SHF-LOC-01)', () => {
     expect(wrapper.find('[data-testid="location-picker-modal"]').exists()).toBe(false)
   })
 
-  it('renders modal header, search input, and popular chips when modelValue is true', () => {
+  it('renders modal header, search input, and 4 Shopee cascading tabs', () => {
     const wrapper = mountComponent({ modelValue: true })
 
-    expect(wrapper.text()).toContain('Pilih Kota atau Kabupaten')
-    expect(wrapper.text()).toContain('38 Provinsi & 514 Kota/Kabupaten')
+    expect(wrapper.text()).toContain('Pilih Alamat Administratif')
     expect(wrapper.find('[data-testid="location-search-input"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain('Jakarta Selatan')
-    expect(wrapper.text()).toContain('Bandung')
+    expect(wrapper.find('[data-testid="tab-province"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="tab-city"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="tab-district"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="tab-postal"]').exists()).toBe(true)
   })
 
-  it('searches cities dynamically and displays results', async () => {
+  it('performs 4-tier cascading selection: Provinsi -> Kota -> Kecamatan -> Kode Pos', async () => {
     const wrapper = mountComponent({ modelValue: true })
 
-    const input = wrapper.find('[data-testid="location-search-input"]')
-    await input.setValue('Bandung')
+    // Step 1: Click DKI JAKARTA in Provinsi tab
+    const provBtn = wrapper.find('[data-testid="province-item-31"]')
+    expect(provBtn.exists()).toBe(true)
+    await provBtn.trigger('click')
 
-    expect(wrapper.text()).toContain('Kota Bandung')
-    expect(wrapper.text()).toContain('Jawa Barat')
-  })
+    // Automatically advances to Kota tab
+    expect(wrapper.find('[data-testid="tab-city"]').classes()).toContain('text-orange-600')
+    const jakselBtn = wrapper.find('[data-testid="city-item-31.74"]')
+    expect(jakselBtn.exists()).toBe(true)
 
-  it('emits select event with structured location data when city is chosen', async () => {
-    const wrapper = mountComponent({ modelValue: true })
+    // Step 2: Click Kota Jakarta Selatan
+    await jakselBtn.trigger('click')
 
-    const input = wrapper.find('[data-testid="location-search-input"]')
-    await input.setValue('Bandung')
+    // Automatically advances to Kecamatan tab
+    expect(wrapper.find('[data-testid="tab-district"]').classes()).toContain('text-orange-600')
+    const tebetBtn = wrapper.find('[data-testid="district-item-31.74.01"]')
+    expect(tebetBtn.exists()).toBe(true)
 
-    const bandungResult = wrapper.find('[data-testid="city-result-3273"]')
-    expect(bandungResult.exists()).toBe(true)
-    await bandungResult.trigger('click')
+    // Step 3: Click Tebet
+    await tebetBtn.trigger('click')
 
+    // Automatically advances to Kode Pos tab
+    expect(wrapper.find('[data-testid="tab-postal"]').classes()).toContain('text-orange-600')
+    const postalBtn = wrapper.find('[data-testid="postal-item-12810"]')
+    expect(postalBtn.exists()).toBe(true)
+
+    // Step 4: Click Postal Code 12810
+    await postalBtn.trigger('click')
+
+    // Verifies emission of structured 4-tier location data
     expect(wrapper.emitted('select')).toBeTruthy()
-    const emittedData = wrapper.emitted('select')?.[0]?.[0] as any
-    expect(emittedData.cityName).toBe('Kota Bandung')
-    expect(emittedData.provinceName).toBe('Jawa Barat')
-    expect(emittedData.postalCode).toBe('40115')
+    const emitted = wrapper.emitted('select')?.[0]?.[0] as any
+    expect(emitted.provinceId).toBe('31')
+    expect(emitted.provinceName).toBe('DKI Jakarta')
+    expect(emitted.cityName).toBe('Kota Jakarta Selatan')
+    expect(emitted.districtName).toBe('Tebet')
+    expect(emitted.postalCode).toBe('12810')
 
     // Also emits update:modelValue to close modal
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false])
+  })
+
+  it('searches dynamically and selects result directly via autocomplete', async () => {
+    const wrapper = mountComponent({ modelValue: true })
+
+    const input = wrapper.find('[data-testid="location-search-input"]')
+    await input.setValue('Tebet')
+
+    const searchItems = wrapper.findAll('[data-testid="search-result-item"]')
+    expect(searchItems.length).toBeGreaterThan(0)
+    expect(searchItems[0]!.text()).toContain('Tebet')
+
+    await searchItems[0]!.trigger('click')
+
+    expect(wrapper.emitted('select')).toBeTruthy()
+    const emitted = wrapper.emitted('select')?.[0]?.[0] as any
+    expect(emitted.districtName).toBe('Tebet')
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false])
   })
 
@@ -69,30 +103,5 @@ describe('LocationPickerModal Component (SHF-LOC-01)', () => {
     await closeBtn.trigger('click')
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false])
-  })
-
-  it('allows switching to cascading tabs and browsing provinces', async () => {
-    const wrapper = mountComponent({ modelValue: true })
-
-    // Click tab Pilihan Bertingkat
-    const buttons = wrapper.findAll('button')
-    const cascadingTabBtn = buttons.find((b) => b.text().includes('Pilihan Bertingkat'))
-    expect(cascadingTabBtn).toBeDefined()
-    await cascadingTabBtn!.trigger('click')
-
-    expect(wrapper.text()).toContain('DKI Jakarta')
-    expect(wrapper.text()).toContain('Jawa Barat')
-    expect(wrapper.text()).toContain('Bali')
-
-    // Click DKI Jakarta
-    const updatedButtons = wrapper.findAll('button')
-    const dkiBtn = updatedButtons.find((b) => b.text().includes('DKI Jakarta'))
-    expect(dkiBtn).toBeDefined()
-    await dkiBtn!.trigger('click')
-
-    // Shows cities in DKI
-    expect(wrapper.text()).toContain('Kota Jakarta Pusat')
-    expect(wrapper.text()).toContain('Kota Jakarta Selatan')
-    expect(wrapper.text()).toContain('Kembali ke Daftar Provinsi')
   })
 })

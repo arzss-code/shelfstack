@@ -4,6 +4,9 @@ import {
   INDONESIA_CITIES,
   getCitiesByProvince,
   getCityById,
+  getDistrictsByCity,
+  getPostalCodesByDistrict,
+  formatCityDisplay,
   searchLocations,
   POPULAR_CITIES,
 } from '../../shared/data/locations/indonesia-regions'
@@ -39,11 +42,29 @@ describe('Indonesian Administrative Master Data (SHF-LOC-01)', () => {
   })
 
   it('finds city by unique ID', () => {
-    const jaksel = getCityById('3171')
+    const jaksel = getCityById('3174')
     expect(jaksel).toBeDefined()
     expect(jaksel?.name).toBe('Kota Jakarta Selatan')
     expect(jaksel?.provinceName).toBe('DKI Jakarta')
-    expect(jaksel?.postalCode).toBe('12110')
+  })
+
+  it('retrieves districts and postal codes within a city (4-tier cascade)', () => {
+    const jakselDistricts = getDistrictsByCity('31.74')
+    expect(jakselDistricts.length).toBeGreaterThan(0)
+    const tebet = jakselDistricts.find((d) => d.name === 'Tebet')
+    expect(tebet).toBeDefined()
+
+    const postalCodes = getPostalCodesByDistrict(tebet!.id)
+    expect(postalCodes).toContain('12810')
+  })
+
+  it('normalizes city names and prevents double prefix bug (formatCityDisplay)', () => {
+    expect(formatCityDisplay('Kota Kota Jakarta Selatan')).toBe('Kota Jakarta Selatan')
+    expect(formatCityDisplay('Kabupaten Kabupaten Bogor')).toBe('Kabupaten Bogor')
+    expect(formatCityDisplay('Kabupaten Kabupaten Bogor', 'Kabupaten')).toBe('Kabupaten Bogor')
+    expect(formatCityDisplay('Kab. Sleman')).toBe('Kabupaten Sleman')
+    expect(formatCityDisplay('Jakarta Selatan')).toBe('Kota Jakarta Selatan')
+    expect(formatCityDisplay('Sleman', 'Kabupaten')).toBe('Kabupaten Sleman')
   })
 
   it('performs case-insensitive fuzzy search by city name', () => {
