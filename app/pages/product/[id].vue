@@ -4,6 +4,7 @@ import { useCartStore } from '~/features/cart/stores/cart'
 import type { Product } from '~/types/product'
 import ProductGallery from '~/components/product/ProductGallery.vue'
 import ProductConfigurator from '~/components/product/ProductConfigurator.vue'
+import ProductReviewsSection from '~/components/product/ProductReviewsSection.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -145,13 +146,18 @@ const onBuyNow = (payload: { quantity: number; color: string; material: string }
     </div>
 
     <!-- Product Detail Hub -->
-    <div v-else-if="product" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-      <div class="lg:col-span-7">
-        <ProductGallery :product="product" />
+    <div v-else-if="product" class="space-y-12">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div class="lg:col-span-7">
+          <ProductGallery :product="product" />
+        </div>
+        <div class="lg:col-span-5">
+          <ProductConfigurator :product="product" @add-to-bag="onAddToBag" @buy-now="onBuyNow" />
+        </div>
       </div>
-      <div class="lg:col-span-5">
-        <ProductConfigurator :product="product" @add-to-bag="onAddToBag" @buy-now="onBuyNow" />
-      </div>
+
+      <!-- Product Reviews Section -->
+      <ProductReviewsSection :product-id="product.id" :product-name="product.name" />
     </div>
 
     <!-- Product Not Found View -->

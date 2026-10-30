@@ -2,6 +2,40 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.20.0] - 2026-10-30
+
+### Sistem Ulasan & Rating Produk Terverifikasi (Product Reviews & Ratings)
+
+- **Database Migrasi & Skema Transaksional**:
+  - Migrasi `supabase/migrations/20261122000001_product_reviews_and_ratings.sql` mendefinisikan tabel `public.product_reviews` dengan kolom `id`, `product_id`, `user_id`, `order_id`, `rating` (1-5), `review_text` (10-1000 karakter), dan soft-delete `deleted_at`.
+  - Constraint integritas unik `(product_id, user_id, order_id)` memastikan hanya satu ulasan per transaksi produk yang dapat diajukan.
+  - Partial performance index pada `product_reviews(product_id, rating)` dan `product_reviews(user_id)` dengan filter `deleted_at IS NULL`.
+  - PostgreSQL trigger function `recalculate_product_rating()` yang secara otomatis menghitung ulang rata-rata rating (`products.rating`) dan total ulasan (`products.review_count`) pada setiap operasi INSERT, UPDATE, atau soft-delete.
+  - Kebijakan RLS strict: pembacaan ulasan aktif diizinkan untuk semua peran (anon dan authenticated), pembuatan dan penghapusan ulasan hanya dapat dilakukan oleh pemilik akun (`auth.uid() = user_id`).
+- **Nitro Server API & Service Domain**:
+  - `shared/schemas/review.ts`: Skema validasi Zod untuk query parameter dan payload ulasan, utilitas masking privasi nama pengulas `formatReviewerName`, serta kalkulator agregasi distribusi bintang `calculateReviewStats`.
+  - `server/utils/review.ts`: Lapisan domain service untuk verifikasi eligibilitas pesanan tuntas (`completed`), pengambilan ulasan dengan pagination dan filter rating, serta pengelolaan soft delete.
+  - `GET /api/products/[id]/reviews`: Mengembalikan ulasan terpaginasi, ringkasan rating rata-rata, total ulasan, dan breakdown distribusi rating bintang (1-5).
+  - `GET /api/products/[id]/reviews/eligibility`: Memverifikasi apakah pengguna yang terautentikasi berhak memberikan ulasan berdasarkan riwayat pesanan `completed`.
+  - `POST /api/products/[id]/reviews`: Menerima ulasan baru dengan validasi kepemilikan transaksi pesanan.
+  - `DELETE /api/products/[id]/reviews/[reviewId]`: Mengizinkan pemilik ulasan melakukan soft-delete ulasan mereka.
+- **Frontend & Etalase Interaktif**:
+  - `app/types/review.ts`: Kontrak antarmuka TypeScript untuk entitas ulasan dan statistik.
+  - `app/components/product/ProductReviewsSection.vue`: Orkestrator bagian ulasan terpadu pada halaman `/product/[id]` dengan anchor `#reviews`, pagination adaptif, filter bintang, dan penanganan empty/loading state.
+  - `app/components/product/ReviewRatingSummary.vue`: Tampilan bento ringkasan skor rata-rata dengan progress bar distribusi bintang interaktif untuk filter 1-klik.
+  - `app/components/product/ReviewCard.vue`: Kartu ulasan bergaya Archival Gallery Modernist dengan sensor privasi nama (`Budi S.`), tanggal relatif terformat, dan rating bintang tanpa badge artifisial.
+  - `app/components/product/ReviewEligibilityCard.vue`: Kartu pemicu ulasan kontekstual untuk pembeli terverifikasi, pengguna yang sudah mengulas, atau pengunjung umum.
+  - `app/components/product/ReviewFormModal.vue`: Dialog modal interaktif berstandar aksesibilitas dengan star picker 1-5, textarea berpenghitung karakter (10-1000), penanganan error real-time, dan feedback toast.
+  - `app/pages/orders/[id].vue`: Integrasi tombol "Beri Ulasan" pada daftar barang belanja pesanan berstatus `completed`.
+  - `app/components/product/ProductConfigurator.vue`: Tautan rating bintang menuju anchor `#reviews` dengan smooth scrolling.
+- **Quality Gates & Tests**:
+  - `pnpm lint` 0 error / 0 warning.
+  - `nuxi typecheck` EXIT 0 tanpa error tipe data.
+  - 17 unit test di `tests/unit/review-schema.spec.ts`.
+  - 11 unit test di `tests/unit/api-reviews.spec.ts`.
+  - 18 unit test di `tests/unit/product-reviews-section.spec.ts`.
+  - Total test suite: 60 file / 570 test lolos 100%.
+
 ## [0.19.0] - 2026-10-28
 
 ### Sistem Kupon Promo, Halaman Publik Promo & Back-Office Admin (SHF-VOUCHER)

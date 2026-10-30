@@ -771,6 +771,67 @@ export type Database = {
         }
         Relationships: []
       }
+      product_reviews: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          order_id: string
+          order_item_id: string | null
+          product_id: number
+          rating: number
+          review_text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          order_id: string
+          order_item_id?: string | null
+          product_id: number
+          rating: number
+          review_text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          order_id?: string
+          order_item_id?: string | null
+          product_id?: number
+          rating?: number
+          review_text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'product_reviews_order_id_fkey'
+            columns: ['order_id']
+            isOneToOne: false
+            referencedRelation: 'orders'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'product_reviews_order_item_id_fkey'
+            columns: ['order_item_id']
+            isOneToOne: false
+            referencedRelation: 'order_items'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'product_reviews_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

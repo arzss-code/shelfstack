@@ -10,6 +10,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 import { useCartStore } from '~/features/cart/stores/cart'
 import type { ShippingCheckpoint } from '~~/shared/schemas/shipping'
 import OrderTrackingTimeline from '~/components/orders/OrderTrackingTimeline.vue'
+import ReviewFormModal from '~/components/product/ReviewFormModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -30,6 +31,19 @@ const isSilentChecking = ref(false)
 const isCancelModalOpen = ref(false)
 
 const isInvoiceModalOpen = ref(false)
+const isReviewModalOpen = ref(false)
+const selectedReviewProduct = ref<{ id: number | string; name: string } | null>(null)
+
+const openReviewModal = (item: {
+  product_id: number | string
+  product?: { name?: string } | null
+}) => {
+  selectedReviewProduct.value = {
+    id: item.product_id,
+    name: item.product?.name || `Produk #${item.product_id}`,
+  }
+  isReviewModalOpen.value = true
+}
 const errorMsg = ref('')
 
 const customerCheckpoints = ref<ShippingCheckpoint[]>([])
@@ -816,11 +830,21 @@ const getSegmentColor = (idx: number) => {
                   </div>
                 </div>
 
-                <span
-                  class="font-display font-bold text-xs sm:text-sm text-brand-ink tabular-nums shrink-0"
-                >
-                  {{ formatRupiah((item.price_cents * item.qty) / 100) }}
-                </span>
+                <div class="flex items-center gap-3 shrink-0">
+                  <span
+                    class="font-display font-bold text-xs sm:text-sm text-brand-ink tabular-nums"
+                  >
+                    {{ formatRupiah((item.price_cents * item.qty) / 100) }}
+                  </span>
+                  <UiButton
+                    v-if="order.status === 'completed'"
+                    variant="outline"
+                    size="sm"
+                    @click="openReviewModal(item)"
+                  >
+                    Beri Ulasan
+                  </UiButton>
+                </div>
               </article>
             </div>
           </div>
@@ -1086,5 +1110,14 @@ const getSegmentColor = (idx: number) => {
 
     <!-- Modal Invoice Resmi & Print Sheet -->
     <OrderInvoiceModal v-if="order" v-model:visible="isInvoiceModalOpen" :order="order" />
+
+    <!-- Modal Tulis Ulasan Produk -->
+    <ReviewFormModal
+      v-if="selectedReviewProduct"
+      v-model="isReviewModalOpen"
+      :product-id="selectedReviewProduct.id"
+      :product-name="selectedReviewProduct.name"
+      :order-id="order?.id || orderId"
+    />
   </div>
 </template>

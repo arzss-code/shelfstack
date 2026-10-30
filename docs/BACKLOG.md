@@ -88,6 +88,6 @@ Fitur berikut tercatat resmi belum diimplementasikan pada siklus berjalan (alasa
 6. ~~**Pusat Bantuan & FAQ**~~: ✅ **SELESAI 2026-10-30** (Halaman `/help` interaktif, tab kategori via `UiTabs`, pencarian FAQ, dan kebijakan pengembalian mandiri).
 7. **Live Chat CS**: Widget bantuan langsung (WhatsApp CS / web live chat).
 8. ~~**Halaman Perusahaan**~~: ✅ **SELESAI 2026-10-30** (Halaman kurasi `/about` dan formulir kontak interaktif `/contact` dengan validasi Zod).
-9. **Ulasan & Rating Pelanggan**: Review pasca-transaksi dan rating bintang nyata (bintang statis sudah dibersihkan).
+9. ~~**Ulasan & Rating Pelanggan**~~: ✅ **SELESAI 2026-10-30** (Tabel `public.product_reviews`, database trigger `recalculate_product_rating()`, endpoint Nitro GET/POST/DELETE, sensor privasi nama depan dan inisial `Budi S.`, modal ulasan interaktif pada order selesai dan detail produk, serta 46 unit test).
 10. **Infrastruktur BullMQ**: Worker antrean DLQ Redis untuk order expiry sweep (saat ini sweep direct endpoint).
 11. **Payment Gateway Live**: Transaksi nyata menggunakan kartu kredit/kartu debit live (saat ini Midtrans Sandbox).
