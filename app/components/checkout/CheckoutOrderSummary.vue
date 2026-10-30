@@ -43,7 +43,7 @@ const emit = defineEmits<{
 
 <template>
   <aside
-    class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-28"
+    class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 lg:sticky lg:top-36"
   >
     <!-- Header -->
     <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">

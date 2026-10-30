@@ -6,7 +6,7 @@ import CheckoutOrderSummary from '~/components/checkout/CheckoutOrderSummary.vue
 import CheckoutPaymentNotice from '~/components/checkout/CheckoutPaymentNotice.vue'
 
 useSeoMeta({
-  title: 'Selesaikan Pesanan - ShelfStack',
+  title: 'Checkout - ShelfStack',
   description:
     'Selesaikan pemesanan produk pilihan Anda dengan aman melalui gateway resmi Midtrans.',
 })
@@ -62,7 +62,7 @@ const {
           Keranjang
         </NuxtLink>
         <span class="text-brand-faint">/</span>
-        <span class="text-brand-ink font-semibold">Selesaikan Pesanan</span>
+        <span class="text-brand-ink font-semibold">Checkout</span>
       </nav>
 
       <div class="flex items-center gap-2 text-[11px] text-brand-muted">
@@ -76,9 +76,7 @@ const {
 
     <!-- Page Title -->
     <div>
-      <h1 class="font-display text-2xl sm:text-3xl font-bold text-brand-ink m-0">
-        Selesaikan Pesanan
-      </h1>
+      <h1 class="font-display text-2xl sm:text-3xl font-bold text-brand-ink m-0">Checkout</h1>
       <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1">
         Periksa alamat pengiriman dan opsi ekspedisi sebelum memproses pembayaran resmi Anda.
       </p>
@@ -136,7 +134,7 @@ const {
     </div>
 
     <!-- Checkout Main Content -->
-    <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <!-- Left Column: Delivery Form, Shipping Option, Payment Gateway -->
       <section class="lg:col-span-7 space-y-6" aria-labelledby="shipping-heading">
         <!-- Error Alert -->
