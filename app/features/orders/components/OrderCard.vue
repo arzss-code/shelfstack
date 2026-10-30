@@ -15,37 +15,36 @@ const props = withDefaults(
 const emit = defineEmits<{
   select: [order: Order]
   pay: [order: Order]
+  review: [order: Order]
 }>()
 
 const formatDate = (dateStr: string) => {
   try {
-    const date = new Date(dateStr)
     return new Intl.DateTimeFormat('id-ID', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    }).format(date)
+    }).format(new Date(dateStr))
   } catch {
     return dateStr
   }
 }
 
 const getStatusBadge = (status: OrderStatus) => {
-  switch (status) {
-    case 'paid':
-      return { variant: 'info' as const, label: 'Diproses' }
-    case 'shipped':
-      return { variant: 'info' as const, label: 'Dikirim' }
-    case 'completed':
-      return { variant: 'success' as const, label: 'Selesai' }
-    case 'cancelled':
-      return { variant: 'danger' as const, label: 'Dibatalkan' }
-    case 'pending':
-    default:
-      return { variant: 'warning' as const, label: 'Menunggu Pembayaran' }
+  const map: Record<
+    OrderStatus,
+    { variant: 'info' | 'success' | 'danger' | 'warning'; label: string }
+  > = {
+    paid: { variant: 'info', label: 'Diproses' },
+    shipped: { variant: 'info', label: 'Dikirim' },
+    completed: { variant: 'success', label: 'Selesai' },
+    cancelled: { variant: 'danger', label: 'Dibatalkan' },
+    refunded: { variant: 'danger', label: 'Dikembalikan' },
+    pending: { variant: 'warning', label: 'Menunggu Pembayaran' },
   }
+  return map[status] || map.pending
 }
 
 const totalItemsCount = computed(() => {
@@ -86,13 +85,12 @@ const currentLocationText = computed(() => {
 const formatCheckpointTime = (dateStr?: string) => {
   if (!dateStr) return ''
   try {
-    const d = new Date(dateStr)
     return new Intl.DateTimeFormat('id-ID', {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
       minute: '2-digit',
-    }).format(d)
+    }).format(new Date(dateStr))
   } catch {
     return dateStr
   }
@@ -204,7 +202,7 @@ const handleCardClick = () => {
       </div>
     </div>
 
-    <!-- Logistics & Tracking Strip (Informasi kurir, nomor resi, dan lokasi terkini paket) -->
+    <!-- Logistics & Tracking Strip -->
     <div
       v-if="order.tracking_number"
       class="bg-blue-50/40 border border-blue-100 rounded-field p-3 sm:p-3.5 text-xs space-y-2 transition-colors"
@@ -320,6 +318,16 @@ const handleCardClick = () => {
             icon="pi-compass"
           >
             Lacak
+          </UiButton>
+
+          <UiButton
+            v-if="order.status === 'completed'"
+            variant="outline"
+            size="sm"
+            icon="pi-star"
+            @click="emit('review', order)"
+          >
+            Beri Ulasan
           </UiButton>
 
           <UiButton

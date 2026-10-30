@@ -218,4 +218,25 @@ describe('OrderCard Component', () => {
     expect(buttonTexts).toContain('Lacak')
     expect(buttonTexts).toContain('Detail')
   })
+
+  it('renders "Beri Ulasan" button on completed order and emits review event when clicked', async () => {
+    const completedOrder: Order = {
+      ...mockOrderWithItems,
+      status: 'completed',
+    }
+
+    const wrapper = mount(OrderCard, {
+      props: { order: completedOrder },
+      global: { stubs: globalStubs },
+    })
+
+    const buttons = wrapper.findAll('.ui-button')
+    const reviewButton = buttons.find((b) => b.text().includes('Beri Ulasan'))
+    expect(reviewButton).toBeDefined()
+    expect(reviewButton?.exists()).toBe(true)
+
+    await reviewButton?.trigger('click')
+    expect(wrapper.emitted('review')).toBeTruthy()
+    expect(wrapper.emitted('review')?.[0]).toEqual([completedOrder])
+  })
 })

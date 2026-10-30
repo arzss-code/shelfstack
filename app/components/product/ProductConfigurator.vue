@@ -24,13 +24,9 @@ watch(
   () => props.product,
   () => {
     const firstColor = variants.value.colors[0]
-    if (firstColor) {
-      selectedColor.value = firstColor.name
-    }
+    if (firstColor) selectedColor.value = firstColor.name
     const firstOption = variants.value.options[0]
-    if (firstOption) {
-      selectedMaterial.value = firstOption.name
-    }
+    if (firstOption) selectedMaterial.value = firstOption.name
   },
   { immediate: true },
 )
@@ -127,8 +123,12 @@ const handleBuyNow = () => {
         {{ product.name }}
       </h1>
 
-      <!-- Reviews Social Proof / Curatorial Assurance -->
-      <div v-if="ratingValue" class="flex items-center gap-3 text-xs text-brand-muted">
+      <!-- Reviews Social Proof with Smooth Anchor Link -->
+      <a
+        v-if="ratingValue"
+        href="#reviews"
+        class="inline-flex items-center gap-3 text-xs text-brand-muted cursor-pointer hover:opacity-80 transition-opacity no-underline"
+      >
         <div
           class="inline-flex items-center gap-1 bg-brand-canvas-soft border border-brand-hair px-2.5 py-1 rounded-full"
         >
@@ -137,14 +137,18 @@ const handleBuyNow = () => {
           </div>
           <span class="font-bold text-brand-ink ml-1">{{ ratingValue.toFixed(1) }}</span>
         </div>
-        <span v-if="reviewCountValue">{{ reviewCountValue }} ulasan terverifikasi</span>
-      </div>
-      <div v-else class="flex items-center gap-2 text-xs text-brand-muted">
+        <span v-if="reviewCountValue">{{ reviewCountValue }} ulasan</span>
+      </a>
+      <a
+        v-else
+        href="#reviews"
+        class="inline-flex items-center gap-2 text-xs text-brand-muted cursor-pointer hover:opacity-80 transition-opacity no-underline"
+      >
         <i class="pi pi-verified text-brand-success text-xs" />
         <span class="font-medium text-brand-ink">Kurasi Fisik Terjamin</span>
         <span class="text-brand-faint">·</span>
         <span>ShelfStack Official</span>
-      </div>
+      </a>
     </div>
 
     <!-- Pricing Container -->
@@ -162,9 +166,9 @@ const handleBuyNow = () => {
     <!-- Configurator 1: Colorways -->
     <div class="space-y-2">
       <div class="flex items-center justify-between text-xs">
-        <span class="uppercase tracking-wider font-semibold text-brand-muted">
-          {{ variants.colorTitle }}
-        </span>
+        <span class="uppercase tracking-wider font-semibold text-brand-muted">{{
+          variants.colorTitle
+        }}</span>
         <span class="font-bold text-brand-ink">{{ selectedColor }}</span>
       </div>
       <div class="flex items-center gap-2.5">
@@ -190,9 +194,9 @@ const handleBuyNow = () => {
     <!-- Configurator 2: Material / Secondary Options -->
     <div class="space-y-2">
       <div class="flex items-center justify-between text-xs">
-        <span class="uppercase tracking-wider font-semibold text-brand-muted">
-          {{ variants.optionTitle }}
-        </span>
+        <span class="uppercase tracking-wider font-semibold text-brand-muted">{{
+          variants.optionTitle
+        }}</span>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <button
@@ -275,7 +279,7 @@ const handleBuyNow = () => {
         <WishlistButton :product="product" variant="inline" class="shrink-0" />
       </div>
 
-      <!-- Instant 1-Click Buy Action using UiButton (Clean Architectural Secondary) -->
+      <!-- Instant 1-Click Buy Action using UiButton -->
       <UiButton
         variant="outline"
         block
@@ -287,7 +291,7 @@ const handleBuyNow = () => {
       </UiButton>
     </div>
 
-    <!-- Fulfillment & Dispatch Assurance Strip (Deduplicated with Gallery) -->
+    <!-- Fulfillment & Dispatch Assurance Strip -->
     <div
       class="pt-4 border-t border-brand-hairsoft flex items-center justify-between text-xs text-brand-muted"
     >
