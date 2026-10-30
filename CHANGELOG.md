@@ -2,6 +2,35 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.21.0] - 2026-10-30
+
+### Pilihan Layanan & Kalkulator Ongkir Checkout (SHF-SHP-01)
+
+- **Database Migrasi & Skema Transaksional**:
+  - Migrasi `supabase/migrations/20261123000001_checkout_shipping_rates.sql` menambahkan kolom `shipping_service` (default 'reguler') dan `shipping_cost_cents` (default 0) pada tabel `public.orders`.
+  - Fungsi RPC atomik `public.create_order` diperbarui untuk memvalidasi dan menghitung tarif ongkir secara aman di sisi server Postgres (anti-tamper):
+    - Layanan Reguler (2-3 Hari Kerja): Rp 15.000 (Otomatis Bebas Ongkir Rp 0 jika subtotal belanja >= Rp 500.000).
+    - Layanan Kilat / Next Day (1 Hari Kerja): Rp 30.000.
+    - Layanan Instan / Sameday (Tiba Hari Ini): Rp 45.000.
+    - Layanan Kargo Ekonomis (4-7 Hari Kerja): Rp 25.000.
+  - Total pesanan akhir dihitung atomik: `v_total := greatest(0, v_subtotal - v_discount + v_shipping_cost)`.
+  - Sinkronisasi snapshot tagihan langsung ke transaksi Midtrans Snap (`gross_amount = order.total_cents / 100`).
+- **Server API & Schemas**:
+  - `shared/schemas/shipping.ts`: Enum `shippingServiceSchema`, metadata `shippingRateTiers`, dan fungsi murni `calculateShippingFee()`.
+  - `shared/schemas/order.ts`: Penambahan `shipping_service` dan `courier_code` pada `checkoutSchema`.
+  - `server/utils/idempotency.ts`: Penyertaan `shipping_service` ke dalam kalkulasi deterministik `calculateCheckoutHash()`.
+  - `POST /api/shipping/calculate`: Endpoint kalkulasi tarif ongkir publik untuk estimasi biaya pengiriman cepat.
+  - `server/api/orders/index.ts`: Meneruskan parameter opsi pengiriman ke pemanggilan RPC `create_order`.
+- **Frontend & Etalase Interaktif**:
+  - Komponen `app/components/checkout/ShippingMethodSelector.vue` (187 baris): Antarmuka pemilihan 4 layanan pengiriman bertingkat dengan radio card Archival Modernist, badge Bebas Ongkir dinamis, estimasi waktu tiba, chip mitra kurir pilihan (JNE, SiCepat, J&T, Anteraja, Pos), dan aksesibilitas WAI-ARIA `role="radiogroup"`.
+  - Halaman `app/pages/checkout.vue`: Integrasi pilihan kurir dengan kalkulasi ongkir reaktif pada ringkasan belanja, pengiriman parameter ke backend, dan pemeliharaan state snapshot pembayaran Midtrans.
+  - Halaman `app/pages/orders/[id].vue` & `OrderInvoiceModal.vue`: Penayangan baris rincian "Biaya Pengiriman" dengan nama layanan kurir pada rincian pesanan dan cetak invoice resmi.
+- **Quality Gates & Tests**:
+  - `tests/unit/shipping-calculator.spec.ts`: 25 unit tests (kalkulasi tarif 4 tier, threshold bebas ongkir, proteksi non-reguler, validasi schema, API endpoint).
+  - `tests/unit/shipping-selector.spec.ts`: 7 unit tests (render opsi, interaksi radio card, seleksi kurir, navigasi keyboard).
+  - Total test suite: 62 test files / 605 tests lolos 100%.
+  - `nuxi typecheck` EXIT 0 & `eslint .` 0 error.
+
 ## [0.20.0] - 2026-10-30
 
 ### Sistem Ulasan & Rating Produk Terverifikasi (Product Reviews & Ratings)

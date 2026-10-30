@@ -82,7 +82,7 @@ Fitur berikut tercatat resmi belum diimplementasikan pada siklus berjalan (alasa
 
 1. **Pusat Notifikasi**: In-app notification center & web push notifications.
 2. ~~**Wishlist**~~: ✅ **SELESAI 2026-10-26** (Penyimpanan favorit persisten `useWishlistStore`, `WishlistButton.vue`, badge navbar, `/wishlist`, dan integrasi keranjang).
-3. **Kalkulator Ongkir & Logistik**: Integrasi kurir ekspedisi real (RajaOngkir/Biteship), kalkulasi berat, dan pilihan layanan (saat ini flat gratis ongkir).
+3. ~~**Kalkulator Ongkir & Logistik**~~: ✅ **SELESAI 2026-10-30** (SHF-SHP-01: 4 tingkat layanan pengiriman bertingkat, kalkulasi ongkir server-side di RPC `create_order`, promo Bebas Ongkir belanja >= Rp 500.000, komponen `ShippingMethodSelector`, dan unit tests).
 4. **Lacak Pengiriman Ekspedisi**: Nomor resi kurir dan tracking perjalanan paket real-time (saat ini alur internal status pesanan).
 5. **Kupon Promo & Voucher**: Sistem kode voucher promosi di checkout (saat ini hanya diskon per-produk langsung).
 6. ~~**Pusat Bantuan & FAQ**~~: ✅ **SELESAI 2026-10-30** (Halaman `/help` interaktif, tab kategori via `UiTabs`, pencarian FAQ, dan kebijakan pengembalian mandiri).

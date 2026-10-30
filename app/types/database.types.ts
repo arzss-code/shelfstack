@@ -307,6 +307,8 @@ export type Database = {
           payment_type: string | null
           refunded_at: string | null
           shipped_at: string | null
+          shipping_cost_cents: number
+          shipping_service: string
           snap_token: string | null
           status: Database['public']['Enums']['order_status']
           total_cents: number
@@ -332,6 +334,8 @@ export type Database = {
           payment_type?: string | null
           refunded_at?: string | null
           shipped_at?: string | null
+          shipping_cost_cents?: number
+          shipping_service?: string
           snap_token?: string | null
           status?: Database['public']['Enums']['order_status']
           total_cents?: number
@@ -357,6 +361,8 @@ export type Database = {
           payment_type?: string | null
           refunded_at?: string | null
           shipped_at?: string | null
+          shipping_cost_cents?: number
+          shipping_service?: string
           snap_token?: string | null
           status?: Database['public']['Enums']['order_status']
           total_cents?: number
@@ -875,6 +881,8 @@ export type Database = {
           p_idempotency_key?: string | null
           p_request_hash?: string | null
           p_coupon_code?: string | null
+          p_shipping_service?: string | null
+          p_courier_code?: string | null
         }
         Returns: string
       }

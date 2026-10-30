@@ -7,6 +7,8 @@ import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import { useAddresses } from '~/composables/useAddresses'
 import type { UserAddress } from '~~/shared/schemas/address'
 import SavedAddressSelector from '~/components/checkout/SavedAddressSelector.vue'
+import ShippingMethodSelector from '~/components/checkout/ShippingMethodSelector.vue'
+import { type ShippingService, calculateShippingFee } from '~~/shared/schemas/shipping'
 
 const { user, profile } = useAuth()
 const cartStore = useCartStore()
@@ -47,6 +49,16 @@ const createdOrderId = ref<string | null>(null)
 const generalError = ref('')
 const checkoutIdempotencyKey = ref<string>('')
 
+// Layanan pengiriman dan preferensi kurir
+const selectedShippingService = ref<ShippingService>('reguler')
+const selectedCourierCode = ref<string | null>(null)
+
+const shippingFeeCalculation = computed(() => {
+  return calculateShippingFee(selectedShippingService.value, cartStore.totalPriceCents)
+})
+const shippingFeeCents = computed(() => shippingFeeCalculation.value.feeCents)
+const isFreeShipping = computed(() => shippingFeeCalculation.value.isFree)
+
 // Snapshot isi keranjang agar UI ringkasan dan preview item tetap utuh saat popup Midtrans dibuka
 const placedOrderSnapshot = ref<{
   items: typeof cartStore.items
@@ -54,6 +66,9 @@ const placedOrderSnapshot = ref<{
   totalPriceFormatted: string
   discountFormatted?: string | null
   couponCode?: string | null
+  shippingFeeFormatted?: string
+  shippingService?: string
+  isFreeShipping?: boolean
   finalPriceFormatted?: string
 } | null>(null)
 
@@ -76,11 +91,25 @@ const displayCouponCode = computed(() => {
   }
   return cartStore.appliedCoupon?.code || null
 })
+const displayShippingFeeFormatted = computed(() => {
+  if (placedOrderSnapshot.value?.shippingFeeFormatted) {
+    return placedOrderSnapshot.value.shippingFeeFormatted
+  }
+  return isFreeShipping.value ? 'Gratis Ongkir' : formatRupiah(shippingFeeCents.value / 100)
+})
+const displayIsFreeShipping = computed(() => {
+  if (placedOrderSnapshot.value) {
+    return placedOrderSnapshot.value.isFreeShipping ?? isFreeShipping.value
+  }
+  return isFreeShipping.value
+})
+
 const displayFinalPrice = computed(() => {
   if (placedOrderSnapshot.value) {
     return (placedOrderSnapshot.value as any).finalPriceFormatted
   }
-  return cartStore.formattedFinalPrice
+  const totalWithShipping = Math.max(0, cartStore.finalPriceCents + shippingFeeCents.value)
+  return formatRupiah(totalWithShipping / 100)
 })
 
 const submitButtonLabel = computed(() => {
@@ -121,7 +150,7 @@ const getOrCreateCheckoutKey = () => {
 // Reset Idempotency-Key jika user memodifikasi isi keranjang atau rincian alamat
 // sehingga checkout baru yang disengaja memiliki kunci baru dan terhindar dari conflict 409
 watch(
-  [() => cartStore.items, address],
+  [() => cartStore.items, address, selectedShippingService, selectedCourierCode],
   () => {
     checkoutIdempotencyKey.value = ''
   },
@@ -185,6 +214,8 @@ const handleCreateOrder = async () => {
         cartStore.appliedCoupon && cartStore.isCouponValidForCurrentSubtotal
           ? cartStore.appliedCoupon.code
           : undefined,
+      shipping_service: selectedShippingService.value,
+      courier_code: selectedCourierCode.value || undefined,
     }
 
     // Gunakan Idempotency-Key persisten per logical attempt untuk mencegah order ganda
@@ -208,7 +239,14 @@ const handleCreateOrder = async () => {
       totalPriceFormatted: cartStore.formattedTotalPrice,
       discountFormatted: cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null,
       couponCode: cartStore.appliedCoupon?.code || null,
-      finalPriceFormatted: cartStore.formattedFinalPrice,
+      shippingFeeFormatted: isFreeShipping.value
+        ? 'Gratis Ongkir'
+        : formatRupiah(shippingFeeCents.value / 100),
+      shippingService: selectedShippingService.value,
+      isFreeShipping: isFreeShipping.value,
+      finalPriceFormatted: formatRupiah(
+        Math.max(0, cartStore.finalPriceCents + shippingFeeCents.value) / 100,
+      ),
     }
     isOrderPlaced.value = true
 
@@ -521,6 +559,14 @@ const handleCreateOrder = async () => {
           </div>
         </fieldset>
 
+        <!-- Shipping Method Selector -->
+        <ShippingMethodSelector
+          v-model="selectedShippingService"
+          v-model:selected-courier="selectedCourierCode"
+          :subtotal-cents="cartStore.totalPriceCents"
+          :disabled="isSubmitting || isOrderPlaced"
+        />
+
         <!-- Payment Method Notice -->
         <div
           class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-3"
@@ -644,7 +690,15 @@ const handleCreateOrder = async () => {
           </div>
           <div class="flex items-center justify-between">
             <span>Biaya Pengiriman</span>
-            <span class="text-brand-success font-semibold">Gratis Ongkir</span>
+            <span
+              :class="[
+                displayIsFreeShipping
+                  ? 'text-brand-success font-semibold'
+                  : 'font-semibold text-brand-ink tabular-nums',
+              ]"
+            >
+              {{ displayShippingFeeFormatted }}
+            </span>
           </div>
           <div class="flex items-center justify-between">
             <span>Pajak PPN (11%)</span>

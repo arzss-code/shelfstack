@@ -79,6 +79,21 @@ const copyHeaderResi = async (resi?: string | null) => {
   }
 }
 
+const formatShippingServiceName = (service?: string | null) => {
+  if (!service) return 'Reguler'
+  switch (service.toLowerCase()) {
+    case 'express':
+      return 'Kilat / Next Day'
+    case 'instant':
+      return 'Instan / Sameday'
+    case 'cargo':
+      return 'Kargo'
+    case 'reguler':
+    default:
+      return 'Reguler'
+  }
+}
+
 const activeCheckpoints = computed(() => {
   if (customerCheckpoints.value.length > 0) {
     return customerCheckpoints.value
@@ -1008,8 +1023,25 @@ const getSegmentColor = (idx: number) => {
               >
             </div>
             <div class="flex items-center justify-between">
-              <span>Biaya Pengiriman</span>
-              <span class="text-brand-accent font-semibold">Gratis Ongkir</span>
+              <span>
+                Biaya Pengiriman
+                <span v-if="order.shipping_service" class="text-brand-muted font-normal">
+                  ({{ formatShippingServiceName(order.shipping_service) }})
+                </span>
+              </span>
+              <span
+                :class="[
+                  (order.shipping_cost_cents ?? 0) === 0
+                    ? 'text-brand-success font-semibold'
+                    : 'font-semibold text-brand-ink tabular-nums',
+                ]"
+              >
+                {{
+                  (order.shipping_cost_cents ?? 0) === 0
+                    ? 'Gratis Ongkir'
+                    : formatRupiah((order.shipping_cost_cents ?? 0) / 100)
+                }}
+              </span>
             </div>
             <div class="flex items-center justify-between">
               <span>Pajak PPN (11%)</span>
