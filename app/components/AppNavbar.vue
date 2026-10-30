@@ -134,7 +134,7 @@ const handleLogout = async () => {
           </p>
         </div>
         <div class="hidden sm:flex items-center gap-4 text-white/70 text-[11px]">
-          <NuxtLink to="/katalog" class="hover:text-white transition-colors no-underline">
+          <NuxtLink to="/help" class="hover:text-white transition-colors no-underline">
             Pusat Bantuan
           </NuxtLink>
           <NuxtLink to="/tracking" class="hover:text-white transition-colors no-underline">
@@ -537,6 +537,27 @@ const handleLogout = async () => {
           @click="isMobileMenuOpen = false"
         >
           Pesanan Saya
+        </NuxtLink>
+        <NuxtLink
+          to="/help"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+          @click="isMobileMenuOpen = false"
+        >
+          Pusat Bantuan
+        </NuxtLink>
+        <NuxtLink
+          to="/tracking"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+          @click="isMobileMenuOpen = false"
+        >
+          Lacak Pesanan
+        </NuxtLink>
+        <NuxtLink
+          to="/contact"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+          @click="isMobileMenuOpen = false"
+        >
+          Hubungi Kami
         </NuxtLink>
         <NuxtLink
           v-if="isAdmin"

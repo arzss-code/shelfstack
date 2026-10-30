@@ -13,7 +13,7 @@ const { isLoggedIn, isAdmin } = useAuth()
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-brand-ink-soft"
       >
         <!-- Brand Info Column -->
-        <div class="lg:col-span-5 flex flex-col items-start gap-4">
+        <div class="lg:col-span-4 flex flex-col items-start gap-4">
           <div class="flex items-center gap-3">
             <AppLogo variant="inverse" size="lg" />
           </div>
@@ -30,8 +30,8 @@ const { isLoggedIn, isAdmin } = useAuth()
           </div>
         </div>
 
-        <!-- Links Columns (Human-friendly e-commerce navigation) -->
-        <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-6">
+        <!-- Links Columns: 4 distinct columns (lg:col-span-8) -->
+        <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-6">
           <div class="flex flex-col gap-3">
             <span class="text-xs uppercase tracking-wider font-semibold text-white/50">
               Katalog
@@ -62,7 +62,7 @@ const { isLoggedIn, isAdmin } = useAuth()
                 Furnitur &amp; Meja
               </NuxtLink>
               <NuxtLink
-                to="/katalog"
+                to="/promos"
                 class="text-white/80 hover:text-white transition-colors no-underline"
               >
                 Promo &amp; Diskon
@@ -76,7 +76,7 @@ const { isLoggedIn, isAdmin } = useAuth()
             </span>
             <nav class="flex flex-col gap-2 text-sm" aria-label="Navigasi Bantuan">
               <NuxtLink
-                to="/katalog"
+                to="/help"
                 class="text-white/80 hover:text-white transition-colors no-underline"
               >
                 Pusat Bantuan
@@ -88,37 +88,69 @@ const { isLoggedIn, isAdmin } = useAuth()
                 Lacak Pesanan
               </NuxtLink>
               <NuxtLink
-                to="/katalog"
+                to="/contact"
                 class="text-white/80 hover:text-white transition-colors no-underline"
               >
-                Kebijakan Pengembalian
-              </NuxtLink>
-              <NuxtLink
-                to="/katalog"
-                class="text-white/80 hover:text-white transition-colors no-underline"
-              >
-                Informasi Pengiriman
+                Hubungi Kami
               </NuxtLink>
             </nav>
           </div>
 
           <div class="flex flex-col gap-3">
             <span class="text-xs uppercase tracking-wider font-semibold text-white/50">
-              Akun &amp; Toko
+              Kebijakan
             </span>
-            <nav class="flex flex-col gap-2 text-sm" aria-label="Navigasi Akun">
+            <nav class="flex flex-col gap-2 text-sm" aria-label="Navigasi Kebijakan">
+              <NuxtLink
+                to="/shipping"
+                class="text-white/80 hover:text-white transition-colors no-underline"
+              >
+                Informasi Pengiriman
+              </NuxtLink>
+              <NuxtLink
+                to="/returns"
+                class="text-white/80 hover:text-white transition-colors no-underline"
+              >
+                Kebijakan Retur &amp; Garansi
+              </NuxtLink>
+              <NuxtLink
+                to="/terms"
+                class="text-white/80 hover:text-white transition-colors no-underline"
+              >
+                Syarat &amp; Ketentuan
+              </NuxtLink>
+              <NuxtLink
+                to="/privacy"
+                class="text-white/80 hover:text-white transition-colors no-underline"
+              >
+                Kebijakan Privasi
+              </NuxtLink>
+            </nav>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <span class="text-xs uppercase tracking-wider font-semibold text-white/50">
+              Perusahaan
+            </span>
+            <nav class="flex flex-col gap-2 text-sm" aria-label="Navigasi Perusahaan">
+              <NuxtLink
+                to="/about"
+                class="text-white/80 hover:text-white transition-colors no-underline"
+              >
+                Tentang Kami
+              </NuxtLink>
               <template v-if="!isLoggedIn">
                 <NuxtLink
                   to="/auth/login"
                   class="text-white/80 hover:text-white transition-colors no-underline"
                 >
-                  Masuk
+                  Masuk Akun
                 </NuxtLink>
                 <NuxtLink
                   to="/auth/register"
                   class="text-white/80 hover:text-white transition-colors no-underline"
                 >
-                  Daftar Akun Baru
+                  Daftar Baru
                 </NuxtLink>
               </template>
               <template v-else>
@@ -150,24 +182,24 @@ const { isLoggedIn, isAdmin } = useAuth()
         </p>
         <div class="flex items-center gap-4">
           <NuxtLink
-            to="/katalog"
+            to="/help"
             class="text-white/60 hover:text-white transition-colors no-underline"
           >
-            Privasi
+            Pusat Bantuan
           </NuxtLink>
           <span class="w-1 h-1 rounded-full bg-white/40" />
           <NuxtLink
-            to="/katalog"
+            to="/terms"
             class="text-white/60 hover:text-white transition-colors no-underline"
           >
             Syarat &amp; Ketentuan
           </NuxtLink>
           <span class="w-1 h-1 rounded-full bg-white/40" />
           <NuxtLink
-            to="/katalog"
+            to="/privacy"
             class="text-white/60 hover:text-white transition-colors no-underline"
           >
-            Bantuan
+            Kebijakan Privasi
           </NuxtLink>
         </div>
       </div>

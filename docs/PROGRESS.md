@@ -204,15 +204,13 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
 5. **Kupon Promo & Diskon (Voucher Codes & Auto-Discounts)**:
    - Status: Belum diimplementasikan.
    - Keterangan: Belum ada modul voucher (tabel `coupons`, input kode promo di keranjang/checkout, validasi kuota klaim, dan potongan harga dinamis). Diskon saat ini hanya potongan langsung berbasis kolom produk (`original_price_cents`).
-6. **Pusat Bantuan & FAQ Interaktif (Help Center / FAQ Page)**:
-   - Status: Belum diimplementasikan.
-   - Keterangan: Belum ada halaman `/help` atau `/faq` mandiri. Link "Pusat Bantuan", "Kebijakan Pengembalian", dan "Informasi Pengiriman" di navbar atas dan footer masih dialihkan ke `/katalog`.
+6. ~~**Pusat Bantuan & FAQ Interaktif (Help Center / FAQ Page)**~~:
+   - Status: ✅ **SELESAI 2026-10-30** (Halaman `/help` interaktif dengan pencarian FAQ real-time, tab navigasi kategori via `UiTabs`, accordion yang dapat dibuka/tutup, integrasi URL hash `#pengembalian` dan `#pengiriman`, banner bantuan cepat dengan link ke `/tracking` dan `/contact`, serta 9 unit test di `tests/unit/help-page.spec.ts`).
 7. **Live Chat / Bantuan Pelanggan Langsung (Customer Support Chat)**:
    - Status: Belum diimplementasikan.
    - Keterangan: Belum ada widget live chat (Tawk.to, Crisp, webhook WhatsApp CS, atau chat real-time interaktif berbasis Supabase). Teks di footer hanya label statis.
-8. **Halaman Profil Perusahaan (Tentang Kami, Kontak, Karier)**:
-   - Status: Belum diimplementasikan.
-   - Keterangan: Belum ada rute halaman `/about`, `/contact`, atau `/careers`. Link di footer saat ini masih mengarah ke `/katalog`.
+8. ~~**Halaman Profil Perusahaan (Tentang Kami & Kontak)**~~:
+   - Status: ✅ **SELESAI 2026-10-30** (Halaman kurasi `/about` dengan 4 strip metrik, 3 pilar komitmen rekayasa, dan CTA katalog; serta halaman `/contact` dengan informasi saluran resmi, formulir kontak interaktif tervalidasi via `UiInput`/`UiSelect`/`UiTextarea`, feedback toast, pembersihan form pasca-submit, tautan footer terintegrasi, dan 10 unit test di `tests/unit/contact-page.spec.ts` dan `tests/unit/about-page.spec.ts`).
 9. **Ulasan & Rating Pelanggan (Product Reviews & Ratings)**:
    - Status: Belum diimplementasikan.
    - Keterangan: Belum ada tabel `product_reviews`, sistem submit ulasan pasca-pesanan selesai, maupun agregasi rating bintang pelanggan nyata (bintang statis sebelumnya telah dibersihkan demi integritas data).

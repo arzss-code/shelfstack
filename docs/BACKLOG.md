@@ -85,9 +85,9 @@ Fitur berikut tercatat resmi belum diimplementasikan pada siklus berjalan (alasa
 3. **Kalkulator Ongkir & Logistik**: Integrasi kurir ekspedisi real (RajaOngkir/Biteship), kalkulasi berat, dan pilihan layanan (saat ini flat gratis ongkir).
 4. **Lacak Pengiriman Ekspedisi**: Nomor resi kurir dan tracking perjalanan paket real-time (saat ini alur internal status pesanan).
 5. **Kupon Promo & Voucher**: Sistem kode voucher promosi di checkout (saat ini hanya diskon per-produk langsung).
-6. **Pusat Bantuan & FAQ**: Halaman `/help` interaktif dan kebijakan pengembalian mandiri (link navbar/footer dialihkan ke katalog).
+6. ~~**Pusat Bantuan & FAQ**~~: ✅ **SELESAI 2026-10-30** (Halaman `/help` interaktif, tab kategori via `UiTabs`, pencarian FAQ, dan kebijakan pengembalian mandiri).
 7. **Live Chat CS**: Widget bantuan langsung (WhatsApp CS / web live chat).
-8. **Halaman Perusahaan**: Halaman `/about`, `/contact`, `/careers`.
+8. ~~**Halaman Perusahaan**~~: ✅ **SELESAI 2026-10-30** (Halaman kurasi `/about` dan formulir kontak interaktif `/contact` dengan validasi Zod).
 9. **Ulasan & Rating Pelanggan**: Review pasca-transaksi dan rating bintang nyata (bintang statis sudah dibersihkan).
 10. **Infrastruktur BullMQ**: Worker antrean DLQ Redis untuk order expiry sweep (saat ini sweep direct endpoint).
 11. **Payment Gateway Live**: Transaksi nyata menggunakan kartu kredit/kartu debit live (saat ini Midtrans Sandbox).
