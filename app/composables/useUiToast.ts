@@ -9,6 +9,16 @@ export interface UiToastInput {
   life?: number
 }
 
+export interface UiToastShowOptions {
+  title?: string
+  summary?: string
+  message?: string
+  detail?: string
+  tone?: 'success' | 'error' | 'info' | 'warn' | 'secondary'
+  severity?: UiToastSeverity
+  life?: number
+}
+
 export interface UiToastEntry {
   id: number
   severity: UiToastSeverity
@@ -45,9 +55,18 @@ export const useUiToast = () => {
     return id
   }
 
+  const show = (options: UiToastShowOptions) => {
+    return add({
+      summary: options.title ?? options.summary ?? '',
+      detail: options.message ?? options.detail ?? '',
+      severity: (options.tone ?? options.severity ?? 'secondary') as UiToastSeverity,
+      life: options.life,
+    })
+  }
+
   const clear = () => {
     toasts.value = []
   }
 
-  return { toasts, add, remove, clear }
+  return { toasts, add, show, remove, clear }
 }
