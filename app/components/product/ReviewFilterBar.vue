@@ -17,6 +17,12 @@ const starFilterPills: Array<{ label: string; value: number | null }> = [
   { label: '2 Bintang', value: 2 },
   { label: '1 Bintang', value: 1 },
 ]
+
+const sortOptions: Array<{ value: 'newest' | 'highest' | 'lowest'; label: string }> = [
+  { value: 'newest', label: 'Terbaru' },
+  { value: 'highest', label: 'Rating Tertinggi' },
+  { value: 'lowest', label: 'Rating Terendah' },
+]
 </script>
 
 <template>
@@ -39,24 +45,18 @@ const starFilterPills: Array<{ label: string; value: number | null }> = [
       </button>
     </div>
 
-    <!-- Sort Selector -->
-    <div class="flex items-center gap-2 shrink-0">
-      <label for="review-sort" class="text-xs font-medium text-brand-muted"> Urutkan: </label>
-      <select
-        id="review-sort"
-        :value="selectedSort"
-        class="rounded-field border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs font-medium text-brand-ink transition-colors hover:border-brand-ink focus:border-brand-ink focus:outline-none"
-        @change="
-          emit(
-            'change-sort',
-            ($event.target as HTMLSelectElement).value as 'newest' | 'highest' | 'lowest',
-          )
-        "
-      >
-        <option value="newest">Terbaru</option>
-        <option value="highest">Rating Tertinggi</option>
-        <option value="lowest">Rating Terendah</option>
-      </select>
+    <!-- Sort Selector using UiSelect Component -->
+    <div class="shrink-0">
+      <UiSelect
+        :model-value="selectedSort"
+        :options="sortOptions"
+        prefix="Urutkan:"
+        size="sm"
+        :pill="true"
+        align="right"
+        title="Urutkan ulasan"
+        @update:model-value="emit('change-sort', $event as 'newest' | 'highest' | 'lowest')"
+      />
     </div>
   </div>
 </template>

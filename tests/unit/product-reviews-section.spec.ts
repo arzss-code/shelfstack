@@ -4,6 +4,7 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import ReviewRatingSummary from '../../app/components/product/ReviewRatingSummary.vue'
 import ReviewCard from '../../app/components/product/ReviewCard.vue'
 import ReviewFormModal from '../../app/components/product/ReviewFormModal.vue'
+import ReviewFilterBar from '../../app/components/product/ReviewFilterBar.vue'
 import ProductReviewsSection from '../../app/components/product/ProductReviewsSection.vue'
 import type {
   ProductReview,
@@ -155,6 +156,18 @@ const globalStubs = {
     template: '<div class="ui-skeleton-stub" />',
     props: ['width', 'height', 'shape'],
   },
+  UiSelect: {
+    name: 'UiSelect',
+    template: `
+      <div class="ui-select-stub">
+        <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value); $emit('change', $event.target.value)">
+          <option v-for="opt in (options || [])" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+    `,
+    props: ['modelValue', 'options', 'prefix', 'size', 'pill', 'align', 'title'],
+    emits: ['update:modelValue', 'change'],
+  },
   NuxtLink: {
     template: '<a :href="to"><slot /></a>',
     props: ['to'],
@@ -286,6 +299,48 @@ describe('Product Reviews & Ratings System', () => {
       expect(wrapper.text()).not.toContain('Pembeli Terverifikasi')
       expect(wrapper.text()).not.toContain('Verified Buyer')
       expect(wrapper.text()).not.toContain('Terverifikasi')
+    })
+  })
+
+  describe('ReviewFilterBar Component', () => {
+    it('renders star filter pills and emits select-star when clicked', async () => {
+      const wrapper = mount(ReviewFilterBar, {
+        props: {
+          selectedStar: null,
+          selectedSort: 'newest',
+        },
+        global: { stubs: globalStubs },
+      })
+
+      const buttons = wrapper.findAll('button')
+      expect(buttons.length).toBe(6) // Semua, 5, 4, 3, 2, 1 Bintang
+
+      // Click 5 Bintang pill
+      await buttons[1].trigger('click')
+      expect(wrapper.emitted('select-star')).toBeTruthy()
+      expect(wrapper.emitted('select-star')![0]).toEqual([5])
+    })
+
+    it('renders UiSelect for sorting and emits change-sort when changed', async () => {
+      const wrapper = mount(ReviewFilterBar, {
+        props: {
+          selectedStar: 5,
+          selectedSort: 'newest',
+        },
+        global: { stubs: globalStubs },
+      })
+
+      const selectStub = wrapper.findComponent({ name: 'UiSelect' })
+      expect(selectStub.exists()).toBe(true)
+      expect(selectStub.props('modelValue')).toBe('newest')
+      expect(selectStub.props('prefix')).toBe('Urutkan:')
+      expect(selectStub.props('size')).toBe('sm')
+      expect(selectStub.props('pill')).toBe(true)
+
+      // Emit change from UiSelect
+      await selectStub.vm.$emit('update:modelValue', 'highest')
+      expect(wrapper.emitted('change-sort')).toBeTruthy()
+      expect(wrapper.emitted('change-sort')![0]).toEqual(['highest'])
     })
   })
 
