@@ -4,8 +4,7 @@ Aplikasi fullstack untuk kelola katalog produk internal — berevolusi jadi mini
 (storefront publik + admin dashboard + auth + orders). Dibangun ngikutin SOP Talenavi untuk
 nge-handle list produk, tambah/edit data, dan pastinya state management yang rapi.
 
-> Rencana portofolio 12 minggu (Sprint 1–6): lihat `docs/PORTFOLIO-PLAN.md`,
-> `docs/SPRINT-PLAN.md`, dan `docs/BACKLOG.md`.
+> Dokumentasi teknis dan status kemajuan: lihat `docs/README.md`, `docs/PROGRESS.md`, dan `docs/BACKLOG.md` (arsip rencana awal di `docs/archive/`).
 
 ## Tech Stack
 

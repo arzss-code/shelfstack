@@ -159,7 +159,7 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
 - [x] **CI (`/.github/workflows/ci.yml`)**: lint → typecheck (root + order-service) → build → vitest (root + order-service) → validasi docker compose.
 - [x] **E2E Suite Playwright** (`tests/e2e/full-business-journey.spec.ts` + 12 Page Object Models).
 - [x] **Deployment Docker+Nginx** (`Dockerfile`, `deploy/docker-compose.prod.yml`, `deploy/nginx/nginx.conf`).
-- [ ] **Packaging portofolio** (README baru + GIF + diagram + akun demo — lihat `docs/PORTFOLIO-PACKAGING.md`).
+- [ ] **Packaging portofolio** (README baru + GIF + diagram + akun demo, draf awal di `docs/archive/PORTFOLIO-PACKAGING-LEGACY.md`).
 - [ ] **Lighthouse ≥90** perf/a11y (belum diukur — jangan klaim).
 
 ---

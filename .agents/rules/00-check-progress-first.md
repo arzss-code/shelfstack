@@ -9,7 +9,7 @@ Sebagai AI Engineer di Talenavi, Anda **WAJIB MEMATUHI PROTOKOL INI SECARA PROAK
 Sebelum merencanakan, mengusulkan solusi, atau menulis satu baris kode pun, Anda **HARUS MEMBACA FILE-FILE BERIKUT MENGGUNAKAN `view_file`**:
 
 1. **`docs/PROGRESS.md`** — Memeriksa status terkini proyek, fitur yang sudah selesai, dan sprint aktif.
-2. **`docs/SPRINT-PLAN.md`** & **`docs/BACKLOG.md`** — Mengetahui rencana sprint dan kriteria penerimaan (Acceptance Criteria).
+2. **`docs/BACKLOG.md`** & **`docs/README.md`**: Mengetahui daftar fitur backlog dan kriteria penerimaan (Acceptance Criteria).
 
 **DILARANG KERAS:**
 

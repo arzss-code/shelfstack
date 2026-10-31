@@ -40,7 +40,7 @@ Platform ini dirancang dengan pendekatan arsitektur modern (_clean code_, _atomi
 ```
 +---------------------------------------------------------------------------------+
 |                                 CLIENT LAYER                                    |
-|   Nuxt 4 (Vue 3 Composition API, Vite, Tailwind CSS, PrimeVue, Pinia Store)     |
+|   Nuxt 4 (Vue 3 Composition API, Vite, Tailwind CSS, Brand Primitives, Pinia)  |
 +---------------------------------------------------------------------------------+
                                         | (HTTPS / REST / WebSocket)
 +---------------------------------------------------------------------------------+
@@ -62,7 +62,7 @@ Platform ini dirancang dengan pendekatan arsitektur modern (_clean code_, _atomi
 1. **Frontend & Server:** Nuxt 4 Full-Stack dengan _feature-driven directory structure_ (`app/features/`).
 2. **Database & Realtime:** Supabase PostgreSQL dengan _Strict Row Level Security (RLS)_ dan channel _Supabase Realtime_ (`postgres_changes`).
 3. **Payment Gateway:** Midtrans Sandbox via protokol Snap (mendukung QRIS, GoPay, dan Virtual Account Bank) dengan integrasi _Webhook Callback_.
-4. **Deployment:** Vercel (Edge Network + Native Serverless SSR).
+4. **Deployment:** Docker Multi-stage + Nginx (`deploy/docker-compose.prod.yml`).
 
 ---
 
