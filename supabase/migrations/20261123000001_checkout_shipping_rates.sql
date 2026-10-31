@@ -39,6 +39,8 @@ declare
   v_existing_hash text;
   v_lock_key bigint;
   v_coupon record;
+  v_coupon_id uuid := null;
+  v_coupon_code text := null;
   v_user_usage_count int := 0;
   v_shipping_cost int := 0;
   v_shipping_service text := coalesce(lower(trim(p_shipping_service)), 'reguler');
@@ -125,6 +127,9 @@ begin
       raise exception 'Kupon promo "%" tidak ditemukan atau sudah tidak aktif', p_coupon_code;
     end if;
 
+    v_coupon_id := v_coupon.id;
+    v_coupon_code := v_coupon.code;
+
     if v_coupon.starts_at is not null and v_coupon.starts_at > now() then
       raise exception 'Kupon promo "%" belum dapat digunakan', v_coupon.code;
     end if;
@@ -209,8 +214,8 @@ begin
   set total_cents = v_total,
       subtotal_cents = v_subtotal,
       discount_cents = v_discount,
-      coupon_id = case when v_coupon.id is not null then v_coupon.id else null end,
-      coupon_code = case when v_coupon.code is not null then v_coupon.code else null end,
+      coupon_id = v_coupon_id,
+      coupon_code = v_coupon_code,
       shipping_service = v_shipping_service,
       shipping_cost_cents = v_shipping_cost,
       courier_code = p_courier_code
