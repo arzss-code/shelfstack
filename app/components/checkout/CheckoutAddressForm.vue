@@ -151,7 +151,7 @@ const toggleSave = (e: Event) => {
               </p>
               <p class="text-[11px] text-brand-muted m-0 mt-0.5">
                 Kode Pos:
-                <span class="font-mono font-medium text-brand-ink">{{
+                <span class="font-semibold text-brand-ink tabular">{{
                   modelValue.postal || '-'
                 }}</span>
               </p>

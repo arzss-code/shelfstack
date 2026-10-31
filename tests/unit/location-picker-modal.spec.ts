@@ -42,7 +42,7 @@ describe('LocationPickerModal Component (Shopee-Style 4-Tier Cascade)', () => {
     await provBtn.trigger('click')
 
     // Automatically advances to Kota tab
-    expect(wrapper.find('[data-testid="tab-city"]').classes()).toContain('text-orange-600')
+    expect(wrapper.find('[data-testid="tab-city"]').classes()).toContain('bg-brand-ink')
     const jakselBtn = wrapper.find('[data-testid="city-item-31.74"]')
     expect(jakselBtn.exists()).toBe(true)
 
@@ -50,7 +50,7 @@ describe('LocationPickerModal Component (Shopee-Style 4-Tier Cascade)', () => {
     await jakselBtn.trigger('click')
 
     // Automatically advances to Kecamatan tab
-    expect(wrapper.find('[data-testid="tab-district"]').classes()).toContain('text-orange-600')
+    expect(wrapper.find('[data-testid="tab-district"]').classes()).toContain('bg-brand-ink')
     const tebetBtn = wrapper.find('[data-testid="district-item-31.74.01"]')
     expect(tebetBtn.exists()).toBe(true)
 
@@ -58,7 +58,7 @@ describe('LocationPickerModal Component (Shopee-Style 4-Tier Cascade)', () => {
     await tebetBtn.trigger('click')
 
     // Automatically advances to Kode Pos tab
-    expect(wrapper.find('[data-testid="tab-postal"]').classes()).toContain('text-orange-600')
+    expect(wrapper.find('[data-testid="tab-postal"]').classes()).toContain('bg-brand-ink')
     const postalBtn = wrapper.find('[data-testid="postal-item-12810"]')
     expect(postalBtn.exists()).toBe(true)
 
