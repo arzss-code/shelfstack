@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import type { CreateAddressInput } from '~~/shared/schemas/address'
 import { createAddressSchema } from '~~/shared/schemas/address'
 import type { AdministrativeSelection } from '~~/shared/schemas/location'
-import { formatCityDisplay } from '~~/shared/data/locations/indonesia-regions'
+import { formatAdministrativeAddress } from '~~/shared/data/locations/indonesia-regions'
 import LocationPickerModal from '~/components/checkout/LocationPickerModal.vue'
 
 const props = withDefaults(
@@ -39,9 +39,10 @@ const form = ref<CreateAddressInput>({
 })
 
 const handleLocationSelect = (loc: AdministrativeSelection) => {
-  const cleanCity = formatCityDisplay(loc.cityName)
-  form.value.city = `${cleanCity}, ${loc.provinceName}`
+  form.value.city = formatAdministrativeAddress(loc.districtName, loc.cityName, loc.provinceName)
   form.value.postal = loc.postalCode
+  if (formErrors.value.city) delete formErrors.value.city
+  if (formErrors.value.postal) delete formErrors.value.postal
 }
 
 const handleSubmit = () => {
@@ -117,42 +118,66 @@ const handleSubmit = () => {
       />
     </div>
 
-    <!-- Master Location Picker Button -->
-    <div>
-      <label class="block text-xs font-semibold text-brand-ink mb-1">
-        Pilih Wilayah Resmi (Provinsi, Kota/Kabupaten &amp; Kode Pos)
+    <!-- Master Location Picker Button / Card -->
+    <div class="space-y-1.5">
+      <label class="block text-xs font-semibold text-brand-ink">
+        Wilayah Pengiriman (Provinsi, Kota, Kecamatan &amp; Kode Pos)
+        <span class="text-red-500">*</span>
       </label>
+
+      <!-- Selected State Card -->
+      <div
+        v-if="form.city"
+        class="p-3 rounded-xl border border-brand-hair bg-white flex items-center justify-between gap-3 transition-colors"
+      >
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div
+            class="w-8 h-8 rounded-lg bg-brand-ink text-white flex items-center justify-center shrink-0"
+          >
+            <i class="pi pi-map-marker text-xs" />
+          </div>
+          <div class="min-w-0">
+            <p class="font-display font-bold text-xs text-brand-ink m-0 truncate">
+              {{ form.city }}
+            </p>
+            <p class="text-[11px] text-brand-muted m-0 mt-0.5">
+              Kode Pos:
+              <span class="font-semibold text-brand-ink tabular">{{ form.postal || '-' }}</span>
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          data-testid="saved-address-change-location-btn"
+          class="text-xs font-semibold text-brand-ink hover:underline shrink-0 px-2 py-1 rounded cursor-pointer"
+          @click="isLocationModalOpen = true"
+        >
+          Ubah
+        </button>
+      </div>
+
+      <!-- Empty State Button -->
       <button
+        v-else
         type="button"
         data-testid="saved-address-location-picker-btn"
-        class="w-full flex items-center justify-between p-2.5 rounded-lg border border-brand-hair hover:border-brand-ink bg-brand-canvas-soft/40 hover:bg-white text-xs transition-colors cursor-pointer"
+        class="w-full flex items-center justify-between p-3 rounded-xl border border-dashed border-brand-hair hover:border-brand-ink bg-white hover:bg-brand-canvas-soft/30 transition-all text-left group cursor-pointer"
         @click="isLocationModalOpen = true"
       >
-        <span class="flex items-center gap-2 text-brand-muted truncate">
-          <i class="pi pi-map-marker text-brand-ink text-xs shrink-0" />
-          <span v-if="form.city" class="text-brand-ink font-medium truncate">
-            {{ form.city }} ({{ form.postal || '-' }})
-          </span>
-          <span v-else>Pilih dari Master Data Wilayah Indonesia</span>
+        <div
+          class="flex items-center gap-2.5 text-brand-muted group-hover:text-brand-ink transition-colors"
+        >
+          <i class="pi pi-map-marker text-sm text-brand-ink" />
+          <span class="text-xs font-medium">Pilih Provinsi, Kota, Kecamatan &amp; Kode Pos</span>
+        </div>
+        <span class="inline-flex items-center gap-1 text-xs font-semibold text-brand-ink">
+          Cari Wilayah <i class="pi pi-chevron-right text-[10px]" />
         </span>
-        <span class="text-xs font-semibold text-brand-ink shrink-0 ml-2">Pilih Wilayah</span>
       </button>
-    </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label class="block text-xs font-semibold text-brand-ink mb-1">
-          Kota / Kabupaten <span class="text-red-500">*</span>
-        </label>
-        <UiInput v-model="form.city" placeholder="cth. Jakarta Pusat" :error="formErrors.city" />
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-brand-ink mb-1">
-          Kode Pos <span class="text-red-500">*</span>
-        </label>
-        <UiInput v-model="form.postal" placeholder="cth. 10220" :error="formErrors.postal" />
-      </div>
+      <p v-if="formErrors.city || formErrors.postal" class="text-[11px] text-red-600 m-0">
+        {{ formErrors.city || formErrors.postal }}
+      </p>
     </div>
 
     <div>

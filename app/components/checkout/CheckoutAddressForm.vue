@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import type { UserAddress } from '~~/shared/schemas/address'
 import type { AdministrativeSelection } from '~~/shared/schemas/location'
-import { formatCityDisplay } from '~~/shared/data/locations/indonesia-regions'
+import { formatAdministrativeAddress } from '~~/shared/data/locations/indonesia-regions'
 import SavedAddressSelector from '~/components/checkout/SavedAddressSelector.vue'
 import LocationPickerModal from '~/components/checkout/LocationPickerModal.vue'
 
@@ -49,10 +49,9 @@ const updateField = (field: keyof AddressModel, val: string) => {
 }
 
 const handleLocationSelect = (loc: AdministrativeSelection) => {
-  const cleanCity = formatCityDisplay(loc.cityName)
   emit('update:modelValue', {
     ...props.modelValue,
-    city: `${cleanCity}, ${loc.provinceName}`,
+    city: formatAdministrativeAddress(loc.districtName, loc.cityName, loc.provinceName),
     postal: loc.postalCode,
   })
 }
@@ -188,33 +187,6 @@ const toggleSave = (e: Event) => {
         <p v-if="errors.city || errors.postal" class="text-[11px] text-red-600 m-0">
           {{ errors.city || errors.postal }}
         </p>
-      </div>
-
-      <!-- Quick manual fine-tuning if needed -->
-      <div v-if="modelValue.city" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- Kota / Kabupaten -->
-        <div class="space-y-1">
-          <label class="block text-[11px] font-medium text-brand-muted">
-            Kota / Kabupaten (Tersimpan)
-          </label>
-          <UiInput
-            :model-value="modelValue.city"
-            placeholder="cth. Jakarta Pusat"
-            :error="errors.city"
-            @update:model-value="updateField('city', $event)"
-          />
-        </div>
-
-        <!-- Kode Pos -->
-        <div class="space-y-1">
-          <label class="block text-[11px] font-medium text-brand-muted"> Kode Pos </label>
-          <UiInput
-            :model-value="modelValue.postal"
-            placeholder="cth. 10220"
-            :error="errors.postal"
-            @update:model-value="updateField('postal', $event)"
-          />
-        </div>
       </div>
 
       <!-- Catatan Pengiriman -->

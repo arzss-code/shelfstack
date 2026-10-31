@@ -110,6 +110,27 @@ export function formatCityDisplay(cityName: string, type?: string): string {
 }
 
 /**
+ * Memformat nama wilayah administratif lengkap dengan Kecamatan, Kota/Kabupaten, dan Provinsi.
+ * Format standar ekspedisi nasional: "Kec. [Kecamatan], [Kota/Kabupaten], [Provinsi]"
+ */
+export function formatAdministrativeAddress(
+  districtName: string,
+  cityName: string,
+  provinceName: string,
+): string {
+  const cleanCity = formatCityDisplay(cityName)
+  const trimmedDist = districtName ? districtName.trim() : ''
+  if (!trimmedDist) {
+    return provinceName ? `${cleanCity}, ${provinceName}` : cleanCity
+  }
+  let cleanDist = trimmedDist
+  if (!/^kec(\.|\s)/i.test(cleanDist)) {
+    cleanDist = `Kec. ${cleanDist}`
+  }
+  return provinceName ? `${cleanDist}, ${cleanCity}, ${provinceName}` : `${cleanDist}, ${cleanCity}`
+}
+
+/**
  * Pencarian komprehensif 4-tingkat (Kecamatan, Kota, Provinsi, Kode Pos) dengan prioritas relevansi.
  */
 export function searchAdministrativeLocations(

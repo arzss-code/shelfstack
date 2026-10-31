@@ -88,7 +88,7 @@ describe('CheckoutAddressForm', () => {
     expect(emitted).toBeTruthy()
     expect(emitted![0]![0]).toEqual({
       ...defaultAddress,
-      city: 'Kota Jakarta Selatan, DKI Jakarta',
+      city: 'Kec. Tebet, Kota Jakarta Selatan, DKI Jakarta',
       postal: '12810',
     })
   })

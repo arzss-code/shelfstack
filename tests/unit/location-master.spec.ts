@@ -7,6 +7,7 @@ import {
   getDistrictsByCity,
   getPostalCodesByDistrict,
   formatCityDisplay,
+  formatAdministrativeAddress,
   searchLocations,
   POPULAR_CITIES,
 } from '../../shared/data/locations/indonesia-regions'
@@ -65,6 +66,21 @@ describe('Indonesian Administrative Master Data (SHF-LOC-01)', () => {
     expect(formatCityDisplay('Kab. Sleman')).toBe('Kabupaten Sleman')
     expect(formatCityDisplay('Jakarta Selatan')).toBe('Kota Jakarta Selatan')
     expect(formatCityDisplay('Sleman', 'Kabupaten')).toBe('Kabupaten Sleman')
+  })
+
+  it('formats full administrative address with district prefix (formatAdministrativeAddress)', () => {
+    expect(formatAdministrativeAddress('Tebet', 'Kota Jakarta Selatan', 'DKI Jakarta')).toBe(
+      'Kec. Tebet, Kota Jakarta Selatan, DKI Jakarta',
+    )
+    expect(formatAdministrativeAddress('Sayung', 'Kabupaten Demak', 'Jawa Tengah')).toBe(
+      'Kec. Sayung, Kabupaten Demak, Jawa Tengah',
+    )
+    expect(formatAdministrativeAddress('Kec. Sayung', 'Kabupaten Demak', 'Jawa Tengah')).toBe(
+      'Kec. Sayung, Kabupaten Demak, Jawa Tengah',
+    )
+    expect(formatAdministrativeAddress('', 'Kota Surabaya', 'Jawa Timur')).toBe(
+      'Kota Surabaya, Jawa Timur',
+    )
   })
 
   it('performs case-insensitive fuzzy search by city name', () => {
