@@ -2,6 +2,26 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.24.0] - 2026-10-31
+
+### Persistensi Kecamatan Alamat, RPC create_order Resilient Fallback & Checkout UX Polish
+
+- **Persistensi Kecamatan Alamat Pengiriman (District Persistence)**:
+  - `shared/data/locations/indonesia-regions.ts`: Menambahkan fungsi `formatAdministrativeAddress(districtName, cityName, provinceName)` berstandar ekspedisi nasional (`Kec. [Kecamatan], [Kota/Kabupaten], [Provinsi]`).
+  - `app/components/checkout/CheckoutAddressForm.vue` & `SavedAddressForm.vue`: Mengikat nama kecamatan dari pemilihan 4 tingkat sehingga tidak lagi hilang saat disimpan.
+  - Menghapus input teks manual redundan (`Kota / Kabupaten (Tersimpan)` dan `Kode Pos`) di bawah kartu wilayah terpilih, menjadikan kartu review sebagai _Single Source of Truth_ dengan tombol aksi `Ubah`.
+- **Database & Backend RPC Resilience (Expand-and-Contract Pattern)**:
+  - `supabase/migrations/20261123000002_fix_create_order_coupon_record_unassigned.sql`: Memperbaiki bug PL/pgSQL `55000: record v_coupon is not assigned yet` saat checkout tanpa kupon dengan mendeklarasikan variabel skalar aman `v_coupon_id` dan `v_coupon_code`.
+  - Menerapkan seluruh migrasi yang tertunda ke remote Supabase via `pnpm dlx supabase db push --linked --yes` sehingga skema remote 100% up to date.
+  - `server/api/orders/index.ts`: Menambahkan graceful fallback otomatis ke signature 5-parameter saat PostgREST mengembalikan `PGRST202` (schema cache mismatch), mencegah kegagalan HTTP 400 pada masa transisi deployment.
+- **Frontend Checkout Polish**:
+  - `app/components/checkout/CheckoutOrderSummary.vue`: Membersihkan badge kuantitas redundan pada thumbnail item pesanan untuk tampilan ringkasan yang lebih bersih dan minimalis.
+- **Testing & Quality Verification**:
+  - `tests/unit/api-orders-idempotency.spec.ts`: Menambahkan unit test regresi untuk verifikasi fallback otomatis signature RPC saat terjadi error `PGRST202`.
+  - `tests/unit/location-master.spec.ts`: Menambahkan unit test untuk fungsi `formatAdministrativeAddress`.
+  - `tests/unit/checkout-address-form.spec.ts`: Memperbarui verifikasi nama kecamatan pada payload checkout.
+  - 65 test files / 624 tests lulus 100%. `nuxi typecheck` EXIT 0, ESLint 0 error.
+
 ## [0.23.0] - 2026-10-30
 
 ### Shopee-Style 4-Tier Indonesian Administrative Address Cascade & Bugfix Double Prefix (SHF-LOC-02)
