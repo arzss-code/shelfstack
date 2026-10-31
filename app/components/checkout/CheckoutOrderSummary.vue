@@ -76,11 +76,6 @@ const emit = defineEmits<{
               class="w-full h-full object-cover"
             />
             <i v-else class="pi pi-image text-brand-faint text-sm" />
-            <span
-              class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-ink px-1 text-[9px] font-bold text-white shadow-whisper"
-            >
-              {{ item.quantity }}
-            </span>
           </div>
 
           <div class="min-w-0">
