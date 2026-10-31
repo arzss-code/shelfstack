@@ -60,13 +60,28 @@ describe('POST /api/orders Endpoint Handler Behavior (API-Level)', () => {
     // 3. Request hash
     const requestHash = idempotencyKey ? calculateCheckoutHash(parsed.data) : null
 
-    // 4. RPC execution
-    const { data: orderId, error } = await mockRpc('create_order', {
+    // 4. RPC execution (7-parameter signature with PGRST202 fallback)
+    let { data: orderId, error } = await mockRpc('create_order', {
       p_items: parsed.data.items,
       p_address: parsed.data.address,
       p_idempotency_key: idempotencyKey,
       p_request_hash: requestHash,
+      p_coupon_code: parsed.data.coupon_code || null,
+      p_shipping_service: parsed.data.shipping_service || 'reguler',
+      p_courier_code: parsed.data.courier_code || null,
     })
+
+    if (error && (error.code === 'PGRST202' || error.message?.includes('schema cache'))) {
+      const legacyRpc = await mockRpc('create_order', {
+        p_items: parsed.data.items,
+        p_address: parsed.data.address,
+        p_idempotency_key: idempotencyKey,
+        p_request_hash: requestHash,
+        p_coupon_code: parsed.data.coupon_code || null,
+      })
+      orderId = legacyRpc.data
+      error = legacyRpc.error
+    }
 
     if (error) {
       if (error.message?.includes('IDEMPOTENCY_CONFLICT')) {
@@ -247,5 +262,44 @@ describe('POST /api/orders Endpoint Handler Behavior (API-Level)', () => {
 
     expect(resB.statusCode).toBe(200)
     expect(resB.data?.order_id).toBe('ord-user-b')
+  })
+
+  it('G. Schema cache mismatch (PGRST202): fallback otomatis ke 5-parameter RPC legacy saat migrasi belum diterapkan', async () => {
+    const mockRpc = vi
+      .fn()
+      // First call (7 params) fails with PGRST202
+      .mockResolvedValueOnce({
+        data: null,
+        error: {
+          code: 'PGRST202',
+          message:
+            'Could not find the function public.create_order(p_address, p_coupon_code, p_courier_code, p_idempotency_key, p_items, p_request_hash, p_shipping_service) in the schema cache',
+        },
+      })
+      // Second call (5 params fallback) succeeds
+      .mockResolvedValueOnce({
+        data: 'ord-fallback-001',
+        error: null,
+      })
+
+    const res = await simulateOrdersEndpoint(
+      { 'idempotency-key': 'key-fallback-1' },
+      validPayload,
+      'user-1',
+      mockRpc,
+    )
+
+    expect(res.statusCode).toBe(200)
+    expect(res.status).toBe('success')
+    expect(res.data?.order_id).toBe('ord-fallback-001')
+    expect(mockRpc).toHaveBeenCalledTimes(2)
+    // Check that second call used legacy 5-param signature
+    expect(mockRpc).toHaveBeenLastCalledWith(
+      'create_order',
+      expect.not.objectContaining({
+        p_shipping_service: expect.anything(),
+        p_courier_code: expect.anything(),
+      }),
+    )
   })
 })
