@@ -40,6 +40,12 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
   - `app/components/account/ProfileAvatarCard.vue`: Komponen avatar interaktif dengan preview foto bundar, overlay tombol kamera, tombol "Pilih Foto", "Hapus Foto", dan indikator upload.
   - `app/composables/useUserProfile.ts`: Method `uploadAvatar()` dan `deleteAvatar()` terhubung langsung ke endpoint `/api/account/avatar` dengan penanganan sesi defensif.
   - `app/components/account/AccountSidebar.vue` & `AppNavbar.vue`: Menampilkan foto profil asli pengguna secara reaktif dengan fallback inisial nama.
+- **Refinement UX Copy & Visual Polish (Profil Saya & Avatar Interaction)**:
+  - Standardisasi Penamaan "Profil Saya": Menyelaraskan seluruh touchpoint navigasi (navbar dropdown, sidebar, horizontal tabs, breadcrumbs, dan page title) ke "Profil Saya", menggantikan "Biodata Diri" demi model mental pengguna yang lebih intuitif dan konsisten.
+  - Standardisasi Breadcrumb: Menyeragamkan format breadcrumb di seluruh 5 area akun pelanggan (`ShelfStack / [Nama Halaman]`).
+  - Eliminasi Indikator Hijau Avatar: Menghapus titik hijau ambigu dari semua kartu avatar pelanggan sesuai prinsip Web Content Accessibility (_Don't Use Color Alone_).
+  - Peningkatan Kontras Overlay Foto Profil: Menerapkan gradien hitam pudar transparan native Tailwind (`bg-gradient-to-t from-black/85 via-black/60 to-black/40 backdrop-blur-[1px]`) pada tombol hover ubah foto profil, menjamin keterbacaan teks dan ikon di atas gambar terang maupun gelap.
+  - Perbaikan Opacity Backdrop Modal: Memperbaiki transparansi backdrop modal pada `UiModal.vue` dan `LocationPickerModal.vue` dengan native alpha `bg-black/50`.
 - **Testing & Quality Assurance**:
   - `tests/unit/account-profile-schema.spec.ts`: Unit test validasi skema profil termasuk pengujian format URL dan null avatar (12 test).
   - `tests/unit/account-profile-and-addresses.spec.ts`: Unit test untuk composable `useAddresses` dan kontrak data `AccountStats` (6 test).
