@@ -103,24 +103,22 @@ const handleDeleteAvatar = () => {
           <!-- Uploading Spinner Overlay -->
           <div
             v-if="isUploadingAvatar"
-            class="absolute inset-0 bg-brand-ink/60 flex items-center justify-center text-white backdrop-blur-xs"
+            class="absolute inset-0 rounded-full bg-black/75 flex items-center justify-center text-white backdrop-blur-[2px]"
           >
             <i class="pi pi-spin pi-spinner text-xl" />
           </div>
 
-          <!-- Hover Overlay Trigger (High Contrast & Accessible Focus) -->
+          <!-- Hover Overlay Trigger (Gradient Hitam Pudar Transparan) -->
           <button
             v-else
             type="button"
-            class="absolute inset-0 bg-brand-ink/80 backdrop-blur-xs text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity cursor-pointer border-0"
+            class="absolute inset-0 rounded-full bg-gradient-to-t from-black/85 via-black/60 to-black/40 backdrop-blur-[1px] text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-200 cursor-pointer border-0"
             title="Ubah Foto Profil"
             aria-label="Ubah Foto Profil"
             @click="triggerFileInput"
           >
-            <i class="pi pi-camera text-xl text-white drop-shadow-sm mb-1" />
-            <span class="text-xs font-semibold text-white tracking-wide drop-shadow-sm"
-              >Ubah Foto</span
-            >
+            <i class="pi pi-camera text-2xl text-white drop-shadow-md mb-1" />
+            <span class="text-xs font-bold text-white tracking-wide drop-shadow-md">Ubah Foto</span>
           </button>
         </div>
       </div>

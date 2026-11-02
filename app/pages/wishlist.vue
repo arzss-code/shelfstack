@@ -189,7 +189,7 @@ const handleClear = () => {
               <!-- Stock Status Overlay for Out of Stock -->
               <div v-if="item.stock === 0" class="absolute bottom-2 left-2 z-10">
                 <span
-                  class="px-2 py-0.5 rounded-full bg-brand-ink/80 text-white text-[10px] font-bold backdrop-blur-xs"
+                  class="px-2 py-0.5 rounded-full bg-black/80 text-white text-[10px] font-bold backdrop-blur-xs"
                 >
                   Stok Habis
                 </span>
