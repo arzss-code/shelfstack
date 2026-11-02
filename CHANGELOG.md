@@ -2,6 +2,36 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.25.0] - 2026-11-02
+
+### Manajemen Buku Alamat & Profil Akun Pelanggan (SHF-ACC-01 & SHF-ACC-02)
+
+- **Manajemen Buku Alamat Terpadu (`/account/addresses`)**:
+  - `app/pages/account/addresses.vue`: Halaman buku alamat mandiri dengan visualisasi bento card, empty state informatif, dan tombol tambah alamat.
+  - `app/components/account/AddressCard.vue`: Kartu alamat interaktif dengan badge "Alamat Utama", informasi penerima, format alamat wilayah, catatan kurir, dan aksi (Set Utama, Ubah, Hapus).
+  - `app/components/account/AddressModal.vue`: Modal form tambah dan ubah alamat (`UiModal`), terintegrasi dengan pemilih wilayah kaskade 4 tingkat Indonesia (`LocationPickerModal.vue`).
+  - `app/composables/useAddresses.ts`: Composable pengelolaan alamat pengiriman pelanggan dengan sinkronisasi reaktif ke API `/api/addresses`.
+- **Manajemen Profil Akun & Kredensial (`/account/profile`)**:
+  - `app/pages/account/profile.vue`: Halaman profil pelanggan dilengkapi kartu bento statistik belanja (anggota sejak, total pesanan, pesanan aktif, total alamat tersimpan).
+  - Form Pembaruan Nama Lengkap: Terhubung ke endpoint `PATCH /api/account/profile` yang menyelaraskan tabel `public.profiles` dan metadata auth Supabase.
+  - Form Pembaruan Email: Mengirimkan tautan konfirmasi verifikasi ke alamat email baru via Supabase Auth.
+  - Form Pembaruan Kata Sandi: Validasi minimal 8 karakter dengan toggle visibilitas kata sandi.
+  - `app/composables/useUserProfile.ts`: Composable reaktif untuk mengelola profil pengguna, perubahan kredensial, dan metrik akun.
+  - `app/pages/account/index.vue`: Route redirect otomatis mengarahkan `/account` ke `/account/profile`.
+- **Navigasi Terintegrasi & Akses Cepat**:
+  - `app/components/account/AccountNavTabs.vue`: Bilah tab navigasi responsif menghubungkan Profil Akun, Buku Alamat, Pesanan Saya, dan Wishlist.
+  - `app/components/AppNavbar.vue`: Menambahkan tautan langsung "Profil Saya" dan "Buku Alamat" di menu dropdown pengguna dan navigasi mobile.
+- **Backend API & Validasi Kontrak**:
+  - `server/api/account/profile.patch.ts`: Endpoint terproteksi untuk memperbarui nama lengkap pelanggan dengan audit log dan sinkronisasi metadata.
+  - `server/api/account/stats.get.ts`: Endpoint agregasi ringkasan metrik akun pelanggan (total pesanan, pesanan aktif, pesanan selesai, total alamat tersimpan, tanggal bergabung).
+  - `shared/schemas/profile.ts`: Skema validasi Zod untuk profil (`updateProfileSchema`, `updateEmailSchema`, `updatePasswordSchema`, `AccountStats`).
+- **Testing & Quality Assurance**:
+  - `tests/unit/account-profile-schema.spec.ts`: Unit test komprehensif validasi skema profil (8 test).
+  - `tests/unit/account-profile-and-addresses.spec.ts`: Unit test untuk composable `useAddresses` dan kontrak data `AccountStats` (6 test).
+  - `tests/e2e/pages/AccountPage.ts`: Page Object Model baru untuk pengujian otomatis Playwright area akun.
+  - `tests/e2e/account-journey.spec.ts`: Skenario pengujian E2E mencakup proteksi route guards tamu, penolakan API anonim (HTTP 401), dan alur navigasi akun.
+  - 67 test files / 638 tests lolos 100%. `nuxi typecheck` EXIT 0, ESLint 0 error.
+
 ## [0.24.0] - 2026-10-31
 
 ### Persistensi Kecamatan Alamat, RPC create_order Resilient Fallback & Checkout UX Polish

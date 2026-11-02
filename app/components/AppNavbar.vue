@@ -355,6 +355,20 @@ const handleLogout = async () => {
                     <p class="text-[10px] text-brand-muted m-0 truncate">{{ user.email }}</p>
                   </div>
                   <NuxtLink
+                    to="/account/profile"
+                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
+                    @click="isUserMenuOpen = false"
+                  >
+                    Profil Saya
+                  </NuxtLink>
+                  <NuxtLink
+                    to="/account/addresses"
+                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
+                    @click="isUserMenuOpen = false"
+                  >
+                    Buku Alamat
+                  </NuxtLink>
+                  <NuxtLink
                     to="/orders"
                     class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
                     @click="isUserMenuOpen = false"
@@ -529,6 +543,22 @@ const handleLogout = async () => {
           >
             {{ notificationStore.unreadCount }}
           </span>
+        </NuxtLink>
+        <NuxtLink
+          v-if="isLoggedIn"
+          to="/account/profile"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+          @click="isMobileMenuOpen = false"
+        >
+          Profil Saya
+        </NuxtLink>
+        <NuxtLink
+          v-if="isLoggedIn"
+          to="/account/addresses"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+          @click="isMobileMenuOpen = false"
+        >
+          Buku Alamat
         </NuxtLink>
         <NuxtLink
           v-if="isLoggedIn"
