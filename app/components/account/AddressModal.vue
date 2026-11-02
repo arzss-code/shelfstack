@@ -33,6 +33,7 @@ const isOpen = computed({
 })
 
 const isLocationModalOpen = ref(false)
+const showManualLocationInputs = ref(false)
 
 const form = ref<{
   name: string
@@ -67,6 +68,7 @@ watch(
         note: addr.note || '',
         is_default: Boolean(addr.is_default),
       }
+      showManualLocationInputs.value = false
     } else {
       form.value = {
         name: '',
@@ -77,6 +79,7 @@ watch(
         note: '',
         is_default: false,
       }
+      showManualLocationInputs.value = false
     }
     errors.value = {}
   },
@@ -112,7 +115,7 @@ const handleSubmit = () => {
   <UiModal
     v-model:visible="isOpen"
     :title="addressToEdit ? 'Ubah Alamat Pengiriman' : 'Tambah Alamat Baru'"
-    description="Isi detail alamat pengiriman secara akurat untuk memudahkan kurir mengantarkan pesanan."
+    description="Isi detail alamat pengiriman secara akurat untuk memudahkan kurir mengantarkan pesanan Anda."
     size="md"
   >
     <form class="space-y-4" @submit.prevent="handleSubmit">
@@ -136,7 +139,7 @@ const handleSubmit = () => {
       <UiTextarea
         v-model="form.street"
         label="Alamat Lengkap"
-        placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan..."
+        placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, patokan lokasi..."
         :rows="3"
         :error="errors.street"
         :disabled="loading"
@@ -144,26 +147,70 @@ const handleSubmit = () => {
 
       <!-- Cascade Location Picker Section -->
       <div class="space-y-2">
-        <label class="text-xs font-semibold text-brand-ink sm:text-sm block">
-          Wilayah Administratif &amp; Kode Pos
-        </label>
-        <div class="flex items-start gap-2">
-          <div
-            class="flex-1 min-w-0 px-3.5 py-2.5 rounded-field border bg-brand-canvas-soft text-xs text-brand-ink font-medium truncate"
-            :class="[errors.city ? 'border-rose-300' : 'border-brand-hair']"
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-semibold text-brand-ink sm:text-sm block">
+            Wilayah Administratif &amp; Kode Pos
+          </label>
+          <button
+            type="button"
+            class="text-[11px] font-semibold text-brand-accent hover:underline border-0 bg-transparent cursor-pointer p-0"
+            @click="showManualLocationInputs = !showManualLocationInputs"
           >
-            <span v-if="form.city" class="text-brand-ink">
-              {{ form.city }} ({{ form.postal || 'Kode Pos' }})
+            {{ showManualLocationInputs ? 'Sembunyikan Input Manual' : 'Input Manual Wilayah' }}
+          </button>
+        </div>
+
+        <!-- Selected Location Review Card -->
+        <div
+          v-if="form.city"
+          class="p-3.5 rounded-card border border-brand-hair bg-brand-canvas-soft/70 flex items-center justify-between gap-3 shadow-xs"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span
+              class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0"
+            >
+              <i class="pi pi-map-marker text-xs" aria-hidden="true" />
             </span>
-            <span v-else class="text-brand-muted">
-              Belum memilih provinsi, kota &amp; kecamatan
+            <div class="min-w-0">
+              <p class="text-xs font-bold text-brand-ink m-0 truncate">
+                {{ form.city }}
+              </p>
+              <p class="text-[11px] font-mono text-brand-muted m-0 mt-0.5">
+                Kode Pos: <span class="font-bold text-brand-ink">{{ form.postal || '-' }}</span>
+              </p>
+            </div>
+          </div>
+
+          <UiButton
+            variant="secondary"
+            size="xs"
+            type="button"
+            icon="pi pi-pencil"
+            class="shrink-0"
+            :disabled="loading"
+            @click="isLocationModalOpen = true"
+          >
+            Ubah
+          </UiButton>
+        </div>
+
+        <!-- Unselected Location Trigger -->
+        <div
+          v-else
+          class="p-3.5 rounded-card border border-dashed border-brand-hair hover:border-brand-ink/40 transition-colors bg-brand-canvas-soft flex items-center justify-between gap-3"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <i class="pi pi-map text-sm text-brand-faint shrink-0" aria-hidden="true" />
+            <span class="text-xs text-brand-muted truncate">
+              Pilih provinsi, kota, kecamatan, dan kode pos
             </span>
           </div>
           <UiButton
             variant="secondary"
-            size="sm"
+            size="xs"
             type="button"
-            icon="pi pi-map"
+            icon="pi pi-chevron-right"
+            icon-pos="right"
             :disabled="loading"
             class="shrink-0"
             @click="isLocationModalOpen = true"
@@ -171,16 +218,14 @@ const handleSubmit = () => {
             Pilih Wilayah
           </UiButton>
         </div>
+
         <p v-if="errors.city" class="text-[11px] text-rose-600 m-0">
           {{ errors.city }}
         </p>
-        <p v-else-if="errors.postal" class="text-[11px] text-rose-600 m-0">
-          {{ errors.postal }}
-        </p>
       </div>
 
-      <!-- Quick Manual Override (Optional) -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- Manual Inputs Fallback (Collapsible or if explicitly toggled) -->
+      <div v-show="showManualLocationInputs" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
         <div class="sm:col-span-2">
           <UiInput
             v-model="form.city"
@@ -204,18 +249,20 @@ const handleSubmit = () => {
 
       <UiInput
         v-model="form.note"
-        label="Catatan Pengiriman (Opsional)"
-        placeholder="Contoh: Titipkan di pos satpam / pagar hitam"
+        label="Catatan Pengiriman untuk Kurir (Opsional)"
+        placeholder="Contoh: Titipkan di pos satpam / pagar hitam / dekat masjid"
         :disabled="loading"
       />
 
       <div class="pt-2">
-        <label class="flex items-center gap-2.5 cursor-pointer text-xs text-brand-ink font-medium">
+        <label
+          class="flex items-center gap-2.5 cursor-pointer text-xs text-brand-ink font-medium select-none"
+        >
           <input
             v-model="form.is_default"
             type="checkbox"
             :disabled="loading"
-            class="w-4 h-4 rounded border-brand-hair text-brand-ink focus:ring-brand-ink accent-brand-ink"
+            class="w-4 h-4 rounded border-brand-hair text-brand-ink focus:ring-brand-ink accent-brand-ink cursor-pointer"
           />
           <span>Jadikan sebagai alamat pengiriman utama</span>
         </label>

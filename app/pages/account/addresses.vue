@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import type { UserAddress, CreateAddressInput } from '~~/shared/schemas/address'
 import { useAddresses } from '~/composables/useAddresses'
 import { useUiToast } from '~/composables/useUiToast'
@@ -36,9 +36,23 @@ const confirm = useUiConfirm()
 const isModalOpen = ref(false)
 const editingAddress = ref<UserAddress | null>(null)
 const isSubmitting = ref(false)
+const updatingDefaultId = ref<string | null>(null)
+const searchQuery = ref('')
 
 onMounted(async () => {
   await fetchAddresses()
+})
+
+const filteredAddresses = computed(() => {
+  if (!searchQuery.value.trim()) return addresses.value
+  const q = searchQuery.value.toLowerCase().trim()
+  return addresses.value.filter(
+    (a) =>
+      a.name.toLowerCase().includes(q) ||
+      a.city.toLowerCase().includes(q) ||
+      a.street.toLowerCase().includes(q) ||
+      a.phone.includes(q),
+  )
 })
 
 const handleOpenCreateModal = () => {
@@ -52,6 +66,7 @@ const handleOpenEditModal = (addr: UserAddress) => {
 }
 
 const handleSetDefault = async (addr: UserAddress) => {
+  updatingDefaultId.value = addr.id
   try {
     await selectDefault(addr.id)
     toast.show({
@@ -66,6 +81,8 @@ const handleSetDefault = async (addr: UserAddress) => {
       message: e.message || 'Terjadi kesalahan sistem.',
       tone: 'error',
     })
+  } finally {
+    updatingDefaultId.value = null
   }
 }
 
@@ -138,10 +155,20 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
         class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-brand-hair"
       >
         <div>
-          <h2 class="text-xl font-display font-bold text-brand-ink m-0">Buku Alamat Pengiriman</h2>
+          <div class="flex items-center gap-2.5">
+            <h2 class="text-xl font-display font-bold text-brand-ink m-0">
+              Buku Alamat Pengiriman
+            </h2>
+            <span
+              v-if="addresses.length > 0"
+              class="px-2 py-0.5 rounded-full text-xs font-bold bg-brand-ink text-white tabular-nums"
+            >
+              {{ addresses.length }}
+            </span>
+          </div>
           <p class="text-xs text-brand-muted m-0 mt-1">
-            Kelola daftar alamat tersimpan untuk mempermudah dan mempercepat proses checkout
-            pesanan.
+            Kelola daftar alamat tersimpan untuk mempermudah dan mempercepat proses checkout pesanan
+            Anda.
           </p>
         </div>
 
@@ -149,11 +176,27 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
           variant="primary"
           size="sm"
           icon="pi pi-plus"
-          class="shrink-0"
+          class="shrink-0 active:scale-95"
           @click="handleOpenCreateModal"
         >
           Tambah Alamat Baru
         </UiButton>
+      </div>
+
+      <!-- Quick Search Bar (when multiple addresses exist) -->
+      <div v-if="addresses.length > 2" class="mb-6 max-w-sm">
+        <div class="relative">
+          <i
+            class="pi pi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-brand-faint"
+            aria-hidden="true"
+          />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Cari nama penerima atau kota..."
+            class="w-full pl-9 pr-4 py-2 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink transition-colors"
+          />
+        </div>
       </div>
 
       <!-- State: Loading Skeleton -->
@@ -181,19 +224,34 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
         <UiEmptyState
           icon="pi-map-marker"
           title="Belum Ada Alamat Tersimpan"
-          description="Anda belum memiliki alamat pengiriman yang tersimpan di akun Anda. Tambahkan alamat pertama Anda sekarang."
+          description="Anda belum memiliki alamat pengiriman yang tersimpan di akun Anda. Tambahkan alamat pertama Anda sekarang untuk mempermudah transaksi."
           action-label="Tambah Alamat Baru"
           @action="handleOpenCreateModal"
         />
       </div>
 
+      <!-- State: Filtered Empty -->
+      <div
+        v-else-if="filteredAddresses.length === 0"
+        class="text-center py-12 bg-brand-canvas rounded-card border border-brand-hair p-8"
+      >
+        <p class="text-sm font-semibold text-brand-ink m-0">Tidak ada alamat yang cocok</p>
+        <p class="text-xs text-brand-muted m-0 mt-1">
+          Coba gunakan kata kunci pencarian yang lain.
+        </p>
+        <UiButton variant="ghost" size="xs" class="mt-3" @click="searchQuery = ''">
+          Reset Pencarian
+        </UiButton>
+      </div>
+
       <!-- State: Address Grid -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AddressCard
-          v-for="addr in addresses"
+          v-for="addr in filteredAddresses"
           :key="addr.id"
           :address="addr"
           :loading="loading"
+          :is-setting-default="updatingDefaultId === addr.id"
           @edit="handleOpenEditModal"
           @delete="handleDelete"
           @set-default="handleSetDefault"
