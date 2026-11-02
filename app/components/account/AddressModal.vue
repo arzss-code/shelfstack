@@ -35,13 +35,32 @@ const isOpen = computed({
 const isLocationModalOpen = ref(false)
 const showManualLocationInputs = ref(false)
 
+const addressLabels = [
+  { id: 'Rumah', label: 'Rumah', icon: 'pi pi-home', hint: 'Pengiriman setiap hari (24 jam)' },
+  {
+    id: 'Kantor',
+    label: 'Kantor',
+    icon: 'pi pi-building',
+    hint: 'Disarankan saat jam operasional kantor (Senin - Jumat 08.00 - 17.00)',
+  },
+  {
+    id: 'Apartemen',
+    label: 'Apartemen',
+    icon: 'pi pi-building-columns',
+    hint: 'Sertakan nomor unit dan titipkan di reception/lobby',
+  },
+  { id: 'Lainnya', label: 'Lainnya', icon: 'pi pi-tag', hint: 'Pengiriman sesuai catatan khusus' },
+]
+
+const selectedLabel = ref<string>('Rumah')
+
 const form = ref<{
   name: string
   phone: string
   street: string
   city: string
   postal: string
-  note: string
+  noteText: string
   is_default: boolean
 }>({
   name: '',
@@ -49,7 +68,7 @@ const form = ref<{
   street: '',
   city: '',
   postal: '',
-  note: '',
+  noteText: '',
   is_default: false,
 })
 
@@ -59,24 +78,34 @@ watch(
   () => props.addressToEdit,
   (addr) => {
     if (addr) {
+      let rawNote = addr.note || ''
+      let detectedLabel = 'Rumah'
+      const match = rawNote.match(/^\[(Rumah|Kantor|Apartemen|Lainnya)\]/i)
+      if (match && match[1]) {
+        detectedLabel = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase()
+        rawNote = rawNote.replace(/^\[(Rumah|Kantor|Apartemen|Lainnya)\]\s*/i, '').trim()
+      }
+
+      selectedLabel.value = detectedLabel
       form.value = {
         name: addr.name || '',
         phone: addr.phone || '',
         street: addr.street || '',
         city: addr.city || '',
         postal: addr.postal || '',
-        note: addr.note || '',
+        noteText: rawNote,
         is_default: Boolean(addr.is_default),
       }
       showManualLocationInputs.value = false
     } else {
+      selectedLabel.value = 'Rumah'
       form.value = {
         name: '',
         phone: '',
         street: '',
         city: '',
         postal: '',
-        note: '',
+        noteText: '',
         is_default: false,
       }
       showManualLocationInputs.value = false
@@ -95,7 +124,24 @@ const handleLocationSelect = (loc: AdministrativeSelection) => {
 
 const handleSubmit = () => {
   errors.value = {}
-  const parsed = createAddressSchema.safeParse(form.value)
+
+  // Susun payload dengan label terformat [Label] catatan
+  const labelPrefix = `[${selectedLabel.value}]`
+  const combinedNote = form.value.noteText.trim()
+    ? `${labelPrefix} ${form.value.noteText.trim()}`
+    : labelPrefix
+
+  const payloadToValidate = {
+    name: form.value.name,
+    phone: form.value.phone,
+    street: form.value.street,
+    city: form.value.city,
+    postal: form.value.postal,
+    note: combinedNote,
+    is_default: form.value.is_default,
+  }
+
+  const parsed = createAddressSchema.safeParse(payloadToValidate)
 
   if (!parsed.success) {
     const fieldErrors = parsed.error.flatten().fieldErrors
@@ -119,6 +165,33 @@ const handleSubmit = () => {
     size="md"
   >
     <form class="space-y-4" @submit.prevent="handleSubmit">
+      <!-- Pilihan Label Alamat (Tokopedia / Shopee Signature Pattern) -->
+      <div>
+        <label class="text-xs font-semibold text-brand-ink sm:text-sm block mb-1.5">
+          Label Alamat
+        </label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <button
+            v-for="item in addressLabels"
+            :key="item.id"
+            type="button"
+            class="px-3 py-2 rounded-field text-xs font-medium border flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            :class="[
+              selectedLabel === item.id
+                ? 'bg-brand-ink text-white border-brand-ink shadow-xs font-semibold'
+                : 'bg-brand-canvas text-brand-ink border-brand-hair hover:bg-brand-canvas-soft',
+            ]"
+            @click="selectedLabel = item.id"
+          >
+            <i :class="[item.icon, 'text-xs']" />
+            <span>{{ item.label }}</span>
+          </button>
+        </div>
+        <p class="text-[11px] text-brand-muted m-0 mt-1 italic">
+          {{ addressLabels.find((l) => l.id === selectedLabel)?.hint }}
+        </p>
+      </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <UiInput
           v-model="form.name"
@@ -136,20 +209,11 @@ const handleSubmit = () => {
         />
       </div>
 
-      <UiTextarea
-        v-model="form.street"
-        label="Alamat Lengkap"
-        placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, patokan lokasi..."
-        :rows="3"
-        :error="errors.street"
-        :disabled="loading"
-      />
-
       <!-- Cascade Location Picker Section -->
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <label class="text-xs font-semibold text-brand-ink sm:text-sm block">
-            Wilayah Administratif &amp; Kode Pos
+            Kota atau Kecamatan &amp; Kode Pos
           </label>
           <button
             type="button"
@@ -224,7 +288,7 @@ const handleSubmit = () => {
         </p>
       </div>
 
-      <!-- Manual Inputs Fallback (Collapsible or if explicitly toggled) -->
+      <!-- Manual Inputs Fallback (Collapsible) -->
       <div v-show="showManualLocationInputs" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
         <div class="sm:col-span-2">
           <UiInput
@@ -247,10 +311,19 @@ const handleSubmit = () => {
         </div>
       </div>
 
+      <UiTextarea
+        v-model="form.street"
+        label="Alamat Lengkap"
+        placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, nomor unit..."
+        :rows="3"
+        :error="errors.street"
+        :disabled="loading"
+      />
+
       <UiInput
-        v-model="form.note"
-        label="Catatan Pengiriman untuk Kurir (Opsional)"
-        placeholder="Contoh: Titipkan di pos satpam / pagar hitam / dekat masjid"
+        v-model="form.noteText"
+        label="Catatan untuk Kurir / Patokan Lokasi (Opsional)"
+        placeholder="Contoh: Titipkan di pos satpam / rumah cat biru samping warung"
         :disabled="loading"
       />
 

@@ -25,6 +25,11 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
   - `server/api/account/profile.patch.ts`: Endpoint terproteksi untuk memperbarui nama lengkap pelanggan dengan audit log dan sinkronisasi metadata.
   - `server/api/account/stats.get.ts`: Endpoint agregasi ringkasan metrik akun pelanggan (total pesanan, pesanan aktif, pesanan selesai, total alamat tersimpan, tanggal bergabung).
   - `shared/schemas/profile.ts`: Skema validasi Zod untuk profil (`updateProfileSchema`, `updateEmailSchema`, `updatePasswordSchema`, `AccountStats`).
+- **Peningkatan UX Akun Berstandar Tokopedia & Shopee**:
+  - `app/components/account/AccountSidebar.vue`: Sidebar 2-kolom desktop dengan profil pengguna, tier belanja, pengelompokan menu "Aktivitas Belanja" dan "Pengaturan Akun", serta bilah horizontal mobile.
+  - `app/components/account/AddressCard.vue` & `AddressModal.vue`: Label kategori alamat khas Tokopedia (`Rumah`, `Kantor`, `Apartemen`, `Lainnya`), panduan jam operasional pengiriman (Shopee pattern), dan integrasi patokan kurir.
+  - `app/pages/account/addresses.vue`: Pencarian cepat nama/kota penerima dan filter chips kategori alamat instan.
+  - `app/pages/account/profile.vue`: Tata letak Biodata Diri berstandar Tokopedia dengan kartu tips keamanan akun, status verifikasi email, dan checklist dinamis kriteria kata sandi.
 - **Testing & Quality Assurance**:
   - `tests/unit/account-profile-schema.spec.ts`: Unit test komprehensif validasi skema profil (8 test).
   - `tests/unit/account-profile-and-addresses.spec.ts`: Unit test untuk composable `useAddresses` dan kontrak data `AccountStats` (6 test).

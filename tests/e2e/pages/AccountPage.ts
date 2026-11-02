@@ -29,12 +29,12 @@ export class AccountPage extends BasePage {
   constructor(page: Page) {
     super(page)
 
-    this.profileTab = page.getByRole('link', { name: /profil akun/i })
-    this.addressesTab = page.getByRole('link', { name: /buku alamat/i })
-    this.ordersTab = page.getByRole('link', { name: /pesanan saya/i })
+    this.profileTab = page.getByRole('link', { name: /biodata diri|profil akun/i }).first()
+    this.addressesTab = page.getByRole('link', { name: /daftar alamat|buku alamat/i }).first()
+    this.ordersTab = page.getByRole('link', { name: /pesanan saya/i }).first()
 
     this.fullNameInput = page.getByLabel(/nama lengkap/i).first()
-    this.saveNameButton = page.getByRole('button', { name: /simpan nama/i })
+    this.saveNameButton = page.getByRole('button', { name: /simpan biodata|simpan nama/i })
     this.newEmailInput = page.getByLabel(/ganti dengan email baru/i)
     this.saveEmailButton = page.getByRole('button', { name: /perbarui email/i })
     this.newPasswordInput = page.getByLabel(/kata sandi baru/i).first()

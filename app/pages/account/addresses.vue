@@ -4,7 +4,7 @@ import type { UserAddress, CreateAddressInput } from '~~/shared/schemas/address'
 import { useAddresses } from '~/composables/useAddresses'
 import { useUiToast } from '~/composables/useUiToast'
 import { useUiConfirm } from '~/composables/useUiConfirm'
-import AccountNavTabs from '~/components/account/AccountNavTabs.vue'
+import AccountSidebar from '~/components/account/AccountSidebar.vue'
 import AddressCard from '~/components/account/AddressCard.vue'
 import AddressModal from '~/components/account/AddressModal.vue'
 import UiButton from '~/components/ui/UiButton.vue'
@@ -16,7 +16,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Buku Alamat - ShelfStack',
+  title: 'Daftar Alamat Pengiriman - ShelfStack',
   description: 'Kelola buku alamat pengiriman tersimpan Anda di ShelfStack.',
 })
 
@@ -38,15 +38,31 @@ const editingAddress = ref<UserAddress | null>(null)
 const isSubmitting = ref(false)
 const updatingDefaultId = ref<string | null>(null)
 const searchQuery = ref('')
+const activeFilter = ref<'all' | 'default' | 'rumah' | 'kantor'>('all')
 
 onMounted(async () => {
   await fetchAddresses()
 })
 
 const filteredAddresses = computed(() => {
-  if (!searchQuery.value.trim()) return addresses.value
+  let list = addresses.value
+
+  // Filter tab Tokopedia / Shopee
+  if (activeFilter.value === 'default') {
+    list = list.filter((a) => a.is_default)
+  } else if (activeFilter.value === 'rumah') {
+    list = list.filter(
+      (a) =>
+        a.note?.toLowerCase().includes('[rumah]') ||
+        (!a.note?.includes('[kantor]') && !a.note?.includes('[apartemen]')),
+    )
+  } else if (activeFilter.value === 'kantor') {
+    list = list.filter((a) => a.note?.toLowerCase().includes('[kantor]'))
+  }
+
+  if (!searchQuery.value.trim()) return list
   const q = searchQuery.value.toLowerCase().trim()
-  return addresses.value.filter(
+  return list.filter(
     (a) =>
       a.name.toLowerCase().includes(q) ||
       a.city.toLowerCase().includes(q) ||
@@ -147,115 +163,202 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
 
 <template>
   <main class="min-h-screen bg-brand-canvas-soft pb-16 pt-6">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <AccountNavTabs />
-
-      <!-- Page Subheader -->
-      <div
-        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-brand-hair"
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb -->
+      <nav
+        class="flex items-center gap-1.5 text-[11px] text-brand-muted mb-6"
+        aria-label="Breadcrumb"
       >
-        <div>
-          <div class="flex items-center gap-2.5">
-            <h2 class="text-xl font-display font-bold text-brand-ink m-0">
-              Buku Alamat Pengiriman
-            </h2>
-            <span
-              v-if="addresses.length > 0"
-              class="px-2 py-0.5 rounded-full text-xs font-bold bg-brand-ink text-white tabular-nums"
+        <NuxtLink to="/" class="hover:text-brand-ink transition-colors no-underline">
+          Beranda
+        </NuxtLink>
+        <span class="text-brand-faint">/</span>
+        <span class="text-brand-muted">Akun Saya</span>
+        <span class="text-brand-faint">/</span>
+        <span class="font-semibold text-brand-ink" aria-current="page">Daftar Alamat</span>
+      </nav>
+
+      <!-- 2-Column Tokopedia / Shopee Master Layout -->
+      <div class="flex flex-col lg:flex-row gap-6 items-start">
+        <!-- Left Sidebar Navigation -->
+        <AccountSidebar />
+
+        <!-- Right Main Content Panel -->
+        <div class="flex-1 min-w-0 w-full space-y-6">
+          <!-- Page Header Card -->
+          <div
+            class="bg-brand-canvas border border-brand-hair rounded-card p-5 sm:p-6 shadow-whisper"
+          >
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-brand-hair"
             >
-              {{ addresses.length }}
-            </span>
+              <div>
+                <div class="flex items-center gap-2.5">
+                  <h2 class="text-lg sm:text-xl font-display font-bold text-brand-ink m-0">
+                    Daftar Alamat Pengiriman
+                  </h2>
+                  <span
+                    v-if="addresses.length > 0"
+                    class="px-2 py-0.5 rounded-full text-xs font-bold bg-brand-ink text-white tabular-nums"
+                  >
+                    {{ addresses.length }}
+                  </span>
+                </div>
+                <p class="text-xs text-brand-muted m-0 mt-1">
+                  Kelola alamat pengiriman untuk mempermudah dan mempercepat pesanan belanja Anda.
+                </p>
+              </div>
+
+              <UiButton
+                variant="primary"
+                size="sm"
+                icon="pi pi-plus"
+                class="shrink-0 active:scale-95"
+                @click="handleOpenCreateModal"
+              >
+                Tambah Alamat Baru
+              </UiButton>
+            </div>
+
+            <!-- Search Bar & Category Filter Chips -->
+            <div
+              v-if="addresses.length > 0"
+              class="pt-4 flex flex-col sm:flex-row gap-3 sm:items-center justify-between"
+            >
+              <div class="relative w-full sm:w-72">
+                <i
+                  class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-faint"
+                  aria-hidden="true"
+                />
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="Cari penerima atau kota..."
+                  class="w-full pl-8 pr-3 py-1.5 text-xs rounded-full border border-brand-hair bg-brand-canvas-soft text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink transition-colors"
+                />
+              </div>
+
+              <!-- Filter Chips -->
+              <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <button
+                  type="button"
+                  class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap"
+                  :class="[
+                    activeFilter === 'all'
+                      ? 'bg-brand-ink text-white border-brand-ink'
+                      : 'bg-brand-canvas text-brand-muted border-brand-hair hover:text-brand-ink',
+                  ]"
+                  @click="activeFilter = 'all'"
+                >
+                  Semua Alamat
+                </button>
+                <button
+                  type="button"
+                  class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap"
+                  :class="[
+                    activeFilter === 'default'
+                      ? 'bg-brand-ink text-white border-brand-ink'
+                      : 'bg-brand-canvas text-brand-muted border-brand-hair hover:text-brand-ink',
+                  ]"
+                  @click="activeFilter = 'default'"
+                >
+                  Alamat Utama
+                </button>
+                <button
+                  type="button"
+                  class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap"
+                  :class="[
+                    activeFilter === 'rumah'
+                      ? 'bg-brand-ink text-white border-brand-ink'
+                      : 'bg-brand-canvas text-brand-muted border-brand-hair hover:text-brand-ink',
+                  ]"
+                  @click="activeFilter = 'rumah'"
+                >
+                  Rumah
+                </button>
+                <button
+                  type="button"
+                  class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap"
+                  :class="[
+                    activeFilter === 'kantor'
+                      ? 'bg-brand-ink text-white border-brand-ink'
+                      : 'bg-brand-canvas text-brand-muted border-brand-hair hover:text-brand-ink',
+                  ]"
+                  @click="activeFilter = 'kantor'"
+                >
+                  Kantor
+                </button>
+              </div>
+            </div>
           </div>
-          <p class="text-xs text-brand-muted m-0 mt-1">
-            Kelola daftar alamat tersimpan untuk mempermudah dan mempercepat proses checkout pesanan
-            Anda.
-          </p>
-        </div>
 
-        <UiButton
-          variant="primary"
-          size="sm"
-          icon="pi pi-plus"
-          class="shrink-0 active:scale-95"
-          @click="handleOpenCreateModal"
-        >
-          Tambah Alamat Baru
-        </UiButton>
-      </div>
-
-      <!-- Quick Search Bar (when multiple addresses exist) -->
-      <div v-if="addresses.length > 2" class="mb-6 max-w-sm">
-        <div class="relative">
-          <i
-            class="pi pi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-brand-faint"
-            aria-hidden="true"
-          />
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Cari nama penerima atau kota..."
-            class="w-full pl-9 pr-4 py-2 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink transition-colors"
-          />
-        </div>
-      </div>
-
-      <!-- State: Loading Skeleton -->
-      <div
-        v-if="loading && (!addresses || addresses.length === 0)"
-        class="grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
-        <div
-          v-for="i in 4"
-          :key="i"
-          class="p-5 rounded-card border border-brand-hair bg-brand-canvas space-y-3"
-        >
-          <div class="flex justify-between">
-            <UiSkeleton width="w-32" height="h-5" />
-            <UiSkeleton width="w-20" height="h-4" />
+          <!-- State: Loading Skeleton -->
+          <div
+            v-if="loading && (!addresses || addresses.length === 0)"
+            class="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            <div
+              v-for="i in 4"
+              :key="i"
+              class="p-5 rounded-card border border-brand-hair bg-brand-canvas space-y-3"
+            >
+              <div class="flex justify-between">
+                <UiSkeleton width="w-32" height="h-5" />
+                <UiSkeleton width="w-20" height="h-4" />
+              </div>
+              <UiSkeleton width="w-full" height="h-4" />
+              <UiSkeleton width="w-3/4" height="h-4" />
+              <UiSkeleton width="w-1/2" height="h-4" />
+            </div>
           </div>
-          <UiSkeleton width="w-full" height="h-4" />
-          <UiSkeleton width="w-3/4" height="h-4" />
-          <UiSkeleton width="w-1/2" height="h-4" />
+
+          <!-- State: Empty -->
+          <div v-else-if="!addresses || addresses.length === 0">
+            <UiEmptyState
+              icon="pi-map-marker"
+              title="Belum Ada Alamat Tersimpan"
+              description="Anda belum memiliki alamat pengiriman yang tersimpan di akun Anda. Tambahkan alamat pertama Anda sekarang untuk mempermudah transaksi."
+              action-label="Tambah Alamat Baru"
+              @action="handleOpenCreateModal"
+            />
+          </div>
+
+          <!-- State: Filtered Empty -->
+          <div
+            v-else-if="filteredAddresses.length === 0"
+            class="text-center py-12 bg-brand-canvas rounded-card border border-brand-hair p-8"
+          >
+            <p class="text-sm font-semibold text-brand-ink m-0">Tidak ada alamat yang cocok</p>
+            <p class="text-xs text-brand-muted m-0 mt-1">
+              Coba gunakan kata kunci pencarian atau filter yang lain.
+            </p>
+            <UiButton
+              variant="ghost"
+              size="xs"
+              class="mt-3"
+              @click="
+                searchQuery = ''
+                activeFilter = 'all'
+              "
+            >
+              Reset Filter Pencarian
+            </UiButton>
+          </div>
+
+          <!-- State: Address Grid -->
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <AddressCard
+              v-for="addr in filteredAddresses"
+              :key="addr.id"
+              :address="addr"
+              :loading="loading"
+              :is-setting-default="updatingDefaultId === addr.id"
+              @edit="handleOpenEditModal"
+              @delete="handleDelete"
+              @set-default="handleSetDefault"
+            />
+          </div>
         </div>
-      </div>
-
-      <!-- State: Empty -->
-      <div v-else-if="!addresses || addresses.length === 0">
-        <UiEmptyState
-          icon="pi-map-marker"
-          title="Belum Ada Alamat Tersimpan"
-          description="Anda belum memiliki alamat pengiriman yang tersimpan di akun Anda. Tambahkan alamat pertama Anda sekarang untuk mempermudah transaksi."
-          action-label="Tambah Alamat Baru"
-          @action="handleOpenCreateModal"
-        />
-      </div>
-
-      <!-- State: Filtered Empty -->
-      <div
-        v-else-if="filteredAddresses.length === 0"
-        class="text-center py-12 bg-brand-canvas rounded-card border border-brand-hair p-8"
-      >
-        <p class="text-sm font-semibold text-brand-ink m-0">Tidak ada alamat yang cocok</p>
-        <p class="text-xs text-brand-muted m-0 mt-1">
-          Coba gunakan kata kunci pencarian yang lain.
-        </p>
-        <UiButton variant="ghost" size="xs" class="mt-3" @click="searchQuery = ''">
-          Reset Pencarian
-        </UiButton>
-      </div>
-
-      <!-- State: Address Grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <AddressCard
-          v-for="addr in filteredAddresses"
-          :key="addr.id"
-          :address="addr"
-          :loading="loading"
-          :is-setting-default="updatingDefaultId === addr.id"
-          @edit="handleOpenEditModal"
-          @delete="handleDelete"
-          @set-default="handleSetDefault"
-        />
       </div>
 
       <!-- Address Modal -->

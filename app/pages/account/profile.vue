@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useUserProfile } from '~/composables/useUserProfile'
 import { useUiToast } from '~/composables/useUiToast'
-import AccountNavTabs from '~/components/account/AccountNavTabs.vue'
+import AccountSidebar from '~/components/account/AccountSidebar.vue'
 import UiInput from '~/components/ui/UiInput.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import UiAlert from '~/components/ui/UiAlert.vue'
@@ -13,7 +13,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Profil Akun - ShelfStack',
+  title: 'Biodata Diri - ShelfStack',
   description: 'Kelola informasi profil, kata sandi, dan kredensial akun ShelfStack Anda.',
 })
 
@@ -151,106 +151,97 @@ const handleUpdatePassword = async () => {
 
 <template>
   <main class="min-h-screen bg-brand-canvas-soft pb-16 pt-6">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <AccountNavTabs />
-
-      <!-- Interactive Activity Metrics Bento -->
-      <section
-        class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8"
-        aria-label="Ringkasan Aktivitas Akun"
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb -->
+      <nav
+        class="flex items-center gap-1.5 text-[11px] text-brand-muted mb-6"
+        aria-label="Breadcrumb"
       >
-        <div class="p-4 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper">
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted m-0">
-            Anggota Sejak
-          </p>
-          <div v-if="isLoadingStats" class="mt-2">
-            <UiSkeleton width="w-24" height="h-5" />
-          </div>
-          <p v-else class="text-sm font-bold text-brand-ink m-0 mt-1 truncate">
-            {{ formattedMemberSince }}
-          </p>
-        </div>
-
-        <NuxtLink
-          to="/orders"
-          class="group p-4 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper hover:border-brand-ink/30 transition-all no-underline block cursor-pointer"
-        >
-          <div class="flex items-center justify-between">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted m-0">
-              Total Pesanan
-            </p>
-            <i
-              class="pi pi-arrow-up-right text-[10px] text-brand-faint group-hover:text-brand-ink transition-colors"
-            />
-          </div>
-          <div v-if="isLoadingStats" class="mt-2">
-            <UiSkeleton width="w-12" height="h-5" />
-          </div>
-          <p v-else class="text-xl font-display font-bold text-brand-ink m-0 mt-1 tabular-nums">
-            {{ stats?.totalOrders ?? 0 }}
-          </p>
+        <NuxtLink to="/" class="hover:text-brand-ink transition-colors no-underline">
+          Beranda
         </NuxtLink>
+        <span class="text-brand-faint">/</span>
+        <span class="text-brand-muted">Akun Saya</span>
+        <span class="text-brand-faint">/</span>
+        <span class="font-semibold text-brand-ink" aria-current="page">Biodata Diri</span>
+      </nav>
 
-        <NuxtLink
-          to="/orders"
-          class="group p-4 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper hover:border-brand-ink/30 transition-all no-underline block cursor-pointer"
-        >
-          <div class="flex items-center justify-between">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted m-0">
-              Pesanan Aktif
-            </p>
-            <span class="w-2 h-2 rounded-full bg-brand-accent animate-pulse" />
-          </div>
-          <div v-if="isLoadingStats" class="mt-2">
-            <UiSkeleton width="w-12" height="h-5" />
-          </div>
-          <p v-else class="text-xl font-display font-bold text-brand-accent m-0 mt-1 tabular-nums">
-            {{ stats?.activeOrders ?? 0 }}
-          </p>
-        </NuxtLink>
+      <!-- 2-Column Tokopedia / Shopee Master Layout -->
+      <div class="flex flex-col lg:flex-row gap-6 items-start">
+        <!-- Left Sidebar Navigation -->
+        <AccountSidebar />
 
-        <NuxtLink
-          to="/account/addresses"
-          class="group p-4 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper hover:border-brand-ink/30 transition-all no-underline block cursor-pointer"
-        >
-          <div class="flex items-center justify-between">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted m-0">
-              Alamat Tersimpan
-            </p>
-            <i
-              class="pi pi-arrow-up-right text-[10px] text-brand-faint group-hover:text-brand-ink transition-colors"
-            />
-          </div>
-          <div v-if="isLoadingStats" class="mt-2">
-            <UiSkeleton width="w-12" height="h-5" />
-          </div>
-          <p v-else class="text-xl font-display font-bold text-brand-ink m-0 mt-1 tabular-nums">
-            {{ stats?.totalAddresses ?? 0 }}
-          </p>
-        </NuxtLink>
-      </section>
+        <!-- Right Main Content Panel -->
+        <div class="flex-1 min-w-0 w-full space-y-6">
+          <!-- Top KPI Metrics Banner -->
+          <div
+            class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-brand-canvas border border-brand-hair rounded-card p-4 sm:p-5 shadow-whisper"
+          >
+            <div class="p-3 rounded-field bg-brand-canvas-soft">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block"
+                >Status Akun</span
+              >
+              <span class="text-xs font-bold text-emerald-700 mt-0.5 flex items-center gap-1">
+                <i class="pi pi-shield text-[10px]" />
+                <span>Terverifikasi</span>
+              </span>
+            </div>
 
-      <!-- Main Profile Settings Bento Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Card 1: Nama Lengkap -->
-        <div
-          class="p-6 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper flex flex-col justify-between"
-        >
-          <div>
+            <NuxtLink
+              to="/orders"
+              class="p-3 rounded-field bg-brand-canvas-soft no-underline block hover:bg-brand-hairsoft transition-colors"
+            >
+              <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block"
+                >Total Pesanan</span
+              >
+              <div v-if="isLoadingStats" class="mt-1"><UiSkeleton width="w-10" height="h-4" /></div>
+              <span v-else class="text-base font-bold text-brand-ink tabular-nums">{{
+                stats?.totalOrders ?? 0
+              }}</span>
+            </NuxtLink>
+
+            <NuxtLink
+              to="/orders"
+              class="p-3 rounded-field bg-brand-canvas-soft no-underline block hover:bg-brand-hairsoft transition-colors"
+            >
+              <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block"
+                >Pesanan Aktif</span
+              >
+              <div v-if="isLoadingStats" class="mt-1"><UiSkeleton width="w-10" height="h-4" /></div>
+              <span v-else class="text-base font-bold text-brand-accent tabular-nums">{{
+                stats?.activeOrders ?? 0
+              }}</span>
+            </NuxtLink>
+
+            <NuxtLink
+              to="/account/addresses"
+              class="p-3 rounded-field bg-brand-canvas-soft no-underline block hover:bg-brand-hairsoft transition-colors"
+            >
+              <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block"
+                >Buku Alamat</span
+              >
+              <div v-if="isLoadingStats" class="mt-1"><UiSkeleton width="w-10" height="h-4" /></div>
+              <span v-else class="text-base font-bold text-brand-ink tabular-nums"
+                >{{ stats?.totalAddresses ?? 0 }} Alamat</span
+              >
+            </NuxtLink>
+          </div>
+
+          <!-- Section 1: Ubah Biodata Diri (Tokopedia pattern) -->
+          <div class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper">
             <div class="flex items-center gap-2 mb-1">
               <i class="pi pi-user text-brand-muted text-sm" />
-              <h3 class="text-base font-display font-bold text-brand-ink m-0">Nama Lengkap</h3>
+              <h2 class="text-base font-display font-bold text-brand-ink m-0">Ubah Biodata Diri</h2>
             </div>
             <p class="text-xs text-brand-muted mb-4">
-              Nama ini akan ditampilkan pada profil akun, dokumen transaksi, dan invoice pesanan
-              Anda.
+              Kelola nama lengkap dan informasi akun untuk kebutuhan invoice transaksi resmi.
             </p>
 
             <UiAlert v-if="nameSuccess" variant="success" class="mb-4">
               Nama lengkap berhasil diperbarui.
             </UiAlert>
 
-            <div class="space-y-4">
+            <div class="space-y-4 max-w-lg">
               <UiInput
                 v-model="fullName"
                 label="Nama Lengkap"
@@ -258,56 +249,68 @@ const handleUpdatePassword = async () => {
                 :error="nameError"
                 :disabled="isUpdatingName"
               />
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-brand-muted pt-1">
+                <div class="p-3 rounded-field bg-brand-canvas-soft border border-brand-hair">
+                  <span class="text-[11px] text-brand-muted block font-medium">Tipe Akun</span>
+                  <span class="font-bold text-brand-ink uppercase">{{
+                    profile?.role || 'Customer'
+                  }}</span>
+                </div>
+                <div class="p-3 rounded-field bg-brand-canvas-soft border border-brand-hair">
+                  <span class="text-[11px] text-brand-muted block font-medium"
+                    >Tanggal Bergabung</span
+                  >
+                  <span class="font-bold text-brand-ink">{{ formattedMemberSince }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-5 mt-6 border-t border-brand-hair flex items-center justify-between">
+              <span
+                v-if="isNameChanged"
+                class="text-[11px] text-brand-accent font-semibold flex items-center gap-1"
+              >
+                <i class="pi pi-exclamation-circle text-[10px]" />
+                <span>Perubahan belum disimpan</span>
+              </span>
+              <span v-else class="text-[11px] text-brand-faint">Identitas profil sesuai</span>
+
+              <UiButton
+                variant="primary"
+                size="sm"
+                :loading="isUpdatingName"
+                :disabled="!isNameChanged || isUpdatingName"
+                class="active:scale-95"
+                @click="handleUpdateName"
+              >
+                Simpan Biodata
+              </UiButton>
             </div>
           </div>
 
-          <div class="pt-5 mt-6 border-t border-brand-hair flex items-center justify-between">
-            <span
-              v-if="isNameChanged"
-              class="text-[11px] text-brand-accent font-semibold flex items-center gap-1"
-            >
-              <i class="pi pi-exclamation-circle text-[10px]" />
-              <span>Perubahan belum disimpan</span>
-            </span>
-            <span v-else class="text-[11px] text-brand-faint"> Sesuai identitas profil </span>
-
-            <UiButton
-              variant="primary"
-              size="sm"
-              :loading="isUpdatingName"
-              :disabled="!isNameChanged || isUpdatingName"
-              class="active:scale-95"
-              @click="handleUpdateName"
-            >
-              Simpan Nama
-            </UiButton>
-          </div>
-        </div>
-
-        <!-- Card 2: Alamat Email -->
-        <div
-          class="p-6 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper flex flex-col justify-between"
-        >
-          <div>
+          <!-- Section 2: Kontak Pribadi & Verifikasi Email (Shopee pattern) -->
+          <div class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper">
             <div class="flex items-center gap-2 mb-1">
               <i class="pi pi-envelope text-brand-muted text-sm" />
-              <h3 class="text-base font-display font-bold text-brand-ink m-0">Alamat Email</h3>
+              <h2 class="text-base font-display font-bold text-brand-ink m-0">
+                Kontak Pribadi &amp; Email
+              </h2>
             </div>
             <p class="text-xs text-brand-muted mb-4">
-              Alamat email utama digunakan untuk login dan menerima konfirmasi transaksi belanja.
+              Alamat email utama digunakan untuk login, verifikasi keamanan, dan notifikasi
+              transaksi belanja.
             </p>
 
-            <UiAlert v-if="emailNotice" variant="info" class="mb-4">
-              {{ emailNotice }}
-            </UiAlert>
+            <UiAlert v-if="emailNotice" variant="info" class="mb-4">{{ emailNotice }}</UiAlert>
 
-            <div class="space-y-4">
+            <div class="space-y-4 max-w-lg">
               <div
-                class="p-3.5 rounded-field bg-brand-canvas-soft border border-brand-hair text-xs flex items-center justify-between"
+                class="p-3.5 rounded-field bg-brand-canvas-soft border border-brand-hair flex items-center justify-between"
               >
                 <div>
                   <span class="text-[11px] text-brand-muted block font-medium"
-                    >Email Terdaftar Saat Ini:</span
+                    >Alamat Email Terdaftar:</span
                   >
                   <span class="font-bold text-brand-ink font-mono text-xs">{{ user?.email }}</span>
                 </div>
@@ -329,41 +332,39 @@ const handleUpdatePassword = async () => {
                 :disabled="isUpdatingEmail"
               />
             </div>
+
+            <div class="pt-5 mt-6 border-t border-brand-hair flex justify-end">
+              <UiButton
+                variant="secondary"
+                size="sm"
+                :loading="isUpdatingEmail"
+                :disabled="!newEmail || isUpdatingEmail"
+                class="active:scale-95"
+                @click="handleUpdateEmail"
+              >
+                Perbarui Email
+              </UiButton>
+            </div>
           </div>
 
-          <div class="pt-5 mt-6 border-t border-brand-hair flex justify-end">
-            <UiButton
-              variant="secondary"
-              size="sm"
-              :loading="isUpdatingEmail"
-              :disabled="!newEmail || isUpdatingEmail"
-              class="active:scale-95"
-              @click="handleUpdateEmail"
-            >
-              Perbarui Email
-            </UiButton>
-          </div>
-        </div>
+          <!-- Section 3: Keamanan & Kata Sandi -->
+          <div class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper">
+            <div class="flex items-center gap-2 mb-1">
+              <i class="pi pi-lock text-brand-muted text-sm" />
+              <h2 class="text-base font-display font-bold text-brand-ink m-0">
+                Keamanan &amp; Kata Sandi
+              </h2>
+            </div>
+            <p class="text-xs text-brand-muted mb-4">
+              Pastikan kata sandi Anda kuat untuk melindungi akun dan riwayat transaksi belanja
+              Anda.
+            </p>
 
-        <!-- Card 3: Ubah Kata Sandi -->
-        <div
-          class="md:col-span-2 p-6 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper"
-        >
-          <div class="flex items-center gap-2 mb-1">
-            <i class="pi pi-lock text-brand-muted text-sm" />
-            <h3 class="text-base font-display font-bold text-brand-ink m-0">Ubah Kata Sandi</h3>
-          </div>
-          <p class="text-xs text-brand-muted mb-4">
-            Gunakan kombinasi kata sandi yang aman untuk melindungi akun dan riwayat transaksi
-            belanja Anda.
-          </p>
+            <UiAlert v-if="passwordSuccess" variant="success" class="mb-4">
+              Kata sandi berhasil diperbarui.
+            </UiAlert>
 
-          <UiAlert v-if="passwordSuccess" variant="success" class="mb-4">
-            Kata sandi berhasil diperbarui.
-          </UiAlert>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
               <UiInput
                 v-model="newPassword"
                 label="Kata Sandi Baru"
@@ -373,8 +374,6 @@ const handleUpdatePassword = async () => {
                 :error="passwordError"
                 :disabled="isUpdatingPassword"
               />
-            </div>
-            <div>
               <UiInput
                 v-model="confirmPassword"
                 label="Konfirmasi Kata Sandi Baru"
@@ -384,54 +383,54 @@ const handleUpdatePassword = async () => {
                 :disabled="isUpdatingPassword"
               />
             </div>
-          </div>
 
-          <!-- Live Requirements Visual Checklist -->
-          <div
-            v-if="newPassword || confirmPassword"
-            class="mt-3.5 p-3 rounded-field bg-brand-canvas-soft border border-brand-hair flex items-center gap-4 text-xs"
-          >
+            <!-- Live Checklist -->
             <div
-              class="flex items-center gap-1.5"
-              :class="isPasswordLengthValid ? 'text-emerald-700' : 'text-brand-muted'"
+              v-if="newPassword || confirmPassword"
+              class="mt-3.5 p-3 rounded-field bg-brand-canvas-soft border border-brand-hair flex items-center gap-4 text-xs max-w-2xl"
             >
-              <i
-                :class="
-                  isPasswordLengthValid
-                    ? 'pi pi-check-circle text-emerald-600'
-                    : 'pi pi-circle text-brand-faint'
-                "
-                class="text-xs"
-              />
-              <span>Minimal 8 karakter</span>
+              <div
+                class="flex items-center gap-1.5"
+                :class="isPasswordLengthValid ? 'text-emerald-700' : 'text-brand-muted'"
+              >
+                <i
+                  :class="
+                    isPasswordLengthValid
+                      ? 'pi pi-check-circle text-emerald-600'
+                      : 'pi pi-circle text-brand-faint'
+                  "
+                  class="text-xs"
+                />
+                <span>Minimal 8 karakter</span>
+              </div>
+              <div
+                class="flex items-center gap-1.5"
+                :class="isPasswordMatch ? 'text-emerald-700' : 'text-brand-muted'"
+              >
+                <i
+                  :class="
+                    isPasswordMatch
+                      ? 'pi pi-check-circle text-emerald-600'
+                      : 'pi pi-circle text-brand-faint'
+                  "
+                  class="text-xs"
+                />
+                <span>Konfirmasi cocok</span>
+              </div>
             </div>
-            <div
-              class="flex items-center gap-1.5"
-              :class="isPasswordMatch ? 'text-emerald-700' : 'text-brand-muted'"
-            >
-              <i
-                :class="
-                  isPasswordMatch
-                    ? 'pi pi-check-circle text-emerald-600'
-                    : 'pi pi-circle text-brand-faint'
-                "
-                class="text-xs"
-              />
-              <span>Konfirmasi cocok</span>
-            </div>
-          </div>
 
-          <div class="pt-5 mt-6 border-t border-brand-hair flex justify-end">
-            <UiButton
-              variant="primary"
-              size="sm"
-              :loading="isUpdatingPassword"
-              :disabled="!isPasswordLengthValid || !isPasswordMatch || isUpdatingPassword"
-              class="active:scale-95"
-              @click="handleUpdatePassword"
-            >
-              Simpan Kata Sandi
-            </UiButton>
+            <div class="pt-5 mt-6 border-t border-brand-hair flex justify-end">
+              <UiButton
+                variant="primary"
+                size="sm"
+                :loading="isUpdatingPassword"
+                :disabled="!isPasswordLengthValid || !isPasswordMatch || isUpdatingPassword"
+                class="active:scale-95"
+                @click="handleUpdatePassword"
+              >
+                Simpan Kata Sandi
+              </UiButton>
+            </div>
           </div>
         </div>
       </div>
