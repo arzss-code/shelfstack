@@ -694,6 +694,50 @@ export type Database = {
         }
         Relationships: []
       }
+      user_coupons: {
+        Row: {
+          claimed_at: string
+          coupon_id: string
+          created_at: string
+          id: string
+          order_id: string | null
+          status: 'claimed' | 'used' | 'expired'
+          updated_at: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          coupon_id: string
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          status?: 'claimed' | 'used' | 'expired'
+          updated_at?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          coupon_id?: string
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          status?: 'claimed' | 'used' | 'expired'
+          updated_at?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'user_coupons_coupon_id_fkey'
+            columns: ['coupon_id']
+            isOneToOne: false
+            referencedRelation: 'coupons'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       wishlists: {
         Row: {
           created_at: string | null
@@ -846,6 +890,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_coupon_to_wallet: {
+        Args: {
+          p_coupon_id?: string | null
+          p_code?: string | null
+        }
+        Returns: Json
+      }
       handle_payment_webhook: {
         Args: {
           p_order_id: string

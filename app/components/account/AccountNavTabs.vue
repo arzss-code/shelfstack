@@ -26,6 +26,7 @@ interface NavTab {
 
 const currentTabLabel = computed(() => {
   if (route.path.startsWith('/account/addresses')) return 'Daftar Alamat'
+  if (route.path.startsWith('/account/vouchers')) return 'Voucher Saya'
   if (route.path.startsWith('/account/profile') || route.path === '/account') return 'Profil Saya'
   if (route.path.startsWith('/orders')) return 'Pesanan Saya'
   if (route.path.startsWith('/wishlist')) return 'Wishlist'
@@ -50,6 +51,12 @@ const tabs = computed<NavTab[]>(() => [
     label: 'Pesanan Saya',
     to: '/orders',
     icon: 'pi pi-box',
+  },
+  {
+    id: 'vouchers',
+    label: 'Voucher Saya',
+    to: '/account/vouchers',
+    icon: 'pi pi-ticket',
   },
   {
     id: 'wishlist',
