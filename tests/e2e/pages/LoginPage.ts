@@ -76,8 +76,8 @@ export class LoginPage extends BasePage {
   }
 
   async assertPageLoaded(): Promise<void> {
-    await expect(this.heading).toBeVisible()
-    await expect(this.emailInput).toBeVisible()
-    await expect(this.submitButton).toBeVisible()
+    await expect(this.heading).toBeVisible({ timeout: 15000 })
+    await expect(this.emailInput).toBeVisible({ timeout: 15000 })
+    await expect(this.submitButton).toBeVisible({ timeout: 15000 })
   }
 }

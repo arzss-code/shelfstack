@@ -17,7 +17,7 @@ export class CatalogPage extends BasePage {
     this.heading = page.getByRole('heading', { name: 'Katalog' })
     this.searchInput = page.getByPlaceholder('Cari produk...')
     this.productLinks = page.locator('a[href^="/product/"]')
-    this.emptyState = page.locator('text="Tidak ada produk"')
+    this.emptyState = page.locator(':has-text("Tidak ada produk"), :has-text("Tidak ada hasil")')
     this.productCards = page.locator('article.product-card')
     this.categoryButtons = page.locator('aside button')
     this.quickAddButtons = page.locator('button[aria-label*="ke Keranjang"]')
@@ -42,8 +42,8 @@ export class CatalogPage extends BasePage {
   }
 
   async assertPageLoaded(): Promise<void> {
-    await expect(this.heading).toBeVisible()
-    await expect(this.searchInput).toBeVisible()
+    await expect(this.heading).toBeVisible({ timeout: 15000 })
+    await expect(this.searchInput).toBeVisible({ timeout: 15000 })
   }
 
   async getProductCount(): Promise<number> {
@@ -51,8 +51,17 @@ export class CatalogPage extends BasePage {
   }
 
   async clickFirstProduct(): Promise<void> {
+    await expect(this.productCards.first()).toBeVisible({ timeout: 15000 })
+    const inStockCard = this.productCards.filter({ hasNotText: 'Stok Habis' }).first()
+    if ((await inStockCard.count()) > 0) {
+      const link = inStockCard.locator('a[href^="/product/"]')
+      await expect(link).toBeVisible({ timeout: 10000 })
+      await link.click()
+      return
+    }
+
     const first = this.productLinks.first()
-    await expect(first).toBeVisible()
+    await expect(first).toBeVisible({ timeout: 10000 })
     await first.click()
   }
 

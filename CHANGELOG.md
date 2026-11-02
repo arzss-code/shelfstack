@@ -16,6 +16,11 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
   - `server/api/orders/index.ts`: Menambahkan graceful fallback otomatis ke signature 5-parameter saat PostgREST mengembalikan `PGRST202` (schema cache mismatch), mencegah kegagalan HTTP 400 pada masa transisi deployment.
 - **Frontend Checkout Polish**:
   - `app/components/checkout/CheckoutOrderSummary.vue`: Membersihkan badge kuantitas redundan pada thumbnail item pesanan untuk tampilan ringkasan yang lebih bersih dan minimalis.
+- **Stabilisasi & Hardening Pengujian End-to-End (E2E)**:
+  - `playwright.config.ts`: Menaikkan batas waktu default expect menjadi 10.000ms untuk mencegah timeout prematur di CI GitHub Actions runner.
+  - `tests/e2e/pages/CatalogPage.ts`: Menambahkan filter seleksi produk stok tersedia (`hasNotText: 'Stok Habis'`) dan memperluas matcher empty state.
+  - `tests/e2e/pages/ProductDetailPage.ts`: Menoleransi tombol "Tambah ke Bag" maupun "Stok Habis" dengan timeout 15.000ms.
+  - `tests/e2e/pom-order-flow.spec.ts` & `tests/e2e/product.spec.ts`: Mengeliminasi polling pengetikan berulang di dalam `expect.poll` untuk menghindari pembatalan debounce timer 300ms secara terus-menerus.
 - **Testing & Quality Verification**:
   - `tests/unit/api-orders-idempotency.spec.ts`: Menambahkan unit test regresi untuk verifikasi fallback otomatis signature RPC saat terjadi error `PGRST202`.
   - `tests/unit/location-master.spec.ts`: Menambahkan unit test untuk fungsi `formatAdministrativeAddress`.
