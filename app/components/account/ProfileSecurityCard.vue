@@ -73,7 +73,7 @@ defineExpose({
     <!-- Live Checklist (Shopee pattern) -->
     <div
       v-if="newPassword || confirmPassword"
-      class="mt-3.5 p-3 rounded-field bg-brand-canvas-soft border border-brand-hair flex items-center gap-4 text-xs max-w-2xl"
+      class="mt-3.5 p-3 rounded-field bg-white border border-brand-hair flex items-center gap-4 text-xs max-w-2xl"
     >
       <div
         class="flex items-center gap-1.5"

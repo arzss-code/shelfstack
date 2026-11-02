@@ -59,7 +59,7 @@ const labelInfo = computed(() => {
       <!-- Badges Strip (Shopee / Tokopedia pattern) -->
       <div class="flex items-center gap-2 mb-2.5 flex-wrap">
         <span
-          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-canvas-soft text-brand-ink border border-brand-hair uppercase tracking-wide"
+          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-brand-ink border border-brand-hair uppercase tracking-wide"
         >
           <i :class="[labelInfo.icon, 'text-[10px] text-brand-muted']" aria-hidden="true" />
           <span>{{ labelInfo.label }}</span>
@@ -109,7 +109,7 @@ const labelInfo = computed(() => {
         <!-- Courier Landmark Note -->
         <div
           v-if="labelInfo.note"
-          class="mt-2.5 p-2.5 rounded-field bg-brand-canvas-soft border border-brand-hair text-[11px] text-brand-muted flex items-start gap-1.5"
+          class="mt-2.5 p-2.5 rounded-field bg-white border border-brand-hair text-[11px] text-brand-muted flex items-start gap-1.5"
         >
           <i
             class="pi pi-info-circle text-[11px] text-brand-faint shrink-0 mt-0.5"

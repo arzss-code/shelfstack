@@ -58,7 +58,7 @@ const handleLocationSelect = (loc: AdministrativeSelection) => {
     <!-- Selected Location Review Card -->
     <div
       v-if="city"
-      class="p-3.5 rounded-card border border-brand-hair bg-brand-canvas-soft/70 flex items-center justify-between gap-3 shadow-xs"
+      class="p-3.5 rounded-card border border-brand-hair bg-white flex items-center justify-between gap-3 shadow-xs"
     >
       <div class="flex items-center gap-2.5 min-w-0">
         <span
@@ -92,7 +92,7 @@ const handleLocationSelect = (loc: AdministrativeSelection) => {
     <!-- Unselected Location Trigger -->
     <div
       v-else
-      class="p-3.5 rounded-card border border-dashed border-brand-hair hover:border-brand-ink/40 transition-colors bg-brand-canvas-soft flex items-center justify-between gap-3"
+      class="p-3.5 rounded-card border border-dashed border-brand-hair hover:border-brand-ink/40 transition-colors bg-white flex items-center justify-between gap-3"
     >
       <div class="flex items-center gap-2.5 min-w-0">
         <i class="pi pi-map text-sm text-brand-faint shrink-0" aria-hidden="true" />
