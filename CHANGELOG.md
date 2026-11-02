@@ -21,6 +21,8 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
   - `tests/e2e/pages/CatalogPage.ts`: Menambahkan filter seleksi produk stok tersedia (`hasNotText: 'Stok Habis'`) dan memperluas matcher empty state.
   - `tests/e2e/pages/ProductDetailPage.ts`: Menoleransi tombol "Tambah ke Bag" maupun "Stok Habis" dengan timeout 15.000ms.
   - `tests/e2e/pom-order-flow.spec.ts` & `tests/e2e/product.spec.ts`: Mengeliminasi polling pengetikan berulang di dalam `expect.poll` untuk menghindari pembatalan debounce timer 300ms secara terus-menerus.
+  - `nuxt.config.ts`: Menonaktifkan default global rate limiter nuxt-security (`rateLimiter: false`) untuk mengeliminasi pemblokiran HTTP 429 pada storefront dan test runner, sementara endpoint sensitif tetap diproteksi via `routeRules`.
+  - `tests/e2e/pages/CheckoutPage.ts` & `tests/e2e/full-business-journey.spec.ts`: Menyelaraskan matcher heading checkout dengan regex `^checkout` serta menyinkronkan pengisian alamat dengan pemilih lokasi administratif kaskade 4 tingkat.
 - **Testing & Quality Verification**:
   - `tests/unit/api-orders-idempotency.spec.ts`: Menambahkan unit test regresi untuk verifikasi fallback otomatis signature RPC saat terjadi error `PGRST202`.
   - `tests/unit/location-master.spec.ts`: Menambahkan unit test untuk fungsi `formatAdministrativeAddress`.
