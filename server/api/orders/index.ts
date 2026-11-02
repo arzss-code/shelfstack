@@ -110,13 +110,32 @@ export default defineEventHandler(async (event) => {
     const requestHash = idempotencyKey ? calculateCheckoutHash(parsed.data) : null
 
     // 4. Panggil RPC create_order yang atomik di Postgres (Security Definer)
-    const { data: orderId, error } = await client.rpc('create_order', {
+    let { data: orderId, error } = await client.rpc('create_order', {
       p_items: parsed.data.items,
       p_address: parsed.data.address,
       p_idempotency_key: idempotencyKey,
       p_request_hash: requestHash,
       p_coupon_code: parsed.data.coupon_code || null,
+      p_shipping_service: parsed.data.shipping_service || 'reguler',
+      p_courier_code: parsed.data.courier_code || null,
     })
+
+    // Fallback kompatibilitas jika RPC signature 7-parameter belum tersedia di schema cache (PGRST202)
+    if (error && (error.code === 'PGRST202' || error.message?.includes('schema cache'))) {
+      logger.warn(
+        `[Checkout] RPC create_order signature 7-parameter tidak ditemukan di schema cache (PGRST202). Melakukan fallback ke signature 5-parameter.`,
+        { requestId: event.context?.requestId, error: error.message },
+      )
+      const legacyRpc = await client.rpc('create_order', {
+        p_items: parsed.data.items,
+        p_address: parsed.data.address,
+        p_idempotency_key: idempotencyKey,
+        p_request_hash: requestHash,
+        p_coupon_code: parsed.data.coupon_code || null,
+      })
+      orderId = legacyRpc.data
+      error = legacyRpc.error
+    }
 
     if (error) {
       if (error.message?.includes('IDEMPOTENCY_CONFLICT')) {

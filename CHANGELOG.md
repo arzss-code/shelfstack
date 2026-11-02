@@ -2,6 +2,106 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.24.0] - 2026-10-31
+
+### Persistensi Kecamatan Alamat, RPC create_order Resilient Fallback & Checkout UX Polish
+
+- **Persistensi Kecamatan Alamat Pengiriman (District Persistence)**:
+  - `shared/data/locations/indonesia-regions.ts`: Menambahkan fungsi `formatAdministrativeAddress(districtName, cityName, provinceName)` berstandar ekspedisi nasional (`Kec. [Kecamatan], [Kota/Kabupaten], [Provinsi]`).
+  - `app/components/checkout/CheckoutAddressForm.vue` & `SavedAddressForm.vue`: Mengikat nama kecamatan dari pemilihan 4 tingkat sehingga tidak lagi hilang saat disimpan.
+  - Menghapus input teks manual redundan (`Kota / Kabupaten (Tersimpan)` dan `Kode Pos`) di bawah kartu wilayah terpilih, menjadikan kartu review sebagai _Single Source of Truth_ dengan tombol aksi `Ubah`.
+- **Database & Backend RPC Resilience (Expand-and-Contract Pattern)**:
+  - `supabase/migrations/20261123000002_fix_create_order_coupon_record_unassigned.sql`: Memperbaiki bug PL/pgSQL `55000: record v_coupon is not assigned yet` saat checkout tanpa kupon dengan mendeklarasikan variabel skalar aman `v_coupon_id` dan `v_coupon_code`.
+  - Menerapkan seluruh migrasi yang tertunda ke remote Supabase via `pnpm dlx supabase db push --linked --yes` sehingga skema remote 100% up to date.
+  - `server/api/orders/index.ts`: Menambahkan graceful fallback otomatis ke signature 5-parameter saat PostgREST mengembalikan `PGRST202` (schema cache mismatch), mencegah kegagalan HTTP 400 pada masa transisi deployment.
+- **Frontend Checkout Polish**:
+  - `app/components/checkout/CheckoutOrderSummary.vue`: Membersihkan badge kuantitas redundan pada thumbnail item pesanan untuk tampilan ringkasan yang lebih bersih dan minimalis.
+- **Stabilisasi & Hardening Pengujian End-to-End (E2E)**:
+  - `playwright.config.ts`: Menaikkan batas waktu default expect menjadi 10.000ms untuk mencegah timeout prematur di CI GitHub Actions runner.
+  - `tests/e2e/pages/CatalogPage.ts`: Menambahkan filter seleksi produk stok tersedia (`hasNotText: 'Stok Habis'`) dan memperluas matcher empty state.
+  - `tests/e2e/pages/ProductDetailPage.ts`: Menoleransi tombol "Tambah ke Bag" maupun "Stok Habis" dengan timeout 15.000ms.
+  - `tests/e2e/pom-order-flow.spec.ts` & `tests/e2e/product.spec.ts`: Mengeliminasi polling pengetikan berulang di dalam `expect.poll` untuk menghindari pembatalan debounce timer 300ms secara terus-menerus.
+  - `nuxt.config.ts`: Menonaktifkan default global rate limiter nuxt-security (`rateLimiter: false`) untuk mengeliminasi pemblokiran HTTP 429 pada storefront dan test runner, sementara endpoint sensitif tetap diproteksi via `routeRules`.
+  - `tests/e2e/pages/CheckoutPage.ts` & `tests/e2e/full-business-journey.spec.ts`: Menyelaraskan matcher heading checkout dengan regex `^checkout`, matcher rincian belanja (`/total tagihan|total pembayaran/i`), serta menyinkronkan pengisian alamat dengan pemilih lokasi administratif kaskade 4 tingkat.
+- **Testing & Quality Verification**:
+  - `tests/unit/api-orders-idempotency.spec.ts`: Menambahkan unit test regresi untuk verifikasi fallback otomatis signature RPC saat terjadi error `PGRST202`.
+  - `tests/unit/location-master.spec.ts`: Menambahkan unit test untuk fungsi `formatAdministrativeAddress`.
+  - `tests/unit/checkout-address-form.spec.ts`: Memperbarui verifikasi nama kecamatan pada payload checkout.
+  - 65 test files / 624 tests lulus 100%. `nuxi typecheck` EXIT 0, ESLint 0 error.
+
+## [0.23.0] - 2026-10-30
+
+### Shopee-Style 4-Tier Indonesian Administrative Address Cascade & Bugfix Double Prefix (SHF-LOC-02)
+
+- **Master Data Administratif Indonesia Resmi (Kepmendagri 2025/2026)**:
+  - `shared/data/locations/indonesia-administrative.json`: Dataset resmi mencakup 38 Provinsi, 514 Kota dan Kabupaten, 7.265 Kecamatan, serta pemetaan Kode Pos nasional tanpa dependensi eksternal.
+  - `shared/data/locations/indonesia-regions.ts`: Fungsi helper berkinerja tinggi `getProvinces()`, `getCitiesByProvince()`, `getDistrictsByCity()`, `getPostalCodesByDistrict()`, dan `searchAdministrativeLocations()` dengan skoring relevansi pintar.
+- **Bugfix Double Prefix**:
+  - `formatCityDisplay()`: Memperbaiki bug duplikasi string seperti `Kota Kota Jakarta Selatan` dan `Kabupaten Kabupaten Bogor` dengan normalisasi regex guard clause berlapis, memastikan output kanonikal tepat dan bersih.
+- **Frontend 4-Tier Cascading Selector (Shopee-Style)**:
+  - `app/components/checkout/LocationPickerModal.vue`: Implementasi antarmuka 4 tab bertingkat (`Provinsi` -> `Kota` -> `Kecamatan` -> `Kode Pos`) dengan garis aktif aksen oranye, transisi otomatis saat item dipilih, navigasi fleksibel kembali ke tab sebelumnya, serta pencarian autocomplete instan di bar atas.
+  - Tetap ringkas dan modular di bawah 280 baris kode (mematuhi batasan <= 300 baris Talenavi SOP).
+- **Refactoring Modularitas Komponen**:
+  - `app/components/checkout/SavedAddressForm.vue`: Mengekstrak form tambah alamat baru menjadi komponen mandiri (182 baris) sehingga `SavedAddressSelector.vue` terpangkas dari 447 baris menjadi 230 baris (keduanya <= 300 baris).
+- **Testing & Quality Verification**:
+  - `tests/unit/location-master.spec.ts`: Unit test mencakup 38 provinsi, 4-tier cascade, pencarian kota dan kode pos, serta verifikasi anti double prefix.
+  - `tests/unit/location-picker-modal.spec.ts`: Unit test alur lengkap 4-tier cascading seleksi dan autocomplete.
+  - `tests/unit/checkout-address-form.spec.ts`: Verifikasi integrasi form checkout dengan `AdministrativeSelection`.
+  - 65 test files / 622 tests lolos 100%. TypeScript typecheck EXIT 0, ESLint 0 error.
+
+## [0.22.0] - 2026-10-30
+
+### Master Data Alamat Wilayah Administratif Indonesia & Penghapusan Pemisah Titik Tengah (SHF-LOC-01)
+
+- **Master Data Wilayah Kemendagri & BPS**:
+  - `shared/data/locations/indonesia-regions.ts`: Master data komprehensif 38 Provinsi (termasuk 4 DOB baru Papua 2022: Papua Selatan, Papua Tengah, Papua Pegunungan, Papua Barat Daya) dan 535 Kota/Kabupaten resmi dengan pemetaan kode pos standar.
+  - Zero external dependency: Data terindeks cepat, tanpa latensi jaringan eksternal, dan tanpa dependensi API pihak ketiga.
+  - Helper functions teroptimasi: `getCitiesByProvince()`, `searchLocations()`, `getCityById()`.
+- **Server API & Schemas**:
+  - `shared/schemas/location.ts`: Schema validasi Zod `locationQuerySchema` dan `locationSelectionSchema`.
+  - `server/api/locations/index.get.ts`: Endpoint pencarian cepat dengan query filter dan cascading province ID.
+- **Frontend Master Location Picker**:
+  - `app/components/checkout/LocationPickerModal.vue` (290 baris, <= 300 baris): Modal interaktif dual-mode (Pencarian Cepat / Autocomplete + Pilihan Bertingkat Provinsi ke Kota/Kabupaten) dengan chip kota populer dan navigasi keyboard ramah aksesibilitas.
+  - `app/components/checkout/CheckoutAddressForm.vue`: Integrasi pemilih wilayah resmi satu sentuhan yang mengisi nama kota, provinsi, dan kode pos secara otomatis.
+  - `app/components/checkout/SavedAddressSelector.vue`: Integrasi pemilih wilayah resmi pada formulir penambahan alamat baru.
+- **Perbaikan UI/UX Typography & Penghapusan Pemisah Titik Tengah (Interpunct)**:
+  - Mengganti pemisah titik tengah mentah (`·`) pada opsi pengiriman dan rincian varian produk dengan pemisah tanda koma dan pill badge yang lebih clean dan terstruktur.
+  - Menata ulang badge "Checkout Aman" dan "Enkripsi Midtrans 256-Bit" pada header checkout dengan styling chip individual yang rapi dan konsisten.
+- **Testing & Quality Gates**:
+  - `tests/unit/location-master.spec.ts`: 7 unit tests mencakup kelengkapan 38 provinsi, pencarian autocomplete, dan mapping kode pos.
+  - `tests/unit/location-picker-modal.spec.ts`: 6 unit tests mencakup modal rendering, chip populer, tab cascading, dan keyboard navigation.
+  - `tests/unit/checkout-address-form.spec.ts`: 3 unit tests mencakup tombol pemilih master data, kartu wilayah terisi, dan auto-fill.
+  - 65 test files / 621 unit tests lolos 100%. TypeScript typecheck EXIT 0, ESLint 0 error.
+
+## [0.21.0] - 2026-10-30
+
+### Pilihan Layanan & Kalkulator Ongkir Checkout (SHF-SHP-01)
+
+- **Database Migrasi & Skema Transaksional**:
+  - Migrasi `supabase/migrations/20261123000001_checkout_shipping_rates.sql` menambahkan kolom `shipping_service` (default 'reguler') dan `shipping_cost_cents` (default 0) pada tabel `public.orders`.
+  - Fungsi RPC atomik `public.create_order` diperbarui untuk memvalidasi dan menghitung tarif ongkir secara aman di sisi server Postgres (anti-tamper):
+    - Layanan Reguler (2-3 Hari Kerja): Rp 15.000 (Otomatis Bebas Ongkir Rp 0 jika subtotal belanja >= Rp 500.000).
+    - Layanan Kilat / Next Day (1 Hari Kerja): Rp 30.000.
+    - Layanan Instan / Sameday (Tiba Hari Ini): Rp 45.000.
+    - Layanan Kargo Ekonomis (4-7 Hari Kerja): Rp 25.000.
+  - Total pesanan akhir dihitung atomik: `v_total := greatest(0, v_subtotal - v_discount + v_shipping_cost)`.
+  - Sinkronisasi snapshot tagihan langsung ke transaksi Midtrans Snap (`gross_amount = order.total_cents / 100`).
+- **Server API & Schemas**:
+  - `shared/schemas/shipping.ts`: Enum `shippingServiceSchema`, metadata `shippingRateTiers`, dan fungsi murni `calculateShippingFee()`.
+  - `shared/schemas/order.ts`: Penambahan `shipping_service` dan `courier_code` pada `checkoutSchema`.
+  - `server/utils/idempotency.ts`: Penyertaan `shipping_service` ke dalam kalkulasi deterministik `calculateCheckoutHash()`.
+  - `POST /api/shipping/calculate`: Endpoint kalkulasi tarif ongkir publik untuk estimasi biaya pengiriman cepat.
+  - `server/api/orders/index.ts`: Meneruskan parameter opsi pengiriman ke pemanggilan RPC `create_order`.
+- **Frontend & Etalase Interaktif**:
+  - Komponen `app/components/checkout/ShippingMethodSelector.vue` (187 baris): Antarmuka pemilihan 4 layanan pengiriman bertingkat dengan radio card Archival Modernist, badge Bebas Ongkir dinamis, estimasi waktu tiba, chip mitra kurir pilihan (JNE, SiCepat, J&T, Anteraja, Pos), dan aksesibilitas WAI-ARIA `role="radiogroup"`.
+  - Halaman `app/pages/checkout.vue`: Integrasi pilihan kurir dengan kalkulasi ongkir reaktif pada ringkasan belanja, pengiriman parameter ke backend, dan pemeliharaan state snapshot pembayaran Midtrans.
+  - Halaman `app/pages/orders/[id].vue` & `OrderInvoiceModal.vue`: Penayangan baris rincian "Biaya Pengiriman" dengan nama layanan kurir pada rincian pesanan dan cetak invoice resmi.
+- **Quality Gates & Tests**:
+  - `tests/unit/shipping-calculator.spec.ts`: 25 unit tests (kalkulasi tarif 4 tier, threshold bebas ongkir, proteksi non-reguler, validasi schema, API endpoint).
+  - `tests/unit/shipping-selector.spec.ts`: 7 unit tests (render opsi, interaksi radio card, seleksi kurir, navigasi keyboard).
+  - Total test suite: 62 test files / 605 tests lolos 100%.
+  - `nuxi typecheck` EXIT 0 & `eslint .` 0 error.
+
 ## [0.20.0] - 2026-10-30
 
 ### Sistem Ulasan & Rating Produk Terverifikasi (Product Reviews & Ratings)

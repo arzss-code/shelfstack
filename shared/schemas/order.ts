@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { courierCodeSchema, shippingServiceSchema } from './shipping'
 
 export const checkoutItemSchema = z.object({
   product_id: z.number().int().positive('ID produk tidak valid.'),
@@ -35,6 +36,8 @@ export const checkoutSchema = z.object({
   items: z.array(checkoutItemSchema).min(1, 'Keranjang belanja tidak boleh kosong.'),
   address: checkoutAddressSchema,
   coupon_code: z.string().trim().optional(),
+  shipping_service: shippingServiceSchema.default('reguler'),
+  courier_code: courierCodeSchema.optional(),
 })
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>

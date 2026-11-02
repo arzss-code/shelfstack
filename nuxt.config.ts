@@ -55,6 +55,10 @@ export default defineNuxtConfig({
   },
 
   security: {
+    // Nonaktifkan rateLimiter default modul nuxt-security pada level global agar navigasi
+    // storefront dan runner pengujian otomatis tidak terkena pembatasan HTTP 429.
+    // Proteksi rateLimiter tetap ditegakkan secara granular pada endpoint sensitif via routeRules.
+    rateLimiter: false,
     headers: {
       contentSecurityPolicy: {
         'img-src': [

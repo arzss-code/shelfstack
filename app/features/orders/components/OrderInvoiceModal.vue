@@ -34,6 +34,29 @@ const invoiceNumber = computed(() => {
   return `INV-${props.order.id.slice(0, 8).toUpperCase()}`
 })
 
+const shippingServiceName = computed(() => {
+  const service = props.order.shipping_service || 'reguler'
+  switch (service.toLowerCase()) {
+    case 'express':
+      return 'Kilat / Next Day'
+    case 'instant':
+      return 'Instan / Sameday'
+    case 'cargo':
+      return 'Kargo Ekonomis'
+    case 'reguler':
+    default:
+      return 'Reguler'
+  }
+})
+
+const shippingFeeDisplay = computed(() => {
+  const cost = props.order.shipping_cost_cents ?? 0
+  if (cost === 0) {
+    return 'Gratis'
+  }
+  return formatRupiah(cost / 100)
+})
+
 const handlePrint = () => {
   if (import.meta.client) {
     window.print()
@@ -120,7 +143,11 @@ const handlePrint = () => {
             }}</span
             ><br />
             Pengiriman:
-            <span class="font-semibold text-brand-success-text">Gratis Ongkir Se-Indonesia</span>
+            <span class="font-semibold text-brand-ink">
+              {{ shippingServiceName }}
+              <template v-if="order.courier_name">({{ order.courier_name }})</template>
+              <template v-if="(order.shipping_cost_cents ?? 0) === 0"> · Bebas Ongkir</template>
+            </span>
           </p>
         </div>
       </div>
@@ -163,8 +190,16 @@ const handlePrint = () => {
       <div class="flex justify-end border-t border-brand-hair pt-4">
         <div class="w-full space-y-2 text-xs sm:w-64">
           <div class="flex justify-between text-brand-muted">
-            <span>Biaya Pengiriman:</span>
-            <span class="font-medium tabular text-brand-success-text">Rp 0 (Gratis)</span>
+            <span>Biaya Pengiriman ({{ shippingServiceName }}):</span>
+            <span
+              :class="[
+                (order.shipping_cost_cents ?? 0) === 0
+                  ? 'font-medium tabular text-brand-success-text'
+                  : 'font-medium tabular text-brand-ink',
+              ]"
+            >
+              {{ shippingFeeDisplay }}
+            </span>
           </div>
           <div class="flex justify-between text-brand-muted">
             <span>PPN 11%:</span>

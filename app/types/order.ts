@@ -43,6 +43,8 @@ export interface Order {
   tracking_number?: string | null
   courier_code?: string | null
   courier_name?: string | null
+  shipping_service?: string | null
+  shipping_cost_cents?: number
   shipped_at?: string | null
   delivered_at?: string | null
   created_at: string

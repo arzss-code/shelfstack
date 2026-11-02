@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import type { UserAddress, CreateAddressInput } from '~~/shared/schemas/address'
-import { createAddressSchema } from '~~/shared/schemas/address'
 import { useAddresses } from '~/composables/useAddresses'
+import SavedAddressForm from '~/components/checkout/SavedAddressForm.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -22,17 +22,6 @@ const { addresses, loading, error, fetchAddresses, saveAddress, selectDefault } 
 const isAddingNew = ref(false)
 const isSubmittingNew = ref(false)
 const addFormError = ref('')
-const formErrors = ref<Record<string, string>>({})
-
-const newAddressForm = ref<CreateAddressInput>({
-  name: '',
-  phone: '',
-  street: '',
-  city: '',
-  postal: '',
-  note: '',
-  is_default: false,
-})
 
 onMounted(async () => {
   await fetchAddresses()
@@ -62,45 +51,20 @@ const handleSetDefault = async (addr: UserAddress, event: Event) => {
 }
 
 const openAddForm = () => {
-  newAddressForm.value = {
-    name: '',
-    phone: '',
-    street: '',
-    city: '',
-    postal: '',
-    note: '',
-    is_default: addresses.value.length === 0,
-  }
-  formErrors.value = {}
   addFormError.value = ''
   isAddingNew.value = true
 }
 
 const cancelAddForm = () => {
   isAddingNew.value = false
-  formErrors.value = {}
   addFormError.value = ''
 }
 
-const handleSaveNewAddress = async () => {
-  formErrors.value = {}
+const handleSaveNewAddress = async (data: CreateAddressInput) => {
   addFormError.value = ''
-
-  const validation = createAddressSchema.safeParse(newAddressForm.value)
-  if (!validation.success) {
-    const fieldErrors = validation.error.flatten().fieldErrors
-    for (const [key, msgs] of Object.entries(fieldErrors)) {
-      if (msgs && msgs[0]) {
-        formErrors.value[key] = msgs[0]
-      }
-    }
-    addFormError.value = 'Mohon periksa data formulir yang belum sesuai.'
-    return
-  }
-
   isSubmittingNew.value = true
   try {
-    const created = await saveAddress(validation.data)
+    const created = await saveAddress(data)
     isAddingNew.value = false
     emit('select', created)
   } catch (err: any) {
@@ -173,138 +137,15 @@ const handleSaveNewAddress = async () => {
       </UiButton>
     </div>
 
-    <!-- Form Tambah Alamat Baru Inline -->
-    <div
+    <!-- Form Tambah Alamat Baru Modular Component -->
+    <SavedAddressForm
       v-if="isAddingNew"
-      class="bg-brand-canvas-soft border border-brand-hair rounded-card p-4 sm:p-5 space-y-4"
-    >
-      <div class="flex items-center justify-between border-b border-brand-hairsoft pb-2">
-        <h4
-          class="font-display font-bold text-xs sm:text-sm text-brand-ink m-0 flex items-center gap-2"
-        >
-          <i class="pi pi-plus-circle text-brand-accent" />
-          Tambah Alamat Pengiriman Baru
-        </h4>
-        <button
-          type="button"
-          class="text-brand-muted hover:text-brand-ink text-xs transition-colors"
-          @click="cancelAddForm"
-        >
-          <i class="pi pi-times" />
-        </button>
-      </div>
-
-      <div
-        v-if="addFormError"
-        class="p-2.5 bg-brand-danger-tint border border-brand-danger-edge rounded-field text-xs text-brand-danger-text flex items-center gap-2"
-      >
-        <i class="pi pi-exclamation-circle shrink-0" />
-        <span>{{ addFormError }}</span>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-semibold text-brand-ink mb-1">
-            Nama Penerima <span class="text-red-500">*</span>
-          </label>
-          <UiInput
-            v-model="newAddressForm.name"
-            placeholder="cth. Arya Santoso"
-            :error="formErrors.name"
-          />
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-brand-ink mb-1">
-            Nomor Telepon / WhatsApp <span class="text-red-500">*</span>
-          </label>
-          <UiInput
-            v-model="newAddressForm.phone"
-            placeholder="cth. 081234567890"
-            :error="formErrors.phone"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-brand-ink mb-1">
-          Alamat Lengkap <span class="text-red-500">*</span>
-        </label>
-        <UiInput
-          v-model="newAddressForm.street"
-          placeholder="cth. Jl. Sudirman No. 42, RT 01/RW 04"
-          :error="formErrors.street"
-        />
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-semibold text-brand-ink mb-1">
-            Kota / Kabupaten <span class="text-red-500">*</span>
-          </label>
-          <UiInput
-            v-model="newAddressForm.city"
-            placeholder="cth. Jakarta Pusat"
-            :error="formErrors.city"
-          />
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-brand-ink mb-1">
-            Kode Pos <span class="text-red-500">*</span>
-          </label>
-          <UiInput
-            v-model="newAddressForm.postal"
-            placeholder="cth. 10220"
-            :error="formErrors.postal"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-brand-ink mb-1">
-          Catatan untuk Kurir (Opsional)
-        </label>
-        <UiInput
-          v-model="newAddressForm.note"
-          placeholder="cth. Titipkan ke resepsionis"
-          :error="formErrors.note"
-        />
-      </div>
-
-      <div class="flex items-center gap-2 pt-1">
-        <input
-          id="is_default_checkbox"
-          v-model="newAddressForm.is_default"
-          type="checkbox"
-          class="rounded border-brand-hair text-brand-accent focus:ring-brand-accent w-4 h-4 cursor-pointer"
-        />
-        <label for="is_default_checkbox" class="text-xs text-brand-ink cursor-pointer select-none">
-          Jadikan sebagai alamat utama
-        </label>
-      </div>
-
-      <div class="flex items-center justify-end gap-2 pt-2 border-t border-brand-hairsoft">
-        <UiButton
-          variant="ghost"
-          size="sm"
-          class="text-xs"
-          :disabled="isSubmittingNew"
-          @click="cancelAddForm"
-        >
-          Batal
-        </UiButton>
-        <UiButton
-          variant="primary"
-          size="sm"
-          class="text-xs"
-          :loading="isSubmittingNew"
-          @click="handleSaveNewAddress"
-        >
-          Simpan Alamat
-        </UiButton>
-      </div>
-    </div>
+      :is-submitting="isSubmittingNew"
+      :error="addFormError"
+      :initial-default="addresses.length === 0"
+      @save="handleSaveNewAddress"
+      @cancel="cancelAddForm"
+    />
 
     <!-- Empty State -->
     <div

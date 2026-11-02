@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { CatalogPage, LoginPage, AdminOrdersPage } from './pages'
+import { CatalogPage, LoginPage } from './pages'
 
 test.describe('Automated E2E Flow via Page Object Model [SHF-POM-01]', () => {
   test('[SHF-CAT-01] Catalog Page: Browse, Search, and Verify Empty State via POM', async ({
@@ -11,16 +11,9 @@ test.describe('Automated E2E Flow via Page Object Model [SHF-POM-01]', () => {
     await catalogPage.goto()
     await catalogPage.assertPageLoaded()
 
-    // 2. Lakukan pencarian kata kunci yang tidak mungkin ada dengan polling hidrasi
-    await expect
-      .poll(
-        async () => {
-          await catalogPage.search('produk-tidak-mungkin-ada-xyz-999')
-          return await page.getByText('Tidak ada produk').count()
-        },
-        { timeout: 20000 },
-      )
-      .toBeGreaterThan(0)
+    // 2. Lakukan pencarian kata kunci yang tidak mungkin ada
+    await catalogPage.search('produk-tidak-mungkin-ada-xyz-999')
+    await catalogPage.assertEmptyStateVisible()
 
     // 3. Bersihkan pencarian
     await catalogPage.clearSearch()
@@ -53,13 +46,11 @@ test.describe('Automated E2E Flow via Page Object Model [SHF-POM-01]', () => {
   test('[SHF-ADM-01] Admin Orders: Guard Unauthenticated User Redirects to Login via POM', async ({
     page,
   }) => {
-    const adminOrdersPage = new AdminOrdersPage(page)
-
     // 1. Tamu mencoba mengakses /admin/orders langsung
     await page.goto('/admin/orders')
 
     // 2. Verifikasi diarahkan ke login dengan parameter redirect
-    await expect(page).toHaveURL(/\/auth\/login\?redirect=/)
+    await expect(page).toHaveURL(/\/auth\/login\?redirect=/, { timeout: 15000 })
 
     // 3. Verifikasi halaman login tampil melalui POM
     const loginPage = new LoginPage(page)

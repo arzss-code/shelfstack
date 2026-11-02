@@ -19,28 +19,40 @@ export class CheckoutPage extends BasePage {
   readonly nameInput: Locator
   readonly phoneInput: Locator
   readonly streetInput: Locator
-  readonly cityInput: Locator
-  readonly postalInput: Locator
   readonly noteInput: Locator
   readonly submitButton: Locator
   readonly orderSummary: Locator
   readonly billDetails: Locator
+  readonly openLocationPickerButton: Locator
+  readonly locationSearchInput: Locator
+  readonly searchResultItems: Locator
+  readonly changeLocationButton: Locator
 
   constructor(page: Page) {
     super(page)
-    this.heading = page.getByRole('heading', { name: /checkout & pengiriman/i })
+    this.heading = page.getByRole('heading', { name: /^checkout/i })
     this.authRequiredCard = page.getByText('Login Diperlukan')
     this.loginRedirectButton = page.getByRole('link', { name: 'Masuk ke Akun' })
     this.emptyCartCard = page.getByText('Keranjang Belanja Kosong')
-    this.nameInput = page.getByPlaceholder('cth. Arya Santoso')
+    this.nameInput = page.getByPlaceholder(/cth. (Arya Santoso|Atsiila Arya)/i)
     this.phoneInput = page.getByPlaceholder('cth. 081234567890')
     this.streetInput = page.getByPlaceholder(/cth. Jl. Sudirman/i)
-    this.cityInput = page.getByPlaceholder('cth. Jakarta Pusat')
-    this.postalInput = page.getByPlaceholder('cth. 10220')
     this.noteInput = page.getByPlaceholder(/titipkan ke satpam/i)
     this.submitButton = page.getByRole('button', { name: /bayar sekarang|memproses pesanan/i })
     this.orderSummary = page.locator('aside')
-    this.billDetails = page.locator('aside').getByText(/total tagihan/i)
+    this.billDetails = page.locator('aside').getByText(/total tagihan|total pembayaran/i)
+    this.openLocationPickerButton = page.locator('[data-testid="open-location-picker-btn"]')
+    this.locationSearchInput = page.locator('[data-testid="location-search-input"]')
+    this.searchResultItems = page.locator('[data-testid="search-result-item"]')
+    this.changeLocationButton = page.locator('[data-testid="change-location-btn"]')
+  }
+
+  get cityInput(): Locator {
+    return this.page.getByPlaceholder('cth. Jakarta Pusat')
+  }
+
+  get postalInput(): Locator {
+    return this.page.getByPlaceholder('cth. 10220')
   }
 
   async goto(): Promise<void> {
@@ -60,19 +72,40 @@ export class CheckoutPage extends BasePage {
     await expect(this.emptyCartCard).toBeVisible({ timeout: 10000 })
   }
 
+  async selectAdministrativeLocation(query: string = 'Jakarta Pusat'): Promise<void> {
+    if (await this.openLocationPickerButton.isVisible()) {
+      await this.openLocationPickerButton.click()
+    } else if (await this.changeLocationButton.isVisible()) {
+      await this.changeLocationButton.click()
+    }
+    await expect(this.locationSearchInput).toBeVisible({ timeout: 10000 })
+    await this.locationSearchInput.fill(query)
+    const firstResult = this.searchResultItems.first()
+    await expect(firstResult).toBeVisible({ timeout: 10000 })
+    await firstResult.click()
+  }
+
   async fillShippingAddress(data: ShippingAddressData): Promise<void> {
     await this.nameInput.fill(data.name)
     await this.phoneInput.fill(data.phone)
     await this.streetInput.fill(data.street)
-    await this.cityInput.fill(data.city)
-    await this.postalInput.fill(data.postal)
+    if (data.city) {
+      if (await this.cityInput.isVisible()) {
+        await this.cityInput.fill(data.city)
+      } else {
+        await this.selectAdministrativeLocation(data.city)
+      }
+    }
+    if (data.postal && (await this.postalInput.isVisible())) {
+      await this.postalInput.fill(data.postal)
+    }
     if (data.note) {
       await this.noteInput.fill(data.note)
     }
   }
 
   async submitOrder(): Promise<void> {
-    await expect(this.submitButton).toBeVisible()
+    await expect(this.submitButton).toBeVisible({ timeout: 15000 })
     await this.submitButton.click()
   }
 
@@ -81,7 +114,7 @@ export class CheckoutPage extends BasePage {
   }
 
   async assertOrderSummaryVisible(): Promise<void> {
-    await expect(this.orderSummary).toBeVisible()
-    await expect(this.billDetails).toBeVisible()
+    await expect(this.orderSummary).toBeVisible({ timeout: 15000 })
+    await expect(this.billDetails).toBeVisible({ timeout: 15000 })
   }
 }

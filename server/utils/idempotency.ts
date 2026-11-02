@@ -82,6 +82,7 @@ export function calculateCheckoutHash(input: CheckoutInput): string {
   const canonicalString = JSON.stringify({
     address: normalizedAddress,
     items: sortedItems,
+    shipping_service: input.shipping_service || 'reguler',
   })
 
   // 4. Hitung hash SHA-256

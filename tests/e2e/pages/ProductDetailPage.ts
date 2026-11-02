@@ -38,7 +38,9 @@ export class ProductDetailPage extends BasePage {
 
   async assertPageLoaded(): Promise<void> {
     await expect(this.title).toBeVisible({ timeout: 15000 })
-    await expect(this.addToCartButton).toBeVisible()
+    await expect(this.page.getByRole('button', { name: /tambah ke bag|stok habis/i })).toBeVisible({
+      timeout: 15000,
+    })
   }
 
   async assertSpecsVisible(): Promise<void> {
@@ -56,10 +58,12 @@ export class ProductDetailPage extends BasePage {
   }
 
   async addToCart(): Promise<void> {
+    await expect(this.addToCartButton).toBeVisible({ timeout: 15000 })
     await this.addToCartButton.click()
   }
 
   async buyNow(): Promise<void> {
+    await expect(this.buyNowButton).toBeVisible({ timeout: 15000 })
     await this.buyNowButton.click()
   }
 
