@@ -13,7 +13,7 @@ import UiAlert from '~/components/ui/UiAlert.vue'
 definePageMeta({ middleware: 'auth' })
 
 useSeoMeta({
-  title: 'Biodata Diri - ShelfStack',
+  title: 'Profil Saya - ShelfStack',
   description: 'Kelola informasi profil, kata sandi, dan kredensial akun ShelfStack Anda.',
 })
 
@@ -153,7 +153,7 @@ const handleUpdatePassword = async (newPass: string, confirmPass: string) => {
         ShelfStack
       </NuxtLink>
       <span class="text-brand-faint">/</span>
-      <span class="text-brand-ink font-semibold">Biodata Diri</span>
+      <span class="text-brand-ink font-semibold">Profil Saya</span>
     </nav>
 
     <!-- 2-Column Tokopedia / Shopee Master Layout (Sidebar on xl, Horizontal Tabs on < xl) -->
@@ -168,11 +168,11 @@ const handleUpdatePassword = async (newPass: string, confirmPass: string) => {
         <!-- Profile Avatar Upload Card (Tokopedia & Shopee Pattern) -->
         <ProfileAvatarCard />
 
-        <!-- Section 1: Ubah Biodata Diri (Tokopedia pattern) -->
+        <!-- Section 1: Informasi Pribadi & Nama Lengkap -->
         <div class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper">
           <div class="flex items-center gap-2 mb-1">
             <i class="pi pi-user text-brand-muted text-sm" />
-            <h2 class="text-base font-display font-bold text-brand-ink m-0">Ubah Biodata Diri</h2>
+            <h2 class="text-base font-display font-bold text-brand-ink m-0">Informasi Pribadi</h2>
           </div>
           <p class="text-xs text-brand-muted mb-4">
             Kelola nama lengkap dan informasi akun untuk kebutuhan invoice transaksi resmi.
@@ -225,7 +225,7 @@ const handleUpdatePassword = async (newPass: string, confirmPass: string) => {
               class="active:scale-95"
               @click="handleUpdateName"
             >
-              Simpan Biodata
+              Simpan Profil
             </UiButton>
           </div>
         </div>

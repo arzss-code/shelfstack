@@ -57,7 +57,7 @@ const navGroups = computed<NavGroup[]>(() => [
   {
     title: 'Pengaturan Akun',
     items: [
-      { id: 'profile', label: 'Biodata Diri', to: '/account/profile', icon: 'pi pi-user' },
+      { id: 'profile', label: 'Profil Saya', to: '/account/profile', icon: 'pi pi-user' },
       {
         id: 'addresses',
         label: 'Daftar Alamat',
@@ -69,7 +69,7 @@ const navGroups = computed<NavGroup[]>(() => [
 ])
 
 const horizontalTabs = computed<NavItem[]>(() => [
-  { id: 'profile', label: 'Biodata Diri', to: '/account/profile', icon: 'pi pi-user' },
+  { id: 'profile', label: 'Profil Saya', to: '/account/profile', icon: 'pi pi-user' },
   { id: 'addresses', label: 'Daftar Alamat', to: '/account/addresses', icon: 'pi pi-map-marker' },
   { id: 'orders', label: 'Pesanan Saya', to: '/orders', icon: 'pi pi-box' },
   {

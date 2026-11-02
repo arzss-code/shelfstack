@@ -26,7 +26,7 @@ interface NavTab {
 
 const currentTabLabel = computed(() => {
   if (route.path.startsWith('/account/addresses')) return 'Daftar Alamat'
-  if (route.path.startsWith('/account/profile') || route.path === '/account') return 'Profil Akun'
+  if (route.path.startsWith('/account/profile') || route.path === '/account') return 'Profil Saya'
   if (route.path.startsWith('/orders')) return 'Pesanan Saya'
   if (route.path.startsWith('/wishlist')) return 'Wishlist'
   return 'Akun Pelanggan'
@@ -35,7 +35,7 @@ const currentTabLabel = computed(() => {
 const tabs = computed<NavTab[]>(() => [
   {
     id: 'profile',
-    label: 'Profil Akun',
+    label: 'Profil Saya',
     to: '/account/profile',
     icon: 'pi pi-user',
   },
@@ -53,7 +53,7 @@ const tabs = computed<NavTab[]>(() => [
   },
   {
     id: 'wishlist',
-    label: 'Daftar Keinginan',
+    label: 'Wishlist',
     to: '/wishlist',
     icon: 'pi pi-heart',
     badge: wishlistStore.totalItems,
