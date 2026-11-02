@@ -32,11 +32,22 @@ export default defineEventHandler(async (event) => {
     })
 
     if (rpcError) {
+      if (rpcError.code === 'PGRST202' || rpcError.message?.includes('claim_coupon_to_wallet')) {
+        return errorResponse(
+          event,
+          'Fungsi RPC klaim voucher belum terpasang di database. Pastikan migrasi terbaru telah dijalankan.',
+          rpcError.message,
+          500,
+        )
+      }
       return errorResponse(event, rpcError.message || 'Gagal mengklaim voucher.', null, 400)
     }
 
     return successResponse('Voucher berhasil diklaim dan disimpan ke dompet Anda.', claimResult)
   } catch (err: unknown) {
+    if (err && typeof err === 'object' && ('statusCode' in err || 'status' in err)) {
+      throw err
+    }
     const message = err instanceof Error ? err.message : 'Terjadi kesalahan sistem.'
     return errorResponse(event, 'Terjadi kesalahan internal saat mengklaim voucher.', message, 500)
   }

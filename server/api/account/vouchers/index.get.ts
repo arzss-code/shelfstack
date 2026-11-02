@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
         status,
         used_at,
         order_id,
-        coupons:coupon_id (
+        coupons:coupons (
           id,
           code,
           name,
@@ -73,7 +73,20 @@ export default defineEventHandler(async (event) => {
       .order('claimed_at', { ascending: false })
 
     if (ucError) {
-      return errorResponse(event, 'Gagal mengambil data voucher dompet.', ucError.message, 500)
+      const isMissingTable =
+        ucError.code === '42P01' ||
+        ucError.code === 'PGRST205' ||
+        ucError.message?.includes('does not exist') ||
+        ucError.message?.includes('schema cache')
+
+      if (isMissingTable) {
+        console.warn(
+          '[Voucher Wallet] Tabel public.user_coupons belum tersedia di database. Pastikan migrasi 20261125000001_user_coupons_and_wallet.sql telah dijalankan.',
+          ucError.message,
+        )
+      } else {
+        return errorResponse(event, 'Gagal mengambil data voucher dompet.', ucError.message, 500)
+      }
     }
 
     // 2. Ambil seluruh kupon publik yang aktif
@@ -197,6 +210,9 @@ export default defineEventHandler(async (event) => {
 
     return successResponse('Data dompet voucher berhasil diambil.', payload)
   } catch (err: unknown) {
+    if (err && typeof err === 'object' && ('statusCode' in err || 'status' in err)) {
+      throw err
+    }
     const message = err instanceof Error ? err.message : 'Terjadi kesalahan internal server.'
     return errorResponse(event, 'Gagal memproses permintaan voucher dompet.', message, 500)
   }
