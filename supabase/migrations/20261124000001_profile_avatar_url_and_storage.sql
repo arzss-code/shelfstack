@@ -21,3 +21,4 @@ create policy "users manage own avatar"
 on storage.objects for all to authenticated
 using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text)
 with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+

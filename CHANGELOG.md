@@ -32,10 +32,12 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
   - `app/pages/account/profile.vue`: Tata letak Biodata Diri berstandar Tokopedia dengan kartu tips keamanan akun, status verifikasi email, dan checklist dinamis kriteria kata sandi.
 - **Manajemen Foto Profil Pelanggan (Avatar Upload, Ubah, Hapus)**:
   - `supabase/migrations/20261124000001_profile_avatar_url_and_storage.sql`: Menambahkan kolom `avatar_url` pada tabel `public.profiles` dan bucket `avatars` dengan RLS storage terproteksi per ID user.
+  - `server/api/account/avatar.post.ts`: Endpoint terproteksi untuk upload avatar dengan validasi multipart server-side (maks. 2 MB, JPG/PNG/WEBP), upload ke Supabase Storage, pembersihan avatar lama, pembaruan `public.profiles.avatar_url` via service role, dan sinkronisasi metadata auth.
+  - `server/api/account/avatar.delete.ts`: Endpoint terproteksi untuk menghapus avatar, membersihkan file di cloud storage, dan mengembalikan foto profil ke null.
+  - `server/api/account/profile.patch.ts`: Dukungan pembaruan profil pelanggan via service role untuk mematuhi RLS database, serta sinkronisasi metadata auth Supabase.
   - `app/components/account/ProfileAvatarCard.vue`: Komponen avatar interaktif dengan preview foto bundar, overlay tombol kamera, tombol "Pilih Foto", "Hapus Foto", dan indikator upload.
-  - `app/composables/useUserProfile.ts`: Method `uploadAvatar()` dan `deleteAvatar()` dengan validasi berkas client-side (maks. 2 MB, JPG/PNG/WEBP) dan penghapusan avatar lama otomatis.
+  - `app/composables/useUserProfile.ts`: Method `uploadAvatar()` dan `deleteAvatar()` terhubung langsung ke endpoint `/api/account/avatar` dengan penanganan sesi defensif.
   - `app/components/account/AccountSidebar.vue` & `AppNavbar.vue`: Menampilkan foto profil asli pengguna secara reaktif dengan fallback inisial nama.
-  - `server/api/account/profile.patch.ts`: Dukungan pembaruan `avatar_url` dan sinkronisasi metadata auth Supabase.
 - **Testing & Quality Assurance**:
   - `tests/unit/account-profile-schema.spec.ts`: Unit test validasi skema profil termasuk pengujian format URL dan null avatar (12 test).
   - `tests/unit/account-profile-and-addresses.spec.ts`: Unit test untuk composable `useAddresses` dan kontrak data `AccountStats` (6 test).

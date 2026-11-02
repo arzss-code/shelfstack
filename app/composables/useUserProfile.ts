@@ -83,49 +83,28 @@ export function useUserProfile() {
       return false
     }
 
-    const userId = user.value?.id
-    if (!userId) {
-      error.value = 'Sesi pengguna tidak valid. Silakan login kembali.'
-      return false
-    }
-
     isUploadingAvatar.value = true
     try {
-      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-      const filePath = `${userId}/${Date.now()}.${fileExt}`
+      const formData = new FormData()
+      formData.append('avatar', file)
 
-      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: true,
-      })
+      const response = await $fetch<{ status: string; data: { avatar_url: string } }>(
+        '/api/account/avatar',
+        {
+          method: 'POST',
+          body: formData,
+        },
+      )
 
-      if (uploadError) {
-        error.value = uploadError.message || 'Gagal mengunggah foto profil ke penyimpanan.'
-        return false
+      if (profile.value && response.data?.avatar_url) {
+        profile.value.avatar_url = response.data.avatar_url
       }
-
-      const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath)
-      const newAvatarUrl = publicUrlData.publicUrl
-
-      await $fetch('/api/account/profile', {
-        method: 'PATCH',
-        body: { avatar_url: newAvatarUrl },
-      })
-
-      const oldAvatarUrl = profile.value?.avatar_url
-      if (oldAvatarUrl && oldAvatarUrl.includes('/avatars/')) {
-        const oldPath = oldAvatarUrl.split('/avatars/')[1]
-        if (oldPath && oldPath !== filePath) {
-          await supabase.storage.from('avatars').remove([oldPath])
-        }
-      }
-
       await fetchProfile(true)
       successMessage.value = 'Foto profil berhasil diperbarui.'
       return true
     } catch (err: unknown) {
       const fetchErr = err as { data?: { message?: string }; message?: string }
-      error.value = fetchErr?.data?.message || fetchErr?.message || 'Gagal menyimpan foto profil.'
+      error.value = fetchErr?.data?.message || fetchErr?.message || 'Gagal mengunggah foto profil.'
       return false
     } finally {
       isUploadingAvatar.value = false
@@ -136,23 +115,15 @@ export function useUserProfile() {
     error.value = null
     successMessage.value = null
 
-    const oldAvatarUrl = profile.value?.avatar_url
-    if (!oldAvatarUrl) return true
-
     isUploadingAvatar.value = true
     try {
-      await $fetch('/api/account/profile', {
-        method: 'PATCH',
-        body: { avatar_url: null },
+      await $fetch('/api/account/avatar', {
+        method: 'DELETE',
       })
 
-      if (oldAvatarUrl.includes('/avatars/')) {
-        const oldPath = oldAvatarUrl.split('/avatars/')[1]
-        if (oldPath) {
-          await supabase.storage.from('avatars').remove([oldPath])
-        }
+      if (profile.value) {
+        profile.value.avatar_url = null
       }
-
       await fetchProfile(true)
       successMessage.value = 'Foto profil berhasil dihapus.'
       return true

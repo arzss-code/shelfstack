@@ -1,4 +1,4 @@
-import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
+import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { updateProfileSchema } from '../../../shared/schemas/profile'
 import { requireUser } from '../../utils/auth'
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     )
   }
 
-  const client = await serverSupabaseClient<Database>(event)
+  const serviceClient = serverSupabaseServiceRole<Database>(event)
   const updatePayload: Record<string, string | null> = {}
   const metadataPayload: Record<string, string | null> = {}
 
@@ -35,8 +35,8 @@ export default defineEventHandler(async (event) => {
     metadataPayload.avatar_url = parsed.data.avatar_url
   }
 
-  // Update profil di tabel public.profiles
-  const { data: updatedProfile, error: updateError } = await (client as any)
+  // Update profil di tabel public.profiles (service role bypass RLS, otorisasi di-enforce di level endpoint)
+  const { data: updatedProfile, error: updateError } = await (serviceClient as any)
     .from('profiles')
     .update(updatePayload)
     .eq('user_id', targetUserId)
@@ -49,7 +49,6 @@ export default defineEventHandler(async (event) => {
 
   // Selaraskan metadata auth Supabase (fail-safe)
   try {
-    const serviceClient = serverSupabaseServiceRole<Database>(event)
     await (serviceClient as any).auth.admin.updateUserById(targetUserId, {
       user_metadata: metadataPayload,
     })

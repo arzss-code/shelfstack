@@ -1,0 +1,49 @@
+import { serverSupabaseServiceRole } from '#supabase/server'
+import type { Database } from '~/types/database.types'
+import { requireUser } from '../../utils/auth'
+import { errorResponse, successResponse } from '../../utils/response'
+
+export default defineEventHandler(async (event) => {
+  const { user, profile } = await requireUser(event)
+  const targetUserId = user.id || profile.user_id
+
+  const serviceClient = serverSupabaseServiceRole<Database>(event)
+
+  // 1. Ambil URL avatar lama
+  const { data: currentProfile } = await (serviceClient as any)
+    .from('profiles')
+    .select('avatar_url')
+    .eq('user_id', targetUserId)
+    .maybeSingle()
+
+  const oldAvatarUrl = currentProfile?.avatar_url
+
+  // 2. Set avatar_url menjadi null di public.profiles (service role bypass RLS)
+  const { error: updateError } = await (serviceClient as any)
+    .from('profiles')
+    .update({ avatar_url: null })
+    .eq('user_id', targetUserId)
+
+  if (updateError) {
+    return errorResponse(event, 'Gagal menghapus foto profil.', updateError, 500)
+  }
+
+  // 3. Hapus file lama dari storage jika ada
+  if (oldAvatarUrl && oldAvatarUrl.includes('/avatars/')) {
+    const oldPath = oldAvatarUrl.split('/avatars/')[1]
+    if (oldPath) {
+      await serviceClient.storage.from('avatars').remove([oldPath])
+    }
+  }
+
+  // 4. Selaraskan user_metadata di auth Supabase
+  try {
+    await (serviceClient as any).auth.admin.updateUserById(targetUserId, {
+      user_metadata: { avatar_url: null },
+    })
+  } catch {
+    // Fail-safe jika service role auth admin tidak tersedia
+  }
+
+  return successResponse('Foto profil berhasil dihapus', null)
+})
