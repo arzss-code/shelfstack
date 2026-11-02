@@ -1,0 +1,52 @@
+import { serverSupabaseClient } from '#supabase/server'
+import type { Database } from '~/types/database.types'
+import { requireUser } from '../../../utils/auth'
+import { claimVoucherSchema } from '../../../../shared/schemas/user-voucher'
+import { successResponse, errorResponse } from '../../../utils/response'
+
+export default defineEventHandler(async (event) => {
+  try {
+    await requireUser(event)
+
+    const body = await readBody(event)
+    const validation = claimVoucherSchema.safeParse(body)
+    if (!validation.success) {
+      const issue = validation.error.issues[0]
+      return errorResponse(
+        event,
+        issue?.message || 'Data klaim kupon tidak valid.',
+        validation.error.format(),
+        400,
+      )
+    }
+
+    const { coupon_id, code } = validation.data
+    const client = await serverSupabaseClient<Database>(event)
+
+    // Panggil RPC claim_coupon_to_wallet
+    const { data: claimResult, error: rpcError } = await client.rpc('claim_coupon_to_wallet', {
+      p_coupon_id: coupon_id || null,
+      p_code: code || null,
+    })
+
+    if (rpcError) {
+      if (rpcError.code === 'PGRST202' || rpcError.message?.includes('claim_coupon_to_wallet')) {
+        return errorResponse(
+          event,
+          'Fungsi RPC klaim voucher belum terpasang di database. Pastikan migrasi terbaru telah dijalankan.',
+          rpcError.message,
+          500,
+        )
+      }
+      return errorResponse(event, rpcError.message || 'Gagal mengklaim voucher.', null, 400)
+    }
+
+    return successResponse('Voucher berhasil diklaim dan disimpan ke dompet Anda.', claimResult)
+  } catch (err: unknown) {
+    if (err && typeof err === 'object' && ('statusCode' in err || 'status' in err)) {
+      throw err
+    }
+    const message = err instanceof Error ? err.message : 'Terjadi kesalahan sistem.'
+    return errorResponse(event, 'Terjadi kesalahan internal saat mengklaim voucher.', message, 500)
+  }
+})

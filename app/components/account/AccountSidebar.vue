@@ -5,11 +5,13 @@ import { useAuth } from '~/features/auth/composables/useAuth'
 import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
 import { useNotificationStore } from '~/features/notifications/stores/notifications'
 import { useUiConfirm } from '~/composables/useUiConfirm'
+import { useUserVouchers } from '~/composables/useUserVouchers'
 
 const route = useRoute()
 const { user, profile, signOut } = useAuth()
 const wishlistStore = useWishlistStore()
 const notificationStore = useNotificationStore()
+const { activeCount: activeVoucherCount } = useUserVouchers()
 const confirm = useUiConfirm()
 
 const displayName = computed(() => {
@@ -46,6 +48,13 @@ const navGroups = computed<NavGroup[]>(() => [
         badge: wishlistStore.totalItems,
       },
       {
+        id: 'vouchers',
+        label: 'Voucher Saya',
+        to: '/account/vouchers',
+        icon: 'pi pi-ticket',
+        badge: activeVoucherCount.value,
+      },
+      {
         id: 'notifications',
         label: 'Notifikasi',
         to: '/notifications',
@@ -78,6 +87,13 @@ const horizontalTabs = computed<NavItem[]>(() => [
     to: '/wishlist',
     icon: 'pi pi-heart',
     badge: wishlistStore.totalItems,
+  },
+  {
+    id: 'vouchers',
+    label: 'Voucher Saya',
+    to: '/account/vouchers',
+    icon: 'pi pi-ticket',
+    badge: activeVoucherCount.value,
   },
   {
     id: 'notifications',
@@ -138,25 +154,19 @@ const handleLogout = () => {
         </div>
 
         <div class="min-w-0 flex-1">
-          <p class="text-xs font-bold text-brand-ink m-0 truncate">
-            {{ displayName }}
-          </p>
-          <p class="text-[11px] text-brand-muted m-0 truncate mt-0.5">
-            {{ user?.email }}
-          </p>
+          <p class="text-xs font-bold text-brand-ink m-0 truncate">{{ displayName }}</p>
+          <p class="text-[11px] text-brand-muted m-0 truncate mt-0.5">{{ user?.email }}</p>
           <div class="mt-1 flex items-center gap-1.5">
             <span
               v-if="profile?.role === 'admin'"
               class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wider"
+              >Admin</span
             >
-              Admin
-            </span>
             <span
               v-else
               class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
+              >Member Aktif</span
             >
-              Member Aktif
-            </span>
           </div>
         </div>
       </div>

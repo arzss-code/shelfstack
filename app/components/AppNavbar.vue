@@ -384,6 +384,13 @@ const handleLogout = async () => {
                     Pesanan Saya
                   </NuxtLink>
                   <NuxtLink
+                    to="/account/vouchers"
+                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
+                    @click="isUserMenuOpen = false"
+                  >
+                    Voucher Saya
+                  </NuxtLink>
+                  <NuxtLink
                     to="/katalog"
                     class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline transition-colors"
                     @click="isUserMenuOpen = false"
@@ -575,6 +582,14 @@ const handleLogout = async () => {
           @click="isMobileMenuOpen = false"
         >
           Pesanan Saya
+        </NuxtLink>
+        <NuxtLink
+          v-if="isLoggedIn"
+          to="/account/vouchers"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+          @click="isMobileMenuOpen = false"
+        >
+          Voucher Saya
         </NuxtLink>
         <NuxtLink
           to="/help"

@@ -2,6 +2,29 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.26.0] - 2026-11-02
+
+### Dompet Voucher Pelanggan ("Voucher Saya" - `/account/vouchers`)
+
+- **Halaman Dompet Voucher Mandiri (`/account/vouchers`)**:
+  - `app/pages/account/vouchers.vue`: Halaman dompet voucher pelanggan terpadu dengan 3 tab navigasi status (Voucher Saya, Temukan Promo, Riwayat), filter kategori (Semua, Diskon, Gratis Ongkir), input kode promo, dan 5 status interaksi lengkap (Idle, Loading, Success, Empty, Error).
+  - `app/components/account/VoucherTicketCard.vue`: Kartu voucher bertema tiket belanja dengan aksen takik perforasi tiket (ticket cutout notch), badge diskon vertikal, tombol salin kode, indikator kadaluarsa, serta tombol kontekstual ("Pakai Sekarang" / "Klaim Voucher").
+  - `app/components/account/VoucherClaimInput.vue`: Bilah input kode voucher promo mandiri dengan tombol klaim instan dan feedback error ramah pengguna.
+  - `app/composables/useUserVouchers.ts`: Composable reaktif untuk memuat voucher dompet pengguna, klaim 1-klik kupon publik, klaim berbasis kode manual, dan sinkronisasi jumlah voucher aktif.
+- **Database & Supabase RPC (`public.user_coupons`)**:
+  - `supabase/migrations/20261125000001_user_coupons_and_wallet.sql`: Tabel relasi dompet voucher `public.user_coupons` dengan kolom `id`, `user_id`, `coupon_id`, `status` ('claimed', 'used', 'expired'), `claimed_at`, `used_at`, dan `order_id`. Dilengkapi foreign key, indexing, RLS policy ketat per user, serta fungsi atomik PostgreSQL `claim_coupon_to_wallet(p_coupon_id uuid, p_code text)` dengan validasi kuota dan status aktif.
+- **Backend API & Validasi Kontrak**:
+  - `server/api/account/vouchers/index.get.ts`: Endpoint terproteksi yang mengembalikan ringkasan dompet voucher lengkap (voucher tersimpan aktif, kupon publik yang belum diklaim, dan riwayat voucher yang telah digunakan atau kedaluwarsa).
+  - `server/api/account/vouchers/claim.post.ts`: Endpoint terproteksi untuk memproses klaim voucher via RPC atomik, mendukung 1-klik klaim dari ID kupon atau input kode promo manual.
+  - `shared/schemas/user-voucher.ts`: Skema validasi Zod untuk operasi voucher dompet (`claimVoucherSchema`, `userVoucherItemSchema`, `voucherWalletResponseSchema`).
+  - `app/types/database.types.ts`: Pembaruan tipe TypeScript Database untuk tabel `user_coupons` dan fungsi RPC `claim_coupon_to_wallet` tanpa penggunaan tipe `any`.
+- **Integrasi Navigasi Akun**:
+  - `app/components/account/AccountSidebar.vue`: Menambahkan menu "Voucher Saya" di bawah grup "Aktivitas Belanja" dan pada bilah tab horizontal untuk viewport mobile/tablet.
+  - `app/components/account/AccountNavTabs.vue`: Menambahkan tab "Voucher Saya" dengan ikon tiket dan penyesuaian label breadcrumb otomatis.
+  - `app/components/AppNavbar.vue`: Menambahkan tautan "Voucher Saya" di menu dropdown pengguna dan laci navigasi mobile.
+- **Testing & Quality Assurance**:
+  - `tests/unit/user-voucher-schema.spec.ts`: Unit test validasi skema Zod untuk klaim voucher, item voucher, status voucher, dan ringkasan respons dompet (8 test lulus).
+
 ## [0.25.0] - 2026-11-02
 
 ### Manajemen Buku Alamat & Profil Akun Pelanggan (SHF-ACC-01 & SHF-ACC-02)
