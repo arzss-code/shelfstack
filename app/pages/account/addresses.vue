@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import type { UserAddress, CreateAddressInput } from '~~/shared/schemas/address'
+import type { AddressFilterType } from '~/components/account/AddressFilterBar.vue'
 import { useAddresses } from '~/composables/useAddresses'
 import { useUiToast } from '~/composables/useUiToast'
 import { useUiConfirm } from '~/composables/useUiConfirm'
 import AccountSidebar from '~/components/account/AccountSidebar.vue'
 import AddressCard from '~/components/account/AddressCard.vue'
 import AddressModal from '~/components/account/AddressModal.vue'
+import AddressFilterBar from '~/components/account/AddressFilterBar.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import UiEmptyState from '~/components/ui/UiEmptyState.vue'
 import UiSkeleton from '~/components/ui/UiSkeleton.vue'
 
-definePageMeta({
-  middleware: 'auth',
-})
+definePageMeta({ middleware: 'auth' })
 
 useSeoMeta({
   title: 'Daftar Alamat Pengiriman - ShelfStack',
@@ -38,7 +38,7 @@ const editingAddress = ref<UserAddress | null>(null)
 const isSubmitting = ref(false)
 const updatingDefaultId = ref<string | null>(null)
 const searchQuery = ref('')
-const activeFilter = ref<'all' | 'default' | 'rumah' | 'kantor'>('all')
+const activeFilter = ref<AddressFilterType>('all')
 
 onMounted(async () => {
   await fetchAddresses()
@@ -47,7 +47,6 @@ onMounted(async () => {
 const filteredAddresses = computed(() => {
   let list = addresses.value
 
-  // Filter tab Tokopedia / Shopee
   if (activeFilter.value === 'default') {
     list = list.filter((a) => a.is_default)
   } else if (activeFilter.value === 'rumah') {
@@ -70,6 +69,11 @@ const filteredAddresses = computed(() => {
       a.phone.includes(q),
   )
 })
+
+const handleResetFilter = () => {
+  searchQuery.value = ''
+  activeFilter.value = 'all'
+}
 
 const handleOpenCreateModal = () => {
   editingAddress.value = null
@@ -169,9 +173,9 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
         class="flex items-center gap-1.5 text-[11px] text-brand-muted mb-6"
         aria-label="Breadcrumb"
       >
-        <NuxtLink to="/" class="hover:text-brand-ink transition-colors no-underline">
-          Beranda
-        </NuxtLink>
+        <NuxtLink to="/" class="hover:text-brand-ink transition-colors no-underline"
+          >Beranda</NuxtLink
+        >
         <span class="text-brand-faint">/</span>
         <span class="text-brand-muted">Akun Saya</span>
         <span class="text-brand-faint">/</span>
@@ -180,7 +184,6 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
 
       <!-- 2-Column Tokopedia / Shopee Master Layout -->
       <div class="flex flex-col lg:flex-row gap-6 items-start">
-        <!-- Left Sidebar Navigation -->
         <AccountSidebar />
 
         <!-- Right Main Content Panel -->
@@ -220,76 +223,11 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
               </UiButton>
             </div>
 
-            <!-- Search Bar & Category Filter Chips -->
-            <div
+            <AddressFilterBar
               v-if="addresses.length > 0"
-              class="pt-4 flex flex-col sm:flex-row gap-3 sm:items-center justify-between"
-            >
-              <div class="relative w-full sm:w-72">
-                <i
-                  class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-faint"
-                  aria-hidden="true"
-                />
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="Cari penerima atau kota..."
-                  class="w-full pl-8 pr-3 py-1.5 text-xs rounded-full border border-brand-hair bg-brand-canvas-soft text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink transition-colors"
-                />
-              </div>
-
-              <!-- Filter Chips -->
-              <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-                <button
-                  type="button"
-                  class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap"
-                  :class="[
-                    activeFilter === 'all'
-                      ? 'bg-brand-ink text-white border-brand-ink'
-                      : 'bg-brand-canvas text-brand-muted border-brand-hair hover:text-brand-ink',
-                  ]"
-                  @click="activeFilter = 'all'"
-                >
-                  Semua Alamat
-                </button>
-                <button
-                  type="button"
-                  class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap"
-                  :class="[
-                    activeFilter === 'default'
-                      ? 'bg-brand-ink text-white border-brand-ink'
-                      : 'bg-brand-canvas text-brand-muted border-brand-hair hover:text-brand-ink',
-                  ]"
-                  @click="activeFilter = 'default'"
-                >
-                  Alamat Utama
-                </button>
-                <button
-                  type="button"
-                  class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap"
-                  :class="[
-                    activeFilter === 'rumah'
-                      ? 'bg-brand-ink text-white border-brand-ink'
-                      : 'bg-brand-canvas text-brand-muted border-brand-hair hover:text-brand-ink',
-                  ]"
-                  @click="activeFilter = 'rumah'"
-                >
-                  Rumah
-                </button>
-                <button
-                  type="button"
-                  class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap"
-                  :class="[
-                    activeFilter === 'kantor'
-                      ? 'bg-brand-ink text-white border-brand-ink'
-                      : 'bg-brand-canvas text-brand-muted border-brand-hair hover:text-brand-ink',
-                  ]"
-                  @click="activeFilter = 'kantor'"
-                >
-                  Kantor
-                </button>
-              </div>
-            </div>
+              v-model:search-query="searchQuery"
+              v-model:active-filter="activeFilter"
+            />
           </div>
 
           <!-- State: Loading Skeleton -->
@@ -335,11 +273,8 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
             <UiButton
               variant="ghost"
               size="xs"
-              class="mt-3"
-              @click="
-                searchQuery = ''
-                activeFilter = 'all'
-              "
+              class="mt-3 active:scale-95"
+              @click="handleResetFilter"
             >
               Reset Filter Pencarian
             </UiButton>

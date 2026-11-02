@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { UserAddress, CreateAddressInput } from '~~/shared/schemas/address'
-import type { AdministrativeSelection } from '~~/shared/schemas/location'
-import { formatAdministrativeAddress } from '~~/shared/data/locations/indonesia-regions'
 import { createAddressSchema } from '~~/shared/schemas/address'
 import UiModal from '~/components/ui/UiModal.vue'
 import UiInput from '~/components/ui/UiInput.vue'
 import UiTextarea from '~/components/ui/UiTextarea.vue'
 import UiButton from '~/components/ui/UiButton.vue'
-import LocationPickerModal from '~/components/checkout/LocationPickerModal.vue'
+import AddressLocationField from '~/components/account/AddressLocationField.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -31,9 +29,6 @@ const isOpen = computed({
   get: () => props.modelValue,
   set: (val: boolean) => emit('update:modelValue', val),
 })
-
-const isLocationModalOpen = ref(false)
-const showManualLocationInputs = ref(false)
 
 const addressLabels = [
   { id: 'Rumah', label: 'Rumah', icon: 'pi pi-home', hint: 'Pengiriman setiap hari (24 jam)' },
@@ -96,7 +91,6 @@ watch(
         noteText: rawNote,
         is_default: Boolean(addr.is_default),
       }
-      showManualLocationInputs.value = false
     } else {
       selectedLabel.value = 'Rumah'
       form.value = {
@@ -108,24 +102,15 @@ watch(
         noteText: '',
         is_default: false,
       }
-      showManualLocationInputs.value = false
     }
     errors.value = {}
   },
   { immediate: true },
 )
 
-const handleLocationSelect = (loc: AdministrativeSelection) => {
-  form.value.city = formatAdministrativeAddress(loc.districtName, loc.cityName, loc.provinceName)
-  form.value.postal = loc.postalCode
-  if (errors.value.city) delete errors.value.city
-  if (errors.value.postal) delete errors.value.postal
-}
-
 const handleSubmit = () => {
   errors.value = {}
 
-  // Susun payload dengan label terformat [Label] catatan
   const labelPrefix = `[${selectedLabel.value}]`
   const combinedNote = form.value.noteText.trim()
     ? `${labelPrefix} ${form.value.noteText.trim()}`
@@ -175,7 +160,7 @@ const handleSubmit = () => {
             v-for="item in addressLabels"
             :key="item.id"
             type="button"
-            class="px-3 py-2 rounded-field text-xs font-medium border flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            class="px-3 py-2 rounded-field text-xs font-medium border flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95"
             :class="[
               selectedLabel === item.id
                 ? 'bg-brand-ink text-white border-brand-ink shadow-xs font-semibold'
@@ -209,107 +194,14 @@ const handleSubmit = () => {
         />
       </div>
 
-      <!-- Cascade Location Picker Section -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <label class="text-xs font-semibold text-brand-ink sm:text-sm block">
-            Kota atau Kecamatan &amp; Kode Pos
-          </label>
-          <button
-            type="button"
-            class="text-[11px] font-semibold text-brand-accent hover:underline border-0 bg-transparent cursor-pointer p-0"
-            @click="showManualLocationInputs = !showManualLocationInputs"
-          >
-            {{ showManualLocationInputs ? 'Sembunyikan Input Manual' : 'Input Manual Wilayah' }}
-          </button>
-        </div>
-
-        <!-- Selected Location Review Card -->
-        <div
-          v-if="form.city"
-          class="p-3.5 rounded-card border border-brand-hair bg-brand-canvas-soft/70 flex items-center justify-between gap-3 shadow-xs"
-        >
-          <div class="flex items-center gap-2.5 min-w-0">
-            <span
-              class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0"
-            >
-              <i class="pi pi-map-marker text-xs" aria-hidden="true" />
-            </span>
-            <div class="min-w-0">
-              <p class="text-xs font-bold text-brand-ink m-0 truncate">
-                {{ form.city }}
-              </p>
-              <p class="text-[11px] font-mono text-brand-muted m-0 mt-0.5">
-                Kode Pos: <span class="font-bold text-brand-ink">{{ form.postal || '-' }}</span>
-              </p>
-            </div>
-          </div>
-
-          <UiButton
-            variant="secondary"
-            size="xs"
-            type="button"
-            icon="pi pi-pencil"
-            class="shrink-0"
-            :disabled="loading"
-            @click="isLocationModalOpen = true"
-          >
-            Ubah
-          </UiButton>
-        </div>
-
-        <!-- Unselected Location Trigger -->
-        <div
-          v-else
-          class="p-3.5 rounded-card border border-dashed border-brand-hair hover:border-brand-ink/40 transition-colors bg-brand-canvas-soft flex items-center justify-between gap-3"
-        >
-          <div class="flex items-center gap-2.5 min-w-0">
-            <i class="pi pi-map text-sm text-brand-faint shrink-0" aria-hidden="true" />
-            <span class="text-xs text-brand-muted truncate">
-              Pilih provinsi, kota, kecamatan, dan kode pos
-            </span>
-          </div>
-          <UiButton
-            variant="secondary"
-            size="xs"
-            type="button"
-            icon="pi pi-chevron-right"
-            icon-pos="right"
-            :disabled="loading"
-            class="shrink-0"
-            @click="isLocationModalOpen = true"
-          >
-            Pilih Wilayah
-          </UiButton>
-        </div>
-
-        <p v-if="errors.city" class="text-[11px] text-rose-600 m-0">
-          {{ errors.city }}
-        </p>
-      </div>
-
-      <!-- Manual Inputs Fallback (Collapsible) -->
-      <div v-show="showManualLocationInputs" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-        <div class="sm:col-span-2">
-          <UiInput
-            v-model="form.city"
-            label="Kota / Wilayah (Teks)"
-            placeholder="Kota / Kabupaten"
-            :error="errors.city"
-            :disabled="loading"
-          />
-        </div>
-        <div>
-          <UiInput
-            v-model="form.postal"
-            label="Kode Pos"
-            placeholder="40132"
-            numeric
-            :error="errors.postal"
-            :disabled="loading"
-          />
-        </div>
-      </div>
+      <!-- Cascade Location Picker Subcomponent -->
+      <AddressLocationField
+        v-model:city="form.city"
+        v-model:postal="form.postal"
+        :error-city="errors.city"
+        :error-postal="errors.postal"
+        :disabled="loading"
+      />
 
       <UiTextarea
         v-model="form.street"
@@ -348,16 +240,21 @@ const handleSubmit = () => {
           size="sm"
           type="button"
           :disabled="loading"
+          class="active:scale-95"
           @click="isOpen = false"
         >
           Batal
         </UiButton>
-        <UiButton variant="primary" size="sm" type="submit" :loading="loading">
+        <UiButton
+          variant="primary"
+          size="sm"
+          type="submit"
+          :loading="loading"
+          class="active:scale-95"
+        >
           {{ addressToEdit ? 'Simpan Perubahan' : 'Tambah Alamat' }}
         </UiButton>
       </div>
     </form>
-
-    <LocationPickerModal v-model="isLocationModalOpen" @select="handleLocationSelect" />
   </UiModal>
 </template>
