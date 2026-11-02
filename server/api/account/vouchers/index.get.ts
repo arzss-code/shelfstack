@@ -1,6 +1,7 @@
-import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
+import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { formatRupiah } from '~/utils/format'
+import { requireUser } from '../../../utils/auth'
 import { successResponse, errorResponse } from '../../../utils/response'
 import type {
   UserVoucherItem,
@@ -35,10 +36,8 @@ interface UserCouponJoinRow {
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await serverSupabaseUser(event)
-    if (!user) {
-      return errorResponse(event, 'Sesi tidak valid. Silakan masuk kembali.', null, 401)
-    }
+    const { user, profile } = await requireUser(event)
+    const targetUserId = user.id || profile.user_id
 
     const client = await serverSupabaseClient<Database>(event)
 
@@ -69,7 +68,7 @@ export default defineEventHandler(async (event) => {
         )
       `,
       )
-      .eq('user_id', user.id)
+      .eq('user_id', targetUserId)
       .order('claimed_at', { ascending: false })
 
     if (ucError) {

@@ -1,14 +1,12 @@
-import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
+import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { requireUser } from '../../../utils/auth'
 import { claimVoucherSchema } from '../../../../shared/schemas/user-voucher'
 import { successResponse, errorResponse } from '../../../utils/response'
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await serverSupabaseUser(event)
-    if (!user) {
-      return errorResponse(event, 'Sesi tidak valid. Silakan login kembali.', null, 401)
-    }
+    await requireUser(event)
 
     const body = await readBody(event)
     const validation = claimVoucherSchema.safeParse(body)
