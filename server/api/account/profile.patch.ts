@@ -21,16 +21,26 @@ export default defineEventHandler(async (event) => {
   }
 
   const client = await serverSupabaseClient<Database>(event)
-  const fullName = parsed.data.full_name.trim()
+  const updatePayload: Record<string, string | null> = {}
+  const metadataPayload: Record<string, string | null> = {}
+
+  if (parsed.data.full_name !== undefined) {
+    const trimmed = parsed.data.full_name.trim()
+    updatePayload.full_name = trimmed
+    metadataPayload.full_name = trimmed
+  }
+
+  if (parsed.data.avatar_url !== undefined) {
+    updatePayload.avatar_url = parsed.data.avatar_url
+    metadataPayload.avatar_url = parsed.data.avatar_url
+  }
 
   // Update profil di tabel public.profiles
   const { data: updatedProfile, error: updateError } = await (client as any)
     .from('profiles')
-    .update({
-      full_name: fullName,
-    })
+    .update(updatePayload)
     .eq('user_id', targetUserId)
-    .select('id, user_id, full_name, role')
+    .select('id, user_id, full_name, role, avatar_url')
     .single()
 
   if (updateError) {
@@ -41,7 +51,7 @@ export default defineEventHandler(async (event) => {
   try {
     const serviceClient = serverSupabaseServiceRole<Database>(event)
     await (serviceClient as any).auth.admin.updateUserById(targetUserId, {
-      user_metadata: { full_name: fullName },
+      user_metadata: metadataPayload,
     })
   } catch {
     // Abaikan jika service role key tidak tersedia di lingkungan saat ini

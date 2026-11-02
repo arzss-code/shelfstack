@@ -1,12 +1,18 @@
 import { z } from 'zod'
 
-export const updateProfileSchema = z.object({
-  full_name: z
-    .string({ error: 'Nama lengkap wajib diisi.' })
-    .trim()
-    .min(3, 'Nama lengkap minimal 3 karakter.')
-    .max(100, 'Nama lengkap maksimal 100 karakter.'),
-})
+export const updateProfileSchema = z
+  .object({
+    full_name: z
+      .string({ error: 'Nama lengkap wajib diisi.' })
+      .trim()
+      .min(3, 'Nama lengkap minimal 3 karakter.')
+      .max(100, 'Nama lengkap maksimal 100 karakter.')
+      .optional(),
+    avatar_url: z.string().url('Format URL foto profil tidak valid.').nullable().optional(),
+  })
+  .refine((data) => data.full_name !== undefined || data.avatar_url !== undefined, {
+    message: 'Setidaknya salah satu data profil wajib disertakan.',
+  })
 
 export const updateEmailSchema = z.object({
   email: z

@@ -318,9 +318,17 @@ const handleLogout = async () => {
                 @click="isUserMenuOpen = !isUserMenuOpen"
               >
                 <span
-                  class="w-7 h-7 rounded-full bg-brand-ink text-white text-xs font-bold flex items-center justify-center shrink-0"
+                  class="w-7 h-7 rounded-full overflow-hidden border border-brand-hair bg-brand-ink text-white text-xs font-bold flex items-center justify-center shrink-0"
                 >
-                  {{ initial }}
+                  <img
+                    v-if="profile?.avatar_url"
+                    :src="profile.avatar_url"
+                    :alt="displayName"
+                    class="w-full h-full object-cover"
+                  />
+                  <template v-else>
+                    {{ initial }}
+                  </template>
                 </span>
                 <svg
                   class="w-3 h-3 text-brand-muted shrink-0 transition-transform duration-200 hidden sm:block"

@@ -3,6 +3,7 @@ import { ref, onMounted, computed, useTemplateRef } from 'vue'
 import { useUserProfile } from '~/composables/useUserProfile'
 import { useUiToast } from '~/composables/useUiToast'
 import AccountSidebar from '~/components/account/AccountSidebar.vue'
+import ProfileAvatarCard from '~/components/account/ProfileAvatarCard.vue'
 import ProfileMetricsBanner from '~/components/account/ProfileMetricsBanner.vue'
 import ProfileSecurityCard from '~/components/account/ProfileSecurityCard.vue'
 import UiInput from '~/components/ui/UiInput.vue'
@@ -162,6 +163,9 @@ const handleUpdatePassword = async (newPass: string, confirmPass: string) => {
       <div class="flex-1 min-w-0 w-full space-y-6">
         <!-- Top KPI Metrics Banner -->
         <ProfileMetricsBanner :stats="stats" :loading="isLoadingStats" />
+
+        <!-- Profile Avatar Upload Card (Tokopedia & Shopee Pattern) -->
+        <ProfileAvatarCard />
 
         <!-- Section 1: Ubah Biodata Diri (Tokopedia pattern) -->
         <div class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper">

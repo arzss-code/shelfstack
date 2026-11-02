@@ -37,12 +37,7 @@ const navGroups = computed<NavGroup[]>(() => [
   {
     title: 'Aktivitas Belanja',
     items: [
-      {
-        id: 'orders',
-        label: 'Pesanan Saya',
-        to: '/orders',
-        icon: 'pi pi-box',
-      },
+      { id: 'orders', label: 'Pesanan Saya', to: '/orders', icon: 'pi pi-box' },
       {
         id: 'wishlist',
         label: 'Daftar Keinginan',
@@ -62,12 +57,7 @@ const navGroups = computed<NavGroup[]>(() => [
   {
     title: 'Pengaturan Akun',
     items: [
-      {
-        id: 'profile',
-        label: 'Biodata Diri',
-        to: '/account/profile',
-        icon: 'pi pi-user',
-      },
+      { id: 'profile', label: 'Biodata Diri', to: '/account/profile', icon: 'pi pi-user' },
       {
         id: 'addresses',
         label: 'Daftar Alamat',
@@ -110,9 +100,20 @@ const handleLogout = () => {
       <div class="flex items-center gap-3 pb-5 border-b border-brand-hairsoft">
         <div class="relative shrink-0">
           <div
-            class="w-11 h-11 rounded-full bg-brand-ink text-white font-display text-base font-bold flex items-center justify-center shadow-whisper"
+            class="w-11 h-11 rounded-full border border-brand-hair overflow-hidden bg-brand-canvas-soft flex items-center justify-center shadow-whisper"
           >
-            {{ initial }}
+            <img
+              v-if="profile?.avatar_url"
+              :src="profile.avatar_url"
+              :alt="displayName"
+              class="w-full h-full object-cover"
+            />
+            <div
+              v-else
+              class="w-full h-full bg-brand-ink text-white font-display text-base font-bold flex items-center justify-center"
+            >
+              {{ initial }}
+            </div>
           </div>
           <span
             class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white"
@@ -206,9 +207,20 @@ const handleLogout = () => {
       >
         <div class="flex items-center gap-3 min-w-0">
           <div
-            class="w-10 h-10 rounded-full bg-brand-ink text-white font-display text-sm font-bold flex items-center justify-center shrink-0"
+            class="w-10 h-10 rounded-full border border-brand-hair overflow-hidden bg-brand-canvas-soft flex items-center justify-center shrink-0"
           >
-            {{ initial }}
+            <img
+              v-if="profile?.avatar_url"
+              :src="profile.avatar_url"
+              :alt="displayName"
+              class="w-full h-full object-cover"
+            />
+            <div
+              v-else
+              class="w-full h-full bg-brand-ink text-white font-display text-sm font-bold flex items-center justify-center"
+            >
+              {{ initial }}
+            </div>
           </div>
           <div class="min-w-0">
             <p class="text-xs font-bold text-brand-ink m-0 truncate">{{ displayName }}</p>

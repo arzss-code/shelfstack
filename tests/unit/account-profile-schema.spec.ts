@@ -32,6 +32,43 @@ describe('Account Profile Schemas [SHF-ACC-01]', () => {
         expect(result.data.full_name).toBe('Aria Pratama')
       }
     })
+
+    it('menerima avatar_url yang valid', () => {
+      const result = updateProfileSchema.safeParse({
+        avatar_url: 'https://example.com/storage/avatars/user123.jpg',
+      })
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.avatar_url).toBe('https://example.com/storage/avatars/user123.jpg')
+      }
+    })
+
+    it('menerima avatar_url bernilai null untuk menghapus foto', () => {
+      const result = updateProfileSchema.safeParse({
+        avatar_url: null,
+      })
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.avatar_url).toBeNull()
+      }
+    })
+
+    it('menolak avatar_url yang tidak valid format URL-nya', () => {
+      const result = updateProfileSchema.safeParse({
+        avatar_url: 'bukan-url-gambar',
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.avatar_url).toContain(
+          'Format URL foto profil tidak valid.',
+        )
+      }
+    })
+
+    it('menolak objek kosong tanpa nama maupun foto profil', () => {
+      const result = updateProfileSchema.safeParse({})
+      expect(result.success).toBe(false)
+    })
   })
 
   describe('updateEmailSchema', () => {

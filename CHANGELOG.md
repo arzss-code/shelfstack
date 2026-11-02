@@ -30,12 +30,18 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
   - `app/components/account/AddressCard.vue` & `AddressModal.vue`: Label kategori alamat khas Tokopedia (`Rumah`, `Kantor`, `Apartemen`, `Lainnya`), panduan jam operasional pengiriman (Shopee pattern), dan integrasi patokan kurir.
   - `app/pages/account/addresses.vue`: Pencarian cepat nama/kota penerima dan filter chips kategori alamat instan.
   - `app/pages/account/profile.vue`: Tata letak Biodata Diri berstandar Tokopedia dengan kartu tips keamanan akun, status verifikasi email, dan checklist dinamis kriteria kata sandi.
+- **Manajemen Foto Profil Pelanggan (Avatar Upload, Ubah, Hapus)**:
+  - `supabase/migrations/20261124000001_profile_avatar_url_and_storage.sql`: Menambahkan kolom `avatar_url` pada tabel `public.profiles` dan bucket `avatars` dengan RLS storage terproteksi per ID user.
+  - `app/components/account/ProfileAvatarCard.vue`: Komponen avatar interaktif dengan preview foto bundar, overlay tombol kamera, tombol "Pilih Foto", "Hapus Foto", dan indikator upload.
+  - `app/composables/useUserProfile.ts`: Method `uploadAvatar()` dan `deleteAvatar()` dengan validasi berkas client-side (maks. 2 MB, JPG/PNG/WEBP) dan penghapusan avatar lama otomatis.
+  - `app/components/account/AccountSidebar.vue` & `AppNavbar.vue`: Menampilkan foto profil asli pengguna secara reaktif dengan fallback inisial nama.
+  - `server/api/account/profile.patch.ts`: Dukungan pembaruan `avatar_url` dan sinkronisasi metadata auth Supabase.
 - **Testing & Quality Assurance**:
-  - `tests/unit/account-profile-schema.spec.ts`: Unit test komprehensif validasi skema profil (8 test).
+  - `tests/unit/account-profile-schema.spec.ts`: Unit test validasi skema profil termasuk pengujian format URL dan null avatar (12 test).
   - `tests/unit/account-profile-and-addresses.spec.ts`: Unit test untuk composable `useAddresses` dan kontrak data `AccountStats` (6 test).
   - `tests/e2e/pages/AccountPage.ts`: Page Object Model baru untuk pengujian otomatis Playwright area akun.
   - `tests/e2e/account-journey.spec.ts`: Skenario pengujian E2E mencakup proteksi route guards tamu, penolakan API anonim (HTTP 401), dan alur navigasi akun.
-  - 67 test files / 638 tests lolos 100%. `nuxi typecheck` EXIT 0, ESLint 0 error.
+  - 67 test files / 642 tests lolos 100%. `nuxi typecheck` EXIT 0, ESLint 0 error.
 
 ## [0.24.0] - 2026-10-31
 

@@ -17,6 +17,7 @@ export function useUserProfile() {
   const isUpdatingName = ref(false)
   const isUpdatingPassword = ref(false)
   const isUpdatingEmail = ref(false)
+  const isUploadingAvatar = ref(false)
   const error = ref<string | null>(null)
   const successMessage = ref<string | null>(null)
 
@@ -54,7 +55,6 @@ export function useUserProfile() {
         body: { full_name: parsed.data.full_name },
       })
 
-      // Sinkronkan state profile in-memory
       await fetchProfile(true)
       successMessage.value = 'Nama lengkap berhasil diperbarui.'
       return true
@@ -64,6 +64,104 @@ export function useUserProfile() {
       return false
     } finally {
       isUpdatingName.value = false
+    }
+  }
+
+  const uploadAvatar = async (file: File): Promise<boolean> => {
+    error.value = null
+    successMessage.value = null
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      error.value = 'Format file tidak didukung. Harap gunakan format JPG, PNG, atau WEBP.'
+      return false
+    }
+
+    const MAX_SIZE = 2 * 1024 * 1024 // 2MB
+    if (file.size > MAX_SIZE) {
+      error.value = 'Ukuran file terlalu besar. Maksimal ukuran file adalah 2 MB.'
+      return false
+    }
+
+    const userId = user.value?.id
+    if (!userId) {
+      error.value = 'Sesi pengguna tidak valid. Silakan login kembali.'
+      return false
+    }
+
+    isUploadingAvatar.value = true
+    try {
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+      const filePath = `${userId}/${Date.now()}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+      })
+
+      if (uploadError) {
+        error.value = uploadError.message || 'Gagal mengunggah foto profil ke penyimpanan.'
+        return false
+      }
+
+      const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath)
+      const newAvatarUrl = publicUrlData.publicUrl
+
+      await $fetch('/api/account/profile', {
+        method: 'PATCH',
+        body: { avatar_url: newAvatarUrl },
+      })
+
+      const oldAvatarUrl = profile.value?.avatar_url
+      if (oldAvatarUrl && oldAvatarUrl.includes('/avatars/')) {
+        const oldPath = oldAvatarUrl.split('/avatars/')[1]
+        if (oldPath && oldPath !== filePath) {
+          await supabase.storage.from('avatars').remove([oldPath])
+        }
+      }
+
+      await fetchProfile(true)
+      successMessage.value = 'Foto profil berhasil diperbarui.'
+      return true
+    } catch (err: unknown) {
+      const fetchErr = err as { data?: { message?: string }; message?: string }
+      error.value = fetchErr?.data?.message || fetchErr?.message || 'Gagal menyimpan foto profil.'
+      return false
+    } finally {
+      isUploadingAvatar.value = false
+    }
+  }
+
+  const deleteAvatar = async (): Promise<boolean> => {
+    error.value = null
+    successMessage.value = null
+
+    const oldAvatarUrl = profile.value?.avatar_url
+    if (!oldAvatarUrl) return true
+
+    isUploadingAvatar.value = true
+    try {
+      await $fetch('/api/account/profile', {
+        method: 'PATCH',
+        body: { avatar_url: null },
+      })
+
+      if (oldAvatarUrl.includes('/avatars/')) {
+        const oldPath = oldAvatarUrl.split('/avatars/')[1]
+        if (oldPath) {
+          await supabase.storage.from('avatars').remove([oldPath])
+        }
+      }
+
+      await fetchProfile(true)
+      successMessage.value = 'Foto profil berhasil dihapus.'
+      return true
+    } catch (err: unknown) {
+      const fetchErr = err as { data?: { message?: string }; message?: string }
+      error.value = fetchErr?.data?.message || fetchErr?.message || 'Gagal menghapus foto profil.'
+      return false
+    } finally {
+      isUploadingAvatar.value = false
     }
   }
 
@@ -145,10 +243,13 @@ export function useUserProfile() {
     isUpdatingName,
     isUpdatingPassword,
     isUpdatingEmail,
+    isUploadingAvatar,
     error,
     successMessage,
     fetchStats,
     updateName,
+    uploadAvatar,
+    deleteAvatar,
     updatePassword,
     updateEmail,
   }

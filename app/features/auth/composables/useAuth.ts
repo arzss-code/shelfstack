@@ -5,6 +5,7 @@ export interface UserProfile {
   user_id: string
   full_name: string | null
   role: 'admin' | 'customer'
+  avatar_url?: string | null
 }
 
 const SUPABASE_ERROR_ID: Array<[RegExp, string]> = [
@@ -47,7 +48,7 @@ export function useAuth() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, user_id, full_name, role')
+        .select('id, user_id, full_name, role, avatar_url')
         .eq('user_id', userId)
         .maybeSingle()
 
