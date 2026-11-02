@@ -72,16 +72,14 @@ const isTabActive = (tabPath: string) => {
   <header class="w-full mb-8">
     <!-- Breadcrumb Micro-Navigation -->
     <nav
-      class="flex items-center gap-1.5 text-[11px] text-brand-muted mb-4"
-      aria-label="Breadcrumb"
+      class="flex items-center gap-2 text-xs font-medium text-brand-muted mb-4 overflow-x-auto"
+      aria-label="Breadcrumbs"
     >
-      <NuxtLink to="/" class="hover:text-brand-ink transition-colors no-underline">
-        Beranda
+      <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
+        ShelfStack
       </NuxtLink>
       <span class="text-brand-faint">/</span>
-      <span class="text-brand-muted">Akun Saya</span>
-      <span class="text-brand-faint">/</span>
-      <span class="font-semibold text-brand-ink" aria-current="page">{{ currentTabLabel }}</span>
+      <span class="font-semibold text-brand-ink">{{ currentTabLabel }}</span>
     </nav>
 
     <!-- User Quick Overview Banner -->

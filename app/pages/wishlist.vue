@@ -73,14 +73,15 @@ const handleClear = () => {
 <template>
   <div class="space-y-6 pb-20">
     <!-- Breadcrumbs -->
-    <nav aria-label="Breadcrumbs" class="flex items-center gap-1.5 text-[11px] text-brand-muted">
+    <nav
+      aria-label="Breadcrumbs"
+      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 overflow-x-auto"
+    >
       <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
-        Beranda
+        ShelfStack
       </NuxtLink>
       <span class="text-brand-faint">/</span>
-      <span class="text-brand-muted">Akun Saya</span>
-      <span class="text-brand-faint">/</span>
-      <span class="font-semibold text-brand-ink" aria-current="page">Wishlist</span>
+      <span class="text-brand-ink font-semibold">Wishlist</span>
       <span
         v-if="wishlistStore.totalItems > 0"
         class="ml-1 px-2 py-0.5 rounded-full bg-brand-canvas-soft border border-brand-hair text-brand-ink text-[10px] font-bold tabular-nums"

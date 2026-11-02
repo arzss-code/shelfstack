@@ -1,14 +1,15 @@
 <template>
   <div class="space-y-6 pb-20">
-    <!-- Breadcrumb -->
-    <nav class="flex items-center gap-1.5 text-[11px] text-brand-muted" aria-label="Breadcrumb">
-      <NuxtLink to="/" class="hover:text-brand-ink transition-colors no-underline">
-        Beranda
+    <!-- Breadcrumbs -->
+    <nav
+      aria-label="Breadcrumbs"
+      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 overflow-x-auto"
+    >
+      <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
+        ShelfStack
       </NuxtLink>
       <span class="text-brand-faint">/</span>
-      <span class="text-brand-muted">Akun Saya</span>
-      <span class="text-brand-faint">/</span>
-      <span class="font-semibold text-brand-ink" aria-current="page">Notifikasi</span>
+      <span class="text-brand-ink font-semibold">Notifikasi</span>
     </nav>
 
     <!-- 2-Column Tokopedia / Shopee Master Layout (Sidebar on xl, Horizontal Tabs on < xl) -->

@@ -564,9 +564,7 @@ const resetFilters = () => {
         ShelfStack
       </NuxtLink>
       <span class="text-brand-faint">/</span>
-      <span class="text-brand-muted">Akun Saya</span>
-      <span class="text-brand-faint">/</span>
-      <span class="text-brand-ink font-semibold" aria-current="page">Pesanan Saya</span>
+      <span class="text-brand-ink font-semibold">Pesanan Saya</span>
     </nav>
 
     <!-- 2-Column Tokopedia / Shopee Master Layout (Sidebar on xl, Horizontal Tabs on < xl) -->
