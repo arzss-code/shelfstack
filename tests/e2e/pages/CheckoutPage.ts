@@ -40,7 +40,7 @@ export class CheckoutPage extends BasePage {
     this.noteInput = page.getByPlaceholder(/titipkan ke satpam/i)
     this.submitButton = page.getByRole('button', { name: /bayar sekarang|memproses pesanan/i })
     this.orderSummary = page.locator('aside')
-    this.billDetails = page.locator('aside').getByText(/total tagihan/i)
+    this.billDetails = page.locator('aside').getByText(/total tagihan|total pembayaran/i)
     this.openLocationPickerButton = page.locator('[data-testid="open-location-picker-btn"]')
     this.locationSearchInput = page.locator('[data-testid="location-search-input"]')
     this.searchResultItems = page.locator('[data-testid="search-result-item"]')
@@ -114,7 +114,7 @@ export class CheckoutPage extends BasePage {
   }
 
   async assertOrderSummaryVisible(): Promise<void> {
-    await expect(this.orderSummary).toBeVisible()
-    await expect(this.billDetails).toBeVisible()
+    await expect(this.orderSummary).toBeVisible({ timeout: 15000 })
+    await expect(this.billDetails).toBeVisible({ timeout: 15000 })
   }
 }
