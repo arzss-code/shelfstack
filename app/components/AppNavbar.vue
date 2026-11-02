@@ -374,7 +374,7 @@ const handleLogout = async () => {
                     class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
                     @click="isUserMenuOpen = false"
                   >
-                    Buku Alamat
+                    Daftar Alamat
                   </NuxtLink>
                   <NuxtLink
                     to="/orders"
@@ -566,7 +566,7 @@ const handleLogout = async () => {
           class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
           @click="isMobileMenuOpen = false"
         >
-          Buku Alamat
+          Daftar Alamat
         </NuxtLink>
         <NuxtLink
           v-if="isLoggedIn"

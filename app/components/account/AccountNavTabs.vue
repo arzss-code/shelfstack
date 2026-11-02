@@ -25,10 +25,10 @@ interface NavTab {
 }
 
 const currentTabLabel = computed(() => {
-  if (route.path.startsWith('/account/addresses')) return 'Buku Alamat'
+  if (route.path.startsWith('/account/addresses')) return 'Daftar Alamat'
   if (route.path.startsWith('/account/profile') || route.path === '/account') return 'Profil Akun'
   if (route.path.startsWith('/orders')) return 'Pesanan Saya'
-  if (route.path.startsWith('/wishlist')) return 'Daftar Keinginan'
+  if (route.path.startsWith('/wishlist')) return 'Wishlist'
   return 'Akun Pelanggan'
 })
 
@@ -41,7 +41,7 @@ const tabs = computed<NavTab[]>(() => [
   },
   {
     id: 'addresses',
-    label: 'Buku Alamat',
+    label: 'Daftar Alamat',
     to: '/account/addresses',
     icon: 'pi pi-map-marker',
   },

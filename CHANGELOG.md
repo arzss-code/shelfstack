@@ -26,7 +26,9 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
   - `server/api/account/stats.get.ts`: Endpoint agregasi ringkasan metrik akun pelanggan (total pesanan, pesanan aktif, pesanan selesai, total alamat tersimpan, tanggal bergabung).
   - `shared/schemas/profile.ts`: Skema validasi Zod untuk profil (`updateProfileSchema`, `updateEmailSchema`, `updatePasswordSchema`, `AccountStats`).
 - **Peningkatan UX Akun Berstandar Tokopedia & Shopee**:
-  - `app/components/account/AccountSidebar.vue`: Sidebar 2-kolom desktop dengan profil pengguna, tier belanja, pengelompokan menu "Aktivitas Belanja" dan "Pengaturan Akun", serta bilah horizontal mobile.
+  - `app/components/account/AccountSidebar.vue`: Sidebar responsif Opsi A yang otomatis beralih menjadi sidebar vertikal 2-kolom pada layar besar (>= 1280px / xl) dan menjadi bilah tab horizontal scrollable pada layar lebih kecil (< 1280px). Mengintegrasikan 5 menu utama: Biodata Diri, Daftar Alamat, Pesanan Saya, Wishlist, dan Notifikasi.
+  - Standardisasi Penamaan "Daftar Alamat": Mengganti label kaku "Buku Alamat" menjadi "Daftar Alamat" pada navigasi navbar, tab, sidebar, dan banner metrik akun.
+  - Integrasi Shell Navigasi Akun Terpadu: Menyematkan `AccountSidebar` responsif pada halaman `orders/index.vue`, `wishlist.vue`, dan `notifications.vue` sehingga pengalaman navigasi akun pelanggan mengalir konsisten di seluruh rute.
   - `app/components/account/AddressCard.vue` & `AddressModal.vue`: Label kategori alamat khas Tokopedia (`Rumah`, `Kantor`, `Apartemen`, `Lainnya`), panduan jam operasional pengiriman (Shopee pattern), dan integrasi patokan kurir.
   - `app/pages/account/addresses.vue`: Pencarian cepat nama/kota penerima dan filter chips kategori alamat instan.
   - `app/pages/account/profile.vue`: Tata letak Biodata Diri berstandar Tokopedia dengan kartu tips keamanan akun, status verifikasi email, dan checklist dinamis kriteria kata sandi.

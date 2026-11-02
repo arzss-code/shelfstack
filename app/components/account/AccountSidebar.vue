@@ -40,7 +40,7 @@ const navGroups = computed<NavGroup[]>(() => [
       { id: 'orders', label: 'Pesanan Saya', to: '/orders', icon: 'pi pi-box' },
       {
         id: 'wishlist',
-        label: 'Daftar Keinginan',
+        label: 'Wishlist',
         to: '/wishlist',
         icon: 'pi pi-heart',
         badge: wishlistStore.totalItems,
@@ -68,6 +68,26 @@ const navGroups = computed<NavGroup[]>(() => [
   },
 ])
 
+const horizontalTabs = computed<NavItem[]>(() => [
+  { id: 'profile', label: 'Biodata Diri', to: '/account/profile', icon: 'pi pi-user' },
+  { id: 'addresses', label: 'Daftar Alamat', to: '/account/addresses', icon: 'pi pi-map-marker' },
+  { id: 'orders', label: 'Pesanan Saya', to: '/orders', icon: 'pi pi-box' },
+  {
+    id: 'wishlist',
+    label: 'Wishlist',
+    to: '/wishlist',
+    icon: 'pi pi-heart',
+    badge: wishlistStore.totalItems,
+  },
+  {
+    id: 'notifications',
+    label: 'Notifikasi',
+    to: '/notifications',
+    icon: 'pi pi-bell',
+    badge: notificationStore.unreadCount,
+  },
+])
+
 const isItemActive = (to: string) => {
   if (to === '/account/profile') {
     return route.path === '/account/profile' || route.path === '/account'
@@ -91,10 +111,10 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <aside class="w-full lg:w-64 shrink-0">
-    <!-- Desktop Sidebar Card -->
+  <aside class="w-full xl:w-64 shrink-0">
+    <!-- Desktop Sidebar Card (Hanya Tampil di Layar Besar >= 1280px) -->
     <div
-      class="hidden lg:block bg-brand-canvas border border-brand-hair rounded-card p-5 shadow-whisper sticky top-24"
+      class="hidden xl:block bg-brand-canvas border border-brand-hair rounded-card p-5 shadow-whisper sticky top-24"
     >
       <!-- User Profile Lockup -->
       <div class="flex items-center gap-3 pb-5 border-b border-brand-hairsoft">
@@ -200,8 +220,8 @@ const handleLogout = () => {
       </div>
     </div>
 
-    <!-- Mobile Navigation Tab Ribbon -->
-    <div class="lg:hidden mb-6">
+    <!-- Responsive Horizontal Tab Ribbon (Hanya Tampil di Layar < 1280px) -->
+    <div class="block xl:hidden mb-6">
       <div
         class="bg-brand-canvas border border-brand-hair rounded-card p-4 mb-3 shadow-whisper flex items-center justify-between gap-3"
       >
@@ -229,68 +249,34 @@ const handleLogout = () => {
         </div>
         <NuxtLink
           to="/katalog"
-          class="px-3 py-1 rounded-full border border-brand-hair text-[11px] font-semibold text-brand-ink hover:bg-brand-canvas-soft no-underline shrink-0"
+          class="px-3 py-1 rounded-full border border-brand-hair text-[11px] font-semibold text-brand-ink hover:bg-brand-canvas-soft no-underline shrink-0 active:scale-95 transition-all"
         >
           Belanja
         </NuxtLink>
       </div>
 
       <nav
-        class="flex items-center gap-2 overflow-x-auto no-scrollbar border-b border-brand-hair pb-px"
-        aria-label="Navigasi Mobile Akun"
+        class="flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-brand-hair pb-px"
+        aria-label="Navigasi Menu Akun"
       >
         <NuxtLink
-          to="/account/profile"
-          class="flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium no-underline whitespace-nowrap border-b-2 transition-all"
+          v-for="tab in horizontalTabs"
+          :key="tab.id"
+          :to="tab.to"
+          class="flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium no-underline whitespace-nowrap border-b-2 transition-all min-h-[44px]"
           :class="[
-            isItemActive('/account/profile')
+            isItemActive(tab.to)
               ? 'border-brand-ink text-brand-ink font-semibold'
               : 'border-transparent text-brand-muted hover:text-brand-ink',
           ]"
         >
-          <i class="pi pi-user text-xs" />
-          <span>Biodata Diri</span>
-        </NuxtLink>
-        <NuxtLink
-          to="/account/addresses"
-          class="flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium no-underline whitespace-nowrap border-b-2 transition-all"
-          :class="[
-            isItemActive('/account/addresses')
-              ? 'border-brand-ink text-brand-ink font-semibold'
-              : 'border-transparent text-brand-muted hover:text-brand-ink',
-          ]"
-        >
-          <i class="pi pi-map-marker text-xs" />
-          <span>Daftar Alamat</span>
-        </NuxtLink>
-        <NuxtLink
-          to="/orders"
-          class="flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium no-underline whitespace-nowrap border-b-2 transition-all"
-          :class="[
-            isItemActive('/orders')
-              ? 'border-brand-ink text-brand-ink font-semibold'
-              : 'border-transparent text-brand-muted hover:text-brand-ink',
-          ]"
-        >
-          <i class="pi pi-box text-xs" />
-          <span>Pesanan Saya</span>
-        </NuxtLink>
-        <NuxtLink
-          to="/wishlist"
-          class="flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium no-underline whitespace-nowrap border-b-2 transition-all"
-          :class="[
-            isItemActive('/wishlist')
-              ? 'border-brand-ink text-brand-ink font-semibold'
-              : 'border-transparent text-brand-muted hover:text-brand-ink',
-          ]"
-        >
-          <i class="pi pi-heart text-xs" />
-          <span>Wishlist</span>
+          <i :class="[tab.icon, 'text-xs']" />
+          <span>{{ tab.label }}</span>
           <span
-            v-if="wishlistStore.totalItems > 0"
-            class="px-1 py-0.2 rounded-full text-[9px] font-bold bg-brand-ink text-white tabular-nums"
+            v-if="tab.badge !== undefined && tab.badge > 0"
+            class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-brand-ink text-white tabular-nums leading-none ml-0.5"
           >
-            {{ wishlistStore.totalItems }}
+            {{ tab.badge }}
           </span>
         </NuxtLink>
       </nav>

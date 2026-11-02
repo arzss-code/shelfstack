@@ -57,7 +57,7 @@ defineProps<{
       class="p-3 rounded-field bg-white border border-brand-hair no-underline block hover:border-brand-ink/40 transition-colors active:scale-95"
     >
       <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block">
-        Buku Alamat
+        Daftar Alamat
       </span>
       <div v-if="loading" class="mt-1">
         <UiSkeleton width="w-10" height="h-4" />

@@ -178,8 +178,8 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
       <span class="font-semibold text-brand-ink" aria-current="page">Daftar Alamat</span>
     </nav>
 
-    <!-- 2-Column Tokopedia / Shopee Master Layout -->
-    <div class="flex flex-col lg:flex-row gap-6 items-start">
+    <!-- 2-Column Tokopedia / Shopee Master Layout (Sidebar on xl, Horizontal Tabs on < xl) -->
+    <div class="flex flex-col xl:flex-row gap-6 items-start">
       <AccountSidebar />
 
       <!-- Right Main Content Panel -->
