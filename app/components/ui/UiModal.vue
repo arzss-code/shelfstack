@@ -124,7 +124,7 @@ onBeforeUnmount(() => lockBodyScroll(false))
       <Transition name="ui-modal">
         <div
           v-if="visible"
-          class="fixed inset-0 z-[1000] flex items-end justify-center overflow-y-auto bg-brand-ink/45 p-0 backdrop-blur-[2px] sm:items-center sm:p-6"
+          class="fixed inset-0 z-[1000] flex items-end justify-center overflow-y-auto bg-black/50 p-0 backdrop-blur-[2px] sm:items-center sm:p-6"
           @click.self="closeOnOverlay && (visible = false)"
         >
           <div

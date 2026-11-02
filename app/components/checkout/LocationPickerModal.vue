@@ -149,7 +149,7 @@ watch(
   <Teleport to="body">
     <div
       v-if="modelValue"
-      class="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-brand-ink/45 backdrop-blur-[2px]"
+      class="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-[2px]"
       data-testid="location-picker-modal"
       @click.self="closeModal"
     >

@@ -4,6 +4,7 @@ import type { Database } from '~/types/database.types'
 import type { Order, OrderStatus } from '~/types/order'
 import OrderCard from '~/features/orders/components/OrderCard.vue'
 import ReviewFormModal from '~/components/product/ReviewFormModal.vue'
+import AccountSidebar from '~/components/account/AccountSidebar.vue'
 import type { UiTabItem } from '~/components/ui/UiTabs.vue'
 import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import type { RealtimeChannel } from '@supabase/supabase-js'
@@ -566,128 +567,144 @@ const resetFilters = () => {
       <span class="text-brand-ink font-semibold">Pesanan Saya</span>
     </nav>
 
-    <!-- Full-Width Controls: Filter Tabs & Search Bar -->
-    <div v-if="statusCounts.all > 0 || orders.length > 0 || loading" class="w-full space-y-4">
-      <!-- Full-Width Tabs Filter -->
-      <div class="w-full">
-        <UiTabs
-          v-model="activeTab"
-          :items="tabItems"
-          full-width
-          aria-label="Filter status pesanan"
-        />
-      </div>
+    <!-- 2-Column Tokopedia / Shopee Master Layout (Sidebar on xl, Horizontal Tabs on < xl) -->
+    <div class="flex flex-col xl:flex-row gap-6 items-start">
+      <AccountSidebar />
 
-      <!-- Full-Width Search Field -->
-      <div class="w-full flex items-center gap-2">
-        <div class="relative w-full">
-          <UiInput
-            v-model="searchQuery"
-            placeholder="Cari berdasarkan No. Pesanan atau nama produk..."
-            left-icon="pi-search"
-            size="sm"
-            class="w-full"
-          />
+      <div class="flex-1 min-w-0 w-full space-y-6">
+        <!-- Full-Width Controls: Filter Tabs & Search Bar -->
+        <div v-if="statusCounts.all > 0 || orders.length > 0 || loading" class="w-full space-y-4">
+          <!-- Full-Width Tabs Filter -->
+          <div class="w-full">
+            <UiTabs
+              v-model="activeTab"
+              :items="tabItems"
+              full-width
+              aria-label="Filter status pesanan"
+            />
+          </div>
+
+          <!-- Full-Width Search Field -->
+          <div class="w-full flex items-center gap-2">
+            <div class="relative w-full">
+              <UiInput
+                v-model="searchQuery"
+                placeholder="Cari berdasarkan No. Pesanan atau nama produk..."
+                left-icon="pi-search"
+                size="sm"
+                class="w-full"
+              />
+            </div>
+            <UiButton
+              v-if="searchQuery"
+              variant="ghost"
+              size="sm"
+              icon="pi-times"
+              @click="searchQuery = ''"
+            >
+              Hapus
+            </UiButton>
+          </div>
         </div>
-        <UiButton
-          v-if="searchQuery"
-          variant="ghost"
-          size="sm"
-          icon="pi-times"
-          @click="searchQuery = ''"
+
+        <!-- Error Alert -->
+        <div
+          v-if="errorMsg"
+          class="p-4 bg-red-50 border border-red-200 rounded-card flex items-center justify-between text-red-700 text-xs"
         >
-          Hapus
-        </UiButton>
-      </div>
-    </div>
+          <span>{{ errorMsg }}</span>
+          <UiButton variant="ghost" size="sm" @click="() => fetchInitialOrders()"
+            >Coba Lagi</UiButton
+          >
+        </div>
 
-    <!-- Error Alert -->
-    <div
-      v-if="errorMsg"
-      class="p-4 bg-red-50 border border-red-200 rounded-card flex items-center justify-between text-red-700 text-xs"
-    >
-      <span>{{ errorMsg }}</span>
-      <UiButton variant="ghost" size="sm" @click="() => fetchInitialOrders()">Coba Lagi</UiButton>
-    </div>
+        <!-- Initial Loading Skeleton -->
+        <div v-if="loading" class="space-y-4 animate-pulse">
+          <div v-for="i in 3" :key="i" class="h-36 bg-brand-field rounded-card" />
+        </div>
 
-    <!-- Initial Loading Skeleton -->
-    <div v-if="loading" class="space-y-4 animate-pulse">
-      <div v-for="i in 3" :key="i" class="h-36 bg-brand-field rounded-card" />
-    </div>
+        <!-- Empty State: Belum pernah ada pesanan sama sekali -->
+        <div
+          v-else-if="statusCounts.all === 0 && orders.length === 0"
+          class="text-center py-16 px-6 bg-brand-canvas-soft border border-dashed border-brand-hair rounded-card max-w-lg mx-auto space-y-4"
+        >
+          <div
+            class="w-14 h-14 rounded-full bg-brand-canvas border border-brand-hair flex items-center justify-center mx-auto text-brand-muted shadow-whisper"
+          >
+            <i class="pi pi-inbox text-2xl text-brand-muted" aria-hidden="true" />
+          </div>
+          <div>
+            <h2 class="font-display text-base font-bold text-brand-ink m-0">
+              Belum Ada Riwayat Pesanan
+            </h2>
+            <p class="font-body text-xs text-brand-muted m-0 mt-1">
+              Anda belum pernah melakukan pemesanan. Jelajahi katalog dan temukan produk pilihan
+              Anda.
+            </p>
+          </div>
+          <UiButton
+            to="/katalog"
+            variant="primary"
+            size="sm"
+            icon="pi-arrow-right"
+            icon-pos="right"
+          >
+            Mulai Belanja
+          </UiButton>
+        </div>
 
-    <!-- Empty State: Belum pernah ada pesanan sama sekali -->
-    <div
-      v-else-if="statusCounts.all === 0 && orders.length === 0"
-      class="text-center py-16 px-6 bg-brand-canvas-soft border border-dashed border-brand-hair rounded-card max-w-lg mx-auto space-y-4"
-    >
-      <div
-        class="w-14 h-14 rounded-full bg-brand-canvas border border-brand-hair flex items-center justify-center mx-auto text-brand-muted shadow-whisper"
-      >
-        <i class="pi pi-inbox text-2xl text-brand-muted" aria-hidden="true" />
-      </div>
-      <div>
-        <h2 class="font-display text-base font-bold text-brand-ink m-0">
-          Belum Ada Riwayat Pesanan
-        </h2>
-        <p class="font-body text-xs text-brand-muted m-0 mt-1">
-          Anda belum pernah melakukan pemesanan. Jelajahi katalog dan temukan produk pilihan Anda.
-        </p>
-      </div>
-      <UiButton to="/katalog" variant="primary" size="sm" icon="pi-arrow-right" icon-pos="right">
-        Mulai Belanja
-      </UiButton>
-    </div>
+        <!-- Empty State: Filter / Search tidak menemukan hasil -->
+        <div
+          v-else-if="filteredOrders.length === 0"
+          class="text-center py-12 px-6 bg-brand-canvas-soft border border-dashed border-brand-hair rounded-card max-w-md mx-auto space-y-3"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-brand-canvas border border-brand-hair flex items-center justify-center mx-auto text-brand-muted shadow-whisper"
+          >
+            <i class="pi pi-search text-xl text-brand-muted" aria-hidden="true" />
+          </div>
+          <div>
+            <h2 class="font-display text-sm font-bold text-brand-ink m-0">
+              Tidak Ada Pesanan Ditemukan
+            </h2>
+            <p class="font-body text-xs text-brand-muted m-0 mt-1">
+              Tidak ada pesanan yang sesuai dengan filter atau kata kunci pencarian Anda.
+            </p>
+          </div>
+          <UiButton variant="secondary" size="sm" icon="pi-filter-slash" @click="resetFilters">
+            Reset Filter
+          </UiButton>
+        </div>
 
-    <!-- Empty State: Filter / Search tidak menemukan hasil -->
-    <div
-      v-else-if="filteredOrders.length === 0"
-      class="text-center py-12 px-6 bg-brand-canvas-soft border border-dashed border-brand-hair rounded-card max-w-md mx-auto space-y-3"
-    >
-      <div
-        class="w-12 h-12 rounded-full bg-brand-canvas border border-brand-hair flex items-center justify-center mx-auto text-brand-muted shadow-whisper"
-      >
-        <i class="pi pi-search text-xl text-brand-muted" aria-hidden="true" />
-      </div>
-      <div>
-        <h2 class="font-display text-sm font-bold text-brand-ink m-0">
-          Tidak Ada Pesanan Ditemukan
-        </h2>
-        <p class="font-body text-xs text-brand-muted m-0 mt-1">
-          Tidak ada pesanan yang sesuai dengan filter atau kata kunci pencarian Anda.
-        </p>
-      </div>
-      <UiButton variant="secondary" size="sm" icon="pi-filter-slash" @click="resetFilters">
-        Reset Filter
-      </UiButton>
-    </div>
+        <!-- Orders List with Lazy/Infinite Scroll Sentinel -->
+        <div v-else class="space-y-4">
+          <OrderCard
+            v-for="order in filteredOrders"
+            :key="order.id"
+            :order="order"
+            :is-paying="payingOrderId === order.id"
+            @select="router.push(`/orders/${$event.id}`)"
+            @pay="handlePayNow"
+            @review="handleOpenReview"
+          />
 
-    <!-- Orders List with Lazy/Infinite Scroll Sentinel -->
-    <div v-else class="space-y-4">
-      <OrderCard
-        v-for="order in filteredOrders"
-        :key="order.id"
-        :order="order"
-        :is-paying="payingOrderId === order.id"
-        @select="router.push(`/orders/${$event.id}`)"
-        @pay="handlePayNow"
-        @review="handleOpenReview"
-      />
+          <!-- Infinite Scroll Trigger Sentinel -->
+          <div ref="sentinelEl" class="h-10 w-full flex items-center justify-center">
+            <!-- Skeleton when fetching next batch -->
+            <div v-if="isLoadingMore" class="w-full space-y-3 animate-pulse pt-2">
+              <div class="h-28 bg-brand-field rounded-card" />
+            </div>
+          </div>
 
-      <!-- Infinite Scroll Trigger Sentinel -->
-      <div ref="sentinelEl" class="h-10 w-full flex items-center justify-center">
-        <!-- Skeleton when fetching next batch -->
-        <div v-if="isLoadingMore" class="w-full space-y-3 animate-pulse pt-2">
-          <div class="h-28 bg-brand-field rounded-card" />
+          <!-- End of List Indicator -->
+          <p
+            v-if="!hasMore && orders.length >= BATCH_SIZE"
+            class="text-xs text-brand-faint text-center py-4 m-0"
+          >
+            Semua pesanan telah ditampilkan
+          </p>
         </div>
       </div>
-
-      <!-- End of List Indicator -->
-      <p
-        v-if="!hasMore && orders.length >= BATCH_SIZE"
-        class="text-xs text-brand-faint text-center py-4 m-0"
-      >
-        Semua pesanan telah ditampilkan
-      </p>
     </div>
 
     <!-- Modal Pemilihan Produk untuk Diulas (jika pesanan memiliki > 1 item) -->

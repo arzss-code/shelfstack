@@ -2,6 +2,57 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.25.0] - 2026-11-02
+
+### Manajemen Buku Alamat & Profil Akun Pelanggan (SHF-ACC-01 & SHF-ACC-02)
+
+- **Manajemen Buku Alamat Terpadu (`/account/addresses`)**:
+  - `app/pages/account/addresses.vue`: Halaman buku alamat mandiri dengan visualisasi bento card, empty state informatif, dan tombol tambah alamat.
+  - `app/components/account/AddressCard.vue`: Kartu alamat interaktif dengan badge "Alamat Utama", informasi penerima, format alamat wilayah, catatan kurir, dan aksi (Set Utama, Ubah, Hapus).
+  - `app/components/account/AddressModal.vue`: Modal form tambah dan ubah alamat (`UiModal`), terintegrasi dengan pemilih wilayah kaskade 4 tingkat Indonesia (`LocationPickerModal.vue`).
+  - `app/composables/useAddresses.ts`: Composable pengelolaan alamat pengiriman pelanggan dengan sinkronisasi reaktif ke API `/api/addresses`.
+- **Manajemen Profil Akun & Kredensial (`/account/profile`)**:
+  - `app/pages/account/profile.vue`: Halaman profil pelanggan dilengkapi kartu bento statistik belanja (anggota sejak, total pesanan, pesanan aktif, total alamat tersimpan).
+  - Form Pembaruan Nama Lengkap: Terhubung ke endpoint `PATCH /api/account/profile` yang menyelaraskan tabel `public.profiles` dan metadata auth Supabase.
+  - Form Pembaruan Email: Mengirimkan tautan konfirmasi verifikasi ke alamat email baru via Supabase Auth.
+  - Form Pembaruan Kata Sandi: Validasi minimal 8 karakter dengan toggle visibilitas kata sandi.
+  - `app/composables/useUserProfile.ts`: Composable reaktif untuk mengelola profil pengguna, perubahan kredensial, dan metrik akun.
+  - `app/pages/account/index.vue`: Route redirect otomatis mengarahkan `/account` ke `/account/profile`.
+- **Navigasi Terintegrasi & Akses Cepat**:
+  - `app/components/account/AccountNavTabs.vue`: Bilah tab navigasi responsif menghubungkan Profil Akun, Buku Alamat, Pesanan Saya, dan Wishlist.
+  - `app/components/AppNavbar.vue`: Menambahkan tautan langsung "Profil Saya" dan "Buku Alamat" di menu dropdown pengguna dan navigasi mobile.
+- **Backend API & Validasi Kontrak**:
+  - `server/api/account/profile.patch.ts`: Endpoint terproteksi untuk memperbarui nama lengkap pelanggan dengan audit log dan sinkronisasi metadata.
+  - `server/api/account/stats.get.ts`: Endpoint agregasi ringkasan metrik akun pelanggan (total pesanan, pesanan aktif, pesanan selesai, total alamat tersimpan, tanggal bergabung).
+  - `shared/schemas/profile.ts`: Skema validasi Zod untuk profil (`updateProfileSchema`, `updateEmailSchema`, `updatePasswordSchema`, `AccountStats`).
+- **Peningkatan UX Akun Berstandar Tokopedia & Shopee**:
+  - `app/components/account/AccountSidebar.vue`: Sidebar responsif Opsi A yang otomatis beralih menjadi sidebar vertikal 2-kolom pada layar besar (>= 1280px / xl) dan menjadi bilah tab horizontal scrollable pada layar lebih kecil (< 1280px). Mengintegrasikan 5 menu utama: Biodata Diri, Daftar Alamat, Pesanan Saya, Wishlist, dan Notifikasi.
+  - Standardisasi Penamaan "Daftar Alamat": Mengganti label kaku "Buku Alamat" menjadi "Daftar Alamat" pada navigasi navbar, tab, sidebar, dan banner metrik akun.
+  - Integrasi Shell Navigasi Akun Terpadu: Menyematkan `AccountSidebar` responsif pada halaman `orders/index.vue`, `wishlist.vue`, dan `notifications.vue` sehingga pengalaman navigasi akun pelanggan mengalir konsisten di seluruh rute.
+  - `app/components/account/AddressCard.vue` & `AddressModal.vue`: Label kategori alamat khas Tokopedia (`Rumah`, `Kantor`, `Apartemen`, `Lainnya`), panduan jam operasional pengiriman (Shopee pattern), dan integrasi patokan kurir.
+  - `app/pages/account/addresses.vue`: Pencarian cepat nama/kota penerima dan filter chips kategori alamat instan.
+  - `app/pages/account/profile.vue`: Tata letak Biodata Diri berstandar Tokopedia dengan kartu tips keamanan akun, status verifikasi email, dan checklist dinamis kriteria kata sandi.
+- **Manajemen Foto Profil Pelanggan (Avatar Upload, Ubah, Hapus)**:
+  - `supabase/migrations/20261124000001_profile_avatar_url_and_storage.sql`: Menambahkan kolom `avatar_url` pada tabel `public.profiles` dan bucket `avatars` dengan RLS storage terproteksi per ID user.
+  - `server/api/account/avatar.post.ts`: Endpoint terproteksi untuk upload avatar dengan validasi multipart server-side (maks. 2 MB, JPG/PNG/WEBP), upload ke Supabase Storage, pembersihan avatar lama, pembaruan `public.profiles.avatar_url` via service role, dan sinkronisasi metadata auth.
+  - `server/api/account/avatar.delete.ts`: Endpoint terproteksi untuk menghapus avatar, membersihkan file di cloud storage, dan mengembalikan foto profil ke null.
+  - `server/api/account/profile.patch.ts`: Dukungan pembaruan profil pelanggan via service role untuk mematuhi RLS database, serta sinkronisasi metadata auth Supabase.
+  - `app/components/account/ProfileAvatarCard.vue`: Komponen avatar interaktif dengan preview foto bundar, overlay tombol kamera, tombol "Pilih Foto", "Hapus Foto", dan indikator upload.
+  - `app/composables/useUserProfile.ts`: Method `uploadAvatar()` dan `deleteAvatar()` terhubung langsung ke endpoint `/api/account/avatar` dengan penanganan sesi defensif.
+  - `app/components/account/AccountSidebar.vue` & `AppNavbar.vue`: Menampilkan foto profil asli pengguna secara reaktif dengan fallback inisial nama.
+- **Refinement UX Copy & Visual Polish (Profil Saya & Avatar Interaction)**:
+  - Standardisasi Penamaan "Profil Saya": Menyelaraskan seluruh touchpoint navigasi (navbar dropdown, sidebar, horizontal tabs, breadcrumbs, dan page title) ke "Profil Saya", menggantikan "Biodata Diri" demi model mental pengguna yang lebih intuitif dan konsisten.
+  - Standardisasi Breadcrumb: Menyeragamkan format breadcrumb di seluruh 5 area akun pelanggan (`ShelfStack / [Nama Halaman]`).
+  - Eliminasi Indikator Hijau Avatar: Menghapus titik hijau ambigu dari semua kartu avatar pelanggan sesuai prinsip Web Content Accessibility (_Don't Use Color Alone_).
+  - Peningkatan Kontras Overlay Foto Profil: Menerapkan gradien hitam pudar transparan native Tailwind (`bg-gradient-to-t from-black/85 via-black/60 to-black/40 backdrop-blur-[1px]`) pada tombol hover ubah foto profil, menjamin keterbacaan teks dan ikon di atas gambar terang maupun gelap.
+  - Perbaikan Opacity Backdrop Modal: Memperbaiki transparansi backdrop modal pada `UiModal.vue` dan `LocationPickerModal.vue` dengan native alpha `bg-black/50`.
+- **Testing & Quality Assurance**:
+  - `tests/unit/account-profile-schema.spec.ts`: Unit test validasi skema profil termasuk pengujian format URL dan null avatar (12 test).
+  - `tests/unit/account-profile-and-addresses.spec.ts`: Unit test untuk composable `useAddresses` dan kontrak data `AccountStats` (6 test).
+  - `tests/e2e/pages/AccountPage.ts`: Page Object Model baru untuk pengujian otomatis Playwright area akun.
+  - `tests/e2e/account-journey.spec.ts`: Skenario pengujian E2E mencakup proteksi route guards tamu, penolakan API anonim (HTTP 401), dan alur navigasi akun.
+  - 67 test files / 642 tests lolos 100%. `nuxi typecheck` EXIT 0, ESLint 0 error.
+
 ## [0.24.0] - 2026-10-31
 
 ### Persistensi Kecamatan Alamat, RPC create_order Resilient Fallback & Checkout UX Polish

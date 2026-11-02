@@ -318,9 +318,17 @@ const handleLogout = async () => {
                 @click="isUserMenuOpen = !isUserMenuOpen"
               >
                 <span
-                  class="w-7 h-7 rounded-full bg-brand-ink text-white text-xs font-bold flex items-center justify-center shrink-0"
+                  class="w-7 h-7 rounded-full overflow-hidden border border-brand-hair bg-brand-ink text-white text-xs font-bold flex items-center justify-center shrink-0"
                 >
-                  {{ initial }}
+                  <img
+                    v-if="profile?.avatar_url"
+                    :src="profile.avatar_url"
+                    :alt="displayName"
+                    class="w-full h-full object-cover"
+                  />
+                  <template v-else>
+                    {{ initial }}
+                  </template>
                 </span>
                 <svg
                   class="w-3 h-3 text-brand-muted shrink-0 transition-transform duration-200 hidden sm:block"
@@ -354,6 +362,20 @@ const handleLogout = async () => {
                     <p class="text-xs font-bold text-brand-ink m-0 truncate">{{ displayName }}</p>
                     <p class="text-[10px] text-brand-muted m-0 truncate">{{ user.email }}</p>
                   </div>
+                  <NuxtLink
+                    to="/account/profile"
+                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
+                    @click="isUserMenuOpen = false"
+                  >
+                    Profil Saya
+                  </NuxtLink>
+                  <NuxtLink
+                    to="/account/addresses"
+                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
+                    @click="isUserMenuOpen = false"
+                  >
+                    Daftar Alamat
+                  </NuxtLink>
                   <NuxtLink
                     to="/orders"
                     class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
@@ -529,6 +551,22 @@ const handleLogout = async () => {
           >
             {{ notificationStore.unreadCount }}
           </span>
+        </NuxtLink>
+        <NuxtLink
+          v-if="isLoggedIn"
+          to="/account/profile"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+          @click="isMobileMenuOpen = false"
+        >
+          Profil Saya
+        </NuxtLink>
+        <NuxtLink
+          v-if="isLoggedIn"
+          to="/account/addresses"
+          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+          @click="isMobileMenuOpen = false"
+        >
+          Daftar Alamat
         </NuxtLink>
         <NuxtLink
           v-if="isLoggedIn"
