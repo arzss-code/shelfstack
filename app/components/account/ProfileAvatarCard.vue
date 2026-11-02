@@ -108,23 +108,21 @@ const handleDeleteAvatar = () => {
             <i class="pi pi-spin pi-spinner text-xl" />
           </div>
 
-          <!-- Hover Overlay Trigger -->
+          <!-- Hover Overlay Trigger (High Contrast & Accessible Focus) -->
           <button
             v-else
             type="button"
-            class="absolute inset-0 bg-brand-ink/40 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer border-0"
+            class="absolute inset-0 bg-brand-ink/80 backdrop-blur-xs text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity cursor-pointer border-0"
             title="Ubah Foto Profil"
+            aria-label="Ubah Foto Profil"
             @click="triggerFileInput"
           >
-            <i class="pi pi-camera text-lg" />
-            <span class="text-[10px] font-semibold mt-1">Ubah Foto</span>
+            <i class="pi pi-camera text-xl text-white drop-shadow-sm mb-1" />
+            <span class="text-xs font-semibold text-white tracking-wide drop-shadow-sm"
+              >Ubah Foto</span
+            >
           </button>
         </div>
-
-        <span
-          class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white"
-          title="Akun Terverifikasi"
-        />
       </div>
 
       <!-- Action & Requirements Section -->

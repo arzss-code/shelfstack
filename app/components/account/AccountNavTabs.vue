@@ -93,11 +93,6 @@ const isTabActive = (tabPath: string) => {
           >
             {{ initial }}
           </div>
-          <span
-            class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white"
-            title="Akun Terverifikasi"
-            aria-label="Akun Terverifikasi"
-          />
         </div>
 
         <div class="min-w-0">
