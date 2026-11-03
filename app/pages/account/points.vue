@@ -69,7 +69,7 @@ const handleRefresh = async () => {
         <!-- Error alert if any -->
         <UiAlert v-if="error" tone="danger">
           <div class="flex flex-wrap items-center justify-between gap-3">
-            <span class="font-medium text-xs leading-normal">{{ error }}</span>
+            <span class="font-medium text-xs leading-5">{{ error }}</span>
             <UiButton size="xs" variant="outline" class="shrink-0" @click="handleRefresh">
               Coba Lagi
             </UiButton>

@@ -1,6 +1,7 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { updateCouponSchema } from '~~/shared/schemas/coupon'
+import { requireAdmin } from '../../../utils/auth'
 import { successResponse, errorResponse } from '../../../utils/response'
 
 export default defineEventHandler(async (event) => {
@@ -29,6 +30,7 @@ export default defineEventHandler(async (event) => {
 
     const { data: updatedCoupon, error: updateError } = await client
       .from('coupons')
+      // @ts-expect-error Supabase Database types might omit coin_cost if not regenerated
       .update(updates)
       .eq('id', id)
       .is('deleted_at', null)
@@ -44,12 +46,13 @@ export default defineEventHandler(async (event) => {
     }
 
     return successResponse('Kupon promosi berhasil diperbarui', updatedCoupon)
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorObj = err as { message?: string; statusCode?: number }
     return errorResponse(
       event,
-      err.message || 'Terjadi kesalahan sistem',
+      errorObj?.message || 'Terjadi kesalahan sistem',
       null,
-      err.statusCode || 500,
+      errorObj?.statusCode || 500,
     )
   }
 })

@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { requireAdmin } from '../../../utils/auth'
 import { successResponse, errorResponse } from '../../../utils/response'
 
 export default defineEventHandler(async (event) => {
@@ -32,12 +33,13 @@ export default defineEventHandler(async (event) => {
     }
 
     return successResponse('Kupon promosi berhasil dihapus', { id })
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorObj = err as { message?: string; statusCode?: number }
     return errorResponse(
       event,
-      err.message || 'Terjadi kesalahan sistem',
+      errorObj?.message || 'Terjadi kesalahan sistem',
       null,
-      err.statusCode || 500,
+      errorObj?.statusCode || 500,
     )
   }
 })

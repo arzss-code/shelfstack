@@ -47,8 +47,12 @@ export default defineEventHandler(async (event) => {
       const isMissingTable =
         coinError.code === '42P01' ||
         coinError.code === 'PGRST205' ||
-        coinError.message?.includes('does not exist') ||
-        coinError.message?.includes('schema cache')
+        coinError.code === 'PGRST204' ||
+        coinError.code === '42501' ||
+        coinError.message?.toLowerCase().includes('does not exist') ||
+        coinError.message?.toLowerCase().includes('schema cache') ||
+        coinError.message?.toLowerCase().includes('not found') ||
+        coinError.message?.toLowerCase().includes('user_coins')
 
       if (isMissingTable) {
         logger.warn(
@@ -81,8 +85,12 @@ export default defineEventHandler(async (event) => {
       const isMissingTable =
         txError.code === '42P01' ||
         txError.code === 'PGRST205' ||
-        txError.message?.includes('does not exist') ||
-        txError.message?.includes('schema cache')
+        txError.code === 'PGRST204' ||
+        txError.code === '42501' ||
+        txError.message?.toLowerCase().includes('does not exist') ||
+        txError.message?.toLowerCase().includes('schema cache') ||
+        txError.message?.toLowerCase().includes('not found') ||
+        txError.message?.toLowerCase().includes('coin_transactions')
 
       if (isMissingTable) {
         logger.warn('[Loyalty Points] Tabel public.coin_transactions belum tersedia di database.', {

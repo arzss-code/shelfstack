@@ -1,6 +1,7 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { createCouponSchema } from '~~/shared/schemas/coupon'
+import { requireAdmin } from '../../../utils/auth'
 import { successResponse, errorResponse } from '../../../utils/response'
 
 export default defineEventHandler(async (event) => {
@@ -39,22 +40,26 @@ export default defineEventHandler(async (event) => {
       )
     }
 
+    const insertPayload: Record<string, unknown> = {
+      code: input.code,
+      name: input.name,
+      description: input.description || null,
+      discount_type: input.discount_type,
+      discount_value: input.discount_value,
+      max_discount_cents: input.max_discount_cents ?? null,
+      min_purchase_cents: input.min_purchase_cents ?? 0,
+      usage_limit: input.usage_limit ?? null,
+      user_limit: input.user_limit ?? 1,
+      starts_at: input.starts_at || null,
+      expires_at: input.expires_at || null,
+      is_active: input.is_active ?? true,
+      coin_cost: input.coin_cost ?? null,
+    }
+
     const { data: createdCoupon, error: insertError } = await client
       .from('coupons')
-      .insert({
-        code: input.code,
-        name: input.name,
-        description: input.description || null,
-        discount_type: input.discount_type,
-        discount_value: input.discount_value,
-        max_discount_cents: input.max_discount_cents ?? null,
-        min_purchase_cents: input.min_purchase_cents ?? 0,
-        usage_limit: input.usage_limit ?? null,
-        user_limit: input.user_limit ?? 1,
-        starts_at: input.starts_at || null,
-        expires_at: input.expires_at || null,
-        is_active: input.is_active ?? true,
-      })
+      // @ts-expect-error Supabase Database types might omit coin_cost if not regenerated
+      .insert(insertPayload)
       .select()
       .single()
 
@@ -69,12 +74,13 @@ export default defineEventHandler(async (event) => {
 
     setResponseStatus(event, 201)
     return successResponse('Kupon promosi baru berhasil dibuat', createdCoupon)
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorObj = err as { message?: string; statusCode?: number }
     return errorResponse(
       event,
-      err.message || 'Terjadi kesalahan sistem',
+      errorObj?.message || 'Terjadi kesalahan sistem',
       null,
-      err.statusCode || 500,
+      errorObj?.statusCode || 500,
     )
   }
 })

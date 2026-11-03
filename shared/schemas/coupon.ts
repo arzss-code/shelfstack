@@ -86,6 +86,12 @@ export const createCouponSchema = z
     starts_at: z.string().nullable().optional(),
     expires_at: z.string().nullable().optional(),
     is_active: z.boolean().default(true),
+    coin_cost: z
+      .number()
+      .int('Biaya koin harus bilangan bulat.')
+      .nonnegative('Biaya koin tidak boleh negatif.')
+      .nullable()
+      .optional(),
   })
   .refine(
     (data) => {
@@ -141,6 +147,12 @@ export const updateCouponSchema = z.object({
   starts_at: z.string().nullable().optional(),
   expires_at: z.string().nullable().optional(),
   is_active: z.boolean().optional(),
+  coin_cost: z
+    .number()
+    .int('Biaya koin harus bilangan bulat.')
+    .nonnegative('Biaya koin tidak boleh negatif.')
+    .nullable()
+    .optional(),
 })
 
 export type UpdateCouponInput = z.infer<typeof updateCouponSchema>
