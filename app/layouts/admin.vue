@@ -10,6 +10,7 @@ const route = useRoute()
 const navLinks = [
   { to: '/admin', label: 'Dashboard', icon: 'pi-chart-bar', exact: true },
   { to: '/admin/orders', label: 'Kelola Pesanan', icon: 'pi-shopping-bag', exact: false },
+  { to: '/admin/returns', label: 'Komplain & Retur', icon: 'pi-replay', exact: false },
   { to: '/admin/products', label: 'Kelola Produk', icon: 'pi-th-large', exact: false },
   { to: '/admin/coupons', label: 'Kelola Voucher', icon: 'pi-ticket', exact: false },
   { to: '/admin/activities', label: 'Activity Log', icon: 'pi-history', exact: false },

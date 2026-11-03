@@ -11,6 +11,9 @@ import { useCartStore } from '~/features/cart/stores/cart'
 import type { ShippingCheckpoint } from '~~/shared/schemas/shipping'
 import OrderTrackingTimeline from '~/components/orders/OrderTrackingTimeline.vue'
 import ReviewFormModal from '~/components/product/ReviewFormModal.vue'
+import OrderReturnModal from '~/components/orders/OrderReturnModal.vue'
+import OrderReturnStatusCard from '~/components/orders/OrderReturnStatusCard.vue'
+import { useReturnRequest } from '~/composables/useReturnRequest'
 
 const route = useRoute()
 const router = useRouter()
@@ -33,6 +36,8 @@ const isCancelModalOpen = ref(false)
 const isInvoiceModalOpen = ref(false)
 const isReviewModalOpen = ref(false)
 const selectedReviewProduct = ref<{ id: number | string; name: string } | null>(null)
+const isReturnModalOpen = ref(false)
+const { ticket: returnTicket, eligibility: returnEligibility, fetchReturnData } = useReturnRequest()
 
 const openReviewModal = (item: {
   product_id: number | string
@@ -196,6 +201,9 @@ const fetchOrderDetail = async (silent = false) => {
 
 onMounted(async () => {
   await fetchOrderDetail()
+  if (orderId) {
+    await fetchReturnData(orderId)
+  }
 
   // Jika pesanan masih pending, sinkronisasi status otomatis dan mulai polling di background
   if (order.value?.status === 'pending') {
@@ -687,6 +695,14 @@ const getSegmentColor = (idx: number) => {
         </div>
       </div>
 
+      <!-- Kartu Status Retur / Garansi Pelanggan -->
+      <OrderReturnStatusCard
+        v-if="returnTicket"
+        :ticket="returnTicket"
+        :order-id="order.id"
+        @refetch="fetchReturnData(order.id)"
+      />
+
       <!-- Timeline Status Progress -->
       <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper">
         <div class="flex items-center justify-between pb-4 mb-6 border-b border-brand-hairsoft">
@@ -1108,6 +1124,18 @@ const getSegmentColor = (idx: number) => {
             </UiButton>
           </div>
 
+          <!-- Ajukan Komplain & Retur Produk (Hanya completed dalam 7 hari & belum ada tiket aktif) -->
+          <UiButton
+            v-if="order.status === 'completed' && returnEligibility?.isEligible && !returnTicket"
+            variant="outline"
+            size="sm"
+            class="w-full justify-center text-xs border-brand-hair hover:border-brand-ink"
+            icon="pi-replay"
+            @click="isReturnModalOpen = true"
+          >
+            Ajukan Komplain & Retur
+          </UiButton>
+
           <!-- Invoice is only available for confirmed/paid/shipped/completed orders -->
           <UiButton
             v-if="['paid', 'shipped', 'completed'].includes(order.status)"
@@ -1142,6 +1170,16 @@ const getSegmentColor = (idx: number) => {
 
     <!-- Modal Invoice Resmi & Print Sheet -->
     <OrderInvoiceModal v-if="order" v-model:visible="isInvoiceModalOpen" :order="order" />
+
+    <!-- Modal Ajukan Komplain & Retur -->
+    <OrderReturnModal
+      v-if="order"
+      v-model="isReturnModalOpen"
+      :order-id="order.id"
+      :order-number="`ORD-${order.id.slice(0, 8).toUpperCase()}`"
+      :remaining-days="returnEligibility?.remainingDays || 7"
+      @success="fetchReturnData(order.id)"
+    />
 
     <!-- Modal Tulis Ulasan Produk -->
     <ReviewFormModal

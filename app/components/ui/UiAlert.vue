@@ -64,7 +64,7 @@ const isCentered = computed(() => {
   >
     <span
       class="inline-flex h-5 w-5 shrink-0 items-center justify-center text-sm leading-none"
-      :class="isCentered ? 'self-center' : 'self-start mt-0.5'"
+      :class="isCentered ? 'self-center' : 'self-start'"
       aria-hidden="true"
     >
       <i :class="['pi', iconClass]" />
