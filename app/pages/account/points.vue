@@ -67,10 +67,12 @@ const handleRefresh = async () => {
       <!-- Right Main Content Panel -->
       <div class="w-full min-w-0 flex-1 space-y-6">
         <!-- Error alert if any -->
-        <UiAlert v-if="error" variant="error">
-          <div class="flex items-center justify-between">
-            <span>{{ error }}</span>
-            <UiButton size="sm" variant="secondary" @click="handleRefresh"> Coba Lagi </UiButton>
+        <UiAlert v-if="error" tone="danger">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <span class="font-medium text-xs leading-normal">{{ error }}</span>
+            <UiButton size="xs" variant="outline" class="shrink-0" @click="handleRefresh">
+              Coba Lagi
+            </UiButton>
           </div>
         </UiAlert>
 

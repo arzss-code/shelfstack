@@ -1,7 +1,8 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 import type { Database } from '~/types/database.types'
-import { successResponse, errorResponse } from '../../../utils/response'
 import { formatRupiah } from '~/utils/format'
+import { logger } from '../../../utils/logger'
+import { successResponse, errorResponse } from '../../../utils/response'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -21,6 +22,18 @@ export default defineEventHandler(async (event) => {
       .order('coin_cost', { ascending: true })
 
     if (error) {
+      const isMissingColumn =
+        error.code === '42703' ||
+        error.message?.includes('coin_cost') ||
+        error.message?.includes('schema cache')
+
+      if (isMissingColumn) {
+        logger.warn(
+          '[Points Catalog] Kolom coin_cost belum tersedia di tabel coupons. Menampilkan katalog kosong.',
+        )
+        return successResponse('Katalog penukaran koin berhasil dimuat.', [])
+      }
+
       return errorResponse(event, 'Gagal memuat katalog penukaran koin.', error.message, 500)
     }
 

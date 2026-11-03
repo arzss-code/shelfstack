@@ -3,6 +3,7 @@ import type { Database } from '~/types/database.types'
 import { formatRupiah } from '~/utils/format'
 import { requireUser } from '../../../utils/auth'
 import { successResponse, errorResponse } from '../../../utils/response'
+import { logger } from '../../../utils/logger'
 import type {
   CoinTransaction,
   CoinTransactionType,
@@ -43,7 +44,20 @@ export default defineEventHandler(async (event) => {
       .maybeSingle()
 
     if (coinError) {
-      return errorResponse(event, 'Gagal mengambil data saldo koin.', coinError.message, 500)
+      const isMissingTable =
+        coinError.code === '42P01' ||
+        coinError.code === 'PGRST205' ||
+        coinError.message?.includes('does not exist') ||
+        coinError.message?.includes('schema cache')
+
+      if (isMissingTable) {
+        logger.warn(
+          '[Loyalty Points] Tabel public.user_coins belum tersedia di database. Pastikan migrasi 20261127000001_loyalty_coins_and_rewards.sql telah dijalankan.',
+          { error: coinError.message },
+        )
+      } else {
+        return errorResponse(event, 'Gagal mengambil data saldo koin.', coinError.message, 500)
+      }
     }
 
     const coinsData: UserCoinsRow = (userCoins as unknown as UserCoinsRow) || {
@@ -64,7 +78,19 @@ export default defineEventHandler(async (event) => {
       .limit(20)
 
     if (txError) {
-      return errorResponse(event, 'Gagal mengambil riwayat transaksi koin.', txError.message, 500)
+      const isMissingTable =
+        txError.code === '42P01' ||
+        txError.code === 'PGRST205' ||
+        txError.message?.includes('does not exist') ||
+        txError.message?.includes('schema cache')
+
+      if (isMissingTable) {
+        logger.warn('[Loyalty Points] Tabel public.coin_transactions belum tersedia di database.', {
+          error: txError.message,
+        })
+      } else {
+        return errorResponse(event, 'Gagal mengambil riwayat transaksi koin.', txError.message, 500)
+      }
     }
 
     const transactions: CoinTransaction[] = ((rawTx || []) as unknown as CoinTransactionRow[]).map(

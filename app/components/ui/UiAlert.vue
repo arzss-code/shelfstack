@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-export type UiAlertTone = 'danger' | 'warning' | 'info' | 'success'
+export type UiAlertTone = 'danger' | 'warning' | 'info' | 'success' | 'error'
 
 const props = withDefaults(
   defineProps<{
     tone?: UiAlertTone
+    variant?: UiAlertTone
     title?: string
+    align?: 'start' | 'center'
   }>(),
-  { tone: 'info', title: '' },
+  { tone: undefined, variant: undefined, title: '', align: undefined },
 )
 
+const resolvedTone = computed<UiAlertTone>(() => {
+  const val = props.tone || props.variant || 'info'
+  return val === 'error' ? 'danger' : val
+})
+
 const toneClass = computed(() => {
-  switch (props.tone) {
+  switch (resolvedTone.value) {
     case 'danger':
       return 'border-brand-danger-edge bg-brand-danger-tint text-brand-danger-text'
     case 'warning':
@@ -26,7 +33,7 @@ const toneClass = computed(() => {
 })
 
 const iconClass = computed(() => {
-  switch (props.tone) {
+  switch (resolvedTone.value) {
     case 'danger':
       return 'pi pi-exclamation-circle'
     case 'warning':
@@ -38,20 +45,34 @@ const iconClass = computed(() => {
       return 'pi pi-info-circle'
   }
 })
+
+const isCentered = computed(() => {
+  if (props.align === 'center') return true
+  if (props.align === 'start') return false
+  return !props.title
+})
 </script>
 
 <template>
   <div
     role="status"
     :class="[
-      'flex items-start gap-2.5 rounded-field border px-3.5 py-3 text-xs leading-relaxed',
+      'flex gap-2.5 rounded-field border px-3.5 py-3 text-xs leading-relaxed',
+      isCentered ? 'items-center' : 'items-start',
       toneClass,
     ]"
   >
-    <i :class="['pi', iconClass, 'mt-0.5 shrink-0 text-xs']" aria-hidden="true" />
+    <i
+      :class="['pi', iconClass, 'shrink-0 text-sm leading-none', isCentered ? '' : 'mt-0.5']"
+      aria-hidden="true"
+    />
     <div class="min-w-0 flex-1">
-      <p v-if="title" class="m-0 font-semibold">{{ title }}</p>
-      <div class="[&>:first-child]:mt-0 [&>*:last-child]:mb-0"><slot /></div>
+      <p v-if="title" class="m-0 font-semibold">
+        {{ title }}
+      </p>
+      <div class="[&>:first-child]:mt-0 [&>*:last-child]:mb-0">
+        <slot />
+      </div>
     </div>
   </div>
 </template>
