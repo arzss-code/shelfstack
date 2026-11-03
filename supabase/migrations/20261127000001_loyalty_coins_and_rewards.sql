@@ -294,6 +294,9 @@ grant execute on function public.exchange_coins_for_voucher(uuid) to authenticat
 -- =========================================================================
 -- 6. UPDATE RPC CREATE_ORDER DENGAN INTEGRASI PEMAKAIAN KOIN
 -- =========================================================================
+-- Drop overload lama 7-parameter jika ada agar tidak terjadi PostgreSQL function overloading ambiguity
+drop function if exists public.create_order(jsonb, jsonb, text, text, text, text, text);
+
 create or replace function public.create_order(
   p_items jsonb,
   p_address jsonb,
@@ -697,96 +700,163 @@ grant execute on function public.cancel_order(uuid, text) to authenticated;
 -- =========================================================================
 create or replace function public.transition_order_status(
   p_order_id uuid,
-  p_new_status text,
-  p_note text default null
+  p_target_status text,
+  p_reason text default null
 )
-returns boolean
+returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   v_order record;
-  v_eligible boolean := false;
+  r record;
   v_earned_coins bigint := 0;
-  v_new_coin_balance bigint;
+  v_new_coin_balance bigint := 0;
 begin
+  if (auth.uid() is not null and not public.is_admin())
+     or (auth.uid() is null and current_setting('role', true) in ('authenticated', 'anon')) then
+    raise exception 'FORBIDDEN_NOT_ADMIN: Hanya administrator yang dapat memperbarui status pesanan';
+  end if;
+
   select * into v_order
   from public.orders
   where id = p_order_id
   for update;
 
   if not found then
-    raise exception 'Pesanan tidak ditemukan';
+    raise exception 'ORDER_NOT_FOUND: Pesanan tidak ditemukan';
   end if;
 
-  -- Validasi transisi status
-  if v_order.status = 'pending' and p_new_status in ('paid', 'cancelled') then
-    v_eligible := true;
-  elsif v_order.status = 'paid' and p_new_status in ('processing', 'cancelled', 'refunded') then
-    v_eligible := true;
-  elsif v_order.status = 'processing' and p_new_status in ('shipped', 'cancelled', 'refunded') then
-    v_eligible := true;
-  elsif v_order.status = 'shipped' and p_new_status in ('completed', 'returned') then
-    v_eligible := true;
-  elsif v_order.status = p_new_status then
-    return true;
+  if v_order.status = p_target_status then
+    return jsonb_build_object(
+      'order_id', p_order_id,
+      'current_status', v_order.status,
+      'previous_status', v_order.status,
+      'no_op', true,
+      'message', 'Status pesanan sudah dalam status target (' || p_target_status || ')'
+    );
   end if;
 
-  if not v_eligible then
-    raise exception 'Transisi status tidak valid dari "%" ke "%"', v_order.status, p_new_status;
-  end if;
+  -- Set trusted transition source context for admin transitions
+  perform set_config('app.order_transition_source', 'admin_transition_rpc', true);
 
-  -- Jika order completed: Berikan reward 1% koin dari nilai belanja bersih
-  if p_new_status = 'completed' and coalesce(v_order.coins_earned, 0) = 0 then
-    -- Nilai belanja bersih: subtotal - diskon voucher - diskon koin
-    v_earned_coins := greatest(0, floor(
-      (v_order.subtotal_cents - coalesce(v_order.discount_cents, 0) - coalesce(v_order.coins_discount_cents, 0)) * 0.01 / 100
-    ));
+  if v_order.status = 'pending' then
+    if p_target_status = 'paid' then
+      -- GUARD: Admin dilarang menandai pending -> paid tanpa verifikasi payment gateway
+      raise exception 'ADMIN_PAYMENT_OVERRIDE_DISABLED: Perubahan status dari "pending" ke "paid" oleh admin dinonaktifkan. Status paid hanya dapat ditetapkan melalui konfirmasi resmi payment gateway (Midtrans).';
+    elsif p_target_status = 'cancelled' then
+      perform set_config('app.stock_change_reason', 'admin_order_cancellation', true);
+      perform set_config('app.stock_change_order_id', p_order_id::text, true);
 
-    if v_earned_coins > 0 then
-      insert into public.user_coins (
-        user_id, balance_coins, lifetime_earned_coins, lifetime_spent_coins
-      ) values (
-        v_order.user_id, v_earned_coins, v_earned_coins, 0
-      )
-      on conflict (user_id) do update set
-        balance_coins = public.user_coins.balance_coins + v_earned_coins,
-        lifetime_earned_coins = public.user_coins.lifetime_earned_coins + v_earned_coins,
-        updated_at = now()
-      returning balance_coins into v_new_coin_balance;
+      for r in
+        select product_id, qty
+        from public.order_items
+        where order_id = p_order_id
+        order by product_id asc
+      loop
+        update public.products set stock = stock + r.qty where id = r.product_id;
+      end loop;
 
-      insert into public.coin_transactions (
-        user_id, type, amount_coins, balance_after, order_id, description
-      ) values (
-        v_order.user_id, 
-        'earned', 
-        v_earned_coins, 
-        v_new_coin_balance, 
-        p_order_id, 
-        'Cashback ' || v_earned_coins || ' Koin dari penyelesaian pesanan'
-      );
+      update public.orders
+      set status = 'cancelled',
+          cancelled_at = coalesce(cancelled_at, now()),
+          cancellation_reason = coalesce(p_reason, 'Dibatalkan oleh Administrator'),
+          updated_at = now()
+      where id = p_order_id;
+    else
+      raise exception 'INVALID_ORDER_TRANSITION: Transisi status tidak diizinkan: % -> %', v_order.status, p_target_status;
     end if;
-  end if;
 
-  update public.orders
-  set status = p_new_status,
-      coins_earned = case when p_new_status = 'completed' then v_earned_coins else coins_earned end,
-      completed_at = case when p_new_status = 'completed' then now() else completed_at end,
-      updated_at = now()
-  where id = p_order_id;
+  elsif v_order.status = 'paid' then
+    if p_target_status = 'shipped' then
+      update public.orders set status = 'shipped', updated_at = now() where id = p_order_id;
+    elsif p_target_status = 'cancelled' then
+      raise exception 'INVALID_ORDER_TRANSITION: Pesanan berstatus paid tidak dapat dibatalkan tanpa proses refund resmi (gunakan modul refund)';
+    elsif p_target_status = 'refunded' then
+      raise exception 'INVALID_ORDER_TRANSITION: Transisi ke status refunded harus melalui modul refund resmi (create_refund_attempt & finalize_refund)';
+    else
+      raise exception 'INVALID_ORDER_TRANSITION: Transisi status tidak diizinkan: % -> %', v_order.status, p_target_status;
+    end if;
+
+  elsif v_order.status = 'shipped' then
+    if p_target_status = 'completed' then
+      -- Berikan reward cashback 1% koin dari nilai belanja bersih jika belum pernah diberikan
+      if coalesce(v_order.coins_earned, 0) = 0 then
+        v_earned_coins := greatest(0, floor(
+          (coalesce(v_order.subtotal_cents, v_order.total_cents) - coalesce(v_order.discount_cents, 0) - coalesce(v_order.coins_discount_cents, 0)) * 0.01 / 100
+        ));
+
+        if v_earned_coins > 0 then
+          insert into public.user_coins (
+            user_id, balance_coins, lifetime_earned_coins, lifetime_spent_coins
+          ) values (
+            v_order.user_id, v_earned_coins, v_earned_coins, 0
+          )
+          on conflict (user_id) do update set
+            balance_coins = public.user_coins.balance_coins + v_earned_coins,
+            lifetime_earned_coins = public.user_coins.lifetime_earned_coins + v_earned_coins,
+            updated_at = now()
+          returning balance_coins into v_new_coin_balance;
+
+          insert into public.coin_transactions (
+            user_id, type, amount_coins, balance_after, order_id, description
+          ) values (
+            v_order.user_id,
+            'earned',
+            v_earned_coins,
+            v_new_coin_balance,
+            p_order_id,
+            'Cashback ' || v_earned_coins || ' Koin dari penyelesaian pesanan'
+          );
+        end if;
+      end if;
+
+      update public.orders
+      set status = 'completed',
+          coins_earned = case when coalesce(v_order.coins_earned, 0) = 0 then v_earned_coins else coins_earned end,
+          completed_at = coalesce(completed_at, now()),
+          updated_at = now()
+      where id = p_order_id;
+    else
+      raise exception 'INVALID_ORDER_TRANSITION: Transisi status tidak diizinkan: % -> %', v_order.status, p_target_status;
+    end if;
+
+  elsif v_order.status in ('completed', 'cancelled', 'refunded') then
+    raise exception 'INVALID_ORDER_TRANSITION: Pesanan sudah berada dalam status terminal (%) dan tidak dapat diubah lagi', v_order.status;
+
+  else
+    raise exception 'INVALID_ORDER_TRANSITION: Status pesanan tidak dikenal: %', v_order.status;
+  end if;
 
   begin
     insert into public.activity_logs (
-      entity_type, entity_id, action, description, created_at
+      entity_type,
+      entity_id,
+      action,
+      description,
+      old_data,
+      new_data
     ) values (
-      'order', p_order_id, p_new_status, 'Perubahan status pesanan menjadi ' || p_new_status || coalesce('. Catatan: ' || p_note, ''), now()
+      'order',
+      0,
+      'UPDATE'::public.activity_action,
+      'Status pesanan diperbarui menjadi: ' || p_target_status || coalesce(' (Alasan: ' || p_reason || ')', ''),
+      jsonb_build_object('order_id', p_order_id, 'status', v_order.status),
+      jsonb_build_object('order_id', p_order_id, 'status', p_target_status, 'reason', p_reason)
     );
   exception when others then
-    -- fail-safe
+    null;
   end;
 
-  return true;
+  return jsonb_build_object(
+    'order_id', p_order_id,
+    'current_status', p_target_status,
+    'previous_status', v_order.status,
+    'no_op', false,
+    'coins_earned', v_earned_coins,
+    'message', 'Status pesanan berhasil diperbarui menjadi ' || p_target_status
+  );
 end;
 $$;
 
