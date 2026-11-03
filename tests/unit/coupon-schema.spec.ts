@@ -291,5 +291,37 @@ describe('Coupon & Promo Discount Domain Tests', () => {
         expect(valid.data.is_active).toBe(false)
       }
     })
+
+    it('memvalidasi kupon loyalitas dengan atribut coin_cost yang sah', () => {
+      const valid = createCouponSchema.safeParse({
+        code: 'KOINHEMAT50',
+        name: 'Voucher Koin Rp 50.000',
+        discount_type: 'fixed',
+        discount_value: 5000000,
+        coin_cost: 5000,
+      })
+
+      expect(valid.success).toBe(true)
+      if (valid.success) {
+        expect(valid.data.coin_cost).toBe(5000)
+      }
+
+      const invalidNegative = createCouponSchema.safeParse({
+        code: 'KOINERROR',
+        name: 'Voucher Koin Error',
+        discount_type: 'fixed',
+        discount_value: 10000,
+        coin_cost: -500,
+      })
+      expect(invalidNegative.success).toBe(false)
+
+      const updateWithCoin = updateCouponSchema.safeParse({
+        coin_cost: 2500,
+      })
+      expect(updateWithCoin.success).toBe(true)
+      if (updateWithCoin.success) {
+        expect(updateWithCoin.data.coin_cost).toBe(2500)
+      }
+    })
   })
 })

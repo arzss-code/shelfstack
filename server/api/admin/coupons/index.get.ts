@@ -1,6 +1,7 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { formatRupiah } from '~/utils/format'
+import { requireAdmin } from '../../../utils/auth'
 import { successResponse, errorResponse } from '../../../utils/response'
 
 export default defineEventHandler(async (event) => {
@@ -90,6 +91,11 @@ export default defineEventHandler(async (event) => {
       const formattedMinPurchase =
         coupon.min_purchase_cents > 0 ? formatRupiah(coupon.min_purchase_cents / 100) : 'Rp0'
 
+      const coinCost = (coupon as { coin_cost?: number | null }).coin_cost ?? null
+      const formattedCoinCost = coinCost
+        ? `${new Intl.NumberFormat('id-ID').format(coinCost)} Koin`
+        : null
+
       return {
         id: coupon.id,
         code: coupon.code,
@@ -109,6 +115,8 @@ export default defineEventHandler(async (event) => {
         expires_at: coupon.expires_at,
         is_active: coupon.is_active,
         is_expired: isExpired,
+        coin_cost: coinCost,
+        formatted_coin_cost: formattedCoinCost,
         created_at: coupon.created_at,
       }
     })
@@ -123,12 +131,13 @@ export default defineEventHandler(async (event) => {
         formatted_total_discount: formatRupiah(totalDiscountCents / 100),
       },
     })
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorObj = err as { message?: string; statusCode?: number }
     return errorResponse(
       event,
-      err.message || 'Terjadi kesalahan sistem',
+      errorObj?.message || 'Terjadi kesalahan sistem',
       null,
-      err.statusCode || 500,
+      errorObj?.statusCode || 500,
     )
   }
 })
