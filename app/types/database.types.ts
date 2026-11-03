@@ -738,6 +738,72 @@ export type Database = {
           },
         ]
       }
+      user_coins: {
+        Row: {
+          balance_coins: number
+          created_at: string
+          has_claimed_welcome: boolean
+          lifetime_earned_coins: number
+          lifetime_spent_coins: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance_coins?: number
+          created_at?: string
+          has_claimed_welcome?: boolean
+          lifetime_earned_coins?: number
+          lifetime_spent_coins?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance_coins?: number
+          created_at?: string
+          has_claimed_welcome?: boolean
+          lifetime_earned_coins?: number
+          lifetime_spent_coins?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      coin_transactions: {
+        Row: {
+          amount_coins: number
+          balance_after: number
+          coupon_id: string | null
+          created_at: string
+          description: string
+          id: string
+          order_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount_coins: number
+          balance_after: number
+          coupon_id?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          order_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount_coins?: number
+          balance_after?: number
+          coupon_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          order_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       wishlists: {
         Row: {
           created_at: string | null
@@ -890,6 +956,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_welcome_coins: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      exchange_coins_for_voucher: {
+        Args: {
+          p_coupon_id: string
+        }
+        Returns: Json
+      }
       claim_coupon_to_wallet: {
         Args: {
           p_coupon_id?: string | null

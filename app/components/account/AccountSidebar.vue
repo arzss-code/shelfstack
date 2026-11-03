@@ -6,21 +6,20 @@ import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
 import { useNotificationStore } from '~/features/notifications/stores/notifications'
 import { useUiConfirm } from '~/composables/useUiConfirm'
 import { useUserVouchers } from '~/composables/useUserVouchers'
+import { useLoyaltyPoints } from '~/composables/useLoyaltyPoints'
 
 const route = useRoute()
 const { user, profile, signOut } = useAuth()
 const wishlistStore = useWishlistStore()
 const notificationStore = useNotificationStore()
 const { activeCount: activeVoucherCount } = useUserVouchers()
+const { balanceCoins } = useLoyaltyPoints()
 const confirm = useUiConfirm()
 
-const displayName = computed(() => {
-  return profile.value?.full_name || user.value?.email?.split('@')[0] || 'Pelanggan'
-})
-
-const initial = computed(() => {
-  return displayName.value.charAt(0).toUpperCase()
-})
+const displayName = computed(
+  () => profile.value?.full_name || user.value?.email?.split('@')[0] || 'Pelanggan',
+)
+const initial = computed(() => displayName.value.charAt(0).toUpperCase())
 
 interface NavItem {
   id: string
@@ -54,6 +53,7 @@ const navGroups = computed<NavGroup[]>(() => [
         icon: 'pi pi-ticket',
         badge: activeVoucherCount.value,
       },
+      { id: 'points', label: 'Koin & Rewards', to: '/account/points', icon: 'pi pi-dollar' },
       {
         id: 'notifications',
         label: 'Notifikasi',
@@ -80,6 +80,7 @@ const navGroups = computed<NavGroup[]>(() => [
 const horizontalTabs = computed<NavItem[]>(() => [
   { id: 'profile', label: 'Profil Saya', to: '/account/profile', icon: 'pi pi-user' },
   { id: 'addresses', label: 'Daftar Alamat', to: '/account/addresses', icon: 'pi pi-map-marker' },
+  { id: 'points', label: 'Koin & Rewards', to: '/account/points', icon: 'pi pi-dollar' },
   { id: 'orders', label: 'Pesanan Saya', to: '/orders', icon: 'pi pi-box' },
   {
     id: 'wishlist',
@@ -127,26 +128,26 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <aside class="w-full xl:w-64 shrink-0">
+  <aside class="w-full shrink-0 xl:w-64">
     <!-- Desktop Sidebar Card (Hanya Tampil di Layar Besar >= 1280px) -->
     <div
-      class="hidden xl:block bg-brand-canvas border border-brand-hair rounded-card p-5 shadow-whisper sticky top-24"
+      class="sticky top-24 hidden rounded-card border border-brand-hair bg-brand-canvas p-5 shadow-whisper xl:block"
     >
       <!-- User Profile Lockup -->
-      <div class="flex items-center gap-3 pb-5 border-b border-brand-hairsoft">
+      <div class="flex items-center gap-3 border-b border-brand-hairsoft pb-5">
         <div class="relative shrink-0">
           <div
-            class="w-11 h-11 rounded-full border border-brand-hair overflow-hidden bg-brand-canvas-soft flex items-center justify-center shadow-whisper"
+            class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-brand-hair bg-brand-canvas-soft shadow-whisper"
           >
             <img
               v-if="profile?.avatar_url"
               :src="profile.avatar_url"
               :alt="displayName"
-              class="w-full h-full object-cover"
+              class="h-full w-full object-cover"
             />
             <div
               v-else
-              class="w-full h-full bg-brand-ink text-white font-display text-base font-bold flex items-center justify-center"
+              class="flex h-full w-full items-center justify-center bg-brand-ink font-display font-bold text-base text-white"
             >
               {{ initial }}
             </div>
@@ -154,27 +155,29 @@ const handleLogout = () => {
         </div>
 
         <div class="min-w-0 flex-1">
-          <p class="text-xs font-bold text-brand-ink m-0 truncate">{{ displayName }}</p>
-          <p class="text-[11px] text-brand-muted m-0 truncate mt-0.5">{{ user?.email }}</p>
+          <p class="m-0 truncate font-bold text-xs text-brand-ink">{{ displayName }}</p>
+          <p class="m-0 mt-0.5 truncate text-[11px] text-brand-muted">{{ user?.email }}</p>
           <div class="mt-1 flex items-center gap-1.5">
             <span
               v-if="profile?.role === 'admin'"
-              class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wider"
-              >Admin</span
+              class="rounded bg-amber-100 px-1.5 py-0.5 font-bold text-[9px] text-amber-800 uppercase tracking-wider"
             >
+              Admin
+            </span>
             <span
               v-else
-              class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
-              >Member Aktif</span
+              class="rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 font-semibold text-[9px] text-emerald-700"
             >
+              Member Aktif
+            </span>
           </div>
         </div>
       </div>
 
       <!-- Navigation Groups -->
-      <div class="pt-4 space-y-5">
+      <div class="space-y-5 pt-4">
         <div v-for="group in navGroups" :key="group.title">
-          <p class="text-[10px] font-bold uppercase tracking-wider text-brand-muted/80 mb-2 px-2">
+          <p class="mb-2 px-2 font-bold text-[10px] text-brand-muted/80 uppercase tracking-wider">
             {{ group.title }}
           </p>
           <nav class="space-y-0.5" :aria-label="group.title">
@@ -182,10 +185,10 @@ const handleLogout = () => {
               v-for="item in group.items"
               :key="item.id"
               :to="item.to"
-              class="flex items-center justify-between px-3 py-2 rounded-field text-xs font-medium no-underline transition-all"
+              class="flex items-center justify-between rounded-field px-3 py-2 font-medium text-xs no-underline transition-all"
               :class="[
                 isItemActive(item.to)
-                  ? 'bg-brand-ink text-white font-semibold shadow-xs'
+                  ? 'bg-brand-ink font-semibold text-white shadow-xs'
                   : 'text-brand-ink hover:bg-brand-canvas-soft',
               ]"
             >
@@ -201,7 +204,7 @@ const handleLogout = () => {
               </div>
               <span
                 v-if="item.badge !== undefined && item.badge > 0"
-                class="px-1.5 py-0.5 rounded-full text-[10px] font-bold tabular-nums"
+                class="rounded-full px-1.5 py-0.5 font-bold text-[10px] tabular-nums"
                 :class="[
                   isItemActive(item.to) ? 'bg-white text-brand-ink' : 'bg-brand-ink text-white',
                 ]"
@@ -213,10 +216,10 @@ const handleLogout = () => {
         </div>
 
         <!-- Logout Action -->
-        <div class="pt-3 border-t border-brand-hairsoft">
+        <div class="border-t border-brand-hairsoft pt-3">
           <button
             type="button"
-            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-field text-xs font-medium text-brand-danger hover:bg-brand-danger-tint transition-colors cursor-pointer border-0 bg-transparent"
+            class="flex w-full cursor-pointer items-center gap-2.5 border-0 bg-transparent px-3 py-2 font-medium text-brand-danger text-xs transition-colors hover:bg-brand-danger-tint"
             @click="handleLogout"
           >
             <i class="pi pi-sign-out text-xs" />
@@ -227,52 +230,52 @@ const handleLogout = () => {
     </div>
 
     <!-- Responsive Horizontal Tab Ribbon (Hanya Tampil di Layar < 1280px) -->
-    <div class="block xl:hidden mb-6">
+    <div class="mb-6 block xl:hidden">
       <div
-        class="bg-brand-canvas border border-brand-hair rounded-card p-4 mb-3 shadow-whisper flex items-center justify-between gap-3"
+        class="mb-3 flex items-center justify-between gap-3 rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper"
       >
-        <div class="flex items-center gap-3 min-w-0">
+        <div class="flex min-w-0 items-center gap-3">
           <div
-            class="w-10 h-10 rounded-full border border-brand-hair overflow-hidden bg-brand-canvas-soft flex items-center justify-center shrink-0"
+            class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-brand-hair bg-brand-canvas-soft"
           >
             <img
               v-if="profile?.avatar_url"
               :src="profile.avatar_url"
               :alt="displayName"
-              class="w-full h-full object-cover"
+              class="h-full w-full object-cover"
             />
             <div
               v-else
-              class="w-full h-full bg-brand-ink text-white font-display text-sm font-bold flex items-center justify-center"
+              class="flex h-full w-full items-center justify-center bg-brand-ink font-display font-bold text-sm text-white"
             >
               {{ initial }}
             </div>
           </div>
           <div class="min-w-0">
-            <p class="text-xs font-bold text-brand-ink m-0 truncate">{{ displayName }}</p>
-            <p class="text-[10px] text-brand-muted m-0 truncate">{{ user?.email }}</p>
+            <p class="m-0 truncate font-bold text-xs text-brand-ink">{{ displayName }}</p>
+            <p class="m-0 truncate text-[10px] text-brand-muted">{{ user?.email }}</p>
           </div>
         </div>
         <NuxtLink
           to="/katalog"
-          class="px-3 py-1 rounded-full border border-brand-hair text-[11px] font-semibold text-brand-ink hover:bg-brand-canvas-soft no-underline shrink-0 active:scale-95 transition-all"
+          class="shrink-0 rounded-full border border-brand-hair px-3 py-1 font-semibold text-[11px] text-brand-ink no-underline transition-all hover:bg-brand-canvas-soft active:scale-95"
         >
           Belanja
         </NuxtLink>
       </div>
 
       <nav
-        class="flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-brand-hair pb-px"
+        class="no-scrollbar flex items-center gap-1.5 overflow-x-auto border-b border-brand-hair pb-px"
         aria-label="Navigasi Menu Akun"
       >
         <NuxtLink
           v-for="tab in horizontalTabs"
           :key="tab.id"
           :to="tab.to"
-          class="flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium no-underline whitespace-nowrap border-b-2 transition-all min-h-[44px]"
+          class="flex min-h-[44px] items-center gap-1.5 whitespace-nowrap border-b-2 px-3.5 py-2.5 font-medium text-xs no-underline transition-all"
           :class="[
             isItemActive(tab.to)
-              ? 'border-brand-ink text-brand-ink font-semibold'
+              ? 'border-brand-ink font-semibold text-brand-ink'
               : 'border-transparent text-brand-muted hover:text-brand-ink',
           ]"
         >
@@ -280,7 +283,7 @@ const handleLogout = () => {
           <span>{{ tab.label }}</span>
           <span
             v-if="tab.badge !== undefined && tab.badge > 0"
-            class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-brand-ink text-white tabular-nums leading-none ml-0.5"
+            class="ml-0.5 rounded-full bg-brand-ink px-1.5 py-0.2 font-bold text-[9px] text-white tabular-nums leading-none"
           >
             {{ tab.badge }}
           </span>

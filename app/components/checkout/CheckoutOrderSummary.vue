@@ -18,6 +18,8 @@ withDefaults(
     totalPrice: string
     discountAmount?: string | null
     couponCode?: string | null
+    coinsDiscountAmount?: string | null
+    coinsUsed?: number
     shippingFeeFormatted?: string
     isFreeShipping?: boolean
     finalPrice: string
@@ -28,6 +30,8 @@ withDefaults(
   {
     discountAmount: null,
     couponCode: null,
+    coinsDiscountAmount: null,
+    coinsUsed: 0,
     shippingFeeFormatted: 'Gratis',
     isFreeShipping: true,
     isSubmitting: false,
@@ -43,61 +47,61 @@ const emit = defineEmits<{
 
 <template>
   <aside
-    class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 lg:sticky lg:top-36"
+    class="space-y-5 rounded-card border border-brand-hair bg-brand-canvas p-6 shadow-whisper lg:sticky lg:top-36"
   >
     <!-- Header -->
-    <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
+    <div class="flex items-center justify-between border-b border-brand-hairsoft pb-3">
       <div class="flex items-center gap-2">
-        <i class="pi pi-receipt text-brand-ink text-base" />
-        <h2 class="font-display text-base font-bold text-brand-ink m-0">Ringkasan Belanja</h2>
+        <i class="pi pi-receipt text-base text-brand-ink" />
+        <h2 class="m-0 font-display text-base font-bold text-brand-ink">Ringkasan Belanja</h2>
       </div>
       <span
-        class="text-xs font-semibold text-brand-ink bg-brand-canvas-soft border border-brand-hair px-2.5 py-0.5 rounded-full"
+        class="rounded-full border border-brand-hair bg-brand-canvas-soft px-2.5 py-0.5 text-xs font-semibold text-brand-ink"
       >
         {{ totalItems }} barang
       </span>
     </div>
 
     <!-- Items Preview Scrollable -->
-    <div class="max-h-64 overflow-y-auto divide-y divide-brand-hairsoft pr-1 space-y-0.5">
+    <div class="max-h-64 space-y-0.5 divide-y divide-brand-hairsoft overflow-y-auto pr-1">
       <div
         v-for="item in items"
         :key="`${item.productId}-${item.color || ''}-${item.material || ''}`"
-        class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs"
+        class="flex items-center justify-between gap-3 py-3 text-xs first:pt-0 last:pb-0"
       >
-        <div class="flex items-center gap-3 min-w-0">
+        <div class="flex min-w-0 items-center gap-3">
           <div
-            class="relative w-12 h-12 rounded-xl bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center shadow-2xs"
+            class="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-brand-hairsoft bg-brand-field shadow-2xs"
           >
             <img
               v-if="item.imageUrl"
               :src="item.imageUrl"
               :alt="item.name"
-              class="w-full h-full object-cover"
+              class="h-full w-full object-cover"
             />
-            <i v-else class="pi pi-image text-brand-faint text-sm" />
+            <i v-else class="pi pi-image text-sm text-brand-faint" />
           </div>
 
           <div class="min-w-0">
-            <p class="font-medium text-xs text-brand-ink m-0 leading-snug truncate">
+            <p class="m-0 truncate font-medium text-xs leading-snug text-brand-ink">
               {{ item.name }}
             </p>
             <p
               v-if="item.color || item.material"
-              class="text-[10.5px] text-brand-muted m-0 mt-0.5 truncate"
+              class="m-0 mt-0.5 truncate text-[10.5px] text-brand-muted"
             >
               <span v-if="item.color">{{ item.color }}</span>
               <span v-if="item.color && item.material">, </span>
               <span v-if="item.material">{{ item.material }}</span>
             </p>
-            <p class="text-[11px] text-brand-muted m-0 mt-0.5 tabular-nums">
+            <p class="m-0 mt-0.5 text-[11px] tabular-nums text-brand-muted">
               {{ item.quantity }} &times; {{ formatRupiah(item.price) }}
             </p>
           </div>
         </div>
 
         <span
-          class="font-display font-bold text-xs text-brand-ink tabular-nums shrink-0 text-right"
+          class="shrink-0 text-right font-display font-bold text-xs tabular-nums text-brand-ink"
         >
           {{ formatRupiah(item.price * item.quantity) }}
         </span>
@@ -105,32 +109,50 @@ const emit = defineEmits<{
     </div>
 
     <!-- Voucher & Pricing Breakdown -->
-    <div class="pt-4 border-t border-brand-hairsoft space-y-2.5 text-xs text-brand-muted">
+    <div class="space-y-2.5 border-t border-brand-hairsoft pt-4 text-xs text-brand-muted">
       <!-- Coupon Slot -->
-      <div v-if="!isOrderPlaced" class="pb-2 border-b border-brand-hairsoft">
+      <div v-if="!isOrderPlaced" class="border-b border-brand-hairsoft pb-2">
         <CartCouponInput compact />
       </div>
 
       <!-- Breakdown Rows -->
       <div class="flex items-center justify-between">
         <span>Subtotal Produk</span>
-        <span class="font-semibold text-brand-ink tabular-nums">{{ totalPrice }}</span>
+        <span class="font-semibold tabular-nums text-brand-ink">{{ totalPrice }}</span>
       </div>
 
+      <!-- Voucher Discount -->
       <div
         v-if="discountAmount"
-        class="flex items-center justify-between text-brand-success-text font-medium"
+        class="flex items-center justify-between font-medium text-brand-success-text"
       >
         <span class="flex items-center gap-1.5 truncate">
           <span>Potongan Voucher</span>
           <span
             v-if="couponCode"
-            class="font-mono text-[10px] bg-brand-canvas-soft border border-brand-hair px-1.5 py-0.5 rounded text-brand-ink uppercase"
+            class="rounded border border-brand-hair bg-brand-canvas-soft px-1.5 py-0.5 font-mono text-[10px] uppercase text-brand-ink"
           >
             {{ couponCode }}
           </span>
         </span>
-        <span class="font-bold tabular-nums shrink-0">-{{ discountAmount }}</span>
+        <span class="shrink-0 font-bold tabular-nums">-{{ discountAmount }}</span>
+      </div>
+
+      <!-- Coin Discount -->
+      <div
+        v-if="coinsDiscountAmount"
+        class="flex items-center justify-between font-medium text-amber-700 dark:text-amber-400"
+      >
+        <span class="flex items-center gap-1.5 truncate">
+          <span>Potongan Koin</span>
+          <span
+            v-if="coinsUsed"
+            class="rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 font-mono text-[10px] text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+          >
+            {{ new Intl.NumberFormat('id-ID').format(coinsUsed) }} Koin
+          </span>
+        </span>
+        <span class="shrink-0 font-bold tabular-nums">-{{ coinsDiscountAmount }}</span>
       </div>
 
       <div class="flex items-center justify-between">
@@ -138,8 +160,8 @@ const emit = defineEmits<{
         <span
           :class="[
             isFreeShipping
-              ? 'text-brand-success font-semibold'
-              : 'font-semibold text-brand-ink tabular-nums',
+              ? 'font-semibold text-brand-success'
+              : 'font-semibold tabular-nums text-brand-ink',
           ]"
         >
           {{ shippingFeeFormatted }}
@@ -152,12 +174,12 @@ const emit = defineEmits<{
       </div>
 
       <!-- Total Row -->
-      <div class="pt-3 border-t border-brand-hairsoft flex items-center justify-between">
+      <div class="flex items-center justify-between border-t border-brand-hairsoft pt-3">
         <div>
-          <span class="font-display font-bold text-sm text-brand-ink block">Total Pembayaran</span>
+          <span class="block font-display font-bold text-sm text-brand-ink">Total Pembayaran</span>
           <span class="text-[10.5px] text-brand-muted">Sudah termasuk ongkir &amp; PPN</span>
         </div>
-        <span class="font-display text-xl sm:text-2xl font-bold text-brand-ink tabular-nums">
+        <span class="font-display font-bold text-xl tabular-nums text-brand-ink sm:text-2xl">
           {{ finalPrice }}
         </span>
       </div>
@@ -167,7 +189,7 @@ const emit = defineEmits<{
     <UiButton
       variant="primary"
       size="md"
-      class="w-full justify-center text-xs font-semibold py-3 rounded-full shadow-whisper"
+      class="w-full justify-center rounded-full py-3 font-semibold text-xs shadow-whisper"
       icon="pi-lock"
       :loading="isSubmitting || isOrderPlaced"
       :disabled="isSubmitting || isOrderPlaced"
@@ -177,9 +199,9 @@ const emit = defineEmits<{
     </UiButton>
 
     <div
-      class="flex items-center justify-center gap-1.5 text-[11px] text-brand-muted text-center pt-0.5"
+      class="flex items-center justify-center gap-1.5 pt-0.5 text-center text-[11px] text-brand-muted"
     >
-      <i class="pi pi-shield text-brand-ink text-xs" />
+      <i class="pi pi-shield text-xs text-brand-ink" />
       <span>Pembayaran resmi aman dilindungi Midtrans</span>
     </div>
   </aside>
