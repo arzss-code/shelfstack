@@ -3,6 +3,8 @@ import { computed, ref } from 'vue'
 import { useCartStore } from '~/features/cart/stores/cart'
 import { formatRupiah } from '~/utils/format'
 import { useUiToast } from '~/composables/useUiToast'
+import { useAuth } from '~/features/auth/composables/useAuth'
+import { useUserVouchers } from '~/composables/useUserVouchers'
 import VoucherSelectModal from './VoucherSelectModal.vue'
 
 const props = withDefaults(
@@ -16,8 +18,14 @@ const props = withDefaults(
 
 const cartStore = useCartStore()
 const toast = useUiToast()
+const auth = useAuth()
+const userVouchers = useUserVouchers()
 
 const isModalOpen = ref(false)
+
+const walletVoucherCount = computed(() => {
+  return auth.isLoggedIn.value ? userVouchers.activeCount.value : 0
+})
 
 const handleOpenModal = () => {
   isModalOpen.value = true
@@ -137,7 +145,15 @@ const couponExtraInfo = computed(() => {
           <i class="pi pi-ticket text-xs" />
         </div>
         <div class="min-w-0">
-          <p class="m-0 text-xs font-semibold text-brand-ink">Gunakan / Masukkan Voucher</p>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <p class="m-0 text-xs font-semibold text-brand-ink">Gunakan / Masukkan Voucher</p>
+            <span
+              v-if="walletVoucherCount > 0"
+              class="rounded-full bg-brand-accent/15 px-1.5 py-0.2 text-[9.5px] font-bold text-brand-accent border border-brand-accent/30"
+            >
+              {{ walletVoucherCount }} tersedia
+            </span>
+          </div>
           <p v-if="!props.compact" class="m-0 mt-0.5 truncate text-[11px] text-brand-muted">
             Pilih atau masukkan kode voucher promo hemat
           </p>

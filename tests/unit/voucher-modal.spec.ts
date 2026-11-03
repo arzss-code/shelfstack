@@ -78,6 +78,13 @@ const { mockFetch, toastAddMock } = vi.hoisted(() => {
         }
         return Promise.reject({ data: { message: 'Kode voucher tidak valid.' } })
       }
+      if (url === '/api/account/vouchers/claim') {
+        return Promise.resolve({
+          status: 'success',
+          message: 'Voucher berhasil diklaim',
+          data: null,
+        })
+      }
       return Promise.resolve({ status: 'success', data: [] })
     })
   fMock.create = () => fMock
@@ -103,6 +110,7 @@ mockNuxtImport('useUiToast', () => () => ({
   add: toastAddMock,
   remove: vi.fn(),
   clear: vi.fn(),
+  show: toastAddMock,
 }))
 
 const globalStubs = {
@@ -404,6 +412,108 @@ describe('CartCouponInput & VoucherSelectModal Integration', () => {
 
       expect(wrapper.text()).toContain('Voucher SUPERVIP berhasil diverifikasi dan dipilih.')
       expect(wrapper.text()).toContain('SUPERVIP')
+    })
+
+    it('menampilkan badge Paling Hemat pada voucher yang memberikan diskon terbesar', async () => {
+      const cart = useCartStore()
+      cart.addItem({
+        productId: 1,
+        name: 'Meja Kerja Minimalis',
+        price: 300000,
+        priceCents: 30000000,
+        stock: 5,
+        quantity: 1,
+        openCartDrawer: false,
+      })
+
+      const wrapper = mount(VoucherSelectModal, {
+        props: { visible: true },
+        global: { stubs: globalStubs },
+      })
+
+      await flushPromises()
+
+      // SHELF10 memberikan potongan 10% (Rp 30.000) dan berstatus eligible
+      expect(wrapper.text()).toContain('Paling Hemat')
+      const eligibleCards = wrapper.findAll('[role="button"]')
+      const shelf10Card = eligibleCards.find((c) => c.text().includes('SHELF10'))
+      expect(shelf10Card?.text()).toContain('Paling Hemat')
+    })
+
+    it('dapat beralih antara tab Promo Tersedia dan Voucher Saya', async () => {
+      const cart = useCartStore()
+      cart.addItem({
+        productId: 1,
+        name: 'Meja Kerja',
+        price: 300000,
+        priceCents: 30000000,
+        stock: 5,
+        quantity: 1,
+        openCartDrawer: false,
+      })
+
+      const wrapper = mount(VoucherSelectModal, {
+        props: { visible: true },
+        global: { stubs: globalStubs },
+      })
+
+      await flushPromises()
+
+      // Tab awal Promo Tersedia aktif
+      expect(wrapper.text()).toContain('Promo Tersedia')
+      expect(wrapper.text()).toContain('Voucher Saya')
+
+      // Klik tab Voucher Saya
+      const buttons = wrapper.findAll('button')
+      const walletTabBtn = buttons.find((b) => b.text().includes('Voucher Saya'))
+      expect(walletTabBtn).toBeDefined()
+      await walletTabBtn!.trigger('click')
+
+      // Di lingkungan tamu tanpa auth, tampil empty state untuk voucher saya
+      expect(wrapper.text()).toContain('Masuk untuk Melihat Voucher Saya')
+
+      // Klik tombol Jelajahi / Lihat Promo Tersedia dari empty state
+      const switchBtn = wrapper
+        .findAll('button')
+        .find((b) => b.text().includes('Lihat Promo Tersedia'))
+      expect(switchBtn).toBeDefined()
+      await switchBtn!.trigger('click')
+
+      // Kembali ke tab Promo Tersedia
+      expect(wrapper.text()).toContain('Voucher Yang Bisa Digunakan')
+    })
+
+    it('dapat mengeksekusi 1-klik Klaim & Pakai pada kartu promo publik', async () => {
+      const cart = useCartStore()
+      cart.addItem({
+        productId: 1,
+        name: 'Meja Kerja',
+        price: 300000,
+        priceCents: 30000000,
+        stock: 5,
+        quantity: 1,
+        openCartDrawer: false,
+      })
+
+      const wrapper = mount(VoucherSelectModal, {
+        props: { visible: true },
+        global: { stubs: globalStubs },
+      })
+
+      await flushPromises()
+
+      // Cari tombol Klaim & Pakai pada card SHELF10
+      const buttons = wrapper.findAll('button')
+      const claimAndApplyBtn = buttons.find((b) => b.text().includes('Klaim & Pakai'))
+      expect(claimAndApplyBtn).toBeDefined()
+
+      await claimAndApplyBtn!.trigger('click')
+      await flushPromises()
+
+      // Voucher langsung terpasang di cart
+      expect(cart.appliedCoupon).not.toBeNull()
+      expect(cart.appliedCoupon?.code).toBe('SHELF10')
+      expect(cart.discountCents).toBe(3000000)
     })
   })
 })
