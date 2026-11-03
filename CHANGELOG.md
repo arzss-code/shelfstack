@@ -2,6 +2,44 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.28.0] - 2026-11-03
+
+### Sistem Poin dan Koin Belanja (ShelfStack Coins and Loyalty Rewards Hub)
+
+- **Halaman Loyalty Rewards Mandiri (`/account/points`)**:
+  - `app/pages/account/points.vue`: Hub loyalitas pelanggan terpadu (166 baris) dengan 2 tab navigasi ("Tukar Voucher" dan "Riwayat Transaksi"), tombol penyegaran instan, breadcrumbs, dan 5 status interaksi wajib.
+  - `app/components/account/points/CoinBalanceCard.vue`: Kartu bento saldo koin bertema gradien emas dan amber hangat (106 baris) yang menampilkan saldo koin, ekuivalen nilai rupiah (1 Koin = Rp 1), statistik seumur hidup (total didapat vs total dipakai), serta banner 1-klik klaim bonus sambutan 10.000 Koin bagi pengguna baru.
+  - `app/components/account/points/CoinVoucherExchangeGrid.vue`: Grid katalog voucher eksklusif penukaran koin (158 baris) dengan kartu voucher takik taktil, indikator biaya koin, kupon sudah ditukar, dan tombol penukaran interaktif.
+  - `app/components/account/points/CoinTransactionList.vue`: Garis waktu mutasi koin double-entry transaksional (127 baris) dengan badge ikon visual untuk setiap kategori (+ untuk earned, welcome bonus, dan refund, - untuk spent dan redeemed) serta status saldo setelah mutasi.
+  - `app/composables/useLoyaltyPoints.ts`: Composable state management reaktif untuk ringkasan koin, katalog penukaran, klaim bonus sambutan, dan eksekusi penukaran voucher dengan fallback runtime ramah pengujian.
+- **Integrasi Pemakaian Koin di Halaman Checkout**:
+  - `app/components/checkout/CheckoutCoinsToggle.vue`: Komponen toggle switch 1-klik yang mudah diakses (109 baris, role switch, WCAG AA, target sentuh 44px) untuk menukarkan koin dengan batas otomatis maksimal 50% dari subtotal barang setelah kupon diskon.
+  - `app/components/checkout/CheckoutOrderSummary.vue`: Pembaruan rincian tagihan belanja dengan baris potongan koin interaktif.
+  - `app/pages/checkout.vue` dan `app/composables/useCheckoutOrder.ts`: Pengikatan parameter `coins_used` ke pembuatan pesanan, pembaruan kalkulasi total pembayaran aman Midtrans Snap, serta sinkronisasi kunci idempotensi saat status koin berubah.
+- **Navigasi Akun Terpadu**:
+  - `app/components/account/AccountSidebar.vue` dan `app/components/account/AccountNavTabs.vue`: Penambahan tautan menu "Koin & Rewards" dengan ikon koin emas pada navigasi sidebar desktop dan pita horizontal seluler (semua komponen <= 300 baris).
+- **Database Transaksional & RPC Supabase**:
+  - `supabase/migrations/20261127000001_loyalty_coins_and_rewards.sql`:
+    - Tabel `public.user_coins`: Pencatatan saldo koin per pengguna dengan kolom `balance_coins`, `lifetime_earned_coins`, `lifetime_spent_coins`, dan `has_claimed_welcome` dengan RLS ketat.
+    - Tabel `public.coin_transactions`: Ledger audit mutasi koin double-entry dengan jenis `'earned'`, `'spent'`, `'redeemed_voucher'`, `'welcome_bonus'`, `'refunded_order'`, `'cancelled_order'`.
+    - Kolom baru pada `public.orders`: `coins_used`, `coins_discount_cents`, `coins_earned`.
+    - Kolom baru pada `public.coupons`: `coin_cost` untuk kupon penukaran koin eksklusif (`KOINONGKIR`, `KOINHEMAT25`, `KOINSUPER50`).
+    - RPC `claim_welcome_coins`: Pemberian bonus sambutan 10.000 Koin untuk pengguna baru dengan proteksi klaim ganda.
+    - RPC `exchange_coins_for_voucher`: Penukaran koin ke voucher dompet `public.user_coupons` secara atomik dengan verifikasi saldo.
+    - Pembaruan RPC `create_order`: Pemotongan saldo koin secara atomik dengan batasan maksimal 50% dari subtotal setelah kupon diskon.
+    - Pembaruan RPC `cancel_order`: Pemulihan koin yang digunakan saat pesanan dibatalkan.
+    - Pembaruan RPC `transition_order_status`: Pemberian cashback 1% koin secara otomatis saat pesanan bertransisi ke status `'completed'`.
+- **Backend API & Validasi Kontrak**:
+  - `shared/schemas/loyalty-coin.ts`: Validasi skema Zod untuk mutasi koin, ringkasan saldo koin, input penukaran kupon, dan item katalog penukaran.
+  - `server/api/account/points/index.get.ts`: Endpoint terproteksi untuk mengambil ringkasan saldo dan 20 riwayat mutasi koin terbaru.
+  - `server/api/account/points/welcome.post.ts`: Endpoint terproteksi untuk klaim bonus sambutan pengguna baru via RPC atomik.
+  - `server/api/account/points/exchange.post.ts`: Endpoint terproteksi untuk penukaran koin ke voucher dompet via RPC atomik.
+  - `server/api/account/points/catalog.get.ts`: Endpoint publik/terautentikasi untuk memuat katalog penukaran kupon loyalitas.
+  - `server/api/orders/index.ts`: Integrasi penerimaan parameter `coins_used` ke pemanggilan RPC atomik `create_order`.
+- **Pengujian Unit & Keamanan**:
+  - `tests/unit/loyalty-coin-schema.spec.ts`: 13 pengujian unit skema Zod dan aturan kalkulasi batas 50% subtotal.
+  - `tests/unit/loyalty-coin-lifecycle.spec.ts`: 4 pengujian unit siklus hidup transaksional koin (bonus sambutan, pemakaian di checkout, refund pembatalan, dan cashback 1% pesanan selesai).
+
 ## [0.27.0] - 2026-11-03
 
 ### Integrasi Dompet Voucher ke Checkout & Keranjang Belanja ("Pilih Voucher Saya")

@@ -118,6 +118,7 @@ export default defineEventHandler(async (event) => {
       p_coupon_code: parsed.data.coupon_code || null,
       p_shipping_service: parsed.data.shipping_service || 'reguler',
       p_courier_code: parsed.data.courier_code || null,
+      p_coins_used: parsed.data.coins_used || 0,
     })
 
     // Fallback kompatibilitas jika RPC signature 7-parameter belum tersedia di schema cache (PGRST202)

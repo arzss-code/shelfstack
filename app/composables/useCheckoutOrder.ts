@@ -1,10 +1,11 @@
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useCartStore } from '~/features/cart/stores/cart'
 import { checkoutAddressSchema } from '~~/shared/schemas/order'
 import { formatRupiah } from '~/utils/format'
 import { useMidtransSnap } from '~/composables/useMidtransSnap'
 import { useAddresses } from '~/composables/useAddresses'
+import { useLoyaltyPoints } from '~/composables/useLoyaltyPoints'
 import type { UserAddress } from '~~/shared/schemas/address'
 import { type ShippingService, calculateShippingFee } from '~~/shared/schemas/shipping'
 
@@ -16,6 +17,13 @@ export function useCheckoutOrder() {
   const config = useRuntimeConfig()
   const { pay: openSnapModal } = useMidtransSnap()
   const { saveAddress } = useAddresses()
+  const { balanceCoins, fetchPointsSummary } = useLoyaltyPoints()
+
+  onMounted(() => {
+    if (user.value) {
+      fetchPointsSummary().catch(() => {})
+    }
+  })
 
   const address = ref({
     name: profile.value?.full_name || '',
@@ -47,6 +55,22 @@ export function useCheckoutOrder() {
   const selectedSavedAddressId = ref<string | null>(null)
   const saveAddressForNextOrder = ref(false)
 
+  // Manajemen pemakaian koin loyalitas di checkout
+  const useCoins = ref(false)
+
+  const maxUsableCoins = computed(() => {
+    if (balanceCoins.value <= 0) return 0
+    // Maksimal 50% dari subtotal setelah kupon diskon (1 koin = Rp 1 = 100 sen)
+    const maxAllowed = Math.floor((cartStore.finalPriceCents * 0.5) / 100)
+    return Math.max(0, Math.min(balanceCoins.value, maxAllowed))
+  })
+
+  const actualCoinsUsed = computed(() => {
+    return useCoins.value ? maxUsableCoins.value : 0
+  })
+
+  const coinsDiscountCents = computed(() => actualCoinsUsed.value * 100)
+
   const shippingFeeCalculation = computed(() => {
     return calculateShippingFee(selectedShippingService.value, cartStore.totalPriceCents)
   })
@@ -59,6 +83,8 @@ export function useCheckoutOrder() {
     totalPriceFormatted: string
     discountFormatted?: string | null
     couponCode?: string | null
+    coinsDiscountFormatted?: string | null
+    coinsUsed?: number
     shippingFeeFormatted?: string
     shippingService?: string
     isFreeShipping?: boolean
@@ -84,6 +110,18 @@ export function useCheckoutOrder() {
     }
     return cartStore.appliedCoupon?.code || null
   })
+  const displayCoinsDiscountAmount = computed(() => {
+    if (placedOrderSnapshot.value) {
+      return placedOrderSnapshot.value.coinsDiscountFormatted
+    }
+    return actualCoinsUsed.value > 0 ? formatRupiah(actualCoinsUsed.value) : null
+  })
+  const displayCoinsUsed = computed(() => {
+    if (placedOrderSnapshot.value?.coinsUsed != null) {
+      return placedOrderSnapshot.value.coinsUsed
+    }
+    return actualCoinsUsed.value
+  })
   const displayShippingFeeFormatted = computed(() => {
     if (placedOrderSnapshot.value?.shippingFeeFormatted) {
       return placedOrderSnapshot.value.shippingFeeFormatted
@@ -98,10 +136,13 @@ export function useCheckoutOrder() {
   })
 
   const displayFinalPrice = computed(() => {
-    if (placedOrderSnapshot.value) {
-      return (placedOrderSnapshot.value as any).finalPriceFormatted
+    if (placedOrderSnapshot.value?.finalPriceFormatted) {
+      return placedOrderSnapshot.value.finalPriceFormatted
     }
-    const totalWithShipping = Math.max(0, cartStore.finalPriceCents + shippingFeeCents.value)
+    const totalWithShipping = Math.max(
+      0,
+      cartStore.finalPriceCents - coinsDiscountCents.value + shippingFeeCents.value,
+    )
     return formatRupiah(totalWithShipping / 100)
   })
 
@@ -137,7 +178,7 @@ export function useCheckoutOrder() {
   }
 
   watch(
-    [() => cartStore.items, address, selectedShippingService, selectedCourierCode],
+    [() => cartStore.items, address, selectedShippingService, selectedCourierCode, useCoins],
     () => {
       checkoutIdempotencyKey.value = ''
     },
@@ -202,6 +243,7 @@ export function useCheckoutOrder() {
             : undefined,
         shipping_service: selectedShippingService.value,
         courier_code: selectedCourierCode.value || undefined,
+        coins_used: actualCoinsUsed.value,
       }
 
       const idempotencyKey = getOrCreateCheckoutKey()
@@ -223,13 +265,19 @@ export function useCheckoutOrder() {
         totalPriceFormatted: cartStore.formattedTotalPrice,
         discountFormatted: cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null,
         couponCode: cartStore.appliedCoupon?.code || null,
+        coinsDiscountFormatted:
+          actualCoinsUsed.value > 0 ? formatRupiah(actualCoinsUsed.value) : null,
+        coinsUsed: actualCoinsUsed.value,
         shippingFeeFormatted: isFreeShipping.value
           ? 'Gratis Ongkir'
           : formatRupiah(shippingFeeCents.value / 100),
         shippingService: selectedShippingService.value,
         isFreeShipping: isFreeShipping.value,
         finalPriceFormatted: formatRupiah(
-          Math.max(0, cartStore.finalPriceCents + shippingFeeCents.value) / 100,
+          Math.max(
+            0,
+            cartStore.finalPriceCents - coinsDiscountCents.value + shippingFeeCents.value,
+          ) / 100,
         ),
       }
       isOrderPlaced.value = true
@@ -245,30 +293,31 @@ export function useCheckoutOrder() {
             city: address.value.city.trim(),
             postal: address.value.postal.trim(),
             note: address.value.note ? address.value.note.trim() : undefined,
+            is_default: false,
           })
-        } catch (saveErr) {
-          console.warn('[Checkout] Gagal menyimpan alamat ke daftar tersimpan:', saveErr)
+        } catch {
+          // Gagal menyimpan alamat sekunder tidak membatalkan checkout
         }
       }
 
-      if (config.public.enableMidtransSandbox) {
+      if (config.public?.enableMidtrans) {
         try {
-          const tokenRes = await $fetch<{
+          const paymentRes = await $fetch<{
             status: string
-            data: { token: string; redirect_url?: string }
-          }>(`/api/orders/${orderId}/payment-token`, {
+            data: { snap_token: string; redirect_url: string }
+          }>(`/api/orders/${orderId}/pay`, {
             method: 'POST',
           })
 
-          const snapToken = tokenRes.data.token
+          const snapToken = paymentRes.data.snap_token
 
           openSnapModal(snapToken, {
             onSuccess: () => {
               toast.add({
                 severity: 'success',
-                summary: 'Pembayaran Diterima',
-                detail: 'Pembayaran berhasil diproses di Sandbox.',
-                life: 4000,
+                summary: 'Pembayaran Berhasil',
+                detail: 'Terima kasih, pembayaran Anda telah berhasil diverifikasi!',
+                life: 5000,
               })
               router.push(`/orders/${orderId}`)
             },
@@ -276,8 +325,8 @@ export function useCheckoutOrder() {
               toast.add({
                 severity: 'info',
                 summary: 'Menunggu Pembayaran',
-                detail: 'Instruksi pembayaran telah dibuat.',
-                life: 4000,
+                detail: 'Silakan selesaikan pembayaran sesuai petunjuk metode yang dipilih.',
+                life: 5000,
               })
               router.push(`/orders/${orderId}`)
             },
@@ -285,7 +334,7 @@ export function useCheckoutOrder() {
               toast.add({
                 severity: 'error',
                 summary: 'Pembayaran Gagal',
-                detail: 'Transaksi dibatalkan atau terjadi kesalahan.',
+                detail: 'Transaksi pembayaran gagal diproses. Anda dapat mencobanya kembali.',
                 life: 5000,
               })
               router.push(`/orders/${orderId}`)
@@ -295,8 +344,17 @@ export function useCheckoutOrder() {
             },
           })
           return
-        } catch (tokenErr: unknown) {
-          console.warn('Gagal memuat token Snap Midtrans, mengalihkan ke detail pesanan:', tokenErr)
+        } catch (payErr: unknown) {
+          const fetchErr = payErr as { data?: { message?: string } }
+          const errorMsg =
+            fetchErr.data?.message ||
+            'Gagal memuat sesi Snap Midtrans. Mengalihkan ke detail pesanan...'
+          toast.add({
+            severity: 'warn',
+            summary: 'Perhatian Pembayaran',
+            detail: errorMsg,
+            life: 5000,
+          })
           router.push(`/orders/${orderId}`)
           return
         }
@@ -334,11 +392,17 @@ export function useCheckoutOrder() {
     selectedCourierCode,
     selectedSavedAddressId,
     saveAddressForNextOrder,
+    useCoins,
+    balanceCoins,
+    maxUsableCoins,
+    actualCoinsUsed,
     displayItems,
     displayTotalItems,
     displayTotalPrice,
     displayDiscountAmount,
     displayCouponCode,
+    displayCoinsDiscountAmount,
+    displayCoinsUsed,
     displayShippingFeeFormatted,
     displayIsFreeShipping,
     displayFinalPrice,

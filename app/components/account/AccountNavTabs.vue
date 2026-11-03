@@ -27,6 +27,7 @@ interface NavTab {
 const currentTabLabel = computed(() => {
   if (route.path.startsWith('/account/addresses')) return 'Daftar Alamat'
   if (route.path.startsWith('/account/vouchers')) return 'Voucher Saya'
+  if (route.path.startsWith('/account/points')) return 'Koin & Rewards'
   if (route.path.startsWith('/account/profile') || route.path === '/account') return 'Profil Saya'
   if (route.path.startsWith('/orders')) return 'Pesanan Saya'
   if (route.path.startsWith('/wishlist')) return 'Wishlist'
@@ -45,6 +46,12 @@ const tabs = computed<NavTab[]>(() => [
     label: 'Daftar Alamat',
     to: '/account/addresses',
     icon: 'pi pi-map-marker',
+  },
+  {
+    id: 'points',
+    label: 'Koin & Rewards',
+    to: '/account/points',
+    icon: 'pi pi-dollar',
   },
   {
     id: 'orders',
@@ -76,13 +83,13 @@ const isTabActive = (tabPath: string) => {
 </script>
 
 <template>
-  <header class="w-full mb-8">
+  <header class="mb-8 w-full">
     <!-- Breadcrumb Micro-Navigation -->
     <nav
-      class="flex items-center gap-2 text-xs font-medium text-brand-muted mb-4 overflow-x-auto"
+      class="mb-4 flex items-center gap-2 overflow-x-auto text-xs font-medium text-brand-muted"
       aria-label="Breadcrumbs"
     >
-      <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
+      <NuxtLink to="/" class="text-brand-muted no-underline transition-colors hover:text-brand-ink">
         ShelfStack
       </NuxtLink>
       <span class="text-brand-faint">/</span>
@@ -91,45 +98,45 @@ const isTabActive = (tabPath: string) => {
 
     <!-- User Quick Overview Banner -->
     <div
-      class="bg-brand-canvas border border-brand-hair rounded-card p-4 sm:p-6 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-whisper"
+      class="mb-6 flex flex-col justify-between gap-4 rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper sm:flex-row sm:items-center sm:p-6"
     >
-      <div class="flex items-center gap-3.5 sm:gap-4 min-w-0">
+      <div class="flex min-w-0 items-center gap-3.5 sm:gap-4">
         <div class="relative shrink-0">
           <div
-            class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-brand-ink text-white font-display text-lg sm:text-xl font-bold flex items-center justify-center shadow-whisper"
+            class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-ink font-display font-bold text-lg text-white shadow-whisper sm:h-14 sm:w-14 sm:text-xl"
           >
             {{ initial }}
           </div>
         </div>
 
         <div class="min-w-0">
-          <div class="flex items-center gap-2 flex-wrap">
-            <h1 class="text-base sm:text-lg font-display font-bold text-brand-ink m-0 truncate">
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="m-0 truncate font-display font-bold text-base text-brand-ink sm:text-lg">
               {{ displayName }}
             </h1>
             <span
               v-if="profile?.role === 'admin'"
-              class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wider"
+              class="rounded-full bg-amber-100 px-2 py-0.5 font-bold text-[10px] text-amber-800 uppercase tracking-wider"
             >
               Admin
             </span>
             <span
               v-else
-              class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
+              class="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-semibold text-[10px] text-emerald-700"
             >
               Pelanggan Terverifikasi
             </span>
           </div>
-          <p class="text-xs text-brand-muted m-0 truncate mt-0.5">
+          <p class="m-0 mt-0.5 truncate text-xs text-brand-muted">
             {{ user?.email || 'Akun Aktif' }}
           </p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 self-start sm:self-auto shrink-0">
+      <div class="flex shrink-0 items-center gap-2 self-start sm:self-auto">
         <NuxtLink
           to="/katalog"
-          class="px-3.5 py-1.5 rounded-full border border-brand-hair text-xs font-semibold text-brand-ink hover:bg-brand-canvas-soft transition-colors inline-flex items-center gap-1.5 no-underline active:scale-95"
+          class="inline-flex items-center gap-1.5 rounded-full border border-brand-hair px-3.5 py-1.5 text-xs font-semibold text-brand-ink no-underline transition-colors hover:bg-brand-canvas-soft active:scale-95"
         >
           <i class="pi pi-shopping-bag text-xs" />
           <span>Mulai Belanja</span>
@@ -139,25 +146,25 @@ const isTabActive = (tabPath: string) => {
 
     <!-- Navigation Tabs Strip with Smooth Scrolling & Touch Snapping -->
     <nav
-      class="flex items-center gap-2 overflow-x-auto no-scrollbar border-b border-brand-hair pb-px"
+      class="no-scrollbar flex items-center gap-2 overflow-x-auto border-brand-hair border-b pb-px"
       aria-label="Navigasi Area Akun"
     >
       <NuxtLink
         v-for="tab in tabs"
         :key="tab.id"
         :to="tab.to"
-        class="group relative flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-medium no-underline whitespace-nowrap transition-all border-b-2"
+        class="group relative flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 font-medium text-xs no-underline transition-all sm:text-sm"
         :class="[
           isTabActive(tab.to)
-            ? 'border-brand-ink text-brand-ink font-semibold'
-            : 'border-transparent text-brand-muted hover:text-brand-ink hover:border-brand-hair',
+            ? 'border-brand-ink font-semibold text-brand-ink'
+            : 'border-transparent text-brand-muted hover:border-brand-hair hover:text-brand-ink',
         ]"
       >
         <i :class="[tab.icon, 'text-xs sm:text-sm transition-colors']" :aria-hidden="true" />
         <span>{{ tab.label }}</span>
         <span
           v-if="tab.badge !== undefined && tab.badge > 0"
-          class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-ink text-white tabular-nums leading-none"
+          class="ml-1 rounded-full bg-brand-ink px-1.5 py-0.5 font-bold text-[10px] text-white tabular-nums leading-none"
         >
           {{ tab.badge }}
         </span>

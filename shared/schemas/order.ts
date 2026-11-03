@@ -38,6 +38,7 @@ export const checkoutSchema = z.object({
   coupon_code: z.string().trim().optional(),
   shipping_service: shippingServiceSchema.default('reguler'),
   courier_code: courierCodeSchema.optional(),
+  coins_used: z.number().int().nonnegative().optional().default(0),
 })
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>

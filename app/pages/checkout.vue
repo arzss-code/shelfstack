@@ -2,6 +2,7 @@
 import { useCheckoutOrder } from '~/composables/useCheckoutOrder'
 import CheckoutAddressForm from '~/components/checkout/CheckoutAddressForm.vue'
 import ShippingMethodSelector from '~/components/checkout/ShippingMethodSelector.vue'
+import CheckoutCoinsToggle from '~/components/checkout/CheckoutCoinsToggle.vue'
 import CheckoutOrderSummary from '~/components/checkout/CheckoutOrderSummary.vue'
 import CheckoutPaymentNotice from '~/components/checkout/CheckoutPaymentNotice.vue'
 
@@ -24,11 +25,16 @@ const {
   selectedCourierCode,
   selectedSavedAddressId,
   saveAddressForNextOrder,
+  useCoins,
+  balanceCoins,
+  maxUsableCoins,
   displayItems,
   displayTotalItems,
   displayTotalPrice,
   displayDiscountAmount,
   displayCouponCode,
+  displayCoinsDiscountAmount,
+  displayCoinsUsed,
   displayShippingFeeFormatted,
   displayIsFreeShipping,
   displayFinalPrice,
@@ -42,7 +48,7 @@ const {
   <div class="space-y-6 pb-20">
     <!-- Breadcrumbs & Trust Badge Header -->
     <div
-      class="flex items-center justify-between pb-3 border-b border-brand-hairsoft flex-wrap gap-2"
+      class="flex flex-wrap items-center justify-between gap-2 border-b border-brand-hairsoft pb-3"
     >
       <nav
         aria-label="Breadcrumbs"
@@ -50,29 +56,29 @@ const {
       >
         <NuxtLink
           to="/"
-          class="hover:text-brand-ink no-underline text-brand-muted transition-colors"
+          class="text-brand-muted no-underline transition-colors hover:text-brand-ink"
         >
           ShelfStack
         </NuxtLink>
         <span class="text-brand-faint">/</span>
         <NuxtLink
           to="/cart"
-          class="hover:text-brand-ink no-underline text-brand-muted transition-colors"
+          class="text-brand-muted no-underline transition-colors hover:text-brand-ink"
         >
           Keranjang
         </NuxtLink>
         <span class="text-brand-faint">/</span>
-        <span class="text-brand-ink font-semibold">Checkout</span>
+        <span class="font-semibold text-brand-ink">Checkout</span>
       </nav>
 
       <div class="flex items-center gap-1.5 text-[11px]">
         <span
-          class="inline-flex items-center gap-1.5 font-semibold text-brand-ink bg-white border border-brand-hair rounded-full px-2.5 py-0.5 shadow-2xs"
+          class="inline-flex items-center gap-1.5 rounded-full border border-brand-hair bg-white px-2.5 py-0.5 font-semibold text-brand-ink shadow-2xs"
         >
           <i class="pi pi-check-circle text-xs text-brand-success" /> Checkout Aman
         </span>
         <span
-          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-canvas-soft border border-brand-hair text-[10.5px] font-medium text-brand-muted"
+          class="inline-flex items-center gap-1 rounded-full border border-brand-hair bg-brand-canvas-soft px-2 py-0.5 font-medium text-[10.5px] text-brand-muted"
         >
           <i class="pi pi-lock text-[10px]" /> Enkripsi Midtrans 256-Bit
         </span>
@@ -81,8 +87,8 @@ const {
 
     <!-- Page Title -->
     <div>
-      <h1 class="font-display text-2xl sm:text-3xl font-bold text-brand-ink m-0">Checkout</h1>
-      <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1">
+      <h1 class="m-0 font-display font-bold text-2xl text-brand-ink sm:text-3xl">Checkout</h1>
+      <p class="m-0 mt-1 font-body text-xs text-brand-muted sm:text-sm">
         Periksa alamat pengiriman dan opsi ekspedisi sebelum memproses pembayaran resmi Anda.
       </p>
     </div>
@@ -90,16 +96,16 @@ const {
     <!-- Auth Guard Check -->
     <div
       v-if="!user"
-      class="bg-brand-canvas border border-brand-hair rounded-card p-8 text-center max-w-md mx-auto space-y-4 shadow-whisper"
+      class="mx-auto max-w-md space-y-4 rounded-card border border-brand-hair bg-brand-canvas p-8 text-center shadow-whisper"
     >
       <div
-        class="w-12 h-12 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center mx-auto text-brand-ink"
+        class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-brand-ink"
       >
         <i class="pi pi-lock text-lg" />
       </div>
       <div>
-        <h2 class="font-display font-bold text-base text-brand-ink m-0">Login Diperlukan</h2>
-        <p class="font-body text-xs text-brand-muted m-0 mt-1.5 leading-relaxed">
+        <h2 class="m-0 font-display font-bold text-base text-brand-ink">Login Diperlukan</h2>
+        <p class="m-0 mt-1.5 font-body text-xs leading-relaxed text-brand-muted">
           Silakan masuk ke akun Anda untuk memastikan alamat pengiriman tersimpan aman dan riwayat
           pesanan dapat dipantau langsung.
         </p>
@@ -117,18 +123,18 @@ const {
     <!-- Empty Cart Check -->
     <div
       v-else-if="cartStore.isEmpty && !isOrderPlaced && !isSubmitting"
-      class="text-center py-16 px-6 bg-brand-canvas border border-brand-hair rounded-card max-w-md mx-auto space-y-4 shadow-whisper"
+      class="mx-auto max-w-md space-y-4 rounded-card border border-brand-hair bg-brand-canvas px-6 py-16 text-center shadow-whisper"
     >
       <div
-        class="w-12 h-12 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center mx-auto text-brand-muted"
+        class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-brand-muted"
       >
         <i class="pi pi-shopping-bag text-lg" />
       </div>
       <div>
-        <h2 class="font-display text-base font-bold text-brand-ink m-0">
+        <h2 class="m-0 font-display font-bold text-base text-brand-ink">
           Keranjang Belanja Kosong
         </h2>
-        <p class="text-xs text-brand-muted m-0 mt-1">
+        <p class="m-0 mt-1 text-xs text-brand-muted">
           Tidak ada produk yang siap di-checkout. Silakan pilih barang dari etalase kurasi terlebih
           dahulu.
         </p>
@@ -139,30 +145,30 @@ const {
     </div>
 
     <!-- Checkout Main Content -->
-    <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div v-else class="grid grid-cols-1 gap-8 lg:grid-cols-12">
       <!-- Left Column: Delivery Form, Shipping Option, Payment Gateway -->
-      <section class="lg:col-span-7 space-y-6" aria-labelledby="shipping-heading">
+      <section class="space-y-6 lg:col-span-7" aria-labelledby="shipping-heading">
         <!-- Error Alert -->
         <div
           v-if="generalError"
-          class="p-4 bg-red-50 border border-red-200 rounded-card flex items-start gap-3 text-red-700 text-xs shadow-2xs"
+          class="flex items-start gap-3 rounded-card border border-red-200 bg-red-50 p-4 text-xs text-red-700 shadow-2xs"
         >
-          <i class="pi pi-exclamation-circle text-base shrink-0 mt-0.5 text-red-600" />
+          <i class="pi pi-exclamation-circle mt-0.5 shrink-0 text-base text-red-600" />
           <span class="leading-relaxed">{{ generalError }}</span>
         </div>
 
         <!-- Payment Processing Banner -->
         <div
           v-if="isOrderPlaced && createdOrderId"
-          class="p-4 bg-emerald-50 border border-emerald-200 rounded-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-emerald-800 text-xs shadow-2xs"
+          class="flex flex-col items-start justify-between gap-3 rounded-card border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800 shadow-2xs sm:flex-row sm:items-center"
         >
           <div class="flex items-center gap-3">
-            <i class="pi pi-spin pi-spinner text-base shrink-0 text-emerald-600" />
+            <i class="pi pi-spin pi-spinner shrink-0 text-base text-emerald-600" />
             <span>Pesanan berhasil dibuat. Menyiapkan popup pembayaran resmi Midtrans...</span>
           </div>
           <NuxtLink
             :to="`/orders/${createdOrderId}`"
-            class="font-semibold text-emerald-800 hover:text-emerald-950 underline shrink-0"
+            class="shrink-0 font-semibold text-emerald-800 underline hover:text-emerald-950"
           >
             Buka Pesanan &rarr;
           </NuxtLink>
@@ -187,7 +193,15 @@ const {
           :disabled="isSubmitting || isOrderPlaced"
         />
 
-        <!-- Step 3: Payment Notice -->
+        <!-- Step 3: Tukarkan Koin Loyalitas -->
+        <CheckoutCoinsToggle
+          v-model="useCoins"
+          :balance-coins="balanceCoins"
+          :max-usable-coins="maxUsableCoins"
+          :disabled="isSubmitting || isOrderPlaced"
+        />
+
+        <!-- Step 4: Payment Notice -->
         <CheckoutPaymentNotice />
       </section>
 
@@ -199,6 +213,8 @@ const {
           :total-price="displayTotalPrice"
           :discount-amount="displayDiscountAmount"
           :coupon-code="displayCouponCode"
+          :coins-discount-amount="displayCoinsDiscountAmount"
+          :coins-used="displayCoinsUsed"
           :shipping-fee-formatted="displayShippingFeeFormatted"
           :is-free-shipping="displayIsFreeShipping"
           :final-price="displayFinalPrice"
