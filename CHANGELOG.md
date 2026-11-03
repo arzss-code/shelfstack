@@ -2,6 +2,30 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.29.0] - 2026-11-03
+
+### Modularisasi & Manajemen Kupon Voucher Promo Panel Admin
+
+- **Modularisasi Komponen Halaman Admin (`/admin/coupons.vue`)**:
+  - `app/pages/admin/coupons.vue`: Didekomposisi dari file monolitik 751 baris menjadi 286 baris (mematuhi batas ketat SOP maksimal 300 baris per file). Bertindak sebagai orchestrator ramping dengan filter pencarian, filter status semantik, filter tipe diskon, dan koordinasi modal dialog.
+  - `app/components/admin/coupons/AdminCouponMetrics.vue`: Sub-komponen modular (64 baris) bento grid 4 kartu KPI (Total Voucher, Voucher Aktif, Total Penggunaan, Total Diskon Diberikan).
+  - `app/components/admin/coupons/AdminCouponTable.vue`: Sub-komponen modular (215 baris) tabel data voucher terstandarisasi dengan badge status semantik, progress bar penggunaan kuota, pill kode voucher, dan tombol aksi (toggle aktif, ubah, audit riwayat, soft delete).
+  - `app/components/admin/coupons/AdminCouponModal.vue`: Sub-komponen modular (229 baris) modal formulir terpadu untuk menerbitkan dan memperbarui parameter voucher promosi dengan validasi real-time.
+  - `app/components/admin/coupons/AdminCouponUsagesModal.vue`: Sub-komponen modular (189 baris) modal dialog audit riwayat pesanan yang telah menggunakan voucher tertentu (Order ID, total belanja, potongan diskon, status order, dan tanggal pemakaian).
+  - `app/composables/useAdminCouponForm.ts`: Composable state management (148 baris) untuk formulir kupon dengan sinkronisasi adapter numerik, validasi batas nilai, dan transformer payload.
+- **Integrasi Biaya Koin Loyalitas (`coin_cost`)**:
+  - Admin kini dapat mengonfigurasi biaya koin (`coin_cost`) langsung via modal formulir voucher.
+  - Voucher berbiaya koin secara otomatis ditampilkan di katalog penukaran koin pelanggan pada halaman `/account/points` dan ditandai dengan badge khusus "Voucher Koin" pada tabel admin.
+- **Backend Nitro API & Schema Zod**:
+  - `shared/schemas/coupon.ts`: Penambahan validasi field `coin_cost` pada `createCouponSchema` dan `updateCouponSchema`.
+  - `server/api/admin/coupons/index.get.ts`: Pemetaan atribut `coin_cost` dan format koin pada daftar voucher admin.
+  - `server/api/admin/coupons/index.post.ts` & `server/api/admin/coupons/[id].put.ts`: Penyimpanan dan pembaruan kolom `coin_cost` ke database Supabase.
+  - `server/api/admin/coupons/[id]/usages.get.ts`: Endpoint terproteksi admin untuk mengambil riwayat pemakaian voucher dari tabel `coupon_usages` join rincian `orders`.
+- **Pengujian Unit & Kualitas**:
+  - `tests/unit/admin-coupons-management.spec.ts`: 5 pengujian unit baru untuk validasi skema voucher loyalitas, format angka, dan kalkulasi masa kedaluwarsa.
+  - `tests/unit/coupon-schema.spec.ts`: Penambahan pengujian unit atribut `coin_cost` (total 21 pengujian lulus).
+  - Total pengujian proyek: 72 file test / 681 tests lulus 100%.
+
 ## [0.28.0] - 2026-11-03
 
 ### Sistem Poin dan Koin Belanja (ShelfStack Coins and Loyalty Rewards Hub)

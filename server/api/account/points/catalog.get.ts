@@ -24,8 +24,13 @@ export default defineEventHandler(async (event) => {
     if (error) {
       const isMissingColumn =
         error.code === '42703' ||
-        error.message?.includes('coin_cost') ||
-        error.message?.includes('schema cache')
+        error.code === '42P01' ||
+        error.code === 'PGRST204' ||
+        error.code === 'PGRST205' ||
+        error.code === '42501' ||
+        error.message?.toLowerCase().includes('coin_cost') ||
+        error.message?.toLowerCase().includes('schema cache') ||
+        error.message?.toLowerCase().includes('does not exist')
 
       if (isMissingColumn) {
         logger.warn(

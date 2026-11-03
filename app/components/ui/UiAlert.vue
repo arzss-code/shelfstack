@@ -57,17 +57,20 @@ const isCentered = computed(() => {
   <div
     role="status"
     :class="[
-      'flex gap-2.5 rounded-field border px-3.5 py-3 text-xs leading-relaxed',
+      'flex gap-2.5 rounded-field border px-3.5 py-3 text-xs leading-5',
       isCentered ? 'items-center' : 'items-start',
       toneClass,
     ]"
   >
-    <i
-      :class="['pi', iconClass, 'shrink-0 text-sm leading-none', isCentered ? '' : 'mt-0.5']"
+    <span
+      class="inline-flex h-5 w-5 shrink-0 items-center justify-center text-sm leading-none"
+      :class="isCentered ? 'self-center' : 'self-start mt-0.5'"
       aria-hidden="true"
-    />
-    <div class="min-w-0 flex-1">
-      <p v-if="title" class="m-0 font-semibold">
+    >
+      <i :class="['pi', iconClass]" />
+    </span>
+    <div class="min-w-0 flex-1 leading-5">
+      <p v-if="title" class="m-0 font-semibold leading-5">
         {{ title }}
       </p>
       <div class="[&>:first-child]:mt-0 [&>*:last-child]:mb-0">
