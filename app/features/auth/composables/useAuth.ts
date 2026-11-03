@@ -1,3 +1,6 @@
+import { tryUseNuxtApp } from '#imports'
+import { computed, ref, watch } from 'vue'
+import type { User } from '@supabase/supabase-js'
 import type { Database } from '~/types/database.types'
 
 export interface UserProfile {
@@ -28,9 +31,21 @@ function toIndonesianMessage(error: { message: string }, fallback: string) {
 
 /** Session + profile + role. Satu-satunya tempat UI bertanya "siapa yang login". */
 export function useAuth() {
-  const supabase = useSupabaseClient<Database>()
-  const user = useSupabaseUser()
-  const profile = useState<UserProfile | null>('auth-profile', () => null)
+  let supabase: ReturnType<typeof useSupabaseClient<Database>> | null = null
+  let user = ref<User | null>(null)
+  let profile = ref<UserProfile | null>(null)
+
+  const nuxtApp = tryUseNuxtApp()
+  if (nuxtApp) {
+    try {
+      supabase = useSupabaseClient<Database>()
+      user = useSupabaseUser() as any
+      profile = useState<UserProfile | null>('auth-profile', () => null)
+    } catch {
+      // Abaikan jika Supabase composables belum siap
+    }
+  }
+
   const pending = ref(false)
 
   const isLoggedIn = computed(() => !!user.value)
@@ -39,7 +54,7 @@ export function useAuth() {
   const fetchProfile = async (force = false) => {
     const rawId = user.value?.id || (user.value as any)?.sub
     const userId = typeof rawId === 'string' && rawId !== 'undefined' ? rawId : null
-    if (!userId) {
+    if (!userId || !supabase) {
       profile.value = null
       return null
     }
@@ -80,6 +95,7 @@ export function useAuth() {
   }
 
   const signUp = async (fullName: string, email: string, password: string) => {
+    if (!supabase) throw new Error('Supabase client tidak tersedia.')
     pending.value = true
     try {
       const { error } = await supabase.auth.signUp({
@@ -95,6 +111,7 @@ export function useAuth() {
   }
 
   const signIn = async (email: string, password: string) => {
+    if (!supabase) throw new Error('Supabase client tidak tersedia.')
     pending.value = true
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -106,6 +123,7 @@ export function useAuth() {
   }
 
   const signInWithGoogle = async () => {
+    if (!supabase) throw new Error('Supabase client tidak tersedia.')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/auth/callback` },
@@ -114,6 +132,7 @@ export function useAuth() {
   }
 
   const signOut = async () => {
+    if (!supabase) return
     await supabase.auth.signOut()
     profile.value = null
     await navigateTo('/')
@@ -124,6 +143,7 @@ export function useAuth() {
    * Supabase akan mengirim tautan ke `redirectTo`, di mana user dapat mengatur password baru.
    */
   const sendPasswordResetEmail = async (email: string) => {
+    if (!supabase) throw new Error('Supabase client tidak tersedia.')
     pending.value = true
     try {
       const redirectTo = `${window.location.origin}/auth/reset-password`
@@ -139,6 +159,7 @@ export function useAuth() {
    * Harus dipanggil di halaman `/auth/reset-password` setelah Supabase menginisiasi sesi dari magic link.
    */
   const updatePassword = async (newPassword: string) => {
+    if (!supabase) throw new Error('Supabase client tidak tersedia.')
     pending.value = true
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword })

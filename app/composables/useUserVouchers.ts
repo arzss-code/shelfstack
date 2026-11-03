@@ -1,12 +1,23 @@
-import { useState } from '#imports'
+import { tryUseNuxtApp, useState } from '#imports'
 import { computed, ref } from 'vue'
 import type { UserVoucherItem, VoucherWalletResponse } from '~~/shared/schemas/user-voucher'
 import { useUiToast } from './useUiToast'
 
 export const useUserVouchers = () => {
-  const claimedVouchers = useState<UserVoucherItem[]>('user_vouchers_claimed', () => [])
-  const discoverableVouchers = useState<UserVoucherItem[]>('user_vouchers_discoverable', () => [])
-  const historyVouchers = useState<UserVoucherItem[]>('user_vouchers_history', () => [])
+  let claimedVouchers = ref<UserVoucherItem[]>([])
+  let discoverableVouchers = ref<UserVoucherItem[]>([])
+  let historyVouchers = ref<UserVoucherItem[]>([])
+
+  const nuxtApp = tryUseNuxtApp()
+  if (nuxtApp) {
+    try {
+      claimedVouchers = useState<UserVoucherItem[]>('user_vouchers_claimed', () => [])
+      discoverableVouchers = useState<UserVoucherItem[]>('user_vouchers_discoverable', () => [])
+      historyVouchers = useState<UserVoucherItem[]>('user_vouchers_history', () => [])
+    } catch {
+      // Abaikan jika useState belum siap
+    }
+  }
 
   const isLoading = ref(false)
   const isClaiming = ref(false)
@@ -102,12 +113,11 @@ export const useUserVouchers = () => {
     } catch (err: unknown) {
       const msg =
         err && typeof err === 'object' && 'data' in err
-          ? (err as { data?: { message?: string } }).data?.message ||
-            'Kode promo tidak valid atau kuota habis.'
-          : 'Kode promo tidak valid atau kuota habis.'
+          ? (err as { data?: { message?: string } }).data?.message || 'Gagal mengklaim kode kupon.'
+          : 'Gagal mengklaim kode kupon.'
       error.value = msg
       toast.show({
-        title: 'Kode Promo Tidak Valid',
+        title: 'Klaim Voucher Gagal',
         message: msg,
         tone: 'error',
       })
@@ -121,10 +131,10 @@ export const useUserVouchers = () => {
     claimedVouchers,
     discoverableVouchers,
     historyVouchers,
-    activeCount,
     isLoading,
     isClaiming,
     error,
+    activeCount,
     fetchVouchers,
     claimVoucher,
     claimVoucherByCode,

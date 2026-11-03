@@ -2,6 +2,28 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.27.0] - 2026-11-03
+
+### Integrasi Dompet Voucher ke Checkout & Keranjang Belanja ("Pilih Voucher Saya")
+
+- **Dekomposisi & Refaktorisasi Modal Pemilih Voucher (`VoucherSelectModal.vue`)**:
+  - `app/components/cart/VoucherSelectModal.vue`: Didekomposisi dari 646 baris menjadi 269 baris (mematuhi batas SOP maksimal 300 baris). Dilengkapi 2 tab navigasi status ("Voucher Saya" dan "Promo Tersedia"), bilah input kode promo manual, dan ringkasan penghematan belanja.
+  - `app/components/cart/VoucherSelectCard.vue`: Sub-komponen modular (254 baris) kartu voucher belanja dengan layout tiket, selektor radio aktif, badge diskon vertikal, badge rekomendasi "Paling Hemat", peringatan kekurangan syarat belanja (deficit alert), serta aksi kontekstual 1-klik "Klaim & Pakai".
+  - `app/components/cart/VoucherSelectEmpty.vue`: Sub-komponen modular (65 baris) untuk status kosong tematik pada kedua tab modal, dilengkapi tombol navigasi cepat.
+  - `app/composables/useVoucherSelection.ts`: Composable state management khusus untuk pemilih voucher dengan logika kalkulasi diskon, filter kupon eligible/ineligible, seleksi "Paling Hemat", validasi kode manual, dan penanganan pemakaian kupon.
+- **Trigger Interaktif Keranjang (`CartCouponInput.vue`)**:
+  - `app/components/cart/CartCouponInput.vue`: Ditambahkan indikator badge jumlah voucher aktif dompet pengguna yang tersedia ("X tersedia") saat pelanggan dalam status terautentikasi.
+- **Ketahanan Runtime & Testing Composable**:
+  - `app/features/auth/composables/useAuth.ts`: Menambahkan pemeriksaan runtime `tryUseNuxtApp()` dan impor tipe `User` dari `@supabase/supabase-js` untuk mencegah `NUXT_E1001` saat eksekusi di lingkungan unit testing non-Nuxt.
+  - `app/composables/useUserVouchers.ts`: Menambahkan fallback aman untuk inisialisasi state di lingkungan pengujian otomatis.
+- **Database Transaksional & RPC Supabase**:
+  - `supabase/migrations/20261126000001_checkout_user_coupons_integration.sql`:
+    - Pembaruan RPC `public.create_order`: Secara atomik menandai status kupon pelanggan di `public.user_coupons` menjadi `'used'`, mencatat `used_at = now()`, dan mengikat `order_id = v_order`.
+    - Pembaruan RPC `public.cancel_order`: Memulihkan status voucher pelanggan di `public.user_coupons` kembali menjadi `'claimed'`, mengosongkan `used_at` dan `order_id` jika pesanan dibatalkan sebelum dibayar, serta merevert `usage_count` pada master kupon.
+- **Unit Testing & Verifikasi Transaksional**:
+  - `tests/unit/voucher-modal.spec.ts`: Diperluas menjadi 10 pengujian terverifikasi (termasuk verifikasi tab switching, badge rekomendasi "Paling Hemat", dan eksekusi 1-klik "Klaim & Pakai").
+  - `tests/unit/checkout-voucher-lifecycle.spec.ts`: Pengujian unit siklus hidup transaksional pemakaian dan pemulihan voucher pesanan (5 pengujian lulus).
+
 ## [0.26.0] - 2026-11-02
 
 ### Dompet Voucher Pelanggan ("Voucher Saya" - `/account/vouchers`)
