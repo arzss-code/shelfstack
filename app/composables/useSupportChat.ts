@@ -63,7 +63,26 @@ export function useSupportChat() {
 
   const cleanupChannel = () => {
     if (channel && supabase) {
-      supabase.removeChannel(channel)
+      try {
+        if (typeof (channel as any).unsubscribe === 'function') {
+          ;(channel as any).unsubscribe()
+        }
+      } catch {
+        // Safe unsubscribe
+      }
+      try {
+        supabase.removeChannel(channel)
+      } catch {
+        // Safe removal
+      }
+      try {
+        const realtime = (supabase as any).realtime
+        if (realtime && typeof realtime._remove === 'function') {
+          realtime._remove(channel)
+        }
+      } catch {
+        // Safe remove from realtime registry
+      }
       channel = null
     }
   }
@@ -89,21 +108,48 @@ export function useSupportChat() {
 
   const subscribeRealtime = (threadId: string) => {
     if (!import.meta.client || !supabase || !threadId) return
-    cleanupChannel()
+    const topic = `support-thread-${threadId}`
+    if (typeof supabase.getChannels === 'function') {
+      try {
+        const existing = supabase
+          .getChannels()
+          .find((c) => c.topic === topic || c.topic === `realtime:${topic}`)
+        if (
+          existing &&
+          ((existing as any).channelAdapter?.isJoined() ||
+            (existing as any).channelAdapter?.isJoining())
+        ) {
+          channel = existing
+          return
+        }
+        if (existing) {
+          if (typeof (existing as any).unsubscribe === 'function') (existing as any).unsubscribe()
+          const realtime = (supabase as any).realtime
+          if (realtime && typeof realtime._remove === 'function') realtime._remove(existing)
+        }
+      } catch {
+        // Safe check
+      }
+    }
 
-    channel = supabase
-      .channel(`support-thread-${threadId}`)
-      .on(
-        'postgres_changes' as any,
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'support_messages',
-          filter: `thread_id=eq.${threadId}`,
-        },
-        (payload: { new: SupportMessageItem }) => handleIncomingMessage(payload.new),
-      )
-      .subscribe()
+    cleanupChannel()
+    try {
+      channel = supabase
+        .channel(topic)
+        .on(
+          'postgres_changes' as any,
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'support_messages',
+            filter: `thread_id=eq.${threadId}`,
+          },
+          (payload: { new: SupportMessageItem }) => handleIncomingMessage(payload.new),
+        )
+        .subscribe()
+    } catch {
+      // Safe fallback
+    }
   }
 
   const initThread = async () => {

@@ -17,11 +17,28 @@ let activeSubscribedThreadId: string | null = null
 
 function getFreshChannel(client: SupabaseClient<Database>, topic: string): RealtimeChannel {
   try {
-    const existing = client
-      .getChannels()
-      .find((ch) => ch.topic === topic || ch.topic === `realtime:${topic}`)
-    if (existing) {
-      client.removeChannel(existing)
+    if (typeof client.getChannels === 'function') {
+      const existing = client
+        .getChannels()
+        .find((ch) => ch.topic === topic || ch.topic === `realtime:${topic}`)
+      if (existing) {
+        try {
+          if (typeof (existing as any).unsubscribe === 'function') (existing as any).unsubscribe()
+        } catch {
+          // Safe unsubscribe
+        }
+        try {
+          client.removeChannel(existing)
+        } catch {
+          // Safe removal
+        }
+        try {
+          const realtime = (client as any).realtime
+          if (realtime && typeof realtime._remove === 'function') realtime._remove(existing)
+        } catch {
+          // Safe remove from realtime registry
+        }
+      }
     }
   } catch {
     // Safe fallback for testing environments
@@ -57,9 +74,24 @@ export function useAdminSupportChat() {
   const cleanupInbox = () => {
     if (sharedInboxChannel && supabase) {
       try {
+        if (typeof (sharedInboxChannel as any).unsubscribe === 'function') {
+          ;(sharedInboxChannel as any).unsubscribe()
+        }
+      } catch {
+        // Safe unsubscribe
+      }
+      try {
         supabase.removeChannel(sharedInboxChannel)
       } catch {
         // Safe removal
+      }
+      try {
+        const realtime = (supabase as any).realtime
+        if (realtime && typeof realtime._remove === 'function') {
+          realtime._remove(sharedInboxChannel)
+        }
+      } catch {
+        // Safe remove
       }
       sharedInboxChannel = null
     }
@@ -68,9 +100,24 @@ export function useAdminSupportChat() {
   const cleanupMessage = () => {
     if (sharedMessageChannel && supabase) {
       try {
+        if (typeof (sharedMessageChannel as any).unsubscribe === 'function') {
+          ;(sharedMessageChannel as any).unsubscribe()
+        }
+      } catch {
+        // Safe unsubscribe
+      }
+      try {
         supabase.removeChannel(sharedMessageChannel)
       } catch {
         // Safe removal
+      }
+      try {
+        const realtime = (supabase as any).realtime
+        if (realtime && typeof realtime._remove === 'function') {
+          realtime._remove(sharedMessageChannel)
+        }
+      } catch {
+        // Safe remove
       }
       sharedMessageChannel = null
       activeSubscribedThreadId = null
@@ -121,7 +168,30 @@ export function useAdminSupportChat() {
   }
 
   const subscribeInbox = () => {
-    if (!import.meta.client || !supabase || sharedInboxChannel) return
+    if (!import.meta.client || !supabase) return
+    if (sharedInboxChannel) {
+      const adapter = (sharedInboxChannel as any).channelAdapter
+      if (adapter?.isJoined() || adapter?.isJoining()) return
+    }
+    if (typeof supabase.getChannels === 'function') {
+      try {
+        const existing = supabase
+          .getChannels()
+          .find(
+            (ch) =>
+              ch.topic === 'admin-support-inbox' || ch.topic === 'realtime:admin-support-inbox',
+          )
+        if (existing) {
+          const adapter = (existing as any).channelAdapter
+          if (adapter?.isJoined() || adapter?.isJoining()) {
+            sharedInboxChannel = existing
+            return
+          }
+        }
+      } catch {
+        // Safe channel inspection
+      }
+    }
     try {
       sharedInboxChannel = getFreshChannel(supabase, 'admin-support-inbox')
         .on(
@@ -137,7 +207,10 @@ export function useAdminSupportChat() {
 
   const subscribeThreadMessages = (threadId: string) => {
     if (!import.meta.client || !supabase || !threadId) return
-    if (activeSubscribedThreadId === threadId && sharedMessageChannel) return
+    if (activeSubscribedThreadId === threadId && sharedMessageChannel) {
+      const adapter = (sharedMessageChannel as any).channelAdapter
+      if (adapter?.isJoined() || adapter?.isJoining()) return
+    }
 
     cleanupMessage()
     activeSubscribedThreadId = threadId
@@ -181,7 +254,11 @@ export function useAdminSupportChat() {
       })
       if (res?.data) {
         threads.value = res.data.threads || []
-        subscribeInbox()
+        try {
+          subscribeInbox()
+        } catch {
+          // Realtime safe fallback
+        }
         return res.data
       }
       return null
@@ -197,7 +274,11 @@ export function useAdminSupportChat() {
     activeThreadId.value = threadId
     const target = threads.value.find((t) => t.id === threadId)
     if (target) target.unread_by_admin_count = 0
-    subscribeThreadMessages(threadId)
+    try {
+      subscribeThreadMessages(threadId)
+    } catch {
+      // Realtime safe fallback
+    }
     isLoadingMessages.value = true
     error.value = null
     try {
