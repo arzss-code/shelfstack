@@ -2,6 +2,10 @@
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useSupportChat } from '~/composables/useSupportChat'
 import ChatOrderSnippet from './ChatOrderSnippet.vue'
+import ChatProductSnippet from './ChatProductSnippet.vue'
+import ChatEmojiPicker from './ChatEmojiPicker.vue'
+import ChatGuestPrompt from './ChatGuestPrompt.vue'
+import ChatLightboxModal from './ChatLightboxModal.vue'
 
 export interface ChatMessageItem {
   id: string
@@ -10,12 +14,8 @@ export interface ChatMessageItem {
   created_at: string
   attachment_url?: string | null
   attachment_type?: string | null
-  attached_order?: {
-    id: string
-    order_number?: string | null
-    total_cents: number
-    status: string
-  } | null
+  attached_order?: any | null
+  attached_product?: any | null
 }
 
 interface Props {
@@ -39,7 +39,7 @@ let supportChat: ReturnType<typeof useSupportChat> | null = null
 try {
   supportChat = useSupportChat()
 } catch {
-  // Graceful fallback for isolated unit tests
+  // Composable fallback in unit testing environments
 }
 
 const inputText = ref('')
@@ -48,6 +48,7 @@ const previewImage = ref<string | null>(null)
 const activeLightboxUrl = ref<string | null>(null)
 const uploadError = ref<string | null>(null)
 const isUploading = ref(false)
+const isEmojiOpen = ref(false)
 const messageContainer = ref<HTMLElement | null>(null)
 
 const effectiveMessages = computed<ChatMessageItem[]>(() => {
@@ -72,34 +73,25 @@ watch(
 
 onMounted(() => {
   scrollToBottom()
-  if (supportChat && props.isAuthenticated) {
-    supportChat.markAsRead()
-  }
+  if (supportChat && props.isAuthenticated) supportChat.markAsRead()
 })
-
-const handleClose = () => emit('close')
 
 const handleSend = async () => {
   const text = inputText.value.trim()
   if (!text || text.length > 1000 || isSending.value) return
 
   const payload: { message_text: string; attachment_url?: string } = { message_text: text }
-  if (previewImage.value) {
-    payload.attachment_url = previewImage.value
-  }
+  if (previewImage.value) payload.attachment_url = previewImage.value
 
   emit('sendMessage', payload)
-  if (supportChat) {
-    await supportChat.sendMessage(payload)
-  }
+  if (supportChat) await supportChat.sendMessage(payload)
 
   inputText.value = ''
   previewImage.value = null
   uploadError.value = null
+  isEmojiOpen.value = false
   scrollToBottom()
 }
-
-const triggerFileUpload = () => fileInput.value?.click()
 
 const handleFileChange = async (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -117,9 +109,8 @@ const handleFileChange = async (event: Event) => {
     try {
       isUploading.value = true
       previewImage.value = await supportChat.uploadAttachment(file)
-    } catch (err: unknown) {
-      const e = err as { message?: string }
-      uploadError.value = e?.message || 'Gagal mengunggah foto.'
+    } catch (err: any) {
+      uploadError.value = err?.message || 'Gagal mengunggah foto.'
     } finally {
       isUploading.value = false
     }
@@ -133,28 +124,18 @@ const handleFileChange = async (event: Event) => {
   target.value = ''
 }
 
-const removeAttachment = () => {
-  previewImage.value = null
-  uploadError.value = null
-}
-
-const openLightbox = (url: string) => {
-  activeLightboxUrl.value = url
-}
-const closeLightbox = () => {
-  activeLightboxUrl.value = null
-}
-
-const loginUrl = computed(() => {
-  let redirect = '/'
+const formatTime = (isoString?: string): string => {
+  if (!isoString) return ''
   try {
-    const route = useRoute()
-    if (route?.fullPath) redirect = route.fullPath
+    return new Date(isoString).toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    })
   } catch {
-    // Fallback if useRoute is unavailable in unit tests
+    return ''
   }
-  return `/auth/login?redirect=${encodeURIComponent(redirect)}`
-})
+}
 </script>
 
 <template>
@@ -166,7 +147,7 @@ const loginUrl = computed(() => {
   >
     <!-- Header -->
     <header
-      class="chat-header flex items-center justify-between border-b border-brand-hair bg-brand-canvas px-4 py-3"
+      class="chat-header flex items-center justify-between border-b border-brand-hair bg-brand-canvas px-4 py-3 shrink-0"
     >
       <div class="flex items-center gap-2">
         <span class="font-semibold text-sm text-brand-ink">ShelfStack Support</span>
@@ -181,34 +162,14 @@ const loginUrl = computed(() => {
         type="button"
         class="btn-close flex h-8 w-8 items-center justify-center rounded-full text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
         aria-label="Tutup jendela chat"
-        @click="handleClose"
+        @click="emit('close')"
       >
         <i class="pi pi-times text-xs" aria-hidden="true" />
       </button>
     </header>
 
     <!-- Guest Mode Card (Unauthenticated) -->
-    <div
-      v-if="!isAuthenticated"
-      class="guest-prompt-card flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center"
-    >
-      <div
-        class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-canvas-soft text-brand-ink"
-      >
-        <i class="pi pi-user text-xl text-brand-muted" aria-hidden="true" />
-      </div>
-      <h3 class="m-0 text-sm font-bold text-brand-ink">Silakan Masuk untuk Memulai Chat</h3>
-      <p class="m-0 text-xs text-brand-muted max-w-xs leading-relaxed">
-        Masuk ke akun ShelfStack Anda agar kami dapat memeriksa riwayat pesanan dan memberikan
-        bantuan lebih cepat.
-      </p>
-      <a
-        :href="loginUrl"
-        class="btn-login inline-flex items-center justify-center rounded-full bg-brand-ink px-5 py-2 text-xs font-semibold text-white no-underline transition-all hover:bg-brand-inkhover active:scale-95 shadow-whisper"
-      >
-        Masuk Akun
-      </a>
-    </div>
+    <ChatGuestPrompt v-if="!isAuthenticated" />
 
     <!-- Authenticated Conversation Body -->
     <div v-else class="authenticated-chat-body flex flex-1 flex-col min-h-0 bg-brand-canvas">
@@ -242,9 +203,13 @@ const loginUrl = computed(() => {
               :src="msg.attachment_url"
               alt="Lampiran gambar"
               class="attachment-preview max-h-40 max-w-full rounded-field cursor-pointer object-cover hover:opacity-90"
-              @click="openLightbox(msg.attachment_url)"
+              @click="activeLightboxUrl = msg.attachment_url"
             />
             <ChatOrderSnippet v-if="msg.attached_order" :order="msg.attached_order" />
+            <ChatProductSnippet v-if="msg.attached_product" :product="msg.attached_product" />
+            <div class="flex items-center justify-end text-[10px] text-white/70 tabular-nums">
+              <span>{{ formatTime(msg.created_at) }}</span>
+            </div>
           </div>
 
           <!-- Admin Message (Left) -->
@@ -258,9 +223,13 @@ const loginUrl = computed(() => {
               :src="msg.attachment_url"
               alt="Lampiran gambar"
               class="attachment-preview max-h-40 max-w-full rounded-field cursor-pointer object-cover hover:opacity-90"
-              @click="openLightbox(msg.attachment_url)"
+              @click="activeLightboxUrl = msg.attachment_url"
             />
             <ChatOrderSnippet v-if="msg.attached_order" :order="msg.attached_order" />
+            <ChatProductSnippet v-if="msg.attached_product" :product="msg.attached_product" />
+            <div class="flex items-center justify-end text-[10px] text-brand-muted tabular-nums">
+              <span>{{ formatTime(msg.created_at) }}</span>
+            </div>
           </div>
         </template>
       </div>
@@ -276,7 +245,7 @@ const loginUrl = computed(() => {
           <button
             type="button"
             class="text-brand-muted hover:text-brand-ink text-xs"
-            @click="removeAttachment"
+            @click="previewImage = null"
           >
             <i class="pi pi-times" />
           </button>
@@ -286,8 +255,21 @@ const loginUrl = computed(() => {
         </div>
       </div>
 
+      <!-- Emoji Picker Popover -->
+      <div v-if="isEmojiOpen" class="absolute bottom-16 left-3 z-30">
+        <ChatEmojiPicker
+          @select-emoji="
+            (e) => {
+              inputText += e
+              isEmojiOpen = false
+            }
+          "
+          @close="isEmojiOpen = false"
+        />
+      </div>
+
       <!-- Composer Input Bar -->
-      <div class="composer flex items-center gap-2 border-t border-brand-hair bg-white p-3">
+      <div class="composer flex items-center gap-1.5 border-t border-brand-hair bg-white p-3">
         <input
           ref="fileInput"
           type="file"
@@ -300,13 +282,21 @@ const loginUrl = computed(() => {
           class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
           title="Lampirkan foto (maks 5MB)"
           :disabled="isUploading || isSending"
-          @click="triggerFileUpload"
+          @click="fileInput?.click()"
         >
           <i
             :class="isUploading ? 'pi pi-spin pi-spinner' : 'pi pi-image'"
             class="text-xs"
             aria-hidden="true"
           />
+        </button>
+        <button
+          type="button"
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
+          title="Pilih emotikon"
+          @click="isEmojiOpen = !isEmojiOpen"
+        >
+          <i class="pi pi-face-smile text-xs" aria-hidden="true" />
         </button>
         <textarea
           v-model="inputText"
@@ -321,7 +311,7 @@ const loginUrl = computed(() => {
         >
         <button
           type="button"
-          class="btn-send shrink-0 rounded-full bg-brand-ink px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-brand-inkhover disabled:opacity-50 disabled:cursor-not-allowed"
+          class="btn-send shrink-0 rounded-full bg-brand-ink px-3.5 py-1.5 text-xs font-semibold text-white transition-all hover:bg-brand-inkhover disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="!inputText.trim() || inputText.length > 1000 || isSending"
           @click="handleSend"
         >
@@ -331,25 +321,6 @@ const loginUrl = computed(() => {
     </div>
 
     <!-- Lightbox Modal Overlay -->
-    <div
-      v-if="activeLightboxUrl"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-      @click="closeLightbox"
-    >
-      <button
-        type="button"
-        class="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30"
-        aria-label="Tutup pratinjau"
-        @click="closeLightbox"
-      >
-        <i class="pi pi-times text-base" />
-      </button>
-      <img
-        :src="activeLightboxUrl"
-        alt="Pratinjau lampiran"
-        class="max-h-[85vh] max-w-[85vw] rounded-card object-contain shadow-floating"
-        @click.stop
-      />
-    </div>
+    <ChatLightboxModal :image-url="activeLightboxUrl" @close="activeLightboxUrl = null" />
   </div>
 </template>

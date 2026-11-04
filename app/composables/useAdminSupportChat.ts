@@ -10,6 +10,25 @@ import type {
   SupportThreadWithCustomer,
 } from '~~/shared/schemas/support-chat'
 
+// Module-level singletons across admin page and child components to prevent duplicate subscriptions
+let sharedInboxChannel: RealtimeChannel | null = null
+let sharedMessageChannel: RealtimeChannel | null = null
+let activeSubscribedThreadId: string | null = null
+
+function getFreshChannel(client: SupabaseClient<Database>, topic: string): RealtimeChannel {
+  try {
+    const existing = client
+      .getChannels()
+      .find((ch) => ch.topic === topic || ch.topic === `realtime:${topic}`)
+    if (existing) {
+      client.removeChannel(existing)
+    }
+  } catch {
+    // Safe fallback for testing environments
+  }
+  return client.channel(topic)
+}
+
 export function useAdminSupportChat() {
   let supabase: SupabaseClient<Database> | null = null
   if (import.meta.client) {
@@ -35,20 +54,26 @@ export function useAdminSupportChat() {
     activeThreadId.value ? threads.value.find((t) => t.id === activeThreadId.value) || null : null,
   )
 
-  let inboxChannel: RealtimeChannel | null = null
-  let messageChannel: RealtimeChannel | null = null
-
   const cleanupInbox = () => {
-    if (inboxChannel && supabase) {
-      supabase.removeChannel(inboxChannel)
-      inboxChannel = null
+    if (sharedInboxChannel && supabase) {
+      try {
+        supabase.removeChannel(sharedInboxChannel)
+      } catch {
+        // Safe removal
+      }
+      sharedInboxChannel = null
     }
   }
 
   const cleanupMessage = () => {
-    if (messageChannel && supabase) {
-      supabase.removeChannel(messageChannel)
-      messageChannel = null
+    if (sharedMessageChannel && supabase) {
+      try {
+        supabase.removeChannel(sharedMessageChannel)
+      } catch {
+        // Safe removal
+      }
+      sharedMessageChannel = null
+      activeSubscribedThreadId = null
     }
   }
 
@@ -96,33 +121,42 @@ export function useAdminSupportChat() {
   }
 
   const subscribeInbox = () => {
-    if (!import.meta.client || !supabase || inboxChannel) return
-    inboxChannel = supabase
-      .channel('admin-support-inbox')
-      .on(
-        'postgres_changes' as any,
-        { event: '*', schema: 'public', table: 'support_threads' },
-        handleInboxUpdate,
-      )
-      .subscribe()
+    if (!import.meta.client || !supabase || sharedInboxChannel) return
+    try {
+      sharedInboxChannel = getFreshChannel(supabase, 'admin-support-inbox')
+        .on(
+          'postgres_changes' as any,
+          { event: '*', schema: 'public', table: 'support_threads' },
+          handleInboxUpdate,
+        )
+        .subscribe()
+    } catch {
+      // Safe fallback
+    }
   }
 
   const subscribeThreadMessages = (threadId: string) => {
     if (!import.meta.client || !supabase || !threadId) return
+    if (activeSubscribedThreadId === threadId && sharedMessageChannel) return
+
     cleanupMessage()
-    messageChannel = supabase
-      .channel(`support-thread-${threadId}`)
-      .on(
-        'postgres_changes' as any,
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'support_messages',
-          filter: `thread_id=eq.${threadId}`,
-        },
-        (p: { new: SupportMessageItem }) => handleIncomingMessage(p.new),
-      )
-      .subscribe()
+    activeSubscribedThreadId = threadId
+    try {
+      sharedMessageChannel = getFreshChannel(supabase, `support-thread-${threadId}`)
+        .on(
+          'postgres_changes' as any,
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'support_messages',
+            filter: `thread_id=eq.${threadId}`,
+          },
+          (p: { new: SupportMessageItem }) => handleIncomingMessage(p.new),
+        )
+        .subscribe()
+    } catch {
+      // Safe fallback
+    }
   }
 
   const fetchThreads = async (params?: {

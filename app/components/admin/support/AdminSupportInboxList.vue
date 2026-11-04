@@ -81,14 +81,14 @@ const effectiveSearchQuery = computed<string>(() => {
 
 const onSelectThread = (threadId: string) => {
   emit('selectThread', threadId)
-  if (adminChat) {
+  if (props.threads === undefined && adminChat) {
     adminChat.selectThread(threadId)
   }
 }
 
 const onSelectTab = (statusKey: string) => {
   emit('updateFilter', statusKey)
-  if (adminChat) {
+  if (props.threads === undefined && adminChat) {
     adminChat.activeFilter.value = statusKey
     adminChat.fetchThreads()
   }
@@ -98,7 +98,7 @@ const onSearchInput = (e: Event) => {
   const target = e.target as HTMLInputElement
   const val = target.value
   emit('updateSearch', val)
-  if (adminChat) {
+  if (props.threads === undefined && adminChat) {
     adminChat.searchQuery.value = val
     adminChat.fetchThreads()
   }
@@ -131,35 +131,55 @@ const formatRelativeTime = (isoString?: string | null): string => {
     return ''
   }
 }
+
+const statusPillClass = (status: string): string => {
+  switch (status) {
+    case 'open':
+      return 'bg-sky-50 text-sky-700 border border-sky-200'
+    case 'waiting_admin':
+      return 'bg-amber-50 text-amber-700 border border-amber-200'
+    case 'waiting_customer':
+      return 'bg-blue-50 text-blue-700 border border-blue-200'
+    case 'resolved':
+      return 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+    default:
+      return 'bg-brand-canvas-soft text-brand-muted border border-brand-hair'
+  }
+}
 </script>
 
 <template>
   <div class="admin-support-inbox-list flex h-full flex-col border-r border-brand-hair bg-white">
-    <!-- Search Bar -->
+    <!-- Search Bar with Icon -->
     <div class="border-b border-brand-hair p-3">
       <div class="relative">
+        <i
+          class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-muted pointer-events-none"
+        />
         <input
           type="text"
           :value="effectiveSearchQuery"
           placeholder="Cari nama atau email..."
-          class="search-input w-full rounded border border-brand-hair px-3 py-1.5 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:outline-none transition-colors"
+          class="search-input w-full rounded-field border border-brand-hair bg-brand-canvas-soft pl-8 pr-3 py-1.5 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-white focus:outline-none transition-colors"
           @input="onSearchInput"
         />
       </div>
     </div>
 
     <!-- Status Tabs -->
-    <div class="status-tabs flex overflow-x-auto border-b border-brand-hair text-xs scrollbar-none">
+    <div
+      class="status-tabs flex overflow-x-auto border-b border-brand-hair text-xs scrollbar-none bg-brand-canvas-soft/30 px-1"
+    >
       <button
         v-for="tab in tabs"
         :key="tab.key"
         type="button"
         :data-status="tab.key"
-        class="tab-btn filter-tab px-3 py-2 font-medium whitespace-nowrap transition-colors"
+        class="tab-btn filter-tab px-3 py-2.5 font-medium whitespace-nowrap transition-colors border-b-2"
         :class="
           effectiveFilterStatus === tab.key
-            ? 'active-tab border-b-2 border-brand-ink text-brand-ink'
-            : 'text-brand-muted hover:text-brand-ink'
+            ? 'active-tab border-brand-ink text-brand-ink font-semibold'
+            : 'border-transparent text-brand-muted hover:text-brand-ink'
         "
         @click="onSelectTab(tab.key)"
       >
@@ -168,22 +188,23 @@ const formatRelativeTime = (isoString?: string | null): string => {
     </div>
 
     <!-- Thread Cards List -->
-    <div class="thread-items flex-1 overflow-y-auto">
+    <div class="thread-items flex-1 overflow-y-auto divide-y divide-brand-hair/60">
       <div
         v-if="effectiveThreads.length === 0"
-        class="empty-inbox p-6 text-center text-xs text-brand-muted"
+        class="empty-inbox p-8 text-center text-xs text-brand-muted flex flex-col items-center justify-center gap-2"
       >
-        Tidak ada pesan bantuan ditemukan
+        <i class="pi pi-inbox text-2xl text-brand-hair" />
+        <span>Tidak ada pesan bantuan ditemukan</span>
       </div>
 
       <div
         v-for="thread in effectiveThreads"
         :key="thread.id"
         :data-id="thread.id"
-        class="thread-card thread-item flex cursor-pointer items-center justify-between border-b border-brand-hair p-3 transition-colors hover:bg-brand-canvas-soft"
+        class="thread-card thread-item flex cursor-pointer items-center justify-between p-3.5 transition-colors hover:bg-brand-canvas-soft/80"
         :class="[
           effectiveActiveThreadId === thread.id
-            ? 'active-thread is-active bg-brand-canvas-soft'
+            ? 'active-thread is-active bg-brand-canvas-soft border-l-4 border-l-brand-ink pl-2.5'
             : '',
         ]"
         @click="onSelectThread(thread.id)"
@@ -191,7 +212,7 @@ const formatRelativeTime = (isoString?: string | null): string => {
         <div class="flex flex-1 items-center gap-2.5 min-w-0 mr-2">
           <!-- Avatar -->
           <div
-            class="customer-avatar flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-xs font-semibold text-brand-ink overflow-hidden"
+            class="customer-avatar flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-xs font-semibold text-brand-ink overflow-hidden shadow-xs"
           >
             <img
               v-if="thread.customer_avatar_url"
@@ -208,7 +229,7 @@ const formatRelativeTime = (isoString?: string | null): string => {
               <span class="customer-name truncate text-xs font-semibold text-brand-ink">
                 {{ thread.customer_name }}
               </span>
-              <span class="shrink-0 text-[10px] text-brand-muted">
+              <span class="shrink-0 text-[10px] text-brand-muted tabular-nums">
                 {{ formatRelativeTime(thread.last_message_at) }}
               </span>
             </div>
@@ -219,16 +240,17 @@ const formatRelativeTime = (isoString?: string | null): string => {
         </div>
 
         <!-- Status pill & unread badge -->
-        <div class="flex shrink-0 flex-col items-end gap-1">
+        <div class="flex shrink-0 flex-col items-end gap-1.5">
           <span
-            class="status-pill rounded px-1.5 py-0.5 text-[10px] font-medium"
+            class="status-pill rounded-full px-2 py-0.5 text-[10px] font-medium"
+            :class="statusPillClass(thread.status)"
             :data-status="thread.status"
           >
             {{ thread.status }}
           </span>
           <span
             v-if="thread.unread_by_admin_count > 0"
-            class="unread-admin-badge unread-badge rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white min-w-[18px] text-center"
+            class="unread-admin-badge unread-badge flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white shadow-xs"
           >
             {{ thread.unread_by_admin_count }}
           </span>

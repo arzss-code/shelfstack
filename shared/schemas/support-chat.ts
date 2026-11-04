@@ -37,7 +37,7 @@ export const adminSendSupportMessageSchema = z.object({
     .min(1, 'Balasan tidak boleh kosong')
     .max(1000, 'Balasan maksimal 1000 karakter'),
   attachment_url: z.string().url('URL lampiran tidak valid').optional().nullable(),
-  attachment_type: z.enum(['image']).optional().nullable(),
+  attachment_type: z.literal('image').optional().nullable(),
 })
 
 export const updateThreadStatusSchema = z.object({
