@@ -2,6 +2,39 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.30.0] - 2026-11-03
+
+### Sistem Komplain & Retur Barang Pelanggan (Customer Returns & RMA Workflow)
+
+- **Database PostgreSQL & Supabase Storage Bucket**:
+  - `supabase/migrations/20261128000001_customer_return_requests_and_rma.sql`:
+    - Tabel baru `public.return_requests`: Pencatatan tiket komplain retur pelanggan dengan kolom `order_id`, `user_id`, `reason_type` (defective, damaged_in_transit, wrong_item, missing_accessories, other), `solution_type` (refund, replacement), `customer_notes`, `proof_image_urls`, `unboxing_video_url`, `status` (requested, approved, rejected, item_received, completed, cancelled), `return_courier`, `return_tracking_number`, `admin_notes`, `replacement_courier`, `replacement_tracking_number`, `refund_amount_cents`, `restocked_at`, `resolved_at`, dan `deleted_at`.
+    - Partial Unique Index `idx_return_requests_active_order`: Memastikan hanya ada 1 tiket retur aktif per pesanan.
+    - Bucket baru Supabase Storage `return-proofs`: Bucket khusus penyimpanan foto bukti retur dengan batasan ukuran 5MB, format JPEG/PNG/WebP, dan kebijakan RLS khusus kepemilikan user.
+- **Skema Zod & Logika Validasi Bersama**:
+  - `shared/schemas/return-request.ts`: Skema validasi terpadu (`createReturnRequestSchema`, `updateReturnTrackingSchema`, `adminReviewReturnRequestSchema`, `returnFilterQuerySchema`) dengan pesan validasi berbahasa Indonesia.
+  - `server/utils/return-request.ts`: Helper penentuan jendela retur garansi 7 hari (`checkReturnWindowEligibility`), alamat resmi pusat retur pergudangan ShelfStack, kamus label alasan, dan metadata status warna semantik.
+- **Backend API Server Nitro**:
+  - `server/api/returns/upload.post.ts`: Endpoint pengunggahan berkas foto bukti ke bucket `return-proofs` dengan validasi tipe mime, sanitasi nama berkas unik, dan batas maksimal 5MB.
+  - `server/api/orders/[id]/return-requests/index.get.ts`: Endpoint publik pelanggan untuk memuat status kelayakan retur pesanan dan tiket aktif.
+  - `server/api/orders/[id]/return-requests/index.post.ts`: Endpoint pengajuan tiket retur baru dengan verifikasi jendela 7 hari, kepemilikan pesanan, audit log, dan in-app notification.
+  - `server/api/orders/[id]/return-requests/tracking.put.ts`: Endpoint pelanggan untuk menginput kurir dan nomor resi pengiriman balik barang retur setelah tiket disetujui.
+  - `server/api/admin/returns/index.get.ts`: Endpoint terproteksi admin untuk memuat daftar tiket retur, metrik statistik, dan filter pencarian.
+  - `server/api/admin/returns/[id]/review.put.ts`: Endpoint terproteksi admin untuk memproses keputusan RMA (approve, reject, item_received, completed) dengan opsi pengembalian stok inventaris (`restock_inventory`) dan audit log.
+- **Komponen Frontend & State Management (Semua Komponen <= 300 Baris)**:
+  - `app/composables/useReturnRequest.ts`: Composable state management reaktif (148 baris) untuk memuat data retur, mengunggah foto, dan mengirimkan tiket komplain.
+  - `app/components/orders/OrderReturnModal.vue`: Modal interaktif pengajuan retur (294 baris) dengan selektor solusi (refund vs penukaran unit), pilihan alasan kendala, deskripsi kendala, dan pratinjau multi-foto bukti.
+  - `app/components/orders/OrderReturnStatusCard.vue`: Kartu pelacak status retur pelanggan (265 baris) dengan stepper 4 tahap visual, instruksi alamat gudang pengembalian, formulir input resi kurir, dan catatan admin.
+  - `app/components/admin/returns/AdminReturnDetailModal.vue`: Modal inspeksi RMA admin (249 baris) dengan galeri foto bukti resolusi penuh, formulir keputusan admin, input kurir pengganti, dan toggle restock inventaris otomatis.
+  - `app/pages/admin/returns.vue`: Panel manajemen RMA admin (282 baris) dengan 4 kartu metrik KPI, tab navigasi status filter, input pencarian real-time, dan tabel interaktif tiket retur.
+  - `app/layouts/admin.vue`: Penambahan menu navigasi "Komplain & Retur" dengan ikon `pi-replay`.
+  - `app/pages/orders/[id].vue`: Integrasi tombol "Ajukan Komplain / Retur" dan penampil kartu status retur pada rincian pesanan pelanggan.
+  - `app/components/ui/UiAlert.vue`: Perbaikan perataan vertikal ikon dan teks alert agar selalu sejajar pada semua varian.
+- **Pengujian Unit & Kualitas**:
+  - `tests/unit/return-request-schema.spec.ts`: 14 pengujian unit untuk validasi skema pengajuan retur, batas foto, dan kalkulasi eligibility 7 hari garansi.
+  - `tests/unit/order-return-components.spec.ts`: 6 pengujian unit untuk perenderan komponen status card dan modal retur.
+  - Total pengujian proyek: 74 file test / 701 tests lulus 100%.
+
 ## [0.29.0] - 2026-11-03
 
 ### Modularisasi & Manajemen Kupon Voucher Promo Panel Admin

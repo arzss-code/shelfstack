@@ -951,6 +951,83 @@ export type Database = {
           },
         ]
       }
+      return_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          customer_notes: string
+          deleted_at: string | null
+          id: string
+          order_id: string
+          proof_image_urls: string[]
+          reason_type: string
+          refund_amount_cents: number | null
+          replacement_courier: string | null
+          replacement_tracking_number: string | null
+          resolved_at: string | null
+          restocked_at: string | null
+          return_courier: string | null
+          return_tracking_number: string | null
+          solution_type: string
+          status: string
+          unboxing_video_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          customer_notes: string
+          deleted_at?: string | null
+          id?: string
+          order_id: string
+          proof_image_urls?: string[]
+          reason_type: string
+          refund_amount_cents?: number | null
+          replacement_courier?: string | null
+          replacement_tracking_number?: string | null
+          resolved_at?: string | null
+          restocked_at?: string | null
+          return_courier?: string | null
+          return_tracking_number?: string | null
+          solution_type: string
+          status?: string
+          unboxing_video_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          customer_notes?: string
+          deleted_at?: string | null
+          id?: string
+          order_id?: string
+          proof_image_urls?: string[]
+          reason_type?: string
+          refund_amount_cents?: number | null
+          replacement_courier?: string | null
+          replacement_tracking_number?: string | null
+          resolved_at?: string | null
+          restocked_at?: string | null
+          return_courier?: string | null
+          return_tracking_number?: string | null
+          solution_type?: string
+          status?: string
+          unboxing_video_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'return_requests_order_id_fkey'
+            columns: ['order_id']
+            isOneToOne: false
+            referencedRelation: 'orders'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
