@@ -42,6 +42,36 @@ const statusBadgeClass = (status: string): string => {
   }
 }
 
+const statusDotClass = (status: string): string => {
+  switch (status) {
+    case 'open':
+      return 'bg-sky-500'
+    case 'waiting_admin':
+      return 'bg-amber-500 animate-pulse'
+    case 'waiting_customer':
+      return 'bg-blue-500'
+    case 'resolved':
+      return 'bg-emerald-500'
+    default:
+      return 'bg-gray-400'
+  }
+}
+
+const statusDescription = (status: string): string => {
+  switch (status) {
+    case 'open':
+      return 'Tiket baru dibuat, menunggu respon awal.'
+    case 'waiting_admin':
+      return 'Pelanggan mengirim pesan, perlu tindakan/balasan CS.'
+    case 'waiting_customer':
+      return 'CS telah merespon, menunggu tindak lanjut pelanggan.'
+    case 'resolved':
+      return 'Kendala pelanggan telah terselesaikan.'
+    default:
+      return 'Status percakapan bantuan.'
+  }
+}
+
 const onStatusChange = (e: Event) => {
   const val = (e.target as HTMLSelectElement).value
   emit('updateStatus', val)
@@ -75,14 +105,16 @@ const onStatusChange = (e: Event) => {
     </div>
 
     <div class="flex items-center gap-2">
-      <!-- Status Badge -->
+      <!-- Status Badge with Dot Indicator & Tooltip Title -->
       <span
-        class="status-badge inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize"
+        class="status-badge inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize cursor-help"
         :data-status="thread.status"
         :class="statusBadgeClass(thread.status)"
+        :title="statusDescription(thread.status)"
+        ><span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(thread.status)" />{{
+          thread.status
+        }}</span
       >
-        {{ thread.status }}
-      </span>
 
       <!-- Status Dropdown Wrapper -->
       <div class="relative">
@@ -92,10 +124,10 @@ const onStatusChange = (e: Event) => {
           aria-label="Ubah status percakapan"
           @change="onStatusChange"
         >
-          <option value="open">open</option>
-          <option value="waiting_admin">waiting_admin</option>
-          <option value="waiting_customer">waiting_customer</option>
-          <option value="resolved">resolved</option>
+          <option value="open">open (Baru)</option>
+          <option value="waiting_admin">waiting_admin (Perlu Respon CS)</option>
+          <option value="waiting_customer">waiting_customer (Menunggu Pelanggan)</option>
+          <option value="resolved">resolved (Selesai)</option>
         </select>
         <i
           class="pi pi-chevron-down pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-brand-muted"

@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
+import {
+  formatStatusLabel,
+  statusDotClass,
+  statusPillClass,
+  statusDescription,
+  formatRelativeTime,
+  getInitials,
+} from '~/utils/support-status'
 
 export interface SupportThreadListItem {
   id: string
@@ -51,6 +59,8 @@ try {
   // Graceful fallback for isolated unit tests
 }
 
+const isDropdownOpen = ref(false)
+
 const tabs = [
   { key: 'all', label: 'Semua' },
   { key: 'open', label: 'Baru' },
@@ -79,6 +89,11 @@ const effectiveSearchQuery = computed<string>(() => {
   return adminChat?.searchQuery?.value ?? ''
 })
 
+const activeTabLabel = computed(() => {
+  const found = tabs.find((t) => t.key === effectiveFilterStatus.value)
+  return found?.label || 'Semua Percakapan'
+})
+
 const onSelectThread = (threadId: string) => {
   emit('selectThread', threadId)
   if (props.threads === undefined && adminChat) {
@@ -88,6 +103,7 @@ const onSelectThread = (threadId: string) => {
 
 const onSelectTab = (statusKey: string) => {
   emit('updateFilter', statusKey)
+  isDropdownOpen.value = false
   if (props.threads === undefined && adminChat) {
     adminChat.activeFilter.value = statusKey
     adminChat.fetchThreads()
@@ -101,49 +117,6 @@ const onSearchInput = (e: Event) => {
   if (props.threads === undefined && adminChat) {
     adminChat.searchQuery.value = val
     adminChat.fetchThreads()
-  }
-}
-
-const getInitials = (name: string): string => {
-  if (!name) return '?'
-  const parts = name.trim().split(/\s+/)
-  if (parts.length >= 2) {
-    return `${parts[0]?.[0] || ''}${parts[1]?.[0] || ''}`.toUpperCase()
-  }
-  return name.slice(0, 2).toUpperCase()
-}
-
-const formatRelativeTime = (isoString?: string | null): string => {
-  if (!isoString) return ''
-  try {
-    const date = new Date(isoString)
-    const now = new Date()
-    const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000)
-    if (diffSec < 60) return 'Baru saja'
-    const diffMin = Math.floor(diffSec / 60)
-    if (diffMin < 60) return `${diffMin}m`
-    const diffHour = Math.floor(diffMin / 60)
-    if (diffHour < 24) return `${diffHour}j`
-    const diffDay = Math.floor(diffHour / 24)
-    if (diffDay < 7) return `${diffDay}h`
-    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
-  } catch {
-    return ''
-  }
-}
-
-const statusPillClass = (status: string): string => {
-  switch (status) {
-    case 'open':
-      return 'bg-sky-50 text-sky-700 border border-sky-200'
-    case 'waiting_admin':
-      return 'bg-amber-50 text-amber-700 border border-amber-200'
-    case 'waiting_customer':
-      return 'bg-blue-50 text-blue-700 border border-blue-200'
-    case 'resolved':
-      return 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-    default:
-      return 'bg-brand-canvas-soft text-brand-muted border border-brand-hair'
   }
 }
 </script>
@@ -166,25 +139,58 @@ const statusPillClass = (status: string): string => {
       </div>
     </div>
 
-    <!-- Status Tabs -->
-    <div
-      class="status-tabs flex overflow-x-auto border-b border-brand-hair text-xs scrollbar-none bg-brand-canvas-soft/30 px-1"
-    >
+    <!-- Status Filter Dropdown Section (Replaces cramped text tabs) -->
+    <div class="filter-section relative border-b border-brand-hair bg-brand-canvas-soft/30 p-2.5">
       <button
-        v-for="tab in tabs"
-        :key="tab.key"
         type="button"
-        :data-status="tab.key"
-        class="tab-btn filter-tab px-3 py-2.5 font-medium whitespace-nowrap transition-colors border-b-2"
-        :class="
-          effectiveFilterStatus === tab.key
-            ? 'active-tab border-brand-ink text-brand-ink font-semibold'
-            : 'border-transparent text-brand-muted hover:text-brand-ink'
-        "
-        @click="onSelectTab(tab.key)"
+        class="filter-dropdown-trigger flex w-full items-center justify-between rounded-field border border-brand-hair bg-white px-3 py-1.5 text-xs text-brand-ink shadow-xs transition-colors hover:border-brand-ink focus:outline-none cursor-pointer"
+        aria-label="Filter status percakapan"
+        @click="isDropdownOpen = !isDropdownOpen"
       >
-        {{ tab.label }}
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-brand-muted text-[11px] font-medium shrink-0">Filter:</span>
+          <span
+            class="h-2 w-2 shrink-0 rounded-full"
+            :class="statusDotClass(effectiveFilterStatus)"
+          />
+          <span class="truncate font-semibold text-brand-ink">
+            {{ activeTabLabel }}
+          </span>
+        </div>
+        <i
+          class="pi pi-chevron-down text-[10px] text-brand-muted transition-transform duration-200"
+          :class="isDropdownOpen ? 'rotate-180' : ''"
+        />
       </button>
+
+      <!-- Dropdown Popover Menu with Test Contracts Preserved -->
+      <div
+        v-show="isDropdownOpen"
+        class="status-tabs filter-menu absolute left-2.5 right-2.5 top-[calc(100%+4px)] z-30 rounded-card border border-brand-hair bg-white p-1.5 shadow-floating space-y-0.5"
+      >
+        <button
+          v-for="tab in tabs"
+          :key="tab.key"
+          type="button"
+          :data-status="tab.key"
+          class="tab-btn filter-tab flex w-full items-center justify-between rounded-field px-2.5 py-2 text-xs transition-colors text-left cursor-pointer"
+          :class="
+            effectiveFilterStatus === tab.key
+              ? 'active-tab bg-brand-canvas-soft font-semibold text-brand-ink'
+              : 'text-brand-ink hover:bg-brand-canvas-soft/70'
+          "
+          @click="onSelectTab(tab.key)"
+        >
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="h-2 w-2 shrink-0 rounded-full" :class="statusDotClass(tab.key)" />
+            <span class="truncate">{{ tab.label }}</span>
+          </div>
+          <i
+            v-if="effectiveFilterStatus === tab.key"
+            class="pi pi-check text-[10px] text-brand-ink shrink-0"
+          />
+        </button>
+      </div>
     </div>
 
     <!-- Thread Cards List -->
@@ -242,11 +248,13 @@ const statusPillClass = (status: string): string => {
         <!-- Status pill & unread badge -->
         <div class="flex shrink-0 flex-col items-end gap-1.5">
           <span
-            class="status-pill rounded-full px-2 py-0.5 text-[10px] font-medium"
+            class="status-pill inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
             :class="statusPillClass(thread.status)"
             :data-status="thread.status"
+            :title="statusDescription(thread.status)"
           >
-            {{ thread.status }}
+            <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(thread.status)" />
+            <span>{{ formatStatusLabel(thread.status) }}</span>
           </span>
           <span
             v-if="thread.unread_by_admin_count > 0"

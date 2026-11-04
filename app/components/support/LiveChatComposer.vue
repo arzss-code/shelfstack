@@ -213,7 +213,7 @@ const handleFileChange = async (event: Event) => {
       <div class="flex items-center justify-between gap-2 pt-0.5">
         <!-- Left: Action Tooltips & Buttons -->
         <div class="flex items-center gap-1">
-          <UiTooltip text="Lampirkan Foto" position="top">
+          <UiTooltip text="Lampirkan Foto" position="top" align="start">
             <button
               type="button"
               class="flex h-8 w-8 items-center justify-center rounded-field text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"

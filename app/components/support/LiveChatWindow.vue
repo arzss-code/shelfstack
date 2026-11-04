@@ -156,7 +156,7 @@ const formatTime = (isoString?: string): string => {
         </span>
       </div>
       <div class="flex items-center gap-1">
-        <UiTooltip text="Kecilkan" position="top" align="end">
+        <UiTooltip text="Kecilkan" position="bottom" align="end">
           <button
             type="button"
             class="btn-minimize flex h-8 w-8 items-center justify-center rounded-field text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
@@ -166,7 +166,7 @@ const formatTime = (isoString?: string): string => {
             <i class="pi pi-minus text-xs" />
           </button>
         </UiTooltip>
-        <UiTooltip text="Tutup Bantuan" position="top" align="end">
+        <UiTooltip text="Tutup Bantuan" position="bottom" align="end">
           <button
             type="button"
             class="btn-close flex h-8 w-8 items-center justify-center rounded-field text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"

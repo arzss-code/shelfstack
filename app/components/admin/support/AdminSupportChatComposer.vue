@@ -142,7 +142,7 @@ defineExpose({
         <!-- Left: Action Tools with UiTooltip -->
         <div class="flex items-center gap-1.5">
           <!-- Canned Responses Trigger -->
-          <UiTooltip text="Gunakan Template Balasan Cepat" position="top">
+          <UiTooltip text="Gunakan Template Balasan Cepat" position="top" align="start">
             <button
               type="button"
               class="btn-canned inline-flex h-8 items-center gap-1.5 rounded-field border border-brand-hair bg-brand-canvas-soft px-2.5 text-xs font-medium text-brand-ink hover:bg-white hover:border-brand-ink transition-colors"
