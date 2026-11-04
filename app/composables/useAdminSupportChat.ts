@@ -133,7 +133,22 @@ export function useAdminSupportChat() {
     if (!newMsg || newMsg.deleted_at || newMsg.thread_id !== activeThreadId.value) return
     if (messages.value.some((m) => m.id === newMsg.id)) return // Deduplication check
 
-    messages.value.push(newMsg)
+    const enriched = { ...newMsg } as SupportMessageItem
+    if (
+      (newMsg.attachment_type === 'order_card' || newMsg.message_text.includes('Pesanan')) &&
+      !enriched.attached_order
+    ) {
+      const prev = messages.value.find((m) => m.attached_order)
+      if (prev?.attached_order) enriched.attached_order = prev.attached_order
+    } else if (
+      (newMsg.attachment_type === 'product_card' || newMsg.message_text.includes('Produk')) &&
+      !enriched.attached_product
+    ) {
+      const prev = messages.value.find((m) => m.attached_product)
+      if (prev?.attached_product) enriched.attached_product = prev.attached_product
+    }
+
+    messages.value.push(enriched)
     const thread = threads.value.find((t) => t.id === newMsg.thread_id)
     if (thread) {
       thread.last_message_text = newMsg.message_text

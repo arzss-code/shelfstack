@@ -88,6 +88,18 @@ export interface SupportMessageItem {
   is_read: boolean
   created_at: string
   deleted_at?: string | null
+  attached_order?: {
+    id: string
+    order_number?: string | null
+    total_cents: number
+    status: string
+  } | null
+  attached_product?: {
+    id: number
+    title: string
+    price_cents: number
+    image_url?: string | null
+  } | null
 }
 
 export interface SupportThreadWithCustomer extends SupportThreadItem {

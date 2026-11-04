@@ -95,6 +95,46 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    let attachedProduct = null
+    if (thread.attached_product_id) {
+      const { data: prodData } = await client
+        .from('products')
+        .select('id, name, price_cents, image_url')
+        .eq('id', thread.attached_product_id)
+        .maybeSingle()
+
+      if (prodData) {
+        attachedProduct = {
+          id: prodData.id,
+          title: prodData.name || 'Produk ShelfStack',
+          price_cents: prodData.price_cents || 0,
+          image_url: prodData.image_url || null,
+        }
+      }
+    }
+
+    const enrichedMessages = (rawMessages || []).map((m) => {
+      const enriched = { ...m } as any
+      if (m.attachment_type === 'order_card' && attachedOrder) {
+        enriched.attached_order = attachedOrder
+      } else if (m.attachment_type === 'product_card' && attachedProduct) {
+        enriched.attached_product = attachedProduct
+      } else if (
+        attachedOrder &&
+        m.sender_type === 'customer' &&
+        m.message_text.includes('Pesanan')
+      ) {
+        enriched.attached_order = attachedOrder
+      } else if (
+        attachedProduct &&
+        m.sender_type === 'customer' &&
+        m.message_text.includes('Produk')
+      ) {
+        enriched.attached_product = attachedProduct
+      }
+      return enriched
+    })
+
     return successResponse('Riwayat pesan berhasil dimuat', {
       thread: {
         ...thread,
@@ -107,8 +147,9 @@ export default defineEventHandler(async (event) => {
         avatar_url: profile?.avatar_url || null,
         total_orders: orderCount ?? 0,
       },
-      messages: rawMessages || [],
+      messages: enrichedMessages,
       attached_order: attachedOrder,
+      attached_product: attachedProduct,
     })
   } catch (err: unknown) {
     const errorObj = err as { message?: string; statusCode?: number }
