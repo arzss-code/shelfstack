@@ -96,6 +96,10 @@ const handleSend = async () => {
   )
     return
 
+  // Capture before clearing so we can enrich the sent message after send succeeds
+  const capturedOrder = selectedOrder.value
+  const capturedProduct = selectedProduct.value
+
   const payload: {
     message_text: string
     attachment_url?: string
@@ -104,17 +108,27 @@ const handleSend = async () => {
   } = {
     message_text:
       text ||
-      (selectedOrder.value
-        ? `Lampiran Pesanan #${selectedOrder.value.order_number || selectedOrder.value.id.slice(0, 8)}`
-        : `Lampiran Produk ${selectedProduct.value?.title}`),
+      (capturedOrder
+        ? `Lampiran Pesanan #${capturedOrder.order_number || capturedOrder.id.slice(0, 8)}`
+        : `Lampiran Produk ${capturedProduct?.title}`),
   }
   if (previewImage.value) payload.attachment_url = previewImage.value
-  if (selectedOrder.value) payload.attached_order_id = selectedOrder.value.id
-  if (selectedProduct.value) payload.attached_product_id = selectedProduct.value.id
+  if (capturedOrder) payload.attached_order_id = capturedOrder.id
+  if (capturedProduct) payload.attached_product_id = capturedProduct.id
 
   emit('sendMessage', payload)
   if (props.messages === undefined && supportChat) {
-    await supportChat.sendMessage(payload)
+    const ok = await supportChat.sendMessage(payload)
+    // Enrich the last pushed message with full order/product objects so the
+    // snippet components can render immediately without a server round-trip.
+    if (ok && (capturedOrder || capturedProduct)) {
+      const msgs = supportChat.messages.value
+      const last = msgs[msgs.length - 1] as ChatMessageItem | undefined
+      if (last && last.sender_type === 'customer') {
+        if (capturedOrder) last.attached_order = capturedOrder
+        if (capturedProduct) last.attached_product = capturedProduct
+      }
+    }
   }
 
   inputText.value = ''
@@ -183,7 +197,7 @@ const formatTime = (isoString?: string): string => {
 
 <template>
   <div
-    class="live-chat-window fixed bottom-0 right-4 sm:right-6 z-50 flex h-[600px] max-h-[calc(100vh-1rem)] w-[400px] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-t-2xl border-t border-x border-brand-hair bg-white shadow-floating"
+    class="live-chat-window fixed bottom-0 right-4 sm:right-6 z-50 flex h-[600px] max-h-[calc(100vh-1rem)] w-[400px] max-w-[calc(100vw-1rem)] flex-col rounded-t-2xl border-t border-x border-brand-hair bg-white shadow-floating"
     role="dialog"
     aria-modal="true"
     aria-label="Jendela Live Chat Bantuan ShelfStack"
@@ -202,7 +216,7 @@ const formatTime = (isoString?: string): string => {
         </span>
       </div>
       <div class="flex items-center gap-1">
-        <UiTooltip text="Kecilkan" position="bottom">
+        <UiTooltip text="Kecilkan" position="top">
           <button
             type="button"
             class="btn-minimize flex h-8 w-8 items-center justify-center rounded-field text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
@@ -212,7 +226,7 @@ const formatTime = (isoString?: string): string => {
             <i class="pi pi-minus text-xs" />
           </button>
         </UiTooltip>
-        <UiTooltip text="Tutup Bantuan" position="bottom">
+        <UiTooltip text="Tutup Bantuan" position="top">
           <button
             type="button"
             class="btn-close flex h-8 w-8 items-center justify-center rounded-field text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
