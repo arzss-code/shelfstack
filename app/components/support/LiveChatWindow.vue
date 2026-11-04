@@ -6,6 +6,8 @@ import ChatProductSnippet from './ChatProductSnippet.vue'
 import ChatEmojiPicker from './ChatEmojiPicker.vue'
 import ChatGuestPrompt from './ChatGuestPrompt.vue'
 import ChatLightboxModal from './ChatLightboxModal.vue'
+import ChatOrderPickerModal, { type OrderPickerItem } from './ChatOrderPickerModal.vue'
+import ChatProductPickerModal, { type ProductPickerItem } from './ChatProductPickerModal.vue'
 
 export interface ChatMessageItem {
   id: string
@@ -32,7 +34,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   close: []
-  sendMessage: [payload: { message_text: string; attachment_url?: string }]
+  sendMessage: [
+    payload: {
+      message_text: string
+      attachment_url?: string
+      attached_order_id?: string
+      attached_product_id?: number
+    },
+  ]
 }>()
 
 let supportChat: ReturnType<typeof useSupportChat> | null = null
@@ -45,6 +54,10 @@ try {
 const inputText = ref('')
 const fileInput = ref<HTMLInputElement | null>(null)
 const previewImage = ref<string | null>(null)
+const selectedOrder = ref<OrderPickerItem | null>(null)
+const selectedProduct = ref<ProductPickerItem | null>(null)
+const isOrderPickerOpen = ref(false)
+const isProductPickerOpen = ref(false)
 const activeLightboxUrl = ref<string | null>(null)
 const uploadError = ref<string | null>(null)
 const isUploading = ref(false)
@@ -60,9 +73,8 @@ const isSending = computed(() => supportChat?.isSending.value ?? false)
 
 const scrollToBottom = () => {
   nextTick(() => {
-    if (messageContainer.value) {
+    if (messageContainer.value)
       messageContainer.value.scrollTop = messageContainer.value.scrollHeight
-    }
   })
 }
 
@@ -77,20 +89,46 @@ onMounted(() => {
 })
 
 const handleSend = async () => {
-  const text = inputText.value.trim()
+  let text = inputText.value.trim()
+  if (!text && selectedOrder.value) {
+    text = `Mohon bantuan terkait pesanan ${selectedOrder.value.order_number || selectedOrder.value.id}`
+  } else if (!text && selectedProduct.value) {
+    text = `Halo, saya ingin menanyakan produk ${selectedProduct.value.title}`
+  }
+
   if (!text || text.length > 1000 || isSending.value) return
 
-  const payload: { message_text: string; attachment_url?: string } = { message_text: text }
+  const payload: any = { message_text: text }
   if (previewImage.value) payload.attachment_url = previewImage.value
+  if (selectedOrder.value) {
+    payload.attached_order_id = selectedOrder.value.id
+    payload.attachment_type = 'order_card'
+  } else if (selectedProduct.value) {
+    payload.attached_product_id = selectedProduct.value.id
+    payload.attachment_type = 'product_card'
+  }
 
   emit('sendMessage', payload)
   if (supportChat) await supportChat.sendMessage(payload)
 
   inputText.value = ''
   previewImage.value = null
+  selectedOrder.value = null
+  selectedProduct.value = null
   uploadError.value = null
   isEmojiOpen.value = false
   scrollToBottom()
+}
+
+const onSelectOrder = (o: OrderPickerItem) => {
+  selectedOrder.value = o
+  selectedProduct.value = null
+  isOrderPickerOpen.value = false
+}
+const onSelectProduct = (p: ProductPickerItem) => {
+  selectedProduct.value = p
+  selectedOrder.value = null
+  isProductPickerOpen.value = false
 }
 
 const handleFileChange = async (event: Event) => {
@@ -184,20 +222,22 @@ const formatTime = (isoString?: string): string => {
         </div>
 
         <template v-for="msg in effectiveMessages" :key="msg.id">
-          <!-- System Pill -->
+          <!-- System Note (Clean Card instead of Oval Badge) -->
           <div
             v-if="msg.sender_type === 'system'"
-            class="system-bubble mx-auto max-w-[90%] rounded-full border border-brand-hairsoft bg-brand-canvas-soft px-3 py-1.5 text-center text-[11px] leading-relaxed text-brand-muted"
+            class="system-bubble mx-auto my-1 max-w-[90%] rounded-card border border-brand-hair bg-white p-3 text-center text-xs text-brand-muted leading-relaxed shadow-whisper"
           >
             {{ msg.message_text }}
           </div>
 
-          <!-- Customer Message (Right) -->
+          <!-- Customer Message (Dynamic fit right) -->
           <div
             v-else-if="msg.sender_type === 'customer'"
-            class="customer-bubble ml-auto max-w-[80%] rounded-2xl rounded-br-sm bg-brand-ink p-3 text-white shadow-whisper space-y-2"
+            class="customer-bubble ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-brand-ink p-3 text-white shadow-whisper space-y-1.5"
           >
-            <p class="m-0 text-xs leading-relaxed whitespace-pre-wrap">{{ msg.message_text }}</p>
+            <p class="m-0 text-xs leading-relaxed whitespace-pre-wrap break-words">
+              {{ msg.message_text }}
+            </p>
             <img
               v-if="msg.attachment_url"
               :src="msg.attachment_url"
@@ -212,12 +252,14 @@ const formatTime = (isoString?: string): string => {
             </div>
           </div>
 
-          <!-- Admin Message (Left) -->
+          <!-- Admin Message (Dynamic fit left) -->
           <div
             v-else
-            class="admin-bubble mr-auto max-w-[80%] rounded-2xl rounded-bl-sm border border-brand-hair bg-white p-3 text-brand-ink shadow-whisper space-y-2"
+            class="admin-bubble mr-auto w-fit max-w-[80%] rounded-2xl rounded-bl-sm border border-brand-hair bg-white p-3 text-brand-ink shadow-whisper space-y-1.5"
           >
-            <p class="m-0 text-xs leading-relaxed whitespace-pre-wrap">{{ msg.message_text }}</p>
+            <p class="m-0 text-xs leading-relaxed whitespace-pre-wrap break-words">
+              {{ msg.message_text }}
+            </p>
             <img
               v-if="msg.attachment_url"
               :src="msg.attachment_url"
@@ -236,16 +278,42 @@ const formatTime = (isoString?: string): string => {
 
       <!-- Attachment staging bar -->
       <div
-        v-if="previewImage || uploadError"
+        v-if="previewImage || selectedOrder || selectedProduct || uploadError"
         class="border-t border-brand-hairsoft bg-brand-canvas-soft px-3 py-2 flex items-center justify-between text-xs"
       >
         <div v-if="previewImage" class="flex items-center gap-2">
-          <img :src="previewImage" alt="Lampiran" class="h-8 w-8 rounded object-cover" />
-          <span class="text-[11px] text-brand-muted truncate max-w-[180px]">Gambar siap kirim</span>
+          <img :src="previewImage" alt="Lampiran" class="h-7 w-7 rounded object-cover" />
+          <span class="text-[11px] text-brand-muted truncate max-w-[150px]">Gambar siap kirim</span>
           <button
             type="button"
             class="text-brand-muted hover:text-brand-ink text-xs"
             @click="previewImage = null"
+          >
+            <i class="pi pi-times" />
+          </button>
+        </div>
+        <div v-else-if="selectedOrder" class="flex items-center gap-2">
+          <i class="pi pi-receipt text-xs text-brand-accent" />
+          <span class="text-[11px] font-semibold text-brand-ink truncate max-w-[160px]">{{
+            selectedOrder.order_number || selectedOrder.id.slice(0, 8)
+          }}</span>
+          <button
+            type="button"
+            class="text-brand-muted hover:text-brand-ink text-xs"
+            @click="selectedOrder = null"
+          >
+            <i class="pi pi-times" />
+          </button>
+        </div>
+        <div v-else-if="selectedProduct" class="flex items-center gap-2">
+          <i class="pi pi-box text-xs text-brand-accent" />
+          <span class="text-[11px] font-semibold text-brand-ink truncate max-w-[160px]">{{
+            selectedProduct.title
+          }}</span>
+          <button
+            type="button"
+            class="text-brand-muted hover:text-brand-ink text-xs"
+            @click="selectedProduct = null"
           >
             <i class="pi pi-times" />
           </button>
@@ -279,24 +347,36 @@ const formatTime = (isoString?: string): string => {
         />
         <button
           type="button"
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
-          title="Lampirkan foto (maks 5MB)"
+          class="flex h-7 w-7 shrink-0 items-center justify-center rounded-field text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
+          title="Lampirkan foto"
           :disabled="isUploading || isSending"
           @click="fileInput?.click()"
         >
-          <i
-            :class="isUploading ? 'pi pi-spin pi-spinner' : 'pi pi-image'"
-            class="text-xs"
-            aria-hidden="true"
-          />
+          <i :class="isUploading ? 'pi pi-spin pi-spinner' : 'pi pi-image'" class="text-xs" />
         </button>
         <button
           type="button"
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
+          class="flex h-7 w-7 shrink-0 items-center justify-center rounded-field text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
           title="Pilih emotikon"
           @click="isEmojiOpen = !isEmojiOpen"
         >
-          <i class="pi pi-face-smile text-xs" aria-hidden="true" />
+          <i class="pi pi-face-smile text-xs" />
+        </button>
+        <button
+          type="button"
+          class="flex h-7 w-7 shrink-0 items-center justify-center rounded-field text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
+          title="Lampirkan pesanan"
+          @click="isOrderPickerOpen = true"
+        >
+          <i class="pi pi-receipt text-xs" />
+        </button>
+        <button
+          type="button"
+          class="flex h-7 w-7 shrink-0 items-center justify-center rounded-field text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink transition-colors"
+          title="Lampirkan produk"
+          @click="isProductPickerOpen = true"
+        >
+          <i class="pi pi-box text-xs" />
         </button>
         <textarea
           v-model="inputText"
@@ -312,7 +392,11 @@ const formatTime = (isoString?: string): string => {
         <button
           type="button"
           class="btn-send shrink-0 rounded-full bg-brand-ink px-3.5 py-1.5 text-xs font-semibold text-white transition-all hover:bg-brand-inkhover disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="!inputText.trim() || inputText.length > 1000 || isSending"
+          :disabled="
+            (!inputText.trim() && !selectedOrder && !selectedProduct) ||
+            inputText.length > 1000 ||
+            isSending
+          "
           @click="handleSend"
         >
           Kirim
@@ -320,7 +404,17 @@ const formatTime = (isoString?: string): string => {
       </div>
     </div>
 
-    <!-- Lightbox Modal Overlay -->
+    <!-- Modals -->
+    <ChatOrderPickerModal
+      :is-open="isOrderPickerOpen"
+      @select-order="onSelectOrder"
+      @close="isOrderPickerOpen = false"
+    />
+    <ChatProductPickerModal
+      :is-open="isProductPickerOpen"
+      @select-product="onSelectProduct"
+      @close="isProductPickerOpen = false"
+    />
     <ChatLightboxModal :image-url="activeLightboxUrl" @close="activeLightboxUrl = null" />
   </div>
 </template>

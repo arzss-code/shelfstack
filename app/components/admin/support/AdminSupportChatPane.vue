@@ -6,6 +6,7 @@ import ChatEmojiPicker from '~/components/support/ChatEmojiPicker.vue'
 import ChatOrderSnippet from '~/components/support/ChatOrderSnippet.vue'
 import ChatProductSnippet from '~/components/support/ChatProductSnippet.vue'
 import ChatLightboxModal from '~/components/support/ChatLightboxModal.vue'
+import ChatProductPickerModal from '~/components/support/ChatProductPickerModal.vue'
 
 export interface SupportThreadCustomer {
   id: string
@@ -34,10 +35,7 @@ interface Props {
   messages?: SupportPaneMessage[]
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  thread: undefined,
-  messages: undefined,
-})
+const props = withDefaults(defineProps<Props>(), { thread: undefined, messages: undefined })
 
 const emit = defineEmits<{
   sendMessage: [payload: { message_text: string; attachment_url?: string }]
@@ -64,6 +62,7 @@ try {
 const replyText = ref('')
 const isCannedOpen = ref(false)
 const isEmojiOpen = ref(false)
+const isProductPickerOpen = ref(false)
 const selectedImage = ref<string | null>(null)
 const imageFileInput = ref<HTMLInputElement | null>(null)
 const activeLightboxUrl = ref<string | null>(null)
@@ -121,6 +120,14 @@ const onUpdateStatus = async (newStatus: string) => {
   }
 }
 
+const toggleCannedMenu = () => {
+  isCannedOpen.value = !isCannedOpen.value
+  isEmojiOpen.value = false
+}
+const toggleEmojiPicker = () => {
+  isEmojiOpen.value = !isEmojiOpen.value
+  isCannedOpen.value = false
+}
 const onCannedSelect = (text: string) => {
   replyText.value = text
   isCannedOpen.value = false
@@ -128,6 +135,13 @@ const onCannedSelect = (text: string) => {
 const onEmojiSelect = (emoji: string) => {
   replyText.value += emoji
   isEmojiOpen.value = false
+}
+
+const onProductSelect = (product: { id: number; title: string; price_cents: number }) => {
+  const rupiah = Math.round(product.price_cents / 100).toLocaleString('id-ID')
+  const rec = `Rekomendasi Produk: ${product.title} (Rp ${rupiah}) - /products/${product.id}`
+  replyText.value = replyText.value ? `${replyText.value}\n${rec}` : rec
+  isProductPickerOpen.value = false
 }
 
 const onImageSelected = (e: Event) => {
@@ -175,25 +189,27 @@ const formatTime = (isoString?: string): string => {
         class="pane-messages flex-1 overflow-y-auto bg-brand-canvas-soft/40 p-4 space-y-3"
       >
         <template v-for="msg in effectiveMessages" :key="msg.id">
-          <!-- System Note -->
+          <!-- System Note (Clean Card instead of Oval Badge) -->
           <div
             v-if="msg.sender_type === 'system'"
-            class="message-bubble system-bubble mx-auto max-w-[85%] rounded-full border border-brand-hairsoft bg-white/80 backdrop-blur-xs px-3.5 py-1 text-center text-[11px] text-brand-muted shadow-xs"
+            class="message-bubble system-bubble mx-auto my-1 max-w-md rounded-card border border-brand-hair bg-white p-3 text-center text-xs text-brand-muted leading-relaxed shadow-whisper"
           >
-            <p class="text-xs m-0">{{ msg.message_text }}</p>
+            <p class="text-xs m-0 text-brand-muted leading-relaxed">{{ msg.message_text }}</p>
           </div>
 
-          <!-- Customer Message (Left) -->
+          <!-- Customer Message (Dynamic fit left) -->
           <div
             v-else-if="msg.sender_type === 'customer'"
-            class="message-bubble customer-bubble mr-auto max-w-[80%] rounded-2xl rounded-bl-xs border border-brand-hair bg-white p-3 text-brand-ink shadow-whisper space-y-2"
+            class="message-bubble customer-bubble mr-auto w-fit max-w-[80%] rounded-2xl rounded-bl-xs border border-brand-hair bg-white p-3 text-brand-ink shadow-whisper space-y-1.5"
           >
-            <p class="text-xs m-0 leading-relaxed whitespace-pre-wrap">{{ msg.message_text }}</p>
+            <p class="text-xs m-0 leading-relaxed whitespace-pre-wrap break-words">
+              {{ msg.message_text }}
+            </p>
             <img
               v-if="msg.attachment_url"
               :src="msg.attachment_url"
               alt="Lampiran"
-              class="attachment-preview mt-2 max-w-xs max-h-48 rounded-field border border-brand-hair object-cover cursor-pointer hover:opacity-95 shadow-xs"
+              class="attachment-preview mt-1 max-w-xs max-h-48 rounded-field border border-brand-hair object-cover cursor-pointer hover:opacity-95 shadow-xs"
               @click="activeLightboxUrl = msg.attachment_url"
             />
             <ChatOrderSnippet v-if="msg.attached_order" :order="msg.attached_order" />
@@ -203,17 +219,19 @@ const formatTime = (isoString?: string): string => {
             </div>
           </div>
 
-          <!-- Admin Message (Right) -->
+          <!-- Admin Message (Dynamic fit right) -->
           <div
             v-else
-            class="message-bubble admin-bubble ml-auto max-w-[80%] rounded-2xl rounded-br-xs bg-brand-ink text-white p-3 shadow-whisper space-y-2"
+            class="message-bubble admin-bubble ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-xs bg-brand-ink text-white p-3 shadow-whisper space-y-1.5"
           >
-            <p class="text-xs m-0 leading-relaxed whitespace-pre-wrap">{{ msg.message_text }}</p>
+            <p class="text-xs m-0 leading-relaxed whitespace-pre-wrap break-words">
+              {{ msg.message_text }}
+            </p>
             <img
               v-if="msg.attachment_url"
               :src="msg.attachment_url"
               alt="Lampiran"
-              class="attachment-preview mt-2 max-w-xs max-h-48 rounded-field object-cover cursor-pointer hover:opacity-95 shadow-xs"
+              class="attachment-preview mt-1 max-w-xs max-h-48 rounded-field object-cover cursor-pointer hover:opacity-95 shadow-xs"
               @click="activeLightboxUrl = msg.attachment_url"
             />
             <div class="flex items-center justify-end text-[10px] text-white/60 tabular-nums">
@@ -232,7 +250,7 @@ const formatTime = (isoString?: string): string => {
           <img
             :src="selectedImage"
             alt="Preview upload"
-            class="h-14 w-14 object-cover rounded-field border border-brand-hair shadow-xs"
+            class="h-12 w-12 object-cover rounded-field border border-brand-hair shadow-xs"
           />
           <button
             type="button"
@@ -270,10 +288,7 @@ const formatTime = (isoString?: string): string => {
           <button
             type="button"
             class="btn-canned inline-flex items-center gap-1 rounded-field border border-brand-hair bg-brand-canvas-soft px-2.5 py-1.5 text-xs font-medium text-brand-ink hover:bg-white hover:border-brand-ink transition-colors"
-            @click="
-              isCannedOpen = !isCannedOpen
-              isEmojiOpen = false
-            "
+            @click="toggleCannedMenu"
           >
             <i class="pi pi-bolt text-xs text-brand-accent" />
             <span>Pesan Cepat</span>
@@ -284,10 +299,7 @@ const formatTime = (isoString?: string): string => {
             type="button"
             class="btn-emoji flex h-7 w-7 items-center justify-center rounded-field border border-brand-hair text-brand-muted hover:text-brand-ink hover:border-brand-ink transition-colors"
             title="Tambah Emotikon"
-            @click="
-              isEmojiOpen = !isEmojiOpen
-              isCannedOpen = false
-            "
+            @click="toggleEmojiPicker"
           >
             <i class="pi pi-face-smile text-xs" />
           </button>
@@ -300,6 +312,16 @@ const formatTime = (isoString?: string): string => {
             @click="imageFileInput?.click()"
           >
             <i class="pi pi-image text-xs" />
+          </button>
+
+          <!-- Recommend Product Trigger -->
+          <button
+            type="button"
+            class="btn-attach-product flex h-7 w-7 items-center justify-center rounded-field border border-brand-hair text-brand-muted hover:text-brand-ink hover:border-brand-ink transition-colors"
+            title="Rekomendasikan Produk Katalog"
+            @click="isProductPickerOpen = true"
+          >
+            <i class="pi pi-box text-xs" />
           </button>
 
           <!-- Composer Textarea -->
@@ -330,6 +352,13 @@ const formatTime = (isoString?: string): string => {
         </div>
       </div>
     </div>
+
+    <!-- Product Picker Modal -->
+    <ChatProductPickerModal
+      :is-open="isProductPickerOpen"
+      @select-product="onProductSelect"
+      @close="isProductPickerOpen = false"
+    />
 
     <!-- Lightbox Modal Overlay -->
     <ChatLightboxModal :image-url="activeLightboxUrl" @close="activeLightboxUrl = null" />
