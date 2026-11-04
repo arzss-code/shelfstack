@@ -1,8 +1,15 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { ref } from 'vue'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { createPinia, setActivePinia } from 'pinia'
 import { useWishlistStore } from '../../app/features/wishlist/stores/wishlist'
 import { useCartStore } from '../../app/features/cart/stores/cart'
 import type { Product } from '../../app/types/product'
+
+const { mockUser } = vi.hoisted(() => ({
+  mockUser: { value: null as { id: string } | null },
+}))
+mockNuxtImport('useSupabaseUser', () => () => mockUser)
 
 const mockProductA: Product = {
   id: 101,
@@ -153,5 +160,15 @@ describe('useWishlistStore', () => {
     expect(Array.isArray(parsed)).toBe(true)
     expect(parsed.length).toBe(1)
     expect(parsed[0].productId).toBe(101)
+  })
+
+  it('berhasil diinisialisasi saat pengguna dalam kondisi login tanpa ReferenceError', async () => {
+    setActivePinia(createPinia())
+    mockUser.value = { id: 'user-123' }
+    vi.stubGlobal('$fetch', vi.fn().mockResolvedValue({ success: true, data: [] }))
+    const store = useWishlistStore()
+    expect(store).toBeDefined()
+    await store.initWishlist()
+    vi.unstubAllGlobals()
   })
 })
