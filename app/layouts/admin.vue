@@ -1,16 +1,24 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import AppLogo from '~/components/AppLogo.vue'
 import { useAuth } from '~/features/auth/composables/useAuth'
+import { useAdminSupportChat } from '~/composables/useAdminSupportChat'
 
 const { user, profile, signOut: logout } = useAuth()
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
 
+const { threads, fetchThreads } = useAdminSupportChat()
+
+const unreadSupportCount = computed(() => {
+  return threads.value?.reduce((acc, t) => acc + (t.unread_by_admin_count || 0), 0) ?? 0
+})
+
 const navLinks = [
   { to: '/admin', label: 'Dashboard', icon: 'pi-chart-bar', exact: true },
   { to: '/admin/orders', label: 'Kelola Pesanan', icon: 'pi-shopping-bag', exact: false },
   { to: '/admin/returns', label: 'Komplain & Retur', icon: 'pi-replay', exact: false },
+  { to: '/admin/support', label: 'Bantuan & Live Chat', icon: 'pi-comments', exact: false },
   { to: '/admin/products', label: 'Kelola Produk', icon: 'pi-th-large', exact: false },
   { to: '/admin/coupons', label: 'Kelola Voucher', icon: 'pi-ticket', exact: false },
   { to: '/admin/activities', label: 'Activity Log', icon: 'pi-history', exact: false },
@@ -23,6 +31,12 @@ watch(
     isMobileMenuOpen.value = false
   },
 )
+
+onMounted(() => {
+  if (user.value && threads.value.length === 0) {
+    fetchThreads().catch(() => {})
+  }
+})
 </script>
 
 <template>
@@ -53,12 +67,20 @@ watch(
           v-for="item in navLinks"
           :key="item.to"
           :to="item.to"
-          class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center gap-2.5 text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
+          class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center justify-between text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
           :exact-active-class="item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
           :active-class="!item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
         >
-          <i :class="['pi text-xs', item.icon]" />
-          <span>{{ item.label }}</span>
+          <div class="flex items-center gap-2.5">
+            <i :class="['pi text-xs', item.icon]" />
+            <span>{{ item.label }}</span>
+          </div>
+          <span
+            v-if="item.to === '/admin/support' && unreadSupportCount > 0"
+            class="unread-support-badge rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white leading-none shadow-sm"
+          >
+            {{ unreadSupportCount > 99 ? '99+' : unreadSupportCount }}
+          </span>
         </NuxtLink>
       </nav>
 
@@ -131,13 +153,21 @@ watch(
             v-for="item in navLinks"
             :key="item.to"
             :to="item.to"
-            class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center gap-2.5 text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
+            class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center justify-between text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
             :exact-active-class="item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
             :active-class="!item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
             @click="isMobileMenuOpen = false"
           >
-            <i :class="['pi text-xs', item.icon]" />
-            <span>{{ item.label }}</span>
+            <div class="flex items-center gap-2.5">
+              <i :class="['pi text-xs', item.icon]" />
+              <span>{{ item.label }}</span>
+            </div>
+            <span
+              v-if="item.to === '/admin/support' && unreadSupportCount > 0"
+              class="unread-support-badge rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white leading-none shadow-sm"
+            >
+              {{ unreadSupportCount > 99 ? '99+' : unreadSupportCount }}
+            </span>
           </NuxtLink>
         </nav>
 
@@ -172,11 +202,17 @@ watch(
           <!-- Mobile Hamburger Toggle -->
           <button
             type="button"
-            class="flex h-9 w-9 items-center justify-center rounded-lg border border-brand-hair text-brand-ink hover:bg-brand-canvas-soft md:hidden"
+            class="relative flex h-9 w-9 items-center justify-center rounded-lg border border-brand-hair text-brand-ink hover:bg-brand-canvas-soft md:hidden"
             aria-label="Buka menu navigasi admin"
             @click="isMobileMenuOpen = true"
           >
             <i class="pi pi-bars text-sm" />
+            <span v-if="unreadSupportCount > 0" class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <span
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
+              />
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
+            </span>
           </button>
           <div class="flex items-center gap-2">
             <span class="font-display text-sm font-bold text-brand-ink">ShelfStack</span>

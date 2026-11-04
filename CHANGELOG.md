@@ -2,6 +2,46 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.31.0] - 2026-11-04
+
+### Sistem Live Chat Bantuan Pelanggan Real-time (Customer Support Live Chat)
+
+- **Database PostgreSQL & Supabase Storage**:
+  - `supabase/migrations/20261129000001_customer_support_live_chat.sql`:
+    - Tabel baru `public.support_threads`: Menampung 1 dedicated thread percakapan per pelanggan dengan kolom `customer_id`, `status` (open, waiting_admin, waiting_customer, resolved), `last_message_text`, `last_message_at`, `unread_by_customer_count`, `unread_by_admin_count`, `attached_order_id`, `attached_product_id`, dan `deleted_at`.
+    - Tabel baru `public.support_messages`: Menampung riwayat pesan dengan kolom `thread_id`, `sender_type` (customer, admin, system), `sender_id`, `message_text`, `attachment_url`, `attachment_type` (image, order_card, product_card), `is_read`, dan `deleted_at`.
+    - Database Trigger `trigger_update_support_thread_on_message`: Secara atomik memperbarui pesan terakhir, timestamp, dan menambah counter unread untuk pihak lawan.
+    - Bucket Supabase Storage baru `chat-attachments`: Penyimpanan foto bukti tangkapan layar dengan batasan ukuran 5MB, format JPEG/PNG/WebP, dan kebijakan RLS khusus kepemilikan user.
+    - Pendaftaran publikasi Supabase Realtime untuk tabel `support_threads` dan `support_messages`.
+- **Skema Zod & Utilitas Server Bersama**:
+  - `shared/schemas/support-chat.ts`: Skema validasi terpadu (`sendSupportMessageSchema`, `updateThreadStatusSchema`, `supportThreadQuerySchema`) dengan batas 1-1000 karakter pesan dan pesan validasi bahasa Indonesia.
+  - `server/utils/support-chat.ts`: Kamus template balasan cepat (_canned responses_) resmi tim CS, generator pesan bot selamat datang otomatis (_auto welcome bot_), dan pemformat waktu relatif.
+- **Backend API Server Nitro**:
+  - `GET /api/support/thread`: Endpoint inisialisasi thread dan riwayat 50 pesan pelanggan.
+  - `POST /api/support/messages`: Endpoint pengiriman pesan pelanggan dengan pemicu otomatis bot selamat datang pada pesan pertama.
+  - `PATCH /api/support/read`: Endpoint reset counter unread pelanggan menjadi 0 saat obrolan dibuka.
+  - `POST /api/support/upload`: Endpoint pengunggahan berkas bukti foto ke bucket `chat-attachments`.
+  - `GET /api/admin/support/threads`: Endpoint admin memuat daftar seluruh inbox obrolan dengan filter status dan pencarian nama.
+  - `GET /api/admin/support/threads/[id]/messages`: Endpoint admin memuat riwayat pesan obrolan spesifik.
+  - `POST /api/admin/support/threads/[id]/messages`: Endpoint admin membalas pesan obrolan ke pelanggan.
+  - `PATCH /api/admin/support/threads/[id]/status`: Endpoint admin memperbarui status kendala obrolan.
+- **Komponen Frontend & State Management (Semua Komponen <= 300 Baris)**:
+  - `app/composables/useSupportChat.ts`: Composable state management pelanggan (292 baris) dengan sinkronisasi realtime channel `support-thread-${threadId}` dan penanganan login guard.
+  - `app/composables/useAdminSupportChat.ts`: Composable state management admin (272 baris) dengan agregasi channel `admin-support-inbox`.
+  - `app/components/support/LiveChatWidget.vue`: Tombol mengapung interaktif (115 baris) di pojok kanan bawah etalase dengan animasi pulse dan badge unread counter.
+  - `app/components/support/LiveChatWindow.vue`: Popover window obrolan (245 baris) dengan header status CS, stream gelembung pesan, form composer, dan kartu ajakan masuk untuk pengunjung tamu.
+  - `app/components/support/ChatOrderSnippet.vue`: Kartu ringkas cuplikan pesanan terlampir (71 baris) langsung di dalam pesan.
+  - `app/components/admin/support/AdminSupportInboxList.vue`: Panel kiri inbox admin (228 baris) dengan tab filter status dan pencarian pelanggan.
+  - `app/components/admin/support/AdminSupportChatPane.vue`: Panel kanan percakapan aktif admin (250 baris) dengan profil pelanggan dan aksi tandai selesai.
+  - `app/components/admin/support/AdminCannedResponseMenu.vue`: Popover template balasan cepat 1-klik (91 baris).
+  - `app/pages/admin/support.vue`: Halaman orchestrator split-view dual-pane admin (184 baris).
+  - `app/layouts/default.vue`: Pemasangan global widget `<LiveChatWidget />` di etalase toko.
+  - `app/layouts/admin.vue`: Penambahan menu navigasi "Bantuan & Live Chat" dengan ikon `pi-comments` dan badge unread.
+  - `app/pages/help.vue` & `app/pages/contact.vue`: Tombol aksi cepat terintegrasi langsung dengan launcher live chat.
+- **Pengujian Unit Otomatis**:
+  - 8 suite pengujian unit baru melingkupi skema Zod, perenderan komponen Vue, simulasi realtime, deduplikasi pesan, dan API admin.
+  - Total pengujian proyek: 83 file test / 880 tests lulus 100%.
+
 ## [0.30.1] - 2026-11-04
 
 ### Perbaikan Inisialisasi Store Wishlist (Temporal Dead Zone)

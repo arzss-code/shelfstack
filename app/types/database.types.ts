@@ -1028,6 +1028,113 @@ export type Database = {
           },
         ]
       }
+      support_threads: {
+        Row: {
+          attached_order_id: string | null
+          attached_product_id: number | null
+          created_at: string
+          customer_id: string
+          deleted_at: string | null
+          id: string
+          last_message_at: string | null
+          last_message_text: string | null
+          status: 'open' | 'waiting_admin' | 'waiting_customer' | 'resolved'
+          unread_by_admin_count: number
+          unread_by_customer_count: number
+          updated_at: string
+        }
+        Insert: {
+          attached_order_id?: string | null
+          attached_product_id?: number | null
+          created_at?: string
+          customer_id: string
+          deleted_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          last_message_text?: string | null
+          status?: 'open' | 'waiting_admin' | 'waiting_customer' | 'resolved'
+          unread_by_admin_count?: number
+          unread_by_customer_count?: number
+          updated_at?: string
+        }
+        Update: {
+          attached_order_id?: string | null
+          attached_product_id?: number | null
+          created_at?: string
+          customer_id?: string
+          deleted_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          last_message_text?: string | null
+          status?: 'open' | 'waiting_admin' | 'waiting_customer' | 'resolved'
+          unread_by_admin_count?: number
+          unread_by_customer_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'support_threads_attached_order_id_fkey'
+            columns: ['attached_order_id']
+            isOneToOne: false
+            referencedRelation: 'orders'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'support_threads_attached_product_id_fkey'
+            columns: ['attached_product_id']
+            isOneToOne: false
+            referencedRelation: 'products'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      support_messages: {
+        Row: {
+          attachment_type: 'image' | 'order_card' | 'product_card' | null
+          attachment_url: string | null
+          created_at: string
+          deleted_at: string | null
+          id: string
+          is_read: boolean
+          message_text: string
+          sender_id: string | null
+          sender_type: 'customer' | 'admin' | 'system'
+          thread_id: string
+        }
+        Insert: {
+          attachment_type?: 'image' | 'order_card' | 'product_card' | null
+          attachment_url?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_read?: boolean
+          message_text: string
+          sender_id?: string | null
+          sender_type: 'customer' | 'admin' | 'system'
+          thread_id: string
+        }
+        Update: {
+          attachment_type?: 'image' | 'order_card' | 'product_card' | null
+          attachment_url?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_read?: boolean
+          message_text?: string
+          sender_id?: string | null
+          sender_type?: 'customer' | 'admin' | 'system'
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'support_messages_thread_id_fkey'
+            columns: ['thread_id']
+            isOneToOne: false
+            referencedRelation: 'support_threads'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

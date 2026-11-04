@@ -117,6 +117,15 @@ const handleSubmit = async () => {
     isLoading.value = false
   }
 }
+
+const handleOpenLiveChat = () => {
+  try {
+    const { toggleChat } = useSupportChat()
+    toggleChat()
+  } catch {
+    // Fallback for test environments without Nuxt context
+  }
+}
 </script>
 
 <template>
@@ -240,6 +249,19 @@ const handleSubmit = async () => {
           </div>
 
           <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
+            <UiButton
+              type="button"
+              variant="primary"
+              size="sm"
+              icon="pi-comments"
+              block
+              class="justify-start"
+              data-testid="btn-live-chat"
+              @click="handleOpenLiveChat"
+            >
+              Buka Live Chat
+            </UiButton>
+
             <UiButton
               to="/help"
               variant="outline"

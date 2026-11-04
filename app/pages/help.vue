@@ -302,6 +302,15 @@ const getBadgeVariant = (
       return 'default'
   }
 }
+
+const handleOpenLiveChat = () => {
+  try {
+    const { toggleChat } = useSupportChat()
+    toggleChat()
+  } catch {
+    // Fallback for test environments without Nuxt context
+  }
+}
 </script>
 
 <template>
@@ -487,7 +496,15 @@ const getBadgeVariant = (
           09.00 - 18.00 WIB.
         </p>
         <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <UiButton to="/contact" variant="primary" icon="pi pi-envelope" data-testid="btn-contact">
+          <UiButton
+            variant="primary"
+            icon="pi-comments"
+            data-testid="btn-live-chat"
+            @click="handleOpenLiveChat"
+          >
+            Buka Live Chat
+          </UiButton>
+          <UiButton to="/contact" variant="outline" icon="pi pi-envelope" data-testid="btn-contact">
             Hubungi Kami
           </UiButton>
           <UiButton
