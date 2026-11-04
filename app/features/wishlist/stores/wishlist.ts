@@ -32,27 +32,6 @@ export const useWishlistStore = defineStore('wishlist', () => {
     }
   }
 
-  // Inisialisasi dari LocalStorage dan Sinkronisasi Database
-  const initWishlist = async () => {
-    if (import.meta.client) {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-          const parsed = JSON.parse(stored)
-          if (Array.isArray(parsed)) {
-            items.value = parsed
-          }
-        }
-      } catch (e) {
-        console.error('Failed to parse wishlist from localStorage:', e)
-      }
-
-      if (checkIsLoggedIn()) {
-        await syncLocalToDatabase()
-      }
-    }
-  }
-
   // Simpan ke LocalStorage
   const saveWishlist = () => {
     if (import.meta.client) {
@@ -64,25 +43,20 @@ export const useWishlistStore = defineStore('wishlist', () => {
     }
   }
 
-  if (import.meta.client) {
-    initWishlist()
-
-    // Pantau perubahan sesi Supabase untuk sinkronisasi otomatis
-    try {
-      const user = useSupabaseUser()
-      watch(
-        () => user.value?.id,
-        async (newUserId) => {
-          if (newUserId) {
-            await syncLocalToDatabase()
-          }
-        },
-        { immediate: true },
-      )
-    } catch {
-      // Abaikan jika useSupabaseUser tidak tersedia di lingkungan non-Nuxt
-    }
-  }
+  // Helper pemetaan baris relasi database ke WishlistItem
+  const mapWishlistRow = (row: any): WishlistItem => ({
+    productId: row.product.id,
+    name: row.product.name,
+    slug: row.product.slug,
+    price: row.product.price,
+    priceCents: row.product.price_cents ?? row.product.price * 100,
+    originalPriceCents: null,
+    imageUrl: row.product.image_url,
+    stock: row.product.stock,
+    categoryId: row.product.category_id,
+    categoryName: null,
+    addedAt: row.created_at,
+  })
 
   // Ambil data terbaru dari Supabase Database
   const fetchFromDatabase = async () => {
@@ -92,26 +66,7 @@ export const useWishlistStore = defineStore('wishlist', () => {
       isSyncing.value = true
       const response = await $fetch<{ success: boolean; data: any[] }>('/api/wishlist')
       if (response?.success && Array.isArray(response.data)) {
-        const mappedItems: WishlistItem[] = response.data
-          .filter((row) => row.product)
-          .map((row) => {
-            const prod = row.product
-            return {
-              productId: prod.id,
-              name: prod.name,
-              slug: prod.slug,
-              price: prod.price,
-              priceCents: prod.price_cents ?? prod.price * 100,
-              originalPriceCents: null,
-              imageUrl: prod.image_url,
-              stock: prod.stock,
-              categoryId: prod.category_id,
-              categoryName: null,
-              addedAt: row.created_at,
-            }
-          })
-
-        items.value = mappedItems
+        items.value = response.data.filter((row) => row.product).map(mapWishlistRow)
         saveWishlist()
       }
     } catch (err) {
@@ -134,32 +89,34 @@ export const useWishlistStore = defineStore('wishlist', () => {
       })
 
       if (response?.success && Array.isArray(response.data)) {
-        const mappedItems: WishlistItem[] = response.data
-          .filter((row) => row.product)
-          .map((row) => {
-            const prod = row.product
-            return {
-              productId: prod.id,
-              name: prod.name,
-              slug: prod.slug,
-              price: prod.price,
-              priceCents: prod.price_cents ?? prod.price * 100,
-              originalPriceCents: null,
-              imageUrl: prod.image_url,
-              stock: prod.stock,
-              categoryId: prod.category_id,
-              categoryName: null,
-              addedAt: row.created_at,
-            }
-          })
-
-        items.value = mappedItems
+        items.value = response.data.filter((row) => row.product).map(mapWishlistRow)
         saveWishlist()
       }
     } catch (err) {
       console.warn('Gagal menyinkronkan wishlist ke database:', err)
     } finally {
       isSyncing.value = false
+    }
+  }
+
+  // Inisialisasi dari LocalStorage dan Sinkronisasi Database
+  const initWishlist = async () => {
+    if (import.meta.client) {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY)
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          if (Array.isArray(parsed)) {
+            items.value = parsed
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse wishlist from localStorage:', e)
+      }
+
+      if (checkIsLoggedIn()) {
+        await syncLocalToDatabase()
+      }
     }
   }
 
@@ -177,23 +134,20 @@ export const useWishlistStore = defineStore('wishlist', () => {
       return false
     }
 
-    const priceCents = product.price_cents ?? product.price * 100
-    const newItem: WishlistItem = {
+    // Optimistic Update
+    items.value.unshift({
       productId: product.id,
       name: product.name,
       slug: product.slug,
       price: product.price,
-      priceCents,
+      priceCents: product.price_cents ?? product.price * 100,
       originalPriceCents: null,
       imageUrl: product.image_url,
       stock: product.stock,
       categoryId: product.category_id,
       categoryName: categoryName || null,
       addedAt: new Date().toISOString(),
-    }
-
-    // Optimistic Update
-    items.value.unshift(newItem)
+    })
     saveWishlist()
 
     // Sinkronkan ke cloud jika login
@@ -211,14 +165,7 @@ export const useWishlistStore = defineStore('wishlist', () => {
 
   const removeItem = (productId: number): boolean => {
     const existingIndex = items.value.findIndex((item) => item.productId === productId)
-    if (existingIndex === -1) {
-      return false
-    }
-
-    const removedItem = items.value[existingIndex]
-    if (!removedItem) {
-      return false
-    }
+    if (existingIndex === -1 || !items.value[existingIndex]) return false
 
     // Optimistic Update
     items.value.splice(existingIndex, 1)
@@ -306,6 +253,26 @@ export const useWishlistStore = defineStore('wishlist', () => {
       ).catch((err) => {
         console.warn('Gagal membersihkan wishlist di database:', err)
       })
+    }
+  }
+
+  // Inisialisasi otomatis dan watcher sesi setelah seluruh fungsi terdefinisi
+  if (import.meta.client) {
+    initWishlist()
+
+    // Pantau perubahan sesi Supabase untuk sinkronisasi otomatis
+    try {
+      const user = useSupabaseUser()
+      watch(
+        () => user.value?.id,
+        async (newUserId) => {
+          if (newUserId) {
+            await syncLocalToDatabase()
+          }
+        },
+      )
+    } catch {
+      // Abaikan jika useSupabaseUser tidak tersedia di lingkungan non-Nuxt
     }
   }
 

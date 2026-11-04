@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 9 (Customer Experience & Loyalty Hub)**
-- **Versi Rilis:** `v0.30.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-03)
-- **Baseline Quality Gate (2026-11-03, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 74 file / 701 test lolos 100%.
+- **Versi Rilis:** `v0.30.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-04)
+- **Baseline Quality Gate (2026-11-04, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 74 file / 702 test lolos 100%.
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
