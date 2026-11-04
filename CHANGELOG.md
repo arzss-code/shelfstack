@@ -2,6 +2,20 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.30.1] - 2026-11-04
+
+### Perbaikan Inisialisasi Store Wishlist (Temporal Dead Zone)
+
+- **Fix Store Wishlist (`app/features/wishlist/stores/wishlist.ts`)**:
+  - Memperbaiki `ReferenceError: Cannot access 'syncLocalToDatabase' before initialization` yang terjadi saat pengguna terautentikasi membuka aplikasi.
+  - Menata ulang urutan deklarasi fungsi helper internal (`checkIsLoggedIn`, `saveWishlist`, `mapWishlistRow`, `fetchFromDatabase`, `syncLocalToDatabase`, `initWishlist`) di atas getters dan actions publik.
+  - Memindahkan eksekusi `initWishlist()` dan registrasi watcher sesi user ke bagian paling bawah blok setup store.
+  - Menghapus opsi berlebih `{ immediate: true }` pada watcher sesi pengguna guna mencegah eksekusi duplikat saat inisialisasi awal.
+  - Mengekstrak logika pemetaan baris database ke `mapWishlistRow`, merampingkan berkas dari 328 baris menjadi 295 baris (mematuhi batas SOP maksimal 300 baris per berkas).
+- **Pengujian Unit (`tests/unit/wishlist-store.spec.ts`)**:
+  - Menambahkan pengujian inisialisasi store dengan simulasi pengguna terautentikasi (`mockNuxtImport('useSupabaseUser', ...)`), memastikan store berhasil terinisialisasi tanpa `ReferenceError`.
+  - Total pengujian proyek: 74 file test / 702 tests lulus 100%.
+
 ## [0.30.0] - 2026-11-03
 
 ### Sistem Komplain & Retur Barang Pelanggan (Customer Returns & RMA Workflow)
