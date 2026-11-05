@@ -45,6 +45,7 @@ pnpm-debug.log*
 .cursor/
 .mcp.json
 .e2e/
+.agents/teamwork/
 
 # MCP secrets (never commit tokens)
 .secrets/

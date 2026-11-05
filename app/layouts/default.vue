@@ -2,6 +2,7 @@
 import AppNavbar from '~/components/AppNavbar.vue'
 import AppFooter from '~/components/AppFooter.vue'
 import CartDrawer from '~/features/cart/components/CartDrawer.vue'
+import LiveChatWidget from '~/components/support/LiveChatWidget.vue'
 import { useCartStore } from '~/features/cart/stores/cart'
 import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
 import { useNotificationStore } from '~/features/notifications/stores/notifications'
@@ -29,6 +30,11 @@ onMounted(() => {
 
     <!-- Global Slide-over Cart Drawer -->
     <CartDrawer />
+
+    <!-- Global Floating Customer Live Chat Widget -->
+    <ClientOnly>
+      <LiveChatWidget />
+    </ClientOnly>
 
     <!-- Modernist Inverted Footer -->
     <AppFooter />

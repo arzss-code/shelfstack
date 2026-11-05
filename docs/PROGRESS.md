@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 9 (Customer Experience & Loyalty Hub)**
-- **Versi Rilis:** `v0.30.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-04)
-- **Baseline Quality Gate (2026-11-04, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 74 file / 702 test lolos 100%.
+- **Versi Rilis:** `v0.31.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-04)
+- **Baseline Quality Gate (2026-11-04, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 83 file / 880 test lolos 100%.
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -191,6 +191,8 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
 
 22. **Sistem Komplain & Retur Barang Pelanggan (SELESAI 2026-11-03, SHF-RMA-01).** Implementasi alur pengembalian dan penukaran barang (RMA & Customer Returns) end-to-end. Migrasi SQL `20261128000001_customer_return_requests_and_rma.sql` mendefinisikan tabel `public.return_requests` dengan indeks parsial unik per order aktif, RLS policies, dan bucket Supabase Storage baru `return-proofs` (maks 5MB, format JPEG/PNG/WebP). Backend Nitro API (`server/api/orders/[id]/return-requests/`, `server/api/returns/upload.post.ts`, `server/api/admin/returns/`) memverifikasi garansi 7 hari pasca pesanan selesai, pencatatan audit log, notifikasi in-app, serta penanganan restock inventaris otomatis saat admin menyetujui penyelesaian retur. Komponen frontend modular mematuhi batas maksimal 300 baris: `OrderReturnModal.vue` (294 baris), `OrderReturnStatusCard.vue` (265 baris), `AdminReturnDetailModal.vue` (249 baris), dan `app/pages/admin/returns.vue` (282 baris). Menyelaraskan perataan vertikal komponen `UiAlert.vue` sehingga icon dan teks selalu sejajar (+20 unit test baru di `tests/unit/return-request-schema.spec.ts` dan `tests/unit/order-return-components.spec.ts`, total 74 file / 701 tests lolos 100%).
 
+23. **Sistem Live Chat Bantuan Pelanggan Real-time (SELESAI 2026-11-04, SHF-CHAT-01).** Implementasi live chat dua arah antara pelanggan etalase dan admin CS berbasis Supabase Realtime (Postgres Changes). Migrasi SQL `20261129000001_customer_support_live_chat.sql` mendefinisikan tabel `public.support_threads` dan `public.support_messages` dengan soft-deletes, triggers update unread counter atomik, dan bucket Supabase Storage baru `chat-attachments` (maks 5MB, format JPEG/PNG/WebP). Backend Nitro API (8 endpoints di `server/api/support/` dan `server/api/admin/support/`) menyediakan inisialisasi thread, pengiriman pesan dengan auto welcome bot, upload berkas bukti foto, pemuatan inbox admin, canned responses picker, dan perubahan status kendala. Komponen frontend modular mematuhi batas maksimal 300 baris: `LiveChatWidget.vue` (115 baris), `LiveChatWindow.vue` (245 baris), `ChatOrderSnippet.vue` (71 baris), `AdminSupportInboxList.vue` (228 baris), `AdminSupportChatPane.vue` (250 baris), `AdminCannedResponseMenu.vue` (91 baris), `app/pages/admin/support.vue` (184 baris), `useSupportChat.ts` (292 baris), dan `useAdminSupportChat.ts` (272 baris). Terintegrasi dengan layout etalase, navbar, dan sidebar admin (+178 unit test baru di 8 suite test, total 83 file / 880 tests lolos 100%).
+
 ---
 
 ## 📌 Inventaris Fitur Belum Diimplementasikan (Backlog Lanjutan)
@@ -212,9 +214,9 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
    - Keterangan: Belum ada modul voucher (tabel `coupons`, input kode promo di keranjang/checkout, validasi kuota klaim, dan potongan harga dinamis). Diskon saat ini hanya potongan langsung berbasis kolom produk (`original_price_cents`).
 6. ~~**Pusat Bantuan & FAQ Interaktif (Help Center / FAQ Page)**~~:
    - Status: ✅ **SELESAI 2026-10-30** (Halaman `/help` interaktif dengan pencarian FAQ real-time, tab navigasi kategori via `UiTabs`, accordion yang dapat dibuka/tutup, integrasi URL hash `#pengembalian` dan `#pengiriman`, banner bantuan cepat dengan link ke `/tracking` dan `/contact`, serta 9 unit test di `tests/unit/help-page.spec.ts`).
-7. **Live Chat / Bantuan Pelanggan Langsung (Customer Support Chat)**:
-   - Status: Belum diimplementasikan.
-   - Keterangan: Belum ada widget live chat (Tawk.to, Crisp, webhook WhatsApp CS, atau chat real-time interaktif berbasis Supabase). Teks di footer hanya label statis.
+7. ~~**Live Chat / Bantuan Pelanggan Langsung (Customer Support Chat)**~~:
+   - Status: ✅ **SELESAI 2026-11-04** (SHF-CHAT-01).
+   - Keterangan: Sistem Live Chat dua arah berbasis Supabase Realtime (tabel support_threads dan support_messages, trigger unread atomik, bucket chat-attachments maks 5MB), 8 endpoint Nitro API, composable useSupportChat & useAdminSupportChat, floating widget etalase dengan login prompt ramah tamu, split-view dual-pane admin workspace di /admin/support dengan template balasan cepat, serta 83 file / 880 test lolos 100%.
 8. ~~**Halaman Profil Perusahaan (Tentang Kami & Kontak)**~~:
    - Status: ✅ **SELESAI 2026-10-30** (Halaman kurasi `/about` dengan 4 strip metrik, 3 pilar komitmen rekayasa, dan CTA katalog; serta halaman `/contact` dengan informasi saluran resmi, formulir kontak interaktif tervalidasi via `UiInput`/`UiSelect`/`UiTextarea`, feedback toast, pembersihan form pasca-submit, tautan footer terintegrasi, dan 10 unit test di `tests/unit/contact-page.spec.ts` dan `tests/unit/about-page.spec.ts`).
 9. ~~**Ulasan & Rating Pelanggan (Product Reviews & Ratings)**~~:
