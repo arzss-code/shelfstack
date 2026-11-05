@@ -1,13 +1,8 @@
 <script setup lang="ts">
-import type { Order, OrderStatus } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
-import { getAvailableAdminTransitions } from '~~/shared/constants/order-transitions'
-import {
-  supportedCouriers,
-  type CourierCode,
-  type ShippingCheckpoint,
-} from '~~/shared/schemas/shipping'
 import OrderTrackingTimeline from '~/components/orders/OrderTrackingTimeline.vue'
+import AdminOrderStatusModal from '~/features/orders/components/AdminOrderStatusModal.vue'
+import AdminOrderCustomerCard from '~/features/orders/components/AdminOrderCustomerCard.vue'
 
 definePageMeta({
   layout: 'admin',
@@ -15,226 +10,35 @@ definePageMeta({
 })
 
 const route = useRoute()
-const toast = useUiToast()
-
 const orderId = computed(() => route.params.id as string)
 
-const order = ref<Order | null>(null)
-const loading = ref(true)
-const updating = ref(false)
-const errorMessage = ref('')
-
-const isConfirmModalOpen = ref(false)
-const targetStatus = ref<OrderStatus | null>(null)
-const updateReason = ref('')
-
-// State Pengiriman untuk Status 'shipped'
-const selectedCourierCode = ref<CourierCode>('jne')
-const trackingNumberInput = ref('')
-const adminCheckpoints = ref<ShippingCheckpoint[]>([])
-
-const courierOptions = supportedCouriers.map((c) => ({
-  label: c.name,
-  value: c.code,
-}))
-
-const selectedCourierName = computed(() => {
-  return supportedCouriers.find((c) => c.code === selectedCourierCode.value)?.name || 'JNE Express'
-})
-
-const handleAutoGenerateTracking = () => {
-  const prefix =
-    {
-      jne: 'SS-JNE',
-      sicepat: 'SS-SCP',
-      jnt: 'SS-JNT',
-      anteraja: 'SS-ANTR',
-      pos: 'SS-POS',
-    }[selectedCourierCode.value] || 'SS-LOG'
-
-  const timestampPart = Date.now().toString().slice(-6)
-  const randomPart = Math.floor(1000 + Math.random() * 9000).toString()
-  trackingNumberInput.value = `${prefix}-${timestampPart}${randomPart}`
-}
+const {
+  order,
+  loading,
+  updating,
+  errorMessage,
+  isConfirmModalOpen,
+  targetStatus,
+  updateReason,
+  selectedCourierCode,
+  trackingNumberInput,
+  adminCheckpoints,
+  courierOptions,
+  availableTransitions,
+  confirmVariant,
+  handleAutoGenerateTracking,
+  fetchOrderDetail,
+  openTransitionModal,
+  confirmStatusChange,
+  getStatusBadge,
+  getTransitionLabel,
+  getTransitionBtnVariant,
+  formatDate,
+} = useAdminOrderDetail(orderId.value)
 
 useSeoMeta({
   title: computed(() => `Detail Pesanan #${orderId.value.slice(0, 8)} - Admin ShelfStack`),
 })
-
-const fetchAdminTracking = async () => {
-  if (!order.value?.tracking_number) {
-    adminCheckpoints.value = []
-    return
-  }
-  try {
-    const res = await $fetch<{ success: boolean; data: { checkpoints: ShippingCheckpoint[] } }>(
-      `/api/orders/${orderId.value}/tracking`,
-    )
-    if (res?.data?.checkpoints) {
-      adminCheckpoints.value = res.data.checkpoints
-    }
-  } catch {
-    adminCheckpoints.value = []
-  }
-}
-
-const fetchOrderDetail = async () => {
-  loading.value = true
-  errorMessage.value = ''
-  try {
-    const res = await $fetch<{ status: string; data: Order }>(`/api/orders/${orderId.value}`)
-    order.value = res.data
-    await fetchAdminTracking()
-  } catch (err: unknown) {
-    const fetchErr = err as { data?: { message?: string } }
-    errorMessage.value = fetchErr.data?.message || 'Gagal memuat detail pesanan.'
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(() => {
-  fetchOrderDetail()
-})
-
-const availableTransitions = computed<OrderStatus[]>(() => {
-  if (!order.value) return []
-  return getAvailableAdminTransitions(order.value.status)
-})
-
-const openTransitionModal = (status: OrderStatus) => {
-  targetStatus.value = status
-  updateReason.value = ''
-  if (status === 'shipped') {
-    selectedCourierCode.value = (order.value?.courier_code as CourierCode) || 'jne'
-    trackingNumberInput.value = order.value?.tracking_number || ''
-    if (!trackingNumberInput.value) {
-      handleAutoGenerateTracking()
-    }
-  }
-  isConfirmModalOpen.value = true
-}
-
-const confirmStatusChange = async () => {
-  if (!targetStatus.value) return
-
-  updating.value = true
-  try {
-    if (targetStatus.value === 'refunded') {
-      await $fetch(`/api/orders/${orderId.value}/refund`, {
-        method: 'POST',
-        body: {
-          reason: updateReason.value || undefined,
-        },
-      })
-    } else {
-      await $fetch(`/api/orders/${orderId.value}/status`, {
-        method: 'PUT',
-        body: {
-          status: targetStatus.value,
-          reason: updateReason.value || undefined,
-          courier_code: targetStatus.value === 'shipped' ? selectedCourierCode.value : undefined,
-          courier_name: targetStatus.value === 'shipped' ? selectedCourierName.value : undefined,
-          tracking_number:
-            targetStatus.value === 'shipped' ? trackingNumberInput.value.trim() : undefined,
-        },
-      })
-    }
-
-    toast.add({
-      severity: 'success',
-      summary: 'Status Diperbarui',
-      detail: `Status pesanan berhasil diubah menjadi ${targetStatus.value}.`,
-      life: 4000,
-    })
-
-    isConfirmModalOpen.value = false
-    await fetchOrderDetail()
-  } catch (err: unknown) {
-    const fetchErr = err as { data?: { message?: string } }
-    toast.add({
-      severity: 'error',
-      summary: 'Gagal Memperbarui',
-      detail: fetchErr.data?.message || 'Terjadi kesalahan sistem saat memperbarui status.',
-      life: 5000,
-    })
-  } finally {
-    updating.value = false
-  }
-}
-
-const getStatusBadge = (status: OrderStatus) => {
-  switch (status) {
-    case 'paid':
-      return { variant: 'info' as const, label: 'Lunas' }
-    case 'shipped':
-      return { variant: 'info' as const, label: 'Dikirim' }
-    case 'completed':
-      return { variant: 'success' as const, label: 'Selesai' }
-    case 'cancelled':
-      return { variant: 'danger' as const, label: 'Dibatalkan' }
-    case 'refunded':
-      return { variant: 'danger' as const, label: 'Dikembalikan (Refund)' }
-    case 'pending':
-    default:
-      return { variant: 'warning' as const, label: 'Menunggu' }
-  }
-}
-
-const getTransitionLabel = (status: OrderStatus) => {
-  switch (status) {
-    case 'paid':
-      return 'Tandai Lunas'
-    case 'shipped':
-      return 'Kirim Pesanan'
-    case 'completed':
-      return 'Selesaikan Pesanan'
-    case 'cancelled':
-      return 'Batalkan Pesanan'
-    case 'refunded':
-      return 'Refund Pesanan'
-    default:
-      return status
-  }
-}
-
-const getTransitionBtnVariant = (status: OrderStatus) => {
-  switch (status) {
-    case 'paid':
-    case 'completed':
-      return 'primary' as const
-    case 'shipped':
-      return 'accent' as const
-    case 'cancelled':
-    case 'refunded':
-      return 'secondary' as const
-    default:
-      return 'secondary' as const
-  }
-}
-
-const confirmVariant = computed(() => {
-  if (targetStatus.value === 'cancelled' || targetStatus.value === 'refunded') {
-    return 'danger' as const
-  }
-  if (targetStatus.value === 'shipped') {
-    return 'accent' as const
-  }
-  return 'primary' as const
-})
-
-const formatDate = (dateStr?: string | null) => {
-  if (!dateStr) return '-'
-  try {
-    const d = new Date(dateStr)
-    return new Intl.DateTimeFormat('id-ID', {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(d)
-  } catch {
-    return dateStr
-  }
-}
 </script>
 
 <template>
@@ -362,62 +166,7 @@ const formatDate = (dateStr?: string | null) => {
         </div>
 
         <!-- Customer & Delivery Info (1 col) -->
-        <div class="space-y-6">
-          <!-- Delivery Address -->
-          <div
-            class="rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper space-y-3"
-          >
-            <h2 class="font-display text-base font-bold text-brand-ink m-0">
-              Informasi Pengiriman
-            </h2>
-            <div class="text-xs text-brand-ink space-y-1.5 pt-1">
-              <p class="font-semibold m-0">{{ order.address.name }}</p>
-              <p class="text-brand-muted m-0">{{ order.address.phone }}</p>
-              <p class="m-0">{{ order.address.street }}</p>
-              <p class="text-brand-muted m-0">
-                {{ order.address.city }}, {{ order.address.postal }}
-              </p>
-              <p
-                v-if="order.address.note"
-                class="italic text-brand-muted mt-2 m-0 bg-brand-canvas p-2 rounded-lg"
-              >
-                "{{ order.address.note }}"
-              </p>
-            </div>
-          </div>
-
-          <!-- Payment Info -->
-          <div
-            class="rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper space-y-3"
-          >
-            <h2 class="font-display text-base font-bold text-brand-ink m-0">Detail Pembayaran</h2>
-            <div class="text-xs text-brand-muted space-y-2 pt-1">
-              <div class="flex justify-between">
-                <span>Metode:</span>
-                <span class="font-medium text-brand-ink">{{
-                  order.payment_type || 'Midtrans Snap'
-                }}</span>
-              </div>
-              <div v-if="order.subtotal_cents" class="flex justify-between">
-                <span>Subtotal:</span>
-                <span class="font-medium text-brand-ink">{{
-                  formatRupiah(order.subtotal_cents / 100)
-                }}</span>
-              </div>
-              <div
-                v-if="order.discount_cents && order.discount_cents > 0"
-                class="flex justify-between text-brand-success-text font-semibold"
-              >
-                <span>Diskon Voucher ({{ order.coupon_code }}):</span>
-                <span class="font-bold">-{{ formatRupiah(order.discount_cents / 100) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Waktu Pembayaran:</span>
-                <span class="font-medium text-brand-ink">{{ formatDate(order.paid_at) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AdminOrderCustomerCard :order="order" :format-date="formatDate" />
       </div>
 
       <!-- Tracking & Logistics Timeline Card (if shipped or completed) -->
@@ -436,73 +185,17 @@ const formatDate = (dateStr?: string | null) => {
     </div>
 
     <!-- Confirm Transition Modal -->
-    <UiModal v-model:visible="isConfirmModalOpen" title="Konfirmasi Perubahan Status" size="sm">
-      <p class="m-0 text-xs leading-relaxed text-brand-muted">
-        Ubah status pesanan ke
-        <strong class="font-semibold uppercase text-brand-ink">{{ targetStatus }}</strong
-        >? Aksi ini akan dicatat ke dalam audit log aktivitas admin.
-      </p>
-
-      <!-- Logistics Input (Only for 'shipped' target status) -->
-      <div
-        v-if="targetStatus === 'shipped'"
-        class="mt-4 space-y-3 p-3.5 bg-brand-canvas rounded-xl border border-brand-hair text-left"
-      >
-        <div class="space-y-1">
-          <label class="block text-xs font-semibold text-brand-ink">Pilih Ekspedisi Kurir</label>
-          <UiSelect
-            v-model="selectedCourierCode"
-            :options="courierOptions"
-            @update:model-value="handleAutoGenerateTracking"
-          />
-        </div>
-
-        <div class="space-y-1 pt-1">
-          <label class="block text-xs font-semibold text-brand-ink">Nomor Resi Pengiriman</label>
-          <div class="flex items-center gap-2">
-            <input
-              v-model="trackingNumberInput"
-              type="text"
-              class="flex-1 px-3 py-2 text-xs font-mono bg-white border border-brand-hair rounded-lg text-brand-ink focus:outline-none focus:border-brand-ink"
-              placeholder="Contoh: SS-JNE-123456"
-            />
-            <button
-              type="button"
-              class="px-3 py-2 text-xs font-semibold bg-brand-ink hover:bg-brand-inkhover text-white rounded-lg transition-colors cursor-pointer shrink-0 border-0"
-              @click="handleAutoGenerateTracking"
-            >
-              Resi Otomatis
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <UiTextarea
-        v-model="updateReason"
-        class="mt-4"
-        label="Catatan / Alasan (Opsional)"
-        placeholder="Contoh: Paket telah diserahkan ke kurir / konfirmasi pembayaran..."
-        :rows="2"
-      />
-
-      <template #footer>
-        <UiButton
-          variant="secondary"
-          size="sm"
-          :disabled="updating"
-          @click="isConfirmModalOpen = false"
-        >
-          Batal
-        </UiButton>
-        <UiButton
-          :variant="confirmVariant"
-          size="sm"
-          :loading="updating"
-          @click="confirmStatusChange"
-        >
-          Konfirmasi
-        </UiButton>
-      </template>
-    </UiModal>
+    <AdminOrderStatusModal
+      v-model:visible="isConfirmModalOpen"
+      v-model:selected-courier-code="selectedCourierCode"
+      v-model:tracking-number-input="trackingNumberInput"
+      v-model:update-reason="updateReason"
+      :target-status="targetStatus"
+      :courier-options="courierOptions"
+      :updating="updating"
+      :confirm-variant="confirmVariant"
+      @auto-generate-tracking="handleAutoGenerateTracking"
+      @confirm="confirmStatusChange"
+    />
   </div>
 </template>
