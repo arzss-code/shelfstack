@@ -1,43 +1,56 @@
 <script setup lang="ts">
-import { useAuth } from '~/features/auth/composables/useAuth'
-import type { Database } from '~/types/database.types'
-import type { Order, OrderStatus } from '~/types/order'
-import { formatRupiah } from '~/utils/format'
-import { useMidtransSnap } from '~/composables/useMidtransSnap'
+import { ref, onMounted } from 'vue'
 import OrderCancelDialog from '~/features/orders/components/OrderCancelDialog.vue'
 import OrderInvoiceModal from '~/features/orders/components/OrderInvoiceModal.vue'
-import type { RealtimeChannel } from '@supabase/supabase-js'
-import { useCartStore } from '~/features/cart/stores/cart'
-import type { ShippingCheckpoint } from '~~/shared/schemas/shipping'
 import OrderTrackingTimeline from '~/components/orders/OrderTrackingTimeline.vue'
 import ReviewFormModal from '~/components/product/ReviewFormModal.vue'
 import OrderReturnModal from '~/components/orders/OrderReturnModal.vue'
 import OrderReturnStatusCard from '~/components/orders/OrderReturnStatusCard.vue'
+import OrderDetailProgressStepper from '~/features/orders/components/OrderDetailProgressStepper.vue'
+import OrderDetailItemsCard from '~/features/orders/components/OrderDetailItemsCard.vue'
+import OrderDetailDeliveryCard from '~/features/orders/components/OrderDetailDeliveryCard.vue'
+import OrderDetailPaymentCard from '~/features/orders/components/OrderDetailPaymentCard.vue'
 import { useReturnRequest } from '~/composables/useReturnRequest'
+import { useOrderDetail } from '~/composables/useOrderDetail'
+
+definePageMeta({
+  middleware: 'auth',
+})
 
 const route = useRoute()
-const router = useRouter()
-const { user } = useAuth()
-const supabase = useSupabaseClient<Database>()
-const toast = useUiToast()
-const config = useRuntimeConfig()
-const cartStore = useCartStore()
-const { pay: openSnapModal } = useMidtransSnap()
-
 const orderId = route.params.id as string
-const order = ref<Order | null>(null)
-const loading = ref(true)
-const isPaying = ref(false)
-const isCancelling = ref(false)
-const isManualChecking = ref(false)
-const isSilentChecking = ref(false)
-const isCancelModalOpen = ref(false)
 
+const {
+  order,
+  loading,
+  errorMsg,
+  isPaying,
+  isCancelling,
+  isManualChecking,
+  copiedHeaderResi,
+  activeCheckpoints,
+  activeLatestCheckpointLocation,
+  activeLatestCheckpointTitle,
+  orderSteps,
+  copyHeaderResi,
+  formatDate,
+  formatShippingServiceName,
+  getSegmentColor,
+  getStatusBadge,
+  getPaymentStatusBadge,
+  handlePayNow,
+  handleCheckPaymentStatus,
+  handleCancelOrder,
+  handleReorder,
+} = useOrderDetail(orderId)
+
+const { ticket: returnTicket, eligibility: returnEligibility, fetchReturnData } = useReturnRequest()
+
+const isCancelModalOpen = ref(false)
 const isInvoiceModalOpen = ref(false)
 const isReviewModalOpen = ref(false)
 const selectedReviewProduct = ref<{ id: number | string; name: string } | null>(null)
 const isReturnModalOpen = ref(false)
-const { ticket: returnTicket, eligibility: returnEligibility, fetchReturnData } = useReturnRequest()
 
 const openReviewModal = (item: {
   product_id: number | string
@@ -49,95 +62,19 @@ const openReviewModal = (item: {
   }
   isReviewModalOpen.value = true
 }
-const errorMsg = ref('')
 
-const customerCheckpoints = ref<ShippingCheckpoint[]>([])
-
-const fetchCustomerTracking = async () => {
-  if (!order.value?.tracking_number) {
-    customerCheckpoints.value = []
-    return
-  }
-  try {
-    const res = await $fetch<{ success: boolean; data: { checkpoints: ShippingCheckpoint[] } }>(
-      `/api/orders/${orderId}/tracking`,
-    )
-    if (res?.data?.checkpoints) {
-      customerCheckpoints.value = res.data.checkpoints
-    }
-  } catch {
-    customerCheckpoints.value = []
+const onConfirmCancel = async (reason: string) => {
+  const success = await handleCancelOrder(reason)
+  if (success) {
+    isCancelModalOpen.value = false
   }
 }
 
-const copiedHeaderResi = ref(false)
-const copyHeaderResi = async (resi?: string | null) => {
-  if (!resi || !import.meta.client) return
-  try {
-    await navigator.clipboard.writeText(resi)
-    copiedHeaderResi.value = true
-    setTimeout(() => {
-      copiedHeaderResi.value = false
-    }, 2000)
-  } catch {
-    // clipboard fallback
+onMounted(async () => {
+  if (orderId) {
+    await fetchReturnData(orderId)
   }
-}
-
-const formatShippingServiceName = (service?: string | null) => {
-  if (!service) return 'Reguler'
-  switch (service.toLowerCase()) {
-    case 'express':
-      return 'Kilat / Next Day'
-    case 'instant':
-      return 'Instan / Sameday'
-    case 'cargo':
-      return 'Kargo'
-    case 'reguler':
-    default:
-      return 'Reguler'
-  }
-}
-
-const activeCheckpoints = computed(() => {
-  if (customerCheckpoints.value.length > 0) {
-    return customerCheckpoints.value
-  }
-  return order.value?.checkpoints || []
 })
-
-const activeLatestCheckpoint = computed(() => {
-  if (activeCheckpoints.value.length === 0) return null
-  return [...activeCheckpoints.value].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-  )[0]
-})
-
-const activeLatestCheckpointLocation = computed(() => {
-  if (activeLatestCheckpoint.value?.location) {
-    return activeLatestCheckpoint.value.location
-  }
-  if (order.value?.status === 'completed') {
-    const city = (order.value.address as any)?.city
-    return city ? `Diterima di ${city}` : 'Telah Diterima'
-  }
-  if (order.value?.status === 'shipped') {
-    const city = (order.value.address as any)?.city
-    return city ? `Menuju ${city}` : 'Dalam Pengiriman'
-  }
-  return 'Gudang Pengiriman ShelfStack'
-})
-
-const activeLatestCheckpointTitle = computed(() => {
-  return activeLatestCheckpoint.value?.title || ''
-})
-
-definePageMeta({
-  middleware: 'auth',
-})
-
-let channel: RealtimeChannel | null = null
-let pollInterval: ReturnType<typeof setInterval> | null = null
 
 useSeoMeta({
   title: () =>
@@ -146,449 +83,6 @@ useSeoMeta({
       : 'Detail Pesanan - ShelfStack',
   description: 'Detail informasi dan status pemesanan produk resmi di ShelfStack.',
 })
-
-const startPolling = () => {
-  if (pollInterval || !import.meta.client) return
-  pollInterval = setInterval(async () => {
-    if (!order.value || order.value.status !== 'pending') {
-      stopPolling()
-      return
-    }
-    // Hanya polling ketika tab aktif untuk efisiensi resource jaringan
-    if (document.visibilityState === 'visible') {
-      await handleCheckPaymentStatus(true)
-    }
-  }, 3500)
-}
-
-const stopPolling = () => {
-  if (pollInterval) {
-    clearInterval(pollInterval)
-    pollInterval = null
-  }
-}
-
-const handleVisibilityOrFocusChange = () => {
-  if (document.visibilityState === 'visible' && order.value?.status === 'pending') {
-    handleCheckPaymentStatus(true)
-  }
-}
-
-const fetchOrderDetail = async (silent = false) => {
-  if (!user.value) {
-    router.push(`/auth/login?redirect=/orders/${orderId}`)
-    return
-  }
-
-  if (!silent) {
-    loading.value = true
-  }
-  errorMsg.value = ''
-
-  try {
-    const res = await $fetch<{ status: string; data: Order }>(`/api/orders/${orderId}`)
-    order.value = res.data
-    await fetchCustomerTracking()
-  } catch (err: unknown) {
-    const fetchErr = err as { data?: { message?: string } }
-    errorMsg.value = fetchErr.data?.message || 'Pesanan tidak ditemukan atau akses ditolak.'
-  } finally {
-    if (!silent) {
-      loading.value = false
-    }
-  }
-}
-
-onMounted(async () => {
-  await fetchOrderDetail()
-  if (orderId) {
-    await fetchReturnData(orderId)
-  }
-
-  // Jika pesanan masih pending, sinkronisasi status otomatis dan mulai polling di background
-  if (order.value?.status === 'pending') {
-    handleCheckPaymentStatus(true)
-    startPolling()
-  }
-
-  // Langganan pembaruan status realtime via Supabase Realtime Postgres Changes
-  if (order.value && import.meta.client) {
-    channel = supabase
-      .channel(`order-realtime-${orderId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'orders',
-          filter: `id=eq.${orderId}`,
-        },
-        (payload) => {
-          if (payload.new && order.value) {
-            const updated = payload.new as Record<string, unknown>
-            const prevStatus = order.value.status
-            const nextStatus = updated.status as OrderStatus
-
-            order.value = {
-              ...order.value,
-              status: nextStatus,
-              payment_type: (updated.payment_type as string) || order.value.payment_type,
-              paid_at: (updated.paid_at as string) || order.value.paid_at,
-              tracking_number: (updated.tracking_number as string) || order.value.tracking_number,
-              courier_name: (updated.courier_name as string) || order.value.courier_name,
-              courier_code: (updated.courier_code as string) || order.value.courier_code,
-            }
-
-            if (nextStatus !== 'pending') {
-              stopPolling()
-            }
-
-            fetchCustomerTracking()
-
-            if (prevStatus === 'pending' && nextStatus === 'paid') {
-              toast.add({
-                severity: 'success',
-                summary: 'Pembayaran Terkonfirmasi!',
-                detail: 'Status pesanan berhasil diperbarui menjadi Lunas secara realtime.',
-                life: 5000,
-              })
-              fetchOrderDetail(true)
-            }
-          }
-        },
-      )
-      .subscribe()
-
-    document.addEventListener('visibilitychange', handleVisibilityOrFocusChange)
-    window.addEventListener('focus', handleVisibilityOrFocusChange)
-  }
-})
-
-onUnmounted(() => {
-  stopPolling()
-  if (channel) {
-    supabase.removeChannel(channel)
-  }
-  if (import.meta.client) {
-    document.removeEventListener('visibilitychange', handleVisibilityOrFocusChange)
-    window.removeEventListener('focus', handleVisibilityOrFocusChange)
-  }
-})
-
-const handleCheckPaymentStatus = async (silent = false) => {
-  if (!order.value) return
-  if (silent) {
-    if (isSilentChecking.value) return
-    isSilentChecking.value = true
-  } else {
-    if (isManualChecking.value) return
-    isManualChecking.value = true
-  }
-
-  try {
-    const res = await $fetch<{
-      status: string
-      data: {
-        status: OrderStatus
-        is_paid: boolean
-        transaction_status?: string
-        payment_type?: string
-      }
-    }>(`/api/orders/${order.value.id}/check-payment-status`, {
-      method: 'POST',
-    })
-
-    if (res.data?.is_paid) {
-      stopPolling()
-      const wasPending = order.value.status === 'pending'
-      order.value.status = 'paid'
-      if (res.data.payment_type) {
-        order.value.payment_type = res.data.payment_type
-      }
-      if (wasPending) {
-        toast.add({
-          severity: 'success',
-          summary: 'Pembayaran Terkonfirmasi!',
-          detail: 'Status pesanan Anda telah berhasil dikonfirmasi sebagai Lunas (Paid).',
-          life: 5000,
-        })
-      }
-      await fetchOrderDetail(true)
-    } else if (!silent) {
-      toast.add({
-        severity: 'info',
-        summary: 'Menunggu Pembayaran',
-        detail:
-          'Pembayaran belum terkonfirmasi oleh sistem Midtrans. Silakan selesaikan pembayaran sesuai instruksi.',
-        life: 4000,
-      })
-    }
-  } catch (err: unknown) {
-    if (!silent) {
-      toast.add({
-        severity: 'warn',
-        summary: 'Gagal Memeriksa Status',
-        detail:
-          'Tidak dapat memeriksa status pembayaran ke payment gateway. Silakan coba kembali sesaat lagi.',
-        life: 4000,
-      })
-    }
-  } finally {
-    if (silent) {
-      isSilentChecking.value = false
-    } else {
-      isManualChecking.value = false
-    }
-  }
-}
-
-const handlePayNow = async () => {
-  if (!order.value || isPaying.value) return
-
-  if (!config.public.enableMidtransSandbox) {
-    toast.add({
-      severity: 'warn',
-      summary: 'Sandbox Nonaktif',
-      detail: 'Fitur pembayaran Midtrans Sandbox saat ini dinonaktifkan.',
-      life: 4000,
-    })
-    return
-  }
-
-  isPaying.value = true
-
-  try {
-    const res = await $fetch<{
-      status: string
-      data: { token: string; redirect_url?: string }
-    }>(`/api/orders/${order.value.id}/payment-token`, {
-      method: 'POST',
-    })
-
-    const snapToken = res.data.token
-
-    openSnapModal(snapToken, {
-      onSuccess: () => {
-        toast.add({
-          severity: 'success',
-          summary: 'Pembayaran Diterima',
-          detail: 'Memverifikasi status pembayaran dengan payment gateway...',
-          life: 4000,
-        })
-        handleCheckPaymentStatus(true)
-      },
-      onPending: () => {
-        startPolling()
-        toast.add({
-          severity: 'info',
-          summary: 'Menunggu Pembayaran',
-          detail:
-            'Instruksi pembayaran telah aktif. Status akan otomatis diperbarui begitu transfer diterima.',
-          life: 5000,
-        })
-      },
-      onError: () => {
-        toast.add({
-          severity: 'error',
-          summary: 'Pembayaran Gagal',
-          detail: 'Terjadi kesalahan saat memproses pembayaran Sandbox.',
-          life: 4000,
-        })
-      },
-      onClose: () => {
-        if (order.value?.status === 'pending') {
-          startPolling()
-          handleCheckPaymentStatus(true)
-        }
-      },
-    })
-  } catch (err: unknown) {
-    const fetchErr = err as { data?: { message?: string } }
-    toast.add({
-      severity: 'error',
-      summary: 'Gagal Membuka Pembayaran',
-      detail:
-        fetchErr.data?.message ||
-        'Layanan pembayaran sedang mengalami kendala. Silakan coba beberapa saat lagi.',
-      life: 5000,
-    })
-  } finally {
-    isPaying.value = false
-  }
-}
-
-const handleCancelOrder = async (reason: string) => {
-  if (!order.value || isCancelling.value) return
-  isCancelling.value = true
-  try {
-    await $fetch(`/api/orders/${orderId}/cancel`, {
-      method: 'POST',
-      body: { reason },
-    })
-    stopPolling()
-    toast.add({
-      severity: 'success',
-      summary: 'Pesanan Dibatalkan',
-      detail: 'Pesanan berhasil dibatalkan dan persediaan stok telah dikembalikan.',
-      life: 5000,
-    })
-    isCancelModalOpen.value = false
-    await fetchOrderDetail()
-  } catch (err: unknown) {
-    const fetchErr = err as { data?: { message?: string } }
-    toast.add({
-      severity: 'error',
-      summary: 'Gagal Membatalkan',
-      detail: fetchErr.data?.message || 'Terjadi kesalahan saat membatalkan pesanan.',
-      life: 5000,
-    })
-  } finally {
-    isCancelling.value = false
-  }
-}
-
-const handleReorder = () => {
-  if (!order.value?.items || order.value.items.length === 0) return
-
-  for (const item of order.value.items) {
-    cartStore.addItem({
-      productId: item.product_id,
-      name: item.product?.name || `Produk #${item.product_id}`,
-      price: item.price_cents / 100,
-      priceCents: item.price_cents,
-      imageUrl: item.product?.image_url ?? null,
-      quantity: item.qty,
-      stock: 99,
-      openCartDrawer: false,
-    })
-  }
-
-  toast.add({
-    severity: 'success',
-    summary: 'Produk Ditambahkan',
-    detail: 'Item dari pesanan ini telah dimasukkan kembali ke keranjang belanja Anda.',
-    life: 4000,
-  })
-
-  router.push('/cart')
-}
-
-const getStatusBadge = (status: OrderStatus) => {
-  switch (status) {
-    case 'paid':
-      return { variant: 'info' as const, label: 'Diproses' }
-    case 'shipped':
-      return { variant: 'info' as const, label: 'Dikirim' }
-    case 'completed':
-      return { variant: 'success' as const, label: 'Selesai' }
-    case 'cancelled':
-      return { variant: 'danger' as const, label: 'Dibatalkan' }
-    case 'pending':
-    default:
-      return { variant: 'warning' as const, label: 'Menunggu Pembayaran' }
-  }
-}
-
-const getPaymentStatusBadge = (orderData: Order) => {
-  if (orderData.status === 'refunded') {
-    return { variant: 'default' as const, label: 'Dikembalikan' }
-  }
-  if (orderData.status === 'cancelled') {
-    return { variant: 'default' as const, label: 'Belum Dibayar' }
-  }
-  if (orderData.paid_at || ['paid', 'shipped', 'completed'].includes(orderData.status)) {
-    return { variant: 'success' as const, label: 'Lunas' }
-  }
-  return { variant: 'warning' as const, label: 'Menunggu Pembayaran' }
-}
-
-const formatDate = (dateStr: string) => {
-  try {
-    const date = new Date(dateStr)
-    return new Intl.DateTimeFormat('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date)
-  } catch {
-    return dateStr
-  }
-}
-
-interface OrderStep {
-  title: string
-  description: string
-  timestamp?: string
-  isCompleted: boolean
-  isActive: boolean
-}
-
-const orderSteps = computed<OrderStep[]>(() => {
-  if (!order.value) return []
-
-  const status = order.value.status
-  const isPaid = ['paid', 'shipped', 'completed'].includes(status)
-  const isShipped = ['shipped', 'completed'].includes(status)
-  const isCompleted = status === 'completed'
-  const isPending = status === 'pending'
-
-  return [
-    {
-      title: 'Dipesan',
-      description: 'Pesanan resmi dibuat',
-      timestamp: formatDate(order.value.created_at),
-      isCompleted: true,
-      isActive: false,
-    },
-    {
-      title: 'Dibayar',
-      description: isPaid ? 'Pembayaran terverifikasi' : 'Menunggu pembayaran',
-      timestamp: order.value.paid_at ? formatDate(order.value.paid_at) : undefined,
-      isCompleted: isPaid,
-      isActive: isPending,
-    },
-    {
-      title: 'Dikirim',
-      description: isShipped
-        ? 'Pesanan dalam pengiriman'
-        : isPaid
-          ? 'Sedang disiapkan seller'
-          : 'Menunggu diproses',
-      isCompleted: isShipped,
-      isActive: isPaid && !isShipped,
-    },
-    {
-      title: 'Selesai',
-      description: isCompleted ? 'Pesanan telah diterima' : 'Konfirmasi penerimaan',
-      isCompleted: isCompleted,
-      isActive: isShipped && !isCompleted,
-    },
-  ]
-})
-
-const getSegmentColor = (idx: number) => {
-  if (!order.value || order.value.status === 'cancelled') {
-    return 'bg-brand-hairsoft'
-  }
-  const status = order.value.status
-  if (idx === 0) {
-    // Jalur Step 1 (Dipesan) -> Step 2 (Dibayar)
-    return 'bg-emerald-600'
-  }
-  if (idx === 1) {
-    // Jalur Step 2 (Dibayar) -> Step 3 (Dikirim)
-    return ['paid', 'shipped', 'completed'].includes(status)
-      ? 'bg-emerald-600'
-      : 'bg-brand-hairsoft'
-  }
-  if (idx === 2) {
-    // Jalur Step 3 (Dikirim) -> Step 4 (Selesai)
-    return ['shipped', 'completed'].includes(status) ? 'bg-emerald-600' : 'bg-brand-hairsoft'
-  }
-  return 'bg-brand-hairsoft'
-}
 </script>
 
 <template>
@@ -620,7 +114,7 @@ const getSegmentColor = (idx: number) => {
       <i class="pi pi-exclamation-triangle text-3xl text-red-600" />
       <h2 class="font-display text-lg font-bold text-red-900 m-0">Gagal Memuat Pesanan</h2>
       <p class="text-xs text-red-700 m-0">{{ errorMsg }}</p>
-      <UiButton to="/orders" variant="secondary" size="sm"> Kembali ke Riwayat Pesanan </UiButton>
+      <UiButton to="/orders" variant="secondary" size="sm">Kembali ke Riwayat Pesanan</UiButton>
     </div>
 
     <!-- Loading Skeleton -->
@@ -703,107 +197,13 @@ const getSegmentColor = (idx: number) => {
         @refetch="fetchReturnData(order.id)"
       />
 
-      <!-- Timeline Status Progress -->
-      <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper">
-        <div class="flex items-center justify-between pb-4 mb-6 border-b border-brand-hairsoft">
-          <div class="flex items-center gap-2">
-            <i class="pi pi-compass text-brand-accent text-sm" />
-            <h2 class="font-display text-sm font-bold text-brand-ink m-0">
-              Alur Pesanan & Pengiriman
-            </h2>
-          </div>
-        </div>
-
-        <!-- Cancelled State Alert: Pure informative notification without duplicated action button -->
-        <div
-          v-if="order.status === 'cancelled'"
-          class="p-4 bg-red-50 text-red-700 border border-red-200 rounded-card text-xs flex items-start gap-3"
-        >
-          <i class="pi pi-times-circle text-lg shrink-0 text-red-600 mt-0.5" />
-          <div class="space-y-1">
-            <p class="font-semibold text-sm m-0">Pesanan Dibatalkan</p>
-            <p v-if="order.cancellation_reason" class="text-xs text-red-700 m-0">
-              Alasan: <span class="font-medium text-red-800">{{ order.cancellation_reason }}</span>
-            </p>
-            <p class="text-[11px] text-red-600/90 m-0">
-              Dibatalkan pada
-              {{ formatDate(order.cancelled_at || order.updated_at || order.created_at) }}. Stok
-              produk telah dikembalikan ke etalase.
-            </p>
-          </div>
-        </div>
-
-        <!-- Active Stepper -->
-        <div v-else class="relative pt-2 pb-1">
-          <!-- Stepper Grid: 4 columns without gap so lines span center-to-center seamlessly -->
-          <div class="grid grid-cols-4">
-            <div
-              v-for="(step, idx) in orderSteps"
-              :key="step.title"
-              class="relative flex flex-col items-center text-center"
-            >
-              <!-- Circle and Connector Row -->
-              <div class="relative flex items-center justify-center w-full">
-                <!-- Discrete Connector Line to Next Step (Starts at this circle center, ends at next circle center) -->
-                <div
-                  v-if="idx < orderSteps.length - 1"
-                  class="absolute left-1/2 w-full top-1/2 -translate-y-1/2 h-0.5 z-0 transition-colors duration-300"
-                  :class="getSegmentColor(idx)"
-                />
-
-                <!-- Step Circle (z-10 masks the connector line underneath) -->
-                <div
-                  class="relative z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-all duration-200"
-                  :class="[
-                    step.isCompleted
-                      ? 'bg-emerald-600 text-white shadow-sm ring-4 ring-emerald-50'
-                      : step.isActive && order.status === 'pending'
-                        ? 'bg-amber-500 text-white shadow-sm ring-4 ring-amber-100'
-                        : step.isActive
-                          ? 'bg-brand-accent text-white shadow-sm ring-4 ring-brand-accent/20'
-                          : 'bg-white border-2 border-brand-hair text-brand-muted',
-                  ]"
-                >
-                  <i v-if="step.isCompleted" class="pi pi-check text-xs" />
-                  <i
-                    v-else-if="step.isActive && order.status === 'pending'"
-                    class="pi pi-clock text-xs"
-                  />
-                  <span v-else>{{ idx + 1 }}</span>
-                </div>
-              </div>
-
-              <!-- Step Info -->
-              <div class="mt-3 px-1 w-full max-w-[160px] mx-auto">
-                <p
-                  class="font-display font-bold text-[11px] sm:text-xs m-0 truncate"
-                  :class="[
-                    step.isCompleted || step.isActive ? 'text-brand-ink' : 'text-brand-muted',
-                  ]"
-                >
-                  {{ step.title }}
-                </p>
-                <p
-                  class="text-[10px] sm:text-[11px] m-0 mt-0.5 leading-snug"
-                  :class="[
-                    step.isActive && order.status === 'pending'
-                      ? 'text-amber-700 font-medium'
-                      : 'text-brand-muted',
-                  ]"
-                >
-                  {{ step.description }}
-                </p>
-                <p
-                  v-if="step.timestamp"
-                  class="text-[9px] sm:text-[10px] text-brand-faint m-0 mt-0.5 truncate"
-                >
-                  {{ step.timestamp }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Timeline Status Progress (Modular Stepper) -->
+      <OrderDetailProgressStepper
+        :order="order"
+        :order-steps="orderSteps"
+        :get-segment-color="getSegmentColor"
+        :format-date="formatDate"
+      />
 
       <!-- Real-time Logistics & Courier Tracking Timeline -->
       <OrderTrackingTimeline
@@ -813,7 +213,7 @@ const getSegmentColor = (idx: number) => {
         :tracking-number="order.tracking_number"
         :courier-name="order.courier_name || 'JNE Express'"
         :status="order.status"
-        :destination-city="(order.address as any)?.city"
+        :destination-city="order.address?.city"
         :checkpoints="activeCheckpoints"
       />
 
@@ -821,357 +221,50 @@ const getSegmentColor = (idx: number) => {
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <!-- Left Column: Items List & Delivery Address -->
         <div class="lg:col-span-8 space-y-6">
-          <!-- Items Card -->
-          <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-4">
-            <h2
-              class="font-display text-base font-bold text-brand-ink m-0 pb-3 border-b border-brand-hairsoft"
-            >
-              Daftar Barang Belanja
-            </h2>
+          <OrderDetailItemsCard
+            :items="order.items"
+            :order-status="order.status"
+            @review="openReviewModal"
+          />
 
-            <div class="divide-y divide-brand-hairsoft">
-              <article
-                v-for="item in order.items"
-                :key="item.id"
-                class="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4"
-              >
-                <div class="flex items-center gap-4 min-w-0">
-                  <div
-                    class="w-16 h-16 rounded-card bg-brand-field border border-brand-hairsoft overflow-hidden shrink-0 flex items-center justify-center"
-                  >
-                    <img
-                      v-if="item.product?.image_url"
-                      :src="item.product.image_url"
-                      :alt="item.product?.name || 'Produk'"
-                      class="w-full h-full object-cover"
-                    />
-                    <i v-else class="pi pi-image text-brand-faint text-xl" />
-                  </div>
-
-                  <div class="min-w-0">
-                    <NuxtLink
-                      :to="`/product/${item.product_id}`"
-                      class="font-display font-semibold text-xs sm:text-sm text-brand-ink hover:text-brand-accent transition-colors no-underline line-clamp-1"
-                    >
-                      {{ item.product?.name || `Produk #${item.product_id}` }}
-                    </NuxtLink>
-                    <p class="font-body text-xs text-brand-muted m-0 mt-0.5">
-                      {{ item.qty }}x @ {{ formatRupiah(item.price_cents / 100) }}
-                    </p>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-3 shrink-0">
-                  <span
-                    class="font-display font-bold text-xs sm:text-sm text-brand-ink tabular-nums"
-                  >
-                    {{ formatRupiah((item.price_cents * item.qty) / 100) }}
-                  </span>
-                  <UiButton
-                    v-if="order.status === 'completed'"
-                    variant="outline"
-                    size="sm"
-                    @click="openReviewModal(item)"
-                  >
-                    Beri Ulasan
-                  </UiButton>
-                </div>
-              </article>
-            </div>
-          </div>
-
-          <!-- Delivery Address & Shipping Logistics -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Address Card -->
-            <div
-              class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-3"
-            >
-              <div class="flex items-center gap-2 pb-3 border-b border-brand-hairsoft">
-                <i class="pi pi-map-marker text-brand-accent text-base" />
-                <h2 class="font-display text-base font-bold text-brand-ink m-0">
-                  Tujuan Pengiriman
-                </h2>
-              </div>
-
-              <div v-if="order.address" class="text-xs text-brand-muted space-y-1">
-                <p class="font-bold text-brand-ink m-0">
-                  {{ order.address.name }} ({{ order.address.phone }})
-                </p>
-                <p class="m-0 leading-relaxed">
-                  {{ order.address.street }}, {{ order.address.city }} {{ order.address.postal }}
-                </p>
-                <p v-if="order.address.note" class="italic text-[11px] text-brand-muted pt-1 m-0">
-                  Catatan: "{{ order.address.note }}"
-                </p>
-              </div>
-            </div>
-
-            <!-- Shipping Logistics Card -->
-            <div
-              class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-3"
-            >
-              <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
-                <div class="flex items-center gap-2">
-                  <i class="pi pi-truck text-brand-accent text-base" />
-                  <h2 class="font-display text-base font-bold text-brand-ink m-0">
-                    Ekspedisi & Resi
-                  </h2>
-                </div>
-                <UiBadge
-                  v-if="order.tracking_number"
-                  variant="info"
-                  :label="order.courier_name || 'Kurir'"
-                />
-              </div>
-
-              <div v-if="order.tracking_number" class="text-xs text-brand-muted space-y-2.5">
-                <div class="flex items-center justify-between gap-2">
-                  <span class="text-[11px] text-brand-muted">Nomor Resi</span>
-                  <div class="flex items-center gap-1.5">
-                    <span
-                      class="font-mono font-bold text-brand-ink bg-brand-canvas-soft px-2 py-0.5 rounded border border-brand-hairsoft"
-                    >
-                      {{ order.tracking_number }}
-                    </span>
-                    <button
-                      type="button"
-                      class="text-[11px] text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 transition-colors"
-                      :title="copiedHeaderResi ? 'Tersalin!' : 'Salin Resi'"
-                      @click="copyHeaderResi(order.tracking_number)"
-                    >
-                      <i
-                        :class="
-                          copiedHeaderResi
-                            ? 'pi pi-check text-emerald-600 text-xs'
-                            : 'pi pi-copy text-xs'
-                        "
-                      />
-                      <span>{{ copiedHeaderResi ? 'Tersalin' : 'Salin' }}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="pt-2 border-t border-brand-hairsoft/70 space-y-1">
-                  <div class="flex items-start gap-1.5">
-                    <i class="pi pi-compass text-blue-600 text-xs mt-0.5 shrink-0" />
-                    <div>
-                      <p class="font-semibold text-brand-ink m-0">
-                        Lokasi Terkini:
-                        <span class="text-blue-900 font-bold">{{
-                          activeLatestCheckpointLocation
-                        }}</span>
-                      </p>
-                      <p
-                        v-if="activeLatestCheckpointTitle"
-                        class="text-[11px] text-brand-muted m-0 mt-0.5"
-                      >
-                        {{ activeLatestCheckpointTitle }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="pt-2">
-                  <UiButton
-                    :to="`/tracking?q=${encodeURIComponent(order.tracking_number)}`"
-                    variant="outline"
-                    size="sm"
-                    class="w-full justify-center text-xs"
-                    icon="pi-external-link"
-                    icon-pos="right"
-                  >
-                    Buka Halaman Lacak
-                  </UiButton>
-                </div>
-              </div>
-
-              <div v-else class="text-xs text-brand-muted py-2 space-y-1">
-                <p class="font-medium text-brand-ink m-0">Pengiriman Reguler ShelfStack</p>
-                <p class="text-[11px] text-brand-muted m-0">
-                  {{
-                    order.status === 'pending'
-                      ? 'Nomor resi akan diterbitkan setelah pembayaran berhasil terverifikasi.'
-                      : 'Pesanan sedang dipersiapkan di gudang ShelfStack.'
-                  }}
-                </p>
-              </div>
-            </div>
-          </div>
+          <OrderDetailDeliveryCard
+            :order="order"
+            :copied-header-resi="copiedHeaderResi"
+            :active-latest-checkpoint-location="activeLatestCheckpointLocation"
+            :active-latest-checkpoint-title="activeLatestCheckpointTitle"
+            @copy-resi="copyHeaderResi"
+          />
         </div>
 
-        <!-- Right Column: Payment & Bill Summary -->
-        <aside
-          class="lg:col-span-4 bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-24"
-        >
-          <h2
-            class="font-display text-base font-bold text-brand-ink m-0 pb-3 border-b border-brand-hairsoft"
-          >
-            Ringkasan Pembayaran
-          </h2>
-
-          <div class="space-y-3 text-xs text-brand-muted">
-            <div class="flex items-center justify-between">
-              <span>Status Pembayaran</span>
-              <UiBadge
-                :variant="getPaymentStatusBadge(order).variant"
-                :label="getPaymentStatusBadge(order).label"
-              />
-            </div>
-            <div v-if="order.payment_type" class="flex items-center justify-between">
-              <span>Metode Pembayaran</span>
-              <span class="font-semibold text-brand-ink uppercase">{{ order.payment_type }}</span>
-            </div>
-            <div v-if="order.subtotal_cents" class="flex items-center justify-between">
-              <span>Subtotal Produk</span>
-              <span class="font-semibold text-brand-ink tabular-nums">{{
-                formatRupiah(order.subtotal_cents / 100)
-              }}</span>
-            </div>
-            <div
-              v-if="order.discount_cents && order.discount_cents > 0"
-              class="flex items-center justify-between text-brand-success-text font-medium"
-            >
-              <span
-                >Diskon Voucher {{ order.coupon_code ? '(' + order.coupon_code + ')' : '' }}</span
-              >
-              <span class="font-bold tabular-nums"
-                >-{{ formatRupiah(order.discount_cents / 100) }}</span
-              >
-            </div>
-            <div class="flex items-center justify-between">
-              <span>
-                Biaya Pengiriman
-                <span v-if="order.shipping_service" class="text-brand-muted font-normal">
-                  ({{ formatShippingServiceName(order.shipping_service) }})
-                </span>
-              </span>
-              <span
-                :class="[
-                  (order.shipping_cost_cents ?? 0) === 0
-                    ? 'text-brand-success font-semibold'
-                    : 'font-semibold text-brand-ink tabular-nums',
-                ]"
-              >
-                {{
-                  (order.shipping_cost_cents ?? 0) === 0
-                    ? 'Gratis Ongkir'
-                    : formatRupiah((order.shipping_cost_cents ?? 0) / 100)
-                }}
-              </span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span>Pajak PPN (11%)</span>
-              <span class="font-semibold text-brand-ink">Termasuk</span>
-            </div>
-          </div>
-
-          <div class="pt-4 border-t border-brand-hairsoft flex items-center justify-between">
-            <span class="font-display font-bold text-sm text-brand-ink">Total Tagihan</span>
-            <span class="font-display text-xl font-bold text-brand-ink tabular-nums">
-              {{ formatRupiah(order.total_cents / 100) }}
-            </span>
-          </div>
-
-          <!-- Action Button if pending -->
-          <div v-if="order.status === 'pending'" class="space-y-3 pt-2">
-            <UiButton
-              variant="primary"
-              size="md"
-              class="w-full justify-center"
-              icon="pi-credit-card"
-              :loading="isPaying"
-              :disabled="isCancelling || isManualChecking"
-              @click="handlePayNow"
-            >
-              Bayar Sekarang (Midtrans)
-            </UiButton>
-            <UiButton
-              variant="outline"
-              size="md"
-              class="w-full justify-center !text-brand-ink hover:!bg-brand-hairsoft font-semibold"
-              icon="pi-sync"
-              :loading="isManualChecking"
-              :disabled="isPaying || isCancelling"
-              @click="handleCheckPaymentStatus(false)"
-            >
-              Cek Status Pembayaran
-            </UiButton>
-            <UiButton
-              variant="outline"
-              size="sm"
-              class="w-full justify-center !text-red-600 hover:!text-red-700 hover:!border-red-300"
-              icon="pi-times-circle"
-              :disabled="isPaying || isCancelling || isManualChecking"
-              @click="isCancelModalOpen = true"
-            >
-              Batalkan Pesanan
-            </UiButton>
-            <p class="text-[11px] text-brand-muted text-center m-0">
-              Pembayaran diproses secara instan dan aman melalui jaringan Midtrans.
-            </p>
-          </div>
-
-          <!-- Action Button if cancelled: Single primary CTA for reorder -->
-          <div v-else-if="order.status === 'cancelled'" class="space-y-3 pt-2">
-            <UiButton
-              variant="primary"
-              size="md"
-              class="w-full justify-center"
-              icon="pi-refresh"
-              @click="handleReorder"
-            >
-              Beli Lagi
-            </UiButton>
-          </div>
-
-          <!-- Ajukan Komplain & Retur Produk (Hanya completed dalam 7 hari & belum ada tiket aktif) -->
-          <UiButton
-            v-if="order.status === 'completed' && returnEligibility?.isEligible && !returnTicket"
-            variant="outline"
-            size="sm"
-            class="w-full justify-center text-xs border-brand-hair hover:border-brand-ink"
-            icon="pi-replay"
-            @click="isReturnModalOpen = true"
-          >
-            Ajukan Komplain & Retur
-          </UiButton>
-
-          <!-- Invoice is only available for confirmed/paid/shipped/completed orders -->
-          <UiButton
-            v-if="['paid', 'shipped', 'completed'].includes(order.status)"
-            variant="outline"
-            size="sm"
-            class="w-full justify-center text-xs"
-            icon="pi-print"
-            @click="isInvoiceModalOpen = true"
-          >
-            Cetak Invoice Resmi
-          </UiButton>
-
-          <UiButton
-            to="/orders"
-            variant="secondary"
-            size="sm"
-            class="w-full justify-center text-xs"
-            icon="pi-arrow-left"
-          >
-            Kembali ke Daftar Pesanan
-          </UiButton>
-        </aside>
+        <!-- Right Column: Payment & Bill Summary (Modular Aside) -->
+        <OrderDetailPaymentCard
+          :order="order"
+          :is-paying="isPaying"
+          :is-cancelling="isCancelling"
+          :is-manual-checking="isManualChecking"
+          :get-payment-status-badge="getPaymentStatusBadge"
+          :format-shipping-service-name="formatShippingServiceName"
+          :return-eligibility="returnEligibility"
+          :return-ticket="returnTicket"
+          @pay="handlePayNow"
+          @check-status="handleCheckPaymentStatus(false)"
+          @open-cancel-modal="isCancelModalOpen = true"
+          @reorder="handleReorder"
+          @open-return-modal="isReturnModalOpen = true"
+          @open-invoice-modal="isInvoiceModalOpen = true"
+        />
       </div>
     </div>
 
-    <!-- Modal Konfirmasi Pembatalan -->
+    <!-- Modals -->
     <OrderCancelDialog
       v-model:visible="isCancelModalOpen"
       :loading="isCancelling"
-      @confirm="handleCancelOrder"
+      @confirm="onConfirmCancel"
     />
 
-    <!-- Modal Invoice Resmi & Print Sheet -->
     <OrderInvoiceModal v-if="order" v-model:visible="isInvoiceModalOpen" :order="order" />
 
-    <!-- Modal Ajukan Komplain & Retur -->
     <OrderReturnModal
       v-if="order"
       v-model="isReturnModalOpen"
@@ -1181,7 +274,6 @@ const getSegmentColor = (idx: number) => {
       @success="fetchReturnData(order.id)"
     />
 
-    <!-- Modal Tulis Ulasan Produk -->
     <ReviewFormModal
       v-if="selectedReviewProduct"
       v-model="isReviewModalOpen"

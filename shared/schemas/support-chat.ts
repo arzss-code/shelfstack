@@ -37,7 +37,7 @@ export const adminSendSupportMessageSchema = z.object({
     .min(1, 'Balasan tidak boleh kosong')
     .max(1000, 'Balasan maksimal 1000 karakter'),
   attachment_url: z.string().url('URL lampiran tidak valid').optional().nullable(),
-  attachment_type: z.enum(['image']).optional().nullable(),
+  attachment_type: z.literal('image').optional().nullable(),
 })
 
 export const updateThreadStatusSchema = z.object({
@@ -88,6 +88,18 @@ export interface SupportMessageItem {
   is_read: boolean
   created_at: string
   deleted_at?: string | null
+  attached_order?: {
+    id: string
+    order_number?: string | null
+    total_cents: number
+    status: string
+  } | null
+  attached_product?: {
+    id: number
+    title: string
+    price_cents: number
+    image_url?: string | null
+  } | null
 }
 
 export interface SupportThreadWithCustomer extends SupportThreadItem {

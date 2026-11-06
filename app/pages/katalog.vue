@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useCategories } from '~/composables/useCategories'
+import { useKatalogFilters } from '~/composables/useKatalogFilters'
 import ProductList from '~/features/products/components/ProductList.vue'
-import KatalogToolbar, { type SortOption } from '~/components/katalog/KatalogToolbar.vue'
-import KatalogSidebar, { type PriceRange } from '~/components/katalog/KatalogSidebar.vue'
+import KatalogToolbar from '~/components/katalog/KatalogToolbar.vue'
+import KatalogSidebar from '~/components/katalog/KatalogSidebar.vue'
 import KatalogActiveFilters from '~/components/katalog/KatalogActiveFilters.vue'
 import KatalogMobileFilter from '~/components/katalog/KatalogMobileFilter.vue'
 import type { Product } from '~/types/product'
@@ -13,40 +14,30 @@ useSeoMeta({
     'Jelajahi etalase ShelfStack: peralatan presisi, koleksi meja kerja, furnitur, dan perkakas terkurasi berkualitas tinggi.',
 })
 
-const route = useRoute()
-const router = useRouter()
 const { categories: dynamicCategories, fetchCategories } = useCategories()
 
-const searchQuery = ref((route.query.q as string) || '')
-const selectedCategory = ref((route.query.category as string) || 'all')
-const selectedPriceRange = ref((route.query.price as string) || 'all')
-const selectedSort = ref((route.query.sort as string) || 'featured')
-const currentPage = ref(parseInt((route.query.page as string) || '1', 10) || 1)
-const gridDensity = ref<'compact' | 'spacious'>('compact')
-const showMobileFilterModal = ref(false)
-const itemsPerPage = 12
-
-// Susun params server-side secara reaktif
-const queryParams = computed(() => {
-  const params: Record<string, string | number> = {
-    page: currentPage.value,
-    limit: itemsPerPage,
-    sort: selectedSort.value,
-  }
-  if (searchQuery.value.trim()) params.q = searchQuery.value.trim()
-  if (selectedCategory.value !== 'all') params.category = selectedCategory.value
-
-  if (selectedPriceRange.value === 'under500k') {
-    params.max_price = 500000
-  } else if (selectedPriceRange.value === '500k-2m') {
-    params.min_price = 500000
-    params.max_price = 2000000
-  } else if (selectedPriceRange.value === 'above2m') {
-    params.min_price = 2000000
-  }
-
-  return params
-})
+const {
+  searchQuery,
+  selectedCategory,
+  selectedPriceRange,
+  selectedSort,
+  currentPage,
+  gridDensity,
+  showMobileFilterModal,
+  itemsPerPage,
+  queryParams,
+  sortOptions,
+  priceRanges,
+  activeFiltersCount,
+  selectCategory,
+  clearSearch,
+  handleSearchUpdate,
+  handleSortUpdate,
+  handlePriceRangeUpdate,
+  handleClearPriceRange,
+  resetAllFilters,
+  changePage,
+} = useKatalogFilters()
 
 interface CatalogApiResponse {
   status: string
@@ -106,112 +97,9 @@ const categories = computed(() => [
   }),
 ])
 
-const sortOptions: SortOption[] = [
-  { id: 'featured', label: 'Pilihan Kurator' },
-  { id: 'popular', label: 'Paling Populer' },
-  { id: 'price-low', label: 'Harga: Rendah ke Tinggi' },
-  { id: 'price-high', label: 'Harga: Tinggi ke Rendah' },
-  { id: 'name-asc', label: 'Nama: A-Z' },
-]
-
-const priceRanges: PriceRange[] = [
-  { id: 'all', label: 'Semua Harga' },
-  { id: 'under500k', label: 'Di bawah Rp 500rb' },
-  { id: '500k-2m', label: 'Rp 500rb – Rp 2jt' },
-  { id: 'above2m', label: 'Di atas Rp 2jt' },
-]
-
 onMounted(async () => {
   await fetchCategories()
 })
-
-const syncQuery = () => {
-  const query: Record<string, string> = {}
-  if (searchQuery.value.trim()) query.q = searchQuery.value.trim()
-  if (selectedCategory.value !== 'all') query.category = selectedCategory.value
-  if (selectedPriceRange.value !== 'all') query.price = selectedPriceRange.value
-  if (selectedSort.value !== 'featured') query.sort = selectedSort.value
-  if (currentPage.value > 1) query.page = String(currentPage.value)
-  router.replace({ query })
-}
-
-const activeFiltersCount = computed(() => {
-  let count = 0
-  if (searchQuery.value.trim()) count++
-  if (selectedCategory.value !== 'all') count++
-  if (selectedPriceRange.value !== 'all') count++
-  if (selectedSort.value !== 'featured') count++
-  return count
-})
-
-const selectCategory = (catId: string) => {
-  selectedCategory.value = catId
-  currentPage.value = 1
-  syncQuery()
-}
-
-let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
-
-onUnmounted(() => {
-  if (searchDebounceTimer) {
-    clearTimeout(searchDebounceTimer)
-  }
-})
-
-const clearSearch = () => {
-  if (searchDebounceTimer) {
-    clearTimeout(searchDebounceTimer)
-  }
-  searchQuery.value = ''
-  currentPage.value = 1
-  syncQuery()
-}
-
-const handleSearchUpdate = (val: string) => {
-  searchQuery.value = val
-  currentPage.value = 1
-  if (searchDebounceTimer) {
-    clearTimeout(searchDebounceTimer)
-  }
-  searchDebounceTimer = setTimeout(() => {
-    syncQuery()
-  }, 300)
-}
-
-const handleSortUpdate = (val: string) => {
-  selectedSort.value = val
-  syncQuery()
-}
-
-const handlePriceRangeUpdate = (val: string) => {
-  selectedPriceRange.value = val
-  currentPage.value = 1
-  syncQuery()
-}
-
-const handleClearPriceRange = () => {
-  selectedPriceRange.value = 'all'
-  currentPage.value = 1
-  syncQuery()
-}
-
-const resetAllFilters = () => {
-  searchQuery.value = ''
-  selectedCategory.value = 'all'
-  selectedPriceRange.value = 'all'
-  selectedSort.value = 'featured'
-  currentPage.value = 1
-  router.replace({ query: {} })
-}
-
-const changePage = (newPage: number) => {
-  if (newPage < 1 || newPage > totalPages.value) return
-  currentPage.value = newPage
-  syncQuery()
-  if (import.meta.client) {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-}
 </script>
 
 <template>
@@ -301,7 +189,7 @@ const changePage = (newPage: number) => {
               size="sm"
               icon="pi-chevron-left"
               :disabled="currentPage <= 1 || pending"
-              @click="changePage(currentPage - 1)"
+              @click="changePage(currentPage - 1, totalPages)"
             >
               Sebelumnya
             </UiButton>
@@ -310,7 +198,7 @@ const changePage = (newPage: number) => {
               size="sm"
               icon="pi-chevron-right"
               :disabled="currentPage >= totalPages || pending"
-              @click="changePage(currentPage + 1)"
+              @click="changePage(currentPage + 1, totalPages)"
             >
               Selanjutnya
             </UiButton>

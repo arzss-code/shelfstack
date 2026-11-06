@@ -10,6 +10,42 @@ import type {
   SupportThreadWithCustomer,
 } from '~~/shared/schemas/support-chat'
 
+// Module-level singletons across admin page and child components to prevent duplicate subscriptions
+let sharedInboxChannel: RealtimeChannel | null = null
+let sharedMessageChannel: RealtimeChannel | null = null
+let activeSubscribedThreadId: string | null = null
+
+function getFreshChannel(client: SupabaseClient<Database>, topic: string): RealtimeChannel {
+  try {
+    if (typeof client.getChannels === 'function') {
+      const existing = client
+        .getChannels()
+        .find((ch) => ch.topic === topic || ch.topic === `realtime:${topic}`)
+      if (existing) {
+        try {
+          if (typeof (existing as any).unsubscribe === 'function') (existing as any).unsubscribe()
+        } catch {
+          // Safe unsubscribe
+        }
+        try {
+          client.removeChannel(existing)
+        } catch {
+          // Safe removal
+        }
+        try {
+          const realtime = (client as any).realtime
+          if (realtime && typeof realtime._remove === 'function') realtime._remove(existing)
+        } catch {
+          // Safe remove from realtime registry
+        }
+      }
+    }
+  } catch {
+    // Safe fallback for testing environments
+  }
+  return client.channel(topic)
+}
+
 export function useAdminSupportChat() {
   let supabase: SupabaseClient<Database> | null = null
   if (import.meta.client) {
@@ -35,20 +71,56 @@ export function useAdminSupportChat() {
     activeThreadId.value ? threads.value.find((t) => t.id === activeThreadId.value) || null : null,
   )
 
-  let inboxChannel: RealtimeChannel | null = null
-  let messageChannel: RealtimeChannel | null = null
-
   const cleanupInbox = () => {
-    if (inboxChannel && supabase) {
-      supabase.removeChannel(inboxChannel)
-      inboxChannel = null
+    if (sharedInboxChannel && supabase) {
+      try {
+        if (typeof (sharedInboxChannel as any).unsubscribe === 'function') {
+          ;(sharedInboxChannel as any).unsubscribe()
+        }
+      } catch {
+        // Safe unsubscribe
+      }
+      try {
+        supabase.removeChannel(sharedInboxChannel)
+      } catch {
+        // Safe removal
+      }
+      try {
+        const realtime = (supabase as any).realtime
+        if (realtime && typeof realtime._remove === 'function') {
+          realtime._remove(sharedInboxChannel)
+        }
+      } catch {
+        // Safe remove
+      }
+      sharedInboxChannel = null
     }
   }
 
   const cleanupMessage = () => {
-    if (messageChannel && supabase) {
-      supabase.removeChannel(messageChannel)
-      messageChannel = null
+    if (sharedMessageChannel && supabase) {
+      try {
+        if (typeof (sharedMessageChannel as any).unsubscribe === 'function') {
+          ;(sharedMessageChannel as any).unsubscribe()
+        }
+      } catch {
+        // Safe unsubscribe
+      }
+      try {
+        supabase.removeChannel(sharedMessageChannel)
+      } catch {
+        // Safe removal
+      }
+      try {
+        const realtime = (supabase as any).realtime
+        if (realtime && typeof realtime._remove === 'function') {
+          realtime._remove(sharedMessageChannel)
+        }
+      } catch {
+        // Safe remove
+      }
+      sharedMessageChannel = null
+      activeSubscribedThreadId = null
     }
   }
 
@@ -61,7 +133,22 @@ export function useAdminSupportChat() {
     if (!newMsg || newMsg.deleted_at || newMsg.thread_id !== activeThreadId.value) return
     if (messages.value.some((m) => m.id === newMsg.id)) return // Deduplication check
 
-    messages.value.push(newMsg)
+    const enriched = { ...newMsg } as SupportMessageItem
+    if (
+      (newMsg.attachment_type === 'order_card' || newMsg.message_text.includes('Pesanan')) &&
+      !enriched.attached_order
+    ) {
+      const prev = messages.value.find((m) => m.attached_order)
+      if (prev?.attached_order) enriched.attached_order = prev.attached_order
+    } else if (
+      (newMsg.attachment_type === 'product_card' || newMsg.message_text.includes('Produk')) &&
+      !enriched.attached_product
+    ) {
+      const prev = messages.value.find((m) => m.attached_product)
+      if (prev?.attached_product) enriched.attached_product = prev.attached_product
+    }
+
+    messages.value.push(enriched)
     const thread = threads.value.find((t) => t.id === newMsg.thread_id)
     if (thread) {
       thread.last_message_text = newMsg.message_text
@@ -96,33 +183,68 @@ export function useAdminSupportChat() {
   }
 
   const subscribeInbox = () => {
-    if (!import.meta.client || !supabase || inboxChannel) return
-    inboxChannel = supabase
-      .channel('admin-support-inbox')
-      .on(
-        'postgres_changes' as any,
-        { event: '*', schema: 'public', table: 'support_threads' },
-        handleInboxUpdate,
-      )
-      .subscribe()
+    if (!import.meta.client || !supabase) return
+    if (sharedInboxChannel) {
+      const adapter = (sharedInboxChannel as any).channelAdapter
+      if (adapter?.isJoined() || adapter?.isJoining()) return
+    }
+    if (typeof supabase.getChannels === 'function') {
+      try {
+        const existing = supabase
+          .getChannels()
+          .find(
+            (ch) =>
+              ch.topic === 'admin-support-inbox' || ch.topic === 'realtime:admin-support-inbox',
+          )
+        if (existing) {
+          const adapter = (existing as any).channelAdapter
+          if (adapter?.isJoined() || adapter?.isJoining()) {
+            sharedInboxChannel = existing
+            return
+          }
+        }
+      } catch {
+        // Safe channel inspection
+      }
+    }
+    try {
+      sharedInboxChannel = getFreshChannel(supabase, 'admin-support-inbox')
+        .on(
+          'postgres_changes' as any,
+          { event: '*', schema: 'public', table: 'support_threads' },
+          handleInboxUpdate,
+        )
+        .subscribe()
+    } catch {
+      // Safe fallback
+    }
   }
 
   const subscribeThreadMessages = (threadId: string) => {
     if (!import.meta.client || !supabase || !threadId) return
+    if (activeSubscribedThreadId === threadId && sharedMessageChannel) {
+      const adapter = (sharedMessageChannel as any).channelAdapter
+      if (adapter?.isJoined() || adapter?.isJoining()) return
+    }
+
     cleanupMessage()
-    messageChannel = supabase
-      .channel(`support-thread-${threadId}`)
-      .on(
-        'postgres_changes' as any,
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'support_messages',
-          filter: `thread_id=eq.${threadId}`,
-        },
-        (p: { new: SupportMessageItem }) => handleIncomingMessage(p.new),
-      )
-      .subscribe()
+    activeSubscribedThreadId = threadId
+    try {
+      sharedMessageChannel = getFreshChannel(supabase, `support-thread-${threadId}`)
+        .on(
+          'postgres_changes' as any,
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'support_messages',
+            filter: `thread_id=eq.${threadId}`,
+          },
+          (p: { new: SupportMessageItem }) => handleIncomingMessage(p.new),
+        )
+        .subscribe()
+    } catch {
+      // Safe fallback
+    }
   }
 
   const fetchThreads = async (params?: {
@@ -147,7 +269,11 @@ export function useAdminSupportChat() {
       })
       if (res?.data) {
         threads.value = res.data.threads || []
-        subscribeInbox()
+        try {
+          subscribeInbox()
+        } catch {
+          // Realtime safe fallback
+        }
         return res.data
       }
       return null
@@ -163,7 +289,11 @@ export function useAdminSupportChat() {
     activeThreadId.value = threadId
     const target = threads.value.find((t) => t.id === threadId)
     if (target) target.unread_by_admin_count = 0
-    subscribeThreadMessages(threadId)
+    try {
+      subscribeThreadMessages(threadId)
+    } catch {
+      // Realtime safe fallback
+    }
     isLoadingMessages.value = true
     error.value = null
     try {

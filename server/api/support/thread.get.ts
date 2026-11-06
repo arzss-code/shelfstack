@@ -68,7 +68,63 @@ export default defineEventHandler(async (event) => {
       return errorResponse(event, 'Gagal memuat pesan bantuan.', messagesError.message, 500)
     }
 
-    const messages = (rawMessages || []).reverse()
+    let attachedOrder = null
+    if (thread.attached_order_id) {
+      const { data: orderData } = await client
+        .from('orders')
+        .select('id, total_cents, status, created_at')
+        .eq('id', thread.attached_order_id)
+        .maybeSingle()
+
+      if (orderData) {
+        attachedOrder = {
+          id: orderData.id,
+          order_number: `ORD-${orderData.id.slice(0, 8).toUpperCase()}`,
+          total_cents: orderData.total_cents,
+          status: orderData.status,
+        }
+      }
+    }
+
+    let attachedProduct = null
+    if (thread.attached_product_id) {
+      const { data: prodData } = await client
+        .from('products')
+        .select('id, name, price_cents, image_url')
+        .eq('id', thread.attached_product_id)
+        .maybeSingle()
+
+      if (prodData) {
+        attachedProduct = {
+          id: prodData.id,
+          title: prodData.name || 'Produk ShelfStack',
+          price_cents: prodData.price_cents || 0,
+          image_url: prodData.image_url || null,
+        }
+      }
+    }
+
+    const messages = (rawMessages || []).reverse().map((m) => {
+      const enriched = { ...m } as any
+      if (m.attachment_type === 'order_card' && attachedOrder) {
+        enriched.attached_order = attachedOrder
+      } else if (m.attachment_type === 'product_card' && attachedProduct) {
+        enriched.attached_product = attachedProduct
+      } else if (
+        attachedOrder &&
+        m.sender_type === 'customer' &&
+        m.message_text.includes('Pesanan')
+      ) {
+        enriched.attached_order = attachedOrder
+      } else if (
+        attachedProduct &&
+        m.sender_type === 'customer' &&
+        m.message_text.includes('Produk')
+      ) {
+        enriched.attached_product = attachedProduct
+      }
+      return enriched
+    })
 
     return successResponse('Thread bantuan berhasil dimuat', {
       thread,

@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 9 (Customer Experience & Loyalty Hub)**
-- **Versi Rilis:** `v0.31.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-04)
-- **Baseline Quality Gate (2026-11-04, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 83 file / 880 test lolos 100%.
+- **Versi Rilis:** `v0.31.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-06)
+- **Baseline Quality Gate (2026-11-06, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 83 file / 880 test lolos 100% · 0 file `.vue` di `app/` melampaui 300 baris (172/172 patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -193,6 +193,8 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
 
 23. **Sistem Live Chat Bantuan Pelanggan Real-time (SELESAI 2026-11-04, SHF-CHAT-01).** Implementasi live chat dua arah antara pelanggan etalase dan admin CS berbasis Supabase Realtime (Postgres Changes). Migrasi SQL `20261129000001_customer_support_live_chat.sql` mendefinisikan tabel `public.support_threads` dan `public.support_messages` dengan soft-deletes, triggers update unread counter atomik, dan bucket Supabase Storage baru `chat-attachments` (maks 5MB, format JPEG/PNG/WebP). Backend Nitro API (8 endpoints di `server/api/support/` dan `server/api/admin/support/`) menyediakan inisialisasi thread, pengiriman pesan dengan auto welcome bot, upload berkas bukti foto, pemuatan inbox admin, canned responses picker, dan perubahan status kendala. Komponen frontend modular mematuhi batas maksimal 300 baris: `LiveChatWidget.vue` (115 baris), `LiveChatWindow.vue` (245 baris), `ChatOrderSnippet.vue` (71 baris), `AdminSupportInboxList.vue` (228 baris), `AdminSupportChatPane.vue` (250 baris), `AdminCannedResponseMenu.vue` (91 baris), `app/pages/admin/support.vue` (184 baris), `useSupportChat.ts` (292 baris), dan `useAdminSupportChat.ts` (272 baris). Terintegrasi dengan layout etalase, navbar, dan sidebar admin (+178 unit test baru di 8 suite test, total 83 file / 880 tests lolos 100%).
 
+24. **Modularisasi Menyeluruh <= 300 Baris & Penyempurnaan Live Chat (SELESAI 2026-11-06, v0.31.1).** Audit dan modularisasi tuntas atas seluruh halaman (`app/pages/`, 14 file) dan komponen (`app/components/` & `app/features/`, 15 file) yang sebelumnya melampaui batas 300 baris kode per file sesuai konstitusi Talenavi Engineering SOP. Kini seluruh 172 file `.vue` di dalam `app/` berada di bawah 300 baris (terbesar 296 baris) melalui ekstraksi composable dan sub-komponen terfokus dengan tipe TypeScript ketat tanpa `any`. Termasuk perbaikan kelas skala aktif peluncur `LiveChatWidget.vue` (`active:scale-95`), penyelarasan tipe callback `useUiSelect.ts`, serta sinkronisasi status inventaris fitur di `docs/PROGRESS.md` dan `docs/BACKLOG.md` (`pnpm typecheck` EXIT 0, `pnpm lint` EXIT 0, `pnpm exec vitest run` 83 file / 880 tests lolos 100%).
+
 ---
 
 ## 📌 Inventaris Fitur Belum Diimplementasikan (Backlog Lanjutan)
@@ -209,14 +211,14 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
 4. ~~**Lacak Pengiriman Ekspedisi (Courier Live Tracking)**~~:
    - Status: ✅ **SELESAI 2026-10-27** (SHF-LOG-01).
    - Keterangan: Kolom tracking pada `orders`, tabel riwayat `shipping_checkpoints`, RLS strict, publikasi realtime, utilitas generator resi & data masking privasi, modal admin fulfillment dengan pilihan kurir resmi, kartu linimasa pelacakan di `/orders/[id]`, halaman publik pencarian resi di `/tracking` yang terhubung dari navbar dan footer, serta 9 unit test di `tests/unit/shipping-tracking.spec.ts`.
-5. **Kupon Promo & Diskon (Voucher Codes & Auto-Discounts)**:
-   - Status: Belum diimplementasikan.
-   - Keterangan: Belum ada modul voucher (tabel `coupons`, input kode promo di keranjang/checkout, validasi kuota klaim, dan potongan harga dinamis). Diskon saat ini hanya potongan langsung berbasis kolom produk (`original_price_cents`).
+5. ~~**Kupon Promo & Diskon (Voucher Codes & Auto-Discounts)**~~:
+   - Status: ✅ **SELESAI 2026-10-28 & 2026-11-03** (SHF-VOUCHER & SHF-ADM-COUPON-01).
+   - Keterangan: Tabel `public.coupons` dan `public.coupon_usages` dengan RLS strict, validasi dan penguncian kupon atomik (`FOR UPDATE`) di RPC `create_order`, endpoint validasi kode promo, penukaran voucher dengan koin loyalitas (`coin_cost`), komponen pemilihan voucher di keranjang dan checkout, serta panel manajemen kupon admin modular beserta riwayat pemakaian.
 6. ~~**Pusat Bantuan & FAQ Interaktif (Help Center / FAQ Page)**~~:
    - Status: ✅ **SELESAI 2026-10-30** (Halaman `/help` interaktif dengan pencarian FAQ real-time, tab navigasi kategori via `UiTabs`, accordion yang dapat dibuka/tutup, integrasi URL hash `#pengembalian` dan `#pengiriman`, banner bantuan cepat dengan link ke `/tracking` dan `/contact`, serta 9 unit test di `tests/unit/help-page.spec.ts`).
 7. ~~**Live Chat / Bantuan Pelanggan Langsung (Customer Support Chat)**~~:
    - Status: ✅ **SELESAI 2026-11-04** (SHF-CHAT-01).
-   - Keterangan: Sistem Live Chat dua arah berbasis Supabase Realtime (tabel support_threads dan support_messages, trigger unread atomik, bucket chat-attachments maks 5MB), 8 endpoint Nitro API, composable useSupportChat & useAdminSupportChat, floating widget etalase dengan login prompt ramah tamu, split-view dual-pane admin workspace di /admin/support dengan template balasan cepat, serta 83 file / 880 test lolos 100%.
+   - Keterangan: Sistem Live Chat dua arah berbasis Supabase Realtime (tabel support_threads dan support_messages, trigger unread atomik, bucket chat-attachments maks 5MB), 8 endpoint Nitro API, composable useSupportChat & useAdminSupportChat (proteksi deduplikasi singleton realtime channel), floating widget etalase dengan login prompt ramah tamu, split-view dual-pane admin workspace di /admin/support dengan template balasan cepat, stempel jam (HH:mm), pemilih emotikon cepat, pratinjau lampiran gambar & lightbox, cuplikan kartu pesanan/produk, serta 83 file / 880 test lolos 100%.
 8. ~~**Halaman Profil Perusahaan (Tentang Kami & Kontak)**~~:
    - Status: ✅ **SELESAI 2026-10-30** (Halaman kurasi `/about` dengan 4 strip metrik, 3 pilar komitmen rekayasa, dan CTA katalog; serta halaman `/contact` dengan informasi saluran resmi, formulir kontak interaktif tervalidasi via `UiInput`/`UiSelect`/`UiTextarea`, feedback toast, pembersihan form pasca-submit, tautan footer terintegrasi, dan 10 unit test di `tests/unit/contact-page.spec.ts` dan `tests/unit/about-page.spec.ts`).
 9. ~~**Ulasan & Rating Pelanggan (Product Reviews & Ratings)**~~:

@@ -6,6 +6,7 @@ import UiButton from '~/components/ui/UiButton.vue'
 import UiInput from '~/components/ui/UiInput.vue'
 import UiSelect from '~/components/ui/UiSelect.vue'
 import UiAlert from '~/components/ui/UiAlert.vue'
+import OrderReturnStepper from '~/components/orders/OrderReturnStepper.vue'
 import type { ReturnRequestItem } from '~~/shared/schemas/return-request'
 import {
   RETURN_REASON_LABELS,
@@ -88,76 +89,10 @@ const handleSaveTracking = async () => {
     </div>
 
     <!-- Stepper 4 Tahap (Jika bukan rejected/cancelled) -->
-    <div
+    <OrderReturnStepper
       v-if="ticket.status !== 'rejected' && ticket.status !== 'cancelled'"
-      class="py-4 border-b border-brand-hairsoft"
-    >
-      <div class="grid grid-cols-4 gap-2 text-center">
-        <!-- Step 1 -->
-        <div class="flex flex-col items-center gap-1.5">
-          <div
-            class="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold"
-            :class="
-              statusMeta.step >= 1
-                ? 'bg-brand-ink text-brand-onink'
-                : 'bg-brand-field text-brand-muted'
-            "
-          >
-            <i v-if="statusMeta.step > 1" class="pi pi-check text-[10px]" />
-            <span v-else>1</span>
-          </div>
-          <span class="text-[10px] font-medium leading-tight text-brand-ink">Diajukan</span>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="flex flex-col items-center gap-1.5">
-          <div
-            class="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold"
-            :class="
-              statusMeta.step >= 2
-                ? 'bg-brand-ink text-brand-onink'
-                : 'bg-brand-field text-brand-muted'
-            "
-          >
-            <i v-if="statusMeta.step > 2" class="pi pi-check text-[10px]" />
-            <span v-else>2</span>
-          </div>
-          <span class="text-[10px] font-medium leading-tight text-brand-ink">Disetujui</span>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="flex flex-col items-center gap-1.5">
-          <div
-            class="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold"
-            :class="
-              statusMeta.step >= 3
-                ? 'bg-brand-ink text-brand-onink'
-                : 'bg-brand-field text-brand-muted'
-            "
-          >
-            <i v-if="statusMeta.step > 3" class="pi pi-check text-[10px]" />
-            <span v-else>3</span>
-          </div>
-          <span class="text-[10px] font-medium leading-tight text-brand-ink">Inspeksi Gudang</span>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="flex flex-col items-center gap-1.5">
-          <div
-            class="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold"
-            :class="
-              statusMeta.step >= 4
-                ? 'bg-brand-success text-white'
-                : 'bg-brand-field text-brand-muted'
-            "
-          >
-            <i v-if="statusMeta.step === 4" class="pi pi-check text-[10px]" />
-            <span v-else>4</span>
-          </div>
-          <span class="text-[10px] font-medium leading-tight text-brand-ink">Selesai</span>
-        </div>
-      </div>
-    </div>
+      :current-step="statusMeta.step"
+    />
 
     <!-- Informasi Detail Tiket -->
     <div class="space-y-3.5 pt-3.5 text-xs text-brand-ink">

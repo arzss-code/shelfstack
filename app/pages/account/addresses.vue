@@ -259,23 +259,14 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
         </div>
 
         <!-- State: Filtered Empty -->
-        <div
+        <UiEmptyState
           v-else-if="filteredAddresses.length === 0"
-          class="text-center py-12 bg-brand-canvas rounded-card border border-brand-hair p-8"
-        >
-          <p class="text-sm font-semibold text-brand-ink m-0">Tidak ada alamat yang cocok</p>
-          <p class="text-xs text-brand-muted m-0 mt-1">
-            Coba gunakan kata kunci pencarian atau filter yang lain.
-          </p>
-          <UiButton
-            variant="ghost"
-            size="xs"
-            class="mt-3 active:scale-95"
-            @click="handleResetFilter"
-          >
-            Reset Filter Pencarian
-          </UiButton>
-        </div>
+          icon="pi-search"
+          title="Tidak ada alamat yang cocok"
+          description="Coba gunakan kata kunci pencarian atau filter yang lain."
+          action-label="Reset Filter Pencarian"
+          @action="handleResetFilter"
+        />
 
         <!-- State: Address Grid -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { useProductStore } from '~/features/products/stores/product'
-import type { Product } from '~/types/product'
 import ProductList from '~/features/products/components/ProductList.vue'
 import ProductForm from '~/features/products/components/ProductForm.vue'
 import StockMovementsModal from '~/features/products/components/StockMovementsModal.vue'
-import { sortProducts, type SortDir, type SortKey } from '~/features/products/utils/product-sort'
 
 useSeoMeta({
   title: 'Kelola Produk',
@@ -15,199 +12,25 @@ definePageMeta({
   middleware: 'admin',
 })
 
-const productStore = useProductStore()
-const toast = useUiToast()
-const confirm = useUiConfirm()
-
-const isFormVisible = ref(false)
-const editingProduct = ref<Product | null>(null)
-const isStockModalVisible = ref(false)
-const stockAuditProduct = ref<Product | null>(null)
-const searchQuery = ref('')
-const activeTab = ref('0')
-const sortOption = ref('name-asc')
-const sortOptionsList = [
-  { value: 'name-asc', label: 'Nama A-Z' },
-  { value: 'price-asc', label: 'Termurah' },
-  { value: 'price-desc', label: 'Termahal' },
-  { value: 'stock-asc', label: 'Stok tersedikit' },
-]
-
-const openStockMovements = (product: Product) => {
-  stockAuditProduct.value = product
-  isStockModalVisible.value = true
-}
-
-const criticalStockProducts = computed(() =>
-  productStore.products.filter((p) => (p.stock ?? 0) < 5),
-)
-
-const tabItems = computed(() => [
-  { value: '0', label: 'Produk Aktif' },
-  {
-    value: '2',
-    label: 'Stok Kritis',
-    count: criticalStockProducts.value.length,
-    countTone: 'danger' as const,
-  },
-  { value: '1', label: 'Keranjang Sampah' },
-])
-
-const filteredProducts = computed(() => {
-  const src =
-    activeTab.value === '1'
-      ? productStore.deletedProducts
-      : activeTab.value === '2'
-        ? criticalStockProducts.value
-        : productStore.products
-  const q = searchQuery.value.trim().toLowerCase()
-  const list = !q ? src : src.filter((p) => p.name.toLowerCase().includes(q))
-  const [k, d] = sortOption.value.split('-') as [SortKey, SortDir]
-  return sortProducts(list, k, d)
-})
-
-watch(activeTab, async (newVal) => {
-  if (newVal === '1' && productStore.deletedProducts.length === 0) {
-    try {
-      await productStore.fetchDeletedProducts()
-    } catch (e) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Gagal memuat keranjang sampah',
-        life: 3000,
-      })
-    }
-  }
-})
-
-onMounted(async () => {
-  try {
-    await productStore.fetchProducts()
-  } catch (error: unknown) {
-    toast.add({
-      severity: 'error',
-      summary: 'Gagal Memuat Data',
-      detail: error instanceof Error ? error.message : 'Gagal mengambil daftar produk.',
-      life: 5000,
-    })
-  }
-})
-
-const openAddForm = () => {
-  editingProduct.value = null
-  isFormVisible.value = true
-}
-
-const openEditForm = (product: Product) => {
-  editingProduct.value = product
-  isFormVisible.value = true
-}
-
-const handleSave = async (
-  name: string,
-  price: number,
-  description: string | null,
-  link: string | null,
-  file: File | null,
-  stock = 0,
-  categoryId: string | null = null,
-) => {
-  try {
-    if (editingProduct.value) {
-      await productStore.updateProduct(
-        editingProduct.value.id,
-        name,
-        price,
-        description,
-        link,
-        file,
-        stock,
-        categoryId,
-      )
-      toast.add({
-        severity: 'success',
-        summary: 'Berhasil',
-        detail: 'Produk berhasil diperbarui.',
-        life: 3000,
-      })
-    } else {
-      await productStore.addProduct(name, price, description, link, file, stock, categoryId)
-      toast.add({
-        severity: 'success',
-        summary: 'Berhasil',
-        detail: 'Produk baru berhasil ditambahkan.',
-        life: 3000,
-      })
-    }
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Terjadi kesalahan tidak terduga.'
-    const isRls = message.includes('row-level security policy')
-    toast.add({
-      severity: 'error',
-      summary: isRls ? 'Akses Ditolak (RLS)' : 'Gagal Menyimpan',
-      detail: isRls ? 'Supabase menolak operasi. Pastikan RLS Policy sudah diatur.' : message,
-      life: isRls ? 8000 : 5000,
-    })
-  }
-}
-
-const handleDelete = async (id: number) => {
-  confirm.require({
-    message: 'Apakah Anda yakin ingin menghapus produk ini?',
-    header: 'Konfirmasi Penghapusan',
-    tone: 'danger',
-    acceptLabel: 'Hapus',
-    rejectLabel: 'Batal',
-    accept: async () => {
-      try {
-        await productStore.deleteProduct(id)
-        toast.add({
-          severity: 'success',
-          summary: 'Terhapus',
-          detail: 'Produk berhasil dihapus.',
-          life: 3000,
-        })
-      } catch (error: unknown) {
-        toast.add({
-          severity: 'error',
-          summary: 'Gagal Menghapus',
-          detail: error instanceof Error ? error.message : 'Terjadi kesalahan.',
-          life: 5000,
-        })
-      }
-    },
-  })
-}
-
-const handleRestore = async (id: number) => {
-  confirm.require({
-    message: 'Apakah Anda yakin ingin mengembalikan produk ini dari keranjang sampah?',
-    header: 'Konfirmasi Restore',
-    tone: 'success',
-    acceptLabel: 'Restore',
-    rejectLabel: 'Batal',
-    accept: async () => {
-      try {
-        await productStore.restoreProduct(id)
-        toast.add({
-          severity: 'success',
-          summary: 'Berhasil',
-          detail: 'Produk berhasil dikembalikan.',
-          life: 3000,
-        })
-        productStore.fetchProducts()
-      } catch (error: unknown) {
-        toast.add({
-          severity: 'error',
-          summary: 'Gagal Mengembalikan',
-          detail: error instanceof Error ? error.message : 'Terjadi kesalahan.',
-          life: 5000,
-        })
-      }
-    },
-  })
-}
+const {
+  productStore,
+  isFormVisible,
+  editingProduct,
+  isStockModalVisible,
+  stockAuditProduct,
+  searchQuery,
+  activeTab,
+  sortOption,
+  sortOptionsList,
+  tabItems,
+  filteredProducts,
+  openStockMovements,
+  openAddForm,
+  openEditForm,
+  handleSave,
+  handleDelete,
+  handleRestore,
+} = useAdminProducts()
 </script>
 
 <template>

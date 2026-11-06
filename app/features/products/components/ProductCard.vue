@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { Product } from '~/types/product'
 import { formatRupiah } from '~/utils/format'
-import { useCategories } from '~/composables/useCategories'
-import { useCartStore } from '~/features/cart/stores/cart'
+import { useProductCard } from '~/composables/useProductCard'
 import WishlistButton from '~/components/wishlist/WishlistButton.vue'
 
 const props = withDefaults(
@@ -24,114 +23,18 @@ const emit = defineEmits<{
   viewStockMovements: [product: Product]
 }>()
 
-const router = useRouter()
-const toast = useUiToast()
-const cartStore = useCartStore()
-const { categories: dynamicCategories } = useCategories()
-
-const justAdded = ref(false)
-const imageLoadError = ref(false)
-const imageEl = ref<HTMLImageElement | null>(null)
-
-const onImgError = () => {
-  imageLoadError.value = true
-}
-
-onMounted(() => {
-  // Catch SSR hydration race condition where image 404 happened before @error listener attached
-  if (imageEl.value && imageEl.value.complete && imageEl.value.naturalWidth === 0) {
-    imageLoadError.value = true
-  }
-})
-
-watch(
-  () => props.product.image_url,
-  () => {
-    imageLoadError.value = false
-    nextTick(() => {
-      if (imageEl.value && imageEl.value.complete && imageEl.value.naturalWidth === 0) {
-        imageLoadError.value = true
-      }
-    })
-  },
-)
-
-const categoryName = computed(() => {
-  if (!props.product.category_id) return null
-  const cat = dynamicCategories.value.find((c) => c.id === props.product.category_id)
-  return cat ? cat.name : null
-})
-
-const formattedRating = computed(() => {
-  const r = props.product.rating
-  if (!r || Number(r) <= 0) return null
-  return Number(r).toFixed(1)
-})
-
-const stockStatusText = computed(() => {
-  if (props.product.stock === 0) return 'Stok Habis'
-  if (props.product.stock <= 3) return `Sisa ${props.product.stock}`
-  if (props.product.sold_count && props.product.sold_count > 0) {
-    return props.product.sold_count >= 1000
-      ? `${(props.product.sold_count / 1000).toFixed(1)}rb+ terjual`
-      : `${props.product.sold_count} terjual`
-  }
-  return 'Tersedia'
-})
-
-const badgeInfo = computed(() => {
-  if (props.product.stock === 0) {
-    return {
-      label: 'Habis',
-      badgeClass: 'bg-brand-danger text-white',
-    }
-  }
-  if (props.product.stock > 0 && props.product.stock <= 3) {
-    return {
-      label: `Sisa ${props.product.stock}`,
-      badgeClass: 'bg-brand-warning text-white',
-    }
-  }
-  if (props.product.is_featured) {
-    return {
-      label: 'Unggulan',
-      badgeClass: 'bg-brand-ink text-brand-onink shadow-sm',
-    }
-  }
-  return null
-})
-
-const navigateToDetail = () => {
-  const target = props.product.slug || props.product.id
-  router.push(`/product/${target}`)
-}
-
-const handleQuickAdd = () => {
-  if (props.product.stock <= 0) return
-
-  cartStore.addItem({
-    productId: props.product.id,
-    slug: props.product.slug,
-    name: props.product.name,
-    price: props.product.price,
-    priceCents: props.product.price_cents ?? Math.round(props.product.price * 100),
-    imageUrl: props.product.image_url,
-    stock: props.product.stock,
-    openCartDrawer: true,
-  })
-
-  justAdded.value = true
-  setTimeout(() => {
-    justAdded.value = false
-  }, 1500)
-
-  toast.add({
-    severity: 'success',
-    summary: 'Ditambahkan ke Keranjang',
-    detail: `${props.product.name} masuk ke pesanan.`,
-    life: 2500,
-  })
-}
+const {
+  justAdded,
+  imageLoadError,
+  imageEl,
+  onImgError,
+  categoryName,
+  formattedRating,
+  stockStatusText,
+  badgeInfo,
+  navigateToDetail,
+  handleQuickAdd,
+} = useProductCard(() => props.product)
 </script>
 
 <template>

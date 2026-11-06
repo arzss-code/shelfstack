@@ -83,8 +83,14 @@ export default defineEventHandler(async (event) => {
     const isFirstMessage = (existingCount ?? 0) === 0
 
     let attachmentType = payload.attachment_type || null
-    if (!attachmentType && payload.attachment_url) {
-      attachmentType = 'image'
+    if (!attachmentType) {
+      if (payload.attachment_url) {
+        attachmentType = 'image'
+      } else if (payload.attached_order_id) {
+        attachmentType = 'order_card'
+      } else if (payload.attached_product_id) {
+        attachmentType = 'product_card'
+      }
     }
 
     const { data: customerMessage, error: insertError } = await client
@@ -103,6 +109,40 @@ export default defineEventHandler(async (event) => {
 
     if (insertError) {
       return errorResponse(event, 'Gagal mengirim pesan bantuan.', insertError.message, 500)
+    }
+
+    let attachedOrder = null
+    if (payload.attached_order_id) {
+      const { data: ord } = await client
+        .from('orders')
+        .select('id, total_cents, status, created_at')
+        .eq('id', payload.attached_order_id)
+        .maybeSingle()
+      if (ord) {
+        attachedOrder = {
+          id: ord.id,
+          order_number: `ORD-${ord.id.slice(0, 8).toUpperCase()}`,
+          total_cents: ord.total_cents,
+          status: ord.status,
+        }
+      }
+    }
+
+    let attachedProduct = null
+    if (payload.attached_product_id) {
+      const { data: prod } = await client
+        .from('products')
+        .select('id, name, price_cents, image_url')
+        .eq('id', payload.attached_product_id)
+        .maybeSingle()
+      if (prod) {
+        attachedProduct = {
+          id: prod.id,
+          title: prod.name || 'Produk ShelfStack',
+          price_cents: prod.price_cents || 0,
+          image_url: prod.image_url || null,
+        }
+      }
     }
 
     let systemMessage = null
@@ -134,7 +174,11 @@ export default defineEventHandler(async (event) => {
     }
 
     return successResponse('Pesan berhasil dikirim', {
-      message: customerMessage,
+      message: {
+        ...customerMessage,
+        attached_order: attachedOrder,
+        attached_product: attachedProduct,
+      },
       system_message: systemMessage,
     })
   } catch (err: unknown) {

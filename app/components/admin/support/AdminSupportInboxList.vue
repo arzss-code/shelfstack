@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
+import {
+  formatStatusLabel,
+  statusDotClass,
+  statusPillClass,
+  statusDescription,
+  formatRelativeTime,
+  getInitials,
+} from '~/utils/support-status'
 
 export interface SupportThreadListItem {
   id: string
@@ -51,6 +59,8 @@ try {
   // Graceful fallback for isolated unit tests
 }
 
+const isDropdownOpen = ref(false)
+
 const tabs = [
   { key: 'all', label: 'Semua' },
   { key: 'open', label: 'Baru' },
@@ -79,16 +89,22 @@ const effectiveSearchQuery = computed<string>(() => {
   return adminChat?.searchQuery?.value ?? ''
 })
 
+const activeTabLabel = computed(() => {
+  const found = tabs.find((t) => t.key === effectiveFilterStatus.value)
+  return found?.label || 'Semua Percakapan'
+})
+
 const onSelectThread = (threadId: string) => {
   emit('selectThread', threadId)
-  if (adminChat) {
+  if (props.threads === undefined && adminChat) {
     adminChat.selectThread(threadId)
   }
 }
 
 const onSelectTab = (statusKey: string) => {
   emit('updateFilter', statusKey)
-  if (adminChat) {
+  isDropdownOpen.value = false
+  if (props.threads === undefined && adminChat) {
     adminChat.activeFilter.value = statusKey
     adminChat.fetchThreads()
   }
@@ -98,92 +114,103 @@ const onSearchInput = (e: Event) => {
   const target = e.target as HTMLInputElement
   const val = target.value
   emit('updateSearch', val)
-  if (adminChat) {
+  if (props.threads === undefined && adminChat) {
     adminChat.searchQuery.value = val
     adminChat.fetchThreads()
-  }
-}
-
-const getInitials = (name: string): string => {
-  if (!name) return '?'
-  const parts = name.trim().split(/\s+/)
-  if (parts.length >= 2) {
-    return `${parts[0]?.[0] || ''}${parts[1]?.[0] || ''}`.toUpperCase()
-  }
-  return name.slice(0, 2).toUpperCase()
-}
-
-const formatRelativeTime = (isoString?: string | null): string => {
-  if (!isoString) return ''
-  try {
-    const date = new Date(isoString)
-    const now = new Date()
-    const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000)
-    if (diffSec < 60) return 'Baru saja'
-    const diffMin = Math.floor(diffSec / 60)
-    if (diffMin < 60) return `${diffMin}m`
-    const diffHour = Math.floor(diffMin / 60)
-    if (diffHour < 24) return `${diffHour}j`
-    const diffDay = Math.floor(diffHour / 24)
-    if (diffDay < 7) return `${diffDay}h`
-    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
-  } catch {
-    return ''
   }
 }
 </script>
 
 <template>
   <div class="admin-support-inbox-list flex h-full flex-col border-r border-brand-hair bg-white">
-    <!-- Search Bar -->
+    <!-- Search Bar with Icon -->
     <div class="border-b border-brand-hair p-3">
       <div class="relative">
+        <i
+          class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-muted pointer-events-none"
+        />
         <input
           type="text"
           :value="effectiveSearchQuery"
           placeholder="Cari nama atau email..."
-          class="search-input w-full rounded border border-brand-hair px-3 py-1.5 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:outline-none transition-colors"
+          class="search-input w-full rounded-field border border-brand-hair bg-brand-canvas-soft pl-8 pr-3 py-1.5 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-white focus:outline-none transition-colors"
           @input="onSearchInput"
         />
       </div>
     </div>
 
-    <!-- Status Tabs -->
-    <div class="status-tabs flex overflow-x-auto border-b border-brand-hair text-xs scrollbar-none">
+    <!-- Status Filter Dropdown Section (Replaces cramped text tabs) -->
+    <div class="filter-section relative border-b border-brand-hair bg-brand-canvas-soft/30 p-2.5">
       <button
-        v-for="tab in tabs"
-        :key="tab.key"
         type="button"
-        :data-status="tab.key"
-        class="tab-btn filter-tab px-3 py-2 font-medium whitespace-nowrap transition-colors"
-        :class="
-          effectiveFilterStatus === tab.key
-            ? 'active-tab border-b-2 border-brand-ink text-brand-ink'
-            : 'text-brand-muted hover:text-brand-ink'
-        "
-        @click="onSelectTab(tab.key)"
+        class="filter-dropdown-trigger flex w-full items-center justify-between rounded-field border border-brand-hair bg-white px-3 py-1.5 text-xs text-brand-ink shadow-xs transition-colors hover:border-brand-ink focus:outline-none cursor-pointer"
+        aria-label="Filter status percakapan"
+        @click="isDropdownOpen = !isDropdownOpen"
       >
-        {{ tab.label }}
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-brand-muted text-[11px] font-medium shrink-0">Filter:</span>
+          <span
+            class="h-2 w-2 shrink-0 rounded-full"
+            :class="statusDotClass(effectiveFilterStatus)"
+          />
+          <span class="truncate font-semibold text-brand-ink">
+            {{ activeTabLabel }}
+          </span>
+        </div>
+        <i
+          class="pi pi-chevron-down text-[10px] text-brand-muted transition-transform duration-200"
+          :class="isDropdownOpen ? 'rotate-180' : ''"
+        />
       </button>
+
+      <!-- Dropdown Popover Menu with Test Contracts Preserved -->
+      <div
+        v-show="isDropdownOpen"
+        class="status-tabs filter-menu absolute left-2.5 right-2.5 top-[calc(100%+4px)] z-30 rounded-card border border-brand-hair bg-white p-1.5 shadow-floating space-y-0.5"
+      >
+        <button
+          v-for="tab in tabs"
+          :key="tab.key"
+          type="button"
+          :data-status="tab.key"
+          class="tab-btn filter-tab flex w-full items-center justify-between rounded-field px-2.5 py-2 text-xs transition-colors text-left cursor-pointer"
+          :class="
+            effectiveFilterStatus === tab.key
+              ? 'active-tab bg-brand-canvas-soft font-semibold text-brand-ink'
+              : 'text-brand-ink hover:bg-brand-canvas-soft/70'
+          "
+          @click="onSelectTab(tab.key)"
+        >
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="h-2 w-2 shrink-0 rounded-full" :class="statusDotClass(tab.key)" />
+            <span class="truncate">{{ tab.label }}</span>
+          </div>
+          <i
+            v-if="effectiveFilterStatus === tab.key"
+            class="pi pi-check text-[10px] text-brand-ink shrink-0"
+          />
+        </button>
+      </div>
     </div>
 
     <!-- Thread Cards List -->
-    <div class="thread-items flex-1 overflow-y-auto">
+    <div class="thread-items flex-1 overflow-y-auto divide-y divide-brand-hair/60">
       <div
         v-if="effectiveThreads.length === 0"
-        class="empty-inbox p-6 text-center text-xs text-brand-muted"
+        class="empty-inbox p-8 text-center text-xs text-brand-muted flex flex-col items-center justify-center gap-2"
       >
-        Tidak ada pesan bantuan ditemukan
+        <i class="pi pi-inbox text-2xl text-brand-hair" />
+        <span>Tidak ada pesan bantuan ditemukan</span>
       </div>
 
       <div
         v-for="thread in effectiveThreads"
         :key="thread.id"
         :data-id="thread.id"
-        class="thread-card thread-item flex cursor-pointer items-center justify-between border-b border-brand-hair p-3 transition-colors hover:bg-brand-canvas-soft"
+        class="thread-card thread-item flex cursor-pointer items-center justify-between p-3.5 transition-colors hover:bg-brand-canvas-soft/80"
         :class="[
           effectiveActiveThreadId === thread.id
-            ? 'active-thread is-active bg-brand-canvas-soft'
+            ? 'active-thread is-active bg-brand-canvas-soft border-l-4 border-l-brand-ink pl-2.5'
             : '',
         ]"
         @click="onSelectThread(thread.id)"
@@ -191,7 +218,7 @@ const formatRelativeTime = (isoString?: string | null): string => {
         <div class="flex flex-1 items-center gap-2.5 min-w-0 mr-2">
           <!-- Avatar -->
           <div
-            class="customer-avatar flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-xs font-semibold text-brand-ink overflow-hidden"
+            class="customer-avatar flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-xs font-semibold text-brand-ink overflow-hidden shadow-xs"
           >
             <img
               v-if="thread.customer_avatar_url"
@@ -208,7 +235,7 @@ const formatRelativeTime = (isoString?: string | null): string => {
               <span class="customer-name truncate text-xs font-semibold text-brand-ink">
                 {{ thread.customer_name }}
               </span>
-              <span class="shrink-0 text-[10px] text-brand-muted">
+              <span class="shrink-0 text-[10px] text-brand-muted tabular-nums">
                 {{ formatRelativeTime(thread.last_message_at) }}
               </span>
             </div>
@@ -219,16 +246,19 @@ const formatRelativeTime = (isoString?: string | null): string => {
         </div>
 
         <!-- Status pill & unread badge -->
-        <div class="flex shrink-0 flex-col items-end gap-1">
+        <div class="flex shrink-0 flex-col items-end gap-1.5">
           <span
-            class="status-pill rounded px-1.5 py-0.5 text-[10px] font-medium"
+            class="status-pill inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
+            :class="statusPillClass(thread.status)"
             :data-status="thread.status"
+            :title="statusDescription(thread.status)"
           >
-            {{ thread.status }}
+            <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(thread.status)" />
+            <span>{{ formatStatusLabel(thread.status) }}</span>
           </span>
           <span
             v-if="thread.unread_by_admin_count > 0"
-            class="unread-admin-badge unread-badge rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white min-w-[18px] text-center"
+            class="unread-admin-badge unread-badge flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white shadow-xs"
           >
             {{ thread.unread_by_admin_count }}
           </span>
