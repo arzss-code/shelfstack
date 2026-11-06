@@ -74,6 +74,9 @@ const {
         ref="imageEl"
         :src="product.image_url"
         :alt="product.name"
+        width="400"
+        height="400"
+        decoding="async"
         loading="lazy"
         :class="[
           'w-full h-full object-cover block transition-transform duration-500 ease-out group-hover:scale-105',
@@ -85,7 +88,7 @@ const {
         v-else
         class="flex flex-col items-center justify-center w-full h-full text-brand-muted gap-1.5 bg-brand-canvas-soft"
       >
-        <i class="pi pi-image text-2xl opacity-25" />
+        <i class="pi pi-image text-2xl opacity-25" aria-hidden="true" />
         <span class="text-[10px] font-semibold tracking-widest uppercase opacity-40"
           >ShelfStack</span
         >
@@ -94,7 +97,7 @@ const {
       <!-- Floating Quick Add Button (Smooth fade without any vertical translation/geser) -->
       <div
         v-if="hideActions && product.stock > 0"
-        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150"
+        class="absolute bottom-2.5 right-2.5 z-10 pointer-events-auto opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 transition-opacity duration-150"
       >
         <button
           type="button"
@@ -103,8 +106,8 @@ const {
           :aria-label="`Tambah ${product.name} ke Keranjang`"
           @click.stop.prevent="handleQuickAdd"
         >
-          <i v-if="justAdded" class="pi pi-check text-xs text-brand-success" />
-          <i v-else class="pi pi-plus text-xs" />
+          <i v-if="justAdded" class="pi pi-check text-xs text-brand-success" aria-hidden="true" />
+          <i v-else class="pi pi-plus text-xs" aria-hidden="true" />
         </button>
       </div>
     </div>

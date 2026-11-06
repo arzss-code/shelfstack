@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { z } from 'zod'
+import { productFormSchema } from '~~/shared/schemas/product'
 import { compressImage } from '~/utils/image'
 import { useCategories } from '~/composables/useCategories'
 
@@ -23,27 +23,6 @@ export interface ProductFormSavePayload {
   stock: number
   categoryId: string | null
 }
-
-const productFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(3, 'Nama produk minimal 3 karakter.')
-    .max(120, 'Nama produk maksimal 120 karakter.'),
-  price: z.number({ message: 'Harga wajib diisi.' }).positive('Harga harus lebih dari 0.'),
-  stock: z
-    .number({ message: 'Stok wajib diisi.' })
-    .int('Stok harus bilangan bulat.')
-    .min(0, 'Stok minimal 0.'),
-  category_id: z.string().uuid('Kategori tidak valid.').nullish(),
-  link: z
-    .union([
-      z.string().url('Format link tidak valid (gunakan http:// atau https://).'),
-      z.literal(''),
-      z.null(),
-    ])
-    .optional(),
-})
 
 export function useProductForm(
   getInitialData: () => ProductFormInitialData | null | undefined,
@@ -71,6 +50,7 @@ export function useProductForm(
     name?: string
     price?: string
     stock?: string
+    description?: string
     category_id?: string
     link?: string
   }>({})
@@ -197,6 +177,7 @@ export function useProductForm(
       name: name.value,
       price: price.value,
       stock: stock.value,
+      description: description.value,
       category_id: categoryId.value || null,
       link: link.value,
     })

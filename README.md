@@ -1,44 +1,87 @@
 # ShelfStack
 
-Aplikasi fullstack untuk kelola katalog produk internal — berevolusi jadi mini e-commerce
-(storefront publik + admin dashboard + auth + orders). Dibangun ngikutin SOP Talenavi untuk
-nge-handle list produk, tambah/edit data, dan pastinya state management yang rapi.
+Aplikasi e-commerce single-vendor berbasis **Nuxt 4**, **Nitro**, **Supabase (PostgreSQL + Auth + Storage + Realtime)**, **Midtrans Sandbox**, dan worker mikroservis **Fastify + Redis 7 + BullMQ** (`@shelfstack/order-service`). Dirancang mengikuti estetika **Gallery Modernist** (`DESIGN.md`) dengan integritas transaksional di level database, pemisahan state pesanan dan pembayaran, serta komponen modular (`<= 300` baris per berkas `.vue`).
 
-> Dokumentasi teknis dan status kemajuan: lihat `docs/README.md`, `docs/PROGRESS.md`, dan `docs/BACKLOG.md` (arsip rencana awal di `docs/archive/`).
+> Sumber kebenaran dokumentasi: [docs/README.md](docs/README.md), [docs/PROGRESS.md](docs/PROGRESS.md), [docs/BACKLOG.md](docs/BACKLOG.md), dan [DESIGN.md](DESIGN.md).
 
-## Tech Stack
+## Arsitektur Sistem
 
-- **Nuxt 4** (Vue 3) + **Nitro** (server API)
-- **Tailwind CSS** (Styling) + **PrimeIcons** (icon font)
-- **Primitif UI sendiri** di `app/components/ui/` (bukan pustaka komponen pihak ketiga)
-- **Pinia** (State Management)
-- **Supabase** (PostgreSQL + Auth + Storage + Realtime)
-- **Zod** (Schema Validation, client + server via `shared/schemas/`)
-- **Midtrans Sandbox** (Payment Snap)
-- Dev/infra: **Vitest + Playwright** (testing), **nuxt-security + @nuxt/image**, **Docker + Nginx** (deploy), **Fastify + Redis 7** (`services/order-service`, pilot)
+```mermaid
+flowchart LR
+  Browser["Browser (Nuxt 4 / Vue 3 SSR)"] --> Nginx["Nginx Reverse Proxy"]
+  Nginx --> Nitro["Nuxt Nitro API (/api/**)"]
+  Nginx --> Fastify["Order Service (/api/v1/orders/webhook)"]
+  Nitro --> Supabase[("Supabase PostgreSQL + RLS + Realtime")]
+  Nitro -. "Fail-Open Schedule & Admin Telemetry" .-> Fastify
+  Fastify --> BullMQ[("Redis 7: Cache + BullMQ + DLQ")]
+  Fastify --> Supabase
+  Midtrans["Midtrans Sandbox"] --> Nginx
+```
 
-## Cara Setup
+## Kapabilitas Utama
 
-1. Clone repo ini.
-2. Copy `.env.example` ke `.env` dan isi _credentials_ Supabase kamu.
-3. Install dependencies:
+### Etalase Pelanggan (Storefront)
+
+- **Katalog & Pencarian Sinkron URL**: Filter kategori, rentang harga, penyortiran, badge ketersediaan stok aktual, dan detail produk SEO-friendly (`/katalog`, `/product/[id]`).
+- **Keranjang, Voucher, Koin Loyalitas & Ongkir**: Keranjang persisten (`Pinia`), klaim voucher/promo (`/promos`), penukaran koin loyalitas (`1 Koin = Rp 1`), dan 4 opsi kurir bertingkat dengan Bebas Ongkir otomatis untuk subtotal `>= Rp 500.000`.
+- **Checkout Atomik & Midtrans Snap**: RPC PostgreSQL `create_order()` mengunci baris produk secara deterministik (`ORDER BY id FOR UPDATE`), memvalidasi harga/kupon/koin di sisi server, dan memproses pembayaran via Midtrans Snap Sandbox.
+- **Pelacakan Realtime, Retur (RMA), Ulasan & Live Chat**: Linimasa status pesanan dan resi kurir (`/orders/[id]`, `/tracking`), pengajuan komplain/retur beserta bukti foto (`/returns`), ulasan terverifikasi pasca pesanan selesai, pusat notifikasi realtime, serta widget Live Chat dua arah dengan tim CS.
+
+### Ruang Kerja Operasional Admin (`/admin`)
+
+- **Dashboard Eksekutif & Analitik**: Ringkasan omzet bulanan, pesanan tertunda, peringatan stok kritis (`< 5`), dan mutasi transaksi terbaru.
+- **Manajemen Pesanan, Refund & Telemetri BullMQ/DLQ**: Transisi status pesanan tervalidasi state-machine, alur refund bertahap (`create_refund_attempt` & `finalize_refund`), ekspor CSV, serta kartu pemantauan antrean kedaluwarsa BullMQ dan pemutaran ulang (_replay_) job Dead Letter Queue (`order-expiry-dlq`).
+- **Inventaris, Kupon, Retur, Live Chat & Audit Log**: CRUD produk + _trash/restore_ (`deleted_at`), mutasi stok teraudit (`stock_movements`), manajemen kupon, pemrosesan tiket retur, inbox Live Chat multi-pelanggan, dan `activity_logs` lengkap.
+
+## Sorotan Rekayasa Perangkat Lunak
+
+1. **Integritas Transaksional PostgreSQL**: Seluruh mutasi stok, kuota kupon (`coupon_usages` dengan _soft delete_ `deleted_at`), dan saldo koin (`user_coins` + `coin_transactions`) dieksekusi secara atomik di dalam fungsi PL/pgSQL (`create_order`, `cancel_order`, `handle_payment_webhook`, `transition_order_status`, `finalize_refund`).
+2. **State Machine Pesanan & Pembayaran Terpisah**: Trigger database `enforce_order_status_state_machine` memblokir perubahan status sembarangan di luar RPC resmi (`app.order_transition_source`).
+3. **Antrean Kedaluwarsa BullMQ + Dead Letter Queue (DLQ)**: Checkout mendaftarkan delayed job per pesanan (`expire-order-<uuid>`) secara _fail-open_ ke `@shelfstack/order-service`, didukung _repeatable reconciliation sweep_ setiap 5 menit, _exponential backoff retry_ (`3` percobaan), dan eskalasi ke `order-expiry-dlq`.
+4. **Primitif UI Mandiri & Standar Web Modern**: 16 primitif bebas pustaka komponen berat di `app/components/ui/`, pemuatan font `DM Sans` via `preconnect` tanpa rantai `@import` CSS, `fetchpriority="high"` terarah pada citra utama LCP, landmark `<search>`, _skip link_ keyboard, serta dukungan `prefers-reduced-motion`.
+
+## Indeks Architecture Decision Records (ADR)
+
+- [ADR-001: Nuxt 4 + Supabase Fullstack Topology](docs/ADR/001-nuxt-supabase.md)
+- [ADR-002: Feature-Sliced Design Lite (`app/features/`)](docs/ADR/002-fsd-lite.md)
+- [ADR-003: Integer Cents Pricing & Server-Authoritative Checkout RPC](docs/ADR/003-price-cents-rpc.md)
+- [ADR-004: Single Supabase Project & Strict RLS Governance](docs/ADR/004-single-supabase-project.md)
+- [ADR-005: Order State & Payment State Separation](docs/ADR/005-order-state-payment-state-separation.md)
+
+## Persiapan Lokal (Quickstart 5 Menit)
+
+> Repositori ini menggunakan **pnpm** secara eksklusif (`pnpm@11.5.3`). Jangan gunakan `npm`, `npx`, `yarn`, atau `bun`.
+
+1. Salin berkas variabel lingkungan dari `.env.example` menjadi `.env`, lalu lengkapi kredensial Supabase, Midtrans Sandbox, dan `INTERNAL_SERVICE_KEY`.
+2. Instal seluruh dependensi workspace:
    ```bash
-   pnpm install
+   pnpm install --frozen-lockfile
+   ```
+3. Terapkan migrasi dan data awal Supabase lokal (menghasilkan 5 kategori kanonik, produk kurasi, dan akun demo sesuai `supabase/seed.sql`):
+   ```bash
+   pnpm dlx supabase db reset
+   ```
+4. Jalankan server pengembangan Nuxt:
+   ```bash
+   pnpm dev
+   ```
+5. _(Opsional)_ Jalankan Redis dan mikroservis `@shelfstack/order-service` untuk menguji webhook terisolasi serta worker BullMQ/DLQ:
+   ```bash
+   docker compose -f docker-compose.dev.yml up -d
+   pnpm --filter @shelfstack/order-service dev
    ```
 
-## Scripts
+## Perintah Verifikasi & Pengujian
 
-- `pnpm dev` - Jalanin server local untuk development
-- `pnpm build` - Build project untuk production
-- `pnpm preview` - Preview hasil build lokal
-- `pnpm generate` - Generate static
-- `pnpm typecheck` - Cek tipe (`vue-tsc --noEmit`)
-- `pnpm lint` / `pnpm lint:fix` - ESLint
-- `pnpm test` - Unit test (Vitest, watch mode)
-- `pnpm test:e2e` - E2E (Playwright)
+| Perintah                                            | Deskripsi                                                           |
+| :-------------------------------------------------- | :------------------------------------------------------------------ |
+| `pnpm dev`                                          | Menjalankan server pengembangan Nuxt lokal                          |
+| `pnpm lint`                                         | Pemeriksaan statis ESLint pada aplikasi utama dan server            |
+| `pnpm typecheck`                                    | Pemeriksaan tipe penuh via `nuxi typecheck` (`app` + `server`)      |
+| `pnpm --filter @shelfstack/order-service typecheck` | Pemeriksaan tipe TypeScript pada mikroservis `order-service`        |
+| `pnpm exec vitest run`                              | Menjalankan seluruh unit test Nuxt sekali jalan (bukan watch mode)  |
+| `pnpm --filter @shelfstack/order-service test`      | Menjalankan unit test Fastify, BullMQ, dan DLQ pada `order-service` |
+| `pnpm test:e2e`                                     | Menjalankan skenario end-to-end Playwright (`tests/e2e/`)           |
+| `pnpm build`                                        | Membangun bundel produksi Nuxt + Nitro                              |
 
-> **CI:** `.github/workflows/ci.yml` menjalankan `lint → typecheck → build → vitest → docker compose validate` di setiap push/PR.
->
-> **Docs:** indeks dokumentasi di `docs/README.md`; status terkini di `docs/PROGRESS.md` (wajib dibaca sebelum kerja); scope di `docs/BACKLOG.md`.
->
-> **Note:** Pastikan RLS (Row Level Security) di Supabase udah di-setup dengan bener buat table `products`, `orders`/`order_items`, `profiles`, `activity_logs` dan storage bucket `product-images`, kalau nggak nanti bakal kena error 403 / Access Denied.
+> Pipeline CI di [.github/workflows/ci.yml](.github/workflows/ci.yml) memvalidasi `lint -> typecheck -> build -> vitest -> docker compose config` pada setiap push dan Pull Request.

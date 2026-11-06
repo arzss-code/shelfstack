@@ -35,15 +35,15 @@
 
 ## EPIC 2 — Catalog Pro (Fase 2)
 
-| ID   | Story                                                                                | Prioritas | AC                                                                                             |
-| ---- | ------------------------------------------------------------------------------------ | --------- | ---------------------------------------------------------------------------------------------- |
-| C-01 | Sebagai pembeli, saya cari + filter kategori + sort via URL                          | Must      | Refresh tidak hilang state; `GET /api/products?q=&cat=&sort=&from=&to=`; debounce 300ms        |
-| C-02 | Sebagai pembeli, saya lihat badge stok                                               | Must      | `Habis` disabled, `Sisa <5` warning, data dari `stock` asli                                    |
-| C-03 | Sebagai pembeli, saya buka detail SEO-friendly                                       | Must      | `useSeoMeta` + OG image, breadcrumb, related 4 produk                                          |
-| C-04 | Sebagai pembeli mobile, katalog tetap enak                                           | Must      | Grid 1 kolom 375px, tidak ada elemen terpotong (lihat tests/e2e/product.spec.ts)               |
-| C-05 | Sebagai dev, LCP <2.5s                                                               | Should    | `NuxtImg`, lazy, skeleton; ukur Lighthouse mobile                                              |
-| C-06 | Sebagai pembeli, saya lihat kategori dengan slug cantik                              | Could     | `/c/minuman` alias query, tidak wajib                                                          |
-| C-07 | Sebagai dev, schema Zod produk tunggal (hapus duplikat lokal `ProductForm.vue:6-20`) | Should    | `ProductForm` pakai `shared/schemas/product.ts`; aturan tampil (max 50 vs 120) disepakati satu |
+| ID   | Story                                                                                | Prioritas | AC                                                                                                                                                     |
+| ---- | ------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C-01 | Sebagai pembeli, saya cari + filter kategori + sort via URL                          | Must      | Refresh tidak hilang state; `GET /api/products?q=&cat=&sort=&from=&to=`; debounce 300ms                                                                |
+| C-02 | Sebagai pembeli, saya lihat badge stok                                               | Must      | `Habis` disabled, `Sisa <5` warning, data dari `stock` asli                                                                                            |
+| C-03 | Sebagai pembeli, saya buka detail SEO-friendly                                       | Must      | `useSeoMeta` + OG image, breadcrumb, related 4 produk                                                                                                  |
+| C-04 | Sebagai pembeli mobile, katalog tetap enak                                           | Must      | Grid 1 kolom 375px, tidak ada elemen terpotong (lihat tests/e2e/product.spec.ts)                                                                       |
+| C-05 | Sebagai dev, LCP <2.5s                                                               | Should    | `NuxtImg`, lazy, skeleton; ukur Lighthouse mobile                                                                                                      |
+| C-06 | Sebagai pembeli, saya lihat kategori dengan slug cantik                              | Could     | `/c/minuman` alias query, tidak wajib                                                                                                                  |
+| C-07 | Sebagai dev, schema Zod produk tunggal (hapus duplikat lokal `ProductForm.vue:6-20`) | Should    | ✅ SELESAI (2026-11-06): `useProductForm.ts` mengimpor `productFormSchema` langsung dari `shared/schemas/product.ts` (batas nama 120 karakter seragam) |
 
 ## EPIC 3 — Cart & Orders (Fase 3)
 
@@ -68,13 +68,13 @@
 
 ## EPIC 5 — Quality & Launch (Fase 5)
 
-| ID   | Story                                             | Prioritas | AC                                                                                                                    |
-| ---- | ------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------- |
-| Q-01 | Sebagai dev, CI hijau                             | Must      | `lint → typecheck → vitest → docker compose validate` di `.github/workflows/ci.yml` (sudah ada; pastikan tetap hijau) |
-| Q-02 | Sebagai dev, coverage kritis                      | Should    | Unit schema/store/RPC mock + e2e happy path + 403 path                                                                |
-| Q-03 | Sebagai visitor, saya buka demo live cepat + aman | Must      | Vercel + Supabase Cloud, header `nuxt-security`, `/api/version` OK                                                    |
-| Q-04 | Sebagai perekrut, saya paham repo dalam 3 menit   | Must      | README baru + GIF + arsitektur diagram + akun demo (arsip referensi di `docs/archive/PORTFOLIO-PACKAGING-LEGACY.md`)  |
-| Q-05 | Sebagai dev, saya ukur a11y + perf                | Should    | Lighthouse ≥90 perf/a11y/best-practice, tab order logis                                                               |
+| ID   | Story                                             | Prioritas | AC                                                                                                                                        |
+| ---- | ------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Q-01 | Sebagai dev, CI hijau                             | Must      | `lint → typecheck → vitest → docker compose validate` di `.github/workflows/ci.yml` (sudah ada; pastikan tetap hijau)                     |
+| Q-02 | Sebagai dev, coverage kritis                      | Should    | Unit schema/store/RPC mock + e2e happy path + 403 path                                                                                    |
+| Q-03 | Sebagai visitor, saya buka demo live cepat + aman | Must      | Vercel + Supabase Cloud, header `nuxt-security`, `/api/version` OK                                                                        |
+| Q-04 | Sebagai perekrut, saya paham repo dalam 3 menit   | Must      | ✅ SELESAI (2026-11-06): `README.md` diperbarui dengan diagram arsitektur Mermaid, matriks fitur, indeks ADR, dan panduan quickstart pnpm |
+| Q-05 | Sebagai dev, saya ukur a11y + perf                | Should    | Lighthouse ≥90 perf/a11y/best-practice, tab order logis                                                                                   |
 
 ## Out of Scope & Backlog Lanjutan (Belum Diimplementasikan)
 
@@ -89,5 +89,5 @@ Fitur berikut tercatat resmi belum diimplementasikan pada siklus berjalan (alasa
 7. ~~**Live Chat CS**~~: ✅ **SELESAI 2026-11-04** (SHF-CHAT-01: Sistem Live Chat dua arah berbasis Supabase Realtime, widget etalase, lampiran foto/pesanan/produk, dan ruang kerja inbox admin `/admin/support`).
 8. ~~**Halaman Perusahaan**~~: ✅ **SELESAI 2026-10-30** (Halaman kurasi `/about` dan formulir kontak interaktif `/contact` dengan validasi Zod).
 9. ~~**Ulasan & Rating Pelanggan**~~: ✅ **SELESAI 2026-10-30** (Tabel `public.product_reviews`, database trigger `recalculate_product_rating()`, endpoint Nitro GET/POST/DELETE, sensor privasi nama depan dan inisial `Budi S.`, modal ulasan interaktif pada order selesai dan detail produk, serta 46 unit test).
-10. **Infrastruktur BullMQ**: Worker antrean DLQ Redis untuk order expiry sweep (saat ini sweep direct endpoint).
+10. ~~**Infrastruktur BullMQ**~~: ✅ **SELESAI 2026-11-06** (Antrean `order-expiry` delayed per-order + repeatable reconciliation sweep 5 menit + exponential backoff retry + Dead Letter Queue `order-expiry-dlq` di `@shelfstack/order-service`, serta pemantauan & replay DLQ di panel admin `/admin/orders`).
 11. **Payment Gateway Live**: Transaksi nyata menggunakan kartu kredit/kartu debit live (saat ini Midtrans Sandbox).

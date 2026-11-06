@@ -7,6 +7,9 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      htmlAttrs: {
+        lang: 'id',
+      },
       title: 'ShelfStack',
       meta: [
         { charset: 'utf-8' },
@@ -15,6 +18,12 @@ export default defineNuxtConfig({
         { name: 'theme-color', content: '#141414' },
       ],
       link: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap',
+        },
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg?v=2' },
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png?v=2' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png?v=2' },
@@ -45,6 +54,8 @@ export default defineNuxtConfig({
     midtransServerKey: process.env.MIDTRANS_SERVER_KEY || '',
     midtransApiUrl:
       process.env.MIDTRANS_API_URL || 'https://app.sandbox.midtrans.com/snap/v1/transactions',
+    orderServiceUrl: process.env.ORDER_SERVICE_URL || 'http://127.0.0.1:4000',
+    internalServiceKey: process.env.INTERNAL_SERVICE_KEY || '',
     public: {
       enableMidtransSandbox: process.env.NUXT_PUBLIC_ENABLE_MIDTRANS_SANDBOX === 'true',
       midtransClientKey: process.env.NUXT_PUBLIC_MIDTRANS_CLIENT_KEY || '',
@@ -61,6 +72,8 @@ export default defineNuxtConfig({
     rateLimiter: false,
     headers: {
       contentSecurityPolicy: {
+        'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
         'img-src': [
           "'self'",
           'data:',
@@ -132,6 +145,12 @@ export default defineNuxtConfig({
 
   tailwindcss: {
     cssPath: '~/assets/css/main.css',
+  },
+
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag) => tag === 'search',
+    },
   },
 
   // Abaikan nested worktree Kilo (.kilo/) agar Vite watcher + HMR tidak melambat.

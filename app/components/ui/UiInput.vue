@@ -63,6 +63,21 @@ const effectiveType = computed(() => {
   return props.type
 })
 
+const isIdentifierField = computed(() =>
+  ['email', 'password', 'search', 'url', 'tel'].includes(props.type),
+)
+
+const effectiveInputMode = computed<'email' | 'tel' | 'url' | 'search' | 'decimal' | undefined>(
+  () => {
+    if (props.type === 'email') return 'email'
+    if (props.type === 'tel') return 'tel'
+    if (props.type === 'url') return 'url'
+    if (props.type === 'search') return 'search'
+    if (props.numeric) return 'decimal'
+    return undefined
+  },
+)
+
 const controlClass = computed(() => {
   const geometry =
     props.size === 'sm'
@@ -111,11 +126,16 @@ const controlClass = computed(() => {
 
       <input
         :id="fieldId"
+        :name="props.id"
         :type="effectiveType"
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
         :autocomplete="autocomplete"
+        :inputmode="effectiveInputMode"
+        :spellcheck="isIdentifierField ? 'false' : undefined"
+        :autocorrect="isIdentifierField ? 'off' : undefined"
+        :autocapitalize="isIdentifierField ? 'off' : undefined"
         :min="min"
         :step="step"
         :aria-invalid="error ? 'true' : undefined"

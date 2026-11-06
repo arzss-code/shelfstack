@@ -104,11 +104,14 @@ const handleLogout = async () => {
     <!-- LAYER 1: Top Announcement Bar (Inverted Ink Strip) -->
     <div class="bg-brand-ink text-white py-1.5 border-b border-white/10 hidden sm:block">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between text-xs">
-        <div class="flex items-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" />
-          <p class="tracking-wide m-0 text-[11px] sm:text-xs">
-            Gratis Ongkir min. belanja Rp500.000 · Garansi Pengembalian 30 Hari · Koleksi Produk
-            Original
+        <div class="flex items-center gap-2.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" aria-hidden="true" />
+          <p class="tracking-wide m-0 text-[11px] sm:text-xs flex items-center gap-2.5">
+            <span>Gratis Ongkir min. belanja Rp500.000</span>
+            <span class="h-3 w-px bg-white/20" aria-hidden="true" />
+            <span>Garansi Pengembalian 30 Hari</span>
+            <span class="h-3 w-px bg-white/20" aria-hidden="true" />
+            <span>Koleksi Produk Original</span>
           </p>
         </div>
         <div class="hidden sm:flex items-center gap-4 text-white/70 text-[11px]">
@@ -232,11 +235,13 @@ const handleLogout = async () => {
             type="button"
             class="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-brand-canvas-soft text-brand-ink transition-colors cursor-pointer active:scale-95"
             aria-label="Buka menu navigasi"
+            :aria-expanded="isMobileMenuOpen"
             @click="isMobileMenuOpen = !isMobileMenuOpen"
           >
             <i
               :class="isMobileMenuOpen ? 'pi pi-times' : 'pi pi-bars'"
               class="text-base text-brand-ink"
+              aria-hidden="true"
             />
           </button>
         </div>

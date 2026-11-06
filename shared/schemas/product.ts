@@ -6,14 +6,19 @@ import { z } from 'zod'
 export const productSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(3, 'Nama produk minimal 3 karakter.')
     .max(120, 'Nama produk maksimal 120 karakter.'),
   price: z.number({ error: 'Harga wajib berupa angka.' }).positive('Harga harus lebih dari 0.'),
   description: z.string().max(2000, 'Deskripsi maksimal 2000 karakter.').nullish(),
   link: z.string().url('Link harus URL yang valid.').nullish(),
   image_url: z.string().url('URL gambar tidak valid.').nullish(),
-  stock: z.number().int().min(0, 'Stok minimal 0.').default(0),
-  category_id: z.string().uuid().nullish(),
+  stock: z
+    .number({ error: 'Stok wajib diisi.' })
+    .int('Stok harus bilangan bulat.')
+    .min(0, 'Stok minimal 0.')
+    .default(0),
+  category_id: z.string().uuid('Kategori tidak valid.').nullish(),
   slug: z.string().max(150).nullish(),
   sku: z.string().max(50).nullish(),
   weight_grams: z.number().int().positive().default(500),
@@ -26,6 +31,30 @@ export const productSchema = z.object({
 })
 
 export type ProductInput = z.infer<typeof productSchema>
+
+// Skema validasi form produk di sisi klien yang diturunkan dari sumber kebenaran productSchema (Backlog C-07).
+export const productFormSchema = productSchema
+  .pick({
+    name: true,
+    price: true,
+    description: true,
+    category_id: true,
+  })
+  .extend({
+    stock: z
+      .number({ error: 'Stok wajib diisi.' })
+      .int('Stok harus bilangan bulat.')
+      .min(0, 'Stok minimal 0.'),
+    link: z
+      .union([
+        z.string().url('Format link tidak valid (gunakan http:// atau https://).'),
+        z.literal(''),
+        z.null(),
+      ])
+      .optional(),
+  })
+
+export type ProductFormInput = z.infer<typeof productFormSchema>
 
 // Query pagination & filter GET /api/products
 export const productListQuerySchema = z.object({

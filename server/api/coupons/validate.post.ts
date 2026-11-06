@@ -52,6 +52,7 @@ export default defineEventHandler(async (event) => {
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('coupon_id', coupon.id)
+      .is('deleted_at', null)
 
     userUsageCount = count || 0
   }

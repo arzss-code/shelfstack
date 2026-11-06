@@ -3,6 +3,7 @@ import type { Database } from '~/types/database.types'
 import { checkoutSchema } from '../../../shared/schemas/order'
 import { calculateCheckoutHash, validateIdempotencyKey } from '../../utils/idempotency'
 import { logger } from '../../utils/logger'
+import { enqueueOrderExpiryNotification } from '../../utils/order-service'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
@@ -169,6 +170,9 @@ export default defineEventHandler(async (event) => {
         userId: targetUserId,
       })
     }
+
+    // Jadwalkan job kedaluwarsa pesanan di BullMQ (@shelfstack/order-service) secara fail-open
+    void enqueueOrderExpiryNotification(String(orderId), event.context?.requestId)
 
     // Buat notifikasi otomatis pesanan dibuat
     await createNotification(client, {
