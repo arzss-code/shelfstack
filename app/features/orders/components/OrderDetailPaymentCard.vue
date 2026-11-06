@@ -30,7 +30,7 @@ defineEmits<{
 
 <template>
   <aside
-    class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-24"
+    class="lg:col-span-4 w-full bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-24"
   >
     <h2
       class="font-display text-base font-bold text-brand-ink m-0 pb-3 border-b border-brand-hairsoft"

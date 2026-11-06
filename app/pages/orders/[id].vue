@@ -238,6 +238,7 @@ useSeoMeta({
 
         <!-- Right Column: Payment & Bill Summary (Modular Aside) -->
         <OrderDetailPaymentCard
+          class="lg:col-span-4"
           :order="order"
           :is-paying="isPaying"
           :is-cancelling="isCancelling"
