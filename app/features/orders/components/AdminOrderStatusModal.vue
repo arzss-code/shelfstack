@@ -21,6 +21,13 @@ const emit = defineEmits<{
   autoGenerateTracking: []
   confirm: []
 }>()
+
+function handleCourierSelect(value: string | number | null) {
+  if (typeof value === 'string') {
+    emit('update:selectedCourierCode', value as CourierCode)
+    emit('autoGenerateTracking')
+  }
+}
 </script>
 
 <template>
@@ -46,10 +53,7 @@ const emit = defineEmits<{
         <UiSelect
           :model-value="selectedCourierCode"
           :options="courierOptions"
-          @update:model-value="
-            emit('update:selectedCourierCode', $event as CourierCode)
-            emit('autoGenerateTracking')
-          "
+          @update:model-value="handleCourierSelect"
         />
       </div>
 
