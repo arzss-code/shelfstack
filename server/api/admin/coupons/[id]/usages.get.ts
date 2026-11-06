@@ -13,6 +13,8 @@ export interface CouponUsageItem {
   order_total_cents: number
   formatted_order_total: string
   order_status: string
+  is_reverted: boolean
+  deleted_at: string | null
   created_at: string
 }
 
@@ -37,10 +39,10 @@ export default defineEventHandler(async (event) => {
       return errorResponse(event, 'Voucher tidak ditemukan', couponError?.message, 404)
     }
 
-    // 2. Ambil riwayat pemakaian dari tabel coupon_usages
+    // 2. Ambil riwayat pemakaian dari tabel coupon_usages (termasuk yang direvert via soft delete untuk audit)
     const { data: usages, error: usagesError } = await client
       .from('coupon_usages')
-      .select('id, order_id, user_id, discount_cents, created_at')
+      .select('id, order_id, user_id, discount_cents, deleted_at, created_at')
       .eq('coupon_id', id)
       .order('created_at', { ascending: false })
       .limit(50)
@@ -86,6 +88,8 @@ export default defineEventHandler(async (event) => {
         order_total_cents: ord.total_cents,
         formatted_order_total: formatRupiah(ord.total_cents / 100),
         order_status: ord.status,
+        is_reverted: u.deleted_at !== null,
+        deleted_at: u.deleted_at,
         created_at: u.created_at,
       }
     })

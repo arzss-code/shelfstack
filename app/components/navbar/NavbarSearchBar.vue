@@ -41,15 +41,17 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex-1 max-w-2xl mx-2 sm:mx-6 hidden md:block">
+  <search class="flex-1 max-w-2xl mx-2 sm:mx-6 hidden md:block">
     <form
-      class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full px-2 border border-brand-hair focus-within:border-brand-ink focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-ink/20 transition-all shadow-whisper"
+      class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full px-2 border border-brand-hair focus-within:border-brand-ink focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-ink/20 transition-colors shadow-whisper"
       @submit.prevent="emit('search')"
     >
       <!-- Single Category Dropdown Button -->
       <div ref="categoryDropdownRef" class="relative shrink-0">
         <button
           type="button"
+          :aria-expanded="isCategoryDropdownOpen"
+          aria-haspopup="listbox"
           class="whitespace-nowrap flex items-center gap-1.5 text-xs text-brand-ink font-semibold px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors cursor-pointer"
           @click="isCategoryDropdownOpen = !isCategoryDropdownOpen"
         >
@@ -99,11 +101,17 @@ onBeforeUnmount(() => {
         </Transition>
       </div>
 
-      <span class="w-px h-5 bg-brand-hair mx-1 shrink-0" />
+      <span class="w-px h-5 bg-brand-hair mx-1 shrink-0" aria-hidden="true" />
 
       <input
         :value="searchQuery"
-        type="text"
+        type="search"
+        name="q"
+        enterkeyhint="search"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        aria-label="Cari produk"
         class="w-full bg-transparent px-3 text-xs sm:text-sm text-brand-ink placeholder:text-brand-faint focus:outline-none"
         placeholder="Cari produk kebutuhan kerja, rumah, audio, furnitur..."
         @input="emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
@@ -115,9 +123,9 @@ onBeforeUnmount(() => {
           class="w-8 h-8 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0 hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
           aria-label="Cari produk"
         >
-          <i class="pi pi-search text-xs" />
+          <i class="pi pi-search text-xs" aria-hidden="true" />
         </button>
       </UiTooltip>
     </form>
-  </div>
+  </search>
 </template>

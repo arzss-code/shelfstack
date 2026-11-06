@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 9 (Customer Experience & Loyalty Hub)**
-- **Versi Rilis:** `v0.31.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-06)
-- **Baseline Quality Gate (2026-11-06, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 83 file / 880 test lolos 100% · 0 file `.vue` di `app/` melampaui 300 baris (172/172 patuh SOP).
+- **Sprint Aktif:** **Sprint 10 (Order Cancellation Transactional Parity, BullMQ + DLQ Worker & Web Best Practices)**
+- **Versi Rilis:** `v0.32.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-06)
+- **Baseline Quality Gate (2026-11-06, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `@shelfstack/order-service` typecheck EXIT 0 & test 2 file / 25 test lolos 100% · `vitest run` 84 file / 892 test lolos 100% · Docker Compose (`root`, `dev`, `prod`) EXIT 0 · 0 file `.vue` di `app/` melampaui 300 baris (173/173 patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -195,6 +195,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
 
 24. **Modularisasi Menyeluruh <= 300 Baris & Penyempurnaan Live Chat (SELESAI 2026-11-06, v0.31.1).** Audit dan modularisasi tuntas atas seluruh halaman (`app/pages/`, 14 file) dan komponen (`app/components/` & `app/features/`, 15 file) yang sebelumnya melampaui batas 300 baris kode per file sesuai konstitusi Talenavi Engineering SOP. Kini seluruh 172 file `.vue` di dalam `app/` berada di bawah 300 baris (terbesar 296 baris) melalui ekstraksi composable dan sub-komponen terfokus dengan tipe TypeScript ketat tanpa `any`. Termasuk perbaikan kelas skala aktif peluncur `LiveChatWidget.vue` (`active:scale-95`), penyelarasan tipe callback `useUiSelect.ts`, serta sinkronisasi status inventaris fitur di `docs/PROGRESS.md` dan `docs/BACKLOG.md` (`pnpm typecheck` EXIT 0, `pnpm lint` EXIT 0, `pnpm exec vitest run` 83 file / 880 tests lolos 100%).
 
+25. **Paritas Transaksional Pembatalan Pesanan, Worker BullMQ + DLQ, Unifikasi Skema Produk & Remediasi Standar Web Modern (SELESAI 2026-11-06, v0.32.0).**
+    - **Database & Paritas Pembatalan (`supabase/migrations/20261130000001_order_cancellation_parity_and_expiry_hardening.sql`)**: Menambahkan kolom soft-delete `deleted_at` dan indeks parsial unik `idx_coupon_usages_active_unique` pada `public.coupon_usages` (menghapus operasi hard `DELETE`), memulihkan `set_config('app.order_transition_source', 'cancel_order_rpc', true)`, otorisasi admin, dan grant `service_role` pada `public.cancel_order`, serta menyatukan pemulihan stok, kuota/wallet voucher (`coupons` + `user_coupons`), dan refund koin loyalitas (`coins_used` via `coin_transactions` bertipe `cancelled_order`) di ketiga jalur pembatalan resmi (`cancel_order`, `handle_payment_webhook`, dan `transition_order_status`).
+    - **Infrastruktur Antrean BullMQ + Dead Letter Queue (`services/order-service/`)**: Mengintegrasikan `bullmq` dengan antrean utama `order-expiry` (delayed job per pesanan `expire-order-<uuid>`, rekonsiliasi berkala 5 menit via `upsertJobScheduler`, exponential backoff 3 percobaan) dan Dead Letter Queue `order-expiry-dlq`, endpoint internal terproteksi `x-internal-secret` (`POST /schedule-expiry`, `GET /queue-stats`, `GET /dlq`, `POST /dlq/:jobId/retry`), blokir akses publik di `deploy/nginx/nginx.conf`, jembatan fail-open di Nitro (`server/utils/order-service.ts`), serta kartu pemantauan operasional `AdminExpiryQueueCard.vue` di `/admin/orders`.
+    - **Unifikasi Skema Produk (`Backlog C-07`) & Dokumentasi Portofolio (`Backlog Q-04`)**: Mengekspor `productFormSchema` tunggal dari `shared/schemas/product.ts` untuk `useProductForm.ts` dan memperbarui `README.md` dengan diagram arsitektur Mermaid serta indeks ADR.
+    - **Standar Web Modern, Aksesibilitas & Performa**: Pemuatan font `DM Sans` via `<link rel="preconnect">` di `nuxt.config.ts` (menghapus `@import` CSS dan font `Inter` tak terpakai), `htmlAttrs: { lang: 'id' }`, _skip link_ keyboard ke `<main>`, `100dvh` layout shell, `fetchpriority="high"` khusus citra utama LCP `HomeHero.vue`, elemen semantik `<search>` pada navbar, `aria-labelledby` + `overscroll-contain` pada `UiModal.vue`, penonaktifan `spellcheck`/`autocorrect` otomatis untuk field identifier pada `UiInput.vue`, serta penghilangan aturan global `animation-duration: 0.01ms !important` demi `@media (prefers-reduced-motion: reduce)` yang terarah.
+
 ---
 
 ## 📌 Inventaris Fitur Belum Diimplementasikan (Backlog Lanjutan)
@@ -223,9 +229,8 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
    - Status: ✅ **SELESAI 2026-10-30** (Halaman kurasi `/about` dengan 4 strip metrik, 3 pilar komitmen rekayasa, dan CTA katalog; serta halaman `/contact` dengan informasi saluran resmi, formulir kontak interaktif tervalidasi via `UiInput`/`UiSelect`/`UiTextarea`, feedback toast, pembersihan form pasca-submit, tautan footer terintegrasi, dan 10 unit test di `tests/unit/contact-page.spec.ts` dan `tests/unit/about-page.spec.ts`).
 9. ~~**Ulasan & Rating Pelanggan (Product Reviews & Ratings)**~~:
    - Status: ✅ **SELESAI 2026-10-30** (Tabel `public.product_reviews`, migrasi `20261122000001_product_reviews_and_ratings.sql`, trigger kalkulasi rating atomik pada tabel `products`, endpoint Nitro GET/POST/DELETE, validasi Zod tervalidasi, eligibility check pembeli pesanan berstatus `completed`, sensor inisial nama pengulas privasi `Budi S.` tanpa badge generik, komponen modular `ProductReviewsSection`, modal submit ulasan interaktif dengan rating bintang dan hitung karakter, tombol ulasan di rincian pesanan, filter rating bintang, dan 46 unit test lolos 100%).
-10. **Antrean Pekerja Latar Belakang (BullMQ Worker untuk Order Expiry Sweep)**:
-    - Status: Belum diimplementasikan.
-    - Keterangan: Pembatalan pesanan kedaluwarsa saat ini masih dijalankan via direct sweep endpoint berkala, belum menggunakan Redis BullMQ dengan antrean DLQ (Dead Letter Queue).
+10. ~~**Antrean Pekerja Latar Belakang (BullMQ Worker untuk Order Expiry Sweep)**~~:
+    - Status: ✅ **SELESAI 2026-11-06** (Antrean `order-expiry` + `order-expiry-dlq` berbasis Redis 7 dan BullMQ v6 di `@shelfstack/order-service`, delayed job per order saat checkout secara fail-open, repeatable reconciliation sweep setiap 5 menit, exponential retry 3 percobaan, endpoint telemetri dan replay DLQ di `/admin/orders`, serta 25 unit test di `@shelfstack/order-service`).
 
 ## 📋 Catatan Teknis & Konvensi Wajib
 

@@ -26,24 +26,33 @@ function closeDrawer() {
     class="md:hidden w-full bg-white border-b border-brand-hair px-4 py-4 space-y-4 shadow-floating animate-fadeIn"
   >
     <!-- Mobile Search Form -->
-    <form
-      class="flex items-center gap-2 bg-brand-field rounded-full px-3 py-1.5 border border-brand-hair"
-      @submit.prevent="emit('search')"
-    >
-      <input
-        :value="searchQuery"
-        type="text"
-        placeholder="Cari produk..."
-        class="w-full bg-transparent text-xs text-brand-ink placeholder-brand-faint focus:outline-none"
-        @input="emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
-      />
-      <button
-        type="submit"
-        class="w-6 h-6 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0"
+    <search>
+      <form
+        class="flex items-center gap-2 bg-brand-field rounded-full px-3 py-1.5 border border-brand-hair"
+        @submit.prevent="emit('search')"
       >
-        <i class="pi pi-search text-[10px]" />
-      </button>
-    </form>
+        <input
+          :value="searchQuery"
+          type="search"
+          name="q"
+          enterkeyhint="search"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-label="Cari produk"
+          placeholder="Cari produk..."
+          class="w-full bg-transparent text-xs text-brand-ink placeholder-brand-faint focus:outline-none"
+          @input="emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
+        />
+        <button
+          type="submit"
+          aria-label="Cari produk"
+          class="w-6 h-6 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0"
+        >
+          <i class="pi pi-search text-[10px]" aria-hidden="true" />
+        </button>
+      </form>
+    </search>
 
     <!-- Mobile Links -->
     <nav class="flex flex-col gap-2 text-xs font-semibold" aria-label="Navigasi Mobile">

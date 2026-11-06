@@ -2,6 +2,29 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.32.0] - 2026-11-06
+
+### Paritas Transaksional Pembatalan Pesanan, Worker BullMQ + DLQ & Standar Web Modern
+
+- **Database PostgreSQL & Paritas Transaksional Pembatalan (`supabase/migrations/20261130000001_order_cancellation_parity_and_expiry_hardening.sql`)**:
+  - Soft delete pada `public.coupon_usages`: Menambahkan kolom `deleted_at timestamptz` dan indeks parsial unik `idx_coupon_usages_active_unique` (`WHERE deleted_at IS NULL`), menggantikan operasi hard `DELETE` saat pesanan dibatalkan.
+  - Perbaikan `public.cancel_order(uuid, text)`: Memulihkan konteks state-machine `set_config('app.order_transition_source', 'cancel_order_rpc', true)`, dukungan otorisasi admin (`public.is_admin()`), grant `authenticated, service_role`, soft-delete `coupon_usages`, pemulihan kuota `coupons` dan wallet `user_coupons`, serta refund koin loyalitas (`coins_used`) secara idempoten.
+  - Paritas penuh pada `public.handle_payment_webhook` (`p_target_status = 'cancelled'`) dan `public.transition_order_status` (`p_target_status = 'cancelled'`): Menyatukan pengembalian stok, kupon, koin loyalitas (`cancelled_order`), dan notifikasi pelanggan (`auto_timeout`).
+  - Sinkronisasi `app/types/database.types.ts`, `server/api/coupons/validate.post.ts` (`.is('deleted_at', null)`), dan `server/api/admin/coupons/[id]/usages.get.ts`.
+- **Infrastruktur Antrean Kedaluwarsa BullMQ + Dead Letter Queue (`@shelfstack/order-service` & Nitro)**:
+  - `services/order-service/src/queues/order-expiry.queue.ts` & `src/workers/order-expiry.worker.ts`: Implementasi antrean `order-expiry` (delayed job deterministik `expire-order-<uuid>`), penjadwal rekonsiliasi berkala 5 menit (`upsertJobScheduler`), exponential backoff retry (`3` percobaan, jeda dasar `5000ms`), dan eskalasi kegagalan permanen ke `order-expiry-dlq`.
+  - `services/order-service/src/routes/order.routes.ts` & `deploy/nginx/nginx.conf`: Endpoint internal terproteksi `x-internal-secret` (`POST /schedule-expiry`, `GET /queue-stats`, `GET /dlq`, `POST /dlq/:jobId/retry`) dengan blokir akses publik di level reverse proxy Nginx.
+  - `server/utils/order-service.ts`, `server/api/orders/index.ts`, `server/api/admin/orders/expiry-queue.get.ts`, `server/api/admin/orders/expiry-dlq-retry.post.ts`, `app/composables/useAdminExpiryQueue.ts`, dan `app/features/orders/components/AdminExpiryQueueCard.vue`: Penjadwalan kedaluwarsa secara fail-open saat checkout dan kartu telemetri antrean + replay DLQ pada halaman `/admin/orders`.
+- **Unifikasi Skema Zod Produk (`Backlog C-07`) & Dokumentasi (`Backlog Q-04`)**:
+  - `shared/schemas/product.ts` & `app/composables/useProductForm.ts`: Ekspor `productFormSchema` tunggal (batas nama 120 karakter seragam antara formulir klien dan API server).
+  - `README.md`, `AGENTS.md`, `docs/PROGRESS.md`, `docs/BACKLOG.md`: Pembaruan arsitektur sistem Mermaid, matriks fitur, indeks ADR, panduan quickstart `pnpm`, dan status BullMQ/DLQ.
+- **Remediasi Performa, Aksesibilitas & Standar Web Modern**:
+  - `nuxt.config.ts` & `app/assets/css/main.css`: Atribut `<html lang="id">`, pemuatan `DM Sans` via `<link rel="preconnect">` (menghapus `@import` CSS berantai dan font `Inter` tak terpakai), utilitas `.skip-link`, serta penggantian aturan global `animation-duration: 0.01ms !important` dengan aturan `@media (prefers-reduced-motion: reduce)` yang terarah.
+  - `app/layouts/default.vue`, `app/layouts/admin.vue`, `HomeHero.vue`, `HomeFlashDeals.vue`, `ProductCard.vue`, `AppNavbar.vue`, `NavbarSearchBar.vue`, `NavbarMobileDrawer.vue`, `UiModal.vue`, dan `UiInput.vue`: Skip link keyboard, `min-h-[100dvh]`, `fetchpriority="high"` dan dimensi eksplisit pada gambar LCP utama, penghapusan `font-mono` dan warna hex hardcoded pada kartu promo, pembungkus semantik `<search>`, `aria-labelledby` + `overscroll-contain` pada modal dialog, serta penonaktifan `spellcheck`/`autocorrect` pada input identifier.
+- **Pengujian Otomatis & Quality Gate**:
+  - Menambahkan `services/order-service/tests/bullmq-expiry-dlq.spec.ts` (10 test baru; total `order-service`: 2 file / 25 test lulus 100%) dan `tests/unit/order-cancellation-parity.spec.ts` (12 test baru; total aplikasi utama: 84 file / 892 test lulus 100%).
+  - Seluruh 173 berkas `.vue` di `app/` mematuhi batas `<= 300` baris kode.
+
 ## [0.31.1] - 2026-11-06
 
 ### Modularisasi Menyeluruh Sesuai SOP <= 300 Baris & Penyempurnaan Live Chat

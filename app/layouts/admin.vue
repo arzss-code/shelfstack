@@ -41,11 +41,13 @@ onMounted(() => {
 
 <template>
   <div
-    class="flex min-h-screen bg-brand-canvas text-brand-ink selection:bg-brand-accent selection:text-white transition-colors duration-200"
+    class="flex min-h-[100dvh] bg-brand-canvas text-brand-ink selection:bg-brand-accent selection:text-white transition-colors duration-200"
   >
+    <a href="#admin-main-content" class="skip-link">Lewati ke konten utama</a>
+
     <!-- Desktop Modernist Admin Sidebar -->
     <aside
-      class="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-2 border-r border-brand-hair bg-brand-canvas-soft p-5 md:flex z-30"
+      class="sticky top-0 hidden h-[100dvh] w-64 shrink-0 flex-col gap-2 border-r border-brand-hair bg-brand-canvas-soft p-5 md:flex z-30"
     >
       <NuxtLink
         to="/"
@@ -254,7 +256,11 @@ onMounted(() => {
       </header>
 
       <!-- Main Admin Content Slot -->
-      <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main
+        id="admin-main-content"
+        tabindex="-1"
+        class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 focus:outline-none"
+      >
         <slot />
       </main>
 

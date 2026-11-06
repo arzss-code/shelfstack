@@ -28,16 +28,16 @@ const { isLoggedIn } = useAuth()
         <div class="flex flex-wrap items-center gap-3 pt-1">
           <NuxtLink
             to="/katalog"
-            class="bg-brand-ink text-white font-semibold text-sm px-7 py-3.5 rounded-full hover:bg-brand-inkhover transition-all flex items-center gap-2 no-underline shadow-whisper"
+            class="bg-brand-ink text-white font-semibold text-sm px-7 py-3.5 rounded-full hover:bg-brand-inkhover transition-colors flex items-center gap-2 no-underline shadow-whisper"
           >
             <span>Lihat Katalog</span>
-            <i class="pi pi-arrow-right text-xs" />
+            <i class="pi pi-arrow-right text-xs" aria-hidden="true" />
           </NuxtLink>
 
           <NuxtLink
             v-if="!isLoggedIn"
             to="/auth/login"
-            class="bg-brand-canvas-soft hover:bg-brand-field text-brand-ink font-semibold text-sm px-6 py-3.5 rounded-full transition-all border border-brand-hair flex items-center gap-2 no-underline shadow-whisper"
+            class="bg-brand-canvas-soft hover:bg-brand-field text-brand-ink font-semibold text-sm px-6 py-3.5 rounded-full transition-colors border border-brand-hair flex items-center gap-2 no-underline shadow-whisper"
           >
             <span>Masuk</span>
           </NuxtLink>
@@ -46,13 +46,17 @@ const { isLoggedIn } = useAuth()
         <!-- Informative Store Credibility Highlights -->
         <div class="pt-5 border-t border-brand-hair/60 grid grid-cols-3 gap-4 max-w-md">
           <div>
-            <p class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tracking-tight">
+            <p
+              class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tracking-tight tabular-nums"
+            >
               1.300+
             </p>
             <p class="font-body text-xs text-brand-muted m-0 mt-0.5 font-medium">Produk Pilihan</p>
           </div>
           <div>
-            <p class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tracking-tight">
+            <p
+              class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tracking-tight tabular-nums"
+            >
               5 Kategori
             </p>
             <p class="font-body text-xs text-brand-muted m-0 mt-0.5 font-medium">
@@ -61,10 +65,10 @@ const { isLoggedIn } = useAuth()
           </div>
           <div>
             <p
-              class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tracking-tight flex items-center gap-1 text-emerald-600"
+              class="font-display text-xl sm:text-2xl font-bold m-0 tracking-tight flex items-center gap-1 text-emerald-600 tabular-nums"
             >
               <span>100%</span>
-              <i class="pi pi-verified text-sm text-emerald-600" />
+              <i class="pi pi-verified text-sm text-emerald-600" aria-hidden="true" />
             </p>
             <p class="font-body text-xs text-brand-muted m-0 mt-0.5 font-medium">Garansi Resmi</p>
           </div>
@@ -82,6 +86,10 @@ const { isLoggedIn } = useAuth()
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwVY6_XJIJ--I5tlVeVHvg6ErT_oBXt2avwd8dlAuTVukdzmLAppAhyNQAGXm3rQFEX1mHUEJ1GZ0wxvknebBIyNihYqTnXUswGHZuBSXpTUJrW6irkYFSwJUdz3lXaf3SIaU32wSKZaVrV6lC7Krf-diQ9YtZ80tMZPN0gDm7158w3dT3TGRm9DJY3Zr0K4RKBXS_5cVnFyD0hA50xpvdjViEWoa2fQmCh6xzjHcub1jp-D9HREja"
               alt="Headphone Nirkabel Studio"
+              width="800"
+              height="800"
+              fetchpriority="high"
+              decoding="async"
             />
             <div
               class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md rounded-full px-3.5 py-2 flex items-center justify-between border border-brand-hair shadow-whisper"
@@ -108,6 +116,9 @@ const { isLoggedIn } = useAuth()
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhuBSFbEmAvUs-dIR2YRW-AgUpd_FXgqc62yOMrFXAqiJxphILJy3g73g9zMSiczWs5C_QAJAN1CjOVg_pzST382d0uUBGS5pFhsCPOFK1nOrZaHe-97eQ5JqcvSwsi3UzEkT3yFNe2vkYGKvByoxn2fF4xlojiv56WR8B1rwrUZFxLT-WZVzHWHvp1T17Fqfe44ym_WRhnIIM_2T_g3dkxEIvLv9oyO86-o48wqWDKZfPrK2obggw"
                 alt="Lampu Meja Kerja"
+                width="480"
+                height="360"
+                decoding="async"
               />
               <div
                 class="absolute bottom-2.5 left-2.5 right-2.5 bg-white/95 backdrop-blur-md rounded-full px-3 py-1.5 flex items-center justify-between border border-brand-hair shadow-whisper"
@@ -132,6 +143,9 @@ const { isLoggedIn } = useAuth()
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaW1aKJlLR-zy1At4XWYvwZTHyVzcedxmF5czH_xXSLAw5u-HsTZgUrlfag8Lcz8Wy41SeSwYS-HeeyVsHZK3HIKWSVxEmb50sDQgwEwzPqy8Tk7DfzdvdVw4uC3VyiWSo8w_SV806yxW6xxj4tygQ5PGNzL4_0kdeany5eVB7SlX4r2_9T2mzzvz4Eqy6YNr5Hqd0-C230EfZJntIcrv_ptSdiTpKbYG9ESr-91MiSkickFdwXSq7"
                 alt="Tas Komuter Multifungsi"
+                width="480"
+                height="360"
+                decoding="async"
               />
               <div
                 class="absolute bottom-2.5 left-2.5 right-2.5 bg-white/95 backdrop-blur-md rounded-full px-3 py-1.5 flex items-center justify-between border border-brand-hair shadow-whisper"

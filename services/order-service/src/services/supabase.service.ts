@@ -54,7 +54,16 @@ export interface ProcessWebhookParams {
   midtransId?: string | null
 }
 
-export async function processPaymentWebhook(params: ProcessWebhookParams) {
+export interface ProcessWebhookResult {
+  orderId: string
+  status: 'pending' | 'paid' | 'cancelled'
+  rpcResult: string
+  method: 'atomic_rpc'
+}
+
+export async function processPaymentWebhook(
+  params: ProcessWebhookParams,
+): Promise<ProcessWebhookResult> {
   const client = getSupabaseClient()
   const baseOrderId = extractBaseOrderId(params.orderId)
 
@@ -65,36 +74,14 @@ export async function processPaymentWebhook(params: ProcessWebhookParams) {
     p_midtrans_id: params.midtransId ?? null,
   })
 
-  // Defensive fallback if RPC is not present
   if (rpcError) {
-    const { data: updatedOrder, error: updateError } = await client
-      .from('orders')
-      .update({
-        status: params.targetStatus,
-        payment_type: params.paymentType ?? null,
-        midtrans_id: params.midtransId ?? null,
-        paid_at: params.targetStatus === 'paid' ? new Date().toISOString() : null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', baseOrderId)
-      .select('id, status')
-      .single()
-
-    if (updateError) {
-      throw new Error(`Failed to update order status in database: ${updateError.message}`)
-    }
-
-    return {
-      orderId: params.orderId,
-      status: updatedOrder.status,
-      method: 'direct_fallback',
-    }
+    throw new Error(`Failed to execute handle_payment_webhook RPC: ${rpcError.message}`)
   }
 
   return {
-    orderId: params.orderId,
+    orderId: baseOrderId,
     status: params.targetStatus,
-    rpcResult,
+    rpcResult: typeof rpcResult === 'string' ? rpcResult : 'UNKNOWN_RPC_RESULT',
     method: 'atomic_rpc',
   }
 }

@@ -18,7 +18,7 @@ Use proven patterns appropriate to the current workload and architecture.
 - Nitro
 - Supabase / PostgreSQL
 - Redis
-- BullMQ (TODO — belum diimplementasi; order-expiry worker masih direct sweep, tanpa queue/DLQ)
+- BullMQ (`order-expiry` delayed queue, repeatable reconciliation sweep, exponential retry, dan `order-expiry-dlq` di `@shelfstack/order-service`)
 - Fastify
 - Zod
 - Pino

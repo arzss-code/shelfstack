@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminExpiryQueueCard from '~/features/orders/components/AdminExpiryQueueCard.vue'
 import AdminOrderTable from '~/features/orders/components/AdminOrderTable.vue'
 
 definePageMeta({
@@ -81,6 +82,9 @@ const {
         </UiButton>
       </div>
     </div>
+
+    <!-- BullMQ Order Expiry & DLQ Telemetry -->
+    <AdminExpiryQueueCard />
 
     <!-- Filter & Search Controls -->
     <div class="flex flex-col gap-3 rounded-2xl border border-brand-hair bg-brand-canvas-soft p-4">

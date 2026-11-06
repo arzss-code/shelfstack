@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 
 const visible = defineModel<boolean>('visible', { default: false })
+const modalUid = useId()
+const titleId = computed(() => `ui-modal-title-${modalUid}`)
+const descriptionId = computed(() => `ui-modal-desc-${modalUid}`)
 
 const props = withDefaults(
   defineProps<{
@@ -124,14 +127,16 @@ onBeforeUnmount(() => lockBodyScroll(false))
       <Transition name="ui-modal">
         <div
           v-if="visible"
-          class="fixed inset-0 z-[1000] flex items-end justify-center overflow-y-auto bg-black/50 p-0 backdrop-blur-[2px] sm:items-center sm:p-6"
+          class="fixed inset-0 z-[1000] flex items-end justify-center overflow-y-auto overscroll-contain bg-black/50 p-0 backdrop-blur-[2px] sm:items-center sm:p-6"
           @click.self="closeOnOverlay && (visible = false)"
         >
           <div
             ref="panelRef"
             role="dialog"
             aria-modal="true"
-            :aria-label="title || undefined"
+            :aria-labelledby="title && !$slots.header ? titleId : undefined"
+            :aria-describedby="description && !$slots.header ? descriptionId : undefined"
+            :aria-label="title && $slots.header ? title : undefined"
             :class="[
               'relative flex w-full flex-col overflow-hidden border border-brand-hair bg-brand-canvas shadow-floating',
               'rounded-t-card sm:rounded-card',
@@ -147,10 +152,17 @@ onBeforeUnmount(() => lockBodyScroll(false))
             >
               <slot name="header">
                 <div class="min-w-0">
-                  <h2 class="m-0 font-display text-base font-bold tracking-tight text-brand-ink">
+                  <h2
+                    :id="titleId"
+                    class="m-0 font-display text-base font-bold tracking-tight text-brand-ink"
+                  >
                     {{ title }}
                   </h2>
-                  <p v-if="description" class="m-0 mt-1 text-xs leading-relaxed text-brand-muted">
+                  <p
+                    v-if="description"
+                    :id="descriptionId"
+                    class="m-0 mt-1 text-xs leading-relaxed text-brand-muted"
+                  >
                     {{ description }}
                   </p>
                 </div>
@@ -161,12 +173,12 @@ onBeforeUnmount(() => lockBodyScroll(false))
                 aria-label="Tutup dialog"
                 @click="visible = false"
               >
-                <i class="pi pi-times text-xs" />
+                <i class="pi pi-times text-xs" aria-hidden="true" />
               </button>
             </header>
 
             <!-- Body -->
-            <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6">
+            <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 sm:px-6">
               <slot />
             </div>
 

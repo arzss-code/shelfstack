@@ -41,7 +41,7 @@ const {
     >
       <div>
         <div class="flex items-center gap-2 mb-1.5 text-brand-accent">
-          <i class="pi pi-bolt text-base" />
+          <i class="pi pi-bolt text-base" aria-hidden="true" />
           <span class="text-xs font-bold tracking-wide uppercase">Penawaran Pilihan Toko</span>
         </div>
         <h2 class="font-display text-2xl sm:text-3xl font-bold text-white m-0">
@@ -60,7 +60,7 @@ const {
         <span class="text-xs text-white/70">Berakhir dalam</span>
         <span
           data-testid="flash-deals-timer"
-          class="text-base font-bold text-white tracking-widest font-mono"
+          class="font-display text-base font-bold text-white tracking-widest tabular-nums"
         >
           {{ countdownData.formatted }}
         </span>
@@ -72,7 +72,7 @@ const {
         data-testid="flash-deals-curated-badge"
         class="flex items-center gap-2 bg-white/10 px-3.5 py-2 rounded-card border border-white/10 shrink-0 text-white/90 text-xs font-medium"
       >
-        <i class="pi pi-verified text-brand-accent text-sm" />
+        <i class="pi pi-verified text-brand-accent text-sm" aria-hidden="true" />
         <span>Koleksi Pilihan Resmi</span>
       </div>
     </div>
@@ -143,15 +143,18 @@ const {
             :src="product.image_url"
             :alt="product.name"
             :data-product-id="product.id"
+            width="400"
+            height="400"
+            decoding="async"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
             @error="onImageError(product.id)"
           />
           <div
             v-else
-            class="flex flex-col items-center justify-center w-full h-full text-slate-400 gap-1.5 bg-[#f4f4f6]"
+            class="flex flex-col items-center justify-center w-full h-full text-brand-muted gap-1.5 bg-brand-canvas-soft"
           >
-            <i class="pi pi-image text-2xl opacity-25" />
+            <i class="pi pi-image text-2xl opacity-25" aria-hidden="true" />
             <span class="text-[10px] font-semibold tracking-widest uppercase opacity-40"
               >ShelfStack</span
             >
@@ -168,9 +171,9 @@ const {
           <!-- Hanya tampilkan rating jika data rating nyata > 0 -->
           <div
             v-if="product.rating && Number(product.rating) > 0"
-            class="flex items-center gap-1 text-[11px] text-brand-muted mb-1"
+            class="flex items-center gap-1 text-[11px] text-brand-muted mb-1 tabular-nums"
           >
-            <i class="pi pi-star-fill text-[10px] text-amber-500" />
+            <i class="pi pi-star-fill text-[10px] text-amber-500" aria-hidden="true" />
             <span class="font-bold text-brand-ink">{{ Number(product.rating).toFixed(1) }}</span>
             <span v-if="product.review_count">({{ product.review_count }})</span>
             <span v-else-if="product.sold_count">· {{ product.sold_count }} terjual</span>
@@ -181,7 +184,7 @@ const {
               v-if="product.stock > 0"
               class="text-emerald-600 font-medium flex items-center gap-1"
             >
-              <i class="pi pi-check-circle text-[10px]" />
+              <i class="pi pi-check-circle text-[10px]" aria-hidden="true" />
               Stok Tersedia
             </span>
             <span v-else class="text-rose-600 font-medium">Stok Habis</span>
@@ -194,7 +197,10 @@ const {
             {{ product.name }}
           </h4>
           <div class="flex items-baseline gap-2 mt-1.5">
-            <span data-testid="deal-price" class="text-base font-bold text-brand-ink">
+            <span
+              data-testid="deal-price"
+              class="font-display text-base font-bold text-brand-ink tabular-nums"
+            >
               {{ formatRupiah(product.price) }}
             </span>
           </div>

@@ -4,6 +4,7 @@ packages:
 
 allowBuilds:
   esbuild: true
+  msgpackr-extract: false
   unrs-resolver: false
 minimumReleaseAgeExclude:
   - '@e2e-dev/web@0.13.0'
