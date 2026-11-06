@@ -2,6 +2,21 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.31.1] - 2026-11-06
+
+### Modularisasi Menyeluruh Sesuai SOP <= 300 Baris & Penyempurnaan Live Chat
+
+- **Penyempurnaan Live Chat Realtime & UI Etalase**:
+  - `app/composables/useSupportChat.ts` & `app/composables/useAdminSupportChat.ts`: Proteksi deduplikasi singleton channel Supabase Realtime dan stabilisasi langganan percakapan.
+  - `app/components/support/`: Ekstraksi `LiveChatComposer.vue`, dukungan perenderan gelembung lampiran pesanan dan produk (`OrderAttachmentModal.vue`, `ProductAttachmentModal.vue`), perapian dock jendela chat, serta perbaikan kelas skala aktif tombol peluncur (`active:scale-95`) pada `LiveChatWidget.vue`.
+  - `app/components/ui/UiTooltip.vue` & `app/components/admin/support/`: Perbaikan perataan tooltip di tepi layar dan penambahan dropdown filter status pada inbox admin.
+- **Modularisasi 100% Halaman & Komponen di Bawah 300 Baris (172 File Vue <= 300 Baris)**:
+  - **Modularisasi 14 Halaman (`app/pages/`)**: Ekstraksi composable dan sub-komponen terfokus pada `orders/[id].vue` (286 baris), `orders/index.vue` (283 baris), `promos.vue` (246 baris), `help.vue` (251 baris), `admin/orders/[id].vue` (188 baris), `notifications.vue` (168 baris), `contact.vue` (235 baris), `admin/orders/index.vue` (150 baris), `katalog.vue` (224 baris), `admin/products.vue` (157 baris), `admin/coupons.vue` (148 baris), `cart.vue` (246 baris), `account/addresses.vue` (296 baris), dan `account/profile.vue` (252 baris).
+  - **Modularisasi 15 Komponen (`app/components/` & `app/features/`)**: Ekstraksi composable dan sub-komponen pada `AppNavbar.vue` (291 baris), `UiSelect.vue` (248 baris), `NotificationBell.vue` (254 baris), `CartDrawer.vue` (206 baris), `OrderCard.vue` (231 baris), `LocationPickerModal.vue` (206 baris), `VoucherSelectModal.vue` (287 baris), `ProductCard.vue` (230 baris), `HomeFlashDeals.vue` (214 baris), `ProductForm.vue` (138 baris), `ProductConfigurator.vue` (247 baris), `OrderReturnModal.vue` (257 baris), `OrderReturnStatusCard.vue` (242 baris), `ProductReviewsSection.vue` (139 baris), dan `AdminReturnDetailModal.vue` (251 baris).
+- **Sinkronisasi Dokumentasi & Quality Gate**:
+  - `docs/PROGRESS.md` & `docs/BACKLOG.md`: Sinkronisasi status inventaris fitur yang sudah tuntas (Pusat Notifikasi, Lacak Pengiriman, Kupon Promo & Diskon, dan Live Chat CS).
+  - Verifikasi quality gate aktual: `pnpm typecheck` EXIT 0, `pnpm lint` EXIT 0 (0 error, 0 warning), dan `pnpm exec vitest run` 83 file test / 880 tests lulus 100%.
+
 ## [0.31.0] - 2026-11-04
 
 ### Sistem Live Chat Bantuan Pelanggan Real-time (Customer Support Live Chat)

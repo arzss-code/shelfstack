@@ -80,13 +80,13 @@
 
 Fitur berikut tercatat resmi belum diimplementasikan pada siklus berjalan (alasan: menjaga fokus pada integritas data transaksional, auth strict, dan arsitektur etalase):
 
-1. **Pusat Notifikasi**: In-app notification center & web push notifications.
+1. ~~**Pusat Notifikasi**~~: ✅ **SELESAI 2026-10-27** (Tabel `public.notifications`, RLS multi-tenant, publikasi Supabase Realtime, `useNotificationStore`, dan `NotificationBell.vue`; catatan: Web Push belum diimplementasikan).
 2. ~~**Wishlist**~~: ✅ **SELESAI 2026-10-26** (Penyimpanan favorit persisten `useWishlistStore`, `WishlistButton.vue`, badge navbar, `/wishlist`, dan integrasi keranjang).
 3. ~~**Kalkulator Ongkir & Logistik**~~: ✅ **SELESAI 2026-10-30** (SHF-SHP-01: 4 tingkat layanan pengiriman bertingkat, kalkulasi ongkir server-side di RPC `create_order`, promo Bebas Ongkir belanja >= Rp 500.000, komponen `ShippingMethodSelector`, dan unit tests).
-4. **Lacak Pengiriman Ekspedisi**: Nomor resi kurir dan tracking perjalanan paket real-time (saat ini alur internal status pesanan).
-5. **Kupon Promo & Voucher**: Sistem kode voucher promosi di checkout (saat ini hanya diskon per-produk langsung).
+4. ~~**Lacak Pengiriman Ekspedisi**~~: ✅ **SELESAI 2026-10-27** (SHF-LOG-01: Nomor resi kurir resmi, tabel `shipping_checkpoints` realtime, linimasa pelacakan di `/orders/[id]`, dan halaman pencarian resi publik `/tracking`).
+5. ~~**Kupon Promo & Voucher**~~: ✅ **SELESAI 2026-10-28 & 2026-11-03** (SHF-VOUCHER & SHF-ADM-COUPON-01: Tabel `coupons` & `coupon_usages`, penguncian atomik di RPC `create_order`, penukaran koin, pemilih voucher di keranjang/checkout, serta manajemen kupon admin).
 6. ~~**Pusat Bantuan & FAQ**~~: ✅ **SELESAI 2026-10-30** (Halaman `/help` interaktif, tab kategori via `UiTabs`, pencarian FAQ, dan kebijakan pengembalian mandiri).
-7. **Live Chat CS**: Widget bantuan langsung (WhatsApp CS / web live chat).
+7. ~~**Live Chat CS**~~: ✅ **SELESAI 2026-11-04** (SHF-CHAT-01: Sistem Live Chat dua arah berbasis Supabase Realtime, widget etalase, lampiran foto/pesanan/produk, dan ruang kerja inbox admin `/admin/support`).
 8. ~~**Halaman Perusahaan**~~: ✅ **SELESAI 2026-10-30** (Halaman kurasi `/about` dan formulir kontak interaktif `/contact` dengan validasi Zod).
 9. ~~**Ulasan & Rating Pelanggan**~~: ✅ **SELESAI 2026-10-30** (Tabel `public.product_reviews`, database trigger `recalculate_product_rating()`, endpoint Nitro GET/POST/DELETE, sensor privasi nama depan dan inisial `Budi S.`, modal ulasan interaktif pada order selesai dan detail produk, serta 46 unit test).
 10. **Infrastruktur BullMQ**: Worker antrean DLQ Redis untuk order expiry sweep (saat ini sweep direct endpoint).
