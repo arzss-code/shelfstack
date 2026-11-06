@@ -73,7 +73,14 @@ const {
   toggleDropdown,
   selectOption,
   onTriggerKeydown,
-} = useUiSelect(props, emit, slots)
+} = useUiSelect(
+  props,
+  (val) => {
+    emit('update:modelValue', val)
+    emit('change', val)
+  },
+  slots,
+)
 </script>
 
 <template>

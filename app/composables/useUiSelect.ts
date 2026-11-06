@@ -20,7 +20,7 @@ export interface UiSelectPropsInput {
 
 export function useUiSelect(
   props: UiSelectPropsInput,
-  emit: (e: 'update:modelValue' | 'change', value: string) => void,
+  onSelectValue: (value: string) => void,
   slots: Slots,
 ) {
   const uid = useId()
@@ -181,8 +181,7 @@ export function useUiSelect(
   function selectOption(opt: UiSelectOption) {
     if (opt.disabled) return
     const strVal = String(opt.value)
-    emit('update:modelValue', strVal)
-    emit('change', strVal)
+    onSelectValue(strVal)
     closeDropdown()
     nextTick(() => {
       triggerRef.value?.focus()
