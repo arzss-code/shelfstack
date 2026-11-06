@@ -6,6 +6,9 @@ import { useCartStore } from '~/features/cart/stores/cart'
 import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
 import { useNotificationStore } from '~/features/notifications/stores/notifications'
 import NotificationBell from '~/components/notifications/NotificationBell.vue'
+import NavbarSearchBar from '~/components/navbar/NavbarSearchBar.vue'
+import NavbarUserMenu from '~/components/navbar/NavbarUserMenu.vue'
+import NavbarMobileDrawer from '~/components/navbar/NavbarMobileDrawer.vue'
 import AppLogo from './AppLogo.vue'
 
 const { user, profile, isAdmin, isLoggedIn, fetchProfile, signOut } = useAuth()
@@ -20,18 +23,14 @@ const {
 const router = useRouter()
 
 const isMobileMenuOpen = ref(false)
-const isCategoryDropdownOpen = ref(false)
-const isUserMenuOpen = ref(false)
 const searchQuery = ref('')
 const selectedCategory = ref('Semua Kategori')
 
-// Daftar dropdown kategori termasuk opsi "Semua Kategori" di awal
 const dropdownCategories = computed(() => [
   'Semua Kategori',
   ...dynamicCategories.value.map((c) => c.name),
 ])
 
-// Sub-nav pita kategori: dibangun dinamis dari data
 const subNavCategories = computed(() => [
   { name: 'Semua Produk', path: '/katalog' },
   ...dynamicCategories.value.map((c) => ({
@@ -56,7 +55,6 @@ const handleSearch = () => {
 
 const selectCategory = (cat: string) => {
   selectedCategory.value = cat
-  isCategoryDropdownOpen.value = false
   const catSlug = dynamicCategoryMap.value[cat]
   if (catSlug) {
     router.push({ path: '/katalog', query: { category: catSlug } })
@@ -65,26 +63,7 @@ const selectCategory = (cat: string) => {
   }
 }
 
-const categoryDropdownRef = ref<HTMLElement | null>(null)
-const userMenuRef = ref<HTMLElement | null>(null)
-
-function handleNavClickOutside(event: MouseEvent) {
-  const target = event.target as Node | null
-  if (!target) return
-  if (
-    isCategoryDropdownOpen.value &&
-    categoryDropdownRef.value &&
-    !categoryDropdownRef.value.contains(target)
-  ) {
-    isCategoryDropdownOpen.value = false
-  }
-  if (isUserMenuOpen.value && userMenuRef.value && !userMenuRef.value.contains(target)) {
-    isUserMenuOpen.value = false
-  }
-}
-
 onMounted(async () => {
-  document.addEventListener('pointerdown', handleNavClickOutside, { passive: true })
   fetchProfile().catch(() => {})
   await fetchCategories().catch(() => {})
 
@@ -96,7 +75,6 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  document.removeEventListener('pointerdown', handleNavClickOutside)
   notificationStore.cleanupRealtimeListener()
 })
 
@@ -114,7 +92,7 @@ watch(
 )
 
 const handleLogout = async () => {
-  isUserMenuOpen.value = false
+  isMobileMenuOpen.value = false
   notificationStore.cleanupRealtimeListener()
   await signOut()
   router.push('/')
@@ -150,7 +128,7 @@ const handleLogout = async () => {
       <div
         class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between gap-4 sm:gap-6"
       >
-        <!-- Brand Logo (Single clean anchor) -->
+        <!-- Brand Logo -->
         <NuxtLink
           to="/"
           class="flex items-center no-underline group shrink-0"
@@ -159,94 +137,23 @@ const handleLogout = async () => {
           <AppLogo size="md" />
         </NuxtLink>
 
-        <!-- Center Search Bar (Contains the single unified Category Dropdown) -->
-        <div class="flex-1 max-w-2xl mx-2 sm:mx-6 hidden md:block">
-          <form
-            class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full px-2 border border-brand-hair focus-within:border-brand-ink focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-ink/20 transition-all shadow-whisper"
-            @submit.prevent="handleSearch"
-          >
-            <!-- Single Category Dropdown Button -->
-            <div ref="categoryDropdownRef" class="relative shrink-0">
-              <button
-                type="button"
-                class="whitespace-nowrap flex items-center gap-1.5 text-xs text-brand-ink font-semibold px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors cursor-pointer"
-                @click="isCategoryDropdownOpen = !isCategoryDropdownOpen"
-              >
-                <span>{{ selectedCategory }}</span>
-                <svg
-                  class="w-3 h-3 text-brand-muted shrink-0 transition-transform duration-200 origin-center"
-                  :class="{ 'rotate-180': isCategoryDropdownOpen }"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-
-              <!-- Category Dropdown List -->
-              <Transition
-                enter-active-class="transition duration-150 ease-out"
-                enter-from-class="transform scale-95 opacity-0 -translate-y-1"
-                enter-to-class="transform scale-100 opacity-100 translate-y-0"
-                leave-active-class="transition duration-100 ease-in"
-                leave-from-class="transform scale-100 opacity-100 translate-y-0"
-                leave-to-class="transform scale-95 opacity-0 -translate-y-1"
-              >
-                <div
-                  v-if="isCategoryDropdownOpen"
-                  class="absolute left-0 top-full mt-2 w-56 max-h-64 overflow-y-auto bg-brand-canvas border border-brand-hair rounded-card shadow-floating p-1.5 z-50"
-                >
-                  <button
-                    v-for="cat in dropdownCategories"
-                    :key="cat"
-                    type="button"
-                    class="w-full text-left px-3 py-2 text-xs font-medium text-brand-ink hover:bg-brand-canvas-soft rounded-field transition-colors flex items-center justify-between cursor-pointer border-0"
-                    @click="selectCategory(cat)"
-                  >
-                    <span>{{ cat }}</span>
-                    <i
-                      v-if="selectedCategory === cat"
-                      class="pi pi-check text-[10px] text-brand-accent font-bold"
-                    />
-                  </button>
-                </div>
-              </Transition>
-            </div>
-
-            <span class="w-px h-5 bg-brand-hair mx-1 shrink-0" />
-
-            <input
-              v-model="searchQuery"
-              type="text"
-              class="w-full bg-transparent px-3 text-xs sm:text-sm text-brand-ink placeholder:text-brand-faint focus:outline-none"
-              placeholder="Cari produk kebutuhan kerja, rumah, audio, furnitur..."
-            />
-
-            <UiTooltip text="Cari produk" position="bottom">
-              <button
-                type="submit"
-                class="w-8 h-8 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0 hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
-                aria-label="Cari produk"
-              >
-                <i class="pi pi-search text-xs" />
-              </button>
-            </UiTooltip>
-          </form>
-        </div>
+        <!-- Center Search Bar -->
+        <NavbarSearchBar
+          v-model:search-query="searchQuery"
+          :selected-category="selectedCategory"
+          :dropdown-categories="dropdownCategories"
+          @search="handleSearch"
+          @select-category="selectCategory"
+        />
 
         <!-- Right Commerce Actions -->
         <div class="flex items-center gap-1 sm:gap-2 shrink-0">
-          <!-- Notification Bell in Main Header (when logged in) -->
+          <!-- Notification Bell -->
           <template v-if="isLoggedIn && user">
             <NotificationBell variant="light" />
           </template>
 
-          <!-- Wishlist Icon Button with UiTooltip -->
+          <!-- Wishlist Icon Button -->
           <UiTooltip text="Wishlist" position="bottom" align="center">
             <NuxtLink
               to="/wishlist"
@@ -263,7 +170,7 @@ const handleLogout = async () => {
             </NuxtLink>
           </UiTooltip>
 
-          <!-- Cart Icon Button with UiTooltip -->
+          <!-- Cart Icon Button -->
           <UiTooltip position="bottom" align="end">
             <button
               type="button"
@@ -280,7 +187,6 @@ const handleLogout = async () => {
               </span>
             </button>
 
-            <!-- Rich Popover Content Slot -->
             <template #content>
               <div v-if="cartStore.totalItems > 0" class="space-y-1 min-w-[190px]">
                 <div
@@ -309,122 +215,17 @@ const handleLogout = async () => {
             </template>
           </UiTooltip>
 
-          <!-- User Authentication Section (Compact Right Layout) -->
-          <div ref="userMenuRef" class="relative">
-            <template v-if="isLoggedIn && user">
-              <button
-                type="button"
-                class="flex items-center gap-1.5 p-1 sm:pl-1 sm:pr-2.5 sm:py-1 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair active:scale-95"
-                @click="isUserMenuOpen = !isUserMenuOpen"
-              >
-                <span
-                  class="w-7 h-7 rounded-full overflow-hidden border border-brand-hair bg-brand-ink text-white text-xs font-bold flex items-center justify-center shrink-0"
-                >
-                  <img
-                    v-if="profile?.avatar_url"
-                    :src="profile.avatar_url"
-                    :alt="displayName"
-                    class="w-full h-full object-cover"
-                  />
-                  <template v-else>
-                    {{ initial }}
-                  </template>
-                </span>
-                <svg
-                  class="w-3 h-3 text-brand-muted shrink-0 transition-transform duration-200 hidden sm:block"
-                  :class="{ 'rotate-180': isUserMenuOpen }"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-
-              <!-- User Popup Menu -->
-              <Transition
-                enter-active-class="transition duration-150 ease-out"
-                enter-from-class="transform scale-95 opacity-0 -translate-y-1"
-                enter-to-class="transform scale-100 opacity-100 translate-y-0"
-                leave-active-class="transition duration-100 ease-in"
-                leave-from-class="transform scale-100 opacity-100 translate-y-0"
-                leave-to-class="transform scale-95 opacity-0 -translate-y-1"
-              >
-                <div
-                  v-if="isUserMenuOpen"
-                  class="absolute right-0 top-full mt-2 w-48 bg-brand-canvas border border-brand-hair rounded-card shadow-floating p-1.5 z-50"
-                >
-                  <div class="px-3 py-2 border-b border-brand-hairsoft mb-1">
-                    <p class="text-xs font-bold text-brand-ink m-0 truncate">{{ displayName }}</p>
-                    <p class="text-[10px] text-brand-muted m-0 truncate">{{ user.email }}</p>
-                  </div>
-                  <NuxtLink
-                    to="/account/profile"
-                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
-                    @click="isUserMenuOpen = false"
-                  >
-                    Profil Saya
-                  </NuxtLink>
-                  <NuxtLink
-                    to="/account/addresses"
-                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
-                    @click="isUserMenuOpen = false"
-                  >
-                    Daftar Alamat
-                  </NuxtLink>
-                  <NuxtLink
-                    to="/orders"
-                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
-                    @click="isUserMenuOpen = false"
-                  >
-                    Pesanan Saya
-                  </NuxtLink>
-                  <NuxtLink
-                    to="/account/vouchers"
-                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-medium transition-colors"
-                    @click="isUserMenuOpen = false"
-                  >
-                    Voucher Saya
-                  </NuxtLink>
-                  <NuxtLink
-                    to="/katalog"
-                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline transition-colors"
-                    @click="isUserMenuOpen = false"
-                  >
-                    Katalog Belanja
-                  </NuxtLink>
-                  <NuxtLink
-                    v-if="isAdmin"
-                    to="/admin/products"
-                    class="block px-3 py-2 text-xs text-brand-ink hover:bg-brand-canvas-soft rounded-field no-underline font-semibold transition-colors"
-                    @click="isUserMenuOpen = false"
-                  >
-                    Dashboard Admin
-                  </NuxtLink>
-                  <button
-                    type="button"
-                    class="w-full text-left px-3 py-2 text-xs text-brand-danger hover:bg-brand-danger-tint rounded-field cursor-pointer border-t border-brand-hairsoft mt-1 transition-colors border-0"
-                    @click="handleLogout"
-                  >
-                    Keluar
-                  </button>
-                </div>
-              </Transition>
-            </template>
-
-            <template v-else>
-              <NuxtLink
-                to="/auth/login"
-                class="px-4 py-1.5 rounded-full bg-brand-ink text-white hover:bg-brand-inkhover text-xs font-semibold no-underline transition-colors shadow-whisper inline-flex items-center"
-              >
-                Masuk
-              </NuxtLink>
-            </template>
-          </div>
+          <!-- User Authentication Section -->
+          <NavbarUserMenu
+            :is-logged-in="isLoggedIn"
+            :has-user="Boolean(user)"
+            :user-email="user?.email"
+            :avatar-url="profile?.avatar_url"
+            :is-admin="isAdmin"
+            :display-name="displayName"
+            :initial="initial"
+            @logout="handleLogout"
+          />
 
           <!-- Mobile Hamburger Trigger -->
           <button
@@ -475,168 +276,15 @@ const handleLogout = async () => {
     </div>
 
     <!-- Mobile Drawer View -->
-    <div
-      v-if="isMobileMenuOpen"
-      class="md:hidden w-full bg-white border-b border-brand-hair px-4 py-4 space-y-4 shadow-floating animate-fadeIn"
-    >
-      <!-- Mobile Search Form -->
-      <form
-        class="flex items-center gap-2 bg-brand-field rounded-full px-3 py-1.5 border border-brand-hair"
-        @submit.prevent="handleSearch"
-      >
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Cari produk..."
-          class="w-full bg-transparent text-xs text-brand-ink placeholder-brand-faint focus:outline-none"
-        />
-        <button
-          type="submit"
-          class="w-6 h-6 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0"
-        >
-          <i class="pi pi-search text-[10px]" />
-        </button>
-      </form>
-
-      <!-- Mobile Links -->
-      <nav class="flex flex-col gap-2 text-xs font-semibold" aria-label="Navigasi Mobile">
-        <NuxtLink
-          to="/"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
-          @click="isMobileMenuOpen = false"
-        >
-          Beranda
-        </NuxtLink>
-        <NuxtLink
-          to="/katalog"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
-          @click="isMobileMenuOpen = false"
-        >
-          Katalog Lengkap
-        </NuxtLink>
-        <NuxtLink
-          to="/promos"
-          class="py-2 text-brand-accent no-underline border-b border-brand-hairsoft flex items-center justify-between font-semibold"
-          @click="isMobileMenuOpen = false"
-        >
-          <span class="flex items-center gap-2">
-            <i class="pi pi-ticket text-sm" />
-            <span>Voucher &amp; Promo</span>
-          </span>
-          <span
-            class="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none"
-          >
-            %
-          </span>
-        </NuxtLink>
-        <NuxtLink
-          to="/wishlist"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft flex items-center justify-between"
-          @click="isMobileMenuOpen = false"
-        >
-          <span>Wishlist</span>
-          <span
-            v-if="wishlistStore.totalItems > 0"
-            class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold"
-          >
-            {{ wishlistStore.totalItems }}
-          </span>
-        </NuxtLink>
-        <NuxtLink
-          v-if="isLoggedIn"
-          to="/notifications"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft flex items-center justify-between"
-          @click="isMobileMenuOpen = false"
-        >
-          <span class="flex items-center gap-2">
-            <i class="pi pi-bell text-sm text-brand-ink" />
-            <span>Notifikasi</span>
-          </span>
-          <span
-            v-if="notificationStore.unreadCount > 0"
-            class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold tabular-nums"
-          >
-            {{ notificationStore.unreadCount }}
-          </span>
-        </NuxtLink>
-        <NuxtLink
-          v-if="isLoggedIn"
-          to="/account/profile"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
-          @click="isMobileMenuOpen = false"
-        >
-          Profil Saya
-        </NuxtLink>
-        <NuxtLink
-          v-if="isLoggedIn"
-          to="/account/addresses"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
-          @click="isMobileMenuOpen = false"
-        >
-          Daftar Alamat
-        </NuxtLink>
-        <NuxtLink
-          v-if="isLoggedIn"
-          to="/orders"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
-          @click="isMobileMenuOpen = false"
-        >
-          Pesanan Saya
-        </NuxtLink>
-        <NuxtLink
-          v-if="isLoggedIn"
-          to="/account/vouchers"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
-          @click="isMobileMenuOpen = false"
-        >
-          Voucher Saya
-        </NuxtLink>
-        <NuxtLink
-          to="/help"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
-          @click="isMobileMenuOpen = false"
-        >
-          Pusat Bantuan
-        </NuxtLink>
-        <NuxtLink
-          to="/tracking"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
-          @click="isMobileMenuOpen = false"
-        >
-          Lacak Pesanan
-        </NuxtLink>
-        <NuxtLink
-          to="/contact"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
-          @click="isMobileMenuOpen = false"
-        >
-          Hubungi Kami
-        </NuxtLink>
-        <NuxtLink
-          v-if="isAdmin"
-          to="/admin/products"
-          class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
-          @click="isMobileMenuOpen = false"
-        >
-          Kelola Produk (Admin)
-        </NuxtLink>
-        <button
-          v-if="isLoggedIn"
-          type="button"
-          class="py-2 text-left text-red-600 font-semibold cursor-pointer border-b border-brand-hairsoft"
-          @click="handleLogout"
-        >
-          Keluar
-        </button>
-        <NuxtLink
-          v-else
-          to="/auth/login"
-          class="py-2 text-brand-accent no-underline font-semibold"
-          @click="isMobileMenuOpen = false"
-        >
-          Masuk ke Akun
-        </NuxtLink>
-      </nav>
-    </div>
+    <NavbarMobileDrawer
+      v-model:open="isMobileMenuOpen"
+      v-model:search-query="searchQuery"
+      :wishlist-count="wishlistStore.totalItems"
+      :unread-notifications-count="notificationStore.unreadCount"
+      :is-logged-in="isLoggedIn"
+      :is-admin="isAdmin"
+      @search="handleSearch"
+      @logout="handleLogout"
+    />
   </header>
 </template>

@@ -69,7 +69,7 @@ const closeChat = () => {
     <!-- Floating Action Button Launcher -->
     <button
       type="button"
-      class="floating-launcher fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand-ink text-white shadow-floating transition-all duration-200 hover:bg-brand-inkhover active:scale-9"
+      class="floating-launcher fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand-ink text-white shadow-floating transition-all duration-200 hover:bg-brand-inkhover active:scale-95"
       :class="[
         effectiveUnreadCount > 0 ? 'has-unread pulse-indicator' : '',
         isChatOpen ? 'rotate-90' : '',

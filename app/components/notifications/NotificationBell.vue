@@ -1,3 +1,37 @@
+<script setup lang="ts">
+import NotificationBellItem from '~/components/notifications/NotificationBellItem.vue'
+import { useNotificationBell } from '~/composables/useNotificationBell'
+
+interface Props {
+  variant?: 'dark' | 'light'
+}
+
+withDefaults(defineProps<Props>(), {
+  variant: 'dark',
+})
+
+const {
+  notificationStore,
+  items,
+  unreadCount,
+  isLoading,
+  isLoadingMore,
+  hasMore,
+  isOpen,
+  desktopPermission,
+  activeTab,
+  bellRef,
+  filteredItems,
+  toggleDropdown,
+  closeDropdown,
+  handleRequestDesktop,
+  handleNotificationClick,
+  getTypeIcon,
+  getTypeStyles,
+  formatTime,
+} = useNotificationBell()
+</script>
+
 <template>
   <div ref="bellRef" class="relative">
     <!-- Bell Button with Dynamic Variant (dark / light) -->
@@ -76,7 +110,7 @@
           </button>
         </div>
 
-        <!-- Desktop Browser Notification Permission Banner (Point 3) -->
+        <!-- Desktop Browser Notification Permission Banner -->
         <div
           v-if="desktopPermission === 'default'"
           class="px-3.5 py-2 bg-blue-50/80 border-b border-blue-100 flex items-center justify-between gap-2"
@@ -164,49 +198,17 @@
           </div>
 
           <!-- List Items -->
-          <button
+          <NotificationBellItem
             v-for="item in filteredItems"
             :key="item.id"
-            type="button"
-            class="w-full text-left p-3.5 sm:p-4 hover:bg-brand-canvas-soft transition-colors flex items-start gap-3 cursor-pointer bg-transparent border-0 relative group"
-            :class="{ 'bg-blue-50/20': !item.is_read }"
-            @click="handleNotificationClick(item)"
-          >
-            <!-- Status Icon -->
-            <div
-              class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm mt-0.5"
-              :class="getTypeStyles(item.type)"
-            >
-              <i :class="getTypeIcon(item.type)" />
-            </div>
+            :item="item"
+            :get-type-icon="getTypeIcon"
+            :get-type-styles="getTypeStyles"
+            :format-time="formatTime"
+            @select="handleNotificationClick"
+          />
 
-            <!-- Content -->
-            <div class="flex-1 min-w-0 pr-2">
-              <div class="flex items-center justify-between gap-2 mb-0.5">
-                <p
-                  class="text-xs font-semibold m-0 truncate"
-                  :class="item.is_read ? 'text-brand-ink' : 'text-brand-ink font-bold'"
-                >
-                  {{ item.title }}
-                </p>
-                <span class="text-[10px] text-brand-faint shrink-0 tabular-nums">
-                  {{ formatTime(item.created_at) }}
-                </span>
-              </div>
-              <p class="text-[11px] text-brand-muted m-0 line-clamp-2 leading-relaxed">
-                {{ item.message }}
-              </p>
-            </div>
-
-            <!-- Unread Dot Indicator -->
-            <span
-              v-if="!item.is_read"
-              class="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-2.5"
-              aria-label="Belum dibaca"
-            />
-          </button>
-
-          <!-- Cursor Pagination "Muat Lebih Banyak" (Point 4) -->
+          <!-- Cursor Pagination "Muat Lebih Banyak" -->
           <div
             v-if="hasMore && activeTab === 'all'"
             class="p-2 text-center bg-brand-canvas-soft/20"
@@ -249,148 +251,3 @@
     </Transition>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { NotificationItem, NotificationType } from '~~/shared/schemas/notification'
-import { useNotificationStore } from '~/features/notifications/stores/notifications'
-
-interface Props {
-  variant?: 'dark' | 'light'
-}
-
-withDefaults(defineProps<Props>(), {
-  variant: 'dark',
-})
-
-const notificationStore = useNotificationStore()
-const { items, unreadCount, isLoading, isLoadingMore, hasMore, isOpen, desktopPermission } =
-  storeToRefs(notificationStore)
-
-const activeTab = ref<'all' | 'unread'>('all')
-const bellRef = ref<HTMLElement | null>(null)
-
-const filteredItems = computed<NotificationItem[]>(() => {
-  if (activeTab.value === 'unread') {
-    return items.value.filter((item: NotificationItem) => !item.is_read)
-  }
-  return items.value
-})
-
-const toggleDropdown = () => {
-  if (!isOpen.value) {
-    notificationStore.fetchNotifications(false)
-  }
-  notificationStore.toggleDropdown()
-}
-
-const closeDropdown = () => {
-  notificationStore.closeDropdown()
-}
-
-const handleRequestDesktop = async () => {
-  await notificationStore.requestDesktopPermission()
-}
-
-const handleNotificationClick = async (item: NotificationItem) => {
-  if (!item.is_read) {
-    await notificationStore.markAsRead(item.id)
-  }
-  closeDropdown()
-  if (item.reference_url) {
-    await navigateTo(item.reference_url)
-  }
-}
-
-// Icon mapper
-const getTypeIcon = (type: NotificationType): string => {
-  switch (type) {
-    case 'order_created':
-      return 'pi pi-shopping-bag'
-    case 'payment_success':
-      return 'pi pi-check-circle'
-    case 'order_shipped':
-      return 'pi pi-truck'
-    case 'order_completed':
-      return 'pi pi-verified'
-    case 'order_cancelled':
-      return 'pi pi-times-circle'
-    case 'system':
-    default:
-      return 'pi pi-info-circle'
-  }
-}
-
-// Color/style mapper
-const getTypeStyles = (type: NotificationType): string => {
-  switch (type) {
-    case 'order_created':
-      return 'bg-blue-100/70 text-blue-700'
-    case 'payment_success':
-      return 'bg-emerald-100/70 text-emerald-700'
-    case 'order_shipped':
-      return 'bg-amber-100/70 text-amber-700'
-    case 'order_completed':
-      return 'bg-purple-100/70 text-purple-700'
-    case 'order_cancelled':
-      return 'bg-rose-100/70 text-rose-700'
-    case 'system':
-    default:
-      return 'bg-zinc-100 text-zinc-700'
-  }
-}
-
-// Relative time formatter
-const formatTime = (isoString: string): string => {
-  try {
-    const diffMs = Date.now() - new Date(isoString).getTime()
-    const diffSec = Math.floor(diffMs / 1000)
-    if (diffSec < 60) return 'Baru saja'
-
-    const diffMin = Math.floor(diffSec / 60)
-    if (diffMin < 60) return `${diffMin} mnt lalu`
-
-    const diffHour = Math.floor(diffMin / 60)
-    if (diffHour < 24) return `${diffHour} jam lalu`
-
-    const diffDay = Math.floor(diffHour / 24)
-    if (diffDay < 7) return `${diffDay} hr lalu`
-
-    const date = new Date(isoString)
-    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
-  } catch {
-    return ''
-  }
-}
-
-// Click outside and escape handling
-function handleClickOutside(event: MouseEvent) {
-  if (!isOpen.value) return
-  const target = event.target as Node | null
-  if (bellRef.value && target && !bellRef.value.contains(target)) {
-    closeDropdown()
-  }
-}
-
-function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && isOpen.value) {
-    closeDropdown()
-  }
-}
-
-onMounted(async () => {
-  if (import.meta.client) {
-    document.addEventListener('pointerdown', handleClickOutside, { passive: true })
-    document.addEventListener('keydown', handleKeydown)
-    if (items.value.length === 0) {
-      await notificationStore.fetchNotifications(true)
-    }
-  }
-})
-
-onBeforeUnmount(() => {
-  if (import.meta.client) {
-    document.removeEventListener('pointerdown', handleClickOutside)
-    document.removeEventListener('keydown', handleKeydown)
-  }
-})
-</script>
