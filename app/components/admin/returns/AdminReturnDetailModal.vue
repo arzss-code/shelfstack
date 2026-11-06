@@ -1,19 +1,13 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import UiModal from '~/components/ui/UiModal.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiInput from '~/components/ui/UiInput.vue'
 import UiTextarea from '~/components/ui/UiTextarea.vue'
 import UiAlert from '~/components/ui/UiAlert.vue'
-import type { ReturnRequestItem, ReturnRequestStatus } from '~~/shared/schemas/return-request'
-import {
-  RETURN_REASON_LABELS,
-  RETURN_SOLUTION_LABELS,
-  RETURN_STATUS_MAP,
-} from '~~/server/utils/return-request'
-import { formatRupiah } from '~/utils/format'
-import { useUiToast } from '~/composables/useUiToast'
+import type { ReturnRequestItem } from '~~/shared/schemas/return-request'
+import { RETURN_REASON_LABELS, RETURN_SOLUTION_LABELS } from '~~/server/utils/return-request'
+import { useAdminReturnReview } from '~/composables/useAdminReturnReview'
 
 interface Props {
   modelValue: boolean
@@ -26,64 +20,19 @@ const emit = defineEmits<{
   reviewed: []
 }>()
 
-const toast = useUiToast()
-const isSubmitting = ref(false)
-const modalError = ref<string | null>(null)
-
-// Form fields for decision
-const adminNotes = ref('')
-const restockInventory = ref(true)
-const replacementCourier = ref('jne')
-const replacementTrackingNumber = ref('')
-const actionType = ref<'approve' | 'reject' | 'receive' | 'complete' | null>(null)
-
-const statusMeta = computed(() => {
-  if (!props.ticket) return null
-  return RETURN_STATUS_MAP[props.ticket.status]
+const {
+  isSubmitting,
+  modalError,
+  adminNotes,
+  restockInventory,
+  replacementCourier,
+  replacementTrackingNumber,
+  statusMeta,
+  handleActionSubmit,
+} = useAdminReturnReview(() => props.ticket, {
+  onReviewed: () => emit('reviewed'),
+  onClose: () => emit('update:modelValue', false),
 })
-
-const handleActionSubmit = async (targetStatus: ReturnRequestStatus) => {
-  if (!props.ticket) return
-  modalError.value = null
-
-  if (targetStatus === 'rejected' && !adminNotes.value.trim()) {
-    modalError.value = 'Wajib memberikan catatan alasan penolakan untuk pelanggan.'
-    return
-  }
-
-  isSubmitting.value = true
-  try {
-    await $fetch(`/api/admin/returns/${props.ticket.id}/review`, {
-      method: 'PUT',
-      body: {
-        status: targetStatus,
-        admin_notes: adminNotes.value.trim() || undefined,
-        restock_inventory: restockInventory.value,
-        replacement_courier:
-          props.ticket.solution_type === 'replacement' ? replacementCourier.value : undefined,
-        replacement_tracking_number:
-          props.ticket.solution_type === 'replacement'
-            ? replacementTrackingNumber.value.trim()
-            : undefined,
-      },
-    })
-
-    toast.show({
-      title: 'Keputusan Disimpan',
-      message: `Status tiket retur berhasil diperbarui menjadi ${RETURN_STATUS_MAP[targetStatus].label}.`,
-      tone: 'success',
-    })
-
-    emit('reviewed')
-    emit('update:modelValue', false)
-  } catch (err: unknown) {
-    const fetchErr = err as { data?: { message?: string }; message?: string }
-    modalError.value =
-      fetchErr?.data?.message || fetchErr?.message || 'Gagal menyimpan keputusan retur.'
-  } finally {
-    isSubmitting.value = false
-  }
-}
 </script>
 
 <template>

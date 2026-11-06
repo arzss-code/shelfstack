@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Product } from '~/types/product'
 import { formatRupiah } from '~/utils/format'
-import { getProductVariants } from '~/utils/product-specs'
+import { useProductConfigurator } from '~/composables/useProductConfigurator'
 import WishlistButton from '~/components/wishlist/WishlistButton.vue'
 
 const props = defineProps<{
@@ -13,91 +13,25 @@ const emit = defineEmits<{
   buyNow: [payload: { quantity: number; color: string; material: string }]
 }>()
 
-const variants = computed(() => getProductVariants(props.product))
-
-const quantity = ref(1)
-const selectedColor = ref('')
-const selectedMaterial = ref('')
-
-// Sinkronkan pilihan default saat produk dimuat atau berubah
-watch(
-  () => props.product,
-  () => {
-    const firstColor = variants.value.colors[0]
-    if (firstColor) selectedColor.value = firstColor.name
-    const firstOption = variants.value.options[0]
-    if (firstOption) selectedMaterial.value = firstOption.name
-  },
-  { immediate: true },
-)
-
-const ratingValue = computed(() => {
-  const r = props.product.rating
-  return r && Number(r) > 0 ? Number(r) : null
+const {
+  variants,
+  quantity,
+  selectedColor,
+  selectedMaterial,
+  ratingValue,
+  reviewCountValue,
+  isOutOfStock,
+  maxQuantity,
+  incrementQty,
+  decrementQty,
+  handleQuantityInput,
+  handleQuantityBlur,
+  handleAddToBag,
+  handleBuyNow,
+} = useProductConfigurator(() => props.product, {
+  onAddToBag: (payload) => emit('addToBag', payload),
+  onBuyNow: (payload) => emit('buyNow', payload),
 })
-const reviewCountValue = computed(() => props.product.review_count ?? null)
-
-const isOutOfStock = computed(() => props.product.stock === 0)
-const maxQuantity = computed(() => Math.max(1, props.product.stock))
-
-const incrementQty = () => {
-  if (quantity.value < maxQuantity.value) {
-    quantity.value++
-  }
-}
-
-const decrementQty = () => {
-  if (quantity.value > 1) {
-    quantity.value--
-  }
-}
-
-const handleQuantityInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const sanitized = target.value.replace(/[^0-9]/g, '')
-  target.value = sanitized
-  if (!sanitized) return
-  const val = parseInt(sanitized, 10)
-  if (val > maxQuantity.value) {
-    quantity.value = maxQuantity.value
-    target.value = String(maxQuantity.value)
-  } else if (val >= 1) {
-    quantity.value = val
-  }
-}
-
-const handleQuantityBlur = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const val = parseInt(target.value, 10)
-  if (!target.value || isNaN(val) || val < 1) {
-    quantity.value = 1
-    target.value = '1'
-  } else if (val > maxQuantity.value) {
-    quantity.value = maxQuantity.value
-    target.value = String(maxQuantity.value)
-  } else {
-    quantity.value = val
-    target.value = String(val)
-  }
-}
-
-const handleAddToBag = () => {
-  if (isOutOfStock.value) return
-  emit('addToBag', {
-    quantity: quantity.value,
-    color: selectedColor.value,
-    material: selectedMaterial.value,
-  })
-}
-
-const handleBuyNow = () => {
-  if (isOutOfStock.value) return
-  emit('buyNow', {
-    quantity: quantity.value,
-    color: selectedColor.value,
-    material: selectedMaterial.value,
-  })
-}
 </script>
 
 <template>
