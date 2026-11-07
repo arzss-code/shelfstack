@@ -8,10 +8,10 @@ const emit = defineEmits<{
   selectDemo: [payload: DemoCredentialPayload]
 }>()
 
-const activeRole = ref<'customer' | 'admin' | null>(null)
+const selectedRole = ref<'customer' | 'admin' | null>(null)
 
 function selectRole(role: 'customer' | 'admin') {
-  activeRole.value = role
+  selectedRole.value = role
   const email = role === 'admin' ? 'admin@shelfstack.local' : 'customer@shelfstack.local'
   emit('selectDemo', { email, role })
 }
@@ -21,72 +21,107 @@ function selectRole(role: 'customer' | 'admin') {
   <div
     role="region"
     aria-label="Akses Cepat Kredensial Demo"
-    class="mb-4 rounded-xl border border-brand-hair bg-brand-canvas-soft p-3.5 text-xs transition-colors"
+    class="mb-4 rounded-xl border border-brand-hair bg-brand-canvas-soft p-2.5 text-xs transition-all"
   >
-    <div class="mb-2.5 flex items-center justify-between">
-      <div class="flex items-center gap-1.5 font-medium text-brand-ink">
-        <i class="pi pi-bolt text-xs text-brand-accent" aria-hidden="true" />
-        <span class="font-semibold">Kredensial Demo 1-Klik</span>
-      </div>
-      <span class="text-[10px] text-brand-muted">Pengujian Portofolio</span>
+    <!-- Header Bar: Purpose & Transparent Password Hint -->
+    <div
+      class="flex items-center justify-between gap-2 pb-2 border-b border-brand-hairsoft/80 text-[11px]"
+    >
+      <span class="font-medium text-brand-ink flex items-center gap-1.5">
+        <i class="pi pi-key text-[10px] text-brand-muted" aria-hidden="true" />
+        <span class="font-semibold">Akun Pengujian Demo</span>
+      </span>
+      <span
+        class="text-[10px] text-brand-muted font-mono bg-brand-canvas px-1.5 py-0.5 rounded border border-brand-hairsoft tabular-nums"
+        title="Kata sandi otomatis terisi saat akun dipilih"
+      >
+        Sandi: Password123!
+      </span>
     </div>
 
-    <div class="grid grid-cols-2 gap-2">
+    <!-- Compact Selector Grid (44px min tap target compliant) -->
+    <div class="grid grid-cols-2 gap-1.5 pt-2">
+      <!-- Role: Pelanggan (Buyer) -->
       <button
         type="button"
-        class="flex flex-col items-start gap-0.5 rounded-lg border p-2 text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/50"
+        class="group relative flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/50 min-h-[44px]"
         :class="[
-          activeRole === 'customer'
-            ? 'border-brand-accent bg-brand-canvas text-brand-ink shadow-whisper'
-            : 'border-brand-hairsoft bg-white text-brand-muted hover:border-brand-hair hover:text-brand-ink',
+          selectedRole === 'customer'
+            ? 'border-brand-ink bg-white shadow-whisper text-brand-ink'
+            : 'border-brand-hairsoft bg-white/70 hover:bg-white hover:border-brand-hair text-brand-muted',
         ]"
-        aria-label="Pilih akun demo pelanggan: customer@shelfstack.local"
+        aria-label="Gunakan akun demo pelanggan: customer@shelfstack.local"
         @click="selectRole('customer')"
       >
-        <div class="flex items-center justify-between w-full">
-          <span class="text-xs font-semibold text-brand-ink">Pelanggan</span>
-          <span
-            class="rounded px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-wider"
-            :class="
-              activeRole === 'customer'
-                ? 'bg-brand-accent/10 text-brand-accent'
-                : 'bg-brand-hairsoft text-brand-muted'
-            "
-          >
-            Buyer
-          </span>
+        <div class="min-w-0 pr-1">
+          <div class="flex items-center gap-1">
+            <span
+              class="font-semibold text-xs leading-none"
+              :class="selectedRole === 'customer' ? 'text-brand-ink' : 'text-brand-ink/90'"
+            >
+              Pelanggan
+            </span>
+            <span
+              v-if="selectedRole === 'customer'"
+              class="inline-flex items-center text-[9px] font-bold text-brand-success"
+              aria-label="Akun terpilih"
+            >
+              <i class="pi pi-check text-[8px]" aria-hidden="true" />
+            </span>
+          </div>
+          <p class="text-[10px] text-brand-muted truncate m-0 mt-0.5">Etalase &amp; Checkout</p>
         </div>
-        <span class="font-mono text-[10px] text-brand-muted truncate w-full">
-          customer@shelfstack.local
+        <span
+          class="shrink-0 text-[10px] font-mono font-medium px-1.5 py-0.5 rounded transition-colors"
+          :class="
+            selectedRole === 'customer'
+              ? 'bg-brand-canvas-soft text-brand-ink'
+              : 'text-brand-muted/70 group-hover:text-brand-muted'
+          "
+        >
+          customer@
         </span>
       </button>
 
+      <!-- Role: Admin Ops (Staff) -->
       <button
         type="button"
-        class="flex flex-col items-start gap-0.5 rounded-lg border p-2 text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/50"
+        class="group relative flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/50 min-h-[44px]"
         :class="[
-          activeRole === 'admin'
-            ? 'border-brand-accent bg-brand-canvas text-brand-ink shadow-whisper'
-            : 'border-brand-hairsoft bg-white text-brand-muted hover:border-brand-hair hover:text-brand-ink',
+          selectedRole === 'admin'
+            ? 'border-brand-ink bg-white shadow-whisper text-brand-ink'
+            : 'border-brand-hairsoft bg-white/70 hover:bg-white hover:border-brand-hair text-brand-muted',
         ]"
-        aria-label="Pilih akun demo admin: admin@shelfstack.local"
+        aria-label="Gunakan akun demo admin: admin@shelfstack.local"
         @click="selectRole('admin')"
       >
-        <div class="flex items-center justify-between w-full">
-          <span class="text-xs font-semibold text-brand-ink">Admin Ops</span>
-          <span
-            class="rounded px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-wider"
-            :class="
-              activeRole === 'admin'
-                ? 'bg-amber-500/10 text-amber-700'
-                : 'bg-brand-hairsoft text-brand-muted'
-            "
-          >
-            Staff
-          </span>
+        <div class="min-w-0 pr-1">
+          <div class="flex items-center gap-1">
+            <span
+              class="font-semibold text-xs leading-none"
+              :class="selectedRole === 'admin' ? 'text-brand-ink' : 'text-brand-ink/90'"
+            >
+              Admin Ops
+            </span>
+            <span
+              v-if="selectedRole === 'admin'"
+              class="inline-flex items-center text-[9px] font-bold text-brand-success"
+              aria-label="Akun terpilih"
+            >
+              <i class="pi pi-check text-[8px]" aria-hidden="true" />
+            </span>
+          </div>
+          <p class="text-[10px] text-brand-muted truncate m-0 mt-0.5">Pesanan, Stok &amp; CS</p>
         </div>
-        <span class="font-mono text-[10px] text-brand-muted truncate w-full">
-          admin@shelfstack.local
+        <span
+          class="shrink-0 text-[10px] font-mono font-medium px-1.5 py-0.5 rounded transition-colors"
+          :class="
+            selectedRole === 'admin'
+              ? 'bg-brand-canvas-soft text-brand-ink'
+              : 'text-brand-muted/70 group-hover:text-brand-muted'
+          "
+        >
+          admin@
         </span>
       </button>
     </div>
