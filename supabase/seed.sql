@@ -150,3 +150,503 @@ values
 on conflict (user_id) do update set
   role = excluded.role,
   full_name = excluded.full_name;
+
+-- 6. Seed Kupon Promo & Voucher Diskon (SHF-VOUCHER)
+insert into public.coupons (
+  id,
+  code,
+  name,
+  description,
+  discount_type,
+  discount_value,
+  max_discount_cents,
+  min_purchase_cents,
+  usage_limit,
+  usage_count,
+  user_limit,
+  is_active
+) values
+  (
+    'c0000000-0000-0000-0000-000000000001'::uuid,
+    'WELCOME10',
+    'Diskon Pengguna Baru 10%',
+    'Potongan 10% maksimum Rp 50.000 untuk transaksi belanja pertama.',
+    'percentage',
+    10,
+    5000000,
+    10000000,
+    1000,
+    1,
+    1,
+    true
+  ),
+  (
+    'c0000000-0000-0000-0000-000000000002'::uuid,
+    'SHELF50K',
+    'Potongan Belanja Rp 50.000',
+    'Diskon potongan langsung Rp 50.000 dengan minimal belanja Rp 300.000.',
+    'fixed',
+    5000000,
+    5000000,
+    30000000,
+    500,
+    0,
+    1,
+    true
+  ),
+  (
+    'c0000000-0000-0000-0000-000000000003'::uuid,
+    'FREESHIP',
+    'Voucher Bebas Ongkir',
+    'Potongan ongkos kirim hingga Rp 15.000 untuk pengiriman reguler.',
+    'fixed',
+    1500000,
+    1500000,
+    15000000,
+    1000,
+    0,
+    2,
+    true
+  )
+on conflict (code) do update set
+  name = excluded.name,
+  description = excluded.description,
+  discount_value = excluded.discount_value,
+  is_active = excluded.is_active;
+
+-- 7. Seed Riwayat Pesanan 5 Status Lifecycle & Rincian Item (Fase 3 & 4)
+-- Menggunakan alamat pelanggan kanonis:
+-- Demo Customer, 081234567890, Jl. MH Thamrin No. 28, Menteng, Jakarta Pusat 10350
+insert into public.orders (
+  id,
+  user_id,
+  total_cents,
+  subtotal_cents,
+  discount_cents,
+  shipping_cost_cents,
+  shipping_service,
+  status,
+  address,
+  snap_token,
+  payment_type,
+  tracking_number,
+  courier_code,
+  courier_name,
+  paid_at,
+  shipped_at,
+  delivered_at,
+  cancelled_at,
+  cancellation_reason,
+  created_at,
+  updated_at
+) values
+  (
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    380000000,
+    380000000,
+    0,
+    0,
+    'reguler',
+    'completed',
+    '{"name": "Demo Customer", "phone": "081234567890", "street": "Jl. MH Thamrin No. 28, Menteng", "city": "Jakarta Pusat", "postal": "10350", "note": "Titip di resepsionis lobi utama"}'::jsonb,
+    'demo-snap-token-completed-01',
+    'bank_transfer',
+    'SS-JNE-1731000001',
+    'jne',
+    'JNE Express',
+    now() - interval '5 days',
+    now() - interval '4 days',
+    now() - interval '2 days',
+    null,
+    null,
+    now() - interval '5 days',
+    now() - interval '2 days'
+  ),
+  (
+    'e0000000-0000-0000-0000-000000000002'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    86500000,
+    85000000,
+    0,
+    1500000,
+    'reguler',
+    'shipped',
+    '{"name": "Demo Customer", "phone": "081234567890", "street": "Jl. MH Thamrin No. 28, Menteng", "city": "Jakarta Pusat", "postal": "10350", "note": "Kamar 402"}'::jsonb,
+    'demo-snap-token-shipped-02',
+    'gopay',
+    'SS-SICEPAT-1731000002',
+    'sicepat',
+    'SiCepat Ekspres',
+    now() - interval '2 days',
+    now() - interval '1 day',
+    null,
+    null,
+    null,
+    now() - interval '2 days',
+    now() - interval '1 day'
+  ),
+  (
+    'e0000000-0000-0000-0000-000000000003'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    35500000,
+    34000000,
+    0,
+    1500000,
+    'reguler',
+    'paid',
+    '{"name": "Demo Customer", "phone": "081234567890", "street": "Jl. MH Thamrin No. 28, Menteng", "city": "Jakarta Pusat", "postal": "10350"}'::jsonb,
+    'demo-snap-token-paid-03',
+    'qris',
+    null,
+    null,
+    null,
+    now() - interval '6 hours',
+    null,
+    null,
+    null,
+    null,
+    now() - interval '8 hours',
+    now() - interval '6 hours'
+  ),
+  (
+    'e0000000-0000-0000-0000-000000000004'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    113500000,
+    112000000,
+    0,
+    1500000,
+    'reguler',
+    'pending',
+    '{"name": "Demo Customer", "phone": "081234567890", "street": "Jl. MH Thamrin No. 28, Menteng", "city": "Jakarta Pusat", "postal": "10350"}'::jsonb,
+    'demo-snap-token-pending-04',
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    now() - interval '15 minutes',
+    now() - interval '15 minutes'
+  ),
+  (
+    'e0000000-0000-0000-0000-000000000005'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    79500000,
+    78000000,
+    0,
+    1500000,
+    'reguler',
+    'cancelled',
+    '{"name": "Demo Customer", "phone": "081234567890", "street": "Jl. MH Thamrin No. 28, Menteng", "city": "Jakarta Pusat", "postal": "10350"}'::jsonb,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    now() - interval '1 day',
+    'Permintaan pembeli: Ingin mengubah metode pengiriman ekspedisi',
+    now() - interval '2 days',
+    now() - interval '1 day'
+  )
+on conflict (id) do nothing;
+
+-- 7.b Seed Item Barang Pesanan (Order Items)
+insert into public.order_items (id, order_id, product_id, qty, price_cents)
+values
+  -- Item Order 1 (Headphone Studio ANC + Tas Komuter)
+  (
+    'f0000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Headphone Studio ANC' limit 1),
+    1,
+    268000000
+  ),
+  (
+    'f0000000-0000-0000-0000-000000000002'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Tas Komuter EDC Ballistic' limit 1),
+    1,
+    112000000
+  ),
+  -- Item Order 2 (Lampu Meja Task Aluminium)
+  (
+    'f0000000-0000-0000-0000-000000000003'::uuid,
+    'e0000000-0000-0000-0000-000000000002'::uuid,
+    (select id from public.products where name = 'Lampu Meja Task Aluminium' limit 1),
+    1,
+    85000000
+  ),
+  -- Item Order 3 (Pena Gel Presisi Titanium)
+  (
+    'f0000000-0000-0000-0000-000000000004'::uuid,
+    'e0000000-0000-0000-0000-000000000003'::uuid,
+    (select id from public.products where name = 'Pena Gel Presisi Titanium' limit 1),
+    1,
+    34000000
+  ),
+  -- Item Order 4 (Tas Komuter EDC Ballistic)
+  (
+    'f0000000-0000-0000-0000-000000000005'::uuid,
+    'e0000000-0000-0000-0000-000000000004'::uuid,
+    (select id from public.products where name = 'Tas Komuter EDC Ballistic' limit 1),
+    1,
+    112000000
+  ),
+  -- Item Order 5 (Ketel Leher Angsa)
+  (
+    'f0000000-0000-0000-0000-000000000006'::uuid,
+    'e0000000-0000-0000-0000-000000000005'::uuid,
+    (select id from public.products where name = 'Ketel Leher Angsa Matte Black' limit 1),
+    1,
+    78000000
+  )
+on conflict (id) do nothing;
+
+-- 8. Seed Linimasa Checkpoint Ekspedisi (Shipping Checkpoints)
+insert into public.shipping_checkpoints (
+  id,
+  order_id,
+  tracking_number,
+  status,
+  title,
+  description,
+  location,
+  created_at
+) values
+  -- Checkpoint Order 1 (Terkirim / Delivered)
+  (
+    'b0000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    'SS-JNE-1731000001',
+    'manifested',
+    'Pengiriman Dibuat',
+    'Pesanan telah terdaftar di sistem pengiriman JNE Express oleh penjual.',
+    'Jakarta Barat',
+    now() - interval '4 days'
+  ),
+  (
+    'b0000000-0000-0000-0000-000000000002'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    'SS-JNE-1731000001',
+    'in_transit',
+    'Dalam Perjalanan',
+    'Paket sedang dalam perjalanan menuju hub transit logistik Jakarta Pusat.',
+    'Hub Transit Jakarta Pusat',
+    now() - interval '3 days'
+  ),
+  (
+    'b0000000-0000-0000-0000-000000000003'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    'SS-JNE-1731000001',
+    'out_for_delivery',
+    'Kurir Mengantar Paket',
+    'Paket dibawa oleh kurir menuju alamat penerima.',
+    'Jakarta Pusat',
+    now() - interval '2 days' - interval '4 hours'
+  ),
+  (
+    'b0000000-0000-0000-0000-000000000004'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    'SS-JNE-1731000001',
+    'delivered',
+    'Paket Diterima',
+    'Paket telah diterima oleh penerima (Demo Customer) di lobi utama.',
+    'Jakarta Pusat',
+    now() - interval '2 days'
+  ),
+  -- Checkpoint Order 2 (Sedang Dalam Perjalanan / In Transit)
+  (
+    'b0000000-0000-0000-0000-000000000005'::uuid,
+    'e0000000-0000-0000-0000-000000000002'::uuid,
+    'SS-SICEPAT-1731000002',
+    'manifested',
+    'Resi Diterbitkan',
+    'Penjual telah menyiapkan paket dan menerbitkan label resi SiCepat Ekspres.',
+    'Jakarta Barat',
+    now() - interval '1 day' - interval '6 hours'
+  ),
+  (
+    'b0000000-0000-0000-0000-000000000006'::uuid,
+    'e0000000-0000-0000-0000-000000000002'::uuid,
+    'SS-SICEPAT-1731000002',
+    'picked_up',
+    'Paket Diambil Kurir',
+    'Paket telah diserahterimakan kepada kurir penjemput SiCepat.',
+    'Jakarta Barat Drop Point',
+    now() - interval '1 day'
+  ),
+  (
+    'b0000000-0000-0000-0000-000000000007'::uuid,
+    'e0000000-0000-0000-0000-000000000002'::uuid,
+    'SS-SICEPAT-1731000002',
+    'in_transit',
+    'Transit Sortir Wilayah',
+    'Paket sedang diproses di fasilitas sortir utama Jakarta Barat.',
+    'Fasilitas Sortir Jakarta',
+    now() - interval '10 hours'
+  )
+on conflict (id) do nothing;
+
+-- 9. Seed Ulasan Produk Terverifikasi (Product Reviews)
+insert into public.product_reviews (
+  id,
+  product_id,
+  user_id,
+  order_id,
+  rating,
+  review_text,
+  created_at
+) values
+  (
+    'd0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Headphone Studio ANC' limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Kualitas audio headphone sangat luar biasa detail dan fitur active noise cancellation bekerja optimal meredam kebisingan saat fokus bekerja di kafe.',
+    now() - interval '1 day'
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000002'::uuid,
+    (select id from public.products where name = 'Tas Komuter EDC Ballistic' limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Material nilon Cordura sangat tebal, tahan percikan air hujan deras, dan kompartemen laptop 16 inci empuk aman untuk mobilitas harian.',
+    now() - interval '1 day'
+  )
+on conflict (product_id, user_id, order_id) do nothing;
+
+-- 10. Seed Pengajuan Komplain & Garansi Retur Pelanggan (Customer RMA)
+insert into public.return_requests (
+  id,
+  order_id,
+  user_id,
+  reason_type,
+  solution_type,
+  status,
+  customer_notes,
+  proof_image_urls,
+  refund_amount_cents,
+  created_at
+) values
+  (
+    'a0000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'defective',
+    'replacement',
+    'requested',
+    'Bantalan telinga kanan sedikit longgar saat unboxing pertama kali. Mohon bantuan penukaran unit baru.',
+    array['https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=400&q=80'],
+    null,
+    now() - interval '1 day'
+  )
+on conflict (id) do nothing;
+
+-- 11. Seed Percakapan Live Chat Bantuan CS (Support Threads & Messages)
+insert into public.support_threads (
+  id,
+  customer_id,
+  status,
+  last_message_text,
+  last_message_at,
+  unread_by_customer_count,
+  unread_by_admin_count,
+  attached_product_id,
+  created_at,
+  updated_at
+) values
+  (
+    '90000000-0000-0000-0000-000000000001'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'open',
+    'Halo CS ShelfStack, apakah Tas Komuter EDC Ballistic muat laptop 16 inci MacBook Pro?',
+    now() - interval '30 minutes',
+    0,
+    1,
+    (select id from public.products where name = 'Tas Komuter EDC Ballistic' limit 1),
+    now() - interval '2 hours',
+    now() - interval '30 minutes'
+  )
+on conflict (id) do nothing;
+
+insert into public.support_messages (
+  id,
+  thread_id,
+  sender_type,
+  sender_id,
+  message_text,
+  created_at
+) values
+  (
+    '80000000-0000-0000-0000-000000000001'::uuid,
+    '90000000-0000-0000-0000-000000000001'::uuid,
+    'system',
+    null,
+    'Selamat datang di Layanan Pelanggan ShelfStack. Tim representatif kami siap membantu pertanyaan produk dan pesanan Anda.',
+    now() - interval '2 hours'
+  ),
+  (
+    '80000000-0000-0000-0000-000000000002'::uuid,
+    '90000000-0000-0000-0000-000000000001'::uuid,
+    'customer',
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'Halo CS ShelfStack, apakah Tas Komuter EDC Ballistic muat laptop 16 inci MacBook Pro?',
+    now() - interval '30 minutes'
+  )
+on conflict (id) do nothing;
+
+-- 12. Seed Notifikasi Pelanggan In-App (Notifications)
+insert into public.notifications (
+  id,
+  user_id,
+  title,
+  message,
+  type,
+  reference_id,
+  reference_url,
+  is_read,
+  created_at
+) values
+  (
+    '70000000-0000-0000-0000-000000000001'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'Pesanan Telah Dikirim',
+    'Pesanan #E0000002 sedang diantar oleh SiCepat Ekspres dengan nomor resi SS-SICEPAT-1731000002.',
+    'order_shipped',
+    'e0000000-0000-0000-0000-000000000002',
+    '/orders/e0000000-0000-0000-0000-000000000002',
+    false,
+    now() - interval '1 day'
+  ),
+  (
+    '70000000-0000-0000-0000-000000000002'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'Pembayaran Pesanan Dikonfirmasi',
+    'Pembayaran untuk pesanan #E0000003 telah berhasil diverifikasi.',
+    'payment_success',
+    'e0000000-0000-0000-0000-000000000003',
+    '/orders/e0000000-0000-0000-0000-000000000003',
+    true,
+    now() - interval '6 hours'
+  ),
+  (
+    '70000000-0000-0000-0000-000000000003'::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'Selamat Datang di ShelfStack',
+    'Gunakan kode promo WELCOME10 untuk mendapatkan potongan belanja 10% pada transaksi pertama Anda.',
+    'system',
+    null,
+    '/promos',
+    true,
+    now() - interval '5 days'
+  )
+on conflict (id) do nothing;

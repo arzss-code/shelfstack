@@ -74,11 +74,15 @@ const warrantyBadge = computed(() => {
         ref="mainImgEl"
         :src="activeImage"
         :alt="product.name"
+        width="800"
+        height="600"
+        fetchpriority="high"
+        decoding="async"
         class="w-full h-full object-contain mix-blend-multiply transition-all duration-300 group-hover:scale-105"
         @error="imageFailed = true"
       />
       <div v-else class="flex flex-col items-center justify-center text-brand-faint">
-        <i class="pi pi-image text-5xl mb-2" />
+        <i class="pi pi-image text-5xl mb-2" aria-hidden="true" />
         <span class="text-xs font-medium">Gambar Produk Belum Tersedia</span>
       </div>
 
@@ -112,6 +116,10 @@ const warrantyBadge = computed(() => {
         <img
           :src="img"
           :alt="`${product.name} thumbnail ${idx + 1}`"
+          width="64"
+          height="64"
+          loading="lazy"
+          decoding="async"
           class="w-full h-full object-contain mix-blend-multiply"
         />
       </button>
