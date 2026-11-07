@@ -12,14 +12,14 @@ describe('AuthDemoCredentialsBanner Component', () => {
     expect(wrapper.text()).toContain('Etalase & Checkout')
     expect(wrapper.text()).toContain('Admin Ops')
     expect(wrapper.text()).toContain('Pesanan, Stok & CS')
-    expect(wrapper.text()).toContain('customer@')
-    expect(wrapper.text()).toContain('admin@')
+    expect(wrapper.text()).toContain('demo-customer@')
+    expect(wrapper.text()).toContain('demo-admin@')
   })
 
   it('emits selectDemo with customer credentials and shows active visual state', async () => {
     const wrapper = mount(AuthDemoCredentialsBanner)
 
-    const customerBtn = wrapper.find('button[aria-label*="customer@shelfstack.local"]')
+    const customerBtn = wrapper.find('button[aria-label*="demo-customer@shelfstack.local"]')
     expect(customerBtn.exists()).toBe(true)
 
     await customerBtn.trigger('click')
@@ -27,7 +27,7 @@ describe('AuthDemoCredentialsBanner Component', () => {
     expect(wrapper.emitted('selectDemo')).toHaveLength(1)
     expect(wrapper.emitted('selectDemo')?.[0]).toEqual([
       {
-        email: 'customer@shelfstack.local',
+        email: 'demo-customer@shelfstack.local',
         role: 'customer',
       },
     ])
@@ -37,7 +37,7 @@ describe('AuthDemoCredentialsBanner Component', () => {
   it('emits selectDemo with admin credentials and shows active visual state', async () => {
     const wrapper = mount(AuthDemoCredentialsBanner)
 
-    const adminBtn = wrapper.find('button[aria-label*="admin@shelfstack.local"]')
+    const adminBtn = wrapper.find('button[aria-label*="demo-admin@shelfstack.local"]')
     expect(adminBtn.exists()).toBe(true)
 
     await adminBtn.trigger('click')
@@ -45,7 +45,7 @@ describe('AuthDemoCredentialsBanner Component', () => {
     expect(wrapper.emitted('selectDemo')).toHaveLength(1)
     expect(wrapper.emitted('selectDemo')?.[0]).toEqual([
       {
-        email: 'admin@shelfstack.local',
+        email: 'demo-admin@shelfstack.local',
         role: 'admin',
       },
     ])

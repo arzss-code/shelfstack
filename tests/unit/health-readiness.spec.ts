@@ -62,6 +62,8 @@ describe('Multi-Service Health, Readiness & Seed Ecosystem Suite', () => {
     const seedSql = readFileSync(SEED_PATH, 'utf8')
 
     it('contains canonical demo accounts with password hash', () => {
+      expect(seedSql).toContain('demo-customer@shelfstack.local')
+      expect(seedSql).toContain('demo-admin@shelfstack.local')
       expect(seedSql).toContain('customer@shelfstack.local')
       expect(seedSql).toContain('admin@shelfstack.local')
       expect(seedSql).toContain("crypt('Password123!', gen_salt('bf'))")

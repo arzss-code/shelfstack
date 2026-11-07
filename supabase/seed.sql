@@ -2,6 +2,11 @@
 -- Dipakai via: supabase db reset --local (atau run manual di dashboard SQL Editor)
 -- Skema: categories, products (dengan category_id, stock, price, image_url)
 
+-- 0. Konfigurasi Lingkungan & Ekstensi Kriptografi
+create extension if not exists pgcrypto with schema extensions;
+create extension if not exists "uuid-ossp" with schema extensions;
+set search_path = public, extensions, auth;
+
 -- 1. Seed 5 Kategori Kanonik
 insert into public.categories (name, slug, description, image_url, display_order) values
   ('Tech & Gadget', 'tech', 'Audio resolusi tinggi, perangkat pintar nirkabel, keyboard mekanikal, dan adaptor daya presisi.', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCmvA8rTc663X0aMY0i5AsRtnJWHHEMBE15l26ff2OBzeQ4YDMUc2bIfeMkM1wTrGpE8S1YpwKD1VFVOTPX83GWEoIoe_Wa5MeCsuOmxDtwLGsMeIlQpoOx_MrCo-cewC9QSL9DbpyFqpGe5CRkiClgbq2Ky9rCJ0x0lVhK8dgvYyfzRf9uFB-43LAqvdnR3zkN9hNg27b6fzEk8dmLSQTX2fxG3PRKyc-Ag1IX7VVNaYXvISjMYLi4', 1),
@@ -15,8 +20,29 @@ on conflict (slug) do update set
   image_url = excluded.image_url,
   display_order = excluded.display_order;
 
--- 2. Seed Produk Kurasi ShelfStack
-insert into public.products (name, price, stock, description, image_url, category_id) values
+-- 2.a Pembersihan Duplikasi Produk dari Eksekusi Seeder Sebelumnya
+-- Menonaktifkan (soft delete) produk duplikat yang memiliki nama sama (hanya jika belum terikat pesanan)
+with duplicates as (
+  select id,
+         row_number() over (partition by name order by id asc) as rn
+  from public.products
+  where deleted_at is null
+)
+update public.products
+set deleted_at = now()
+where id in (
+  select id from duplicates where rn > 1
+)
+and not exists (
+  select 1 from public.order_items oi where oi.product_id = public.products.id
+);
+
+-- 2.b Seed Produk Kurasi ShelfStack
+-- Idempoten: Hanya insert jika produk aktif dengan nama yang sama belum ada di database
+insert into public.products (name, price, stock, description, image_url, category_id)
+select
+  v.name, v.price, v.stock, v.description, v.image_url, v.category_id
+from (values
   (
     'Headphone Studio ANC',
     2680000,
@@ -57,11 +83,26 @@ insert into public.products (name, price, stock, description, image_url, categor
     'https://lh3.googleusercontent.com/aida-public/AB6AXuCtGtrTCVBPJytnec8yoiKZ2iY9yzFgcAGMVbDl8vffvV6ZEoNZFfgeDAQvYGDQ9PHSAAxfVK2j8hKUAZ8b8VxmoAnLrSjVNR8ihTPjQ6pP4gUAImGZd2tG7Lzf12mjzZ9daMM6X8wl7uLjiCTNo0sgJqsJX1aqeuE6NGKVIOcdjxjMbFEaL7kqquFVa0SMIXQWDpPCysw4-xUBBBhXrgB7_alEgVQ5G1N_PIViWD7Wd3vqGT2JE6cr',
     (select id from public.categories where slug = 'stationery')
   )
-on conflict do nothing;
+) as v(name, price, stock, description, image_url, category_id)
+where not exists (
+  select 1 from public.products p
+  where p.name = v.name and p.deleted_at is null
+);
 
--- 3. Seed Akun Demo Deterministik untuk Pengujian & Local Onboarding
--- PERINGATAN: Akun demo ini HANYA untuk lingkungan lokal / CI testing, DILARANG untuk produksi!
+-- 3. Seed Akun Demo Deterministik untuk Pengujian & Evaluasi Portofolio
+-- PERINGATAN: Akun demo ini HANYA untuk lingkungan pengujian/portofolio lokal & staging.
 -- Password default: Password123!
+
+-- 3.a Bersihkan identitas auth lama untuk akun demo agar provider_id diperbaiki ke UUID valid
+delete from auth.identities
+where user_id in (
+  '00000000-0000-0000-0000-000000000001'::uuid,
+  '00000000-0000-0000-0000-000000000099'::uuid,
+  '00000000-0000-0000-0000-000000000002'::uuid,
+  '00000000-0000-0000-0000-000000000098'::uuid
+);
+
+-- 3.b Insert/Update Akun Pengguna auth.users
 insert into auth.users (
   id,
   instance_id,
@@ -84,7 +125,7 @@ insert into auth.users (
     '00000000-0000-0000-0000-000000000000'::uuid,
     'authenticated',
     'authenticated',
-    'customer@shelfstack.local',
+    'demo-customer@shelfstack.local',
     crypt('Password123!', gen_salt('bf')),
     now(),
     '{"provider": "email", "providers": ["email"]}'::jsonb,
@@ -98,7 +139,7 @@ insert into auth.users (
     '00000000-0000-0000-0000-000000000000'::uuid,
     'authenticated',
     'authenticated',
-    'admin@shelfstack.local',
+    'demo-admin@shelfstack.local',
     crypt('Password123!', gen_salt('bf')),
     now(),
     '{"provider": "email", "providers": ["email"]}'::jsonb,
@@ -106,10 +147,45 @@ insert into auth.users (
     now(),
     now(),
     '', '', '', ''
+  ),
+  (
+    '00000000-0000-0000-0000-000000000002'::uuid,
+    '00000000-0000-0000-0000-000000000000'::uuid,
+    'authenticated',
+    'authenticated',
+    'customer@shelfstack.local',
+    crypt('Password123!', gen_salt('bf')),
+    now(),
+    '{"provider": "email", "providers": ["email"]}'::jsonb,
+    '{"full_name": "Customer (Legacy)"}'::jsonb,
+    now(),
+    now(),
+    '', '', '', ''
+  ),
+  (
+    '00000000-0000-0000-0000-000000000098'::uuid,
+    '00000000-0000-0000-0000-000000000000'::uuid,
+    'authenticated',
+    'authenticated',
+    'admin@shelfstack.local',
+    crypt('Password123!', gen_salt('bf')),
+    now(),
+    '{"provider": "email", "providers": ["email"]}'::jsonb,
+    '{"full_name": "Admin (Legacy)", "role": "admin"}'::jsonb,
+    now(),
+    now(),
+    '', '', '', ''
   )
-on conflict (id) do nothing;
+on conflict (id) do update set
+  email = excluded.email,
+  encrypted_password = excluded.encrypted_password,
+  email_confirmed_at = coalesce(auth.users.email_confirmed_at, now()),
+  raw_app_meta_data = excluded.raw_app_meta_data,
+  raw_user_meta_data = excluded.raw_user_meta_data,
+  updated_at = now();
 
--- 4. Seed Identitas GoTrue (auth.identities) agar signInWithPassword Supabase Auth berfungsi normal
+-- 4. Seed Identitas GoTrue (auth.identities) dengan provider_id UUID yang benar
+-- Catatan teknis: GoTrue mencocokkan provider_id dengan user.id (UUID string) untuk email provider
 insert into auth.identities (
   id,
   user_id,
@@ -123,9 +199,9 @@ insert into auth.identities (
   (
     '00000000-0000-0000-0000-000000000001',
     '00000000-0000-0000-0000-000000000001'::uuid,
-    '{"sub": "00000000-0000-0000-0000-000000000001", "email": "customer@shelfstack.local"}'::jsonb,
+    '{"sub": "00000000-0000-0000-0000-000000000001", "email": "demo-customer@shelfstack.local"}'::jsonb,
     'email',
-    'customer@shelfstack.local',
+    '00000000-0000-0000-0000-000000000001',
     now(),
     now(),
     now()
@@ -133,20 +209,45 @@ insert into auth.identities (
   (
     '00000000-0000-0000-0000-000000000099',
     '00000000-0000-0000-0000-000000000099'::uuid,
-    '{"sub": "00000000-0000-0000-0000-000000000099", "email": "admin@shelfstack.local"}'::jsonb,
+    '{"sub": "00000000-0000-0000-0000-000000000099", "email": "demo-admin@shelfstack.local"}'::jsonb,
     'email',
-    'admin@shelfstack.local',
+    '00000000-0000-0000-0000-000000000099',
+    now(),
+    now(),
+    now()
+  ),
+  (
+    '00000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000002'::uuid,
+    '{"sub": "00000000-0000-0000-0000-000000000002", "email": "customer@shelfstack.local"}'::jsonb,
+    'email',
+    '00000000-0000-0000-0000-000000000002',
+    now(),
+    now(),
+    now()
+  ),
+  (
+    '00000000-0000-0000-0000-000000000098',
+    '00000000-0000-0000-0000-000000000098'::uuid,
+    '{"sub": "00000000-0000-0000-0000-000000000098", "email": "admin@shelfstack.local"}'::jsonb,
+    'email',
+    '00000000-0000-0000-0000-000000000098',
     now(),
     now(),
     now()
   )
-on conflict (id) do nothing;
+on conflict (id) do update set
+  provider_id = excluded.provider_id,
+  identity_data = excluded.identity_data,
+  updated_at = now();
 
--- 5. Pastikan role admin aktif di tabel profiles
+-- 5. Sinkronisasi Data Profil & Role Otorisasi
 insert into public.profiles (user_id, full_name, role)
 values
   ('00000000-0000-0000-0000-000000000001'::uuid, 'Demo Customer', 'customer'),
-  ('00000000-0000-0000-0000-000000000099'::uuid, 'Demo Admin', 'admin')
+  ('00000000-0000-0000-0000-000000000099'::uuid, 'Demo Admin', 'admin'),
+  ('00000000-0000-0000-0000-000000000002'::uuid, 'Customer (Legacy)', 'customer'),
+  ('00000000-0000-0000-0000-000000000098'::uuid, 'Admin (Legacy)', 'admin')
 on conflict (user_id) do update set
   role = excluded.role,
   full_name = excluded.full_name;
@@ -364,14 +465,14 @@ values
   (
     'f0000000-0000-0000-0000-000000000001'::uuid,
     'e0000000-0000-0000-0000-000000000001'::uuid,
-    (select id from public.products where name = 'Headphone Studio ANC' limit 1),
+    (select id from public.products where name = 'Headphone Studio ANC' and deleted_at is null order by id asc limit 1),
     1,
     268000000
   ),
   (
     'f0000000-0000-0000-0000-000000000002'::uuid,
     'e0000000-0000-0000-0000-000000000001'::uuid,
-    (select id from public.products where name = 'Tas Komuter EDC Ballistic' limit 1),
+    (select id from public.products where name = 'Tas Komuter EDC Ballistic' and deleted_at is null order by id asc limit 1),
     1,
     112000000
   ),
@@ -379,7 +480,7 @@ values
   (
     'f0000000-0000-0000-0000-000000000003'::uuid,
     'e0000000-0000-0000-0000-000000000002'::uuid,
-    (select id from public.products where name = 'Lampu Meja Task Aluminium' limit 1),
+    (select id from public.products where name = 'Lampu Meja Task Aluminium' and deleted_at is null order by id asc limit 1),
     1,
     85000000
   ),
@@ -387,7 +488,7 @@ values
   (
     'f0000000-0000-0000-0000-000000000004'::uuid,
     'e0000000-0000-0000-0000-000000000003'::uuid,
-    (select id from public.products where name = 'Pena Gel Presisi Titanium' limit 1),
+    (select id from public.products where name = 'Pena Gel Presisi Titanium' and deleted_at is null order by id asc limit 1),
     1,
     34000000
   ),
@@ -395,7 +496,7 @@ values
   (
     'f0000000-0000-0000-0000-000000000005'::uuid,
     'e0000000-0000-0000-0000-000000000004'::uuid,
-    (select id from public.products where name = 'Tas Komuter EDC Ballistic' limit 1),
+    (select id from public.products where name = 'Tas Komuter EDC Ballistic' and deleted_at is null order by id asc limit 1),
     1,
     112000000
   ),
@@ -403,7 +504,7 @@ values
   (
     'f0000000-0000-0000-0000-000000000006'::uuid,
     'e0000000-0000-0000-0000-000000000005'::uuid,
-    (select id from public.products where name = 'Ketel Leher Angsa Matte Black' limit 1),
+    (select id from public.products where name = 'Ketel Leher Angsa Matte Black' and deleted_at is null order by id asc limit 1),
     1,
     78000000
   )
@@ -506,7 +607,7 @@ insert into public.product_reviews (
 ) values
   (
     'd0000000-0000-0000-0000-000000000001'::uuid,
-    (select id from public.products where name = 'Headphone Studio ANC' limit 1),
+    (select id from public.products where name = 'Headphone Studio ANC' and deleted_at is null order by id asc limit 1),
     '00000000-0000-0000-0000-000000000001'::uuid,
     'e0000000-0000-0000-0000-000000000001'::uuid,
     5,
@@ -515,7 +616,7 @@ insert into public.product_reviews (
   ),
   (
     'd0000000-0000-0000-0000-000000000002'::uuid,
-    (select id from public.products where name = 'Tas Komuter EDC Ballistic' limit 1),
+    (select id from public.products where name = 'Tas Komuter EDC Ballistic' and deleted_at is null order by id asc limit 1),
     '00000000-0000-0000-0000-000000000001'::uuid,
     'e0000000-0000-0000-0000-000000000001'::uuid,
     5,
@@ -572,7 +673,7 @@ insert into public.support_threads (
     now() - interval '30 minutes',
     0,
     1,
-    (select id from public.products where name = 'Tas Komuter EDC Ballistic' limit 1),
+    (select id from public.products where name = 'Tas Komuter EDC Ballistic' and deleted_at is null order by id asc limit 1),
     now() - interval '2 hours',
     now() - interval '30 minutes'
   )
