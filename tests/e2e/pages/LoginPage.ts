@@ -9,6 +9,8 @@ export class LoginPage extends BasePage {
   readonly passwordInput: Locator
   readonly submitButton: Locator
   readonly registerLink: Locator
+  readonly demoCustomerButton: Locator
+  readonly demoAdminButton: Locator
 
   constructor(page: Page) {
     super(page)
@@ -17,6 +19,8 @@ export class LoginPage extends BasePage {
     this.passwordInput = page.locator('input[type="password"]')
     this.submitButton = page.locator('form').getByRole('button', { name: 'Masuk' })
     this.registerLink = page.getByRole('link', { name: /Daftar|buat akun/i })
+    this.demoCustomerButton = page.locator('button[aria-label*="demo-customer@shelfstack.local"]')
+    this.demoAdminButton = page.locator('button[aria-label*="demo-admin@shelfstack.local"]')
   }
 
   async goto(): Promise<void> {
@@ -33,6 +37,14 @@ export class LoginPage extends BasePage {
 
   async submit(): Promise<void> {
     await this.submitButton.click()
+  }
+
+  async selectDemoCustomer(): Promise<void> {
+    await this.demoCustomerButton.click()
+  }
+
+  async selectDemoAdmin(): Promise<void> {
+    await this.demoAdminButton.click()
   }
 
   async login(email: string, password: string): Promise<void> {
@@ -64,11 +76,11 @@ export class LoginPage extends BasePage {
   async loginAsCustomer(
     password = process.env.E2E_CUSTOMER_PASSWORD || 'Password123!',
   ): Promise<void> {
-    await this.login(process.env.E2E_CUSTOMER_EMAIL || 'customer@shelfstack.local', password)
+    await this.login(process.env.E2E_CUSTOMER_EMAIL || 'demo-customer@shelfstack.local', password)
   }
 
   async loginAsAdmin(password = process.env.E2E_ADMIN_PASSWORD || 'Password123!'): Promise<void> {
-    await this.login(process.env.E2E_ADMIN_EMAIL || 'admin@shelfstack.local', password)
+    await this.login(process.env.E2E_ADMIN_EMAIL || 'demo-admin@shelfstack.local', password)
   }
 
   async assertErrorMessageVisible(message: string): Promise<void> {

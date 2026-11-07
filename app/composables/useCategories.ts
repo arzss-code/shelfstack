@@ -124,7 +124,12 @@ export const CATEGORY_KEYWORDS: Record<string, string[]> = {
 }
 
 export function useCategories() {
-  const categories = useState<CategoryItem[]>('shelfstack-categories', () => CANONICAL_CATEGORIES)
+  let categories: Ref<CategoryItem[]>
+  try {
+    categories = useState<CategoryItem[]>('shelfstack-categories', () => CANONICAL_CATEGORIES)
+  } catch {
+    categories = ref<CategoryItem[]>(CANONICAL_CATEGORIES)
+  }
   const pending = ref(false)
 
   const fetchCategories = async () => {
