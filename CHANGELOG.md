@@ -2,6 +2,22 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.33.1] - 2026-11-07
+
+### Rute Kategori Cantik SEO, Sinkronisasi E2E Demo Banner & Dokumentasi Portofolio
+
+- **Rute Cantik Kategori SEO-Friendly (`app/pages/c/[slug].vue` : Backlog C-06)**:
+  - Menghadirkan halaman etalase kategori terkurasi `/c/[slug]` (misalnya `/c/tech`, `/c/home`, `/c/furniture`, `/c/lifestyle`, `/c/stationery`).
+  - Dilengkapi metadata SEO dinamis via `useSeoMeta` (`title`, `description`, `ogTitle`, `ogDescription`, `ogImage`), breadcrumb navigasi terhubung (`Beranda > Katalog > Kategori`), header informasi kategori kurasi resmi, dan integrasi grid `ProductList`.
+  - Penanganan graceful empty state via `UiEmptyState` saat parameter slug tidak dikenal.
+  - Suite pengujian unit otomatis di `tests/unit/category-slug-page.spec.ts` (3/3 test lulus).
+- **Sinkronisasi E2E Playwright dengan Akun Demo (`tests/e2e/pages/LoginPage.ts`, `tests/e2e/auth.spec.ts`)**:
+  - Memperbarui fallback kredensial otomatis pada `LoginPage.ts` ke `demo-customer@shelfstack.local` dan `demo-admin@shelfstack.local`.
+  - Menambahkan pengujian otomasi browser Playwright di `tests/e2e/auth.spec.ts` yang memverifikasi pengisian instan 1-klik `AuthDemoCredentialsBanner` untuk kedua peran akun demo.
+- **Penyelarasan Dokumentasi Portofolio (`README.md`, `docs/BACKLOG.md`, `docs/PROGRESS.md`)**:
+  - Dokumentasi CLI seeder `pnpm db:seed` (`--remote` dan `--local`), tabel hak akses akun demo portofolio, dan endpoint observabilitas `/api/health` & `/api/ready`.
+  - Menandai penyelesaian `C-06` di `docs/BACKLOG.md` dan memperbarui riwayat fase pada `docs/PROGRESS.md`.
+
 ## [0.33.0] - 2026-11-07
 
 ### Kesiapan Peluncuran Produksi, Ekosistem Seeding Penuh, Telemetri Multi-Layanan & Hardening Web Vitals

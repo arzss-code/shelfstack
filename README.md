@@ -22,10 +22,24 @@ flowchart LR
 
 ### Etalase Pelanggan (Storefront)
 
-- **Katalog & Pencarian Sinkron URL**: Filter kategori, rentang harga, penyortiran, badge ketersediaan stok aktual, dan detail produk SEO-friendly (`/katalog`, `/product/[id]`).
+- **Katalog & Pencarian Sinkron URL**: Filter kategori, rute cantik per kategori (`/c/[slug]`), rentang harga, penyortiran, badge ketersediaan stok aktual, dan detail produk SEO-friendly (`/katalog`, `/product/[id]`).
 - **Keranjang, Voucher, Koin Loyalitas & Ongkir**: Keranjang persisten (`Pinia`), klaim voucher/promo (`/promos`), penukaran koin loyalitas (`1 Koin = Rp 1`), dan 4 opsi kurir bertingkat dengan Bebas Ongkir otomatis untuk subtotal `>= Rp 500.000`.
 - **Checkout Atomik & Midtrans Snap**: RPC PostgreSQL `create_order()` mengunci baris produk secara deterministik (`ORDER BY id FOR UPDATE`), memvalidasi harga/kupon/koin di sisi server, dan memproses pembayaran via Midtrans Snap Sandbox.
 - **Pelacakan Realtime, Retur (RMA), Ulasan & Live Chat**: Linimasa status pesanan dan resi kurir (`/orders/[id]`, `/tracking`), pengajuan komplain/retur beserta bukti foto (`/returns`), ulasan terverifikasi pasca pesanan selesai, pusat notifikasi realtime, serta widget Live Chat dua arah dengan tim CS.
+
+### Akun Demo Evaluasi Portofolio (1-Klik di `/auth/login`)
+
+Tersedia pemilih kredensial instan 1-klik di halaman login publik tanpa perlu mengetik manual:
+
+| Peran              | Alamat Email                     | Kata Sandi     | Lingkup Hak Akses                                                                                                                    |
+| :----------------- | :------------------------------- | :------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| **Demo Pelanggan** | `demo-customer@shelfstack.local` | `Password123!` | Etalase publik, keranjang belanja, checkout Snap Midtrans, pelacakan pesanan, riwayat ulasan, wishlist, dan komplain retur           |
+| **Demo Admin Ops** | `demo-admin@shelfstack.local`    | `Password123!` | Panel operasional `/admin`, dashboard KPI, transisi status pesanan, refund, audit log, inventaris & stok, kupon, dan inbox Live Chat |
+
+### Telemetri & Observabilitas Multi-Layanan
+
+- `GET /api/health` : Liveness probe proses Nitro (status service, uptime, timestamp, dan SemVer `version.json`).
+- `GET /api/ready` : Readiness probe multi-layanan (konektivitas Supabase PostgreSQL, Redis cache, dan Fastify `@shelfstack/order-service`).
 
 ### Ruang Kerja Operasional Admin (`/admin`)
 
@@ -57,9 +71,13 @@ flowchart LR
    ```bash
    pnpm install --frozen-lockfile
    ```
-3. Terapkan migrasi dan data awal Supabase lokal (menghasilkan 5 kategori kanonik, produk kurasi, dan akun demo sesuai `supabase/seed.sql`):
+3. Terapkan migrasi dan data awal (menghasilkan 5 kategori kanonik, produk kurasi, voucher, pesanan 5 status, ulasan, komplain retur, dan akun demo sesuai `supabase/seed.sql`):
    ```bash
-   pnpm dlx supabase db reset
+   # Untuk project Supabase Cloud yang terhubung:
+   pnpm db:seed
+
+   # Atau untuk stack lokal Supabase Docker:
+   pnpm db:seed:local
    ```
 4. Jalankan server pengembangan Nuxt:
    ```bash
@@ -76,6 +94,8 @@ flowchart LR
 | Perintah                                            | Deskripsi                                                           |
 | :-------------------------------------------------- | :------------------------------------------------------------------ |
 | `pnpm dev`                                          | Menjalankan server pengembangan Nuxt lokal                          |
+| `pnpm db:seed`                                      | Menjalankan SQL seeder idempoten ke remote database Supabase Cloud  |
+| `pnpm db:seed:local`                                | Menjalankan SQL seeder idempoten ke lokal Supabase Docker           |
 | `pnpm lint`                                         | Pemeriksaan statis ESLint pada aplikasi utama dan server            |
 | `pnpm typecheck`                                    | Pemeriksaan tipe penuh via `nuxi typecheck` (`app` + `server`)      |
 | `pnpm --filter @shelfstack/order-service typecheck` | Pemeriksaan tipe TypeScript pada mikroservis `order-service`        |

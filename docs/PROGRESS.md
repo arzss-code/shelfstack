@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 11 (Production Launch Readiness, Complete Seed Ecosystem & Web Vitals Hardening)**
-- **Versi Rilis:** `v0.33.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-07)
-- **Baseline Quality Gate (2026-11-06, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `@shelfstack/order-service` typecheck EXIT 0 & test 2 file / 25 test lolos 100% · `vitest run` 84 file / 892 test lolos 100% · Docker Compose (`root`, `dev`, `prod`) EXIT 0 · 0 file `.vue` di `app/` melampaui 300 baris (173/173 patuh SOP).
+- **Sprint Aktif:** **Sprint 12 (Category Slug Route C-06, E2E Demo Sync & Portfolio Packaging Finalization)**
+- **Versi Rilis:** `v0.33.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-07)
+- **Baseline Quality Gate (2026-11-07, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `@shelfstack/order-service` typecheck EXIT 0 & test 2 file / 25 test lolos 100% · `vitest run` 87 file / 907 test lolos 100% · Docker Compose (`root`, `dev`, `prod`) EXIT 0 · 0 file `.vue` di `app/` melampaui 300 baris (174/174 patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -159,7 +159,7 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
 - [x] **CI (`/.github/workflows/ci.yml`)**: lint → typecheck (root + order-service) → build → vitest (root + order-service) → validasi docker compose.
 - [x] **E2E Suite Playwright** (`tests/e2e/full-business-journey.spec.ts` + 12 Page Object Models).
 - [x] **Deployment Docker+Nginx** (`Dockerfile`, `deploy/docker-compose.prod.yml`, `deploy/nginx/nginx.conf`).
-- [ ] **Packaging portofolio** (README baru + GIF + diagram + akun demo, draf awal di `docs/archive/PORTFOLIO-PACKAGING-LEGACY.md`).
+- [x] **Packaging portofolio** (README terstruktur, diagram Mermaid, indeks ADR, pnpm db:seed CLI runner, tabel kredensial demo, 1-klik banner di `/auth/login`, dan template Pull Request Gitmore profesional).
 - [ ] **Lighthouse ≥90** perf/a11y (belum diukur — jangan klaim).
 
 ---
@@ -206,6 +206,11 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Telemetri Kesiapan Multi-Layanan (`server/api/ready.get.ts`, `server/api/health.get.ts` : Q-03)**: Endpoint `/api/ready` memeriksa status database PostgreSQL, jembatan internal Fastify `@shelfstack/order-service` via `pingOrderService()`, dan status Redis cache. Endpoint liveness probe `/api/health` melaporkan metadata proses dan semver secara real-time (+8 unit test di `tests/unit/health-readiness.spec.ts`).
     - **Akses Demo 1-Klik (`app/pages/auth/login.vue` : Q-04)**: Menghadirkan komponen `AuthDemoCredentialsBanner.vue` untuk pengisian instan akun Demo Pelanggan dan Demo Admin (+3 unit test di `tests/unit/auth-demo-banner.spec.ts`).
     - **Optimasi Core Web Vitals & Aksesibilitas WCAG 2.1 AA (`Q-05`)**: Dimensi gambar eksplisit dan `fetchpriority="high"` pada citra produk utama `ProductGallery.vue`, `loading="lazy"` pada thumbnail dan kategori `HomeFeaturedCategories.vue`, serta kontainer rasio aspek tetap untuk eliminasi Cumulative Layout Shift (CLS < 0.1).
+
+27. **Rute Kategori Cantik SEO (`/c/[slug]` : C-06), Sinkronisasi E2E Demo Banner & Dokumentasi Portofolio (SELESAI 2026-11-07, v0.33.1).**
+    - **Halaman Kategori Cantik SEO (`app/pages/c/[slug].vue` : C-06)**: Menghadirkan halaman etalase kategori terkurasi `/c/[slug]` (`tech`, `home`, `furniture`, `lifestyle`, `stationery`) dengan `useSeoMeta` dinamis, breadcrumb navigasi terhubung, badge kurasi resmi, grid `ProductList`, dan empty state ramah saat slug tidak terdaftar (+3 unit test di `tests/unit/category-slug-page.spec.ts`).
+    - **Sinkronisasi E2E Playwright dengan Akun Demo (`LoginPage.ts`, `auth.spec.ts`)**: Memperbarui fallback kredensial otomatis pada Page Object Model ke `demo-customer@shelfstack.local` dan `demo-admin@shelfstack.local` serta menambah verifikasi otomasi browser untuk pengisian instan 1-klik banner demo pada `/auth/login`.
+    - **Finalisasi Portofolio & Ekosistem Template GitHub**: Menambahkan suite template GitHub profesional lengkap di `.github/` (default PR, multi-scope PR feature/bugfix/hotfix/refactor/docs, issue templates bug/feature, dan `CONTRIBUTING.md`), serta memperbarui `README.md` dan `docs/BACKLOG.md`.
 
 ---
 

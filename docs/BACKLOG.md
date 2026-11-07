@@ -42,7 +42,7 @@
 | C-03 | Sebagai pembeli, saya buka detail SEO-friendly                                       | Must      | `useSeoMeta` + OG image, breadcrumb, related 4 produk                                                                                                  |
 | C-04 | Sebagai pembeli mobile, katalog tetap enak                                           | Must      | Grid 1 kolom 375px, tidak ada elemen terpotong (lihat tests/e2e/product.spec.ts)                                                                       |
 | C-05 | Sebagai dev, LCP <2.5s                                                               | Should    | `NuxtImg`, lazy, skeleton; ukur Lighthouse mobile                                                                                                      |
-| C-06 | Sebagai pembeli, saya lihat kategori dengan slug cantik                              | Could     | `/c/minuman` alias query, tidak wajib                                                                                                                  |
+| C-06 | Sebagai pembeli, saya lihat kategori dengan slug cantik                              | Could     | ✅ SELESAI (2026-11-07, v0.33.1): Halaman SEO-friendly `/c/[slug]` dengan dynamic `useSeoMeta`, breadcrumb, dan grid produk terfilter                  |
 | C-07 | Sebagai dev, schema Zod produk tunggal (hapus duplikat lokal `ProductForm.vue:6-20`) | Should    | ✅ SELESAI (2026-11-06): `useProductForm.ts` mengimpor `productFormSchema` langsung dari `shared/schemas/product.ts` (batas nama 120 karakter seragam) |
 
 ## EPIC 3 — Cart & Orders (Fase 3)

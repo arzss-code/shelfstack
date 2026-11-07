@@ -66,3 +66,25 @@ test('katalog publik tetap bisa dibaca anon', async ({ request }) => {
   expect(body.status).toBe('success')
   expect(Array.isArray(body.data)).toBe(true)
 })
+
+test('banner demo autofill mengisi kredensial pelanggan dan admin secara instan', async ({
+  page,
+}) => {
+  await page.goto('/auth/login')
+  await waitForHydration(page)
+
+  const customerDemoBtn = page.locator('button[aria-label*="demo-customer@shelfstack.local"]')
+  await expect(customerDemoBtn).toBeVisible()
+  await customerDemoBtn.click()
+
+  await expect(page.getByPlaceholder('nama@email.com')).toHaveValue(
+    'demo-customer@shelfstack.local',
+  )
+  await expect(page.locator('input[type="password"]')).toHaveValue('Password123!')
+
+  const adminDemoBtn = page.locator('button[aria-label*="demo-admin@shelfstack.local"]')
+  await adminDemoBtn.click()
+
+  await expect(page.getByPlaceholder('nama@email.com')).toHaveValue('demo-admin@shelfstack.local')
+  await expect(page.locator('input[type="password"]')).toHaveValue('Password123!')
+})
