@@ -1,36 +1,37 @@
-# Pull Request: Refactor to Feature-Sliced Design
+## Summary
 
-**Judul PR:** `chore: [AA] refactor to feature-sliced design`
+<!-- Explain the core purpose of this PR in 1-3 sentences, followed by a compact Mermaid diagram, file tree, or diff-sketch that makes the architectural change immediately clear. -->
 
----
+```text
+path/to/changed-modules/
+├── module-a.ts       # brief responsibility
+└── module-b.vue      # brief responsibility
+```
 
-## Deskripsi
+## Evidence
 
-Melakukan _refactoring_ pada entitas Produk untuk mematuhi standar _Feature-Sliced Design_ dan arsitektur Nuxt/Vue best practices sesuai `SOP-CODING-REPO.md`.
+- **Before:**
+  <!-- Describe or paste the failing test, broken state, error log, or screenshot before this change -->
+- **After:**
+  <!-- Paste actual executed verification commands and results (lint, typecheck, unit/e2e tests, live API checks, or screenshots) -->
+  - `pnpm lint`: `EXIT 0`
+  - `pnpm typecheck`: `EXIT 0`
+  - `pnpm exec vitest run`: `EXIT 0`
 
-**Perubahan Utama:**
+## Merge Danger
 
-1. **Repository Layer**: Memindahkan logika _query_ Supabase (Fetch, Insert, Update, Delete) dari Pinia Store ke `app/repository/product.ts`.
-2. **Feature Isolation**: Memindahkan komponen UI spesifik produk dari `app/components/` ke `app/features/products/components/`.
-3. **Store Abstraction**: Memodifikasi `app/stores/product.ts` agar hanya mengelola state, sedangkan pengolahan data mendelegasikan tugas ke Repository.
+**Door:** <!-- Two-way (reversible without destructive rollback) or One-way (destructive schema/contract change) -->
 
-## Referensi Tiket
+<!-- Brief explanation of rollback safety, fallback behavior, or migration idempotency -->
 
-_Jira / Trello ID_: (Silakan isi jika ada)
+**Blast Radius:** <!-- Low | Medium | High -->
 
-## Syarat Sah Merge Request (Definition of Done)
+<!-- Modules, database tables, or user flows affected by this merge -->
 
-- [x] **No Merge Conflict**: Branch ini _up-to-date_ dan siap digabung.
-- [ ] **Reviewer Approval**: (Menunggu persetujuan dari Tech Lead / Peer).
-- [x] **API Docs Updated**: Tidak ada perubahan struktur Endpoint/API yang terekspos (N/A).
-- [x] **Self-Tested**: Fungsionalitas UI telah dites secara lokal dan komponen berhasil dimuat dengan susunan direktori yang baru.
+## Definition of Done (Talenavi SOP)
 
-### Bukti Self-Tested (Screenshot)
-
-**1. Halaman Utama (Daftar Produk)**
-_(Komponen berhasil di-load dari folder features, meski saat ini terdapat error RLS dari Supabase lokal)_
-<!-- Silakan drag & drop screenshot halaman utama di sini -->
-
-**2. Modal Form Produk**
-_(Modal Form berhasil dibuka)_
-<!-- Silakan drag & drop screenshot modal form di sini -->
+- [ ] **No Merge Conflict**: Branch is up-to-date with the base branch (`develop` / `main`) and merges cleanly.
+- [ ] **Reviewer Approval**: Ready for Peer Developer / Tech Lead review.
+- [ ] **Self-Tested**: Verified locally with concrete execution evidence and/or UI screenshots.
+- [ ] **API & Schema Docs Updated**: Migrations (`supabase/migrations/`), seed scripts, or API contracts are documented (`N/A` if unchanged).
+- [ ] **Quality Gates Passed**: `pnpm lint`, `pnpm typecheck`, and `pnpm exec vitest run` pass with zero errors.
