@@ -53,18 +53,17 @@ console.log(`📌 Target    : ${targetLabel}`)
 console.log(`📄 SQL File  : supabase/seed.sql (${(stats.size / 1024).toFixed(1)} KB)`)
 console.log('=================================================================\n')
 
-const pnpmBin = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
-const cliArgs = ['dlx', 'supabase', 'db', 'query']
+const cliArgs = ['pnpm', 'dlx', 'supabase', 'db', 'query']
 
 if (isRemote) {
-  cliArgs.push('--remote')
+  cliArgs.push('--remote', '--yes')
 }
 
 cliArgs.push('-f', 'supabase/seed.sql')
 
-const child = spawn(pnpmBin, cliArgs, {
+const child = spawn(cliArgs.join(' '), {
   stdio: 'inherit',
-  shell: process.platform === 'win32',
+  shell: true,
 })
 
 child.on('close', (code) => {
@@ -85,3 +84,4 @@ child.on('close', (code) => {
   }
   process.exit(code ?? 1)
 })
+

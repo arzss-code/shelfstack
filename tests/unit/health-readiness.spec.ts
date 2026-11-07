@@ -61,13 +61,22 @@ describe('Multi-Service Health, Readiness & Seed Ecosystem Suite', () => {
   describe('Database Seed Ecosystem (supabase/seed.sql)', () => {
     const seedSql = readFileSync(SEED_PATH, 'utf8')
 
-    it('contains canonical demo accounts with password hash', () => {
+    it('contains canonical demo accounts with password hash and non-null GoTrue token fields', () => {
       expect(seedSql).toContain('demo-customer@shelfstack.local')
       expect(seedSql).toContain('demo-admin@shelfstack.local')
       expect(seedSql).toContain('customer@shelfstack.local')
       expect(seedSql).toContain('admin@shelfstack.local')
       expect(seedSql).toContain("crypt('Password123!', gen_salt('bf'))")
       expect(seedSql).toContain('"role": "admin"')
+      expect(seedSql).toContain("email_change = coalesce(auth.users.email_change, '')")
+      expect(seedSql).toContain("confirmation_token = coalesce(auth.users.confirmation_token, '')")
+      expect(seedSql).toContain("recovery_token = coalesce(auth.users.recovery_token, '')")
+      expect(seedSql).toContain(
+        "email_change_token_new = coalesce(auth.users.email_change_token_new, '')",
+      )
+      expect(seedSql).toContain(
+        "reauthentication_token = coalesce(auth.users.reauthentication_token, '')",
+      )
     })
 
     it('seeds canonical discount coupons with usage constraints', () => {

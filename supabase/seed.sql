@@ -21,7 +21,8 @@ on conflict (slug) do update set
   display_order = excluded.display_order;
 
 -- 2.a Pembersihan Duplikasi Produk dari Eksekusi Seeder Sebelumnya
--- Menonaktifkan (soft delete) produk duplikat yang memiliki nama sama (hanya jika belum terikat pesanan)
+-- Menonaktifkan (soft delete) produk duplikat yang memiliki nama sama (pertahankan id terkecil yang aktif).
+-- Soft delete menjaga keutuhan foreign key pada riwayat order_items lama.
 with duplicates as (
   select id,
          row_number() over (partition by name order by id asc) as rn
@@ -32,9 +33,6 @@ update public.products
 set deleted_at = now()
 where id in (
   select id from duplicates where rn > 1
-)
-and not exists (
-  select 1 from public.order_items oi where oi.product_id = public.products.id
 );
 
 -- 2.b Seed Produk Kurasi ShelfStack
@@ -103,6 +101,9 @@ where user_id in (
 );
 
 -- 3.b Insert/Update Akun Pengguna auth.users
+-- PENTING: GoTrue mewajibkan kolom bertipe string (confirmation_token, recovery_token, email_change,
+-- email_change_token_new, email_change_token_current, phone_change, phone_change_token, reauthentication_token)
+-- bernilai string kosong ('') dan BUKAN NULL agar sql.Scan Go tidak melempar "Database error querying schema".
 insert into auth.users (
   id,
   instance_id,
@@ -117,8 +118,12 @@ insert into auth.users (
   updated_at,
   confirmation_token,
   recovery_token,
+  email_change,
   email_change_token_new,
-  email_change_token_current
+  email_change_token_current,
+  phone_change,
+  phone_change_token,
+  reauthentication_token
 ) values
   (
     '00000000-0000-0000-0000-000000000001'::uuid,
@@ -129,10 +134,10 @@ insert into auth.users (
     crypt('Password123!', gen_salt('bf')),
     now(),
     '{"provider": "email", "providers": ["email"]}'::jsonb,
-    '{"full_name": "Demo Customer"}'::jsonb,
+    '{"full_name": "Demo Customer", "email_verified": true}'::jsonb,
     now(),
     now(),
-    '', '', '', ''
+    '', '', '', '', '', '', '', ''
   ),
   (
     '00000000-0000-0000-0000-000000000099'::uuid,
@@ -143,10 +148,10 @@ insert into auth.users (
     crypt('Password123!', gen_salt('bf')),
     now(),
     '{"provider": "email", "providers": ["email"]}'::jsonb,
-    '{"full_name": "Demo Admin", "role": "admin"}'::jsonb,
+    '{"full_name": "Demo Admin", "role": "admin", "email_verified": true}'::jsonb,
     now(),
     now(),
-    '', '', '', ''
+    '', '', '', '', '', '', '', ''
   ),
   (
     '00000000-0000-0000-0000-000000000002'::uuid,
@@ -157,10 +162,10 @@ insert into auth.users (
     crypt('Password123!', gen_salt('bf')),
     now(),
     '{"provider": "email", "providers": ["email"]}'::jsonb,
-    '{"full_name": "Customer (Legacy)"}'::jsonb,
+    '{"full_name": "Customer (Legacy)", "email_verified": true}'::jsonb,
     now(),
     now(),
-    '', '', '', ''
+    '', '', '', '', '', '', '', ''
   ),
   (
     '00000000-0000-0000-0000-000000000098'::uuid,
@@ -171,10 +176,10 @@ insert into auth.users (
     crypt('Password123!', gen_salt('bf')),
     now(),
     '{"provider": "email", "providers": ["email"]}'::jsonb,
-    '{"full_name": "Admin (Legacy)", "role": "admin"}'::jsonb,
+    '{"full_name": "Admin (Legacy)", "role": "admin", "email_verified": true}'::jsonb,
     now(),
     now(),
-    '', '', '', ''
+    '', '', '', '', '', '', '', ''
   )
 on conflict (id) do update set
   email = excluded.email,
@@ -182,6 +187,14 @@ on conflict (id) do update set
   email_confirmed_at = coalesce(auth.users.email_confirmed_at, now()),
   raw_app_meta_data = excluded.raw_app_meta_data,
   raw_user_meta_data = excluded.raw_user_meta_data,
+  confirmation_token = coalesce(auth.users.confirmation_token, ''),
+  recovery_token = coalesce(auth.users.recovery_token, ''),
+  email_change = coalesce(auth.users.email_change, ''),
+  email_change_token_new = coalesce(auth.users.email_change_token_new, ''),
+  email_change_token_current = coalesce(auth.users.email_change_token_current, ''),
+  phone_change = coalesce(auth.users.phone_change, ''),
+  phone_change_token = coalesce(auth.users.phone_change_token, ''),
+  reauthentication_token = coalesce(auth.users.reauthentication_token, ''),
   updated_at = now();
 
 -- 4. Seed Identitas GoTrue (auth.identities) dengan provider_id UUID yang benar
@@ -199,7 +212,7 @@ insert into auth.identities (
   (
     '00000000-0000-0000-0000-000000000001',
     '00000000-0000-0000-0000-000000000001'::uuid,
-    '{"sub": "00000000-0000-0000-0000-000000000001", "email": "demo-customer@shelfstack.local"}'::jsonb,
+    '{"sub": "00000000-0000-0000-0000-000000000001", "email": "demo-customer@shelfstack.local", "email_verified": true, "phone_verified": false}'::jsonb,
     'email',
     '00000000-0000-0000-0000-000000000001',
     now(),
@@ -209,7 +222,7 @@ insert into auth.identities (
   (
     '00000000-0000-0000-0000-000000000099',
     '00000000-0000-0000-0000-000000000099'::uuid,
-    '{"sub": "00000000-0000-0000-0000-000000000099", "email": "demo-admin@shelfstack.local"}'::jsonb,
+    '{"sub": "00000000-0000-0000-0000-000000000099", "email": "demo-admin@shelfstack.local", "email_verified": true, "phone_verified": false}'::jsonb,
     'email',
     '00000000-0000-0000-0000-000000000099',
     now(),
@@ -219,7 +232,7 @@ insert into auth.identities (
   (
     '00000000-0000-0000-0000-000000000002',
     '00000000-0000-0000-0000-000000000002'::uuid,
-    '{"sub": "00000000-0000-0000-0000-000000000002", "email": "customer@shelfstack.local"}'::jsonb,
+    '{"sub": "00000000-0000-0000-0000-000000000002", "email": "customer@shelfstack.local", "email_verified": true, "phone_verified": false}'::jsonb,
     'email',
     '00000000-0000-0000-0000-000000000002',
     now(),
@@ -229,7 +242,7 @@ insert into auth.identities (
   (
     '00000000-0000-0000-0000-000000000098',
     '00000000-0000-0000-0000-000000000098'::uuid,
-    '{"sub": "00000000-0000-0000-0000-000000000098", "email": "admin@shelfstack.local"}'::jsonb,
+    '{"sub": "00000000-0000-0000-0000-000000000098", "email": "admin@shelfstack.local", "email_verified": true, "phone_verified": false}'::jsonb,
     'email',
     '00000000-0000-0000-0000-000000000098',
     now(),
