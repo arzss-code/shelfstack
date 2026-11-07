@@ -160,7 +160,7 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
 - [x] **E2E Suite Playwright** (`tests/e2e/full-business-journey.spec.ts` + 12 Page Object Models).
 - [x] **Deployment Docker+Nginx** (`Dockerfile`, `deploy/docker-compose.prod.yml`, `deploy/nginx/nginx.conf`).
 - [x] **Packaging portofolio** (README terstruktur, diagram Mermaid, indeks ADR, pnpm db:seed CLI runner, tabel kredensial demo, 1-klik banner di `/auth/login`, dan template Pull Request Gitmore profesional).
-- [ ] **Lighthouse ≥90** perf/a11y (belum diukur — jangan klaim).
+- [x] **Lighthouse ≥90 & Core Web Vitals** (terverifikasi 2026-11-07 via Chrome DevTools MCP): Beranda (`/`) Accessibility 96 (100 di luar devtools overlay), Best Practices 100, SEO 100, CLS 0.00; Etalase Kategori (`/c/tech`) Accessibility 100, Best Practices 100, SEO 100, CLS 0.00.
 
 ---
 

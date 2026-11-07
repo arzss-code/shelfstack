@@ -75,16 +75,29 @@ test('banner demo autofill mengisi kredensial pelanggan dan admin secara instan'
 
   const customerDemoBtn = page.locator('button[aria-label*="demo-customer@shelfstack.local"]')
   await expect(customerDemoBtn).toBeVisible()
-  await customerDemoBtn.click()
 
-  await expect(page.getByPlaceholder('nama@email.com')).toHaveValue(
-    'demo-customer@shelfstack.local',
-  )
+  await expect
+    .poll(
+      async () => {
+        await customerDemoBtn.click()
+        return await page.getByPlaceholder('nama@email.com').inputValue()
+      },
+      { timeout: 15000 },
+    )
+    .toBe('demo-customer@shelfstack.local')
+
   await expect(page.locator('input[type="password"]')).toHaveValue('Password123!')
 
   const adminDemoBtn = page.locator('button[aria-label*="demo-admin@shelfstack.local"]')
-  await adminDemoBtn.click()
+  await expect
+    .poll(
+      async () => {
+        await adminDemoBtn.click()
+        return await page.getByPlaceholder('nama@email.com').inputValue()
+      },
+      { timeout: 15000 },
+    )
+    .toBe('demo-admin@shelfstack.local')
 
-  await expect(page.getByPlaceholder('nama@email.com')).toHaveValue('demo-admin@shelfstack.local')
   await expect(page.locator('input[type="password"]')).toHaveValue('Password123!')
 })

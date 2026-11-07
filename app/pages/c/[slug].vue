@@ -141,6 +141,7 @@ const totalProducts = computed(() => catalogResponse.value?.total ?? products.va
 
       <!-- Grid Daftar Produk -->
       <section aria-label="Daftar Produk Kategori" class="space-y-4">
+        <h2 class="sr-only">Katalog Produk {{ currentCategory.name }}</h2>
         <ProductList :products="products" :loading="pending" density="spacious" hide-actions />
       </section>
     </template>

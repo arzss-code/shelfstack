@@ -40,7 +40,7 @@ const {
       class="flex flex-col lg:flex-row lg:items-center justify-between pb-8 gap-4 border-b border-white/10"
     >
       <div>
-        <div class="flex items-center gap-2 mb-1.5 text-brand-accent">
+        <div class="flex items-center gap-2 mb-1.5 text-blue-400">
           <i class="pi pi-bolt text-base" aria-hidden="true" />
           <span class="text-xs font-bold tracking-wide uppercase">Penawaran Pilihan Toko</span>
         </div>
@@ -190,12 +190,12 @@ const {
             <span v-else class="text-rose-600 font-medium">Stok Habis</span>
           </div>
 
-          <h4
+          <h3
             class="font-display text-sm font-bold text-brand-ink m-0 line-clamp-1"
             :title="product.name"
           >
             {{ product.name }}
-          </h4>
+          </h3>
           <div class="flex items-baseline gap-2 mt-1.5">
             <span
               data-testid="deal-price"

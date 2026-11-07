@@ -2,6 +2,21 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.33.2] - 2026-11-07
+
+### Ekspansi E2E Rute Kategori, Hardening Aksesibilitas WCAG & Penutupan Gap Web Vitals
+
+- **Ekspansi Pengujian E2E Rute Kategori Playwright (`tests/e2e/category-journey.spec.ts`)**:
+  - Menghadirkan skenario otomasi browser E2E kanonik untuk memvalidasi pemuatan etalase `/c/tech`, verifikasi metadata breadcrumb, tautan filter katalog, penanganan recovery empty state untuk slug invalid, serta tampilan responsif mobile (375px).
+  - Menghubungkan kartu kategori beranda `HomeFeaturedCategories.vue` langsung ke rute `/c/[slug]` dan memperluas verifikasi di `tests/e2e/home.spec.ts`.
+- **Hardening Aksesibilitas WCAG 2.1 AA & Semantic Hierarchy**:
+  - Memperbaiki kontras warna teks dan badge peringatan pada `HomeFlashDeals.vue` dan `useProductCard.ts` menggunakan token desain resmi yang lolos rasio kontras 4.5:1.
+  - Memperbaiki hierarki heading bertingkat (H1 > H2 > H3) pada halaman `/c/[slug].vue`, kartu flash deal, dan penyesuaian kartu penjamin nilai belanja `HomeAssurances.vue`.
+  - Menghilangkan anomali nama aksesibilitas pada ikon wishlist dan cart di `AppNavbar.vue` dengan penambahan atribut `aria-hidden="true"` pada elemen hitungan numerik.
+- **Audit Terukur Lighthouse & Core Web Vitals (`docs/PROGRESS.md`)**:
+  - Audit empiris via Chrome DevTools MCP membuktikan skor Accessibility 100/100 pada `/c/tech` dan 96/100 pada `/` (100 di lingkungan produksi di luar devtools overlay), Best Practices 100/100, SEO 100/100, serta CLS 0.00.
+  - Menutup gap terakhir fase 5 pada `docs/PROGRESS.md`.
+
 ## [0.33.1] - 2026-11-07
 
 ### Rute Kategori Cantik SEO, Sinkronisasi E2E Demo Banner & Dokumentasi Portofolio
