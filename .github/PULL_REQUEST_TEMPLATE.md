@@ -1,37 +1,59 @@
-## Summary
+## Description
 
-<!-- Explain the core purpose of this PR in 1-3 sentences, followed by a compact Mermaid diagram, file tree, or diff-sketch that makes the architectural change immediately clear. -->
+<!-- Provide a clear summary of what this PR does and why it is needed. -->
 
-```text
-path/to/changed-modules/
-├── module-a.ts       # brief responsibility
-└── module-b.vue      # brief responsibility
-```
+## Type of Change
 
-## Evidence
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] Refactoring (no functional changes)
+- [ ] Database / Seed / Migration update
+- [ ] Performance / Core Web Vitals improvement
+- [ ] Documentation / CI / Tooling update
 
-- **Before:**
-  <!-- Describe or paste the failing test, broken state, error log, or screenshot before this change -->
-- **After:**
-  <!-- Paste actual executed verification commands and results (lint, typecheck, unit/e2e tests, live API checks, or screenshots) -->
-  - `pnpm lint`: `EXIT 0`
-  - `pnpm typecheck`: `EXIT 0`
-  - `pnpm exec vitest run`: `EXIT 0`
+## Changes Made
 
-## Merge Danger
+<!-- List the specific technical changes introduced in this PR. -->
 
-**Door:** <!-- Two-way (reversible without destructive rollback) or One-way (destructive schema/contract change) -->
+-
+-
 
-<!-- Brief explanation of rollback safety, fallback behavior, or migration idempotency -->
+### Key Files Changed
 
-**Blast Radius:** <!-- Low | Medium | High -->
+| File | Change |
+| :--- | :----- |
+| ``   |        |
 
-<!-- Modules, database tables, or user flows affected by this merge -->
+## API & Database Changes
 
-## Definition of Done (Talenavi SOP)
+- [ ] No API or database changes
+- [ ] Database migration / seed updated (`supabase/`)
+- [ ] API endpoints added or modified (`server/api/`)
 
-- [ ] **No Merge Conflict**: Branch is up-to-date with the base branch (`develop` / `main`) and merges cleanly.
-- [ ] **Reviewer Approval**: Ready for Peer Developer / Tech Lead review.
-- [ ] **Self-Tested**: Verified locally with concrete execution evidence and/or UI screenshots.
-- [ ] **API & Schema Docs Updated**: Migrations (`supabase/migrations/`), seed scripts, or API contracts are documented (`N/A` if unchanged).
-- [ ] **Quality Gates Passed**: `pnpm lint`, `pnpm typecheck`, and `pnpm exec vitest run` pass with zero errors.
+## How to Test
+
+<!-- Step-by-step instructions for reviewers to verify this works locally. -->
+
+1.
+2.
+3.
+
+### Verification Output
+
+- `pnpm lint`: `EXIT 0`
+- `pnpm typecheck`: `EXIT 0`
+- `pnpm exec vitest run`: `EXIT 0`
+
+## Checklist
+
+- [ ] Code follows the project's style and architectural guidelines
+- [ ] Self-reviewed the code for edge cases and potential regressions
+- [ ] Added or updated unit/integration tests where applicable
+- [ ] All existing and new tests pass locally
+- [ ] Updated documentation (`CHANGELOG.md`, `README.md`, or `docs/`) if needed
+- [ ] No new linter warnings, type errors, or console errors introduced
+- [ ] Backwards compatible (or rollback/migration plan documented)
+
+## Related Issues / PRs
+
+<!-- Link related tickets, issues, or PRs. Use "Closes #123" or "Fixes #456" to auto-close. -->
