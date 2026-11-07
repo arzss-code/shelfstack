@@ -213,3 +213,22 @@ export async function retryOrderExpiryDlqJob(
     }
   }
 }
+
+/**
+ * Pings @shelfstack/order-service /health endpoint for readiness probes.
+ */
+export async function pingOrderService(
+  _requestId?: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<boolean> {
+  const { baseUrl } = resolveOrderServiceConfig()
+  try {
+    const res = await fetchImpl(`${baseUrl}/health`, {
+      method: 'GET',
+      signal: AbortSignal.timeout(2_000),
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}

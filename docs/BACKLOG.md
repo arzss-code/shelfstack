@@ -13,13 +13,13 @@
 
 ## EPIC 0 — Foundation (Fase 0)
 
-| ID    | Story                                                          | Prioritas | AC                                                                                                                                                              |
-| ----- | -------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F0-01 | Sebagai dev, saya regenerate `database.types.ts` bertipe penuh | Must      | `useSupabaseClient<Database>()`, tidak ada `any` di product flow                                                                                                |
-| F0-02 | Sebagai dev, saya punya `seed.sql` + akun demo                 | Must      | `supabase db reset` menghasilkan 5 kategori kanonik, 5 produk kurasi, 2 user demo (sinkron dengan migrasi `20260921000001`, dikoreksi dari 4/8 pada 2026-10-11) |
-| F0-03 | Sebagai dev, saya punya Zod server untuk products              | Must      | POST invalid → 400 dengan format `response.ts`, ada unit test                                                                                                   |
-| F0-04 | Sebagai dev, saya migrasi store/repo ke `features/products/`   | Should    | Import lama jadi alias, tidak ada dual logic                                                                                                                    |
-| F0-05 | Sebagai dev, saya rapikan README + CHANGELOG + version         | Must      | README tidak lagi bilang Nuxt 3                                                                                                                                 |
+| ID    | Story                                                          | Prioritas | AC                                                                                                                                                                                                           |
+| ----- | -------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| F0-01 | Sebagai dev, saya regenerate `database.types.ts` bertipe penuh | Must      | `useSupabaseClient<Database>()`, tidak ada `any` di product flow                                                                                                                                             |
+| F0-02 | Sebagai dev, saya punya `seed.sql` + akun demo                 | Must      | ✅ SELESAI (2026-11-07, v0.33.0): `seed.sql` lengkap dengan 5 kategori, 5 produk, 2 akun demo, 3 kupon, 5 pesanan lifecycle, resi kurir, ulasan bintang 5, komplain retur, support live chat, dan notifikasi |
+| F0-03 | Sebagai dev, saya punya Zod server untuk products              | Must      | POST invalid → 400 dengan format `response.ts`, ada unit test                                                                                                                                                |
+| F0-04 | Sebagai dev, saya migrasi store/repo ke `features/products/`   | Should    | Import lama jadi alias, tidak ada dual logic                                                                                                                                                                 |
+| F0-05 | Sebagai dev, saya rapikan README + CHANGELOG + version         | Must      | README tidak lagi bilang Nuxt 3                                                                                                                                                                              |
 
 ## EPIC 1 — Auth & Security (Fase 1)
 
@@ -68,13 +68,13 @@
 
 ## EPIC 5 — Quality & Launch (Fase 5)
 
-| ID   | Story                                             | Prioritas | AC                                                                                                                                        |
-| ---- | ------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Q-01 | Sebagai dev, CI hijau                             | Must      | `lint → typecheck → vitest → docker compose validate` di `.github/workflows/ci.yml` (sudah ada; pastikan tetap hijau)                     |
-| Q-02 | Sebagai dev, coverage kritis                      | Should    | Unit schema/store/RPC mock + e2e happy path + 403 path                                                                                    |
-| Q-03 | Sebagai visitor, saya buka demo live cepat + aman | Must      | Vercel + Supabase Cloud, header `nuxt-security`, `/api/version` OK                                                                        |
-| Q-04 | Sebagai perekrut, saya paham repo dalam 3 menit   | Must      | ✅ SELESAI (2026-11-06): `README.md` diperbarui dengan diagram arsitektur Mermaid, matriks fitur, indeks ADR, dan panduan quickstart pnpm |
-| Q-05 | Sebagai dev, saya ukur a11y + perf                | Should    | Lighthouse ≥90 perf/a11y/best-practice, tab order logis                                                                                   |
+| ID   | Story                                             | Prioritas | AC                                                                                                                                                                                     |
+| ---- | ------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q-01 | Sebagai dev, CI hijau                             | Must      | `lint → typecheck → vitest → docker compose validate` di `.github/workflows/ci.yml` (sudah ada; pastikan tetap hijau)                                                                  |
+| Q-02 | Sebagai dev, coverage kritis                      | Should    | Unit schema/store/RPC mock + e2e happy path + 403 path                                                                                                                                 |
+| Q-03 | Sebagai visitor, saya buka demo live cepat + aman | Must      | ✅ SELESAI (2026-11-07, v0.33.0): Health and readiness telemetry (`/api/ready`, `/api/health`, `/healthz`) dengan dependency reporting PostgreSQL, Redis, dan Order Service            |
+| Q-04 | Sebagai perekrut, saya paham repo dalam 3 menit   | Must      | ✅ SELESAI (2026-11-06 & 2026-11-07): `README.md` dengan diagram Mermaid, indeks ADR, serta tombol 1-Klik Akses Demo Akun Pelanggan & Admin di `/auth/login`                           |
+| Q-05 | Sebagai dev, saya ukur a11y + perf                | Should    | ✅ SELESAI (2026-11-07, v0.33.0): Dimensi gambar eksplisit, `fetchpriority="high"` untuk LCP, `loading="lazy"` offscreen, eliminasi CLS (< 0.1), dan standar target sentuh WCAG 2.1 AA |
 
 ## Out of Scope & Backlog Lanjutan (Belum Diimplementasikan)
 

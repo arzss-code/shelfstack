@@ -127,7 +127,10 @@ const displayCategories = computed(() => {
           </div>
           <div class="flex items-center gap-2 text-xs font-bold text-brand-ink pt-6">
             <span>{{ cat.cta }}</span>
-            <i class="pi pi-arrow-right text-xs group-hover:translate-x-1 transition-transform" />
+            <i
+              class="pi pi-arrow-right text-xs group-hover:translate-x-1 transition-transform"
+              aria-hidden="true"
+            />
           </div>
         </div>
         <div
@@ -140,6 +143,9 @@ const displayCategories = computed(() => {
           <img
             :src="cat.image"
             :alt="cat.name"
+            width="600"
+            height="400"
+            decoding="async"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             loading="lazy"
           />

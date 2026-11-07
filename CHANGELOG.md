@@ -2,6 +2,28 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.33.0] - 2026-11-07
+
+### Kesiapan Peluncuran Produksi, Ekosistem Seeding Penuh, Telemetri Multi-Layanan & Hardening Web Vitals
+
+- **Ekosistem Seeding Database Deterministik Penuh (`supabase/seed.sql` : Backlog F0-02)**:
+  - Master Kupon Aktif: Menambahkan kupon `WELCOME10` (10% maks Rp 50k), `SHELF50K` (flat Rp 50k min Rp 300k), dan `FREESHIP` (bebas ongkir Rp 15k).
+  - Riwayat Pesanan 5 Status Lifecycle: Menambahkan dataset pesanan pelanggan di seluruh status (`completed`, `shipped`, `paid`, `pending`, `cancelled`) beserta rincian item, kalkulasi ongkir, dan alamat pengiriman kanonis.
+  - Linimasa Checkpoint Ekspedisi Kurir: Menambahkan riwayat pelacakan kurir terpadu (JNE dan SiCepat) dari manifested, in_transit, hingga delivered.
+  - Ulasan Produk Terverifikasi & Komplain Retur: Menambahkan ulasan pelanggan bintang 5 pada Headphone Studio ANC dan Tas Komuter EDC Ballistic, serta 1 tiket garansi retur aktif (`requested`) di `/admin/returns`.
+  - Percakapan Live Chat CS & Notifikasi In-App: Menambahkan thread pesan interaktif pelanggan-admin di `/admin/support` dan notifikasi in-app pada `/notifications`.
+- **Telemetri Kesiapan Sistem Multi-Layanan (`server/api/ready.get.ts`, `server/api/health.get.ts` : Backlog Q-03)**:
+  - Endpoint `/api/ready` kini memverifikasi 3 dependensi terdistribusi secara asinkron: database PostgreSQL via Supabase, jembatan internal `@shelfstack/order-service` via `pingOrderService()`, serta status Redis cache.
+  - Endpoint `/api/health` menyediakan probe liveness yang melaporkan status proses, uptime, versi semver, versi Node.js, dan lingkungan eksekusi.
+  - Suite pengujian otomatis komprehensif di `tests/unit/health-readiness.spec.ts` (8/8 test lulus).
+- **Akses Demo 1-Klik untuk Evaluasi Portofolio (`app/pages/auth/login.vue` : Backlog Q-04)**:
+  - Komponen baru `app/components/auth/AuthDemoCredentialsBanner.vue` menghadirkan tombol pemilihan akun cepat untuk Demo Pelanggan (`customer@shelfstack.local`) dan Demo Admin (`admin@shelfstack.local`).
+  - Suite pengujian otomatis di `tests/unit/auth-demo-banner.spec.ts` (3/3 test lulus).
+- **Hardening Core Web Vitals & Aksesibilitas WCAG 2.1 AA (`Backlog Q-05`)**:
+  - `ProductGallery.vue`: Menambahkan `width="800" height="600" fetchpriority="high" decoding="async"` pada gambar LCP utama halaman produk dan `width="64" height="64" loading="lazy" decoding="async"` pada thumbnail sudut foto.
+  - `HomeFeaturedCategories.vue`: Menambahkan `width="600" height="400" decoding="async"` pada banner kategori serta atribut `aria-hidden="true"` pada ikon dekoratif.
+  - `ProductCard.vue` & `HomeFlashDeals.vue`: Menjamin kontainer rasio aspek tetap (`aspect-square`) untuk mencegah pergeseran tata letak (CLS < 0.1).
+
 ## [0.32.0] - 2026-11-06
 
 ### Paritas Transaksional Pembatalan Pesanan, Worker BullMQ + DLQ & Standar Web Modern

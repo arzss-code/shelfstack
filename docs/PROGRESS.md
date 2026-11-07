@@ -6,8 +6,8 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 10 (Order Cancellation Transactional Parity, BullMQ + DLQ Worker & Web Best Practices)**
-- **Versi Rilis:** `v0.32.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-06)
+- **Sprint Aktif:** **Sprint 11 (Production Launch Readiness, Complete Seed Ecosystem & Web Vitals Hardening)**
+- **Versi Rilis:** `v0.33.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-07)
 - **Baseline Quality Gate (2026-11-06, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `@shelfstack/order-service` typecheck EXIT 0 & test 2 file / 25 test lolos 100% · `vitest run` 84 file / 892 test lolos 100% · Docker Compose (`root`, `dev`, `prod`) EXIT 0 · 0 file `.vue` di `app/` melampaui 300 baris (173/173 patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
@@ -200,6 +200,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Infrastruktur Antrean BullMQ + Dead Letter Queue (`services/order-service/`)**: Mengintegrasikan `bullmq` dengan antrean utama `order-expiry` (delayed job per pesanan `expire-order-<uuid>`, rekonsiliasi berkala 5 menit via `upsertJobScheduler`, exponential backoff 3 percobaan) dan Dead Letter Queue `order-expiry-dlq`, endpoint internal terproteksi `x-internal-secret` (`POST /schedule-expiry`, `GET /queue-stats`, `GET /dlq`, `POST /dlq/:jobId/retry`), blokir akses publik di `deploy/nginx/nginx.conf`, jembatan fail-open di Nitro (`server/utils/order-service.ts`), serta kartu pemantauan operasional `AdminExpiryQueueCard.vue` di `/admin/orders`.
     - **Unifikasi Skema Produk (`Backlog C-07`) & Dokumentasi Portofolio (`Backlog Q-04`)**: Mengekspor `productFormSchema` tunggal dari `shared/schemas/product.ts` untuk `useProductForm.ts` dan memperbarui `README.md` dengan diagram arsitektur Mermaid serta indeks ADR.
     - **Standar Web Modern, Aksesibilitas & Performa**: Pemuatan font `DM Sans` via `<link rel="preconnect">` di `nuxt.config.ts` (menghapus `@import` CSS dan font `Inter` tak terpakai), `htmlAttrs: { lang: 'id' }`, _skip link_ keyboard ke `<main>`, `100dvh` layout shell, `fetchpriority="high"` khusus citra utama LCP `HomeHero.vue`, elemen semantik `<search>` pada navbar, `aria-labelledby` + `overscroll-contain` pada `UiModal.vue`, penonaktifan `spellcheck`/`autocorrect` otomatis untuk field identifier pada `UiInput.vue`, serta penghilangan aturan global `animation-duration: 0.01ms !important` demi `@media (prefers-reduced-motion: reduce)` yang terarah.
+
+26. **Kesiapan Peluncuran Produksi, Ekosistem Seeding Penuh, Telemetri Multi-Layanan & Hardening Web Vitals (SELESAI 2026-11-07, v0.33.0).**
+    - **Ekosistem Seeding Database Penuh (`supabase/seed.sql` : F0-02)**: Menambahkan master kupon promo diskon (`WELCOME10`, `SHELF50K`, `FREESHIP`), riwayat pesanan 5 status lifecycle lengkap (`completed`, `shipped`, `paid`, `pending`, `cancelled`) beserta item barang, checkpoint kurir pelacakan logistik (JNE dan SiCepat), ulasan bintang 5 terverifikasi pada produk utama, 1 tiket komplain retur aktif di `/admin/returns`, percakapan customer support live chat di `/admin/support`, dan notifikasi pelanggan in-app.
+    - **Telemetri Kesiapan Multi-Layanan (`server/api/ready.get.ts`, `server/api/health.get.ts` : Q-03)**: Endpoint `/api/ready` memeriksa status database PostgreSQL, jembatan internal Fastify `@shelfstack/order-service` via `pingOrderService()`, dan status Redis cache. Endpoint liveness probe `/api/health` melaporkan metadata proses dan semver secara real-time (+8 unit test di `tests/unit/health-readiness.spec.ts`).
+    - **Akses Demo 1-Klik (`app/pages/auth/login.vue` : Q-04)**: Menghadirkan komponen `AuthDemoCredentialsBanner.vue` untuk pengisian instan akun Demo Pelanggan dan Demo Admin (+3 unit test di `tests/unit/auth-demo-banner.spec.ts`).
+    - **Optimasi Core Web Vitals & Aksesibilitas WCAG 2.1 AA (`Q-05`)**: Dimensi gambar eksplisit dan `fetchpriority="high"` pada citra produk utama `ProductGallery.vue`, `loading="lazy"` pada thumbnail dan kategori `HomeFeaturedCategories.vue`, serta kontainer rasio aspek tetap untuk eliminasi Cumulative Layout Shift (CLS < 0.1).
 
 ---
 

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { loginSchema } from '~~/shared/schemas/auth'
 import { useAuth } from '~/features/auth/composables/useAuth'
+import AuthDemoCredentialsBanner, {
+  type DemoCredentialPayload,
+} from '~/components/auth/AuthDemoCredentialsBanner.vue'
 
 useSeoMeta({
   title: 'Masuk ke Akun - ShelfStack',
@@ -76,10 +79,18 @@ const handleGoogle = async () => {
     })
   }
 }
+const handleSelectDemo = (payload: DemoCredentialPayload) => {
+  email.value = payload.email
+  password.value = 'Password123!'
+  errors.value = {}
+}
 </script>
 
 <template>
   <AuthCard title="Masuk" subtitle="Masuk ke akun Anda untuk melanjutkan pesanan belanja.">
+    <!-- 1-Click Demo Credentials Quick Fill for Portfolio Evaluators -->
+    <AuthDemoCredentialsBanner @select-demo="handleSelectDemo" />
+
     <!-- Login Form -->
     <form novalidate class="flex flex-col gap-3.5" @submit.prevent="handleLogin">
       <AuthFormInput

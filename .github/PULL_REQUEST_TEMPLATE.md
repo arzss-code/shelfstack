@@ -1,36 +1,59 @@
-# Pull Request: Refactor to Feature-Sliced Design
+## Description
 
-**Judul PR:** `chore: [AA] refactor to feature-sliced design`
+<!-- Provide a clear summary of what this PR does and why it is needed. -->
 
----
+## Type of Change
 
-## Deskripsi
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] Refactoring (no functional changes)
+- [ ] Database / Seed / Migration update
+- [ ] Performance / Core Web Vitals improvement
+- [ ] Documentation / CI / Tooling update
 
-Melakukan _refactoring_ pada entitas Produk untuk mematuhi standar _Feature-Sliced Design_ dan arsitektur Nuxt/Vue best practices sesuai `SOP-CODING-REPO.md`.
+## Changes Made
 
-**Perubahan Utama:**
+<!-- List the specific technical changes introduced in this PR. -->
 
-1. **Repository Layer**: Memindahkan logika _query_ Supabase (Fetch, Insert, Update, Delete) dari Pinia Store ke `app/repository/product.ts`.
-2. **Feature Isolation**: Memindahkan komponen UI spesifik produk dari `app/components/` ke `app/features/products/components/`.
-3. **Store Abstraction**: Memodifikasi `app/stores/product.ts` agar hanya mengelola state, sedangkan pengolahan data mendelegasikan tugas ke Repository.
+-
+-
 
-## Referensi Tiket
+### Key Files Changed
 
-_Jira / Trello ID_: (Silakan isi jika ada)
+| File | Change |
+| :--- | :----- |
+| ``   |        |
 
-## Syarat Sah Merge Request (Definition of Done)
+## API & Database Changes
 
-- [x] **No Merge Conflict**: Branch ini _up-to-date_ dan siap digabung.
-- [ ] **Reviewer Approval**: (Menunggu persetujuan dari Tech Lead / Peer).
-- [x] **API Docs Updated**: Tidak ada perubahan struktur Endpoint/API yang terekspos (N/A).
-- [x] **Self-Tested**: Fungsionalitas UI telah dites secara lokal dan komponen berhasil dimuat dengan susunan direktori yang baru.
+- [ ] No API or database changes
+- [ ] Database migration / seed updated (`supabase/`)
+- [ ] API endpoints added or modified (`server/api/`)
 
-### Bukti Self-Tested (Screenshot)
+## How to Test
 
-**1. Halaman Utama (Daftar Produk)**
-_(Komponen berhasil di-load dari folder features, meski saat ini terdapat error RLS dari Supabase lokal)_
-<!-- Silakan drag & drop screenshot halaman utama di sini -->
+<!-- Step-by-step instructions for reviewers to verify this works locally. -->
 
-**2. Modal Form Produk**
-_(Modal Form berhasil dibuka)_
-<!-- Silakan drag & drop screenshot modal form di sini -->
+1.
+2.
+3.
+
+### Verification Output
+
+- `pnpm lint`: `EXIT 0`
+- `pnpm typecheck`: `EXIT 0`
+- `pnpm exec vitest run`: `EXIT 0`
+
+## Checklist
+
+- [ ] Code follows the project's style and architectural guidelines
+- [ ] Self-reviewed the code for edge cases and potential regressions
+- [ ] Added or updated unit/integration tests where applicable
+- [ ] All existing and new tests pass locally
+- [ ] Updated documentation (`CHANGELOG.md`, `README.md`, or `docs/`) if needed
+- [ ] No new linter warnings, type errors, or console errors introduced
+- [ ] Backwards compatible (or rollback/migration plan documented)
+
+## Related Issues / PRs
+
+<!-- Link related tickets, issues, or PRs. Use "Closes #123" or "Fixes #456" to auto-close. -->
