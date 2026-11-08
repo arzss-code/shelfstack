@@ -96,7 +96,7 @@ const displayCategories = computed(() => {
       <NuxtLink
         v-for="cat in displayCategories"
         :key="cat.name"
-        :to="'/katalog?category=' + cat.category"
+        :to="'/c/' + cat.category"
         :class="[
           'bg-brand-canvas-soft hover:bg-brand-field rounded-card overflow-hidden group transition-all border border-brand-hair shadow-whisper no-underline flex flex-col',
           cat.spanTwo ? 'lg:col-span-2 md:flex-row' : '',

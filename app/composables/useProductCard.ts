@@ -71,7 +71,8 @@ export function useProductCard(getProduct: () => Product) {
     if (product.stock > 0 && product.stock <= 3) {
       return {
         label: `Sisa ${product.stock}`,
-        badgeClass: 'bg-brand-warning text-white',
+        badgeClass:
+          'bg-brand-warning-tint text-brand-warning-text border border-brand-warning-edge font-semibold',
       }
     }
     if (product.is_featured) {

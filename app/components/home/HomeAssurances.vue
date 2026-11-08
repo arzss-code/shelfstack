@@ -10,7 +10,7 @@
           <i class="pi pi-verified text-lg" />
         </div>
         <div>
-          <h4 class="font-display m-0 text-sm font-bold text-brand-ink">100% Produk Original</h4>
+          <p class="font-display m-0 text-sm font-bold text-brand-ink">100% Produk Original</p>
           <p class="font-body m-0 text-xs text-brand-muted mt-0.5">
             Jaminan keaslian resmi langsung dari produsen
           </p>
@@ -24,9 +24,9 @@
           <i class="pi pi-truck text-lg" />
         </div>
         <div>
-          <h4 class="font-display m-0 text-sm font-bold text-brand-ink">
+          <p class="font-display m-0 text-sm font-bold text-brand-ink">
             Gratis Ongkir Se-Indonesia
-          </h4>
+          </p>
           <p class="font-body m-0 text-xs text-brand-muted mt-0.5">
             Bebas ongkos kirim min. belanja Rp500.000
           </p>
@@ -40,7 +40,7 @@
           <i class="pi pi-replay text-lg" />
         </div>
         <div>
-          <h4 class="font-display m-0 text-sm font-bold text-brand-ink">Garansi Retur 30 Hari</h4>
+          <p class="font-display m-0 text-sm font-bold text-brand-ink">Garansi Retur 30 Hari</p>
           <p class="font-body m-0 text-xs text-brand-muted mt-0.5">
             Jaminan tukar baru jika barang cacat atau tidak sesuai
           </p>
@@ -54,7 +54,7 @@
           <i class="pi pi-comments text-lg" />
         </div>
         <div>
-          <h4 class="font-display m-0 text-sm font-bold text-brand-ink">Layanan Bantuan 24/7</h4>
+          <p class="font-display m-0 text-sm font-bold text-brand-ink">Layanan Bantuan 24/7</p>
           <p class="font-body m-0 text-xs text-brand-muted mt-0.5">
             Respon cepat untuk konsultasi dan lacak pesanan
           </p>

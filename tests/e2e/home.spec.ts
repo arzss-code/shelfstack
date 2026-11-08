@@ -31,3 +31,16 @@ test('beranda: bagian unggulan + admin CTA tampil', async ({ page }) => {
   })
   await expect(ctaBand.getByRole('link', { name: 'Masuk' })).toBeVisible()
 })
+
+test('beranda: kartu kategori pilihan mengarah ke rute /c/[slug]', async ({ page }) => {
+  await page.goto('/')
+  await waitForHydration(page)
+
+  const firstCategoryCard = page.locator('[data-testid="featured-category-card"]').first()
+  await expect(firstCategoryCard).toBeVisible()
+  const href = await firstCategoryCard.getAttribute('href')
+  expect(href).toMatch(/\/c\/[a-z]+/)
+
+  await firstCategoryCard.click()
+  await expect(page).toHaveURL(/\/c\//)
+})

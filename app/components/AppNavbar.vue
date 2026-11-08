@@ -161,12 +161,17 @@ const handleLogout = async () => {
             <NuxtLink
               to="/wishlist"
               class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 no-underline cursor-pointer"
-              aria-label="Wishlist"
+              :aria-label="
+                wishlistStore.totalItems > 0
+                  ? `Wishlist (${wishlistStore.totalItems} item)`
+                  : 'Wishlist'
+              "
             >
               <i class="pi pi-heart text-base sm:text-lg text-brand-ink" />
               <span
                 v-if="wishlistStore.totalItems > 0"
                 class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-rose-600 text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
+                aria-hidden="true"
               >
                 {{ wishlistStore.totalItems > 99 ? '99+' : wishlistStore.totalItems }}
               </span>
@@ -178,13 +183,18 @@ const handleLogout = async () => {
             <button
               type="button"
               class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 cursor-pointer"
-              aria-label="Buka Keranjang Belanja"
+              :aria-label="
+                cartStore.totalItems > 0
+                  ? `Buka Keranjang Belanja (${cartStore.totalItems} item)`
+                  : 'Buka Keranjang Belanja'
+              "
               @click="cartStore.openDrawer"
             >
               <i class="pi pi-shopping-bag text-base sm:text-lg text-brand-ink" />
               <span
                 v-if="cartStore.totalItems > 0"
                 class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-brand-ink text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
+                aria-hidden="true"
               >
                 {{ cartStore.totalItems > 99 ? '99+' : cartStore.totalItems }}
               </span>
