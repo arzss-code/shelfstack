@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 12 (Category Slug Route C-06, E2E Demo Sync & Portfolio Packaging Finalization)**
-- **Versi Rilis:** `v0.33.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-07)
-- **Baseline Quality Gate (2026-11-07, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `@shelfstack/order-service` typecheck EXIT 0 & test 2 file / 25 test lolos 100% · `vitest run` 87 file / 907 test lolos 100% · Docker Compose (`root`, `dev`, `prod`) EXIT 0 · 0 file `.vue` di `app/` melampaui 300 baris (174/174 patuh SOP).
+- **Sprint Aktif:** **Sprint 14 (Deep Modules Architecture, Web Platform Standards, Database Type Strictness & Final Portfolio Polish)**
+- **Versi Rilis:** `v0.34.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-08)
+- **Baseline Quality Gate (2026-11-08, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 88 file / 923 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)

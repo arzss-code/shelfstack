@@ -180,6 +180,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          coins_balance: number
           created_at: string | null
           full_name: string | null
           id: string
@@ -188,6 +189,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          coins_balance?: number
           created_at?: string | null
           full_name?: string | null
           id?: string
@@ -196,6 +198,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          coins_balance?: number
           created_at?: string | null
           full_name?: string | null
           id?: string
@@ -207,6 +210,7 @@ export type Database = {
       coupons: {
         Row: {
           code: string
+          coin_cost: number
           created_at: string
           deleted_at: string | null
           description: string | null
@@ -226,6 +230,7 @@ export type Database = {
         }
         Insert: {
           code: string
+          coin_cost?: number
           created_at?: string
           deleted_at?: string | null
           description?: string | null
@@ -245,6 +250,7 @@ export type Database = {
         }
         Update: {
           code?: string
+          coin_cost?: number
           created_at?: string
           deleted_at?: string | null
           description?: string | null
@@ -297,6 +303,8 @@ export type Database = {
       orders: {
         Row: {
           address: Json
+          coins_earned: number
+          coins_used: number
           coupon_code: string | null
           coupon_id: string | null
           discount_cents: number
@@ -324,6 +332,8 @@ export type Database = {
         }
         Insert: {
           address: Json
+          coins_earned?: number
+          coins_used?: number
           coupon_code?: string | null
           coupon_id?: string | null
           discount_cents?: number
@@ -351,6 +361,8 @@ export type Database = {
         }
         Update: {
           address?: Json
+          coins_earned?: number
+          coins_used?: number
           coupon_code?: string | null
           coupon_id?: string | null
           discount_cents?: number
@@ -1093,6 +1105,8 @@ export type Database = {
       }
       support_messages: {
         Row: {
+          attached_order_id: string | null
+          attached_product_id: number | null
           attachment_type: 'image' | 'order_card' | 'product_card' | null
           attachment_url: string | null
           created_at: string
@@ -1105,6 +1119,8 @@ export type Database = {
           thread_id: string
         }
         Insert: {
+          attached_order_id?: string | null
+          attached_product_id?: number | null
           attachment_type?: 'image' | 'order_card' | 'product_card' | null
           attachment_url?: string | null
           created_at?: string
@@ -1117,6 +1133,8 @@ export type Database = {
           thread_id: string
         }
         Update: {
+          attached_order_id?: string | null
+          attached_product_id?: number | null
           attachment_type?: 'image' | 'order_card' | 'product_card' | null
           attachment_url?: string | null
           created_at?: string
@@ -1200,6 +1218,7 @@ export type Database = {
           p_coupon_code?: string | null
           p_shipping_service?: string | null
           p_courier_code?: string | null
+          p_use_coins?: boolean | null
         }
         Returns: string
       }

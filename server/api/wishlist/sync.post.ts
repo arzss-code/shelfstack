@@ -1,10 +1,11 @@
 import { serverSupabaseClient } from '#supabase/server'
+import type { Database } from '~/types/database.types'
 import { wishlistSyncSchema } from '../../../shared/schemas/wishlist'
 import { requireUser } from '../../utils/auth'
 import { errorResponse, successResponse } from '../../utils/response'
 
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient(event)
+  const client = await serverSupabaseClient<Database>(event)
 
   const { user, profile } = await requireUser(event)
   const targetUserId = user.id || profile.user_id
@@ -25,12 +26,12 @@ export default defineEventHandler(async (event) => {
 
   if (productIds.length > 0) {
     // Ambil item yang sudah tersimpan untuk menghindari konflik duplikasi
-    const { data: existingRows } = await (client as any)
+    const { data: existingRows } = await client
       .from('wishlists')
       .select('product_id')
       .eq('user_id', targetUserId)
 
-    const existingSet = new Set((existingRows || []).map((r: any) => Number(r.product_id)))
+    const existingSet = new Set((existingRows || []).map((r) => Number(r.product_id)))
     const records = productIds
       .filter((productId) => !existingSet.has(productId))
       .map((productId) => ({
@@ -39,7 +40,7 @@ export default defineEventHandler(async (event) => {
       }))
 
     if (records.length > 0) {
-      const { error: insertError } = await (client as any).from('wishlists').insert(records)
+      const { error: insertError } = await client.from('wishlists').insert(records)
 
       if (insertError) {
         return errorResponse(event, 'Gagal menyinkronkan wishlist', insertError, 500)
@@ -48,7 +49,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Ambil data lengkap hasil sinkronisasi
-  const { data, error: fetchError } = await (client as any)
+  const { data, error: fetchError } = await client
     .from('wishlists')
     .select(
       `

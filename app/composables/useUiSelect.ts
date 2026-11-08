@@ -208,61 +208,47 @@ export function useUiSelect(
   function onTriggerKeydown(event: KeyboardEvent) {
     if (props.disabled) return
 
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault()
-        if (!isOpen.value) {
-          openDropdown()
-        } else {
-          navigateOptions(1)
-        }
-        break
-      case 'ArrowUp':
-        event.preventDefault()
-        if (!isOpen.value) {
-          openDropdown()
-        } else {
-          navigateOptions(-1)
-        }
-        break
-      case 'Home':
-        if (isOpen.value) {
-          event.preventDefault()
-          activeIndex.value = 0
-          scrollActiveIntoView()
-        }
-        break
-      case 'End':
-        if (isOpen.value) {
-          event.preventDefault()
-          activeIndex.value = normalizedOptions.value.length - 1
-          scrollActiveIntoView()
-        }
-        break
-      case 'Enter':
-      case ' ':
-        event.preventDefault()
-        if (!isOpen.value) {
-          openDropdown()
-        } else if (activeIndex.value >= 0 && activeIndex.value < normalizedOptions.value.length) {
-          const target = normalizedOptions.value[activeIndex.value]
-          if (target && !target.disabled) {
-            selectOption(target)
-          }
-        }
-        break
-      case 'Escape':
-        if (isOpen.value) {
-          event.preventDefault()
-          closeDropdown()
-          triggerRef.value?.focus()
-        }
-        break
-      case 'Tab':
-        if (isOpen.value) {
-          closeDropdown()
-        }
-        break
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      if (!isOpen.value) openDropdown()
+      else navigateOptions(event.key === 'ArrowDown' ? 1 : -1)
+      return
+    }
+
+    if (event.key === 'Home' && isOpen.value) {
+      event.preventDefault()
+      activeIndex.value = 0
+      scrollActiveIntoView()
+      return
+    }
+
+    if (event.key === 'End' && isOpen.value) {
+      event.preventDefault()
+      activeIndex.value = normalizedOptions.value.length - 1
+      scrollActiveIntoView()
+      return
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      if (!isOpen.value) {
+        openDropdown()
+      } else if (activeIndex.value >= 0 && activeIndex.value < normalizedOptions.value.length) {
+        const target = normalizedOptions.value[activeIndex.value]
+        if (target && !target.disabled) selectOption(target)
+      }
+      return
+    }
+
+    if (event.key === 'Escape' && isOpen.value) {
+      event.preventDefault()
+      closeDropdown()
+      triggerRef.value?.focus()
+      return
+    }
+
+    if (event.key === 'Tab' && isOpen.value) {
+      closeDropdown()
     }
   }
 

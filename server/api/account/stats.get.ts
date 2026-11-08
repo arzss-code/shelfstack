@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 1. Total seluruh pesanan
-    const { count: totalOrders, error: totalOrdersErr } = await (client as any)
+    const { count: totalOrders, error: totalOrdersErr } = await client
       .from('orders')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', targetUserId)
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 2. Pesanan aktif (pending, paid, shipped)
-    const { count: activeOrders, error: activeOrdersErr } = await (client as any)
+    const { count: activeOrders, error: activeOrdersErr } = await client
       .from('orders')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', targetUserId)
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 3. Pesanan selesai (completed)
-    const { count: completedOrders, error: completedOrdersErr } = await (client as any)
+    const { count: completedOrders, error: completedOrdersErr } = await client
       .from('orders')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', targetUserId)
@@ -42,21 +42,23 @@ export default defineEventHandler(async (event) => {
     }
 
     // 4. Total buku alamat tersimpan
-    const { count: totalAddresses } = await (client as any)
+    const { count: totalAddresses } = await client
       .from('user_addresses')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', targetUserId)
       .is('deleted_at', null)
 
     // 5. Waktu bergabung (member since)
-    const { data: profileRecord } = await (client as any)
+    const { data: profileRecord } = await client
       .from('profiles')
       .select('created_at')
       .eq('user_id', targetUserId)
       .maybeSingle()
 
     const memberSince =
-      profileRecord?.created_at || (user as any).created_at || new Date().toISOString()
+      profileRecord?.created_at ||
+      (user as { created_at?: string }).created_at ||
+      new Date().toISOString()
 
     return successResponse('Statistik akun berhasil dimuat', {
       totalOrders: totalOrders ?? 0,
@@ -65,7 +67,7 @@ export default defineEventHandler(async (event) => {
       totalAddresses: totalAddresses ?? 0,
       memberSince,
     })
-  } catch (err: any) {
+  } catch (err: unknown) {
     return errorResponse(event, 'Gagal memuat ringkasan akun', err, 500)
   }
 })

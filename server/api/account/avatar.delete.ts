@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   const serviceClient = serverSupabaseServiceRole<Database>(event)
 
   // 1. Ambil URL avatar lama
-  const { data: currentProfile } = await (serviceClient as any)
+  const { data: currentProfile } = await serviceClient
     .from('profiles')
     .select('avatar_url')
     .eq('user_id', targetUserId)
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   const oldAvatarUrl = currentProfile?.avatar_url
 
   // 2. Set avatar_url menjadi null di public.profiles (service role bypass RLS)
-  const { error: updateError } = await (serviceClient as any)
+  const { error: updateError } = await serviceClient
     .from('profiles')
     .update({ avatar_url: null })
     .eq('user_id', targetUserId)
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
 
   // 4. Selaraskan user_metadata di auth Supabase
   try {
-    await (serviceClient as any).auth.admin.updateUserById(targetUserId, {
+    await serviceClient.auth.admin.updateUserById(targetUserId, {
       user_metadata: { avatar_url: null },
     })
   } catch {

@@ -1,6 +1,10 @@
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { fetchMidtransTransactionStatus, mapMidtransStatus } from '../../../utils/midtrans'
+import {
+  resolveCandidateLookupIds,
+  evaluateRefundReconciliation,
+} from '../../../utils/payment-reconciliation'
 import { logger } from '../../../utils/logger'
 import { metrics } from '../../../utils/metrics'
 
@@ -63,21 +67,14 @@ export default defineEventHandler(async (event) => {
 
   try {
     const body = await readBody(event).catch(() => ({}))
-    const candidateOrderIds: string[] = [order.id]
-    if (body?.midtrans_order_id && !candidateOrderIds.includes(body.midtrans_order_id)) {
-      candidateOrderIds.unshift(body.midtrans_order_id)
-    }
-    if (order.midtrans_id && !candidateOrderIds.includes(order.midtrans_id)) {
-      candidateOrderIds.push(order.midtrans_id)
-    }
-    if (
-      pendingRefund?.gateway_transaction_id &&
-      !candidateOrderIds.includes(pendingRefund.gateway_transaction_id)
-    ) {
-      candidateOrderIds.push(pendingRefund.gateway_transaction_id)
-    }
+    const candidateOrderIds = resolveCandidateLookupIds({
+      orderId: order.id,
+      bodyOrderId: body?.midtrans_order_id,
+      orderMidtransId: order.midtrans_id,
+      gatewayTransactionId: pendingRefund?.gateway_transaction_id,
+    })
 
-    let midtransData: any = null
+    let midtransData: Record<string, unknown> | null = null
     for (const lookupId of candidateOrderIds) {
       const statusRes = await fetchMidtransTransactionStatus(lookupId, serverKey, isSandbox)
       if (statusRes.success && statusRes.data?.transaction_status) {
@@ -96,85 +93,16 @@ export default defineEventHandler(async (event) => {
 
     // 3. REKONSILIASI REFUND PENDING (Jika order memiliki pending refund)
     if (pendingRefund) {
-      const refundsList: any[] = Array.isArray(midtransData.refunds) ? midtransData.refunds : []
-      const expectedCents = pendingRefund.amount_cents
+      const decision = evaluateRefundReconciliation(midtransData, pendingRefund)
+      const serviceRoleClient = serverSupabaseServiceRole<Database>(event)
 
-      let matchingRefund: any = undefined
-      let bankConfirmedAt: string | undefined = undefined
-      let isAmountMatched = false
-
-      if (refundsList.length > 0) {
-        // A. Cari refund entry spesifik menggunakan identifier yang paling reliable (refund_key atau gateway_refund_id)
-        matchingRefund = refundsList.find((r: any) => {
-          const keyMatch = Boolean(r.refund_key && r.refund_key === pendingRefund.idempotency_key)
-          const idMatch = Boolean(
-            pendingRefund.gateway_refund_id &&
-            (String(r.refund_chargeback_id) === String(pendingRefund.gateway_refund_id) ||
-              String(r.id) === String(pendingRefund.gateway_refund_id)),
-          )
-          return keyMatch || idMatch
-        })
-
-        if (matchingRefund) {
-          // PENTING: Hanya gunakan bank_confirmed_at DARI MATCHING REFUND INI!
-          // Jangan pernah mengambil dari sembarang refund lain di riwayat refunds!
-          bankConfirmedAt = matchingRefund.bank_confirmed_at
-            ? String(matchingRefund.bank_confirmed_at)
-            : undefined
-
-          if (matchingRefund.refund_amount) {
-            const gatewayCents = Math.round(parseFloat(matchingRefund.refund_amount) * 100)
-            isAmountMatched = gatewayCents === expectedCents
-          } else {
-            isAmountMatched = true
-          }
-        } else {
-          // Ada daftar refunds di gateway, tetapi tidak ada satupun yang cocok dengan pendingRefund ini!
-          // Identity mismatch: Jangan sentuh pendingRefund ini dan jangan memfinalisasi.
-          isAmountMatched = false
-          bankConfirmedAt = undefined
-        }
-      } else if (midtransData.transaction_status === 'refund' || midtransData.refund_key) {
-        // Fallback hanya jika refundsList kosong (flat gateway response)
-        const keyMatch =
-          !midtransData.refund_key || midtransData.refund_key === pendingRefund.idempotency_key
-        const idMatch =
-          !midtransData.refund_chargeback_id ||
-          !pendingRefund.gateway_refund_id ||
-          String(midtransData.refund_chargeback_id) === String(pendingRefund.gateway_refund_id)
-
-        if (keyMatch && idMatch) {
-          bankConfirmedAt = midtransData.bank_confirmed_at
-            ? String(midtransData.bank_confirmed_at)
-            : undefined
-          const rawAmount = midtransData.refund_amount || midtransData.gross_amount
-          if (rawAmount) {
-            const gatewayCents = Math.round(parseFloat(rawAmount) * 100)
-            isAmountMatched = gatewayCents === expectedCents
-          } else {
-            isAmountMatched = true
-          }
-        }
-      }
-
-      const isRefundRejected =
-        String(midtransData.refund_chargeback_status || '').toLowerCase() === 'rejected' ||
-        String(midtransData.refund_chargeback_status || '').toLowerCase() === 'failed' ||
-        String(matchingRefund?.status || '').toLowerCase() === 'rejected'
-
-      // C. Cek apakah refund sudah terkonfirmasi resmi oleh bank DENGAN identitas & amount yang cocok
-      if (bankConfirmedAt && isAmountMatched && !isRefundRejected) {
-        const gatewayRefundId = matchingRefund?.refund_chargeback_id
-          ? String(matchingRefund.refund_chargeback_id)
-          : midtransData.transaction_id || null
-
-        const serviceRoleClient = serverSupabaseServiceRole<Database>(event)
+      if (decision.action === 'FINALIZE_SUCCESS') {
         const { error: finErr } = await serviceRoleClient.rpc('finalize_refund', {
           p_refund_id: pendingRefund.id,
           p_success: true,
-          p_gateway_refund_id: gatewayRefundId,
+          p_gateway_refund_id: decision.gatewayRefundId || null,
           p_failure_reason: null,
-          p_bank_confirmed_at: bankConfirmedAt,
+          p_bank_confirmed_at: decision.bankConfirmedAt || null,
         })
 
         if (finErr) {
@@ -197,23 +125,18 @@ export default defineEventHandler(async (event) => {
         }
 
         metrics.recordReconciliation(true)
-        return successResponse(
-          'Refund berhasil dikonfirmasi dan diselesaikan melalui rekonsiliasi',
-          {
-            order_id: order.id,
-            status: 'refunded',
-            refund_status: 'succeeded',
-            bank_confirmed_at: bankConfirmedAt,
-            is_paid: false,
-            is_refunded: true,
-            reconciled: true,
-          },
-        )
+        return successResponse(decision.message, {
+          order_id: order.id,
+          status: 'refunded',
+          refund_status: 'succeeded',
+          bank_confirmed_at: decision.bankConfirmedAt,
+          is_paid: false,
+          is_refunded: true,
+          reconciled: true,
+        })
       }
 
-      if (isRefundRejected) {
-        // Gateway menolak refund secara definitif
-        const serviceRoleClient = serverSupabaseServiceRole<Database>(event)
+      if (decision.action === 'FINALIZE_REJECTED') {
         await serviceRoleClient.rpc('finalize_refund', {
           p_refund_id: pendingRefund.id,
           p_success: false,
@@ -222,7 +145,7 @@ export default defineEventHandler(async (event) => {
         })
 
         metrics.recordReconciliation(true)
-        return successResponse('Refund tercatat ditolak oleh payment gateway', {
+        return successResponse(decision.message, {
           order_id: order.id,
           status: 'paid',
           refund_status: 'failed',
@@ -232,48 +155,43 @@ export default defineEventHandler(async (event) => {
         })
       }
 
-      // D. Refund masih dalam tahap 'accepted' atau menunggu konfirmasi bank (bank_confirmed_at belum ada)
-      // JANGAN finalize premature! Order tetap paid, stok tetap utuh!
-      if (matchingRefund?.refund_chargeback_id && !pendingRefund.gateway_refund_id) {
-        const serviceRoleClient = serverSupabaseServiceRole<Database>(event)
+      // Action WAITING: simpan gateway_refund_id jika baru terbit
+      if (decision.matchingRefund?.refund_chargeback_id && !pendingRefund.gateway_refund_id) {
         await serviceRoleClient
           .from('refunds')
           .update({
-            gateway_refund_id: String(matchingRefund.refund_chargeback_id),
+            gateway_refund_id: String(decision.matchingRefund.refund_chargeback_id),
             updated_at: new Date().toISOString(),
           })
           .eq('id', pendingRefund.id)
       }
 
-      return successResponse(
-        matchingRefund
-          ? 'Refund telah diterima oleh gateway dan sedang menunggu konfirmasi bank (bank_confirmed_at)'
-          : 'Status refund masih dalam proses verifikasi oleh Payment Gateway',
-        {
-          order_id: order.id,
-          status: order.status,
-          refund_status: 'pending',
-          stage: matchingRefund ? 'accepted' : 'processing',
-          is_paid: true,
-          is_refunded: false,
-          reconciled: false,
-        },
-      )
+      return successResponse(decision.message, {
+        order_id: order.id,
+        status: order.status,
+        refund_status: 'pending',
+        stage: decision.matchingRefund ? 'accepted' : 'processing',
+        is_paid: true,
+        is_refunded: false,
+        reconciled: false,
+      })
     }
 
     // 4. REKONSILIASI PEMBAYARAN STANDAR (Pending Order)
-    const targetStatus = mapMidtransStatus(
-      midtransData.transaction_status,
-      midtransData.fraud_status,
-    )
+    const txStatus = String(midtransData.transaction_status || '')
+    const fraudStatus =
+      typeof midtransData.fraud_status === 'string' ? midtransData.fraud_status : null
+    const targetStatus = mapMidtransStatus(txStatus, fraudStatus)
 
     if (targetStatus !== order.status) {
       const serviceRoleClient = serverSupabaseServiceRole<Database>(event)
       const { error: rpcErr } = await serviceRoleClient.rpc('handle_payment_webhook', {
         p_order_id: order.id,
         p_target_status: targetStatus,
-        p_payment_type: midtransData.payment_type || null,
-        p_midtrans_id: midtransData.transaction_id || null,
+        p_payment_type:
+          typeof midtransData.payment_type === 'string' ? midtransData.payment_type : null,
+        p_midtrans_id:
+          typeof midtransData.transaction_id === 'string' ? midtransData.transaction_id : null,
       })
 
       if (rpcErr) {

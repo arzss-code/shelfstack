@@ -23,17 +23,25 @@ const products = ref<ProductPickerItem[]>([])
 const searchQuery = ref('')
 const isLoading = ref(false)
 
+interface RawProductResponseItem {
+  id: number | string
+  name?: string
+  title?: string
+  price_cents?: number
+  image_url?: string | null
+  images?: string[]
+}
+
 const searchProducts = async (query = '') => {
   isLoading.value = true
   try {
-    const res = await $fetch<{ status: string; data?: { products: any[] } | any[] }>(
-      '/api/products',
-      { query: { q: query.trim() || undefined, limit: 15 } },
-    )
-    let rawList: any[] = []
+    const res = await $fetch<{
+      status: string
+      data?: { products: RawProductResponseItem[] } | RawProductResponseItem[]
+    }>('/api/products', { query: { q: query.trim() || undefined, limit: 15 } })
+    let rawList: RawProductResponseItem[] = []
     if (Array.isArray(res)) rawList = res
-    else if (res?.data)
-      rawList = Array.isArray(res.data) ? res.data : (res.data as any).products || []
+    else if (res?.data) rawList = Array.isArray(res.data) ? res.data : res.data.products || []
 
     products.value = rawList.map((p) => ({
       id: Number(p.id),

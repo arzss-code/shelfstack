@@ -1,6 +1,19 @@
 import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import { computed, getCurrentInstance, onUnmounted } from 'vue'
 import type { Database } from '~/types/database.types'
+import {
+  acquireRealtimeChannel,
+  teardownRealtimeChannel,
+  isChannelSubscribed,
+} from '~/utils/supabase-realtime'
+import { enrichIncomingMessage, extractErrorMessage } from '~/utils/support-chat-common'
+import {
+  fetchAdminSupportThreadsApi,
+  fetchAdminSupportMessagesApi,
+  sendAdminSupportMessageApi,
+  updateAdminSupportStatusApi,
+  createAdminSupportState,
+} from '~/utils/support-chat-admin'
 import { SUPPORT_CANNED_RESPONSES, SUPPORT_STATUS_MAP } from '~~/server/utils/support-chat'
 import type {
   AdminSendSupportMessageInput,
@@ -15,57 +28,25 @@ let sharedInboxChannel: RealtimeChannel | null = null
 let sharedMessageChannel: RealtimeChannel | null = null
 let activeSubscribedThreadId: string | null = null
 
-function getFreshChannel(client: SupabaseClient<Database>, topic: string): RealtimeChannel {
-  try {
-    if (typeof client.getChannels === 'function') {
-      const existing = client
-        .getChannels()
-        .find((ch) => ch.topic === topic || ch.topic === `realtime:${topic}`)
-      if (existing) {
-        try {
-          if (typeof (existing as any).unsubscribe === 'function') (existing as any).unsubscribe()
-        } catch {
-          // Safe unsubscribe
-        }
-        try {
-          client.removeChannel(existing)
-        } catch {
-          // Safe removal
-        }
-        try {
-          const realtime = (client as any).realtime
-          if (realtime && typeof realtime._remove === 'function') realtime._remove(existing)
-        } catch {
-          // Safe remove from realtime registry
-        }
-      }
-    }
-  } catch {
-    // Safe fallback for testing environments
-  }
-  return client.channel(topic)
-}
-
 export function useAdminSupportChat() {
   let supabase: SupabaseClient<Database> | null = null
-  if (import.meta.client) {
-    try {
-      supabase = useSupabaseClient<Database>()
-    } catch {
-      // Supabase client fallback in unit tests
-    }
+  try {
+    if (import.meta.client) supabase = useSupabaseClient<Database>()
+  } catch {
+    // Supabase client fallback
   }
 
-  // Reactive state shared across admin workspace panes
-  const threads = useState<SupportThreadWithCustomer[]>('admin-support-threads', () => [])
-  const activeThreadId = useState<string | null>('admin-support-active-id', () => null)
-  const messages = useState<SupportMessageItem[]>('admin-support-messages', () => [])
-  const activeFilter = useState<string>('admin-support-filter', () => 'all')
-  const searchQuery = useState<string>('admin-support-search', () => '')
-  const isLoadingThreads = useState<boolean>('admin-support-loading-threads', () => false)
-  const isLoadingMessages = useState<boolean>('admin-support-loading-messages', () => false)
-  const isSending = useState<boolean>('admin-support-is-sending', () => false)
-  const error = useState<string | null>('admin-support-error', () => null)
+  const {
+    threads,
+    activeThreadId,
+    messages,
+    activeFilter,
+    searchQuery,
+    isLoadingThreads,
+    isLoadingMessages,
+    isSending,
+    error,
+  } = createAdminSupportState()
 
   const activeThread = computed<SupportThreadWithCustomer | null>(() =>
     activeThreadId.value ? threads.value.find((t) => t.id === activeThreadId.value) || null : null,
@@ -73,52 +54,14 @@ export function useAdminSupportChat() {
 
   const cleanupInbox = () => {
     if (sharedInboxChannel && supabase) {
-      try {
-        if (typeof (sharedInboxChannel as any).unsubscribe === 'function') {
-          ;(sharedInboxChannel as any).unsubscribe()
-        }
-      } catch {
-        // Safe unsubscribe
-      }
-      try {
-        supabase.removeChannel(sharedInboxChannel)
-      } catch {
-        // Safe removal
-      }
-      try {
-        const realtime = (supabase as any).realtime
-        if (realtime && typeof realtime._remove === 'function') {
-          realtime._remove(sharedInboxChannel)
-        }
-      } catch {
-        // Safe remove
-      }
+      teardownRealtimeChannel(supabase, sharedInboxChannel)
       sharedInboxChannel = null
     }
   }
 
   const cleanupMessage = () => {
     if (sharedMessageChannel && supabase) {
-      try {
-        if (typeof (sharedMessageChannel as any).unsubscribe === 'function') {
-          ;(sharedMessageChannel as any).unsubscribe()
-        }
-      } catch {
-        // Safe unsubscribe
-      }
-      try {
-        supabase.removeChannel(sharedMessageChannel)
-      } catch {
-        // Safe removal
-      }
-      try {
-        const realtime = (supabase as any).realtime
-        if (realtime && typeof realtime._remove === 'function') {
-          realtime._remove(sharedMessageChannel)
-        }
-      } catch {
-        // Safe remove
-      }
+      teardownRealtimeChannel(supabase, sharedMessageChannel)
       sharedMessageChannel = null
       activeSubscribedThreadId = null
     }
@@ -131,24 +74,9 @@ export function useAdminSupportChat() {
 
   const handleIncomingMessage = (newMsg: SupportMessageItem) => {
     if (!newMsg || newMsg.deleted_at || newMsg.thread_id !== activeThreadId.value) return
-    if (messages.value.some((m) => m.id === newMsg.id)) return // Deduplication check
+    if (messages.value.some((m) => m.id === newMsg.id)) return
 
-    const enriched = { ...newMsg } as SupportMessageItem
-    if (
-      (newMsg.attachment_type === 'order_card' || newMsg.message_text.includes('Pesanan')) &&
-      !enriched.attached_order
-    ) {
-      const prev = messages.value.find((m) => m.attached_order)
-      if (prev?.attached_order) enriched.attached_order = prev.attached_order
-    } else if (
-      (newMsg.attachment_type === 'product_card' || newMsg.message_text.includes('Produk')) &&
-      !enriched.attached_product
-    ) {
-      const prev = messages.value.find((m) => m.attached_product)
-      if (prev?.attached_product) enriched.attached_product = prev.attached_product
-    }
-
-    messages.value.push(enriched)
+    messages.value.push(enrichIncomingMessage(newMsg, messages.value))
     const thread = threads.value.find((t) => t.id === newMsg.thread_id)
     if (thread) {
       thread.last_message_text = newMsg.message_text
@@ -160,79 +88,61 @@ export function useAdminSupportChat() {
     }
   }
 
-  const handleInboxUpdate = (payload: { eventType: string; new: SupportThreadItem }) => {
-    const updated = payload.new
+  const handleInboxUpdate = (payload: { new: SupportThreadItem }) => {
+    const updated = payload?.new
     if (!updated || updated.deleted_at) return
     const existing = threads.value.find((t) => t.id === updated.id)
     if (!existing) {
-      fetchThreads() // New thread: reload to fetch customer details
+      fetchThreads()
       return
     }
-    existing.last_message_text = updated.last_message_text
-    existing.last_message_at = updated.last_message_at
-    existing.status = updated.status
-    existing.updated_at = updated.updated_at
-    existing.unread_by_customer_count = updated.unread_by_customer_count
-    existing.unread_by_admin_count =
-      activeThreadId.value === updated.id ? 0 : updated.unread_by_admin_count
-    threads.value.sort((a, b) => {
-      const timeA = new Date(a.last_message_at || a.created_at).getTime()
-      const timeB = new Date(b.last_message_at || b.created_at).getTime()
-      return timeB - timeA
+    Object.assign(existing, {
+      last_message_text: updated.last_message_text,
+      last_message_at: updated.last_message_at,
+      status: updated.status,
+      updated_at: updated.updated_at,
+      unread_by_customer_count: updated.unread_by_customer_count,
+      unread_by_admin_count:
+        activeThreadId.value === updated.id ? 0 : updated.unread_by_admin_count,
     })
+    threads.value.sort(
+      (a, b) =>
+        new Date(b.last_message_at || b.created_at).getTime() -
+        new Date(a.last_message_at || a.created_at).getTime(),
+    )
   }
 
   const subscribeInbox = () => {
     if (!import.meta.client || !supabase) return
-    if (sharedInboxChannel) {
-      const adapter = (sharedInboxChannel as any).channelAdapter
-      if (adapter?.isJoined() || adapter?.isJoining()) return
-    }
-    if (typeof supabase.getChannels === 'function') {
-      try {
-        const existing = supabase
-          .getChannels()
-          .find(
-            (ch) =>
-              ch.topic === 'admin-support-inbox' || ch.topic === 'realtime:admin-support-inbox',
-          )
-        if (existing) {
-          const adapter = (existing as any).channelAdapter
-          if (adapter?.isJoined() || adapter?.isJoining()) {
-            sharedInboxChannel = existing
-            return
-          }
-        }
-      } catch {
-        // Safe channel inspection
-      }
-    }
+    if (isChannelSubscribed(sharedInboxChannel)) return
+
     try {
-      sharedInboxChannel = getFreshChannel(supabase, 'admin-support-inbox')
+      sharedInboxChannel = acquireRealtimeChannel(supabase, 'admin-support-inbox')
         .on(
-          'postgres_changes' as any,
+          'postgres_changes',
           { event: '*', schema: 'public', table: 'support_threads' },
-          handleInboxUpdate,
+          (payload) => {
+            if (payload.eventType !== 'DELETE' && payload.new) {
+              handleInboxUpdate({ new: payload.new as unknown as SupportThreadItem })
+            }
+          },
         )
         .subscribe()
     } catch {
-      // Safe fallback
+      // Channel subscription fallback
     }
   }
 
   const subscribeThreadMessages = (threadId: string) => {
     if (!import.meta.client || !supabase || !threadId) return
-    if (activeSubscribedThreadId === threadId && sharedMessageChannel) {
-      const adapter = (sharedMessageChannel as any).channelAdapter
-      if (adapter?.isJoined() || adapter?.isJoining()) return
-    }
+    if (activeSubscribedThreadId === threadId && isChannelSubscribed(sharedMessageChannel)) return
 
     cleanupMessage()
     activeSubscribedThreadId = threadId
     try {
-      sharedMessageChannel = getFreshChannel(supabase, `support-thread-${threadId}`)
+      sharedMessageChannel = acquireRealtimeChannel(supabase, `support-thread-${threadId}`)
         .on(
-          'postgres_changes' as any,
+          'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
@@ -243,7 +153,7 @@ export function useAdminSupportChat() {
         )
         .subscribe()
     } catch {
-      // Safe fallback
+      // Channel subscription fallback
     }
   }
 
@@ -256,29 +166,24 @@ export function useAdminSupportChat() {
     isLoadingThreads.value = true
     error.value = null
     try {
-      const res = await $fetch<{
-        status: string
-        data: { threads: SupportThreadWithCustomer[]; total: number }
-      }>('/api/admin/support/threads', {
-        query: {
-          status: params?.status ?? activeFilter.value,
-          search: (params?.search ?? searchQuery.value)?.trim() || undefined,
-          page: params?.page ?? 1,
-          limit: params?.limit ?? 50,
-        },
+      const data = await fetchAdminSupportThreadsApi({
+        status: params?.status ?? activeFilter.value,
+        search: params?.search ?? searchQuery.value,
+        page: params?.page,
+        limit: params?.limit,
       })
-      if (res?.data) {
-        threads.value = res.data.threads || []
+      if (data) {
+        threads.value = data.threads || []
         try {
           subscribeInbox()
         } catch {
-          // Realtime safe fallback
+          // Inbox subscription fallback
         }
-        return res.data
+        return data
       }
       return null
-    } catch (err: any) {
-      error.value = err?.data?.message || err?.message || 'Gagal memuat daftar thread bantuan.'
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Gagal memuat daftar thread bantuan.')
       return null
     } finally {
       isLoadingThreads.value = false
@@ -292,26 +197,23 @@ export function useAdminSupportChat() {
     try {
       subscribeThreadMessages(threadId)
     } catch {
-      // Realtime safe fallback
+      // Thread subscription fallback
     }
     isLoadingMessages.value = true
     error.value = null
     try {
-      const res = await $fetch<{
-        status: string
-        data: { thread: SupportThreadItem; messages: SupportMessageItem[] }
-      }>(`/api/admin/support/threads/${threadId}/messages`)
-      if (res?.data) {
-        if (activeThreadId.value === threadId) messages.value = res.data.messages || []
-        if (target && res.data.thread) {
-          target.status = res.data.thread.status
+      const data = await fetchAdminSupportMessagesApi(threadId)
+      if (data) {
+        if (activeThreadId.value === threadId) messages.value = data.messages || []
+        if (target && data.thread) {
+          target.status = data.thread.status
           target.unread_by_admin_count = 0
         }
-        return res.data
+        return data
       }
       return null
-    } catch (err: any) {
-      error.value = err?.data?.message || err?.message || 'Gagal memuat percakapan bantuan.'
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Gagal memuat percakapan bantuan.')
       return null
     } finally {
       if (activeThreadId.value === threadId) isLoadingMessages.value = false
@@ -339,25 +241,23 @@ export function useAdminSupportChat() {
     isSending.value = true
     error.value = null
     try {
-      const res = await $fetch<{ status: string; data: { message: SupportMessageItem } }>(
-        `/api/admin/support/threads/${activeThreadId.value}/messages`,
-        { method: 'POST', body: payload },
-      )
-      const newMsg = res?.data?.message
+      const newMsg = await sendAdminSupportMessageApi(activeThreadId.value, payload)
       if (newMsg) {
         if (!messages.value.some((m) => m.id === newMsg.id)) messages.value.push(newMsg)
         const current = threads.value.find((t) => t.id === activeThreadId.value)
         if (current) {
-          current.last_message_text = newMsg.message_text
-          current.last_message_at = newMsg.created_at
-          current.status = 'waiting_customer'
-          current.unread_by_admin_count = 0
+          Object.assign(current, {
+            last_message_text: newMsg.message_text,
+            last_message_at: newMsg.created_at,
+            status: 'waiting_customer' as const,
+            unread_by_admin_count: 0,
+          })
         }
         return true
       }
       return false
-    } catch (err: any) {
-      error.value = err?.data?.message || err?.message || 'Gagal mengirim balasan.'
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Gagal mengirim balasan.')
       return false
     } finally {
       isSending.value = false
@@ -371,11 +271,8 @@ export function useAdminSupportChat() {
     }
     error.value = null
     try {
-      const res = await $fetch<{ status: string; data: { thread: SupportThreadItem } }>(
-        `/api/admin/support/threads/${activeThreadId.value}/status`,
-        { method: 'PATCH', body: { status: newStatus } },
-      )
-      if (res?.data) {
+      const thread = await updateAdminSupportStatusApi(activeThreadId.value, newStatus)
+      if (thread) {
         const current = threads.value.find((t) => t.id === activeThreadId.value)
         if (current) {
           current.status = newStatus
@@ -384,16 +281,14 @@ export function useAdminSupportChat() {
         return true
       }
       return false
-    } catch (err: any) {
-      error.value = err?.data?.message || err?.message || 'Gagal memperbarui status thread.'
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Gagal memperbarui status thread.')
       return false
     }
   }
 
   if (import.meta.client && getCurrentInstance()) {
-    onUnmounted(() => {
-      cleanupAll()
-    })
+    onUnmounted(() => cleanupAll())
   }
 
   return {

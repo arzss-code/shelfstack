@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import ProductList from '~/features/products/components/ProductList.vue'
+import type { Product } from '~/types/product'
 
 defineProps<{
-  products: any[]
+  products: Product[]
   loading: boolean
 }>()
 </script>

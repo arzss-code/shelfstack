@@ -54,6 +54,7 @@ const borderClass = computed(() =>
       :disabled="disabled"
       :placeholder="placeholder"
       :aria-invalid="error ? 'true' : undefined"
+      :aria-errormessage="error ? helpId : undefined"
       :aria-describedby="error || hint ? helpId : undefined"
       :class="[
         'w-full resize-y rounded-field border bg-brand-canvas px-3.5 py-2.5 text-sm text-brand-ink',
@@ -64,7 +65,13 @@ const borderClass = computed(() =>
       @input="emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
     />
 
-    <p v-if="error" :id="helpId" class="m-0 text-[11px] font-medium text-rose-600">
+    <p
+      v-if="error"
+      :id="helpId"
+      role="alert"
+      aria-live="polite"
+      class="m-0 text-[11px] font-medium text-rose-600"
+    >
       {{ error }}
     </p>
     <p v-else-if="hint" :id="helpId" class="m-0 text-[11px] text-brand-muted">{{ hint }}</p>

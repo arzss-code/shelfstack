@@ -2,8 +2,10 @@
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import AdminSupportChatHeader from './AdminSupportChatHeader.vue'
 import AdminSupportChatComposer from './AdminSupportChatComposer.vue'
-import ChatOrderSnippet from '~/components/support/ChatOrderSnippet.vue'
-import ChatProductSnippet from '~/components/support/ChatProductSnippet.vue'
+import ChatOrderSnippet, { type ChatOrderData } from '~/components/support/ChatOrderSnippet.vue'
+import ChatProductSnippet, {
+  type ChatProductData,
+} from '~/components/support/ChatProductSnippet.vue'
 import ChatLightboxModal from '~/components/support/ChatLightboxModal.vue'
 import ChatProductPickerModal from '~/components/support/ChatProductPickerModal.vue'
 
@@ -25,8 +27,8 @@ export interface SupportPaneMessage {
   created_at: string
   attachment_url?: string | null
   attachment_type?: string | null
-  attached_order?: any | null
-  attached_product?: any | null
+  attached_order?: ChatOrderData | null
+  attached_product?: ChatProductData | null
 }
 
 interface Props {

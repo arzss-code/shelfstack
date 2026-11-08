@@ -1,4 +1,5 @@
 import { serverSupabaseClient } from '#supabase/server'
+import type { Database } from '~/types/database.types'
 import { updateAddressSchema } from '../../../shared/schemas/address'
 import { requireUser } from '../../utils/auth'
 import { errorResponse, successResponse } from '../../utils/response'
@@ -10,7 +11,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const { user, profile } = await requireUser(event)
-  const client = await serverSupabaseClient(event)
+  const client = await serverSupabaseClient<Database>(event)
   const targetUserId = user.id || profile.user_id
 
   const id = getRouterParam(event, 'id')
@@ -19,7 +20,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Cari alamat yang aktif dan pastikan kepemilikannya
-  const { data: existing, error: findError } = await (client as any)
+  const { data: existing, error: findError } = await client
     .from('user_addresses')
     .select('*')
     .eq('id', id)
@@ -57,14 +58,14 @@ export default defineEventHandler(async (event) => {
 
     // Jika alamat ini diubah menjadi alamat utama, reset is_default untuk alamat lainnya
     if (parsed.data.is_default === true) {
-      await (client as any)
+      await client
         .from('user_addresses')
         .update({ is_default: false, updated_at: new Date().toISOString() })
         .eq('user_id', ownerId)
         .eq('is_default', true)
     }
 
-    const updatePayload: Record<string, any> = {
+    const updatePayload: Database['public']['Tables']['user_addresses']['Update'] = {
       updated_at: new Date().toISOString(),
     }
 
@@ -80,7 +81,7 @@ export default defineEventHandler(async (event) => {
       updatePayload.is_default = parsed.data.is_default
     }
 
-    const { data: updated, error: updateError } = await (client as any)
+    const { data: updated, error: updateError } = await client
       .from('user_addresses')
       .update(updatePayload)
       .eq('id', id)
@@ -96,7 +97,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
-    const { data: deleted, error: deleteError } = await (client as any)
+    const { data: deleted, error: deleteError } = await client
       .from('user_addresses')
       .update({
         deleted_at: new Date().toISOString(),
@@ -113,7 +114,7 @@ export default defineEventHandler(async (event) => {
 
     // Jika alamat yang dihapus adalah alamat utama, jadikan salah satu alamat tersisa sebagai utama
     if (existing.is_default) {
-      const { data: remaining } = await (client as any)
+      const { data: remaining } = await client
         .from('user_addresses')
         .select('id')
         .eq('user_id', ownerId)
@@ -122,7 +123,7 @@ export default defineEventHandler(async (event) => {
         .limit(1)
 
       if (remaining && remaining.length > 0 && remaining[0]) {
-        await (client as any)
+        await client
           .from('user_addresses')
           .update({ is_default: true, updated_at: new Date().toISOString() })
           .eq('id', remaining[0].id)

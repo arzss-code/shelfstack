@@ -35,10 +35,11 @@ const fetchOrders = async () => {
     if (Array.isArray(res)) {
       orders.value = res
     } else if (res?.data) {
-      orders.value = Array.isArray(res.data) ? res.data : (res.data as any).orders || []
+      orders.value = Array.isArray(res.data) ? res.data : res.data.orders || []
     }
-  } catch (err: any) {
-    error.value = err?.data?.message || 'Gagal memuat daftar pesanan Anda.'
+  } catch (err: unknown) {
+    const errorObj = err as { data?: { message?: string } } | undefined
+    error.value = errorObj?.data?.message || 'Gagal memuat daftar pesanan Anda.'
   } finally {
     isLoading.value = false
   }

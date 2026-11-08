@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const serviceClient = serverSupabaseServiceRole<Database>(event)
-  const updatePayload: Record<string, string | null> = {}
+  const updatePayload: Database['public']['Tables']['profiles']['Update'] = {}
   const metadataPayload: Record<string, string | null> = {}
 
   if (parsed.data.full_name !== undefined) {
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Update profil di tabel public.profiles (service role bypass RLS, otorisasi di-enforce di level endpoint)
-  const { data: updatedProfile, error: updateError } = await (serviceClient as any)
+  const { data: updatedProfile, error: updateError } = await serviceClient
     .from('profiles')
     .update(updatePayload)
     .eq('user_id', targetUserId)
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
 
   // Selaraskan metadata auth Supabase (fail-safe)
   try {
-    await (serviceClient as any).auth.admin.updateUserById(targetUserId, {
+    await serviceClient.auth.admin.updateUserById(targetUserId, {
       user_metadata: metadataPayload,
     })
   } catch {
