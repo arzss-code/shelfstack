@@ -1,13 +1,19 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useAuth } from '~/features/auth/composables/useAuth'
-import { useCartStore } from '~/features/cart/stores/cart'
+import { useCartStore, type CartItem } from '~/features/cart/stores/cart'
 import { checkoutAddressSchema } from '~~/shared/schemas/order'
 import { formatRupiah } from '~/utils/format'
-import { useMidtransSnap } from '~/composables/useMidtransSnap'
+import { useOrderPaymentSync } from '~/composables/useOrderPaymentSync'
 import { useAddresses } from '~/composables/useAddresses'
 import { useLoyaltyPoints } from '~/composables/useLoyaltyPoints'
 import type { UserAddress } from '~~/shared/schemas/address'
 import { type ShippingService, calculateShippingFee } from '~~/shared/schemas/shipping'
+import {
+  calculateMaxUsableCoins,
+  calculateCoinsDiscountCents,
+  calculateCheckoutTotalCents,
+  createPlacedOrderSnapshot,
+} from '~/utils/checkout-pricing'
 
 export function useCheckoutOrder() {
   const { user, profile } = useAuth()
@@ -15,7 +21,7 @@ export function useCheckoutOrder() {
   const router = useRouter()
   const toast = useUiToast()
   const config = useRuntimeConfig()
-  const { pay: openSnapModal } = useMidtransSnap()
+  const { launchSnapPayment } = useOrderPaymentSync()
   const { saveAddress } = useAddresses()
   const { balanceCoins, fetchPointsSummary } = useLoyaltyPoints()
 
@@ -37,9 +43,7 @@ export function useCheckoutOrder() {
   watch(
     () => profile.value?.full_name,
     (name) => {
-      if (name && !address.value.name) {
-        address.value.name = name
-      }
+      if (name && !address.value.name) address.value.name = name
     },
   )
 
@@ -59,17 +63,11 @@ export function useCheckoutOrder() {
   const useCoins = ref(false)
 
   const maxUsableCoins = computed(() => {
-    if (balanceCoins.value <= 0) return 0
-    // Maksimal 50% dari subtotal setelah kupon diskon (1 koin = Rp 1 = 100 sen)
-    const maxAllowed = Math.floor((cartStore.finalPriceCents * 0.5) / 100)
-    return Math.max(0, Math.min(balanceCoins.value, maxAllowed))
+    return calculateMaxUsableCoins(balanceCoins.value, cartStore.finalPriceCents)
   })
 
-  const actualCoinsUsed = computed(() => {
-    return useCoins.value ? maxUsableCoins.value : 0
-  })
-
-  const coinsDiscountCents = computed(() => actualCoinsUsed.value * 100)
+  const actualCoinsUsed = computed(() => (useCoins.value ? maxUsableCoins.value : 0))
+  const coinsDiscountCents = computed(() => calculateCoinsDiscountCents(actualCoinsUsed.value))
 
   const shippingFeeCalculation = computed(() => {
     return calculateShippingFee(selectedShippingService.value, cartStore.totalPriceCents)
@@ -78,7 +76,7 @@ export function useCheckoutOrder() {
   const isFreeShipping = computed(() => shippingFeeCalculation.value.isFree)
 
   const placedOrderSnapshot = ref<{
-    items: typeof cartStore.items
+    items: CartItem[]
     totalItems: number
     totalPriceFormatted: string
     discountFormatted?: string | null
@@ -98,52 +96,42 @@ export function useCheckoutOrder() {
   const displayTotalPrice = computed(
     () => placedOrderSnapshot.value?.totalPriceFormatted ?? cartStore.formattedTotalPrice,
   )
-  const displayDiscountAmount = computed(() => {
-    if (placedOrderSnapshot.value) {
-      return placedOrderSnapshot.value.discountFormatted
-    }
-    return cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null
-  })
-  const displayCouponCode = computed(() => {
-    if (placedOrderSnapshot.value) {
-      return placedOrderSnapshot.value.couponCode
-    }
-    return cartStore.appliedCoupon?.code || null
-  })
-  const displayCoinsDiscountAmount = computed(() => {
-    if (placedOrderSnapshot.value) {
-      return placedOrderSnapshot.value.coinsDiscountFormatted
-    }
-    return actualCoinsUsed.value > 0 ? formatRupiah(actualCoinsUsed.value) : null
-  })
-  const displayCoinsUsed = computed(() => {
-    if (placedOrderSnapshot.value?.coinsUsed != null) {
-      return placedOrderSnapshot.value.coinsUsed
-    }
-    return actualCoinsUsed.value
-  })
-  const displayShippingFeeFormatted = computed(() => {
-    if (placedOrderSnapshot.value?.shippingFeeFormatted) {
-      return placedOrderSnapshot.value.shippingFeeFormatted
-    }
-    return isFreeShipping.value ? 'Gratis Ongkir' : formatRupiah(shippingFeeCents.value / 100)
-  })
-  const displayIsFreeShipping = computed(() => {
-    if (placedOrderSnapshot.value) {
-      return placedOrderSnapshot.value.isFreeShipping ?? isFreeShipping.value
-    }
-    return isFreeShipping.value
-  })
+  const displayDiscountAmount = computed(
+    () =>
+      placedOrderSnapshot.value?.discountFormatted ??
+      (cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null),
+  )
+  const displayCouponCode = computed(
+    () => placedOrderSnapshot.value?.couponCode ?? cartStore.appliedCoupon?.code ?? null,
+  )
+  const displayCoinsDiscountAmount = computed(
+    () =>
+      placedOrderSnapshot.value?.coinsDiscountFormatted ??
+      (actualCoinsUsed.value > 0 ? formatRupiah(actualCoinsUsed.value) : null),
+  )
+  const displayCoinsUsed = computed(
+    () => placedOrderSnapshot.value?.coinsUsed ?? actualCoinsUsed.value,
+  )
+  const displayShippingFeeFormatted = computed(
+    () =>
+      placedOrderSnapshot.value?.shippingFeeFormatted ??
+      (isFreeShipping.value ? 'Gratis Ongkir' : formatRupiah(shippingFeeCents.value / 100)),
+  )
+  const displayIsFreeShipping = computed(
+    () => placedOrderSnapshot.value?.isFreeShipping ?? isFreeShipping.value,
+  )
 
   const displayFinalPrice = computed(() => {
-    if (placedOrderSnapshot.value?.finalPriceFormatted) {
-      return placedOrderSnapshot.value.finalPriceFormatted
-    }
-    const totalWithShipping = Math.max(
-      0,
-      cartStore.finalPriceCents - coinsDiscountCents.value + shippingFeeCents.value,
+    return (
+      placedOrderSnapshot.value?.finalPriceFormatted ??
+      formatRupiah(
+        calculateCheckoutTotalCents(
+          cartStore.finalPriceCents,
+          coinsDiscountCents.value,
+          shippingFeeCents.value,
+        ) / 100,
+      )
     )
-    return formatRupiah(totalWithShipping / 100)
   })
 
   const submitButtonLabel = computed(() => {
@@ -158,12 +146,14 @@ export function useCheckoutOrder() {
 
   const handleSelectSavedAddress = (saved: UserAddress) => {
     selectedSavedAddressId.value = saved.id
-    address.value.name = saved.name
-    address.value.phone = saved.phone
-    address.value.street = saved.street
-    address.value.city = saved.city
-    address.value.postal = saved.postal
-    address.value.note = saved.note || ''
+    address.value = {
+      name: saved.name,
+      phone: saved.phone,
+      street: saved.street,
+      city: saved.city,
+      postal: saved.postal,
+      note: saved.note || '',
+    }
     errors.value = {}
   }
 
@@ -191,9 +181,7 @@ export function useCheckoutOrder() {
     if (!result.success) {
       const fieldErrors = result.error.flatten().fieldErrors
       for (const [key, messages] of Object.entries(fieldErrors)) {
-        if (messages && messages.length > 0 && messages[0]) {
-          errors.value[key] = messages[0]
-        }
+        if (messages?.[0]) errors.value[key] = messages[0]
       }
       return false
     }
@@ -201,20 +189,15 @@ export function useCheckoutOrder() {
   }
 
   const handleCreateOrder = async () => {
-    if (isSubmitting.value || isOrderPlaced.value) {
-      return
-    }
-
+    if (isSubmitting.value || isOrderPlaced.value) return
     if (!user.value) {
       router.push('/auth/login?redirect=/checkout')
       return
     }
-
     if (cartStore.isEmpty) {
       generalError.value = 'Keranjang belanja Anda kosong. Silakan pilih produk terlebih dahulu.'
       return
     }
-
     if (!validateForm()) {
       generalError.value = 'Mohon periksa kembali kelengkapan formulir alamat pengiriman.'
       return
@@ -225,10 +208,7 @@ export function useCheckoutOrder() {
 
     try {
       const orderPayload = {
-        items: cartStore.items.map((item) => ({
-          product_id: item.productId,
-          qty: item.quantity,
-        })),
+        items: cartStore.items.map((item) => ({ product_id: item.productId, qty: item.quantity })),
         address: {
           name: address.value.name.trim(),
           phone: address.value.phone.trim(),
@@ -247,117 +227,53 @@ export function useCheckoutOrder() {
       }
 
       const idempotencyKey = getOrCreateCheckoutKey()
-
       const response = await $fetch<{ status: string; data: { order_id: string } }>('/api/orders', {
         method: 'POST',
-        headers: {
-          'Idempotency-Key': idempotencyKey,
-        },
+        headers: { 'Idempotency-Key': idempotencyKey },
         body: orderPayload,
       })
 
       const orderId = response.data.order_id
       createdOrderId.value = orderId
 
-      placedOrderSnapshot.value = {
-        items: [...cartStore.items],
+      placedOrderSnapshot.value = createPlacedOrderSnapshot({
+        items: cartStore.items,
         totalItems: cartStore.totalItems,
-        totalPriceFormatted: cartStore.formattedTotalPrice,
-        discountFormatted: cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null,
-        couponCode: cartStore.appliedCoupon?.code || null,
-        coinsDiscountFormatted:
-          actualCoinsUsed.value > 0 ? formatRupiah(actualCoinsUsed.value) : null,
-        coinsUsed: actualCoinsUsed.value,
-        shippingFeeFormatted: isFreeShipping.value
-          ? 'Gratis Ongkir'
-          : formatRupiah(shippingFeeCents.value / 100),
-        shippingService: selectedShippingService.value,
+        formattedTotalPrice: cartStore.formattedTotalPrice,
+        discountCents: cartStore.discountCents,
+        formattedDiscountAmount: cartStore.formattedDiscountAmount,
+        couponCode: cartStore.appliedCoupon?.code,
+        actualCoinsUsed: actualCoinsUsed.value,
         isFreeShipping: isFreeShipping.value,
-        finalPriceFormatted: formatRupiah(
-          Math.max(
-            0,
-            cartStore.finalPriceCents - coinsDiscountCents.value + shippingFeeCents.value,
-          ) / 100,
-        ),
-      }
+        shippingFeeCents: shippingFeeCents.value,
+        shippingService: selectedShippingService.value,
+        finalPriceCents: cartStore.finalPriceCents,
+        coinsDiscountCents: coinsDiscountCents.value,
+      })
       isOrderPlaced.value = true
       checkoutIdempotencyKey.value = ''
       cartStore.clearCart()
 
       if (saveAddressForNextOrder.value && user.value) {
-        try {
-          await saveAddress({
-            name: address.value.name.trim(),
-            phone: address.value.phone.trim(),
-            street: address.value.street.trim(),
-            city: address.value.city.trim(),
-            postal: address.value.postal.trim(),
-            note: address.value.note ? address.value.note.trim() : undefined,
-            is_default: false,
-          })
-        } catch {
-          // Gagal menyimpan alamat sekunder tidak membatalkan checkout
-        }
+        saveAddress({
+          name: address.value.name.trim(),
+          phone: address.value.phone.trim(),
+          street: address.value.street.trim(),
+          city: address.value.city.trim(),
+          postal: address.value.postal.trim(),
+          note: address.value.note?.trim() || undefined,
+          is_default: false,
+        }).catch(() => {})
       }
 
       if (config.public?.enableMidtrans) {
-        try {
-          const paymentRes = await $fetch<{
-            status: string
-            data: { snap_token: string; redirect_url: string }
-          }>(`/api/orders/${orderId}/pay`, {
-            method: 'POST',
-          })
-
-          const snapToken = paymentRes.data.snap_token
-
-          openSnapModal(snapToken, {
-            onSuccess: () => {
-              toast.add({
-                severity: 'success',
-                summary: 'Pembayaran Berhasil',
-                detail: 'Terima kasih, pembayaran Anda telah berhasil diverifikasi!',
-                life: 5000,
-              })
-              router.push(`/orders/${orderId}`)
-            },
-            onPending: () => {
-              toast.add({
-                severity: 'info',
-                summary: 'Menunggu Pembayaran',
-                detail: 'Silakan selesaikan pembayaran sesuai petunjuk metode yang dipilih.',
-                life: 5000,
-              })
-              router.push(`/orders/${orderId}`)
-            },
-            onError: () => {
-              toast.add({
-                severity: 'error',
-                summary: 'Pembayaran Gagal',
-                detail: 'Transaksi pembayaran gagal diproses. Anda dapat mencobanya kembali.',
-                life: 5000,
-              })
-              router.push(`/orders/${orderId}`)
-            },
-            onClose: () => {
-              router.push(`/orders/${orderId}`)
-            },
-          })
-          return
-        } catch (payErr: unknown) {
-          const fetchErr = payErr as { data?: { message?: string } }
-          const errorMsg =
-            fetchErr.data?.message ||
-            'Gagal memuat sesi Snap Midtrans. Mengalihkan ke detail pesanan...'
-          toast.add({
-            severity: 'warn',
-            summary: 'Perhatian Pembayaran',
-            detail: errorMsg,
-            life: 5000,
-          })
-          router.push(`/orders/${orderId}`)
-          return
-        }
+        await launchSnapPayment(orderId, {
+          onSuccess: () => router.push(`/orders/${orderId}`),
+          onPending: () => router.push(`/orders/${orderId}`),
+          onError: () => router.push(`/orders/${orderId}`),
+          onClose: () => router.push(`/orders/${orderId}`),
+        })
+        return
       }
 
       toast.add({

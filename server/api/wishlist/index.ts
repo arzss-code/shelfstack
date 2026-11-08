@@ -1,18 +1,19 @@
 import { serverSupabaseClient } from '#supabase/server'
+import type { Database } from '~/types/database.types'
 import { wishlistMutationSchema } from '../../../shared/schemas/wishlist'
 import { requireUser } from '../../utils/auth'
 import { errorResponse, successResponse } from '../../utils/response'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
-  const client = await serverSupabaseClient(event)
+  const client = await serverSupabaseClient<Database>(event)
 
   // Autentikasi wajib untuk seluruh operasi wishlist berbasis database
   const { user, profile } = await requireUser(event)
   const targetUserId = user.id || profile.user_id
 
   if (method === 'GET') {
-    const { data, error } = await (client as any)
+    const { data, error } = await client
       .from('wishlists')
       .select(
         `
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Periksa apakah item sudah tersimpan sebelumnya
-    const { data: existing } = await (client as any)
+    const { data: existing } = await client
       .from('wishlists')
       .select('id, product_id, created_at')
       .eq('user_id', targetUserId)
@@ -61,7 +62,7 @@ export default defineEventHandler(async (event) => {
       return successResponse('Produk berhasil disimpan ke wishlist', existing)
     }
 
-    const { data, error } = await (client as any)
+    const { data, error } = await client
       .from('wishlists')
       .insert({
         user_id: targetUserId,
@@ -95,7 +96,7 @@ export default defineEventHandler(async (event) => {
       return errorResponse(event, 'ID produk tidak valid', parsed.error.flatten().fieldErrors, 400)
     }
 
-    const { error } = await (client as any)
+    const { error } = await client
       .from('wishlists')
       .delete()
       .eq('user_id', targetUserId)

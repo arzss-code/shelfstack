@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { formatRupiah } from '~/utils/format'
 import type { DiscountType } from '~~/shared/schemas/coupon'
+import { calculateCouponDiscountCents, isCouponEligible } from '~~/shared/utils/coupon-math'
 
 export interface CartItem {
   productId: number
@@ -112,29 +113,7 @@ export const useCartStore = defineStore('cart', () => {
 
   // Kalkulasi Diskon Voucher Dinamis
   const discountCents = computed(() => {
-    if (!appliedCoupon.value || items.value.length === 0) return 0
-    const subtotal = totalPriceCents.value
-
-    // Jika subtotal belum mencapai minimum belanja kupon, diskon menjadi 0
-    if (
-      appliedCoupon.value.min_purchase_cents > 0 &&
-      subtotal < appliedCoupon.value.min_purchase_cents
-    ) {
-      return 0
-    }
-
-    if (appliedCoupon.value.discount_type === 'percentage') {
-      let d = Math.floor((subtotal * appliedCoupon.value.discount_value) / 100)
-      if (
-        appliedCoupon.value.max_discount_cents != null &&
-        d > appliedCoupon.value.max_discount_cents
-      ) {
-        d = appliedCoupon.value.max_discount_cents
-      }
-      return Math.min(d, subtotal)
-    }
-
-    return Math.min(appliedCoupon.value.discount_value, subtotal)
+    return calculateCouponDiscountCents(appliedCoupon.value, totalPriceCents.value)
   })
 
   const discountAmount = computed(() => discountCents.value / 100)
@@ -145,8 +124,7 @@ export const useCartStore = defineStore('cart', () => {
   const formattedFinalPrice = computed(() => formatRupiah(finalPrice.value))
 
   const isCouponValidForCurrentSubtotal = computed(() => {
-    if (!appliedCoupon.value) return false
-    return totalPriceCents.value >= appliedCoupon.value.min_purchase_cents
+    return isCouponEligible(appliedCoupon.value, totalPriceCents.value)
   })
 
   // Actions

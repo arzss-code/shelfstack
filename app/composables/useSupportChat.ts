@@ -2,8 +2,17 @@ import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import { onUnmounted, watch } from 'vue'
 import type { Database } from '~/types/database.types'
 import { useAuth } from '~/features/auth/composables/useAuth'
+import {
+  acquireRealtimeChannel,
+  teardownRealtimeChannel,
+  isChannelSubscribed,
+} from '~/utils/supabase-realtime'
+import {
+  enrichIncomingMessage,
+  extractErrorMessage,
+  parseSendPayload,
+} from '~/utils/support-chat-common'
 import type {
-  SendSupportMessageInput,
   SupportAttachmentType,
   SupportMessageItem,
   SupportThreadItem,
@@ -11,32 +20,6 @@ import type {
 
 const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024 // 5 MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-
-function parseSendPayload(
-  input:
-    | string
-    | {
-        message_text: string
-        attachment_url?: string | null
-        attachment_type?: SupportAttachmentType | null
-        attached_order_id?: string | null
-        attached_product_id?: number | null
-      },
-): SendSupportMessageInput {
-  if (typeof input === 'string') return { message_text: input }
-  return {
-    message_text: input.message_text,
-    attachment_url: input.attachment_url ?? null,
-    attachment_type: input.attachment_type ?? null,
-    attached_order_id: input.attached_order_id ?? null,
-    attached_product_id: input.attached_product_id ?? null,
-  }
-}
-
-const getErrorMessage = (err: unknown, fallback: string) =>
-  (err as { data?: { message?: string }; message?: string })?.data?.message ||
-  (err as { message?: string })?.message ||
-  fallback
 
 export function useSupportChat() {
   const { isLoggedIn, user, profile } = useAuth()
@@ -63,26 +46,7 @@ export function useSupportChat() {
 
   const cleanupChannel = () => {
     if (channel && supabase) {
-      try {
-        if (typeof (channel as any).unsubscribe === 'function') {
-          ;(channel as any).unsubscribe()
-        }
-      } catch {
-        // Safe unsubscribe
-      }
-      try {
-        supabase.removeChannel(channel)
-      } catch {
-        // Safe removal
-      }
-      try {
-        const realtime = (supabase as any).realtime
-        if (realtime && typeof realtime._remove === 'function') {
-          realtime._remove(channel)
-        }
-      } catch {
-        // Safe remove from realtime registry
-      }
+      teardownRealtimeChannel(supabase, channel)
       channel = null
     }
   }
@@ -90,22 +54,7 @@ export function useSupportChat() {
   const handleIncomingMessage = (newMsg: SupportMessageItem) => {
     if (!newMsg || newMsg.deleted_at || messages.value.some((m) => m.id === newMsg.id)) return
 
-    const enriched = { ...newMsg } as SupportMessageItem
-    if (
-      (newMsg.attachment_type === 'order_card' || newMsg.message_text.includes('Pesanan')) &&
-      !enriched.attached_order
-    ) {
-      const prev = messages.value.find((m) => m.attached_order)
-      if (prev?.attached_order) enriched.attached_order = prev.attached_order
-    } else if (
-      (newMsg.attachment_type === 'product_card' || newMsg.message_text.includes('Produk')) &&
-      !enriched.attached_product
-    ) {
-      const prev = messages.value.find((m) => m.attached_product)
-      if (prev?.attached_product) enriched.attached_product = prev.attached_product
-    }
-
-    messages.value.push(enriched)
+    messages.value.push(enrichIncomingMessage(newMsg, messages.value))
 
     if (thread.value) {
       thread.value.last_message_text = newMsg.message_text
@@ -124,36 +73,13 @@ export function useSupportChat() {
 
   const subscribeRealtime = (threadId: string) => {
     if (!import.meta.client || !supabase || !threadId) return
-    const topic = `support-thread-${threadId}`
-    if (typeof supabase.getChannels === 'function') {
-      try {
-        const existing = supabase
-          .getChannels()
-          .find((c) => c.topic === topic || c.topic === `realtime:${topic}`)
-        if (
-          existing &&
-          ((existing as any).channelAdapter?.isJoined() ||
-            (existing as any).channelAdapter?.isJoining())
-        ) {
-          channel = existing
-          return
-        }
-        if (existing) {
-          if (typeof (existing as any).unsubscribe === 'function') (existing as any).unsubscribe()
-          const realtime = (supabase as any).realtime
-          if (realtime && typeof realtime._remove === 'function') realtime._remove(existing)
-        }
-      } catch {
-        // Safe check
-      }
-    }
+    if (isChannelSubscribed(channel)) return
 
     cleanupChannel()
     try {
-      channel = supabase
-        .channel(topic)
+      channel = acquireRealtimeChannel(supabase, `support-thread-${threadId}`)
         .on(
-          'postgres_changes' as any,
+          'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
@@ -164,7 +90,7 @@ export function useSupportChat() {
         )
         .subscribe()
     } catch {
-      // Safe fallback
+      // Channel subscription fallback
     }
   }
 
@@ -194,7 +120,7 @@ export function useSupportChat() {
       }
       return null
     } catch (err: unknown) {
-      error.value = getErrorMessage(err, 'Gagal memuat thread bantuan.')
+      error.value = extractErrorMessage(err, 'Gagal memuat thread bantuan.')
       return null
     } finally {
       isLoading.value = false
@@ -261,7 +187,7 @@ export function useSupportChat() {
       }
       return false
     } catch (err: unknown) {
-      error.value = getErrorMessage(err, 'Gagal mengirim pesan bantuan.')
+      error.value = extractErrorMessage(err, 'Gagal mengirim pesan bantuan.')
       return false
     } finally {
       isSending.value = false
@@ -294,7 +220,7 @@ export function useSupportChat() {
       )
       return res.data?.file_url || null
     } catch (err: unknown) {
-      error.value = getErrorMessage(err, 'Gagal mengunggah gambar lampiran.')
+      error.value = extractErrorMessage(err, 'Gagal mengunggah gambar lampiran.')
       return null
     } finally {
       isUploading.value = false

@@ -1,18 +1,19 @@
 import { serverSupabaseClient } from '#supabase/server'
+import type { Database } from '~/types/database.types'
 import { createAddressSchema } from '../../../shared/schemas/address'
 import { requireUser } from '../../utils/auth'
 import { errorResponse, successResponse } from '../../utils/response'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
-  const client = await serverSupabaseClient(event)
+  const client = await serverSupabaseClient<Database>(event)
 
   // Autentikasi wajib untuk semua operasi alamat pengguna
   const { user, profile } = await requireUser(event)
   const targetUserId = user.id || profile.user_id
 
   if (method === 'GET') {
-    const { data, error } = await (client as any)
+    const { data, error } = await client
       .from('user_addresses')
       .select('*')
       .eq('user_id', targetUserId)
@@ -41,7 +42,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Periksa apakah pengguna sudah memiliki alamat tersimpan sebelumnya
-    const { count } = await (client as any)
+    const { count } = await client
       .from('user_addresses')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', targetUserId)
@@ -52,7 +53,7 @@ export default defineEventHandler(async (event) => {
 
     // Jika alamat baru ditandai sebagai utama, reset alamat utama sebelumnya
     if (shouldBeDefault) {
-      await (client as any)
+      await client
         .from('user_addresses')
         .update({ is_default: false, updated_at: new Date().toISOString() })
         .eq('user_id', targetUserId)
@@ -70,7 +71,7 @@ export default defineEventHandler(async (event) => {
       is_default: shouldBeDefault,
     }
 
-    const { data, error } = await (client as any)
+    const { data, error } = await client
       .from('user_addresses')
       .insert(insertPayload)
       .select('*')

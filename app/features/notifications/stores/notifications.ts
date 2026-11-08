@@ -1,7 +1,15 @@
 import { defineStore } from 'pinia'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 import type { NotificationItem } from '~~/shared/schemas/notification'
 import { extractAuthUserId } from '~~/shared/utils/auth'
 import { useUiToast } from '~/composables/useUiToast'
+import {
+  getDesktopNotificationPermission,
+  requestDesktopNotificationPermission,
+  showDesktopNotification,
+  type DesktopPermissionStatus,
+} from '~/utils/desktop-notification'
+import { acquireRealtimeChannel, teardownRealtimeChannel } from '~/utils/supabase-realtime'
 
 export const useNotificationStore = defineStore('notifications', () => {
   const items = ref<NotificationItem[]>([])
@@ -11,8 +19,8 @@ export const useNotificationStore = defineStore('notifications', () => {
   const hasMore = ref(false)
   const nextCursor = ref<string | null>(null)
   const isOpen = ref(false)
-  const desktopPermission = ref<'default' | 'granted' | 'denied' | 'unsupported'>('default')
-  let channel: any = null
+  const desktopPermission = ref<DesktopPermissionStatus>('default')
+  let channel: RealtimeChannel | null = null
 
   const toast = useUiToast()
 
@@ -29,28 +37,14 @@ export const useNotificationStore = defineStore('notifications', () => {
 
   // Inisialisasi status izin Web Notification API
   const initDesktopPermission = () => {
-    if (import.meta.client && typeof window !== 'undefined' && 'Notification' in window) {
-      desktopPermission.value = Notification.permission
-    } else {
-      desktopPermission.value = 'unsupported'
-    }
+    desktopPermission.value = getDesktopNotificationPermission()
   }
 
   // Permintaan izin notifikasi browser / desktop
-  const requestDesktopPermission = async (): Promise<
-    'default' | 'granted' | 'denied' | 'unsupported'
-  > => {
-    if (import.meta.client && typeof window !== 'undefined' && 'Notification' in window) {
-      try {
-        const res = await Notification.requestPermission()
-        desktopPermission.value = res
-        return res
-      } catch (err) {
-        console.error('[NotificationStore] Gagal meminta izin notifikasi browser:', err)
-        return desktopPermission.value
-      }
-    }
-    return 'unsupported'
+  const requestDesktopPermission = async (): Promise<DesktopPermissionStatus> => {
+    const res = await requestDesktopNotificationPermission()
+    desktopPermission.value = res
+    return res
   }
 
   // Mengambil daftar notifikasi dari backend Nitro dengan cursor pagination
@@ -185,8 +179,7 @@ export const useNotificationStore = defineStore('notifications', () => {
 
     try {
       const supabase = useSupabaseClient()
-      channel = supabase
-        .channel(`notifications-user-${userId}`)
+      channel = acquireRealtimeChannel(supabase, `notifications-user-${userId}`)
         .on(
           'postgres_changes',
           {
@@ -198,13 +191,9 @@ export const useNotificationStore = defineStore('notifications', () => {
           (payload) => {
             if (payload?.new) {
               const newNotif = payload.new as NotificationItem
-              // Sisipkan di posisi teratas
               items.value.unshift(newNotif)
-              if (!newNotif.is_read) {
-                unreadCount.value++
-              }
+              if (!newNotif.is_read) unreadCount.value++
 
-              // Tampilkan in-app toast feedback
               let severity: 'success' | 'warn' | 'info' = 'info'
               if (newNotif.type === 'payment_success' || newNotif.type === 'order_completed') {
                 severity = 'success'
@@ -212,34 +201,13 @@ export const useNotificationStore = defineStore('notifications', () => {
                 severity = 'warn'
               }
 
-              toast.add({
-                summary: newNotif.title,
-                detail: newNotif.message,
-                severity,
-              })
-
-              // Web Notification API (Desktop Notification saat izin diberikan)
-              if (
-                typeof window !== 'undefined' &&
-                'Notification' in window &&
-                Notification.permission === 'granted'
-              ) {
-                try {
-                  const n = new Notification(newNotif.title, {
-                    body: newNotif.message,
-                    icon: '/favicon.ico',
-                    tag: newNotif.id,
-                  })
-                  n.onclick = () => {
-                    window.focus()
-                    if (newNotif.reference_url) {
-                      navigateTo(newNotif.reference_url)
-                    }
-                  }
-                } catch {
-                  // Browser pembatas background notification
-                }
-              }
+              toast.add({ summary: newNotif.title, detail: newNotif.message, severity })
+              showDesktopNotification(
+                newNotif.title,
+                newNotif.message,
+                newNotif.reference_url,
+                newNotif.id,
+              )
             }
           },
         )
@@ -255,9 +223,7 @@ export const useNotificationStore = defineStore('notifications', () => {
             if (payload?.new) {
               const updated = payload.new as NotificationItem
               const idx = items.value.findIndex((i: NotificationItem) => i.id === updated.id)
-              if (idx !== -1) {
-                items.value[idx] = updated
-              }
+              if (idx !== -1) items.value[idx] = updated
               unreadCount.value = items.value.filter((i: NotificationItem) => !i.is_read).length
             }
           },
@@ -273,7 +239,7 @@ export const useNotificationStore = defineStore('notifications', () => {
     if (channel) {
       try {
         const supabase = useSupabaseClient()
-        supabase.removeChannel(channel)
+        teardownRealtimeChannel(supabase, channel)
       } catch {
         // Abaikan error saat teardown di testing
       }

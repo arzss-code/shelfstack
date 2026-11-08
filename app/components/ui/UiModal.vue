@@ -92,7 +92,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 const lockBodyScroll = (locked: boolean) => {
   if (!import.meta.client) return
-  document.body.style.overflow = locked ? 'hidden' : ''
+  document.documentElement.classList.toggle('modal-open', locked)
 }
 
 const focusFirstField = () => {
@@ -127,7 +127,7 @@ onBeforeUnmount(() => lockBodyScroll(false))
       <Transition name="ui-modal">
         <div
           v-if="visible"
-          class="fixed inset-0 z-[1000] flex items-end justify-center overflow-y-auto overscroll-contain bg-black/50 p-0 backdrop-blur-[2px] sm:items-center sm:p-6"
+          class="ui-modal-overlay fixed inset-0 z-[1000] flex items-end justify-center overflow-y-auto overscroll-contain bg-black/50 p-0 backdrop-blur-[2px] sm:items-center sm:p-6"
           @click.self="closeOnOverlay && (visible = false)"
         >
           <div

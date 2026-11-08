@@ -1,6 +1,11 @@
 import { computed, ref } from 'vue'
 import { useCartStore, type AppliedCoupon } from '~/features/cart/stores/cart'
 import type { CouponSummary } from '~~/shared/schemas/coupon'
+import {
+  calculateCouponDiscountCents,
+  isCouponEligible,
+  findBestCoupon,
+} from '~~/shared/utils/coupon-math'
 import { formatRupiah } from '~/utils/format'
 import { useUiToast } from '~/composables/useUiToast'
 import { useAuth } from '~/features/auth/composables/useAuth'
@@ -56,23 +61,8 @@ export function useVoucherSelection(options: {
 
   const walletCoupons = computed<AvailableCoupon[]>(() => {
     return (userVouchers.claimedVouchers.value || []).map((v) => ({
-      id: v.id,
-      coupon_id: v.coupon_id,
-      code: v.code,
-      name: v.name,
-      description: v.description,
-      discount_type: v.discount_type,
-      discount_value: v.discount_value,
-      formatted_discount: v.formatted_discount,
-      max_discount_cents: v.max_discount_cents,
-      formatted_max_discount: v.formatted_max_discount,
-      min_purchase_cents: v.min_purchase_cents,
-      formatted_min_purchase: v.formatted_min_purchase,
-      starts_at: v.starts_at,
-      expires_at: v.expires_at,
-      is_expired: v.is_expired,
+      ...v,
       is_available: v.status === 'claimed' && !v.is_expired,
-      status: v.status,
     }))
   })
 
@@ -80,18 +70,7 @@ export function useVoucherSelection(options: {
     coupon: AvailableCoupon | CouponSummary | null,
     subtotalCents: number,
   ): number => {
-    if (!coupon || subtotalCents <= 0) return 0
-    if (coupon.min_purchase_cents > 0 && subtotalCents < coupon.min_purchase_cents) {
-      return 0
-    }
-    if (coupon.discount_type === 'percentage') {
-      let d = Math.floor((subtotalCents * coupon.discount_value) / 100)
-      if (coupon.max_discount_cents != null && d > coupon.max_discount_cents) {
-        d = coupon.max_discount_cents
-      }
-      return Math.min(d, subtotalCents)
-    }
-    return Math.min(coupon.discount_value, subtotalCents)
+    return calculateCouponDiscountCents(coupon, subtotalCents)
   }
 
   const fetchCoupons = async () => {
@@ -110,8 +89,7 @@ export function useVoucherSelection(options: {
   }
 
   const isEligible = (coupon: AvailableCoupon): boolean => {
-    if (coupon.is_expired || coupon.is_available === false) return false
-    return cartStore.totalPriceCents >= coupon.min_purchase_cents
+    return isCouponEligible(coupon, cartStore.totalPriceCents)
   }
 
   const allCoupons = computed(() => {
@@ -137,16 +115,7 @@ export function useVoucherSelection(options: {
   const ineligibleCoupons = computed(() => currentTabCoupons.value.filter((c) => !isEligible(c)))
 
   const bestDiscountCode = computed(() => {
-    let maxDiscount = 0
-    let bestCode = ''
-    for (const c of eligibleCoupons.value) {
-      const d = calculateDiscountCents(c, cartStore.totalPriceCents)
-      if (d > maxDiscount) {
-        maxDiscount = d
-        bestCode = c.code
-      }
-    }
-    return bestCode
+    return findBestCoupon(eligibleCoupons.value, cartStore.totalPriceCents)?.code || ''
   })
 
   const selectedCoupon = computed(() => {
@@ -244,25 +213,21 @@ export function useVoucherSelection(options: {
       })
 
       if (res.data) {
-        const summary = res.data
+        const s = res.data
         const couponObj: AvailableCoupon = {
-          id: summary.code,
-          code: summary.code,
-          name: summary.name,
-          description: summary.description,
-          discount_type: summary.discount_type,
-          discount_value: summary.discount_value,
-          formatted_discount: summary.formatted_discount,
-          max_discount_cents: summary.max_discount_cents,
+          id: s.code,
+          code: s.code,
+          name: s.name,
+          description: s.description,
+          discount_type: s.discount_type,
+          discount_value: s.discount_value,
+          formatted_discount: s.formatted_discount,
+          max_discount_cents: s.max_discount_cents,
           formatted_max_discount:
-            summary.max_discount_cents != null
-              ? formatRupiah(summary.max_discount_cents / 100)
-              : null,
-          min_purchase_cents: summary.min_purchase_cents,
+            s.max_discount_cents != null ? formatRupiah(s.max_discount_cents / 100) : null,
+          min_purchase_cents: s.min_purchase_cents,
           formatted_min_purchase:
-            summary.min_purchase_cents > 0
-              ? formatRupiah(summary.min_purchase_cents / 100)
-              : 'Tanpa Minimum',
+            s.min_purchase_cents > 0 ? formatRupiah(s.min_purchase_cents / 100) : 'Tanpa Minimum',
           is_expired: false,
           is_available: true,
         }

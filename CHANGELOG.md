@@ -2,6 +2,34 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.34.0] - 2026-11-08
+
+### Arsitektur Deep Modules, Standar Web Modern, dan Eliminasi Any Type
+
+- **Arsitektur Deep Modules (Batas Ketat Komponen <= 300 Baris Kode)**:
+  - Merestrukturisasi 100% berkas `.vue` dan `.ts` pada direktori `app/`, `server/`, dan `shared/` sehingga seluruhnya berada di bawah batas maksimal 300 baris kode sesuai standar arsitektur Talenavi Senior Full-Stack Engineering SOP.
+  - Mengekstraksi logika pembayaran dan Snap modal ke composable mandiri `useOrderPaymentSync.ts`.
+  - Mengekstraksi polling siklus hidup pesanan pending dan visibility-change listener ke composable `useOrderPolling.ts`.
+  - Mengekstraksi pelacakan kurir dan riwayat checkpoint pengiriman ke composable `useOrderTracking.ts`.
+  - Mengekstraksi presentasi pesanan, badge status, segment color timeline, dan query orders ke utilitas `app/utils/order-presentation.ts`.
+  - Mengekstraksi formula loyalitas koin dan kalkulasi snapshot pesanan ke `app/utils/checkout-pricing.ts`.
+  - Mengekstraksi matematika diskon voucher dan seleksi kupon terbaik ke `shared/utils/coupon-math.ts`.
+  - Mengekstraksi resolusi ID kandidat dan evaluasi rekonsiliasi pengembalian dana Midtrans ke `server/utils/payment-reconciliation.ts`.
+  - Mengekstraksi mutasi penilaian ulasan dan rating produk ke `server/utils/review-mutations.ts`.
+  - Mengekstraksi eksekusi pengembalian dana dan verifikasi webhook Midtrans ke `server/utils/midtrans-refund.ts`.
+  - Mengisolasi penanganan channel Supabase Realtime bebas kebocoran memori ke `app/utils/supabase-realtime.ts`.
+- **Pengetikan Basis Data Ketat dan Eliminasi Tipe `any`**:
+  - Menyinkronkan `app/types/database.types.ts` dengan seluruh skema migrasi terkini termasuk kolom koin loyalitas (`coins_balance`, `coin_cost`, `coins_used`, `coins_earned`), relasi chat (`attached_order_id`, `attached_product_id`), dan parameter RPC `p_use_coins`.
+  - Menghapus seluruh casting `as any`, `(client as any)`, dan `catch (err: any)` pada lapisan API server (`wishlist`, `addresses`, `account/profile`, `account/stats`, `avatar`) dan komponen UI chat.
+- **Penerapan Standar Platform Web Modern**:
+  - Menerapkan isolasi scroll murni berbasis CSS (`dialog:modal`, `.ui-modal-overlay { overscroll-behavior: contain; }`) dan `html.modal-open { scrollbar-gutter: stable; }` pada `UiModal.vue` untuk mencegah layout shift dan kedipan scrollbar pada browser desktop.
+  - Menerapkan `font-size-adjust: from-font;` pada root `body` di `main.css` untuk mencegah layout shift saat pemuatan web font.
+  - Menerapkan `text-wrap: balance;` pada heading (`h1, h2, h3, h4`) dan `text-wrap: pretty;` pada teks paragraf (`p, li, blockquote`) untuk tipografi yang rapi tanpa kata yatim (typographical orphans).
+  - Menerapkan atribut aksesibilitas formulir W3C ARIA (`:aria-errormessage`, `role="alert"`, `aria-live="polite"`) pada `UiInput.vue` dan `UiTextarea.vue`.
+- **Suite Pengujian Unit Otomatis (`tests/unit/deep-modules-and-web-standards.spec.ts`)**:
+  - Menambahkan 16 pengujian unit terisolasi yang menguji matematika voucher, kalkulasi diskon koin, isolasi rekonsiliasi pembayaran, dan logika presentasi timeline pesanan (16/16 lulus).
+  - Seluruh 88 file pengujian Vitest (923/923 test) dan 14 pengujian E2E Playwright lulus 100%.
+
 ## [0.33.2] - 2026-11-07
 
 ### Ekspansi E2E Rute Kategori, Hardening Aksesibilitas WCAG & Penutupan Gap Web Vitals

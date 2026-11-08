@@ -45,33 +45,20 @@ const displayName = computed(
 const initial = computed(() => displayName.value.charAt(0).toUpperCase() || '?')
 
 const handleSearch = () => {
-  if (searchQuery.value.trim()) {
-    router.push({ path: '/katalog', query: { q: searchQuery.value.trim() } })
-  } else {
-    router.push('/katalog')
-  }
+  const q = searchQuery.value.trim()
+  router.push(q ? { path: '/katalog', query: { q } } : '/katalog')
   isMobileMenuOpen.value = false
 }
 
 const selectCategory = (cat: string) => {
   selectedCategory.value = cat
   const catSlug = dynamicCategoryMap.value[cat]
-  if (catSlug) {
-    router.push({ path: '/katalog', query: { category: catSlug } })
-  } else {
-    router.push('/katalog')
-  }
+  router.push(catSlug ? { path: '/katalog', query: { category: catSlug } } : '/katalog')
 }
 
-onMounted(async () => {
+onMounted(() => {
   fetchProfile().catch(() => {})
-  await fetchCategories().catch(() => {})
-
-  const currentUserId = extractAuthUserId(user.value)
-  if (currentUserId) {
-    await notificationStore.fetchNotifications(true)
-    notificationStore.setupRealtimeListener(currentUserId)
-  }
+  fetchCategories().catch(() => {})
 })
 
 onBeforeUnmount(() => {

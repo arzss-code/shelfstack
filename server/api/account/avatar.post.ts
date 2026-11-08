@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
   const newAvatarUrl = publicUrlData.publicUrl
 
   // 3. Ambil avatar lama untuk dibersihkan
-  const { data: currentProfile } = await (serviceClient as any)
+  const { data: currentProfile } = await serviceClient
     .from('profiles')
     .select('avatar_url')
     .eq('user_id', targetUserId)
@@ -82,7 +82,7 @@ export default defineEventHandler(async (event) => {
   const oldAvatarUrl = currentProfile?.avatar_url
 
   // 4. Update avatar_url di tabel public.profiles (service role bypass RLS)
-  const { error: updateError } = await (serviceClient as any)
+  const { error: updateError } = await serviceClient
     .from('profiles')
     .update({ avatar_url: newAvatarUrl })
     .eq('user_id', targetUserId)

@@ -139,6 +139,7 @@ const controlClass = computed(() => {
         :min="min"
         :step="step"
         :aria-invalid="error ? 'true' : undefined"
+        :aria-errormessage="error ? helpId : undefined"
         :aria-describedby="describedBy"
         :class="[controlClass, numeric ? 'tabular' : '']"
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
@@ -175,7 +176,13 @@ const controlClass = computed(() => {
       />
     </div>
 
-    <p v-if="error" :id="helpId" class="m-0 text-[11px] font-medium text-rose-600">
+    <p
+      v-if="error"
+      :id="helpId"
+      role="alert"
+      aria-live="polite"
+      class="m-0 text-[11px] font-medium text-rose-600"
+    >
       {{ error }}
     </p>
     <p v-else-if="hint" :id="helpId" class="m-0 text-[11px] text-brand-muted">{{ hint }}</p>

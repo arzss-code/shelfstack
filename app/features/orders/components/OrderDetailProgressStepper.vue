@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Order } from '~/types/order'
-import type { OrderStep } from '~/composables/useOrderDetail'
+import type { OrderStep } from '~/utils/order-presentation'
 
 defineProps<{
   order: Order
