@@ -26,6 +26,52 @@ useSeoMeta({
   ogImage: () => product.value?.image_url || undefined,
 })
 
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: computed(() => {
+        if (!product.value) return ''
+        const schema = {
+          '@context': 'https://schema.org/',
+          '@type': 'Product',
+          name: product.value.name,
+          image: product.value.image_url ? [product.value.image_url] : [],
+          description: product.value.description || 'Produk terkurasi resmi ShelfStack.',
+          sku: `SKU-${product.value.id}`,
+          brand: {
+            '@type': 'Brand',
+            name: 'ShelfStack',
+          },
+          offers: {
+            '@type': 'Offer',
+            url: `https://shelfstack.id/product/${product.value.slug || product.value.id}`,
+            priceCurrency: 'IDR',
+            price: product.value.price,
+            availability:
+              product.value.stock > 0
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock',
+            itemCondition: 'https://schema.org/NewCondition',
+          },
+          ...(product.value.rating
+            ? {
+                aggregateRating: {
+                  '@type': 'AggregateRating',
+                  ratingValue: product.value.rating,
+                  reviewCount: product.value.review_count || 1,
+                  bestRating: 5,
+                  worstRating: 1,
+                },
+              }
+            : {}),
+        }
+        return JSON.stringify(schema)
+      }),
+    },
+  ],
+})
+
 onMounted(async () => {
   const param = (route.params.id || (route.params as Record<string, string>).slug) as string
   if (!param) {

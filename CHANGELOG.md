@@ -2,6 +2,26 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.36.0] - 2026-11-08
+
+### Portfolio Packaging, PWA Standalone Manifest, Dynamic Sitemap, dan SEO Structured Data
+
+- **PWA Web App Manifest Standalone (`public/site.webmanifest` & `nuxt.config.ts`)**:
+  - Menghadirkan konfigurasi Web App Manifest standar PWA dengan display mode `standalone`, tema warna `#141414`, background color `#FFFFFF`, orientasi portrait, deskripsi aplikasi, dan icon set resmi (192x192, 512x512 maskable/any).
+  - Menyematkan deklarasi manifest di konfigurasi global `nuxt.config.ts` bersama tag OpenGraph (`og:site_name`, `og:type`, `og:locale`).
+- **Dynamic XML Sitemap & Crawl Directives (`server/routes/sitemap.xml.ts` & `public/robots.txt`)**:
+  - Mengimplementasikan endpoint server Nitro dinamis `/sitemap.xml` yang melakukan query langsung ke database Supabase untuk mengindeks seluruh produk aktif beserta canonical slug rute publik (`/`, `/products`, `/categories`, `/c/[slug]`, `/contact`, `/promos`, `/product/[slug]`).
+  - Memperbarui `public/robots.txt` dengan direktif perayapan mesin pencari terarah: mengizinkan perayapan etalase publik, memblokir area privat/administratif (`/admin/`, `/api/`), dan mendeklarasikan referensi sitemap resmi.
+- **Structured Data JSON-LD Google Rich Snippets (`app/pages/product/[id].vue`)**:
+  - Menerapkan schema `Schema.org/Product` reaktif pada halaman detail produk yang menyajikan metadata terstruktur: nama produk, gambar, deskripsi, SKU unik, brand resmi ShelfStack, harga mata uang IDR, ketersediaan stok (`InStock` vs `OutOfStock`), kondisi produk baru (`NewCondition`), serta `AggregateRating` dinamis bila produk memiliki ulasan pembeli.
+- **Indikator Ketahanan Koneksi Jaringan Offline (`OfflineBanner.vue` & `app/layouts/default.vue`)**:
+  - Membangun komponen reaktif ringan `OfflineBanner.vue` yang mendengarkan event jaringan browser `online` dan `offline` secara native tanpa library eksternal berlebih, memperingatkan pengguna saat koneksi terputus dengan desain bento minimalis non-intrusif.
+  - Memasang banner secara global pada `app/layouts/default.vue` dengan transisi halus.
+- **Suite Pengujian Unit & Kepatuhan Arsitektur**:
+  - Menambahkan suite pengujian unit `tests/unit/pwa-seo-portfolio.spec.ts` (7/7 test lulus 100%).
+  - Mempertahankan aturan batas baris kode: 0 berkas melanggar batas 300 baris.
+  - 90 file pengujian Vitest (937/937 test lulus 100%) dan 14 skenario Playwright E2E lulus 100%.
+
 ## [0.35.0] - 2026-11-08
 
 ### Elevasi Etalase Publik: Craftsmanship, Anti-Slop Copywriting, dan Ulasan Pembeli Terverifikasi
