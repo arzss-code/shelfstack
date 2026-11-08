@@ -7,7 +7,7 @@
         <div
           class="w-11 h-11 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center shrink-0 text-brand-accent shadow-whisper"
         >
-          <i class="pi pi-verified text-lg" />
+          <i class="pi pi-verified text-lg" aria-hidden="true" />
         </div>
         <div>
           <p class="font-display m-0 text-sm font-bold text-brand-ink">100% Produk Original</p>
@@ -21,7 +21,7 @@
         <div
           class="w-11 h-11 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center shrink-0 text-brand-ink shadow-whisper"
         >
-          <i class="pi pi-truck text-lg" />
+          <i class="pi pi-truck text-lg" aria-hidden="true" />
         </div>
         <div>
           <p class="font-display m-0 text-sm font-bold text-brand-ink">
@@ -37,7 +37,7 @@
         <div
           class="w-11 h-11 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center shrink-0 text-brand-ink shadow-whisper"
         >
-          <i class="pi pi-replay text-lg" />
+          <i class="pi pi-replay text-lg" aria-hidden="true" />
         </div>
         <div>
           <p class="font-display m-0 text-sm font-bold text-brand-ink">Garansi Retur 30 Hari</p>
@@ -51,7 +51,7 @@
         <div
           class="w-11 h-11 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center shrink-0 text-brand-accent shadow-whisper"
         >
-          <i class="pi pi-comments text-lg" />
+          <i class="pi pi-comments text-lg" aria-hidden="true" />
         </div>
         <div>
           <p class="font-display m-0 text-sm font-bold text-brand-ink">Layanan Bantuan 24/7</p>
