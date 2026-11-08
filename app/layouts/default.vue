@@ -3,6 +3,7 @@ import AppNavbar from '~/components/AppNavbar.vue'
 import AppFooter from '~/components/AppFooter.vue'
 import CartDrawer from '~/features/cart/components/CartDrawer.vue'
 import LiveChatWidget from '~/components/support/LiveChatWidget.vue'
+import OfflineBanner from '~/components/common/OfflineBanner.vue'
 import { useCartStore } from '~/features/cart/stores/cart'
 import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
 import { useNotificationStore } from '~/features/notifications/stores/notifications'
@@ -33,6 +34,11 @@ onMounted(() => {
     >
       <slot />
     </main>
+
+    <!-- Offline Resilience Indicator -->
+    <ClientOnly>
+      <OfflineBanner />
+    </ClientOnly>
 
     <!-- Global Slide-over Cart Drawer -->
     <CartDrawer />

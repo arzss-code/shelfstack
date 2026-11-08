@@ -16,8 +16,14 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'ShelfStack: Curated Archival Department Store' },
         { name: 'theme-color', content: '#141414' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { property: 'og:site_name', content: 'ShelfStack' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:locale', content: 'id_ID' },
       ],
       link: [
+        { rel: 'manifest', href: '/site.webmanifest' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {

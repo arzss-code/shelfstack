@@ -6,15 +6,16 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 15 (Storefront Craft, Anti-Slop Conversion Copywriting & Verified Buyer Reviews)**
-- **Versi Rilis:** `v0.35.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-08)
-- **Baseline Quality Gate (2026-11-08, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 89 file / 930 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 16 (Portfolio Packaging, PWA Standalone Manifest, Dynamic Sitemap & SEO Structured Data)**
+- **Versi Rilis:** `v0.36.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-08)
+- **Baseline Quality Gate (2026-11-08, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 90 file / 937 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
   - UI Language: **Bahasa Indonesia** konsisten di seluruh etalase publik
   - Realtime Engine: **Supabase Realtime** (Postgres Changes untuk order tracking) + polling sync 3.5–4s untuk order `pending`
   - Deployment Target: **Docker + Nginx** (multi-stage build, `deploy/docker-compose.prod.yml`; Vercel tidak lagi jadi target)
+  - PWA / SEO: **PWA Standalone Manifest** (`site.webmanifest`), dynamic XML sitemap (`/sitemap.xml`), robots crawl directives, `Schema.org/Product` JSON-LD rich snippets, dan offline resilience banner.
 
 ---
 
@@ -211,6 +212,23 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Halaman Kategori Cantik SEO (`app/pages/c/[slug].vue` : C-06)**: Menghadirkan halaman etalase kategori terkurasi `/c/[slug]` (`tech`, `home`, `furniture`, `lifestyle`, `stationery`) dengan `useSeoMeta` dinamis, breadcrumb navigasi terhubung, badge kurasi resmi, grid `ProductList`, dan empty state ramah saat slug tidak terdaftar (+3 unit test di `tests/unit/category-slug-page.spec.ts`).
     - **Sinkronisasi E2E Playwright dengan Akun Demo (`LoginPage.ts`, `auth.spec.ts`)**: Memperbarui fallback kredensial otomatis pada Page Object Model ke `demo-customer@shelfstack.local` dan `demo-admin@shelfstack.local` serta menambah verifikasi otomasi browser untuk pengisian instan 1-klik banner demo pada `/auth/login`.
     - **Finalisasi Portofolio & Ekosistem Template GitHub**: Menambahkan suite template GitHub profesional lengkap di `.github/` (default PR, multi-scope PR feature/bugfix/hotfix/refactor/docs, issue templates bug/feature, dan `CONTRIBUTING.md`), serta memperbarui `README.md` dan `docs/BACKLOG.md`.
+
+28. **Arsitektur Deep Modules, Standar Web Modern, dan Eliminasi Any Type (SELESAI 2026-11-08, v0.34.0).**
+    - **Modularisasi Menyeluruh (Batas Komponen <= 300 Baris)**: Merestrukturisasi 100% file `.vue` dan `.ts` pada direktori `app/`, `server/`, dan `shared/` sehingga seluruhnya berada di bawah 300 baris kode melalui ekstraksi composable dan utilitas mendalam (`useOrderPaymentSync`, `useOrderPolling`, `useOrderTracking`, `order-presentation`, `checkout-pricing`, `coupon-math`, `payment-reconciliation`, `review-mutations`, `midtrans-refund`, `supabase-realtime`).
+    - **Pengetikan Basis Data Ketat**: Mengeliminasi seluruh casting `as any` di layer backend dan client dengan menyelaraskan `database.types.ts` dengan skema migrasi terkini.
+    - **Standar Web Modern**: Penerapan isolasi scroll CSS murni (`overscroll-behavior: contain`), `scrollbar-gutter: stable`, dan `font-size-adjust: from-font` pada root styling untuk pencegahan CLS.
+
+29. **Elevasi Etalase Publik: Craftsmanship, Anti-Slop Copywriting, dan Ulasan Pembeli Terverifikasi (SELESAI 2026-11-08, v0.35.0).**
+    - **Ulasan Pembeli Terverifikasi Nyata Database (`server/api/reviews/featured.get.ts` & `HomeReviews.vue`)**: Agregasi ulasan berating tinggi dari tabel `product_reviews` dan data pembeli nyata untuk showcase beranda.
+    - **Copywriting Anti-Slop & Konversi Nilai Ganda (`HomePromoCTA.vue`)**: Penawaran voucher belanja pengguna baru dan akses instan ke panel pengelolaan toko bagi evaluator teknis.
+    - **WCAG 2.1 AA & Zero CLS**: Target sentuh 44x44px dan dimensi gambar eksplisit.
+
+30. **Portfolio Packaging, PWA Standalone Manifest, Dynamic Sitemap, dan SEO Structured Data (SELESAI 2026-11-08, v0.36.0).**
+    - **PWA Web App Manifest Standalone (`public/site.webmanifest` & `nuxt.config.ts`)**: Konfigurasi manifest standar PWA lengkap (mode `standalone`, tema `#141414`, icon set 192/512) dan deklarasi OpenGraph global.
+    - **Dynamic XML Sitemap & Crawl Directives (`server/routes/sitemap.xml.ts` & `public/robots.txt`)**: Rute Nitro dinamis `/sitemap.xml` yang melakukan query langsung atas produk aktif dan canonical route publik, didukung direktif `robots.txt` terarah.
+    - **Schema.org/Product JSON-LD Rich Snippets (`app/pages/product/[id].vue`)**: Metadata terstruktur Google Search (nama, brand, SKU, harga, stok `InStock`/`OutOfStock`, kondisi `NewCondition`, dan `AggregateRating`).
+    - **Indikator Ketahanan Jaringan Offline (`OfflineBanner.vue` & `app/layouts/default.vue`)**: Banner koneksi offline reaktif native tanpa dependensi berlebih.
+    - **Quality Gate Suite**: 90 file test / 937 tests lolos 100% di Vitest, 14 test E2E Playwright lolos 100%, 0 lint error, dan nuxi typecheck EXIT 0.
 
 ---
 

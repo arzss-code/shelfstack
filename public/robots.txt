@@ -1,2 +1,16 @@
 User-Agent: *
-Disallow:
+Allow: /
+Allow: /katalog
+Allow: /c/
+Allow: /product/
+Allow: /about
+Allow: /contact
+Allow: /help
+Allow: /tracking
+Allow: /promos
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout
+Disallow: /orders/
+
+Sitemap: https://shelfstack.id/sitemap.xml
