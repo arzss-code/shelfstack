@@ -2,6 +2,25 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.35.0] - 2026-11-08
+
+### Elevasi Etalase Publik: Craftsmanship, Anti-Slop Copywriting, dan Ulasan Pembeli Terverifikasi
+
+- **Integrasi Ulasan Pembeli Terverifikasi Real Database (`HomeReviews.vue` & `server/api/reviews/featured.get.ts`)**:
+  - Menghadirkan endpoint baru `server/api/reviews/featured.get.ts` yang mengagregasi ulasan berating tinggi (>= 4 bintang) dari tabel `product_reviews`, bergabung dengan metadata produk aktif dan profil pembeli terverifikasi.
+  - Memperkaya showcase `HomeReviews.vue` dengan kartu ulasan pembeli nyata yang memuat avatar inisial, lencana "Pembeli Terverifikasi", bintang rating, kutipan pengalaman belanja terpercaya, dan tautan langsung ke detail produk.
+  - Mempertahankan 4 kartu pilar komitmen layanan resmi (Kurasi Fisik 100% Asli, Jaminan Pengembalian 30 Hari, Pengemasan Tahan Benturan, Layanan Pelanggan Responsif) sebagai jaminan mutu berkelanjutan.
+- **Konversi Nilai Ganda & Copywriting Anti-Slop (`HomePromoCTA.vue`)**:
+  - Merekayasa ulang call-to-action beranda dengan nilai ganda: penawaran voucher belanja pelanggan baru (`WELCOME10` diskon 10% + bebas ongkir se-Indonesia) dan akses instan ke panel pengelolaan toko bagi pemilik bisnis dan evaluator.
+  - Mengeliminasi jargon korporat generik dan pola klise AI, menyajikan proposisi nilai yang nyata dan dapat dibuktikan.
+- **Standar Aksesibilitas Web & Penghalusan Visual Storefront**:
+  - Menyelaraskan seluruh elemen interaktif beranda (`HomeHero`, `HomeAssurances`, `HomeFeatures`, `HomeReviews`, `HomePromoCTA`) dengan target sentuh minimal 44x44px, atribut `aria-hidden` pada ikon dekoratif, dan `aria-label` yang deskriptif untuk pembaca layar.
+  - Memastikan dimensi eksplisit pada gambar untuk mencapai 0 Cumulative Layout Shift (CLS).
+- **Suite Pengujian Unit & Kepatuhan Arsitektur**:
+  - Menambahkan suite pengujian unit komprehensif `tests/unit/storefront-craft-and-copywriting.spec.ts` (7/7 test lulus).
+  - Mempertahankan kepatuhan batas maksimal baris kode: 100% berkas `.vue` dan `.ts` berada di bawah 300 baris kode (0 berkas melanggar).
+  - 89 file pengujian Vitest (930/930 test lulus 100%) dan 14 skenario Playwright E2E lulus 100%.
+
 ## [0.34.0] - 2026-11-08
 
 ### Arsitektur Deep Modules, Standar Web Modern, dan Eliminasi Any Type

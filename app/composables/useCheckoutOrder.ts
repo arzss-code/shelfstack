@@ -75,19 +75,8 @@ export function useCheckoutOrder() {
   const shippingFeeCents = computed(() => shippingFeeCalculation.value.feeCents)
   const isFreeShipping = computed(() => shippingFeeCalculation.value.isFree)
 
-  const placedOrderSnapshot = ref<{
-    items: CartItem[]
-    totalItems: number
-    totalPriceFormatted: string
-    discountFormatted?: string | null
-    couponCode?: string | null
-    coinsDiscountFormatted?: string | null
-    coinsUsed?: number
-    shippingFeeFormatted?: string
-    shippingService?: string
-    isFreeShipping?: boolean
-    finalPriceFormatted?: string
-  } | null>(null)
+  type PlacedOrderSnapshot = ReturnType<typeof createPlacedOrderSnapshot<CartItem>>
+  const placedOrderSnapshot = ref<PlacedOrderSnapshot | null>(null)
 
   const displayItems = computed(() => placedOrderSnapshot.value?.items ?? cartStore.items)
   const displayTotalItems = computed(
