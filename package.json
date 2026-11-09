@@ -15,6 +15,7 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest",
     "test:e2e": "playwright test",
+    "test:load": "node scripts/load-test/runner.mjs",
     "db:seed": "node scripts/seed.mjs --remote",
     "db:seed:local": "node scripts/seed.mjs --local",
     "db:seed:remote": "node scripts/seed.mjs --remote"
