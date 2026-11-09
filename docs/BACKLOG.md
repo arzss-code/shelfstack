@@ -23,15 +23,15 @@
 
 ## EPIC 1 — Auth & Security (Fase 1)
 
-| ID   | Story                                                | Prioritas | AC                                                                                            |
-| ---- | ---------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------- |
-| A-01 | Sebagai visitor, saya bisa register + login email    | Must      | Session persist refresh, error message jelas (email sudah dipakai, password lemah)            |
-| A-02 | Sebagai visitor, saya bisa login Google OAuth        | Should    | Callback ke `/` + buat `profiles` otomatis via trigger                                        |
-| A-03 | Sebagai customer, saya tidak bisa buka `/admin`      | Must      | Redirect + toast 403, middleware `admin.ts` + RLS double-check                                |
-| A-04 | Sebagai dev, RLS products strict                     | Must      | Anon hanya SELECT `deleted_at IS NULL`; CUD admin only; buktikan via `curl` tanpa token → 403 |
-| A-05 | Sebagai dev, RLS profiles/orders/activity strict     | Must      | Customer hanya baca miliknya; admin baca semua; anon tulis = 0                                |
-| A-06 | Sebagai admin, saya upload gambar tanpa error policy | Must      | Storage `product-images` write admin only, 5MB, jpeg/png/webp, kompresi tetap jalan           |
-| A-07 | Sebagai user, saya bisa lihat profil + logout        | Should    | `auth/me` konsisten client/server                                                             |
+| ID   | Story                                                | Prioritas | AC                                                                                                                                                                  |
+| ---- | ---------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A-01 | Sebagai visitor, saya bisa register + login email    | Must      | Session persist refresh, error message jelas (email sudah dipakai, password lemah)                                                                                  |
+| A-02 | Sebagai visitor, saya bisa login Google OAuth        | Should    | ✅ SELESAI (2026-11-09, v0.37.1): Alur OAuth Google tangguh di `/auth/callback` dengan 5 status UI, penanganan error provider, retry profile fetch, dan 7 unit test |
+| A-03 | Sebagai customer, saya tidak bisa buka `/admin`      | Must      | Redirect + toast 403, middleware `admin.ts` + RLS double-check                                                                                                      |
+| A-04 | Sebagai dev, RLS products strict                     | Must      | Anon hanya SELECT `deleted_at IS NULL`; CUD admin only; buktikan via `curl` tanpa token → 403                                                                       |
+| A-05 | Sebagai dev, RLS profiles/orders/activity strict     | Must      | Customer hanya baca miliknya; admin baca semua; anon tulis = 0                                                                                                      |
+| A-06 | Sebagai admin, saya upload gambar tanpa error policy | Must      | Storage `product-images` write admin only, 5MB, jpeg/png/webp, kompresi tetap jalan                                                                                 |
+| A-07 | Sebagai user, saya bisa lihat profil + logout        | Should    | `auth/me` konsisten client/server                                                                                                                                   |
 
 ## EPIC 2 — Catalog Pro (Fase 2)
 

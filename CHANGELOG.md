@@ -2,6 +2,26 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.37.1] - 2026-11-09
+
+### Hardening Alur Autentikasi Google OAuth dan Ketahanan Halaman Callback
+
+- **5 Status UI Wajib pada Halaman Callback (`app/pages/auth/callback.vue`)**:
+  - Membangun antarmuka landing OAuth yang mematuhi standar 5 status UI (Loading, Success, Error, Empty, Idle) menggunakan primitif kustom terstandarisasi (`UiAlert`, `UiButton`).
+  - Menampilkan spinner dan deskripsi pemrosesan kredensial yang jelas saat menunggu penyelesaian pertukaran token sesi Supabase.
+- **Deteksi Parameter Error Provider OAuth**:
+  - Mendeteksi parameter query `error` dan `error_description` (seperti saat pengguna membatalkan izin masuk `access_denied` dari dialog Google).
+  - Menghilangkan kondisi pengguna terjebak pada animasi pemuatan tanpa batas, menyajikan pesan berbahasa Indonesia yang informatif serta tombol navigasi kembali ke `/auth/login`.
+- **Pengambilan Profil Berulang (Retry Logic) dan Pengaman Timeout**:
+  - Menerapkan mekanisme retry `fetchProfile(true)` hingga 3 kali dengan jeda 300ms untuk mengantisipasi keterlambatan pemicu basis data `handle_new_user()`.
+  - Memasang timeout pengaman 10 detik yang mengalihkan tampilan ke state error ramah pengguna jika server otorisasi macet.
+- **Pengalihan Berbasis Peran dan Sanitasi Redirect Query**:
+  - Mengarahkan pengguna dengan peran administrator langsung ke `/admin/activities`.
+  - Memvalidasi parameter query `redirect` (mencegah open-redirect) untuk mengantarkan pelanggan ke rute belanja yang dituju atau kembali ke beranda (`/`).
+- **Suite Pengujian Unit Komprehensif (`tests/unit/auth-callback.spec.ts`)**:
+  - Menambahkan 7 unit test yang memvalidasi status default loading, penanganan pembatalan izin, timeout verifikasi sesi, pengalihan pelanggan, pengalihan admin, sanitasi query redirect, serta batas 300 baris kode per berkas tanpa karakter em dash.
+  - 92 file pengujian Vitest (952/952 test lulus 100%), 0 error ESLint, dan `nuxi typecheck` EXIT 0.
+
 ## [0.37.0] - 2026-11-09
 
 ### Phase E Production Roadmap: k6 Load Testing Suite, Concurrency Verification, dan Webhook Deduplication
