@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 16 (Portfolio Packaging, PWA Standalone Manifest, Dynamic Sitemap & SEO Structured Data)**
-- **Versi Rilis:** `v0.36.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-08)
-- **Baseline Quality Gate (2026-11-08, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 90 file / 937 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 17 (Phase E Production Roadmap: k6 Load Testing Suite & Concurrency Verification)**
+- **Versi Rilis:** `v0.37.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-09)
+- **Baseline Quality Gate (2026-11-09, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 91 file / 945 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -229,6 +229,14 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Schema.org/Product JSON-LD Rich Snippets (`app/pages/product/[id].vue`)**: Metadata terstruktur Google Search (nama, brand, SKU, harga, stok `InStock`/`OutOfStock`, kondisi `NewCondition`, dan `AggregateRating`).
     - **Indikator Ketahanan Jaringan Offline (`OfflineBanner.vue` & `app/layouts/default.vue`)**: Banner koneksi offline reaktif native tanpa dependensi berlebih.
     - **Quality Gate Suite**: 90 file test / 937 tests lolos 100% di Vitest, 14 test E2E Playwright lolos 100%, 0 lint error, dan nuxi typecheck EXIT 0.
+
+31. **Phase E Production Roadmap: Suite Pengujian Beban & Konkurensi k6 (SELESAI 2026-11-09, v0.37.0).**
+    - **Runner CLI Lintas Platform (`scripts/load-test/runner.mjs` & `pnpm test:load`)**: Mendukung eksekusi terarah skenario (`catalog`, `checkout`, `webhook`, `health`, `all`), override VUs dan durasi, resolusi binary k6 otomatis di Windows/Linux/macOS, serta pre-flight health probe server.
+    - **Skenario Katalog (`scripts/load-test/scenarios/catalog-browse.js`)**: Simulasi penelusuran kategori resmi, listing terpaginasi, filter kategori, pencarian teks, dan sortir harga dengan verifikasi data array dan format sukses.
+    - **Critical Inventory Test & Checkout Concurrency (`scripts/load-test/scenarios/checkout-concurrency.js`)**: Menguji invarian konkurensi PostgreSQL RPC `create_order` dengan header `Idempotency-Key` unik saat banyak pengguna berebut SKU produk yang sama (invarian: 0 error crash 500, stok tidak pernah negatif, pesanan tidak melebihi stok).
+    - **Idempotensi & Deduplikasi Webhook Midtrans (`scripts/load-test/scenarios/webhook-dedup.js`)**: Menguji pengiriman duplikat notifikasi settlement dengan signature SHA-512 valid (invarian: 0 crash 500, mutasi status pesanan idempoten).
+    - **Probing Observabilitas & Health Check (`scripts/load-test/scenarios/health-readiness.js`)**: Pengujian polling cepat `/api/health` dan `/api/ready` di bawah konkurensi tinggi tanpa kebocoran pool koneksi database dan Redis.
+    - **Suite Pengujian Unit (`tests/unit/load-test-suite.spec.ts`)**: 8 unit test memvalidasi eksistensi berkas skenario, argumen CLI runner, resolusi binary k6, ambang batas threshold, batas 300 baris kode, dan ketiadaan karakter em dash.
 
 ---
 

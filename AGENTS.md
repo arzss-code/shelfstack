@@ -62,6 +62,12 @@ Sumber kebenaran berlapis (jangan mengarang klaim di luar ini):
 - Supabase MCP selalu `--read-only`. Jangan tulis skema/data lewat MCP; perubahan skema hanya via migrasi `supabase/migrations/`.
 - `project-ref` per project hidup di `opencode.json` masing-masing repo; token tidak pernah masuk repo/chat.
 
+## Orca Workspace & Orchestration
+
+- `orca.yaml` (di root repo) mengatur setup worktree otomatis (`pnpm install --frozen-lockfile`, `setupAgentStartupPolicy: wait-for-setup`), default tab (`Dev Server`), dan template `issueCommand` berbasis 4-Gate.
+- `.worktreeinclude` menyalin file lokal yang di-ignore Git (`.env`, `.mcp.json`) ke child worktree Orca baru agar `server/plugins/00.env-guard.ts` dapat memvalidasi environment saat boot tanpa mengekspos secret ke Git.
+- Aturan operasional lengkap untuk `orca` CLI, worktree, dan multi-agent orchestration terdokumentasi di `.agents/rules/orca-workflow.md`.
+
 ## Mandatory Workflow
 
 Before coding:

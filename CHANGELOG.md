@@ -2,6 +2,32 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.37.0] - 2026-11-09
+
+### Phase E Production Roadmap: k6 Load Testing Suite, Concurrency Verification, dan Webhook Deduplication
+
+- **Runner CLI Lintas Platform (`scripts/load-test/runner.mjs` & `pnpm test:load`)**:
+  - Membangun antarmuka CLI ramah pengembang untuk menjalankan uji beban k6 (`pnpm test:load [scenario] [options]`).
+  - Mendukung seleksi skenario terarah (`catalog`, `checkout`, `webhook`, `health`, `all`), override virtual users (`--vus`), durasi pengujian (`--duration`), dan alamat URL target (`--base-url`).
+  - Dilengkapi mekanisme resolusi binary k6 otomatis yang mendeteksi executable di PATH sistem, `C:\Program Files\k6\k6.exe`, direktori aplikasi lokal, dan path Unix standard.
+  - Menyediakan pre-flight health probe cerdas yang mendeteksi ketersediaan port dan rute host aktif (IPv4 `127.0.0.1` vs IPv6 `[::1]`) sebelum menyalakan beban pengujian.
+- **Skenario Penelusuran Katalog (`scripts/load-test/scenarios/catalog-browse.js`)**:
+  - Mensimulasikan perjalanan penelusuran pembeli di etalase: query kategori resmi (`GET /api/categories`), listing katalog terpaginasi (`GET /api/products`), filter kategori (`?category=tech`), pencarian teks bebas (`?q=desk`), dan sortir harga terendah (`?sort=price-low`).
+  - Menerapkan ambang batas performa ketat (error rate < 1%, latency p95 < 1000ms, p99 < 2000ms).
+- **Critical Inventory Test & Konkurensi Checkout (`scripts/load-test/scenarios/checkout-concurrency.js`)**:
+  - Menguji invarian transaksional PostgreSQL RPC `create_order` saat puluhan virtual users secara bersamaan berebut membeli stok produk yang sama.
+  - Mengirimkan header `Idempotency-Key` unik deterministik berbasis UUID v4 pada tiap percobaan checkout.
+  - Memastikan secara empiris: server tidak pernah mengalami crash 500 atau unhandled deadlock (`checkout_server_errors: count == 0`), stok fisik tidak pernah negatif, dan pesanan yang berhasil tidak pernah melebihi kuota stok tersedia.
+- **Idempotensi & Deduplikasi Webhook Midtrans (`scripts/load-test/scenarios/webhook-dedup.js`)**:
+  - Menguji ketahanan endpoint callback pembayaran (`POST /api/midtrans/notification`) terhadap duplikasi pengiriman notifikasi secara simultan.
+  - Menghasilkan tanda tangan SHA-512 kriptografis yang valid menggunakan runtime `k6/crypto`.
+  - Memastikan notifikasi duplikat ditangani secara aman tanpa mutasi buku besar ganda dan tanpa crash server (`webhook_server_errors: count == 0`).
+- **Probing Observabilitas & Health Check (`scripts/load-test/scenarios/health-readiness.js`)**:
+  - Menguji keandalan endpoint liveness `/api/health` dan readiness probe `/api/ready` di bawah frekuensi polling tinggi tanpa kebocoran pool koneksi basis data PostgreSQL atau Redis.
+- **Suite Pengujian Unit & Kepatuhan Arsitektur (`tests/unit/load-test-suite.spec.ts`)**:
+  - Menambahkan 8 unit test yang memvalidasi eksistensi seluruh berkas skenario k6, argumen parsing CLI runner, resolusi binary executable, kontrak ambang batas threshold, batas maksimal 300 baris kode per berkas, dan ketiadaan karakter em dash.
+  - 91 file pengujian Vitest (945/945 test lulus 100%), 0 error ESLint, dan `nuxi typecheck` EXIT 0.
+
 ## [0.36.0] - 2026-11-08
 
 ### Portfolio Packaging, PWA Standalone Manifest, Dynamic Sitemap, dan SEO Structured Data

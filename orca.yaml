@@ -1,0 +1,19 @@
+# Orca Repository Configuration for ShelfStack (product-management)
+# Governed by Talenavi Global Multi-Agent SOP and ShelfStack AGENTS.md
+
+setupAgentStartupPolicy: wait-for-setup
+
+scripts:
+  setup: pnpm install --frozen-lockfile
+
+defaultTabs:
+  - title: Dev Server
+    command: pnpm dev
+    color: "#141414"
+
+issueCommand: |
+  Execute this task following Talenavi 4-Gate Governance and ShelfStack Engineering Rules:
+  1. Gate 1 (Blueprint & Discovery): Read `docs/PROGRESS.md` and `docs/BACKLOG.md` first. Inspect existing schema in `supabase/migrations/`, architecture in `app/features/` (FSD-lite), and UI primitives in `app/components/ui/`. Map all 5 UI states (Idle, Loading, Success, Empty, Error), server-side RBAC/ownership, and database invariants before coding.
+  2. Gate 2 (Construction): Use `pnpm` exclusively (never `npm`, `npx`, `yarn`, or `bun`). Enforce strict TypeScript (zero `any`), keep every `.vue` and `.ts` file under 300 lines, use early returns (max 2 nesting levels), keep business logic in services/composables, and follow `DESIGN.md` without em dashes in user-facing copy or comments.
+  3. Gate 3 (Hardening & Testing): Run and pass `pnpm lint`, `pnpm typecheck`, and `pnpm exec vitest run` (plus `pnpm test:e2e` for UI/flow changes). Verify zero console errors and zero mobile horizontal overflow (320px-375px).
+  4. Gate 4 (Release Governance): Commit using `<type>: [AA] <short description in English>` without `--no-verify`. Update `version.json` and `CHANGELOG.md` when wrapping a release.

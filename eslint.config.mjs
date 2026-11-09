@@ -5,6 +5,14 @@ export default withNuxt(
     ignores: ['.kilo/**', '.nuxt/**', '.output/**', 'node_modules/**'],
   },
   {
+    files: ['scripts/load-test/**'],
+    languageOptions: {
+      globals: {
+        __ENV: 'readonly',
+      },
+    },
+  },
+  {
     rules: {
       'vue/multi-word-component-names': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

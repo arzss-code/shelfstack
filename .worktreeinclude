@@ -1,0 +1,5 @@
+# Local gitignored files copied automatically into new Orca worktrees
+# Required so server/plugins/00.env-guard.ts and local MCP configs work in child worktrees
+# without committing secrets to Git.
+.env
+.mcp.json

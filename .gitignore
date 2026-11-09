@@ -43,6 +43,7 @@ pnpm-debug.log*
 .kilo/
 .claude/
 .cursor/
+.orca/
 .mcp.json
 .e2e/
 .agents/teamwork/

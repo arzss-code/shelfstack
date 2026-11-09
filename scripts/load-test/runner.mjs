@@ -1,0 +1,236 @@
+#!/usr/bin/env node
+
+/**
+ * ShelfStack k6 Load Testing Suite CLI Runner
+ *
+ * Usage:
+ *   pnpm test:load [scenario] [options]
+ *
+ * Scenarios:
+ *   catalog   - Etalase browsing, search, filter, and category listing
+ *   checkout  - Critical inventory race condition and concurrent checkout
+ *   webhook   - Payment webhook deduplication and concurrency
+ *   health    - Observability, liveness, and readiness probes
+ *   all       - Full comprehensive test suite (default)
+ *
+ * Options:
+ *   --vus <n>            Override virtual users count
+ *   --duration <time>    Override test duration (e.g. 10s, 30s, 1m)
+ *   --base-url <url>     Target server URL (default: http://127.0.0.1:3000)
+ *   --help               Show help menu
+ */
+
+import { spawnSync, spawn } from 'node:child_process'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+export function resolveK6Binary() {
+  if (process.env.K6_PATH && fs.existsSync(process.env.K6_PATH)) {
+    return process.env.K6_PATH
+  }
+
+  // Cek executable di PATH sistem
+  try {
+    const isWindows = process.platform === 'win32'
+    const cmd = isWindows ? 'where' : 'which'
+    const check = spawnSync(cmd, ['k6'], { encoding: 'utf-8' })
+    if (check.status === 0 && check.stdout) {
+      const foundPath = check.stdout.split(/\r?\n/)[0].trim()
+      if (foundPath && fs.existsSync(foundPath)) {
+        return foundPath
+      }
+    }
+  } catch {
+    // Lanjut ke pemeriksaan path fallback
+  }
+
+  // Fallback path umum Windows
+  const windowsCandidates = [
+    'C:\\Program Files\\k6\\k6.exe',
+    'C:\\Program Files (x86)\\k6\\k6.exe',
+    path.join(process.env.LOCALAPPDATA || '', 'Programs', 'k6', 'k6.exe'),
+  ]
+
+  for (const candidate of windowsCandidates) {
+    if (candidate && fs.existsSync(candidate)) {
+      return candidate
+    }
+  }
+
+  // Fallback path Unix
+  const unixCandidates = ['/usr/local/bin/k6', '/usr/bin/k6', '/opt/homebrew/bin/k6']
+  for (const candidate of unixCandidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate
+    }
+  }
+
+  return null
+}
+
+export function parseArgs(argv) {
+  const args = argv.slice(2)
+  const validScenarios = ['catalog', 'checkout', 'webhook', 'health', 'all']
+
+  let scenario = 'all'
+  let vus = null
+  let duration = null
+  let baseUrl = process.env.BASE_URL || 'http://localhost:3000'
+  let showHelp = false
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]
+    if (arg === '--help' || arg === '-h') {
+      showHelp = true
+    } else if (arg === '--vus' && args[i + 1]) {
+      vus = parseInt(args[++i], 10)
+    } else if (arg === '--duration' && args[i + 1]) {
+      duration = args[++i]
+    } else if (arg === '--base-url' && args[i + 1]) {
+      baseUrl = args[++i].replace(/\/+$/, '')
+    } else if (!arg.startsWith('-') && validScenarios.includes(arg.toLowerCase())) {
+      scenario = arg.toLowerCase()
+    }
+  }
+
+  return { scenario, vus, duration, baseUrl, showHelp }
+}
+
+export async function checkServerReachable(baseUrl) {
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 2000)
+    const res = await fetch(`${baseUrl}/api/health`, { signal: controller.signal })
+    clearTimeout(timeout)
+    return res.status >= 200 && res.status < 500
+  } catch {
+    return false
+  }
+}
+export async function detectWorkingBaseUrl(preferredUrl) {
+  if (preferredUrl.includes('localhost:3000')) {
+    if (await checkServerReachable('http://127.0.0.1:3000')) {
+      return 'http://127.0.0.1:3000'
+    }
+    if (await checkServerReachable('http://[::1]:3000')) {
+      return 'http://[::1]:3000'
+    }
+  }
+  if (await checkServerReachable(preferredUrl)) {
+    return preferredUrl
+  }
+  return preferredUrl
+}
+
+
+async function main() {
+  const { scenario, vus, duration, baseUrl, showHelp } = parseArgs(process.argv)
+
+  if (showHelp) {
+    console.log(`
+ShelfStack k6 Load Testing Suite
+
+Penggunaan:
+  pnpm test:load [scenario] [options]
+
+Skenario:
+  catalog    Uji jelajah katalog, pencarian, filter kategori, dan sortir
+  checkout   Uji konkurensi checkout dan integritas stok (Critical Inventory Test)
+  webhook    Uji idempoten dan deduplikasi webhook Midtrans
+  health     Uji liveness dan readiness telemetri
+  all        Jalankan rangkaian pengujian beban penuh (default)
+
+Opsi:
+  --vus <n>          Jumlah virtual users (contoh: --vus 20)
+  --duration <time>  Durasi pengujian (contoh: --duration 30s)
+  --base-url <url>   URL server target (default: http://127.0.0.1:3000)
+  --help, -h         Tampilkan bantuan ini
+`)
+    process.exit(0)
+  }
+
+  const k6Path = resolveK6Binary()
+  if (!k6Path) {
+    console.error(`
+[ERROR] Binary k6 tidak ditemukan di PATH atau Program Files.
+Silakan pasang k6 dengan salah satu metode berikut:
+  1. Windows (winget): winget install --id GrafanaLabs.k6
+  2. macOS (brew):     brew install k6
+  3. Linux:            sudo gpg -k && sudo apt-get install k6
+  4. Docker fallback:  docker run --rm -i grafana/k6 run - < scripts/load-test/suite.js
+`)
+    process.exit(1)
+  }
+
+  console.log(`[k6 Runner] Menggunakan executable: ${k6Path}`)
+  console.log(`[k6 Runner] Skenario: ${scenario.toUpperCase()}`)
+  const targetUrl = await detectWorkingBaseUrl(baseUrl)
+  console.log(`[k6 Runner] Target URL: ${targetUrl}`)
+
+  // Verifikasi ketersediaan server sebelum pengujian
+  const isServerUp = await checkServerReachable(targetUrl)
+  if (!isServerUp) {
+    console.warn(`
+[PERINGATAN] Server target pada ${targetUrl} belum aktif atau tidak merespons /api/health.
+Pastikan aplikasi berjalan di terminal lain sebelum menguji:
+  pnpm dev
+  atau
+  pnpm build && pnpm preview
+`)
+  }
+
+  // Tentukan file skenario target
+  let scriptFile = path.join(__dirname, 'suite.js')
+  if (scenario === 'catalog') {
+    scriptFile = path.join(__dirname, 'scenarios', 'catalog-browse.js')
+  } else if (scenario === 'checkout') {
+    scriptFile = path.join(__dirname, 'scenarios', 'checkout-concurrency.js')
+  } else if (scenario === 'webhook') {
+    scriptFile = path.join(__dirname, 'scenarios', 'webhook-dedup.js')
+  } else if (scenario === 'health') {
+    scriptFile = path.join(__dirname, 'scenarios', 'health-readiness.js')
+  }
+
+  const k6Args = ['run']
+
+  if (vus) {
+    k6Args.push('--vus', String(vus))
+  }
+  if (duration) {
+    k6Args.push('--duration', duration)
+  }
+
+  k6Args.push('-e', `BASE_URL=${targetUrl}`)
+  k6Args.push('-e', `SCENARIO=${scenario}`)
+  if (process.env.AUTH_TOKEN) {
+    k6Args.push('-e', `AUTH_TOKEN=${process.env.AUTH_TOKEN}`)
+  }
+  if (process.env.MIDTRANS_SERVER_KEY) {
+    k6Args.push('-e', `MIDTRANS_SERVER_KEY=${process.env.MIDTRANS_SERVER_KEY}`)
+  }
+
+  k6Args.push(scriptFile)
+
+  console.log(`[k6 Runner] Menjalankan: k6 ${k6Args.join(' ')}\n`)
+
+  const child = spawn(k6Path, k6Args, {
+    stdio: 'inherit',
+    shell: false,
+  })
+
+  child.on('close', (code) => {
+    process.exit(code ?? 0)
+  })
+}
+
+// Jalankan jika dieksekusi langsung
+if (process.argv[1] && process.argv[1].endsWith('runner.mjs')) {
+  main().catch((err) => {
+    console.error('[k6 Runner] Gagal menjalankan pengujian:', err)
+    process.exit(1)
+  })
+}
