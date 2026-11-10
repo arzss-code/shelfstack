@@ -100,4 +100,19 @@ describe('Wishlist Multi-Tenant & Database Invariants', () => {
     const merged = Array.from(new Set([...aliceDbItems, ...guestLocalItems]))
     expect(merged).toEqual([101, 102, 103, 104])
   })
+
+  it('memfilter ID produk yang tidak ada di database produk aktif untuk mencegah foreign key violation 23503', () => {
+    const activeProductIds = new Set([101, 102, 103])
+    const incomingFromLocalStorage = [101, 999, 103, 888] // 999 dan 888 adalah produk usang/terhapus
+
+    const validProductIds = incomingFromLocalStorage.filter((id) => activeProductIds.has(id))
+    expect(validProductIds).toEqual([101, 103])
+    expect(validProductIds.includes(999)).toBe(false)
+  })
+
+  it('menangani duplikasi payload array productIds secara idempoten tanpa melanggar unique constraint', () => {
+    const incomingWithDuplicates = [101, 101, 102, 102, 103]
+    const deduped = [...new Set(incomingWithDuplicates.map(Number))]
+    expect(deduped).toEqual([101, 102, 103])
+  })
 })

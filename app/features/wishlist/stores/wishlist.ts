@@ -64,8 +64,10 @@ export const useWishlistStore = defineStore('wishlist', () => {
 
     try {
       isSyncing.value = true
-      const response = await $fetch<{ success: boolean; data: any[] }>('/api/wishlist')
-      if (response?.success && Array.isArray(response.data)) {
+      const response = await $fetch<{ status?: string; success?: boolean; data: any[] }>(
+        '/api/wishlist',
+      )
+      if ((response?.status === 'success' || response?.success) && Array.isArray(response.data)) {
         items.value = response.data.filter((row) => row.product).map(mapWishlistRow)
         saveWishlist()
       }
@@ -83,12 +85,15 @@ export const useWishlistStore = defineStore('wishlist', () => {
     const localProductIds = items.value.map((i) => i.productId)
     try {
       isSyncing.value = true
-      const response = await $fetch<{ success: boolean; data: any[] }>('/api/wishlist/sync', {
-        method: 'POST',
-        body: { productIds: localProductIds },
-      })
+      const response = await $fetch<{ status?: string; success?: boolean; data: any[] }>(
+        '/api/wishlist/sync',
+        {
+          method: 'POST',
+          body: { productIds: localProductIds },
+        },
+      )
 
-      if (response?.success && Array.isArray(response.data)) {
+      if ((response?.status === 'success' || response?.success) && Array.isArray(response.data)) {
         items.value = response.data.filter((row) => row.product).map(mapWishlistRow)
         saveWishlist()
       }

@@ -37,6 +37,7 @@ describe('useWishlistStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     localStorage.clear()
+    mockUser.value = null
   })
 
   it('menginisialisasi wishlist dalam kondisi kosong secara default', () => {

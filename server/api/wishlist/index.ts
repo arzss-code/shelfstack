@@ -50,24 +50,42 @@ export default defineEventHandler(async (event) => {
       return errorResponse(event, 'Validasi produk gagal', parsed.error.flatten().fieldErrors, 400)
     }
 
-    // Periksa apakah item sudah tersimpan sebelumnya
+    const productId = parsed.data.productId
+
+    // 1. Verifikasi produk ada dan belum dihapus
+    const { data: productRow, error: productError } = await client
+      .from('products')
+      .select('id')
+      .eq('id', productId)
+      .is('deleted_at', null)
+      .maybeSingle()
+
+    if (productError || !productRow) {
+      return errorResponse(event, 'Produk tidak ditemukan atau sudah dihapus', null, 404)
+    }
+
+    // 2. Periksa apakah item sudah tersimpan sebelumnya
     const { data: existing } = await client
       .from('wishlists')
       .select('id, product_id, created_at')
       .eq('user_id', targetUserId)
-      .eq('product_id', parsed.data.productId)
+      .eq('product_id', productId)
       .maybeSingle()
 
     if (existing) {
       return successResponse('Produk berhasil disimpan ke wishlist', existing)
     }
 
+    // 3. Gunakan upsert agar idempoten terhadap double click / race condition
     const { data, error } = await client
       .from('wishlists')
-      .insert({
-        user_id: targetUserId,
-        product_id: parsed.data.productId,
-      })
+      .upsert(
+        {
+          user_id: targetUserId,
+          product_id: productId,
+        },
+        { onConflict: 'user_id,product_id', ignoreDuplicates: true },
+      )
       .select()
       .maybeSingle()
 
@@ -75,7 +93,7 @@ export default defineEventHandler(async (event) => {
       return errorResponse(event, 'Gagal menyimpan ke wishlist', error, 500)
     }
 
-    return successResponse('Produk berhasil disimpan ke wishlist', data)
+    return successResponse('Produk berhasil disimpan ke wishlist', data || existing)
   }
 
   if (method === 'DELETE') {
