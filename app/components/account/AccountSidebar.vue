@@ -127,6 +127,7 @@ const handleLogout = () => {
     acceptLabel: 'Keluar',
     rejectLabel: 'Batal',
     accept: async () => {
+      wishlistStore.resetOnLogout()
       await signOut()
       await navigateTo('/')
     },

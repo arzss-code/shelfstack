@@ -19,7 +19,12 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
 - **Suite Pengujian Unit & Penguatan Isolasi State (`tests/unit/api-wishlist.spec.ts` & `tests/unit/wishlist-store.spec.ts`)**:
   - Menambahkan 2 unit test baru untuk memvalidasi sanitasi ID produk usang dan deduplikasi massal.
   - Mengisolasi reset `mockUser.value = null` di hook `beforeEach` toko wishlist untuk mencegah kebocoran status login antar pengujian.
-  - 93 file pengujian Vitest (959/959 test lulus 100%), 0 error ESLint, dan `nuxi typecheck` EXIT 0.
+- **Pencegahan Kontaminasi Data Antar Akun & Isolasi Sesi Wishlist (`app/features/wishlist/stores/wishlist.ts` & `useAuth.ts`)**:
+  - Menghadirkan mekanisme pembersihan sesi _clean session teardown_ `resetOnLogout()` saat pengguna keluar dari akun (`signOut()`), membersihkan state in-memory dan menghapus item dari `localStorage`.
+  - Menambahkan penanda kepemilikan data tamu (_guest ownership tagging_ via `shelfstack-wishlist-is-guest`), menjamin sinkronisasi massal ke database hanya berjalan jika item murni ditambahkan saat belum login.
+  - Saat pengguna berbeda login di browser yang sama, sistem langsung memuat wishlist murni milik akun tersebut dari database (`fetchFromDatabase()`), mencegah pencemaran data akun lama.
+  - Menambahkan suite pengujian unit `tests/unit/wishlist-session-isolation.spec.ts` (4 unit test baru).
+  - 94 file pengujian Vitest (963/963 test lulus 100%), 0 error ESLint, dan `nuxi typecheck` EXIT 0.
 
 ## [0.38.0] - 2026-11-10
 
