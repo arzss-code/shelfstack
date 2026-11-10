@@ -181,6 +181,21 @@ export const logger = {
           code: (err as any).code,
           stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,
         }
+      } else if (err && typeof err === 'object') {
+        const errObj = err as Record<string, unknown>
+        errorObj = {
+          name: typeof errObj.name === 'string' ? errObj.name : 'DatabaseError',
+          message:
+            typeof errObj.message === 'string'
+              ? errObj.message
+              : typeof errObj.error_description === 'string'
+                ? errObj.error_description
+                : JSON.stringify(err),
+          code:
+            typeof errObj.code === 'string' || typeof errObj.code === 'number'
+              ? String(errObj.code)
+              : undefined,
+        }
       } else {
         errorObj = {
           message: String(err),

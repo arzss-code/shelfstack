@@ -25,25 +25,45 @@ export default defineEventHandler(async (event) => {
   const { productIds } = parsed.data
 
   if (productIds.length > 0) {
-    // Ambil item yang sudah tersimpan untuk menghindari konflik duplikasi
-    const { data: existingRows } = await client
-      .from('wishlists')
-      .select('product_id')
-      .eq('user_id', targetUserId)
+    // 1. Ambil daftar product ID unik bernilai positif
+    const uniqueProductIds = [...new Set(productIds.map(Number))].filter(
+      (id) => Number.isInteger(id) && id > 0,
+    )
 
-    const existingSet = new Set((existingRows || []).map((r) => Number(r.product_id)))
-    const records = productIds
-      .filter((productId) => !existingSet.has(productId))
-      .map((productId) => ({
-        user_id: targetUserId,
-        product_id: productId,
-      }))
+    if (uniqueProductIds.length > 0) {
+      // 2. Verifikasi produk yang benar-benar ada di tabel products (dan belum soft delete)
+      //    Pencegahan error foreign key constraint (23503) dari ID usang di localStorage
+      const { data: validProducts } = await client
+        .from('products')
+        .select('id')
+        .in('id', uniqueProductIds)
+        .is('deleted_at', null)
 
-    if (records.length > 0) {
-      const { error: insertError } = await client.from('wishlists').insert(records)
+      const validProductIdSet = new Set((validProducts || []).map((p) => Number(p.id)))
+      const sanitizedProductIds = uniqueProductIds.filter((id) => validProductIdSet.has(id))
 
-      if (insertError) {
-        return errorResponse(event, 'Gagal menyinkronkan wishlist', insertError, 500)
+      if (sanitizedProductIds.length > 0) {
+        const records = sanitizedProductIds.map((productId) => ({
+          user_id: targetUserId,
+          product_id: productId,
+        }))
+
+        // 3. Gunakan upsert dengan ignoreDuplicates agar idempoten dan bebas race condition
+        const { error: insertError } = await client
+          .from('wishlists')
+          .upsert(records, { onConflict: 'user_id,product_id', ignoreDuplicates: true })
+
+        if (insertError) {
+          logger.error(
+            'Gagal menyinkronkan batch wishlist',
+            {
+              targetUserId,
+              count: records.length,
+            },
+            insertError,
+          )
+          return errorResponse(event, 'Gagal menyinkronkan wishlist', insertError, 500)
+        }
       }
     }
   }

@@ -184,6 +184,14 @@ export function useAuth() {
 
   const signOut = async () => {
     if (!supabase) return
+    if (import.meta.client) {
+      try {
+        localStorage.removeItem('shelfstack-wishlist')
+        localStorage.removeItem('shelfstack-wishlist-is-guest')
+      } catch {
+        // Storage error ignored
+      }
+    }
     await supabase.auth.signOut()
     profile.value = null
     await navigateTo('/')

@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 18 (Google Identity Services OIDC ID Token & Auto Profile Sync)**
-- **Versi Rilis:** `v0.38.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
-- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 93 file / 957 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v0.38.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
+- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 94 file / 963 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -251,6 +251,14 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Migrasi Sinkronisasi Metadata Profil PostgreSQL (`20261130000002_sync_google_profile_metadata.sql`)**: Trigger `handle_new_user()` dan `sync_profile_oauth_metadata()` mengekstrak `full_name`/`name` dan `avatar_url`/`picture` dari `raw_user_meta_data` ke tabel `public.profiles` dengan logika `coalesce` (tidak menimpa foto atau nama kustom pengguna).
     - **Penyelarasan Avatar UI di Seluruh Permukaan**: Menyelaraskan `AppNavbar.vue`, `AccountSidebar.vue`, dan `ProfileAvatarCard.vue` dengan computed `effectiveAvatarUrl` yang reaktif dan aman.
     - **Suite Pengujian Unit (`tests/unit/google-identity-and-profile-sync.spec.ts`)**: 5 unit test memvalidasi deteksi Google Client ID, inisialisasi GIS, callback credential ID token, integritas skema SQL migrasi profil, dan batas 300 baris kode per berkas tanpa karakter em dash.
+
+34. **Perbaikan Ketahanan Sinkronisasi Wishlist, Validasi Foreign Key, dan Isolasi Sesi Akun (SELESAI 2026-11-10, v0.38.1).**
+    - **Sanitasi Produk Aktif & Eliminasi Error Foreign Key (`server/api/wishlist/sync.post.ts`)**: Memverifikasi keberadaan ID produk aktif di tabel `products` sebelum batch insert untuk mengeliminasi error `23503 foreign_key_violation` dari ID produk usang di `localStorage`.
+    - **Idempotensi Batch Upsert**: Mengganti batch `insert` dengan `upsert` (`onConflict: 'user_id,product_id', ignoreDuplicates: true`) untuk mencegah tabrakan _unique constraint_ saat sinkronisasi konkuren atau duplikasi item.
+    - **Validasi Mutasi Satuan (`server/api/wishlist/index.ts`)**: Mengembalikan HTTP 404 terstruktur saat produk tidak ditemukan atau sudah dihapus, serta menerapkan `upsert` idempoten.
+    - **Perbaikan Logging Server (`server/utils/logger.ts`)**: Memformat objek error database PostgREST agar pesan kesalahan spesifik dan kode error tidak lagi tercetak sebagai `[object Object]`.
+    - **Pencegahan Kontaminasi Data Antar Akun (`app/features/wishlist/stores/wishlist.ts` & `useAuth.ts`)**: Mekanisme _clean session teardown_ `resetOnLogout()` saat `signOut()`, penanda data tamu `shelfstack-wishlist-is-guest`, serta pemuatan murni dari database (`fetchFromDatabase()`) saat login akun berbeda.
+    - **Suite Pengujian Unit Komprehensif**: 94 file pengujian Vitest (963/963 test lolos 100%), termasuk pengujian isolasi sesi akun di `tests/unit/wishlist-session-isolation.spec.ts`.
 
 ---
 

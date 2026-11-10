@@ -17,6 +17,7 @@ export interface WishlistItem {
 }
 
 const STORAGE_KEY = 'shelfstack-wishlist'
+const GUEST_FLAG_KEY = 'shelfstack-wishlist-is-guest'
 
 export const useWishlistStore = defineStore('wishlist', () => {
   const items = ref<WishlistItem[]>([])
@@ -34,12 +35,11 @@ export const useWishlistStore = defineStore('wishlist', () => {
 
   // Simpan ke LocalStorage
   const saveWishlist = () => {
-    if (import.meta.client) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items.value))
-      } catch (e) {
-        console.error('Failed to save wishlist to localStorage:', e)
-      }
+    if (!import.meta.client) return
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items.value))
+    } catch {
+      // Storage error ignored
     }
   }
 
@@ -64,8 +64,10 @@ export const useWishlistStore = defineStore('wishlist', () => {
 
     try {
       isSyncing.value = true
-      const response = await $fetch<{ success: boolean; data: any[] }>('/api/wishlist')
-      if (response?.success && Array.isArray(response.data)) {
+      const response = await $fetch<{ status?: string; success?: boolean; data: any[] }>(
+        '/api/wishlist',
+      )
+      if ((response?.status === 'success' || response?.success) && Array.isArray(response.data)) {
         items.value = response.data.filter((row) => row.product).map(mapWishlistRow)
         saveWishlist()
       }
@@ -79,16 +81,17 @@ export const useWishlistStore = defineStore('wishlist', () => {
   // Sinkronkan item lokal ke Supabase saat pengguna login
   const syncLocalToDatabase = async () => {
     if (!checkIsLoggedIn() || !import.meta.client) return
-
     const localProductIds = items.value.map((i) => i.productId)
     try {
       isSyncing.value = true
-      const response = await $fetch<{ success: boolean; data: any[] }>('/api/wishlist/sync', {
-        method: 'POST',
-        body: { productIds: localProductIds },
-      })
-
-      if (response?.success && Array.isArray(response.data)) {
+      const response = await $fetch<{ status?: string; success?: boolean; data: any[] }>(
+        '/api/wishlist/sync',
+        {
+          method: 'POST',
+          body: { productIds: localProductIds },
+        },
+      )
+      if ((response?.status === 'success' || response?.success) && Array.isArray(response.data)) {
         items.value = response.data.filter((row) => row.product).map(mapWishlistRow)
         saveWishlist()
       }
@@ -101,21 +104,24 @@ export const useWishlistStore = defineStore('wishlist', () => {
 
   // Inisialisasi dari LocalStorage dan Sinkronisasi Database
   const initWishlist = async () => {
-    if (import.meta.client) {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-          const parsed = JSON.parse(stored)
-          if (Array.isArray(parsed)) {
-            items.value = parsed
-          }
-        }
-      } catch (e) {
-        console.error('Failed to parse wishlist from localStorage:', e)
+    if (!import.meta.client) return
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (Array.isArray(parsed)) items.value = parsed
       }
+    } catch {
+      // Parse error ignored
+    }
 
-      if (checkIsLoggedIn()) {
+    if (checkIsLoggedIn()) {
+      const isGuestData = localStorage.getItem(GUEST_FLAG_KEY) === 'true'
+      if (isGuestData && items.value.length > 0) {
         await syncLocalToDatabase()
+        localStorage.removeItem(GUEST_FLAG_KEY)
+      } else {
+        await fetchFromDatabase()
       }
     }
   }
@@ -134,6 +140,13 @@ export const useWishlistStore = defineStore('wishlist', () => {
       return false
     }
 
+    if (!checkIsLoggedIn() && import.meta.client) {
+      try {
+        localStorage.setItem(GUEST_FLAG_KEY, 'true')
+      } catch {
+        // Abaikan kegagalan storage
+      }
+    }
     // Optimistic Update
     items.value.unshift({
       productId: product.id,
@@ -170,6 +183,14 @@ export const useWishlistStore = defineStore('wishlist', () => {
     // Optimistic Update
     items.value.splice(existingIndex, 1)
     saveWishlist()
+
+    if (!checkIsLoggedIn() && import.meta.client && items.value.length === 0) {
+      try {
+        localStorage.removeItem(GUEST_FLAG_KEY)
+      } catch {
+        // Abaikan kegagalan storage
+      }
+    }
 
     // Sinkronkan ke cloud jika login
     if (checkIsLoggedIn() && import.meta.client) {
@@ -216,8 +237,6 @@ export const useWishlistStore = defineStore('wishlist', () => {
   const moveAllToCart = (): number => {
     const cartStore = useCartStore()
     const availableItems = items.value.filter((i) => i.stock > 0)
-    let movedCount = 0
-
     for (const item of availableItems) {
       cartStore.addItem({
         productId: item.productId,
@@ -230,29 +249,32 @@ export const useWishlistStore = defineStore('wishlist', () => {
         openCartDrawer: false,
       })
       removeItem(item.productId)
-      movedCount++
     }
-
-    return movedCount
+    return availableItems.length
   }
 
   const clearWishlist = () => {
     const backup = [...items.value]
     items.value = []
     saveWishlist()
-
     if (checkIsLoggedIn() && import.meta.client) {
-      // Hapus seluruh item aktif di database
       Promise.all(
-        backup.map((item) =>
-          $fetch('/api/wishlist', {
-            method: 'DELETE',
-            body: { productId: item.productId },
-          }),
+        backup.map((i) =>
+          $fetch('/api/wishlist', { method: 'DELETE', body: { productId: i.productId } }),
         ),
-      ).catch((err) => {
-        console.warn('Gagal membersihkan wishlist di database:', err)
-      })
+      ).catch((err) => console.warn('Gagal membersihkan wishlist di database:', err))
+    }
+  }
+
+  const resetOnLogout = () => {
+    items.value = []
+    if (import.meta.client) {
+      try {
+        localStorage.removeItem(STORAGE_KEY)
+        localStorage.removeItem(GUEST_FLAG_KEY)
+      } catch {
+        // Abaikan kegagalan storage
+      }
     }
   }
 
@@ -265,9 +287,17 @@ export const useWishlistStore = defineStore('wishlist', () => {
       const user = useSupabaseUser()
       watch(
         () => user.value?.id,
-        async (newUserId) => {
+        async (newUserId, oldUserId) => {
           if (newUserId) {
-            await syncLocalToDatabase()
+            const isGuestData = localStorage.getItem(GUEST_FLAG_KEY) === 'true'
+            if (isGuestData && items.value.length > 0) {
+              await syncLocalToDatabase()
+              localStorage.removeItem(GUEST_FLAG_KEY)
+            } else {
+              await fetchFromDatabase()
+            }
+          } else if (oldUserId && !newUserId) {
+            resetOnLogout()
           }
         },
       )
@@ -290,6 +320,7 @@ export const useWishlistStore = defineStore('wishlist', () => {
     moveAllToCart,
     clearWishlist,
     fetchFromDatabase,
+    resetOnLogout,
     syncLocalToDatabase,
   }
 })

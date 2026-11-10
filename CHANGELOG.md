@@ -2,6 +2,30 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.38.1] - 2026-11-10
+
+### Perbaikan Ketahanan Sinkronisasi Wishlist, Validasi Foreign Key, dan Logging Terstruktur
+
+- **Pencegahan Error Foreign Key & Unique Constraint pada Sinkronisasi Wishlist (`server/api/wishlist/sync.post.ts`)**:
+  - Menambahkan verifikasi keberadaan ID produk aktif pada tabel `products` sebelum proses penyimpanan massal, mengeliminasi error `23503 foreign_key_violation` saat pengunjung memiliki ID produk usang atau terhapus di `localStorage`.
+  - Menerapkan deduplikasi ID produk berbasis Set dan operasi `upsert` dengan `onConflict: 'user_id,product_id', ignoreDuplicates: true` untuk mengeliminasi kondisi balapan (_race condition_) dan error `23505 unique_violation`.
+- **Penguatan Endpoint Mutasi Satuan Wishlist (`server/api/wishlist/index.ts`)**:
+  - Memvalidasi status keaktifan produk sebelum penyimpanan, mengembalikan kode HTTP 404 terstruktur saat produk tidak ditemukan atau sudah dihapus.
+  - Menggunakan operasi `upsert` idempoten untuk mencegah error saat terjadi klik ganda cepat dari antarmuka pengguna.
+- **Perbaikan Penanganan Respon Store Wishlist (`app/features/wishlist/stores/wishlist.ts`)**:
+  - Menyelaraskan evaluasi respon status sukses (`response?.status === 'success' || response?.success`) pada aksi `fetchFromDatabase` dan `syncLocalToDatabase`.
+- **Elevasi Observabilitas Logger Server (`server/utils/logger.ts`)**:
+  - Memperbaiki pemformatan objek error PostgREST agar pesan kesalahan database spesifik dan kode error tidak lagi tercatat sebagai `[object Object]` pada log server.
+- **Suite Pengujian Unit & Penguatan Isolasi State (`tests/unit/api-wishlist.spec.ts` & `tests/unit/wishlist-store.spec.ts`)**:
+  - Menambahkan 2 unit test baru untuk memvalidasi sanitasi ID produk usang dan deduplikasi massal.
+  - Mengisolasi reset `mockUser.value = null` di hook `beforeEach` toko wishlist untuk mencegah kebocoran status login antar pengujian.
+- **Pencegahan Kontaminasi Data Antar Akun & Isolasi Sesi Wishlist (`app/features/wishlist/stores/wishlist.ts` & `useAuth.ts`)**:
+  - Menghadirkan mekanisme pembersihan sesi _clean session teardown_ `resetOnLogout()` saat pengguna keluar dari akun (`signOut()`), membersihkan state in-memory dan menghapus item dari `localStorage`.
+  - Menambahkan penanda kepemilikan data tamu (_guest ownership tagging_ via `shelfstack-wishlist-is-guest`), menjamin sinkronisasi massal ke database hanya berjalan jika item murni ditambahkan saat belum login.
+  - Saat pengguna berbeda login di browser yang sama, sistem langsung memuat wishlist murni milik akun tersebut dari database (`fetchFromDatabase()`), mencegah pencemaran data akun lama.
+  - Menambahkan suite pengujian unit `tests/unit/wishlist-session-isolation.spec.ts` (4 unit test baru).
+  - 94 file pengujian Vitest (963/963 test lulus 100%), 0 error ESLint, dan `nuxi typecheck` EXIT 0.
+
 ## [0.38.0] - 2026-11-10
 
 ### Google Identity Services (OIDC ID Token Flow) dan Sinkronisasi Otomatis Metadata Profil
