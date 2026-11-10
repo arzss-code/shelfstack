@@ -2,6 +2,26 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.40.1] - 2026-11-10
+
+### Penguatan Keamanan Route Rules, Pembatasan Unggah Berkas & Audit RLS
+
+- **Rate Limiting Granular (`nuxt.config.ts`)**:
+  - Menambahkan pembatasan laju request (rate limiting) pada rute mutasi dan validasi sensitif:
+    - `/api/coupons/validate`: 20 token per menit untuk mencegah brute-force kupon diskon.
+    - `/api/returns/upload`: 10 token per menit untuk mencegah spam unggah bukti pengembalian.
+    - `/api/support/upload`: 15 token per menit untuk mencegah eksploitasi lampiran obrolan bantuan.
+  - Mempertahankan pengecualian `rateLimiter: false` pada `/api/midtrans/notification` demi memastikan webhook pembayaran tidak terputus.
+- **Validasi Keamanan Berkas Unggahan**:
+  - Memverifikasi batasan ukuran berkas 5 MB dan whitelist format MIME type (image/jpeg, image/png, image/webp) pada handler unggah bukti retur dan lampiran support.
+  - Memastikan isolasi path penyimpanan berbasis ID pengguna untuk mencegah penimpaan berkas lintas akun.
+- **Audit Skema Basis Data & Kebijakan RLS**:
+  - Memvalidasi bahwa seluruh tabel pada migrasi SQL mengaktifkan Row Level Security (RLS).
+  - Menegakkan integritas soft delete melalui kolom `deleted_at` pada data transaksional dan ketiadaan DDL destruktif (DROP DATABASE atau TRUNCATE).
+- **Suite Pengujian Unit Keamanan (`tests/unit/security-audit-hardening.spec.ts`)**:
+  - 10 unit test memvalidasi rate limiter route rules, validasi ukuran dan tipe MIME berkas, audit skema migrasi SQL, dan ketiadaan karakter em dash.
+  - 97 file pengujian Vitest (996/996 test lulus 100%), 0 error ESLint, dan `nuxi typecheck` EXIT 0.
+
 ## [0.40.0] - 2026-11-10
 
 ### Panel Sinyal Operasional & Telemetri Sistem Dashboard Admin (Phase D & F)
