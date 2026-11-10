@@ -5,6 +5,7 @@ import type { Product } from '~/types/product'
 import ProductGallery from '~/components/product/ProductGallery.vue'
 import ProductConfigurator from '~/components/product/ProductConfigurator.vue'
 import ProductReviewsSection from '~/components/product/ProductReviewsSection.vue'
+import ProductRelatedSection from '~/components/product/ProductRelatedSection.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -204,6 +205,9 @@ const onBuyNow = (payload: { quantity: number; color: string; material: string }
 
       <!-- Product Reviews Section -->
       <ProductReviewsSection :product-id="product.id" :product-name="product.name" />
+
+      <!-- Product Related Recommendations Section (Backlog C-03) -->
+      <ProductRelatedSection :product="product" />
     </div>
 
     <!-- Product Not Found View -->
