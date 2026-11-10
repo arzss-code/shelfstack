@@ -58,13 +58,13 @@
 
 ## EPIC 4 — Admin Ops (Fase 4)
 
-| ID   | Story                                             | Prioritas | AC                                                                                  |
-| ---- | ------------------------------------------------- | --------- | ----------------------------------------------------------------------------------- |
-| D-01 | Sebagai admin, saya lihat KPI dashboard           | Must      | Revenue bulan ini, order pending, low-stock, tabel order terbaru                    |
-| D-02 | Sebagai admin, saya ubah status order valid       | Must      | Hanya transisi legal; setiap perubahan tulis `activity_logs` + realtime ke customer |
-| D-03 | Sebagai admin, saya CRUD produk + kategori + stok | Must      | Reuse `ProductForm.vue` + field baru; trash/restore tetap jalan                     |
-| D-04 | Sebagai admin, saya audit aktivitas               | Should    | Filter entity/action, diff `old_data/new_data`                                      |
-| D-05 | Sebagai admin, saya export CSV order              | Could     | Filter tanggal + status                                                             |
+| ID   | Story                                             | Prioritas | AC                                                                                                                                    |
+| ---- | ------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| D-01 | Sebagai admin, saya lihat KPI dashboard           | Must      | ✅ SELESAI (v0.40.0): Revenue bulan ini, order pending, low-stock, tabel order terbaru, dan panel sinyal operasional/telemetri sistem |
+| D-02 | Sebagai admin, saya ubah status order valid       | Must      | Hanya transisi legal; setiap perubahan tulis `activity_logs` + realtime ke customer                                                   |
+| D-03 | Sebagai admin, saya CRUD produk + kategori + stok | Must      | Reuse `ProductForm.vue` + field baru; trash/restore tetap jalan                                                                       |
+| D-04 | Sebagai admin, saya audit aktivitas               | Should    | Filter entity/action, diff `old_data/new_data`                                                                                        |
+| D-05 | Sebagai admin, saya export CSV order              | Could     | Filter tanggal + status                                                                                                               |
 
 ## EPIC 5 — Quality & Launch (Fase 5)
 

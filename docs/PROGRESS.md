@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 19 (Storefront Completion & Operational Telemetry)**
-- **Versi Rilis:** `v0.39.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
-- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 95 file / 973 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v0.40.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
+- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 96 file / 986 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -265,6 +265,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Komponen Modular Rekomendasi (`app/components/product/ProductRelatedSection.vue`)**: Grid responsif (2 kolom mobile, 4 kolom desktop) menggunakan kartu resmi `ProductCard`, skeleton loading 4 kartu, navigasi tautan cerdas ke rute kategori `/c/[slug]` atau katalog, dan penanganan status error/coba lagi.
     - **Integrasi Etalase & Pemenuhan Kriteria (`app/pages/product/[id].vue`)**: Menuntaskan acceptance criteria Backlog C-03 (useSeoMeta, OG image, breadcrumb, dan 4 produk terkait).
     - **Suite Pengujian Unit Komprehensif (`tests/unit/product-related-recommendations.spec.ts`)**: 10 unit test memvalidasi slug kategori, filter ID target, pengayaan fallback, status antarmuka, rendering skeleton dan kartu produk, batas 300 baris kode per berkas, dan ketiadaan karakter em dash. Total 95 file / 973 unit test lolos 100%.
+
+36. **Panel Sinyal Operasional & Telemetri Sistem Dashboard Admin (SELESAI 2026-11-10, v0.40.0, Phase D & F).**
+    - **Composable Observabilitas Terpusat (`app/features/admin/composables/useAdminOperationalSignals.ts`)**: Pengambilan metrik background polling 30 detik dari `GET /api/admin/metrics` dan evaluasi kesiapan multi-layanan dari `GET /api/ready`.
+    - **Komponen Sinyal Operasional (`app/features/admin/components/AdminOperationalSignals.vue`)**: Strip kesehatan dependensi (PostgreSQL, Fastify BullMQ Worker, Nitro Engine) dan 4 kartu telemetri transaksional (Rasio Sukses HTTP API, Keandalan Webhook Midtrans, Integritas Transaksi Refund, Rekonsiliasi Status Idempoten).
+    - **Modularisasi Tabel Transaksi Terbaru (`app/features/admin/components/AdminRecentOrdersTable.vue`)**: Ekstraksi tabel transaksi ke berkas modular (151 baris), merampingkan `app/pages/admin/index.vue` dari 286 baris menjadi 168 baris kode orkestrator yang bersih (100% patuh batas <= 300 baris SOP).
+    - **Suite Pengujian Unit Komprehensif (`tests/unit/admin-operational-signals.spec.ts`)**: 13 unit test memvalidasi status dependensi, kalkulasi rasio sukses, status tone sistem, penanganan error jaringan, rendering telemetri dan tabel pesanan, batas 300 baris kode per berkas, dan ketiadaan karakter em dash. Total 96 file / 986 unit test lolos 100%.
 
 ---
 
