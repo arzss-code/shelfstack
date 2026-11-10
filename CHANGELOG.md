@@ -2,6 +2,22 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [1.0.1] - 2026-11-10
+
+### Remedi Keamanan Dependensi: Eliminasi Kerentanan Kritis dan Tinggi
+
+- **Eliminasi 102 Kerentanan Dependensi (0 Critical, 0 High)**:
+  - Memperbarui dan mengunci versi minimum aman seluruh rantai dependensi transitif via `pnpm.overrides` pada `package.json` dan `pnpm-workspace.yaml`.
+  - Menuntaskan kerentanan kritis: `@simple-git/argv-parser` (>=2.0.1), `simple-git` (>=4.0.1), `tinypool` (>=2.1.2), `shell-quote` (>=1.11.0), dan `sharp` (>=0.35.5).
+  - Menuntaskan 44 kerentanan tinggi pada pustaka inti: `undici` (^7.30.2 & ^8.12.4), `js-yaml` (^4.3.2), `fast-uri` (^3.1.9 & ^4.2.3), `node-forge` (>=1.4.1), `serialize-javascript` (>=7.1.3), `vue` (3.5.45), `brace-expansion`, `devalue`, `happy-dom` (21.0.4), `launch-editor`, `seroval`, `source-map-js`, `svgo`, dan `vite` (>=8.2.4).
+  - Menyelaraskan dependensi `services/order-service`: `zod: ^4.6.7`, `fastify-type-provider-zod: ^7.0.0`, `fastify: ^5.12.6`, dan `vitest: ^4.1.12`.
+- **Verifikasi Gerbang Kualitas**:
+  - `pnpm audit --audit-level=high`: 0 critical, 0 high vulnerabilities (EXIT 0).
+  - `pnpm lint`: EXIT 0 (0 error).
+  - `pnpm typecheck`: EXIT 0 (root app & order-service).
+  - `pnpm exec vitest run`: 97 file lulus, 996 test lulus 100%.
+  - `pnpm --filter @shelfstack/order-service test`: 2 file lulus, 25 test lulus 100%.
+
 ## [1.0.0] - 2026-11-10
 
 ### Rilis Final Produksi: ShelfStack Curated Archival Department Store

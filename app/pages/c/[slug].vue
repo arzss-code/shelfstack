@@ -84,6 +84,10 @@ const { data: catalogResponse, pending } = useAsyncData<CatalogApiResponse>(
 
 const products = computed(() => catalogResponse.value?.data || [])
 const totalProducts = computed(() => catalogResponse.value?.total ?? products.value.length)
+
+function onExploreCatalog() {
+  return navigateTo('/katalog')
+}
 </script>
 
 <template>
@@ -153,7 +157,7 @@ const totalProducts = computed(() => catalogResponse.value?.total ?? products.va
         title="Kategori Tidak Ditemukan"
         :description="`Kategori '${slug}' tidak terdaftar di etalase resmi ShelfStack.`"
         action-label="Jelajahi Semua Produk di Katalog"
-        @action="navigateTo('/katalog')"
+        @action="onExploreCatalog"
       />
     </div>
   </div>
