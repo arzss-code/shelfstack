@@ -6,8 +6,8 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 19 (Storefront Completion & Operational Telemetry)**
-- **Versi Rilis:** `v0.40.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
+- **Sprint Aktif:** **Sprint 20 (Production Release v1.0.0 & Zero-Drift Documentation)**
+- **Versi Rilis:** `v1.0.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
 - **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 97 file / 996 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
@@ -277,6 +277,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Validasi Keamanan Berkas Unggahan**: Handler unggah berkas menerapkan batas ukuran 5 MB, whitelist tipe MIME (image/jpeg, image/png, image/webp), sanitasi ekstensi berkas, dan isolasi direktori berbasis ID pengguna.
     - **Audit Skema SQL & Kebijakan RLS**: Memvalidasi kepatuhan migrasi SQL terhadap Row Level Security (RLS), soft delete deleted_at pada data transaksional, dan proteksi dari DDL destruktif.
     - **Suite Pengujian Unit Keamanan (`tests/unit/security-audit-hardening.spec.ts`)**: 10 unit test memvalidasi konfigurasi route rules, validasi ukuran dan MIME berkas, audit skema migrasi SQL, dan ketiadaan karakter em dash. Total 97 file / 996 unit test lolos 100%.
+
+38. **Rilis Final Produksi & Penyelarasan Zero-Drift Dokumentasi (SELESAI 2026-11-10, v1.0.0).**
+    - **Penyelarasan Total Dokumentasi (Zero Doc Drift)**: Seluruh backlog (EPIC 0 hingga EPIC 5) di `docs/BACKLOG.md` diverifikasi tuntas 100%, roadmap rilis `docs/PRD-ECOMMERCE.md` dan `AGENTS.md` disinkronkan ke versi produksi.
+    - **Validasi Infrastruktur Kontainer**: Tiga konfigurasi Docker Compose (`docker-compose.yml`, `docker-compose.dev.yml`, dan `deploy/docker-compose.prod.yml`) divalidasi dengan exit code 0.
+    - **Verifikasi Build Produksi Penuh**: Menjalankan `pnpm build` (Nitro preset node-server) menghasilkan output produksi teroptimasi 30.7 MB tanpa peringatan kritis.
+    - **Verifikasi Kualitas Komprehensif**: 97 file pengujian Vitest (996/996 test lolos 100%) + 25 pengujian di `@shelfstack/order-service` + 14 pengujian E2E Playwright. Total unit suite gabungan 1.021 test lulus 100%.
 
 ---
 
