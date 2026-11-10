@@ -2,6 +2,25 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.40.0] - 2026-11-10
+
+### Panel Sinyal Operasional & Telemetri Sistem Dashboard Admin (Phase D & F)
+
+- **Composable Observabilitas Terpusat (`app/features/admin/composables/useAdminOperationalSignals.ts`)**:
+  - Menghadirkan composable `useAdminOperationalSignals` yang secara berkala (polling 30 detik) mengambil metrik snapshot dari `GET /api/admin/metrics` dan kesehatan dependensi sistem dari `GET /api/ready`.
+  - Menghitung rasio keberhasilan request HTTP (`requestSuccessRate`), rasio webhook Midtrans (`webhookSuccessRate`), status kesiapan basis data PostgreSQL, dan konektivitas mikroservis worker Fastify BullMQ.
+  - Menentukan status keseluruhan sistem (`systemTone`: optimal, perhatian, atau terputus) secara reaktif.
+- **Komponen Sinyal Operasional (`app/features/admin/components/AdminOperationalSignals.vue`)**:
+  - Menampilkan strip status dependensi aktif (PostgreSQL Supabase, Order Service Worker, dan Nitro Runtime) dengan indikator visual detak live.
+  - Menyajikan 4 kartu telemetri utama: Rasio Sukses HTTP API (dengan rincian 4xx dan 5xx), Keandalan Webhook Midtrans (tanda tangan SHA-512), Integritas Transaksi Refund 2-Tahap, dan Rekonsiliasi Status Idempoten.
+  - Dilengkapi tombol sinkronisasi manual 1-klik, label waktu pembaruan terakhir, skeleton loading, dan error boundary.
+- **Modularisasi Tabel Transaksi Terbaru (`app/features/admin/components/AdminRecentOrdersTable.vue`)**:
+  - Mengekstrak tabel pesanan mutakhir dari halaman utama admin ke komponen modular tersendiri (151 baris kode) dengan penanganan state kosong dan skeleton loading.
+  - Merampingkan `app/pages/admin/index.vue` dari sebelumnya 286 baris menjadi hanya 168 baris kode orkestrator yang bersih (100% patuh batas <= 300 baris SOP).
+- **Suite Pengujian Unit Komprehensif (`tests/unit/admin-operational-signals.spec.ts`)**:
+  - 13 unit test memvalidasi status dependensi, kalkulasi rasio sukses, transisi tone sistem (success/warning/danger), penanganan error jaringan, rendering skeleton dan telemetri, rendering tabel pesanan, batas 300 baris kode per berkas, dan ketiadaan karakter em dash.
+  - 96 file pengujian Vitest (986/986 test lulus 100%), 0 error ESLint, dan `nuxi typecheck` EXIT 0.
+
 ## [0.39.0] - 2026-11-10
 
 ### Rekomendasi Produk Terkait pada Halaman Detail Produk (Backlog C-03)
