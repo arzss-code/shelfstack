@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 17 (Phase E Production Roadmap: k6 Load Testing Suite & Concurrency Verification)**
-- **Versi Rilis:** `v0.37.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-09)
-- **Baseline Quality Gate (2026-11-09, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 91 file / 945 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v0.37.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-09)
+- **Baseline Quality Gate (2026-11-09, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 92 file / 952 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -237,6 +237,13 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Idempotensi & Deduplikasi Webhook Midtrans (`scripts/load-test/scenarios/webhook-dedup.js`)**: Menguji pengiriman duplikat notifikasi settlement dengan signature SHA-512 valid (invarian: 0 crash 500, mutasi status pesanan idempoten).
     - **Probing Observabilitas & Health Check (`scripts/load-test/scenarios/health-readiness.js`)**: Pengujian polling cepat `/api/health` dan `/api/ready` di bawah konkurensi tinggi tanpa kebocoran pool koneksi database dan Redis.
     - **Suite Pengujian Unit (`tests/unit/load-test-suite.spec.ts`)**: 8 unit test memvalidasi eksistensi berkas skenario, argumen CLI runner, resolusi binary k6, ambang batas threshold, batas 300 baris kode, dan ketiadaan karakter em dash.
+
+32. **Hardening Alur Autentikasi Google OAuth & Resilience Callback (SELESAI 2026-11-09, v0.37.1, Story A-02).**
+    - **5 Status UI Wajib (`app/pages/auth/callback.vue`)**: Menerapkan status Loading, Success, Error, Empty, dan Idle dengan UI primitives terstandarisasi (`UiAlert`, `UiButton`).
+    - **Deteksi & Penanganan Error Provider OAuth**: Mengidentifikasi parameter query `error` (seperti `access_denied` saat pengguna membatalkan izin) dan `error_description`, menampilkan pesan ramah Bahasa Indonesia dan tombol kembali ke login tanpa membiarkan pengguna terjebak pada animasi pemuatan.
+    - **Retry Profile Fetch & Timeout Guard**: Memasang mekanisme pengambilan profil berulang hingga 3 kali (delay 300ms) untuk mengantisipasi jeda commit trigger `handle_new_user()`, serta timeout pengaman 10 detik dengan umpan balik visual yang jelas.
+    - **Redirection Berbasis Peran & Redirect Query**: Mengarahkan akun admin ke `/admin/activities` dan pelanggan biasa ke target `redirect` yang tervalidasi atau beranda (`/`).
+    - **Suite Pengujian Unit (`tests/unit/auth-callback.spec.ts`)**: 7 unit test memvalidasi status default loading, pembatalan izin `access_denied`, timeout verifikasi sesi, alur sukses pelanggan, alur sukses admin, sanitasi query redirect, dan batas 300 baris kode tanpa karakter em dash.
 
 ---
 
