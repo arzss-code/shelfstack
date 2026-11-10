@@ -18,7 +18,28 @@ definePageMeta({
 const toast = useUiToast()
 const route = useRoute()
 const user = useSupabaseUser()
-const { signIn, signInWithGoogle, pending } = useAuth()
+const { signIn, signInWithGoogle, signInWithGoogleIdToken, pending } = useAuth()
+const { isConfigured: isGoogleConfigured, initGoogleIdentity, promptOneTap } = useGoogleIdentity()
+
+onMounted(async () => {
+  if (isGoogleConfigured.value) {
+    await initGoogleIdentity({
+      onSuccess: async (idToken) => {
+        try {
+          await signInWithGoogleIdToken(idToken)
+          await navigateTo(redirectTo.value)
+        } catch (err: unknown) {
+          toast.add({
+            severity: 'error',
+            summary: 'Gagal Masuk',
+            detail: err instanceof Error ? err.message : 'Login Google gagal.',
+            life: 5000,
+          })
+        }
+      },
+    })
+  }
+})
 
 const email = ref('')
 const password = ref('')
@@ -69,6 +90,10 @@ const handleLogin = async () => {
 
 const handleGoogle = async () => {
   try {
+    if (isGoogleConfigured.value) {
+      promptOneTap()
+      return
+    }
     await signInWithGoogle()
   } catch (e: unknown) {
     toast.add({

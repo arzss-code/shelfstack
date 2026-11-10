@@ -52,7 +52,12 @@ export function useAuth() {
   const isAdmin = computed(() => profile.value?.role === 'admin')
 
   const fetchProfile = async (force = false) => {
-    const rawId = user.value?.id || (user.value as any)?.sub
+    const userObj = user.value as unknown as {
+      id?: string
+      sub?: string
+      user_metadata?: Record<string, unknown>
+    } | null
+    const rawId = userObj?.id || userObj?.sub
     const userId = typeof rawId === 'string' && rawId !== 'undefined' ? rawId : null
     if (!userId || !supabase) {
       profile.value = null
@@ -71,7 +76,34 @@ export function useAuth() {
         profile.value = null
         return null
       }
-      profile.value = data as UserProfile
+      const loadedProfile = data as UserProfile
+
+      // Sinkronisasi otomatis ke public.profiles jika profil belum memiliki avatar atau nama
+      const userMeta = userObj?.user_metadata || {}
+      const metaAvatar =
+        (typeof userMeta.avatar_url === 'string' && userMeta.avatar_url) ||
+        (typeof userMeta.picture === 'string' && userMeta.picture) ||
+        null
+      const metaName =
+        (typeof userMeta.full_name === 'string' && userMeta.full_name) ||
+        (typeof userMeta.name === 'string' && userMeta.name) ||
+        null
+
+      if ((!loadedProfile.avatar_url && metaAvatar) || (!loadedProfile.full_name && metaName)) {
+        const updates: { avatar_url?: string; full_name?: string } = {}
+        if (!loadedProfile.avatar_url && metaAvatar) updates.avatar_url = metaAvatar
+        if (!loadedProfile.full_name && metaName) updates.full_name = metaName
+
+        try {
+          await supabase.from('profiles').update(updates).eq('user_id', userId)
+          Object.assign(loadedProfile, updates)
+        } catch {
+          if (updates.avatar_url) loadedProfile.avatar_url = updates.avatar_url
+          if (updates.full_name) loadedProfile.full_name = updates.full_name
+        }
+      }
+
+      profile.value = loadedProfile
       return profile.value
     } catch {
       profile.value = null
@@ -82,7 +114,10 @@ export function useAuth() {
   // Auto-fetch profile saat session user terhidrasi di client
   if (import.meta.client) {
     watch(
-      () => user.value?.id || (user.value as any)?.sub,
+      () => {
+        const u = user.value as unknown as { id?: string; sub?: string } | null
+        return u?.id || u?.sub
+      },
       (newId) => {
         if (newId) {
           fetchProfile()
@@ -129,6 +164,22 @@ export function useAuth() {
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     })
     if (error) throw new Error(toIndonesianMessage(error, 'Login Google gagal.'))
+  }
+
+  const signInWithGoogleIdToken = async (idToken: string, nonce?: string) => {
+    if (!supabase) throw new Error('Supabase client tidak tersedia.')
+    pending.value = true
+    try {
+      const { error } = await supabase.auth.signInWithIdToken({
+        provider: 'google',
+        token: idToken,
+        nonce,
+      })
+      if (error) throw new Error(toIndonesianMessage(error, 'Login Google gagal.'))
+      await fetchProfile(true)
+    } finally {
+      pending.value = false
+    }
   }
 
   const signOut = async () => {
@@ -179,6 +230,7 @@ export function useAuth() {
     signUp,
     signIn,
     signInWithGoogle,
+    signInWithGoogleIdToken,
     signOut,
     sendPasswordResetEmail,
     updatePassword,

@@ -20,7 +20,11 @@ const initial = computed(() => {
 })
 
 const avatarUrl = computed(() => {
-  return profile.value?.avatar_url || null
+  if (profile.value?.avatar_url) return profile.value.avatar_url
+  const meta = user.value?.user_metadata as Record<string, unknown> | undefined
+  if (typeof meta?.avatar_url === 'string' && meta.avatar_url) return meta.avatar_url
+  if (typeof meta?.picture === 'string' && meta.picture) return meta.picture
+  return null
 })
 
 const triggerFileInput = () => {

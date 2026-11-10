@@ -68,6 +68,8 @@ export default defineNuxtConfig({
       midtransSnapUrl:
         process.env.NUXT_PUBLIC_MIDTRANS_SNAP_URL ||
         'https://app.sandbox.midtrans.com/snap/snap.js',
+      googleClientId:
+        process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '',
     },
   },
 
@@ -78,7 +80,12 @@ export default defineNuxtConfig({
     rateLimiter: false,
     headers: {
       contentSecurityPolicy: {
-        'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        'style-src': [
+          "'self'",
+          "'unsafe-inline'",
+          'https://fonts.googleapis.com',
+          'https://accounts.google.com/gsi/',
+        ],
         'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
         'img-src': [
           "'self'",
@@ -94,6 +101,8 @@ export default defineNuxtConfig({
           'https://app.sandbox.midtrans.com',
           'https://app.midtrans.com',
           'https://*.midtrans.com',
+          'https://accounts.google.com',
+          'https://accounts.google.com/gsi/',
         ],
         'connect-src': [
           "'self'",
@@ -104,12 +113,16 @@ export default defineNuxtConfig({
           'https://app.midtrans.com',
           'https://api.midtrans.com',
           'https://*.midtrans.com',
+          'https://accounts.google.com',
+          'https://accounts.google.com/gsi/',
         ],
         'frame-src': [
           "'self'",
           'https://app.sandbox.midtrans.com',
           'https://app.midtrans.com',
           'https://*.midtrans.com',
+          'https://accounts.google.com',
+          'https://accounts.google.com/gsi/',
         ],
       },
     },

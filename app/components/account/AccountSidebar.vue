@@ -20,6 +20,13 @@ const displayName = computed(
   () => profile.value?.full_name || user.value?.email?.split('@')[0] || 'Pelanggan',
 )
 const initial = computed(() => displayName.value.charAt(0).toUpperCase())
+const effectiveAvatarUrl = computed(() => {
+  if (profile.value?.avatar_url) return profile.value.avatar_url
+  const meta = user.value?.user_metadata as Record<string, unknown> | undefined
+  if (typeof meta?.avatar_url === 'string' && meta.avatar_url) return meta.avatar_url
+  if (typeof meta?.picture === 'string' && meta.picture) return meta.picture
+  return null
+})
 
 interface NavItem {
   id: string
@@ -140,8 +147,8 @@ const handleLogout = () => {
             class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-brand-hair bg-brand-canvas-soft shadow-whisper"
           >
             <img
-              v-if="profile?.avatar_url"
-              :src="profile.avatar_url"
+              v-if="effectiveAvatarUrl"
+              :src="effectiveAvatarUrl"
               :alt="displayName"
               class="h-full w-full object-cover"
             />
