@@ -7,11 +7,11 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 19 (Storefront Completion & Operational Telemetry)**
-- **Versi Rilis:** `v0.40.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
-- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 96 file / 986 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v0.40.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
+- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 97 file / 996 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
-  - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
+  - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
   - UI Language: **Bahasa Indonesia** konsisten di seluruh etalase publik
   - Realtime Engine: **Supabase Realtime** (Postgres Changes untuk order tracking) + polling sync 3.5–4s untuk order `pending`
   - Deployment Target: **Docker + Nginx** (multi-stage build, `deploy/docker-compose.prod.yml`; Vercel tidak lagi jadi target)
@@ -271,6 +271,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Komponen Sinyal Operasional (`app/features/admin/components/AdminOperationalSignals.vue`)**: Strip kesehatan dependensi (PostgreSQL, Fastify BullMQ Worker, Nitro Engine) dan 4 kartu telemetri transaksional (Rasio Sukses HTTP API, Keandalan Webhook Midtrans, Integritas Transaksi Refund, Rekonsiliasi Status Idempoten).
     - **Modularisasi Tabel Transaksi Terbaru (`app/features/admin/components/AdminRecentOrdersTable.vue`)**: Ekstraksi tabel transaksi ke berkas modular (151 baris), merampingkan `app/pages/admin/index.vue` dari 286 baris menjadi 168 baris kode orkestrator yang bersih (100% patuh batas <= 300 baris SOP).
     - **Suite Pengujian Unit Komprehensif (`tests/unit/admin-operational-signals.spec.ts`)**: 13 unit test memvalidasi status dependensi, kalkulasi rasio sukses, status tone sistem, penanganan error jaringan, rendering telemetri dan tabel pesanan, batas 300 baris kode per berkas, dan ketiadaan karakter em dash. Total 96 file / 986 unit test lolos 100%.
+
+37. **Penguatan Keamanan Route Rules, Pembatasan Unggah Berkas, dan Audit RLS (SELESAI 2026-11-10, v0.40.1).**
+    - **Rate Limiting Granular (`nuxt.config.ts`)**: Menambahkan proteksi rate limiting pada rute mutasi dan validasi sensitif (/api/coupons/validate: 20 token/menit, /api/returns/upload: 10 token/menit, /api/support/upload: 15 token/menit) dengan tetap mengecualikan webhook pembayaran (/api/midtrans/notification) agar keandalan gateway terjaga.
+    - **Validasi Keamanan Berkas Unggahan**: Handler unggah berkas menerapkan batas ukuran 5 MB, whitelist tipe MIME (image/jpeg, image/png, image/webp), sanitasi ekstensi berkas, dan isolasi direktori berbasis ID pengguna.
+    - **Audit Skema SQL & Kebijakan RLS**: Memvalidasi kepatuhan migrasi SQL terhadap Row Level Security (RLS), soft delete deleted_at pada data transaksional, dan proteksi dari DDL destruktif.
+    - **Suite Pengujian Unit Keamanan (`tests/unit/security-audit-hardening.spec.ts`)**: 10 unit test memvalidasi konfigurasi route rules, validasi ukuran dan MIME berkas, audit skema migrasi SQL, dan ketiadaan karakter em dash. Total 97 file / 996 unit test lolos 100%.
 
 ---
 

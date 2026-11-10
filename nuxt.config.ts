@@ -160,6 +160,30 @@ export default defineNuxtConfig({
         },
       },
     },
+    '/api/coupons/validate': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 20,
+          interval: 60000,
+        },
+      },
+    },
+    '/api/returns/upload': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 10,
+          interval: 60000,
+        },
+      },
+    },
+    '/api/support/upload': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 15,
+          interval: 60000,
+        },
+      },
+    },
   },
 
   tailwindcss: {
