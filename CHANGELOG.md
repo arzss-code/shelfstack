@@ -2,6 +2,41 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [1.0.0] - 2026-11-10
+
+### Rilis Final Produksi: ShelfStack Curated Archival Department Store
+
+- **Kelengkapan Fitur Etalase (Storefront)**:
+  - Katalog terstruktur dengan sinkronisasi URL komprehensif (filter kategori, rute SEO `/c/[slug]`, rentang harga, sortir harga/terbaru, badge stok aktual, dan pencarian instan).
+  - Halaman detail produk berstandar SEO (useSeoMeta, OG Image, Schema.org Product JSON-LD, breadcrumb, dan rekomendasi 4 produk terkait di `ProductRelatedSection.vue`).
+  - Keranjang belanja persisten (Pinia), sistem kupon promo dan voucher diskon bertingkat, penukaran koin loyalitas pelanggan, kalkulator ongkir 4 tingkat kurir dengan Bebas Ongkir otomatis belanja >= Rp 500.000.
+  - Alur checkout atomik via RPC PostgreSQL `create_order` dengan penguncian baris deterministik (`FOR UPDATE`) dan integrasi pembayaran resmi Midtrans Snap Sandbox.
+  - Linimasa pelacakan pesanan realtime dan pencarian nomor resi publik di `/tracking`.
+  - Formulir komplain dan pengembalian barang (RMA) mandiri dengan upload foto bukti tervalidasi.
+  - Ulasan dan penilaian bintang pelanggan terverifikasi dengan sensor privasi inisial nama.
+  - Pusat notifikasi in-app realtime dan widget Live Chat bantuan pelanggan dua arah.
+- **Ruang Kerja Administrasi & Operasional (`/admin`)**:
+  - Panel sinyal operasional dan telemetri multi-layanan (rasio sukses HTTP API, keandalan webhook Midtrans, integritas refund, dan rekonsiliasi status idempoten).
+  - Dashboard KPI eksekutif, transisi status pesanan patuh state-machine terisolasi, audit activity logs, dan ekspor data transaksi ke CSV.
+  - Pemantauan antrean latar belakang BullMQ dan mekanisme putar ulang (replay) Dead Letter Queue (`order-expiry-dlq`).
+  - Manajemen katalog produk, varian, dan inventaris dengan soft delete perlindungan data (`deleted_at`).
+  - Manajemen kupon promosi dan tiket pengembalian barang.
+  - Ruang kerja inbox Live Chat admin dua kolom dengan template respon cepat dan pratinjau lampiran.
+- **Fondasi Rekayasa & Keamanan**:
+  - Nuxt 4, Vue 3 Composition API, Nitro engine preset `node-server`, dan 16 primitif UI mandiri tanpa pustaka komponen berat (0 baris PrimeVue).
+  - Supabase PostgreSQL dengan Row Level Security (RLS) menyeluruh, fungsi RPC atomik, dan trigger audit.
+  - Layanan mikro worker Fastify + Redis 7 + BullMQ v6 terisolasi (`@shelfstack/order-service`).
+  - Konfigurasi Docker multi-stage + Nginx reverse proxy yang tervalidasi penuh (`deploy/docker-compose.prod.yml`).
+  - Rate limiting granular pada rute mutasi sensitif dan sanitasi ketat unggah berkas (maksimal 5 MB, format JPEG/PNG/WEBP).
+- **Penyelarasan Total Dokumentasi (Zero Doc Drift)**:
+  - Seluruh item pada `docs/BACKLOG.md` (EPIC 0 hingga EPIC 5) dan `docs/PROGRESS.md` tercatat selesai dan terverifikasi.
+  - Roadmap rilis pada `docs/PRD-ECOMMERCE.md` dan panduan agen `AGENTS.md` tersinkronisasi 100% tanpa celah dokumentasi.
+- **Verifikasi Quality Gate**:
+  - 97 file pengujian unit Vitest (996/996 test lulus 100%).
+  - 25 pengujian unit Fastify & BullMQ pada `@shelfstack/order-service` lulus 100%.
+  - 14 pengujian E2E Playwright terverifikasi.
+  - 0 error ESLint, `nuxi typecheck` EXIT 0, dan verifikasi build produksi `pnpm build` sukses.
+
 ## [0.40.1] - 2026-11-10
 
 ### Penguatan Keamanan Route Rules, Pembatasan Unggah Berkas & Audit RLS

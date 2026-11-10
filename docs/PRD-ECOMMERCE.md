@@ -338,10 +338,10 @@ Untuk mencegah _race-condition_ saat beberapa pengguna membeli barang yang sama 
 ## 7. Roadmap Rilis & Milestone Pelaksanaan (Sprint Plan)
 
 ```
-Minggu 1-2 (Sprint 1) : Fase 0 — Foundation, Base Types & Product CRUD [SELESAI ✅]
-Minggu 3-4 (Sprint 2) : Fase 1 — Supabase Auth, Strict RLS & Dynamic Categories [SELESAI ✅]
-Minggu 5-6 (Sprint 3) : Fase 2 — Redesign Storefront, Katalog Pro & UI Components [SELESAI ✅]
-Minggu 7-8 (Sprint 4) : Fase 3 — Dynamic Specs, Cart Drawer, Checkout & Midtrans [SEDANG BERJALAN 🔄]
-Minggu 9-10 (Sprint 5): Fase 4 — Admin Dashboard, Order Processing & Realtime Log [BERIKUTNYA ⏳]
-Minggu 11-12 (Sprint 6): Fase 5 — QA End-to-End, Production Hardening & Vercel Launch [FINAL 🎯]
+Sprint 1 : Fase 0: Foundation, Base Types & Product CRUD [SELESAI ✅]
+Sprint 2 : Fase 1: Supabase Auth, Strict RLS & Dynamic Categories [SELESAI ✅]
+Sprint 3 : Fase 2: Redesign Storefront, Katalog Pro & UI Components [SELESAI ✅]
+Sprint 4 : Fase 3: Dynamic Specs, Cart Drawer, Checkout & Midtrans [SELESAI ✅]
+Sprint 5 : Fase 4: Admin Dashboard, Order Processing & Realtime Log [SELESAI ✅]
+Sprint 6 : Fase 5: QA End-to-End, Production Hardening & Docker + Nginx Launch [SELESAI ✅]
 ```
