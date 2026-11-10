@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 18 (Google Identity Services OIDC ID Token & Auto Profile Sync)**
-- **Versi Rilis:** `v0.38.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
-- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 94 file / 963 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 19 (Storefront Completion & Operational Telemetry)**
+- **Versi Rilis:** `v0.39.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
+- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 95 file / 973 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -259,6 +259,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Perbaikan Logging Server (`server/utils/logger.ts`)**: Memformat objek error database PostgREST agar pesan kesalahan spesifik dan kode error tidak lagi tercetak sebagai `[object Object]`.
     - **Pencegahan Kontaminasi Data Antar Akun (`app/features/wishlist/stores/wishlist.ts` & `useAuth.ts`)**: Mekanisme _clean session teardown_ `resetOnLogout()` saat `signOut()`, penanda data tamu `shelfstack-wishlist-is-guest`, serta pemuatan murni dari database (`fetchFromDatabase()`) saat login akun berbeda.
     - **Suite Pengujian Unit Komprehensif**: 94 file pengujian Vitest (963/963 test lolos 100%), termasuk pengujian isolasi sesi akun di `tests/unit/wishlist-session-isolation.spec.ts`.
+
+35. **Rekomendasi 4 Produk Terkait pada Halaman Detail Produk (SELESAI 2026-11-10, v0.39.0, Backlog C-03).**
+    - **Composable Kurasi Rekomendasi (`app/composables/useRelatedProducts.ts`)**: Logika kurasi cerdas berbasis deteksi slug/kategori produk aktif, filter eliminasi ID produk yang sedang dilihat, serta fallback otomatis melengkapi hingga 4 produk dari katalog populer jika varian kategori kurang dari 4.
+    - **Komponen Modular Rekomendasi (`app/components/product/ProductRelatedSection.vue`)**: Grid responsif (2 kolom mobile, 4 kolom desktop) menggunakan kartu resmi `ProductCard`, skeleton loading 4 kartu, navigasi tautan cerdas ke rute kategori `/c/[slug]` atau katalog, dan penanganan status error/coba lagi.
+    - **Integrasi Etalase & Pemenuhan Kriteria (`app/pages/product/[id].vue`)**: Menuntaskan acceptance criteria Backlog C-03 (useSeoMeta, OG image, breadcrumb, dan 4 produk terkait).
+    - **Suite Pengujian Unit Komprehensif (`tests/unit/product-related-recommendations.spec.ts`)**: 10 unit test memvalidasi slug kategori, filter ID target, pengayaan fallback, status antarmuka, rendering skeleton dan kartu produk, batas 300 baris kode per berkas, dan ketiadaan karakter em dash. Total 95 file / 973 unit test lolos 100%.
 
 ---
 

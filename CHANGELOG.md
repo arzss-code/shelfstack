@@ -2,6 +2,23 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.39.0] - 2026-11-10
+
+### Rekomendasi Produk Terkait pada Halaman Detail Produk (Backlog C-03)
+
+- **Composable Kurasi Rekomendasi (`app/composables/useRelatedProducts.ts`)**:
+  - Menghadirkan composable `useRelatedProducts` yang secara cerdas mendeteksi slug dan ID kategori produk aktif, lalu memuat 4 instrumen kurasi sejenis dari basis data.
+  - Menerapkan mekanisme deduplikasi dan pengayaan dinamis: jika kategori aktif memiliki kurang dari 4 varian lain, sistem secara otomatis melengkapi rekomendasi dengan produk terpopuler/terkurasi lainnya dari katalog tanpa menduplikasi produk target.
+  - Mematuhi 5 status antarmuka wajib (Idle, Loading, Success, Empty, Error) dengan penanganan error jaringan yang informatif.
+- **Komponen Modular Rekomendasi (`app/components/product/ProductRelatedSection.vue`)**:
+  - Menampilkan grid responsif (2 kolom pada perangkat bergerak 320px-375px, 4 kolom pada desktop) dengan kartu `ProductCard` resmi tanpa aksi administratif (`hideActions: true`).
+  - Dilengkapi skeleton loading 4 kartu, navigasi tautan cerdas ke rute kategori resmi (`/c/[slug]` atau `/katalog?category=[id]`), dan tombol coba lagi saat terjadi kendala koneksi.
+- **Integrasi Halaman Detail Produk (`app/pages/product/[id].vue`)**:
+  - Mengintegrasikan seksi rekomendasi tepat di bawah ulasan produk, memenuhi acceptance criteria Backlog C-03 (useSeoMeta, OG image, breadcrumb, dan 4 produk terkait).
+- **Suite Pengujian Unit Komprehensif (`tests/unit/product-related-recommendations.spec.ts`)**:
+  - 10 unit test memvalidasi kalkulasi slug kategori, eliminasi ID produk aktif dari rekomendasi, pengayaan fallback saat kandidat kategori kurang dari 4, penanganan status error/empty, rendering skeleton saat loading, rendering 4 kartu produk, batas 300 baris kode per berkas, dan ketiadaan karakter em dash.
+  - 95 file pengujian Vitest (973/973 test lulus 100%), 0 error ESLint, dan `nuxi typecheck` EXIT 0.
+
 ## [0.38.1] - 2026-11-10
 
 ### Perbaikan Ketahanan Sinkronisasi Wishlist, Validasi Foreign Key, dan Logging Terstruktur
