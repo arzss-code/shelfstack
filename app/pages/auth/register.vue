@@ -14,7 +14,28 @@ definePageMeta({
 
 const toast = useUiToast()
 const user = useSupabaseUser()
-const { signUp, signInWithGoogle, pending } = useAuth()
+const { signUp, signInWithGoogle, signInWithGoogleIdToken, pending } = useAuth()
+const { isConfigured: isGoogleConfigured, initGoogleIdentity, promptOneTap } = useGoogleIdentity()
+
+onMounted(async () => {
+  if (isGoogleConfigured.value) {
+    await initGoogleIdentity({
+      onSuccess: async (idToken) => {
+        try {
+          await signInWithGoogleIdToken(idToken)
+          await navigateTo('/')
+        } catch (err: unknown) {
+          toast.add({
+            severity: 'error',
+            summary: 'Gagal Daftar',
+            detail: err instanceof Error ? err.message : 'Login Google gagal.',
+            life: 5000,
+          })
+        }
+      },
+    })
+  }
+})
 
 if (import.meta.client) {
   watch(
@@ -70,6 +91,10 @@ const handleRegister = async () => {
 
 const handleGoogle = async () => {
   try {
+    if (isGoogleConfigured.value) {
+      promptOneTap()
+      return
+    }
     await signInWithGoogle()
   } catch (e: unknown) {
     toast.add({

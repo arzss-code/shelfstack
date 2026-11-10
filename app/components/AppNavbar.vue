@@ -43,6 +43,13 @@ const displayName = computed(
   () => profile.value?.full_name || user.value?.email?.split('@')[0] || 'Pengguna',
 )
 const initial = computed(() => displayName.value.charAt(0).toUpperCase() || '?')
+const effectiveAvatarUrl = computed(() => {
+  if (profile.value?.avatar_url) return profile.value.avatar_url
+  const meta = user.value?.user_metadata as Record<string, unknown> | undefined
+  if (typeof meta?.avatar_url === 'string' && meta.avatar_url) return meta.avatar_url
+  if (typeof meta?.picture === 'string' && meta.picture) return meta.picture
+  return null
+})
 
 const handleSearch = () => {
   const q = searchQuery.value.trim()
@@ -220,7 +227,7 @@ const handleLogout = async () => {
             :is-logged-in="isLoggedIn"
             :has-user="Boolean(user)"
             :user-email="user?.email"
-            :avatar-url="profile?.avatar_url"
+            :avatar-url="effectiveAvatarUrl"
             :is-admin="isAdmin"
             :display-name="displayName"
             :initial="initial"

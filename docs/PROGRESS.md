@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 17 (Phase E Production Roadmap: k6 Load Testing Suite & Concurrency Verification)**
-- **Versi Rilis:** `v0.37.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-09)
-- **Baseline Quality Gate (2026-11-09, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 92 file / 952 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 18 (Google Identity Services OIDC ID Token & Auto Profile Sync)**
+- **Versi Rilis:** `v0.38.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
+- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 93 file / 957 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock — tidak ada lapisan mock di kode)
@@ -244,6 +244,13 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Retry Profile Fetch & Timeout Guard**: Memasang mekanisme pengambilan profil berulang hingga 3 kali (delay 300ms) untuk mengantisipasi jeda commit trigger `handle_new_user()`, serta timeout pengaman 10 detik dengan umpan balik visual yang jelas.
     - **Redirection Berbasis Peran & Redirect Query**: Mengarahkan akun admin ke `/admin/activities` dan pelanggan biasa ke target `redirect` yang tervalidasi atau beranda (`/`).
     - **Suite Pengujian Unit (`tests/unit/auth-callback.spec.ts`)**: 7 unit test memvalidasi status default loading, pembatalan izin `access_denied`, timeout verifikasi sesi, alur sukses pelanggan, alur sukses admin, sanitasi query redirect, dan batas 300 baris kode tanpa karakter em dash.
+
+33. **Google Identity Services (OIDC ID Token) & Sinkronisasi Otomatis Metadata Profil (SELESAI 2026-11-10, v0.38.0, Story A-02).**
+    - **Integrasi Google Identity Services (`app/composables/useGoogleIdentity.ts`)**: Memuat SDK `accounts.google.com/gsi/client` non-blocking via `Promise.withResolvers()`, mendukung inisialisasi OIDC ID Token sehingga origin Google tetap berada langsung di domain aplikasi (`localhost:3000` / domain kustom) tanpa me-redirect pengguna ke subdomain Supabase.
+    - **Autentikasi ID Token (`useAuth.ts: signInWithGoogleIdToken`)**: Menghubungkan ID token Google langsung ke Supabase Auth melalui `supabase.auth.signInWithIdToken` dengan fallback otomatis ke `signInWithOAuth` bila Google Client ID belum dikonfigurasi.
+    - **Migrasi Sinkronisasi Metadata Profil PostgreSQL (`20261130000002_sync_google_profile_metadata.sql`)**: Trigger `handle_new_user()` dan `sync_profile_oauth_metadata()` mengekstrak `full_name`/`name` dan `avatar_url`/`picture` dari `raw_user_meta_data` ke tabel `public.profiles` dengan logika `coalesce` (tidak menimpa foto atau nama kustom pengguna).
+    - **Penyelarasan Avatar UI di Seluruh Permukaan**: Menyelaraskan `AppNavbar.vue`, `AccountSidebar.vue`, dan `ProfileAvatarCard.vue` dengan computed `effectiveAvatarUrl` yang reaktif dan aman.
+    - **Suite Pengujian Unit (`tests/unit/google-identity-and-profile-sync.spec.ts`)**: 5 unit test memvalidasi deteksi Google Client ID, inisialisasi GIS, callback credential ID token, integritas skema SQL migrasi profil, dan batas 300 baris kode per berkas tanpa karakter em dash.
 
 ---
 

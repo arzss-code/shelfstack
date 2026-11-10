@@ -2,6 +2,30 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [0.38.0] - 2026-11-10
+
+### Google Identity Services (OIDC ID Token Flow) dan Sinkronisasi Otomatis Metadata Profil
+
+- **Integrasi Google Identity Services SDK (`app/composables/useGoogleIdentity.ts`)**:
+  - Menghadirkan composable `useGoogleIdentity` untuk memuat SDK resmi Google (`accounts.google.com/gsi/client`) secara asinkron dan non-blocking.
+  - Menggunakan alur OIDC ID Token (`signInWithIdToken`) sehingga origin perizinan Google tetap berada langsung pada domain aplikasi (misal `localhost:3000` atau domain kustom), tanpa me-redirect pengguna ke subdomain bawaan Supabase.
+  - Mendukung inisialisasi aman, verifikasi token, pemanggilan One Tap prompt, serta rendering tombol resmi Google.
+- **Dukungan Ganda di `useAuth.ts` & Halaman Autentikasi**:
+  - Menambahkan fungsi `signInWithGoogleIdToken(token, nonce)` pada `app/features/auth/composables/useAuth.ts` yang terintegrasi langsung dengan Supabase Auth.
+  - Memperbarui `app/pages/auth/login.vue` dan `app/pages/auth/register.vue` untuk memicu alur Google Identity Services saat Google Client ID dikonfigurasi, dengan fallback otomatis ke alur OAuth redirect standar bila belum disetel.
+- **Sinkronisasi Otomatis Metadata Profil Google ke PostgreSQL**:
+  - Migrasi basis data `20261130000002_sync_google_profile_metadata.sql`: Memperbarui fungsi pemicu `handle_new_user()` dan menambahkan `sync_profile_oauth_metadata()` untuk mengekstrak foto profil (`avatar_url`/`picture`) dan nama lengkap (`full_name`/`name`) dari `raw_user_meta_data` ke tabel `public.profiles`.
+  - Menggunakan logika `coalesce` protektif: foto profil bawaan Google diadopsi secara otomatis jika profil masih kosong, dan tidak pernah menimpa foto profil kustom yang diunggah pengguna sendiri.
+  - Memperbarui `server/utils/auth.ts` untuk menyertakan `avatar_url` pada self-healing record profil pengguna.
+- **Penyelarasan Tampilan Avatar UI di Navbar, Sidebar, dan Profil**:
+  - Menyelaraskan komponen `AppNavbar.vue`, `AccountSidebar.vue`, dan `ProfileAvatarCard.vue` dengan computed property `effectiveAvatarUrl` yang mengutamakan foto profil dari tabel `profiles` dan secara cerdas memanfaatkan metadata avatar Google pengguna.
+- **Penyelarasan Kebijakan Keamanan Konten (CSP) & Dokumentasi**:
+  - Memperbarui `security.headers.contentSecurityPolicy` di `nuxt.config.ts` untuk mengizinkan sumber daya `accounts.google.com` pada direktif `script-src`, `connect-src`, `frame-src`, dan `style-src`.
+  - Mendokumentasikan variabel konfigurasi `NUXT_PUBLIC_GOOGLE_CLIENT_ID` di `.env.example`.
+- **Suite Pengujian Unit Komprehensif (`tests/unit/google-identity-and-profile-sync.spec.ts`)**:
+  - Menambahkan 5 unit test yang memvalidasi deteksi konfigurasi Google Client ID, inisialisasi GIS, penerusan callback kredensial ID token, integritas skema SQL migrasi metadata profil, serta batas 300 baris kode per berkas tanpa karakter em dash.
+  - 93 file pengujian Vitest (957/957 test lulus 100%), 0 error ESLint, dan `nuxi typecheck` EXIT 0.
+
 ## [0.37.1] - 2026-11-09
 
 ### Hardening Alur Autentikasi Google OAuth dan Ketahanan Halaman Callback

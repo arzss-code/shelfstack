@@ -12,6 +12,7 @@ export interface AuthProfile {
   user_id: string
   full_name: string | null
   role: 'admin' | 'customer'
+  avatar_url?: string | null
 }
 
 /** Ambil user + profile. Throw 401 jika belum login, 403 jika profil hilang. */
@@ -35,7 +36,7 @@ export async function requireUser(event: H3Event): Promise<{
   const client = await serverSupabaseClient<Database>(event)
   const { data: dbProfile, error } = await client
     .from('profiles')
-    .select('id, user_id, full_name, role')
+    .select('id, user_id, full_name, role, avatar_url')
     .eq('user_id', userId)
     .maybeSingle()
 
@@ -49,9 +50,22 @@ export async function requireUser(event: H3Event): Promise<{
   if (!profile) {
     try {
       const serviceClient = serverSupabaseServiceRole<Database>(event)
-      const userMeta = (user as any).user_metadata || {}
-      const appMeta = (user as any).app_metadata || {}
-      const fullName = userMeta.full_name || (user as any).email?.split('@')[0] || 'Pelanggan'
+      const userRecord = user as unknown as {
+        user_metadata?: Record<string, unknown>
+        app_metadata?: Record<string, unknown>
+        email?: string
+      }
+      const userMeta = userRecord.user_metadata || {}
+      const appMeta = userRecord.app_metadata || {}
+      const fullName =
+        (typeof userMeta.full_name === 'string' && userMeta.full_name) ||
+        (typeof userMeta.name === 'string' && userMeta.name) ||
+        userRecord.email?.split('@')[0] ||
+        'Pelanggan'
+      const avatarUrl =
+        (typeof userMeta.avatar_url === 'string' && userMeta.avatar_url) ||
+        (typeof userMeta.picture === 'string' && userMeta.picture) ||
+        null
       const role: 'admin' | 'customer' = appMeta.role === 'admin' ? 'admin' : 'customer'
 
       const { data: created, error: createError } = await serviceClient
@@ -60,8 +74,9 @@ export async function requireUser(event: H3Event): Promise<{
           user_id: userId,
           full_name: fullName,
           role,
+          avatar_url: avatarUrl,
         })
-        .select('id, user_id, full_name, role')
+        .select('id, user_id, full_name, role, avatar_url')
         .single()
 
       if (!createError && created) {
@@ -75,14 +90,27 @@ export async function requireUser(event: H3Event): Promise<{
   // Fallback graceful: jika database masih belum memiliki baris profile & service role gagal,
   // buat in-memory profile agar flow pengguna tidak mengalami HTTP 403 blocking
   if (!profile) {
-    const userMeta = (user as any).user_metadata || {}
-    const appMeta = (user as any).app_metadata || {}
+    const userRecord = user as unknown as {
+      user_metadata?: Record<string, unknown>
+      app_metadata?: Record<string, unknown>
+      email?: string
+    }
+    const userMeta = userRecord.user_metadata || {}
+    const appMeta = userRecord.app_metadata || {}
     const role: 'admin' | 'customer' = appMeta.role === 'admin' ? 'admin' : 'customer'
     profile = {
       id: userId,
       user_id: userId,
-      full_name: userMeta.full_name || (user as any).email?.split('@')[0] || 'Pelanggan',
+      full_name:
+        (typeof userMeta.full_name === 'string' && userMeta.full_name) ||
+        (typeof userMeta.name === 'string' && userMeta.name) ||
+        userRecord.email?.split('@')[0] ||
+        'Pelanggan',
       role,
+      avatar_url:
+        (typeof userMeta.avatar_url === 'string' && userMeta.avatar_url) ||
+        (typeof userMeta.picture === 'string' && userMeta.picture) ||
+        null,
     }
   }
 
