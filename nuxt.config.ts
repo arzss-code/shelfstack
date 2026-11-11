@@ -124,6 +124,7 @@ export default defineNuxtConfig({
           'https://accounts.google.com',
           'https://accounts.google.com/gsi/',
         ],
+        'worker-src': ["'self'"],
       },
     },
   },
