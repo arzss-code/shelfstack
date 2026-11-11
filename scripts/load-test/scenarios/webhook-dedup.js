@@ -35,7 +35,7 @@ export default function () {
   const targetOrderId =
     typeof __ENV !== 'undefined' && __ENV.TARGET_ORDER_ID
       ? __ENV.TARGET_ORDER_ID
-      : 'SS-ORDER-LOADTEST-001'
+      : '00000000-0000-0000-0000-000000000001'
 
   const statusCode = '200'
   const grossAmount = '350000.00'

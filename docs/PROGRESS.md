@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 20 (Production Release v1.0.0 & Zero-Drift Documentation)**
-- **Versi Rilis:** `v1.0.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
-- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 97 file / 996 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v1.0.2` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-11)
+- **Baseline Quality Gate (2026-11-11, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 97 file / 997 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · Load test terautentikasi k6 (10 VUs checkout anti-overselling lolos 100%, 0 server errors, 0 unauthorized) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -289,6 +289,13 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Resolusi Pustaka Kritis & Tinggi**: Menyelesaikan kerentanan CVE pada `@simple-git/argv-parser` (>=2.0.1), `simple-git` (>=4.0.1), `tinypool` (>=2.1.2), `shell-quote` (>=1.11.0), `sharp` (>=0.35.5), `undici` (^7.30.2 & ^8.12.4), `js-yaml` (^4.3.2), `fast-uri` (^3.1.9 & ^4.2.3), `node-forge` (>=1.4.1), `serialize-javascript` (>=7.1.3), `vue` (3.5.45), `happy-dom` (21.0.4), dan `vite` (>=8.2.4).
     - **Penyelarasan order-service**: Mengupdate `zod` ke `^4.6.7`, `fastify-type-provider-zod` ke `^7.0.0`, `fastify` ke `^5.12.6`, dan `vitest` ke `^4.1.12`.
     - **Verifikasi Kualitas Penuh**: `pnpm audit --audit-level=high` menghasilkan EXIT 0 (0 critical, 0 high), `pnpm lint` EXIT 0, `pnpm typecheck` EXIT 0 (root app & order-service), serta unit suite 97 file / 996 test di root dan 2 file / 25 test di order-service lulus 100%.
+
+40. **Pengujian Beban Terautentikasi Grafana k6 & Verifikasi Anti-Overselling Produksi (SELESAI 2026-11-11, v1.0.2).**
+    - **Injeksi Cookie Sesi Supabase SSR pada Runner k6 (`scripts/load-test/runner.mjs` & `common.js`)**: Mengimplementasikan `formatSupabaseAuthCookie(supabaseUrl, session)` sesuai format resmi `@supabase/ssr` (`sb-<projectRef>-auth-token=base64-...`, chunking otomatis pada 3180 karakter jika payload besar), serta autentikasi runtime otomatis via endpoint Supabase Auth (`/auth/v1/token?grant_type=password`) dan flag `--auth`.
+    - **Penyelarasan Runtime Environment Aman**: Menggunakan `node --env-file-if-exists=.env` pada skrip `test:load` `package.json` tanpa membaca berkas `.env` langsung di kode agen.
+    - **Verifikasi Empiris Integritas Stok & Penguncian Baris PostgreSQL (`POST /api/orders`)**: Menguji konkurensi 10 Virtual Users (VUs) pada produk out of stock (Product ID 12, `stock: 0`). Terbukti secara empiris penguncian baris PostgreSQL RPC `create_order` (`SELECT ... FOR UPDATE`): 149 permintaan konkuren ditangani secara atomik dengan HTTP 400 Out of Stock tanpa pembuatan junk unpaid orders.
+    - **Metrik Beban Produksi Terukur**: `checkout_unauthorized == 0` dan `checkout_server_errors == 0` (zero 500 crash / deadlock). Seluruh metrik terukur untuk skenario `catalog`, `checkout`, `webhook`, dan `health` dicatat dalam `docs/engineering/load-testing.md`.
+    - **Suite Pengujian Unit Komprehensif**: Menambahkan unit test di `tests/unit/load-test-suite.spec.ts` untuk memverifikasi CLI args, format cookie SSR unchunked dan chunked, dan integritas batas baris. Total unit suite 97 file / 997 test lulus 100%.
 
 ---
 

@@ -1,24 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * ShelfStack k6 Load Testing Suite CLI Runner
- *
- * Usage:
- *   pnpm test:load [scenario] [options]
- *
- * Scenarios:
- *   catalog   - Etalase browsing, search, filter, and category listing
- *   checkout  - Critical inventory race condition and concurrent checkout
- *   webhook   - Payment webhook deduplication and concurrency
- *   health    - Observability, liveness, and readiness probes
- *   all       - Full comprehensive test suite (default)
- *
- * Options:
- *   --vus <n>            Override virtual users count
- *   --duration <time>    Override test duration (e.g. 10s, 30s, 1m)
- *   --base-url <url>     Target server URL (default: http://127.0.0.1:3000)
- *   --help               Show help menu
- */
 
 import { spawnSync, spawn } from 'node:child_process'
 import fs from 'node:fs'
@@ -72,6 +53,48 @@ export function resolveK6Binary() {
   return null
 }
 
+export function formatSupabaseAuthCookie(supabaseUrl, session) {
+  if (!supabaseUrl || !session) return ''
+  const parsedUrl = new URL(supabaseUrl)
+  const projectRef = parsedUrl.hostname.split('.')[0]
+  const name = `sb-${projectRef}-auth-token`
+  const rawJson = typeof session === 'string' ? session : JSON.stringify(session)
+  const base64Val = Buffer.from(rawJson, 'utf8').toString('base64url')
+  const encodedValue = `base64-${base64Val}`
+
+  if (encodedValue.length <= 3180) {
+    return `${name}=${encodedValue}`
+  }
+
+  const chunks = []
+  for (let i = 0; i < encodedValue.length; i += 3180) {
+    chunks.push(encodedValue.slice(i, i + 3180))
+  }
+  return chunks.map((chunk, idx) => `${name}.${idx}=${chunk}`).join('; ')
+}
+
+export async function authenticateSupabase(supabaseUrl, supabaseKey, email, password) {
+  try {
+    const res = await fetch(`${supabaseUrl.replace(/\/+$/, '')}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: supabaseKey,
+      },
+      body: JSON.stringify({ email, password }),
+    })
+    if (!res.ok) {
+      const text = await res.text()
+      console.warn(`[k6 Runner] Supabase auth gagal (${res.status}): ${text}`)
+      return null
+    }
+    return await res.json()
+  } catch (err) {
+    console.warn('[k6 Runner] Error saat menghubungi endpoint autentikasi Supabase:', err)
+    return null
+  }
+}
+
 export function parseArgs(argv) {
   const args = argv.slice(2)
   const validScenarios = ['catalog', 'checkout', 'webhook', 'health', 'all']
@@ -81,11 +104,14 @@ export function parseArgs(argv) {
   let duration = null
   let baseUrl = process.env.BASE_URL || 'http://localhost:3000'
   let showHelp = false
+  let auth = false
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i]
     if (arg === '--help' || arg === '-h') {
       showHelp = true
+    } else if (arg === '--auth') {
+      auth = true
     } else if (arg === '--vus' && args[i + 1]) {
       vus = parseInt(args[++i], 10)
     } else if (arg === '--duration' && args[i + 1]) {
@@ -97,7 +123,7 @@ export function parseArgs(argv) {
     }
   }
 
-  return { scenario, vus, duration, baseUrl, showHelp }
+  return { scenario, vus, duration, baseUrl, showHelp, auth }
 }
 
 export async function checkServerReachable(baseUrl) {
@@ -128,7 +154,7 @@ export async function detectWorkingBaseUrl(preferredUrl) {
 
 
 async function main() {
-  const { scenario, vus, duration, baseUrl, showHelp } = parseArgs(process.argv)
+  const { scenario, vus, duration, baseUrl, showHelp, auth } = parseArgs(process.argv)
 
   if (showHelp) {
     console.log(`
@@ -148,6 +174,7 @@ Opsi:
   --vus <n>          Jumlah virtual users (contoh: --vus 20)
   --duration <time>  Durasi pengujian (contoh: --duration 30s)
   --base-url <url>   URL server target (default: http://127.0.0.1:3000)
+  --auth             Autentikasi customer via Supabase dan sematkan cookie sesi
   --help, -h         Tampilkan bantuan ini
 `)
     process.exit(0)
@@ -171,7 +198,6 @@ Silakan pasang k6 dengan salah satu metode berikut:
   const targetUrl = await detectWorkingBaseUrl(baseUrl)
   console.log(`[k6 Runner] Target URL: ${targetUrl}`)
 
-  // Verifikasi ketersediaan server sebelum pengujian
   const isServerUp = await checkServerReachable(targetUrl)
   if (!isServerUp) {
     console.warn(`
@@ -181,6 +207,29 @@ Pastikan aplikasi berjalan di terminal lain sebelum menguji:
   atau
   pnpm build && pnpm preview
 `)
+  }
+
+  // Supabase SSR session cookie resolution
+  let authCookie = process.env.AUTH_COOKIE || ''
+  const shouldAuthenticate =
+    auth ||
+    scenario === 'checkout' ||
+    scenario === 'all'
+
+  const supabaseUrl = process.env.NUXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+  const supabaseKey = process.env.NUXT_PUBLIC_SUPABASE_KEY || process.env.SUPABASE_KEY
+  const customerEmail = process.env.E2E_CUSTOMER_EMAIL
+  const customerPassword = process.env.E2E_CUSTOMER_PASSWORD
+
+  if (!authCookie && shouldAuthenticate && supabaseUrl && supabaseKey && customerEmail && customerPassword) {
+    console.log(`[k6 Runner] Mengautentikasi pengguna customer (${customerEmail}) via Supabase...`)
+    const authData = await authenticateSupabase(supabaseUrl, supabaseKey, customerEmail, customerPassword)
+    if (authData?.access_token) {
+      authCookie = formatSupabaseAuthCookie(supabaseUrl, authData)
+      console.log('[k6 Runner] Berhasil membuat cookie sesi Supabase SSR.')
+    } else {
+      console.warn('[k6 Runner] Gagal memperoleh sesi autentikasi dari Supabase.')
+    }
   }
 
   // Tentukan file skenario target
@@ -208,6 +257,9 @@ Pastikan aplikasi berjalan di terminal lain sebelum menguji:
   k6Args.push('-e', `SCENARIO=${scenario}`)
   if (process.env.AUTH_TOKEN) {
     k6Args.push('-e', `AUTH_TOKEN=${process.env.AUTH_TOKEN}`)
+  }
+  if (authCookie) {
+    k6Args.push('-e', `AUTH_COOKIE=${authCookie}`)
   }
   if (process.env.MIDTRANS_SERVER_KEY) {
     k6Args.push('-e', `MIDTRANS_SERVER_KEY=${process.env.MIDTRANS_SERVER_KEY}`)

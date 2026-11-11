@@ -5,10 +5,10 @@ import { getBaseUrl, createHeaders, generateUUID, COMMON_THRESHOLDS } from '../c
 
 export const checkoutOrdersSuccess = new Counter('checkout_orders_success')
 export const checkoutOrdersOutOfStock = new Counter('checkout_orders_out_of_stock')
+export const checkoutUnauthorized = new Counter('checkout_unauthorized')
 export const checkoutServerErrors = new Counter('checkout_server_errors')
 export const checkoutDurationTrend = new Trend('checkout_duration_ms')
 export const checkoutFailureRate = new Rate('checkout_failure_rate')
-
 export const options = {
   stages: [
     { duration: '3s', target: 5 }, // Persiapan 5 VUs
@@ -32,7 +32,7 @@ export default function () {
   const targetProductId =
     typeof __ENV !== 'undefined' && __ENV.TARGET_PRODUCT_ID
       ? parseInt(__ENV.TARGET_PRODUCT_ID, 10)
-      : 1
+      : 12
 
   const payload = JSON.stringify({
     items: [
@@ -74,6 +74,8 @@ export default function () {
     checkoutOrdersSuccess.add(1)
   } else if (res.status === 400) {
     checkoutOrdersOutOfStock.add(1)
+  } else if (res.status === 401) {
+    checkoutUnauthorized.add(1)
   }
 
   check(res, {
