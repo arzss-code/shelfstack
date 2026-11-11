@@ -1,8 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { parseArgs, resolveK6Binary } from '../../scripts/load-test/runner.mjs'
-
+import {
+  formatSupabaseAuthCookie,
+  parseArgs,
+  resolveK6Binary,
+} from '../../scripts/load-test/runner.mjs'
 describe('k6 Load Testing Suite Verification', () => {
   const rootDir = process.cwd()
   const loadTestDir = path.join(rootDir, 'scripts', 'load-test')
@@ -30,11 +33,13 @@ describe('k6 Load Testing Suite Verification', () => {
     expect(defaultParsed.vus).toBeNull()
     expect(defaultParsed.duration).toBeNull()
     expect(defaultParsed.showHelp).toBe(false)
+    expect(defaultParsed.auth).toBe(false)
 
     const customParsed = parseArgs([
       'node',
       'runner.mjs',
       'checkout',
+      '--auth',
       '--vus',
       '25',
       '--duration',
@@ -43,12 +48,42 @@ describe('k6 Load Testing Suite Verification', () => {
       'http://localhost:5000',
     ])
     expect(customParsed.scenario).toBe('checkout')
+    expect(customParsed.auth).toBe(true)
     expect(customParsed.vus).toBe(25)
     expect(customParsed.duration).toBe('45s')
     expect(customParsed.baseUrl).toBe('http://localhost:5000')
 
     const helpParsed = parseArgs(['node', 'runner.mjs', '--help'])
     expect(helpParsed.showHelp).toBe(true)
+  })
+
+  it('memformat cookie sesi Supabase SSR dengan benar (unchunked dan chunked)', () => {
+    const supabaseUrl = 'https://abcdefghijklm.supabase.co'
+    const mockSession = {
+      access_token: 'fake-access-token-12345',
+      refresh_token: 'fake-refresh-token-67890',
+      user: { id: 'usr-123', email: 'test@example.com' },
+    }
+
+    // Uji unchunked cookie (panjang encoded <= 3180)
+    const cookie = formatSupabaseAuthCookie(supabaseUrl, mockSession)
+    expect(cookie.startsWith('sb-abcdefghijklm-auth-token=base64-')).toBe(true)
+    expect(cookie).not.toContain(';')
+
+    // Verifikasi decoding base64url
+    const valPart = cookie.replace('sb-abcdefghijklm-auth-token=base64-', '')
+    const decoded = JSON.parse(Buffer.from(valPart, 'base64url').toString('utf8'))
+    expect(decoded.access_token).toBe(mockSession.access_token)
+
+    // Uji chunked cookie saat encodedValue > 3180 chars
+    const largePayload = {
+      ...mockSession,
+      long_data: 'x'.repeat(4000),
+    }
+    const chunkedCookie = formatSupabaseAuthCookie(supabaseUrl, largePayload)
+    expect(chunkedCookie).toContain('sb-abcdefghijklm-auth-token.0=')
+    expect(chunkedCookie).toContain('sb-abcdefghijklm-auth-token.1=')
+    expect(chunkedCookie).toContain('; ')
   })
 
   it('mampu mendeteksi atau mereferensikan binary k6 executable', () => {

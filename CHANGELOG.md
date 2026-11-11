@@ -2,6 +2,22 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [1.0.2] - 2026-11-11
+
+### Pengujian Beban Terautentikasi Grafana k6 & Verifikasi Anti-Overselling Produksi
+
+- **Injeksi Cookie Sesi Supabase SSR pada Runner k6 (`scripts/load-test/runner.mjs` & `common.js`)**:
+  - Mengimplementasikan `formatSupabaseAuthCookie(supabaseUrl, session)` sesuai format resmi `@supabase/ssr` (`sb-<projectRef>-auth-token=base64-...`, chunking otomatis pada 3180 karakter untuk cookie besar).
+  - Menambahkan autentikasi runtime otomatis via endpoint Supabase Auth (`/auth/v1/token?grant_type=password`) dan flag `--auth`.
+  - Mendukung `AUTH_COOKIE` pada `createHeaders()` k6 dan pembacaan env aman via `node --env-file-if-exists=.env` tanpa membaca berkas `.env` langsung di kode agen.
+- **Verifikasi Empiris Integritas Stok & Penguncian Baris PostgreSQL (`POST /api/orders`)**:
+  - Menguji konkurensi 10 Virtual Users (VUs) pada produk out of stock (Product ID 12, `stock: 0`).
+  - Membuktikan penguncian baris PostgreSQL RPC `create_order` (`SELECT ... FOR UPDATE`): 149 permintaan konkuren ditangani secara atomik dengan HTTP 400 Out of Stock tanpa pembuatan junk unpaid orders.
+  - Memastikan metrik `checkout_unauthorized == 0` dan `checkout_server_errors == 0` (zero 500 crash / deadlock).
+- **Verifikasi Beban Server Produksi Penuh**:
+  - Menjalankan 4 skenario load test (`catalog`, `checkout`, `webhook`, `health`) pada production build Nitro (`.output/server/index.mjs`) dan mendokumentasikan metrik terukur di `docs/engineering/load-testing.md`.
+  - Menambahkan unit test komprehensif di `tests/unit/load-test-suite.spec.ts` untuk memverifikasi CLI args, format cookie SSR unchunked/chunked, dan integritas batas baris.
+
 ## [1.0.1] - 2026-11-10
 
 ### Remedi Keamanan Dependensi: Eliminasi Kerentanan Kritis dan Tinggi

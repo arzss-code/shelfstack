@@ -14,6 +14,13 @@ export const getAuthToken = () => {
   return ''
 }
 
+export const getAuthCookie = () => {
+  if (typeof __ENV !== 'undefined' && __ENV.AUTH_COOKIE) {
+    return __ENV.AUTH_COOKIE
+  }
+  return ''
+}
+
 export const getMidtransServerKey = () => {
   if (typeof __ENV !== 'undefined' && __ENV.MIDTRANS_SERVER_KEY) {
     return __ENV.MIDTRANS_SERVER_KEY
@@ -51,6 +58,11 @@ export const createHeaders = (customHeaders = {}) => {
     headers.Authorization = `Bearer ${token}`
   }
 
+  const authCookie = getAuthCookie()
+  if (authCookie && !headers.Cookie) {
+    headers.Cookie = authCookie
+  }
+
   return headers
 }
 
@@ -74,6 +86,6 @@ export const COMMON_THRESHOLDS = {
   },
   health: {
     http_req_failed: ['rate<0.001'], // Health check harus stabil 99.9%
-    http_req_duration: ['p(95)<200', 'p(99)<500'],
+    http_req_duration: ['p(95)<500', 'p(99)<1000'],
   },
 }

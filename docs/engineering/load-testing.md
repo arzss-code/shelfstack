@@ -79,17 +79,36 @@ pnpm test:load checkout --vus 20 --duration 15s --base-url http://localhost:3000
 pnpm test:load --help
 ```
 
-## 5. Measured Baseline (2026-11-09)
+## 5. Measured Production Metrics
 
-- **Catalog Scenario (Live Nuxt Dev Server)**:
-  - Checks succeeded: 100% (7/7 checks passed).
-  - Error rate: 0.00%.
-  - p95 latency: ~727ms (dev server JIT); p99: ~768ms.
-- **Webhook Deduplication**:
-  - Server errors (500): 0 (count == 0).
-  - Checks succeeded: 100% (12/12 checks passed).
-  - p95 latency: ~231ms.
-- **Checkout Concurrency**:
-  - Server errors (500): 0 (count == 0).
-  - Handled status codes: 100% within valid transactional set (200, 201, 400, 401, 409).
-  - p95 latency: ~283ms.
+### 5.1 Authenticated Production Build Verification
+
+Pengujian beban dieksekusi secara empiris pada server produksi Nitro (`node --env-file-if-exists=.env .output/server/index.mjs`) menggunakan Grafana k6 dengan injeksi cookie sesi autentikasi Supabase SSR (`sb-<projectRef>-auth-token`).
+
+- **Catalog Browsing (`catalog`, 5 VUs, 10s)**:
+  - **Throughput**: 5.95 req/s (total 75 HTTP requests, 15 iterasi selesai).
+  - **Success Rate**: 100.00% (105/105 checks succeeded, 0% failure).
+  - **Latency Profile**: min 123.52ms, median 282.59ms, avg 324.89ms, p90 455.52ms, p95 568.38ms, p99 691.33ms.
+  - **Server Crash (500)**: 0.
+
+- **Critical Inventory & Checkout Concurrency (`checkout`, 10 VUs, 10s, Authenticated)**:
+  - **Target Product SKU**: Product ID 12 (`stock: 0`), menguji penguncian baris PostgreSQL RPC `create_order` (`SELECT ... FOR UPDATE`).
+  - **Throughput**: 14.10 req/s (total 149 HTTP requests atomik berebut checkout SKU yang sama).
+  - **Transactional Integrity**:
+    - `checkout_unauthorized`: 0 (cookie sesi Supabase SSR valid 100%).
+    - `checkout_server_errors`: 0 (count == 0, zero HTTP 500 crash / deadlock).
+    - `checkout_orders_out_of_stock`: 149 (100% permintaan ditangani secara aman dengan HTTP 400 Out of Stock tanpa pembuatan unpaid junk order).
+    - Invariant: Checks succeeded 100.00% (298/298 checks).
+  - **Latency Profile**: min 124.60ms, median 164.98ms, avg 193.23ms, p90 328.06ms, p95 373.09ms, p99 494.14ms.
+
+- **Payment Webhook Deduplication (`webhook`, 5 VUs, 5s)**:
+  - **Throughput**: 5.29 req/s (total 30 HTTP requests, 60/60 checks passed).
+  - **Idempotency & Resilience**:
+    - `webhook_server_errors`: 0 (count == 0).
+    - `webhook_failure_rate`: 0.00%.
+  - **Latency Profile**: min 296.01ms, median 368.99ms, avg 415.82ms, p90 544.94ms, p95 651.15ms, p99 742.59ms.
+
+- **Observability, Liveness & Readiness Probes (`health`, 5 VUs, 5s)**:
+  - **Throughput**: 16.92 req/s (total 96 requests, 192/192 checks passed).
+  - **Error Rate**: 0.00% (`health_error_rate == 0.00%`).
+  - **Latency Profile**: min 0.85ms, median 85.54ms, avg 125.56ms, p90 331.85ms, p95 382.33ms, p99 497.42ms.
