@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 20 (Production Release v1.0.0 & Zero-Drift Documentation)**
-- **Versi Rilis:** `v1.0.0` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
-- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 97 file / 996 test lolos 100% · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v1.0.1` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-10)
+- **Baseline Quality Gate (2026-11-10, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 97 file / 996 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · Playwright E2E 14/14 test lolos 100% · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -283,6 +283,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Validasi Infrastruktur Kontainer**: Tiga konfigurasi Docker Compose (`docker-compose.yml`, `docker-compose.dev.yml`, dan `deploy/docker-compose.prod.yml`) divalidasi dengan exit code 0.
     - **Verifikasi Build Produksi Penuh**: Menjalankan `pnpm build` (Nitro preset node-server) menghasilkan output produksi teroptimasi 30.7 MB tanpa peringatan kritis.
     - **Verifikasi Kualitas Komprehensif**: 97 file pengujian Vitest (996/996 test lolos 100%) + 25 pengujian di `@shelfstack/order-service` + 14 pengujian E2E Playwright. Total unit suite gabungan 1.021 test lulus 100%.
+
+39. **Remedi Keamanan Dependensi: Eliminasi Kerentanan Kritis dan Tinggi (SELESAI 2026-11-10, v1.0.1).**
+    - **Eliminasi 102 Kerentanan Dependensi (0 Critical, 0 High)**: Memperbarui dan mengunci versi minimum aman seluruh rantai dependensi transitif via `pnpm.overrides` pada `package.json` dan `pnpm-workspace.yaml`.
+    - **Resolusi Pustaka Kritis & Tinggi**: Menyelesaikan kerentanan CVE pada `@simple-git/argv-parser` (>=2.0.1), `simple-git` (>=4.0.1), `tinypool` (>=2.1.2), `shell-quote` (>=1.11.0), `sharp` (>=0.35.5), `undici` (^7.30.2 & ^8.12.4), `js-yaml` (^4.3.2), `fast-uri` (^3.1.9 & ^4.2.3), `node-forge` (>=1.4.1), `serialize-javascript` (>=7.1.3), `vue` (3.5.45), `happy-dom` (21.0.4), dan `vite` (>=8.2.4).
+    - **Penyelarasan order-service**: Mengupdate `zod` ke `^4.6.7`, `fastify-type-provider-zod` ke `^7.0.0`, `fastify` ke `^5.12.6`, dan `vitest` ke `^4.1.12`.
+    - **Verifikasi Kualitas Penuh**: `pnpm audit --audit-level=high` menghasilkan EXIT 0 (0 critical, 0 high), `pnpm lint` EXIT 0, `pnpm typecheck` EXIT 0 (root app & order-service), serta unit suite 97 file / 996 test di root dan 2 file / 25 test di order-service lulus 100%.
 
 ---
 
