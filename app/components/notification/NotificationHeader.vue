@@ -45,7 +45,7 @@ defineEmits<{
           <span>Tandai Semua Dibaca</span>
         </button>
 
-        <!-- Desktop Notification Permission Toggle -->
+        <!-- Browser Notification Permission Toggle -->
         <button
           type="button"
           class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors cursor-pointer border inline-flex items-center gap-1.5"
@@ -56,8 +56,8 @@ defineEmits<{
           "
           :title="
             desktopPermission === 'granted'
-              ? 'Notifikasi browser desktop telah aktif'
-              : 'Klik untuk mengaktifkan notifikasi browser desktop'
+              ? 'Notifikasi browser telah aktif'
+              : 'Klik untuk mengaktifkan notifikasi browser'
           "
           @click="$emit('toggleDesktopPermission')"
         >
@@ -68,8 +68,8 @@ defineEmits<{
           <span class="hidden sm:inline">
             {{
               desktopPermission === 'granted'
-                ? 'Notifikasi Desktop Aktif'
-                : 'Aktifkan Notifikasi Desktop'
+                ? 'Notifikasi Browser Aktif'
+                : 'Aktifkan Notifikasi Browser'
             }}
           </span>
         </button>
