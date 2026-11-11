@@ -13,6 +13,19 @@ export default withNuxt(
     },
   },
   {
+    files: ['public/sw.js'],
+    languageOptions: {
+      globals: {
+        self: 'readonly',
+        caches: 'readonly',
+        clients: 'readonly',
+        Response: 'readonly',
+        Request: 'readonly',
+        URL: 'readonly',
+      },
+    },
+  },
+  {
     rules: {
       'vue/multi-word-component-names': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
@@ -20,5 +33,5 @@ export default withNuxt(
       'no-useless-catch': 'off',
       'vue/html-self-closing': 'off',
     },
-  }
+  },
 )

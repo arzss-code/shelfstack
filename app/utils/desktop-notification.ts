@@ -22,31 +22,76 @@ export async function requestDesktopNotificationPermission(): Promise<DesktopPer
   return 'unsupported'
 }
 
-export function showDesktopNotification(
+function sanitizeNotificationUrl(url?: string | null): string | null {
+  if (typeof url !== 'string') {
+    return null
+  }
+  const trimmed = url.trim()
+  if (!trimmed.startsWith('/') || trimmed.startsWith('//') || trimmed.startsWith('/\\')) {
+    return null
+  }
+  return trimmed
+}
+
+export async function showDesktopNotification(
   title: string,
   message: string,
   url?: string | null,
   tag?: string,
-): void {
+): Promise<void> {
   if (
-    typeof window !== 'undefined' &&
-    'Notification' in window &&
-    Notification.permission === 'granted'
+    typeof window === 'undefined' ||
+    !('Notification' in window) ||
+    Notification.permission !== 'granted'
   ) {
+    return
+  }
+
+  const safeUrl = sanitizeNotificationUrl(url)
+  const notificationOptions: NotificationOptions = {
+    body: message,
+    icon: '/apple-touch-icon.png',
+    badge: '/favicon-32x32.png',
+    tag,
+    data: safeUrl ? { url: safeUrl } : undefined,
+  }
+
+  if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && navigator.serviceWorker) {
     try {
-      const n = new Notification(title, {
-        body: message,
-        icon: '/favicon.ico',
-        tag,
-      })
-      n.onclick = () => {
-        window.focus()
-        if (url) {
-          navigateTo(url)
+      let registration =
+        typeof navigator.serviceWorker.getRegistration === 'function'
+          ? await navigator.serviceWorker.getRegistration('/sw.js')
+          : undefined
+
+      if (!registration && navigator.serviceWorker.controller && navigator.serviceWorker.ready) {
+        registration = await navigator.serviceWorker.ready
+      }
+
+      if (registration && typeof registration.showNotification === 'function') {
+        const hasActiveWorker = !('active' in registration) || Boolean(registration.active)
+        if (hasActiveWorker) {
+          await registration.showNotification(title, notificationOptions)
+          return
         }
       }
     } catch {
-      // Browser background restriction
+      // Fallback to Window Notification API when Service Worker showNotification is unavailable
     }
+  }
+
+  try {
+    const notification = new Notification(title, {
+      body: message,
+      icon: '/apple-touch-icon.png',
+      tag,
+    })
+    notification.onclick = () => {
+      window.focus()
+      if (safeUrl) {
+        void navigateTo(safeUrl)
+      }
+    }
+  } catch {
+    // Browser background restriction
   }
 }
