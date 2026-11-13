@@ -154,7 +154,7 @@ const toggleSave = (e: Event) => {
         <!-- Alamat Lengkap -->
         <div class="space-y-1">
           <label class="block text-xs font-semibold text-brand-ink">
-            Alamat Lengkap (Jalan, No. Rumah, RT/RW, Patokan)
+            Alamat Lengkap (Jalan, No. Rumah, RT/RW)
             <span class="text-red-500">*</span>
           </label>
           <UiInput

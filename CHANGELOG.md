@@ -9,7 +9,7 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
 - **Modal Pemilih Alamat Tersimpan 1-Klik (`AddressPickerModal.vue`, `AddressPickerCard.vue` & `CheckoutSelectedAddressCard.vue`)**:
   - Menggantikan tampilan inline formulir yang panjang dengan kartu ringkasan alamat aktif (`CheckoutSelectedAddressCard.vue`, 133 baris) dan tombol "Ganti Alamat".
   - Membuka dialog modal accessible (`AddressPickerModal.vue`, 278 baris) berbasis `UiModal` lengkap dengan filter pencarian instan, status default, kartu radio taktil, dan form penambahan alamat baru inline (`SavedAddressForm.vue`) tanpa berpindah halaman.
-  - Komponen kartu alamat mandiri (`AddressPickerCard.vue`, 163 baris) dengan indikator radio kustom, tata letak nama dan nomor telepon segaris (single mental chunk), konsolidasi baris wilayah dan kode pos, serta catatan patokan subtle tanpa kotak banner berat.
+  - Komponen kartu alamat mandiri (`AddressPickerCard.vue`, 163 baris) dengan indikator radio kustom, tata letak nama dan nomor telepon segaris (single mental chunk), konsolidasi baris wilayah dan kode pos, serta label catatan kurir (`Catatan: ...`) subtle tanpa kotak banner berat.
   - Penyelarasan desain visual dan hirarki keterbacaan dengan buku alamat akun (`AddressCard.vue`, 153 baris), memastikan kepatuhan batas maksimal komponen 300 baris.
 - **Kalkulasi Estimasi Waktu Tiba (Dynamic Delivery ETA) Dinamis (`shared/utils/shipping-eta.ts`)**:
   - Utilitas murni TypeScript (`shared/utils/shipping-eta.ts`, 132 baris) untuk memetakan tier layanan logistik (Instan, Express/Next Day, Reguler, Kargo) menjadi tanggal kalender aktual dan rentang hari kerja dalam Bahasa Indonesia.

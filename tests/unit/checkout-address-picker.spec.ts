@@ -211,7 +211,7 @@ describe('AddressPickerCard Component', () => {
     expect(wrapper.text()).toContain('Jl. Sudirman No. 42')
     expect(wrapper.text()).toContain('Jakarta Selatan')
     expect(wrapper.text()).toContain('Kode Pos: 12110')
-    expect(wrapper.text()).toContain('Patokan: Dekat lobby utama')
+    expect(wrapper.text()).toContain('Catatan: Dekat lobby utama')
     expect(wrapper.text()).toContain('Utama')
     expect(wrapper.text()).toContain('Alamat Terpilih')
     expect(wrapper.text()).not.toContain('—') // No em dashes

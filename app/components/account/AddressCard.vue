@@ -102,17 +102,17 @@ const labelInfo = computed(() => {
           <span class="text-brand-ink font-semibold">{{ address.postal }}</span>
         </p>
 
-        <!-- Courier Landmark Note (Subtle, non-competing) -->
+        <!-- Courier Note (Subtle, non-competing) -->
         <div
           v-if="labelInfo.note"
           class="flex items-start gap-1.5 text-[11px] text-brand-muted pt-1"
         >
           <i
-            class="pi pi-compass text-[11px] text-brand-faint shrink-0 mt-0.5"
+            class="pi pi-info-circle text-[11px] text-brand-faint shrink-0 mt-0.5"
             aria-hidden="true"
           />
           <p class="m-0 leading-normal">
-            <span class="text-brand-faint font-medium">Patokan: </span>
+            <span class="text-brand-faint font-medium">Catatan: </span>
             <span class="text-brand-ink font-medium">{{ labelInfo.note }}</span>
           </p>
         </div>
