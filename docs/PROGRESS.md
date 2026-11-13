@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 21 (Fitur E-Commerce Fase 2: Checkout Voucher Selector & Auto-Discount Recommendation)**
-- **Versi Rilis:** `v1.0.4` (`version.json`, `CHANGELOG.md` : sinkron)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 101 file / 1.024 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 22 (Fitur E-Commerce Fase 3: Redesign & Elevasi Penukaran Koin Loyalitas di Checkout)**
+- **Versi Rilis:** `v1.0.5` (`version.json`, `CHANGELOG.md` : sinkron)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 102 file / 1.032 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -314,6 +314,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Komponen Pemilih Voucher Checkout Mandiri (`CheckoutVoucherSelector.vue`, 289 baris)**: Komponen mandiri di ringkasan pesanan (`CheckoutOrderSummary.vue`) yang dioptimasi khusus untuk alur checkout dengan kartu rekomendasi "Diskon Terbaik", 1-klik aplikasi diskon, kartu voucher aktif dengan rincian potongan dan peringatan batas belanja minimum, serta tombol Ubah dan Hapus dengan feedback toast khusus checkout.
     - **Composable Voucher & Idempotensi Checkout (`useVoucherSelection.ts`, `useCheckoutOrder.ts`, `checkout-pricing.ts`)**: Abstraksi reaktif `allEligibleCoupons`, `bestEligibleCoupon`, `bestSavingsCents`, `applyBestCoupon`, watch list `appliedCoupon` untuk regenerasi `Idempotency-Key` aman, dan fungsi pembangun payload `buildCheckoutOrderPayload`.
     - **Suite Pengujian Unit Komprehensif (`tests/unit/checkout-voucher-selector.spec.ts`)**: 7 unit test baru memvalidasi trigger default, kartu rekomendasi, 1-klik apply, kartu aktif, pelepasan kupon, shortfall alert, dan pembukaan modal. Total unit suite 101 file / 1.024 test lolos 100%.
+
+44. **Fitur E-Commerce Fase 3: Redesign & Elevasi Penukaran Koin Loyalitas di Checkout (SELESAI, v1.0.5).**
+    - **Komponen Penukaran Koin Loyalitas Checkout (`CheckoutCoinsToggle.vue`, 139 baris)**: Mengeliminasi kelas warna legacy non-standar dan menyelaraskan dengan token semantik resmi ShelfStack (`rounded-card`, `shadow-whisper`, `border-brand-hair`, `bg-brand-canvas`) dengan tetap mempertahankan palet hangat aksen amber/orange yang khas untuk identitas koin loyalitas. Menyajikan badge ketersediaan saldo dinamis dengan dot emas/amber (`Tersedia X Koin`), transparansi konversi (`1 Koin = Rp 1`), serta feedback interaktif saat potongan koin aktif diterapkan (`Hemat Rp X (X Koin) berhasil diterapkan ke pesanan`).
+    - **Aksesibilitas & Standar Saklar Web Modern**: Saklar toggle switch accessible (`role="switch"`, `aria-checked`, `data-testid="coins-toggle-switch"`) dengan target sentuh 44px, transisi halus, dan dukungan navigasi keyboard lengkap (`Space` dan `Enter`).
+    - **Perampingan Composable & Utilitas Checkout (`useCheckoutOrder.ts`, `checkout-pricing.ts`)**: Mengekstraksi helper pemetaan alamat form dan penyimpanan ke `app/utils/checkout-pricing.ts`, merampingkan `useCheckoutOrder.ts` dari 315 baris menjadi 286 baris kode (100% patuh batas maksimal 300 baris SOP).
+    - **Suite Pengujian Unit Komprehensif (`tests/unit/checkout-coins-toggle.spec.ts`)**: 8 unit test baru memvalidasi rendering bersyarat, interaksi klik, aksesibilitas keyboard, kondisi saldo nol/subtotal tidak memenuhi syarat, status disabled, dan ketiadaan karakter em dash. Total unit suite 102 file / 1.032 test lolos 100%.
 
 ---
 
