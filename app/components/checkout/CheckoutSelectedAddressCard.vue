@@ -28,6 +28,7 @@ const labelInfo = computed(() => {
     const label = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1).toLowerCase()
     const cleanNote = note.replace(/^\[(Rumah|Kantor|Apartemen|Lainnya)\]\s*/i, '').trim()
     return {
+      hasCategory: true,
       label,
       note: cleanNote,
       icon:
@@ -42,7 +43,8 @@ const labelInfo = computed(() => {
   }
 
   return {
-    label: 'Alamat',
+    hasCategory: false,
+    label: '',
     note,
     icon: 'pi pi-map-marker',
   }
@@ -51,73 +53,66 @@ const labelInfo = computed(() => {
 
 <template>
   <div
-    class="p-4 sm:p-5 rounded-card border border-brand-ink/30 bg-brand-canvas-soft/40 shadow-whisper space-y-3 transition-all"
+    class="p-4 sm:p-5 rounded-card border-2 border-brand-ink/40 bg-brand-canvas-soft/30 shadow-whisper space-y-3 transition-all"
   >
     <div class="flex items-start justify-between gap-3">
-      <div class="space-y-1.5 min-w-0">
-        <!-- Badges Strip (matching menu daftar alamat) -->
+      <div class="space-y-2 min-w-0">
+        <!-- Badges Strip -->
         <div class="flex items-center gap-1.5 flex-wrap">
           <span
-            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-brand-ink border border-brand-hair uppercase tracking-wide"
+            v-if="labelInfo.hasCategory"
+            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold bg-white text-brand-ink border border-brand-hair uppercase tracking-wide"
           >
             <i :class="[labelInfo.icon, 'text-[10px] text-brand-muted']" aria-hidden="true" />
             <span>{{ labelInfo.label }}</span>
           </span>
 
           <span
-            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-ink text-white"
+            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"
           >
-            Alamat Pengiriman Aktif
+            <i class="pi pi-check text-[9px]" aria-hidden="true" />
+            <span>Alamat Pengiriman Aktif</span>
           </span>
         </div>
 
-        <!-- Recipient Header -->
-        <div class="flex items-center gap-2 flex-wrap">
-          <span class="font-display font-bold text-sm text-brand-ink">
+        <!-- Recipient & Phone (Single mental chunk) -->
+        <div class="flex items-baseline gap-1.5 flex-wrap">
+          <h4 class="font-display font-bold text-sm text-brand-ink m-0 tracking-tight">
             {{ address.name || 'Penerima' }}
-          </span>
-          <span
-            v-if="address.phone"
-            class="text-xs text-brand-muted font-medium tabular-nums flex items-center gap-1"
-          >
-            <i class="pi pi-phone text-[10px] text-brand-faint" aria-hidden="true" />
+          </h4>
+          <span v-if="address.phone" class="text-brand-faint text-xs">·</span>
+          <span v-if="address.phone" class="text-xs text-brand-muted font-normal tabular-nums">
             {{ address.phone }}
           </span>
         </div>
 
-        <!-- Address details -->
-        <div class="text-xs text-brand-muted leading-relaxed space-y-0.5">
-          <div class="flex items-start gap-1.5">
-            <i
-              class="pi pi-map-pin text-[11px] text-brand-faint shrink-0 mt-0.5"
-              aria-hidden="true"
-            />
-            <div class="min-w-0">
-              <p class="text-xs text-brand-ink font-semibold m-0 leading-relaxed">
-                {{ address.street || 'Belum ada rincian jalan' }}
-              </p>
-              <p v-if="address.city" class="text-[11px] text-brand-muted m-0 mt-0.5">
-                {{ address.city }}
-                <span v-if="address.postal" class="font-mono text-brand-ink font-medium">
-                  ({{ address.postal }})
-                </span>
-              </p>
-            </div>
-          </div>
+        <!-- Address details (Street + City & Postal) -->
+        <div class="text-xs space-y-0.5">
+          <p class="text-xs text-brand-ink font-semibold m-0 leading-relaxed">
+            {{ address.street || 'Belum ada rincian jalan' }}
+          </p>
+          <p v-if="address.city" class="text-xs text-brand-muted m-0 leading-normal">
+            {{ address.city }}
+            <span v-if="address.postal" class="text-brand-faint">·</span>
+            <span v-if="address.postal">
+              Kode Pos: <span class="font-medium text-brand-ink">{{ address.postal }}</span>
+            </span>
+          </p>
         </div>
 
-        <!-- Landmark / Note -->
+        <!-- Landmark / Note (Subtle, non-competing) -->
         <div
           v-if="labelInfo.note"
-          class="mt-1.5 p-2 rounded-field bg-white border border-brand-hair text-[11px] text-brand-muted flex items-start gap-1.5 max-w-lg"
+          class="flex items-start gap-1.5 text-[11px] text-brand-muted pt-0.5 max-w-lg"
         >
           <i
-            class="pi pi-info-circle text-[11px] text-brand-faint shrink-0 mt-0.5"
+            class="pi pi-compass text-[11px] text-brand-faint shrink-0 mt-0.5"
             aria-hidden="true"
           />
-          <span class="leading-normal truncate">
-            <strong class="font-semibold text-brand-ink">Patokan:</strong> {{ labelInfo.note }}
-          </span>
+          <p class="m-0 leading-normal truncate">
+            <span class="text-brand-faint font-medium">Patokan: </span>
+            <span class="text-brand-ink font-medium">{{ labelInfo.note }}</span>
+          </p>
         </div>
       </div>
 
