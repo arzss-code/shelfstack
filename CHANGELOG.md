@@ -1,6 +1,6 @@
 # Changelog
 
-Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
+Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
 ## [1.0.4] - 2026-11-13
 

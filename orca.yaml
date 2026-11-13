@@ -1,4 +1,4 @@
-# Orca Repository Configuration for ShelfStack (product-management)
+# Orca Repository Configuration for ShelfStack
 # Governed by Talenavi Global Multi-Agent SOP and ShelfStack AGENTS.md
 
 setupAgentStartupPolicy: wait-for-setup
