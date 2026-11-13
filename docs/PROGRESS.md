@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 20 (Production Release v1.0.0 & Zero-Drift Documentation)**
-- **Versi Rilis:** `v1.0.3` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-13)
-- **Baseline Quality Gate (2026-11-13, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 98 file / 1.005 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · Playwright E2E 29 passed · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 21 (Fitur E-Commerce Fase 1: Checkout Address Picker & Dynamic ETA)**
+- **Versi Rilis:** `v1.0.3` (`version.json`, `CHANGELOG.md` : sinkron)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 100 file / 1.017 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · Playwright E2E 29 passed · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -303,6 +303,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Plugin Klien & Pengiriman Progresif (`app/plugins/sw.client.ts`, `app/utils/desktop-notification.ts`)**: Registrasi `/sw.js` otomatis di browser dengan guard lingkungan pengujian, serta peningkatan `showDesktopNotification` agar memprioritaskan Service Worker `registration.showNotification(...)` untuk kompatibilitas penuh mobile PWA Android sebelum fallback ke `new Notification(...)`.
     - **Kebijakan CSP & Kepatuhan Lint (`nuxt.config.ts`, `eslint.config.mjs`)**: Penambahan `'worker-src': ["'self'"]` pada direktif Content Security Policy dan deklarasi global Service Worker di ESLint.
     - **Suite Pengujian Unit Komprehensif (`tests/unit/pwa-service-worker.spec.ts`)**: 8 unit test baru memvalidasi precaching, aturan bypass keamanan, sanitasi push, dan pengiriman notifikasi progresif. Total unit suite 98 file / 1.005 test lulus 100%.
+
+42. **Fitur E-Commerce Fase 1: Checkout Address Picker 1-Klik & Dynamic Delivery ETA (SELESAI, v1.0.3).**
+    - **Modal Pemilih Alamat Tersimpan 1-Klik (`AddressPickerModal.vue`, `AddressPickerCard.vue`, `CheckoutSelectedAddressCard.vue`)**: Memilih alamat dari buku alamat tanpa reload, pencarian instan, kartu radio taktil, formulir penambahan inline `SavedAddressForm.vue`, dan elevasi shadow seragam.
+    - **Kalkulasi Estimasi Waktu Tiba Dinamis (`shared/utils/shipping-eta.ts`)**: Pemetaan tier logistik (Instan, Express, Reguler, Kargo) menjadi tanggal kalender dan rentang hari kerja dalam Bahasa Indonesia pada `ShippingMethodSelector.vue`.
+    - **Catatan Pengiriman Pelanggan**: Input catatan instruksi kurir/penjual dengan batas 300 karakter pada `CheckoutAddressForm.vue`.
+    - **Suite Pengujian Unit Komprehensif (`tests/unit/shipping-eta.spec.ts`, `tests/unit/checkout-address-picker.spec.ts`)**: 12 unit test baru. Total unit suite 100 file / 1.017 test lolos 100%.
 
 ---
 

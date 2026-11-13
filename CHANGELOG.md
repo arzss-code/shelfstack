@@ -4,6 +4,24 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
 
 ## [1.0.3] - 2026-11-13
 
+### Fitur E-Commerce Fase 1: Modal Seleksi Alamat 1-Klik, Estimasi Tiba (ETA) Dinamis & Catatan Kurir
+
+- **Modal Pemilih Alamat Tersimpan 1-Klik (`AddressPickerModal.vue`, `AddressPickerCard.vue` & `CheckoutSelectedAddressCard.vue`)**:
+  - Menggantikan tampilan inline formulir yang panjang dengan kartu ringkasan alamat aktif (`CheckoutSelectedAddressCard.vue`, 130 baris) dan tombol "Ganti Alamat".
+  - Membuka dialog modal accessible (`AddressPickerModal.vue`, 278 baris) berbasis `UiModal` lengkap dengan filter pencarian instan, status default, kartu radio taktil, dan form penambahan alamat baru inline (`SavedAddressForm.vue`) tanpa berpindah halaman.
+  - Komponen kartu alamat mandiri (`AddressPickerCard.vue`, 172 baris) dengan indikator radio kustom, tata letak nama dan nomor telepon segaris (single mental chunk), konsolidasi baris wilayah dan kode pos, serta label catatan kurir (`Catatan: ...`) subtle tanpa kotak banner berat.
+  - Menyelaraskan elevasi bayangan (shadow) dan geometri container alamat: container section luar `CheckoutAddressForm.vue` (256 baris) menggunakan `shadow-whisper` seragam dengan section checkout lainnya, sedangkan kartu inset dalam dinormalisasi ke `border border-brand-hair rounded-xl` tanpa shadow ganda.
+  - Penyelarasan desain visual dan hirarki keterbacaan dengan buku alamat akun (`AddressCard.vue`, 157 baris), memastikan kepatuhan batas maksimal komponen 300 baris.
+- **Kalkulasi Estimasi Waktu Tiba (Dynamic Delivery ETA) Dinamis (`shared/utils/shipping-eta.ts`)**:
+  - Utilitas murni TypeScript (`shared/utils/shipping-eta.ts`, 132 baris) untuk memetakan tier layanan logistik (Instan, Express/Next Day, Reguler, Kargo) menjadi tanggal kalender aktual dan rentang hari kerja dalam Bahasa Indonesia.
+  - Menampilkan badge kalender dinamis pada pemilih ekspedisi checkout (`ShippingMethodSelector.vue`) untuk transparansi jadwal tiba kepada pembeli.
+- **Catatan Pengiriman Pelanggan untuk Kurir/Penjual (`CheckoutAddressForm.vue`)**:
+  - Menyediakan input instruksi pengiriman opsional dengan batasan 300 karakter untuk memudahkan kurir saat proses antar paket.
+- **Verifikasi Kualitas & Pengujian Komprehensif**:
+  - Menambahkan pengujian unit di `tests/unit/shipping-eta.spec.ts` (7 tests) dan `tests/unit/checkout-address-picker.spec.ts` (5 tests).
+  - Seluruh rangkaian pengujian (100 test files, 1.017 test cases di root app + 25 tests di order-service) lolos 100%.
+  - `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
+
 ### PWA Service Worker Mandiri, Notifikasi Web Push Progresif, dan Finalisasi Zero-Drift Portofolio
 
 - **PWA Service Worker Mandiri (`public/sw.js`)**:
@@ -19,7 +37,7 @@ Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**)
 - **Verifikasi Gerbang Kualitas Penuh**:
   - `pnpm lint`: EXIT 0 (0 error, 0 warning).
   - `pnpm typecheck`: EXIT 0 (root app & order-service).
-  - `pnpm exec vitest run`: 98 file lulus, 1.005 test lulus 100%.
+  - `pnpm exec vitest run`: 100 file lulus, 1.017 test lulus 100%.
   - `pnpm --filter @shelfstack/order-service test`: 2 file lulus, 25 test lulus 100%.
   - Playwright E2E: 29 skenario lulus 100%.
 

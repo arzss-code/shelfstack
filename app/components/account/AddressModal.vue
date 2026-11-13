@@ -214,7 +214,7 @@ const handleSubmit = () => {
 
       <UiInput
         v-model="form.noteText"
-        label="Catatan untuk Kurir / Patokan Lokasi (Opsional)"
+        label="Catatan untuk Kurir (Opsional)"
         placeholder="Contoh: Titipkan di pos satpam / rumah cat biru samping warung"
         :disabled="loading"
       />

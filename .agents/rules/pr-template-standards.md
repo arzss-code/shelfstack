@@ -17,24 +17,32 @@ Every Pull Request and branch created in this repository MUST follow industry-st
 
 ---
 
-## 2. Pull Request Description Template
+## 2. Mandatory Pull Request Template Usage
 
-When creating or updating a Pull Request (`gh pr create` or `gh pr edit`), ALWAYS follow the structure in `.github/PULL_REQUEST_TEMPLATE.md` or the specialized templates in `.github/PULL_REQUEST_TEMPLATE/`:
+When creating or updating a Pull Request (`gh pr create` or `gh pr edit`), you MUST ALWAYS use the official Markdown templates provided in `.github/PULL_REQUEST_TEMPLATE/` or `.github/PULL_REQUEST_TEMPLATE.md`. Writing ad-hoc, informal, or abbreviated descriptions (such as plain `## Summary` bullets) is **STRICTLY FORBIDDEN**.
 
+### Template Selection Guide:
+
+- **Feature & Enhancements**: `.github/PULL_REQUEST_TEMPLATE/feature.md`
+- **Bug Fixes**: `.github/PULL_REQUEST_TEMPLATE/bugfix.md`
+- **Hotfixes**: `.github/PULL_REQUEST_TEMPLATE/hotfix.md`
+- **Refactoring**: `.github/PULL_REQUEST_TEMPLATE/refactor.md`
+- **Documentation**: `.github/PULL_REQUEST_TEMPLATE/docs.md`
 - **General / Multi-Scope PRs**: `.github/PULL_REQUEST_TEMPLATE.md`
-  - `## Description` (concise summary of _what_ and _why_, plus a Mermaid diagram or module tree for architectural changes)
-  - `## Type of Change` (checkboxes)
-  - `## Changes Made` & `### Key Files Changed` (`File | Change` table)
-  - `## API & Database Changes`
-  - `## How to Test` (numbered step-by-step verification guide + `### Verification Output` with real executed results)
-  - `## Checklist`
-  - `## Related Issues / PRs`
-- **Specialized PRs**:
-  - Feature: `.github/PULL_REQUEST_TEMPLATE/feature.md`
-  - Bug Fix: `.github/PULL_REQUEST_TEMPLATE/bugfix.md`
-  - Hotfix: `.github/PULL_REQUEST_TEMPLATE/hotfix.md`
-  - Refactor: `.github/PULL_REQUEST_TEMPLATE/refactor.md`
-  - Docs: `.github/PULL_REQUEST_TEMPLATE/docs.md`
+
+### Required Execution Protocol:
+
+1. Always base the PR description directly on the selected template file.
+2. Fill every section completely:
+   - Clear description and architectural context.
+   - User Story (`As a... I want... so that...`).
+   - Detailed technical implementation choices.
+   - `### Key Files Changed` table with accurate paths and summaries.
+   - API / Database impact sections.
+   - Numbered step-by-step `How to Test` instructions.
+   - `### Verification Output` with real, executed terminal commands (`pnpm lint`, `pnpm typecheck`, `pnpm exec vitest run`, `order-service` tests).
+   - Marked checkboxes (`[x]`) in the Checklist and other selection lists.
+3. When using `gh pr create` or `gh pr edit`, supply the fully populated template via `--body-file` or `--body`. Never bypass template fields.
 
 ---
 

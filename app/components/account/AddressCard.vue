@@ -24,6 +24,7 @@ const labelInfo = computed(() => {
     const label = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1).toLowerCase()
     const cleanNote = note.replace(/^\[(Rumah|Kantor|Apartemen|Lainnya)\]\s*/i, '').trim()
     return {
+      hasCategory: true,
       label,
       note: cleanNote,
       icon:
@@ -38,7 +39,8 @@ const labelInfo = computed(() => {
   }
 
   return {
-    label: 'Alamat',
+    hasCategory: false,
+    label: '',
     note,
     icon: 'pi pi-map-marker',
   }
@@ -55,11 +57,15 @@ const labelInfo = computed(() => {
     ]"
   >
     <!-- Card Top Content -->
-    <div>
-      <!-- Badges Strip (Shopee / Tokopedia pattern) -->
-      <div class="flex items-center gap-2 mb-2.5 flex-wrap">
+    <div class="space-y-2.5">
+      <!-- Badges Strip -->
+      <div
+        v-if="labelInfo.hasCategory || address.is_default"
+        class="flex items-center gap-1.5 flex-wrap"
+      >
         <span
-          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-brand-ink border border-brand-hair uppercase tracking-wide"
+          v-if="labelInfo.hasCategory"
+          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold bg-white text-brand-ink border border-brand-hair uppercase tracking-wide"
         >
           <i :class="[labelInfo.icon, 'text-[10px] text-brand-muted']" aria-hidden="true" />
           <span>{{ labelInfo.label }}</span>
@@ -69,55 +75,46 @@ const labelInfo = computed(() => {
 
         <span
           v-if="labelInfo.label === 'Kantor'"
-          class="text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full font-medium"
+          class="text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-medium"
         >
           Jam Kantor (Senin - Jumat)
         </span>
       </div>
 
       <!-- Recipient Header -->
-      <div class="flex items-start justify-between gap-3 mb-3">
-        <h3 class="text-sm font-bold text-brand-ink m-0 tracking-tight truncate">
+      <div class="flex items-baseline gap-1.5 flex-wrap">
+        <h3 class="text-sm font-bold text-brand-ink m-0 tracking-tight">
           {{ address.name }}
         </h3>
-        <div class="flex items-center text-xs text-brand-muted shrink-0 tabular-nums">
-          <i class="pi pi-phone text-[10px] text-brand-faint mr-1" aria-hidden="true" />
-          <span>{{ address.phone }}</span>
-        </div>
+        <span class="text-brand-faint text-xs">·</span>
+        <span class="text-xs text-brand-muted tabular-nums">
+          {{ address.phone }}
+        </span>
       </div>
 
       <!-- Address Details -->
-      <div class="text-xs text-brand-muted leading-relaxed space-y-1.5 mb-5">
-        <div class="flex items-start gap-2">
-          <i
-            class="pi pi-map-pin text-[12px] text-brand-faint shrink-0 mt-0.5"
-            aria-hidden="true"
-          />
-          <div class="min-w-0">
-            <p class="m-0 text-brand-ink font-semibold">
-              {{ address.street }}
-            </p>
-            <p class="m-0 text-brand-muted mt-0.5">
-              {{ address.city }}
-            </p>
-            <p class="m-0 text-[11px] font-mono text-brand-faint mt-0.5">
-              Kode Pos: <span class="text-brand-ink font-semibold">{{ address.postal }}</span>
-            </p>
-          </div>
-        </div>
+      <div class="text-xs space-y-0.5 mb-4">
+        <p class="m-0 text-brand-ink font-semibold leading-relaxed">
+          {{ address.street }}
+        </p>
+        <p class="m-0 text-brand-muted text-xs leading-normal">
+          {{ address.city }} <span class="text-brand-faint">·</span> Kode Pos:
+          <span class="text-brand-ink font-semibold">{{ address.postal }}</span>
+        </p>
 
-        <!-- Courier Landmark Note -->
+        <!-- Courier Note (Subtle, non-competing) -->
         <div
           v-if="labelInfo.note"
-          class="mt-2.5 p-2.5 rounded-field bg-white border border-brand-hair text-[11px] text-brand-muted flex items-start gap-1.5"
+          class="flex items-start gap-1.5 text-[11px] text-brand-muted pt-1"
         >
           <i
             class="pi pi-info-circle text-[11px] text-brand-faint shrink-0 mt-0.5"
             aria-hidden="true"
           />
-          <span class="leading-normal">
-            <strong class="font-semibold text-brand-ink">Patokan:</strong> {{ labelInfo.note }}
-          </span>
+          <p class="m-0 leading-normal">
+            <span class="text-brand-faint font-medium">Catatan: </span>
+            <span class="text-brand-ink font-medium">{{ labelInfo.note }}</span>
+          </p>
         </div>
       </div>
     </div>

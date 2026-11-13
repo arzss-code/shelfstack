@@ -6,6 +6,7 @@ import {
   calculateShippingFee,
   supportedCouriers,
 } from '~~/shared/schemas/shipping'
+import { calculateDeliveryEta } from '~~/shared/utils/shipping-eta'
 import { formatRupiah } from '~/utils/format'
 
 const props = withDefaults(
@@ -32,11 +33,13 @@ const servicesWithPricing = computed(() => {
   return serviceKeys.map((key) => {
     const opt = shippingRateOptions[key]
     const calc = calculateShippingFee(key, props.subtotalCents)
+    const dynamicEta = calculateDeliveryEta(key)
     return {
       key,
       name: key === 'express' ? 'Kilat / Next Day' : opt.name,
       description: opt.description,
       eta: opt.eta,
+      dynamicEta,
       feeCents: calc.feeCents,
       isFree: calc.isFree,
       formattedPrice: calc.isFree ? 'Gratis' : formatRupiah(calc.feeCents / 100),
@@ -149,6 +152,13 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
                 ]"
               >
                 {{ svc.eta }}
+              </span>
+              <span
+                data-testid="dynamic-eta-badge"
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-medium bg-brand-canvas-soft text-brand-ink border border-brand-hairsoft"
+              >
+                <i class="pi pi-calendar text-[10px] text-brand-muted" />
+                {{ svc.dynamicEta.badgeText }}
               </span>
             </div>
             <p class="text-xs text-brand-muted m-0 mt-0.5 leading-normal">

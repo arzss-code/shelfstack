@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { UserAddress } from '~~/shared/schemas/address'
 import type { AdministrativeSelection } from '~~/shared/schemas/location'
 import { formatAdministrativeAddress } from '~~/shared/data/locations/indonesia-regions'
-import SavedAddressSelector from '~/components/checkout/SavedAddressSelector.vue'
 import LocationPickerModal from '~/components/checkout/LocationPickerModal.vue'
+import AddressPickerModal from '~/components/checkout/AddressPickerModal.vue'
+import CheckoutSelectedAddressCard from '~/components/checkout/CheckoutSelectedAddressCard.vue'
 
 interface AddressModel {
   name: string
@@ -39,7 +40,13 @@ const emit = defineEmits<{
   'select-saved': [saved: UserAddress]
 }>()
 
+const isAddressModalOpen = ref(false)
 const isLocationModalOpen = ref(false)
+const isManualFormExpanded = ref(false)
+
+const hasSelectedAddress = computed(() => {
+  return Boolean(props.selectedSavedAddressId)
+})
 
 const updateField = (field: keyof AddressModel, val: string) => {
   emit('update:modelValue', {
@@ -56,6 +63,10 @@ const handleLocationSelect = (loc: AdministrativeSelection) => {
   })
 }
 
+const handleSelectSavedAddress = (saved: UserAddress) => {
+  emit('select-saved', saved)
+}
+
 const toggleSave = (e: Event) => {
   const target = e.target as HTMLInputElement
   emit('update:saveAddressForNextOrder', target.checked)
@@ -63,27 +74,53 @@ const toggleSave = (e: Event) => {
 </script>
 
 <template>
-  <fieldset :disabled="disabled" class="border-0 p-0 m-0 min-w-0 space-y-6">
-    <div class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-4">
-      <!-- Section Header -->
-      <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
-        <div class="flex items-center gap-2">
-          <i class="pi pi-map-marker text-brand-ink text-base" />
-          <h2 id="shipping-heading" class="font-display text-base font-bold text-brand-ink m-0">
-            Alamat Pengiriman
-          </h2>
-        </div>
-        <span class="text-[11px] text-brand-muted">Langkah 1 dari 2</span>
+  <div
+    :class="{ 'opacity-60 pointer-events-none': disabled }"
+    class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-4"
+  >
+    <!-- Section Header -->
+    <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
+      <div class="flex items-center gap-2">
+        <i class="pi pi-map-marker text-brand-ink text-base" />
+        <h2 id="shipping-heading" class="font-display text-base font-bold text-brand-ink m-0">
+          Alamat Pengiriman
+        </h2>
       </div>
+      <span class="text-[11px] text-brand-muted">Langkah 1 dari 2</span>
+    </div>
 
-      <!-- Saved Address Selector if logged in -->
-      <div v-if="isLoggedIn" class="pb-4 border-b border-brand-hairsoft">
-        <SavedAddressSelector
-          :selected-id="selectedSavedAddressId"
-          @select="emit('select-saved', $event)"
-        />
+    <!-- Quick Address Card for Logged In User with Saved Address -->
+    <CheckoutSelectedAddressCard
+      v-if="isLoggedIn && hasSelectedAddress"
+      :address="modelValue"
+      :is-manual-expanded="isManualFormExpanded"
+      @change-address="isAddressModalOpen = true"
+      @toggle-manual="isManualFormExpanded = !isManualFormExpanded"
+    />
+
+    <!-- Logged-in prompt to pick address when none selected -->
+    <div
+      v-else-if="isLoggedIn"
+      class="p-3.5 rounded-xl border border-dashed border-brand-hair bg-brand-canvas-soft/50 flex items-center justify-between gap-3"
+    >
+      <div class="flex items-center gap-2.5 text-xs text-brand-ink">
+        <i class="pi pi-bookmark text-brand-accent text-sm" />
+        <span>Pilih alamat dari buku alamat tersimpan untuk checkout lebih cepat.</span>
       </div>
+      <UiButton
+        type="button"
+        variant="outline"
+        size="sm"
+        class="text-xs shrink-0"
+        data-testid="open-address-picker-btn"
+        @click="isAddressModalOpen = true"
+      >
+        Pilih Alamat
+      </UiButton>
+    </div>
 
+    <!-- Manual Address Inputs -->
+    <div v-if="!isLoggedIn || !hasSelectedAddress || isManualFormExpanded" class="space-y-4 pt-1">
       <!-- Address Inputs Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <!-- Nama Penerima -->
@@ -116,7 +153,7 @@ const toggleSave = (e: Event) => {
       <!-- Alamat Lengkap -->
       <div class="space-y-1">
         <label class="block text-xs font-semibold text-brand-ink">
-          Alamat Lengkap (Jalan, No. Rumah, RT/RW, Patokan)
+          Alamat Lengkap (Jalan, No. Rumah, RT/RW)
           <span class="text-red-500">*</span>
         </label>
         <UiInput
@@ -189,21 +226,8 @@ const toggleSave = (e: Event) => {
         </p>
       </div>
 
-      <!-- Catatan Pengiriman -->
-      <div class="space-y-1">
-        <label class="block text-xs font-semibold text-brand-ink">
-          Catatan untuk Kurir (Opsional)
-        </label>
-        <UiInput
-          :model-value="modelValue.note"
-          placeholder="cth. Titipkan ke satpam jika penerima tidak ada di tempat"
-          :error="errors.note"
-          @update:model-value="updateField('note', $event)"
-        />
-      </div>
-
       <!-- Option Checkbox: Simpan alamat -->
-      <div v-if="isLoggedIn" class="flex items-center gap-2 pt-3 border-t border-brand-hairsoft">
+      <div v-if="isLoggedIn" class="flex items-center gap-2 pt-2 border-t border-brand-hairsoft">
         <input
           id="save_address_checkbox"
           :checked="saveAddressForNextOrder"
@@ -220,7 +244,30 @@ const toggleSave = (e: Event) => {
       </div>
     </div>
 
+    <!-- Catatan Pengiriman (Kurir / Penjual) -->
+    <div class="space-y-1 pt-2 border-t border-brand-hairsoft">
+      <div class="flex items-center justify-between">
+        <label class="block text-xs font-semibold text-brand-ink">
+          Catatan untuk Kurir / Penjual (Opsional)
+        </label>
+        <span class="text-[11px] text-brand-muted">Maks. 300 karakter</span>
+      </div>
+      <UiInput
+        :model-value="modelValue.note"
+        placeholder="cth. Titipkan ke satpam jika penerima tidak ada di tempat"
+        :error="errors.note"
+        @update:model-value="updateField('note', $event)"
+      />
+    </div>
     <!-- Indonesian Administrative Address Master Data Selector Modal -->
     <LocationPickerModal v-model="isLocationModalOpen" @select="handleLocationSelect" />
-  </fieldset>
+
+    <!-- Saved Address Picker Modal -->
+    <AddressPickerModal
+      v-if="isLoggedIn"
+      v-model:visible="isAddressModalOpen"
+      :selected-id="selectedSavedAddressId"
+      @select="handleSelectSavedAddress"
+    />
+  </div>
 </template>

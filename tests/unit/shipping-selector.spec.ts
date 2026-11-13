@@ -31,6 +31,11 @@ describe('ShippingMethodSelector Component', () => {
     expect(wrapper.text()).toContain('1 Hari Kerja')
     expect(wrapper.text()).toContain('Tiba Hari Ini')
     expect(wrapper.text()).toContain('4-7 Hari Kerja')
+
+    // Dynamic ETA badges
+    const etaBadges = wrapper.findAll('[data-testid="dynamic-eta-badge"]')
+    expect(etaBadges.length).toBe(4)
+    expect(etaBadges[0]?.text()).toContain('Tiba')
   })
 
   it('emits update:modelValue when a shipping option is selected', async () => {
