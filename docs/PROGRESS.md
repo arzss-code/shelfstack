@@ -1,4 +1,4 @@
-# Progress Tracker — ShelfStack (Product Management)
+# Progress Tracker — ShelfStack
 
 > **Catatan Status Proyek:** Dokumen ini adalah sumber kebenaran terkini mengenai progress implementasi fitur, status sprint, dan milestone yang telah dicapai. **Setiap agen AI WAJIB membaca dokumen ini sebelum mulai bekerja.**
 

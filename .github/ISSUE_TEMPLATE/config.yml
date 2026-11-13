@@ -1,6 +1,6 @@
 blank_issues_enabled: true
 contact_links:
   - name: Architecture & Engineering Docs
-    url: https://github.com/arzss-code/product-management/tree/develop/docs
+    url: https://github.com/arzss-code/shelfstack/tree/develop/docs
     about: Read project documentation, ADRs, and backlog specifications before opening an issue.
 
