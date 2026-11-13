@@ -271,7 +271,7 @@ A task is complete only when:
 ## Pull Request & Branch Standards
 
 - **Branch Naming**: Use descriptive, domain-scoped branch names (`feat/<domain-slug>`, `fix/<domain-slug>`, `hotfix/<domain-slug>`, `refactor/<domain-slug>`, `chore/<domain-slug>`, `docs/<domain-slug>`). Never use `production` in feature branch names.
-- **PR Templates**: Every Pull Request must follow `.github/PULL_REQUEST_TEMPLATE.md` or the specialized templates in `.github/PULL_REQUEST_TEMPLATE/` (`feature.md`, `bugfix.md`, `hotfix.md`, `refactor.md`, `docs.md`).
+- **Mandatory PR Template Usage**: Every Pull Request created or updated (`gh pr create`, `gh pr edit`) MUST use the official template files in `.github/PULL_REQUEST_TEMPLATE/` (`feature.md`, `bugfix.md`, `hotfix.md`, `refactor.md`, `docs.md`) or `.github/PULL_REQUEST_TEMPLATE.md`. Writing custom, improvised, or abbreviated summaries (such as plain `## Summary` bullets) is strictly prohibited. Populate every section completely (Description, User Story, Implementation Details, Key Files Changed table, Verification Output with real executed tests, and Checklist).
 - **Public Repo Hygiene**: Never reference internal company SOP labels (e.g., "Talenavi SOP") in public PR descriptions, `.github/` templates, or issues. See `.agents/rules/pr-template-standards.md` for details.
 
 ## Change Report
