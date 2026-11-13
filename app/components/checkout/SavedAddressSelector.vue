@@ -161,7 +161,7 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
       </p>
       <div class="pt-2">
         <UiButton variant="primary" size="sm" icon="pi-plus" class="text-xs" @click="openAddForm">
-          + Tambah Alamat Baru
+          Tambah Alamat Baru
         </UiButton>
       </div>
     </div>

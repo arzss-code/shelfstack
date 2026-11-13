@@ -143,7 +143,7 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
           data-testid="modal-add-address-btn"
           @click="isAddingNew = true"
         >
-          + Tambah Alamat
+          Tambah Alamat
         </UiButton>
       </div>
 
@@ -209,7 +209,7 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
             class="text-xs rounded-lg"
             @click="isAddingNew = true"
           >
-            + Buat Alamat Sekarang
+            Buat Alamat Sekarang
           </UiButton>
         </div>
       </div>
