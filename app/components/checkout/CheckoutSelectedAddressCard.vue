@@ -53,7 +53,7 @@ const labelInfo = computed(() => {
 
 <template>
   <div
-    class="p-4 sm:p-5 rounded-card border-2 border-brand-ink/40 bg-brand-canvas-soft/30 shadow-whisper space-y-3 transition-all"
+    class="p-4 sm:p-5 rounded-xl border border-brand-hair bg-brand-canvas-soft/40 space-y-3 transition-all"
   >
     <div class="flex items-start justify-between gap-3">
       <div class="space-y-2 min-w-0">

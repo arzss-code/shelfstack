@@ -54,7 +54,7 @@ const labelInfo = computed(() => {
     :class="[
       'group relative p-4 sm:p-4.5 rounded-card border-2 transition-all duration-150 text-left cursor-pointer flex flex-col justify-between gap-3 outline-none focus-visible:ring-2 focus-visible:ring-brand-ink/20',
       isSelected
-        ? 'border-brand-ink bg-brand-canvas-soft/30 shadow-whisper'
+        ? 'border-brand-ink bg-brand-canvas-soft/30'
         : 'border-brand-hair bg-white hover:border-brand-ink/40 hover:bg-brand-canvas-soft/10',
     ]"
     @click="emit('select', address)"
