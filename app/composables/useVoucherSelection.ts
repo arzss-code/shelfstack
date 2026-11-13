@@ -35,15 +35,19 @@ export interface AvailableCoupon {
   status?: string
 }
 
-export function useVoucherSelection(options: {
-  onApplied?: (coupon: AppliedCoupon) => void
-  onRemoved?: () => void
-  onClose?: () => void
-}) {
+export function useVoucherSelection(
+  options: {
+    onApplied?: (coupon: AppliedCoupon) => void
+    onRemoved?: () => void
+    onClose?: () => void
+    context?: 'cart' | 'checkout'
+  } = {},
+) {
   const cartStore = useCartStore()
   const toast = useUiToast()
   const auth = useAuth()
   const userVouchers = useUserVouchers()
+  const isCheckoutContext = options.context === 'checkout'
 
   const activeTab = ref<'wallet' | 'public'>('public')
   const availableCoupons = ref<AvailableCoupon[]>([])
@@ -92,27 +96,27 @@ export function useVoucherSelection(options: {
     return isCouponEligible(coupon, cartStore.totalPriceCents)
   }
 
-  const allCoupons = computed(() => {
-    const combined = [...manualCoupons.value, ...walletCoupons.value, ...availableCoupons.value]
-    const map = new Map<string, AvailableCoupon>()
-    for (const c of combined) {
-      map.set(c.code.toUpperCase(), c)
-    }
-    return Array.from(map.values())
-  })
-
+  const dedupe = (list: AvailableCoupon[]) =>
+    Array.from(new Map(list.map((c) => [c.code.toUpperCase(), c])).values())
+  const allCoupons = computed(() =>
+    dedupe([...manualCoupons.value, ...walletCoupons.value, ...availableCoupons.value]),
+  )
   const currentTabCoupons = computed(() => {
     const source = activeTab.value === 'wallet' ? walletCoupons.value : availableCoupons.value
-    const combined = [...manualCoupons.value, ...source]
-    const map = new Map<string, AvailableCoupon>()
-    for (const c of combined) {
-      map.set(c.code.toUpperCase(), c)
-    }
-    return Array.from(map.values())
+    return dedupe([...manualCoupons.value, ...source])
   })
 
   const eligibleCoupons = computed(() => currentTabCoupons.value.filter((c) => isEligible(c)))
   const ineligibleCoupons = computed(() => currentTabCoupons.value.filter((c) => !isEligible(c)))
+  const allEligibleCoupons = computed(() => allCoupons.value.filter((c) => isEligible(c)))
+  const bestEligibleCoupon = computed(() =>
+    findBestCoupon(allEligibleCoupons.value, cartStore.totalPriceCents),
+  )
+  const bestSavingsCents = computed(() =>
+    bestEligibleCoupon.value
+      ? calculateDiscountCents(bestEligibleCoupon.value, cartStore.totalPriceCents)
+      : 0,
+  )
 
   const bestDiscountCode = computed(() => {
     return findBestCoupon(eligibleCoupons.value, cartStore.totalPriceCents)?.code || ''
@@ -157,7 +161,6 @@ export function useVoucherSelection(options: {
         discount_cents: discountCents,
         formatted_discount: formatRupiah(discountCents / 100),
       }
-
       cartStore.applyCoupon(applied)
       toast.add({
         severity: 'success',
@@ -166,19 +169,18 @@ export function useVoucherSelection(options: {
         life: 3500,
       })
       options.onApplied?.(applied)
-    } else {
-      if (cartStore.appliedCoupon) {
-        cartStore.removeCoupon()
-        toast.add({
-          severity: 'info',
-          summary: 'Voucher Dihapus',
-          detail: 'Voucher promo telah dilepas dari keranjang belanja.',
-          life: 3000,
-        })
-        options.onRemoved?.()
-      }
+    } else if (cartStore.appliedCoupon) {
+      cartStore.removeCoupon()
+      toast.add({
+        severity: 'info',
+        summary: 'Voucher Dihapus',
+        detail: isCheckoutContext
+          ? 'Voucher promo telah dilepas dari pesanan checkout.'
+          : 'Voucher promo telah dilepas dari keranjang belanja.',
+        life: 3000,
+      })
+      options.onRemoved?.()
     }
-
     options.onClose?.()
   }
 
@@ -263,11 +265,17 @@ export function useVoucherSelection(options: {
     fetchCoupons()
     if (auth.isLoggedIn.value) {
       userVouchers.fetchVouchers().then(() => {
-        if (walletCoupons.value.length > 0) {
-          activeTab.value = 'wallet'
-        }
+        if (walletCoupons.value.length > 0) activeTab.value = 'wallet'
       })
     }
+  }
+
+  const applyBestCoupon = (targetCoupon?: AvailableCoupon) => {
+    const chosen = targetCoupon || bestEligibleCoupon.value
+    if (!chosen) return false
+    selectedCode.value = chosen.code
+    handleConfirm()
+    return true
   }
 
   return {
@@ -278,6 +286,9 @@ export function useVoucherSelection(options: {
     currentTabCoupons,
     eligibleCoupons,
     ineligibleCoupons,
+    allEligibleCoupons,
+    bestEligibleCoupon,
+    bestSavingsCents,
     bestDiscountCode,
     selectedCode,
     selectedCoupon,
@@ -297,5 +308,6 @@ export function useVoucherSelection(options: {
     handleApplyManual,
     handleConfirm,
     handleCancel,
+    applyBestCoupon,
   }
 }
