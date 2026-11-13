@@ -78,6 +78,15 @@ describe('AddressPickerModal Component', () => {
       template: '<button :class="variant" @click="$emit(\'click\', $event)"><slot /></button>',
       props: ['variant', 'size', 'icon'],
     },
+    UiBadge: {
+      template: '<span class="ui-badge">{{ label }}</span>',
+      props: ['label', 'variant'],
+    },
+    UiEmptyState: {
+      template:
+        '<div class="ui-empty-state"><h4>{{ title }}</h4><button v-if="actionLabel" @click="$emit(\'action\')">{{ actionLabel }}</button></div>',
+      props: ['icon', 'title', 'description', 'actionLabel'],
+    },
     SavedAddressForm: {
       template:
         '<div class="mock-saved-address-form"><button @click="$emit(\'cancel\')">Cancel</button></div>',
@@ -189,6 +198,10 @@ describe('AddressPickerCard Component', () => {
       global: {
         stubs: {
           UiButton: true,
+          UiBadge: {
+            template: '<span>{{ label }}</span>',
+            props: ['label'],
+          },
         },
       },
     })
@@ -196,7 +209,9 @@ describe('AddressPickerCard Component', () => {
     expect(wrapper.text()).toContain('Atsiila Arya')
     expect(wrapper.text()).toContain('081234567890')
     expect(wrapper.text()).toContain('Jl. Sudirman No. 42')
-    expect(wrapper.text()).toContain('Jakarta Selatan, 12110')
+    expect(wrapper.text()).toContain('Jakarta Selatan')
+    expect(wrapper.text()).toContain('Kode Pos: 12110')
+    expect(wrapper.text()).toContain('Patokan: Dekat lobby utama')
     expect(wrapper.text()).toContain('Utama')
     expect(wrapper.text()).toContain('Alamat Terpilih')
     expect(wrapper.text()).not.toContain('—') // No em dashes

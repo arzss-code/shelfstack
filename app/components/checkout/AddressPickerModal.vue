@@ -5,6 +5,9 @@ import { useAddresses } from '~/composables/useAddresses'
 import SavedAddressForm from '~/components/checkout/SavedAddressForm.vue'
 import AddressPickerCard from '~/components/checkout/AddressPickerCard.vue'
 import UiModal from '~/components/ui/UiModal.vue'
+import UiEmptyState from '~/components/ui/UiEmptyState.vue'
+
+type AddressCategoryFilter = 'all' | 'default' | 'rumah' | 'kantor'
 
 const visible = defineModel<boolean>('visible', { default: false })
 
@@ -27,6 +30,14 @@ const isAddingNew = ref(false)
 const isSubmittingNew = ref(false)
 const addFormError = ref('')
 const searchQuery = ref('')
+const activeFilter = ref<AddressCategoryFilter>('all')
+
+const filterOptions = [
+  { id: 'all' as const, label: 'Semua' },
+  { id: 'default' as const, label: 'Alamat Utama' },
+  { id: 'rumah' as const, label: 'Rumah' },
+  { id: 'kantor' as const, label: 'Kantor' },
+]
 
 watch(
   visible,
@@ -35,6 +46,7 @@ watch(
       isAddingNew.value = false
       addFormError.value = ''
       searchQuery.value = ''
+      activeFilter.value = 'all'
       if (addresses.value.length === 0) {
         fetchAddresses().catch(() => {})
       }
@@ -44,9 +56,23 @@ watch(
 )
 
 const filteredAddresses = computed(() => {
+  let list = addresses.value
+
+  if (activeFilter.value === 'default') {
+    list = list.filter((a) => a.is_default)
+  } else if (activeFilter.value === 'rumah') {
+    list = list.filter(
+      (a) =>
+        a.note?.toLowerCase().includes('[rumah]') ||
+        (!a.note?.includes('[kantor]') && !a.note?.includes('[apartemen]')),
+    )
+  } else if (activeFilter.value === 'kantor') {
+    list = list.filter((a) => a.note?.toLowerCase().includes('[kantor]'))
+  }
+
   const q = searchQuery.value.trim().toLowerCase()
-  if (!q) return addresses.value
-  return addresses.value.filter(
+  if (!q) return list
+  return list.filter(
     (a) =>
       a.name.toLowerCase().includes(q) ||
       a.phone.toLowerCase().includes(q) ||
@@ -55,6 +81,11 @@ const filteredAddresses = computed(() => {
       (a.note && a.note.toLowerCase().includes(q)),
   )
 })
+
+const handleResetFilter = () => {
+  searchQuery.value = ''
+  activeFilter.value = 'all'
+}
 
 const handleSelect = (addr: UserAddress) => {
   emit('select', addr)
@@ -119,19 +150,20 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
       />
     </div>
 
-    <!-- View Mode: Address List & Search -->
+    <!-- View Mode: Address List & Filter Bar -->
     <div v-else class="space-y-4">
-      <!-- Search & Add Action Header -->
+      <!-- Search Bar & Add Button (matching menu daftar alamat) -->
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
         <div class="relative flex-1">
           <i
-            class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-muted"
+            class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-faint"
+            aria-hidden="true"
           />
           <input
             v-model="searchQuery"
             type="search"
             placeholder="Cari penerima, jalan, atau kota..."
-            class="w-full pl-8 pr-3 py-2 text-xs rounded-lg border border-brand-hair bg-white focus:outline-none focus:ring-2 focus:ring-brand-ink/20 focus:border-brand-ink transition-colors placeholder:text-brand-muted/70"
+            class="w-full pl-8 pr-3 py-2 text-xs rounded-full border border-brand-hair bg-white text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/15 transition-all"
           />
         </div>
 
@@ -139,12 +171,35 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
           variant="primary"
           size="sm"
           icon="pi-plus"
-          class="text-xs shrink-0 rounded-lg justify-center"
+          class="text-xs shrink-0 rounded-full justify-center"
           data-testid="modal-add-address-btn"
           @click="isAddingNew = true"
         >
           Tambah Alamat
         </UiButton>
+      </div>
+
+      <!-- Filter Chips Strip (matching account/addresses.vue) -->
+      <div
+        v-if="addresses.length > 0"
+        class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1"
+        role="group"
+        aria-label="Filter Kategori Alamat"
+      >
+        <button
+          v-for="opt in filterOptions"
+          :key="opt.id"
+          type="button"
+          class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap active:scale-95"
+          :class="[
+            activeFilter === opt.id
+              ? 'border-brand-ink bg-brand-ink text-white shadow-2xs'
+              : 'border-brand-hair hover:border-brand-ink/30 text-brand-muted bg-white hover:text-brand-ink',
+          ]"
+          @click="activeFilter = opt.id"
+        >
+          {{ opt.label }}
+        </button>
       </div>
 
       <!-- Loading State Skeleton -->
@@ -182,45 +237,25 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
         </UiButton>
       </div>
 
-      <!-- Empty State -->
-      <div
+      <!-- Empty State: Belum Ada Alamat (matching UiEmptyState in account/addresses.vue) -->
+      <UiEmptyState
         v-else-if="!loading && addresses.length === 0"
-        class="p-8 border border-dashed border-brand-hair rounded-card text-center bg-brand-canvas-soft space-y-3"
-      >
-        <div
-          class="w-12 h-12 rounded-full bg-brand-canvas flex items-center justify-center mx-auto border border-brand-hair text-brand-muted"
-        >
-          <i class="pi pi-map text-lg" />
-        </div>
-        <div class="space-y-1">
-          <h4 class="font-display font-semibold text-sm text-brand-ink m-0">
-            Belum Ada Alamat Tersimpan
-          </h4>
-          <p class="text-xs text-brand-muted m-0 max-w-sm mx-auto">
-            Simpan alamat tujuan pengiriman Anda untuk memudahkan proses transaksi sekarang dan
-            berikutnya.
-          </p>
-        </div>
-        <div class="pt-2">
-          <UiButton
-            variant="primary"
-            size="sm"
-            icon="pi-plus"
-            class="text-xs rounded-lg"
-            @click="isAddingNew = true"
-          >
-            Buat Alamat Sekarang
-          </UiButton>
-        </div>
-      </div>
+        icon="pi-map"
+        title="Belum Ada Alamat Tersimpan"
+        description="Tambahkan alamat pengiriman untuk mempermudah proses checkout pesanan Anda."
+        action-label="Tambah Alamat Baru"
+        @action="isAddingNew = true"
+      />
 
-      <!-- Empty Filtered Results -->
-      <div
+      <!-- Empty State: Filter Tidak Ditemukan -->
+      <UiEmptyState
         v-else-if="filteredAddresses.length === 0"
-        class="p-6 border border-dashed border-brand-hair rounded-card text-center bg-brand-canvas-soft text-xs text-brand-muted"
-      >
-        Tidak ada alamat yang cocok dengan pencarian "{{ searchQuery }}".
-      </div>
+        icon="pi-search"
+        title="Alamat Tidak Ditemukan"
+        description="Tidak ada alamat yang cocok dengan filter atau kata kunci pencarian Anda."
+        action-label="Tampilkan Semua Alamat"
+        @action="handleResetFilter"
+      />
 
       <!-- Address Cards Grid -->
       <div
