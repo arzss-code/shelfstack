@@ -45,10 +45,7 @@ const isLocationModalOpen = ref(false)
 const isManualFormExpanded = ref(false)
 
 const hasSelectedAddress = computed(() => {
-  return Boolean(
-    props.selectedSavedAddressId ||
-    (props.isLoggedIn && props.modelValue.name && props.modelValue.city),
-  )
+  return Boolean(props.selectedSavedAddressId)
 })
 
 const updateField = (field: keyof AddressModel, val: string) => {

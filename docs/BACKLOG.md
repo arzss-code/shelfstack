@@ -71,17 +71,17 @@
 | ID   | Story                                                     | Prioritas | AC                                                                                                                                                                                     |
 | ---- | --------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Q-01 | Sebagai dev, CI hijau                                     | Must      | ✅ SELESAI: `lint -> typecheck -> vitest -> docker compose validate` di `.github/workflows/ci.yml` hijau 100%                                                                          |
-| Q-02 | Sebagai dev, coverage kritis                              | Should    | ✅ SELESAI: 97 file / 996 test Vitest lolos 100% + 25 test order-service + 14 test E2E Playwright                                                                                      |
+| Q-02 | Sebagai dev, coverage kritis                              | Should    | ✅ SELESAI: 98 file / 1.005 test Vitest lolos 100% + 25 test order-service + 29 skenario E2E Playwright                                                                                |
 | Q-03 | Sebagai visitor, saya buka demo live cepat + aman         | Must      | ✅ SELESAI (2026-11-07, v0.33.0): Health and readiness telemetry (`/api/ready`, `/api/health`, `/healthz`) dengan dependency reporting PostgreSQL, Redis, dan Order Service            |
 | Q-04 | Sebagai perekrut, saya paham repo dalam 3 menit           | Must      | ✅ SELESAI (2026-11-06 & 2026-11-07): `README.md` dengan diagram Mermaid, indeks ADR, serta tombol 1-Klik Akses Demo Akun Pelanggan & Admin di `/auth/login`                           |
 | Q-05 | Sebagai dev, saya ukur a11y + perf                        | Should    | ✅ SELESAI (2026-11-07, v0.33.0): Dimensi gambar eksplisit, `fetchpriority="high"` untuk LCP, `loading="lazy"` offscreen, eliminasi CLS (< 0.1), dan standar target sentuh WCAG 2.1 AA |
-| Q-06 | Sebagai dev, saya punya suite load testing k6 reproduktif | Must      | ✅ SELESAI (2026-11-09, v0.37.0): Skenario catalog, checkout concurrency, webhook dedup, health probe, runner CLI `pnpm test:load`, dan 8 unit test                                    |
+| Q-06 | Sebagai dev, saya punya suite load testing k6 reproduktif | Must      | ✅ SELESAI (v1.0.2): Skenario catalog, checkout concurrency terautentikasi (anti-overselling terbukti), webhook dedup, health probe, runner CLI `pnpm test:load`, dan unit tests       |
 
 ## Out of Scope & Backlog Lanjutan (Belum Diimplementasikan)
 
 Fitur berikut tercatat resmi selesai pada siklus pengembangan berjalan:
 
-1. ~~**Pusat Notifikasi**~~: ✅ **SELESAI 2026-10-27** (Tabel `public.notifications`, RLS multi-tenant, publikasi Supabase Realtime, `useNotificationStore`, dan `NotificationBell.vue`).
+1. ~~**Pusat Notifikasi & Web Push**~~: ✅ **SELESAI (v1.0.3)** (Tabel `public.notifications`, RLS multi-tenant, publikasi Supabase Realtime, `useNotificationStore`, `NotificationBell.vue`, PWA Service Worker `public/sw.js`, handler Web Push background, pengiriman progresif `desktop-notification.ts`, dan 24 unit test).
 2. ~~**Wishlist**~~: ✅ **SELESAI 2026-10-26** (Penyimpanan favorit persisten `useWishlistStore`, `WishlistButton.vue`, badge navbar, `/wishlist`, dan integrasi keranjang).
 3. ~~**Kalkulator Ongkir & Logistik**~~: ✅ **SELESAI 2026-10-30** (SHF-SHP-01: 4 tingkat layanan pengiriman bertingkat, kalkulasi ongkir server-side di RPC `create_order`, promo Bebas Ongkir belanja >= Rp 500.000, komponen `ShippingMethodSelector`, dan unit tests).
 4. ~~**Lacak Pengiriman Ekspedisi**~~: ✅ **SELESAI 2026-10-27** (SHF-LOG-01: Nomor resi kurir resmi, tabel `shipping_checkpoints` realtime, linimasa pelacakan di `/orders/[id]`, dan halaman pencarian resi publik `/tracking`).
