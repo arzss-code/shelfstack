@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 20 (Production Release v1.0.0 & Zero-Drift Documentation)**
-- **Versi Rilis:** `v1.0.2` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-11)
-- **Baseline Quality Gate (2026-11-11, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 97 file / 997 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · Load test terautentikasi k6 (10 VUs checkout anti-overselling lolos 100%, 0 server errors, 0 unauthorized) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v1.0.3` (`version.json`, `CHANGELOG.md` : sinkron 2026-11-13)
+- **Baseline Quality Gate (2026-11-13, dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 98 file / 1.005 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · Playwright E2E 29 passed · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -297,6 +297,13 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Metrik Beban Produksi Terukur**: `checkout_unauthorized == 0` dan `checkout_server_errors == 0` (zero 500 crash / deadlock). Seluruh metrik terukur untuk skenario `catalog`, `checkout`, `webhook`, dan `health` dicatat dalam `docs/engineering/load-testing.md`.
     - **Suite Pengujian Unit Komprehensif**: Menambahkan unit test di `tests/unit/load-test-suite.spec.ts` untuk memverifikasi CLI args, format cookie SSR unchunked dan chunked, dan integritas batas baris. Total unit suite 97 file / 997 test lulus 100%.
 
+41. **PWA Service Worker & Notifikasi Web Push Progresif (SELESAI 2026-11-11, v1.0.3).**
+    - **PWA Service Worker Mandiri (`public/sw.js`)**: Caching aman shell statis (`PRECACHE_URLS`: manifest, favicon, logo, touch icon), siklus hidup instalasi dan aktivasi klaim klien, serta bypass ketat untuk request non-GET, `/api/*`, `/auth/*`, `/admin/*`, `/checkout`, `/orders/*`, `/account/*`, Supabase Cloud, dan Midtrans.
+    - **Handler Push & Klik Notifikasi**: Parsing payload event `push` defensif, sanitasi tautan deep-link hanya ke path relatif same-origin (`/`), serta penanganan event `notificationclick` yang memfokuskan jendela aktif atau membuka jendela baru secara aman.
+    - **Plugin Klien & Pengiriman Progresif (`app/plugins/sw.client.ts`, `app/utils/desktop-notification.ts`)**: Registrasi `/sw.js` otomatis di browser dengan guard lingkungan pengujian, serta peningkatan `showDesktopNotification` agar memprioritaskan Service Worker `registration.showNotification(...)` untuk kompatibilitas penuh mobile PWA Android sebelum fallback ke `new Notification(...)`.
+    - **Kebijakan CSP & Kepatuhan Lint (`nuxt.config.ts`, `eslint.config.mjs`)**: Penambahan `'worker-src': ["'self'"]` pada direktif Content Security Policy dan deklarasi global Service Worker di ESLint.
+    - **Suite Pengujian Unit Komprehensif (`tests/unit/pwa-service-worker.spec.ts`)**: 8 unit test baru memvalidasi precaching, aturan bypass keamanan, sanitasi push, dan pengiriman notifikasi progresif. Total unit suite 98 file / 1.005 test lulus 100%.
+
 ---
 
 ## 📌 Inventaris Fitur Belum Diimplementasikan (Backlog Lanjutan)
@@ -304,7 +311,7 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
 Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **belum diimplementasikan** atau masih berupa placeholder:
 
 1. ~~**Pusat Notifikasi (In-App Notification Center & Web Push)**~~:
-   - Status: ✅ **SELESAI 2026-10-27** (Tabel `public.notifications`, migrasi `20261119000001_in_app_notifications.sql`, RLS multi-tenant strict, publikasi Supabase Realtime, endpoint Nitro GET/PATCH, store `useNotificationStore`, komponen `NotificationBell.vue` dengan popover dan unread badge, integrasi pemicu order transaksi otomatis, serta 16 unit test).
+   - Status: ✅ **SELESAI (v1.0.3)** (Tabel `public.notifications`, RLS multi-tenant strict, publikasi Supabase Realtime, `useNotificationStore`, `NotificationBell.vue`, PWA Service Worker `public/sw.js`, handler Web Push background, pengiriman progresif `desktop-notification.ts`, dan 24 unit test).
 2. ~~**Wishlist System (Koleksi Produk Tersimpan)**~~:
    - Status: ✅ **SELESAI 2026-10-26** (Store persistent `useWishlistStore`, `WishlistButton.vue`, badge navbar, `/wishlist`, integrasi keranjang, sinkronisasi dua arah database Supabase, dan mitigasi hard refresh).
 3. ~~**Kalkulator Ongkir & Integrasi Kurir Ekspedisi (Shipping & Logistics API)**~~:

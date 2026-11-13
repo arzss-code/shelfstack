@@ -2,6 +2,27 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [1.0.3] - 2026-11-13
+
+### PWA Service Worker Mandiri, Notifikasi Web Push Progresif, dan Finalisasi Zero-Drift Portofolio
+
+- **PWA Service Worker Mandiri (`public/sw.js`)**:
+  - Mengimplementasikan Service Worker native tanpa ketergantungan pustaka luar berat untuk installability PWA penuh.
+  - Caching aman shell statis (`PRECACHE_URLS`: manifest, favicon, logo, touch icon), siklus hidup install dan activate klien instan (`skipWaiting`, `clients.claim`), serta bypass ketat untuk request non-GET, `/api/*`, `/auth/*`, `/admin/*`, `/checkout`, `/orders/*`, `/account/*`, Supabase Cloud, dan Midtrans.
+- **Handler Event Push & NotificationClick**:
+  - Parsing payload push defensif, sanitasi tautan deep-link hanya ke rute same-origin internal (`/`), serta penanganan event `notificationclick` yang memfokuskan jendela aktif atau membuka jendela baru secara aman.
+- **Plugin Registrasi Klien & Pengiriman Progresif (`app/plugins/sw.client.ts`, `app/utils/desktop-notification.ts`)**:
+  - Registrasi otomatis `/sw.js` di browser dengan isolasi lingkungan test, serta peningkatan utilitas `showDesktopNotification` agar memprioritaskan `registration.showNotification(...)` untuk kompatibilitas penuh mobile PWA Android sebelum fallback ke `new Notification(...)`.
+- **Penyelarasan Dokumentasi Portofolio (Zero Doc Drift)**:
+  - Memperbarui `README.md` dengan panduan eksekusi uji beban k6 (`pnpm test:load`), sorotan rekayasa PWA Service Worker, dan metrik riil suite pengujian.
+  - Memperbarui `docs/PROGRESS.md` dan `docs/BACKLOG.md` (item 1 dan Q-06 tuntas 100%).
+- **Verifikasi Gerbang Kualitas Penuh**:
+  - `pnpm lint`: EXIT 0 (0 error, 0 warning).
+  - `pnpm typecheck`: EXIT 0 (root app & order-service).
+  - `pnpm exec vitest run`: 98 file lulus, 1.005 test lulus 100%.
+  - `pnpm --filter @shelfstack/order-service test`: 2 file lulus, 25 test lulus 100%.
+  - Playwright E2E: 29 skenario lulus 100%.
+
 ## [1.0.2] - 2026-11-11
 
 ### Pengujian Beban Terautentikasi Grafana k6 & Verifikasi Anti-Overselling Produksi
