@@ -72,3 +72,40 @@ export function createPlacedOrderSnapshot<T = unknown>(input: PlacedOrderSnapsho
     finalPriceFormatted: formatRupiah(totalWithShipping / 100),
   }
 }
+
+export interface BuildCheckoutOrderPayloadInput {
+  items: Array<{ productId: number; quantity: number }>
+  address: {
+    name: string
+    phone: string
+    street: string
+    city: string
+    postal: string
+    note?: string
+  }
+  couponCode?: string
+  shippingService: string
+  courierCode?: string | null
+  coinsUsed: number
+}
+
+/**
+ * Membangun payload pesanan checkout yang bersih dan tervalidasi.
+ */
+export function buildCheckoutOrderPayload(input: BuildCheckoutOrderPayloadInput) {
+  return {
+    items: input.items.map((item) => ({ product_id: item.productId, qty: item.quantity })),
+    address: {
+      name: input.address.name.trim(),
+      phone: input.address.phone.trim(),
+      street: input.address.street.trim(),
+      city: input.address.city.trim(),
+      postal: input.address.postal.trim(),
+      note: input.address.note ? input.address.note.trim() : undefined,
+    },
+    coupon_code: input.couponCode || undefined,
+    shipping_service: input.shippingService,
+    courier_code: input.courierCode || undefined,
+    coins_used: input.coinsUsed,
+  }
+}

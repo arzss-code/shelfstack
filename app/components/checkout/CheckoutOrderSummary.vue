@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { formatRupiah } from '~/utils/format'
+import CheckoutVoucherSelector from './CheckoutVoucherSelector.vue'
 
 interface CheckoutItem {
   productId: number
@@ -112,7 +113,7 @@ const emit = defineEmits<{
     <div class="space-y-2.5 border-t border-brand-hairsoft pt-4 text-xs text-brand-muted">
       <!-- Coupon Slot -->
       <div v-if="!isOrderPlaced" class="border-b border-brand-hairsoft pb-2">
-        <CartCouponInput compact />
+        <CheckoutVoucherSelector compact :disabled="isSubmitting || isOrderPlaced" />
       </div>
 
       <!-- Breakdown Rows -->

@@ -13,6 +13,7 @@ import {
   calculateCoinsDiscountCents,
   calculateCheckoutTotalCents,
   createPlacedOrderSnapshot,
+  buildCheckoutOrderPayload,
 } from '~/utils/checkout-pricing'
 
 export function useCheckoutOrder() {
@@ -124,12 +125,8 @@ export function useCheckoutOrder() {
   })
 
   const submitButtonLabel = computed(() => {
-    if (isOrderPlaced.value) {
-      return 'Membuka Pembayaran...'
-    }
-    if (isSubmitting.value) {
-      return 'Memproses Pesanan...'
-    }
+    if (isOrderPlaced.value) return 'Membuka Pembayaran...'
+    if (isSubmitting.value) return 'Memproses Pesanan...'
     return 'Bayar Sekarang'
   })
 
@@ -157,7 +154,14 @@ export function useCheckoutOrder() {
   }
 
   watch(
-    [() => cartStore.items, address, selectedShippingService, selectedCourierCode, useCoins],
+    [
+      () => cartStore.items,
+      () => cartStore.appliedCoupon,
+      address,
+      selectedShippingService,
+      selectedCourierCode,
+      useCoins,
+    ],
     () => {
       checkoutIdempotencyKey.value = ''
     },
@@ -196,24 +200,17 @@ export function useCheckoutOrder() {
     generalError.value = ''
 
     try {
-      const orderPayload = {
-        items: cartStore.items.map((item) => ({ product_id: item.productId, qty: item.quantity })),
-        address: {
-          name: address.value.name.trim(),
-          phone: address.value.phone.trim(),
-          street: address.value.street.trim(),
-          city: address.value.city.trim(),
-          postal: address.value.postal.trim(),
-          note: address.value.note ? address.value.note.trim() : undefined,
-        },
-        coupon_code:
+      const orderPayload = buildCheckoutOrderPayload({
+        items: cartStore.items,
+        address: address.value,
+        couponCode:
           cartStore.appliedCoupon && cartStore.isCouponValidForCurrentSubtotal
             ? cartStore.appliedCoupon.code
             : undefined,
-        shipping_service: selectedShippingService.value,
-        courier_code: selectedCourierCode.value || undefined,
-        coins_used: actualCoinsUsed.value,
-      }
+        shippingService: selectedShippingService.value,
+        courierCode: selectedCourierCode.value,
+        coinsUsed: actualCoinsUsed.value,
+      })
 
       const idempotencyKey = getOrCreateCheckoutKey()
       const response = await $fetch<{ status: string; data: { order_id: string } }>('/api/orders', {

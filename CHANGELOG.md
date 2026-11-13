@@ -2,6 +2,25 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [1.0.4] - 2026-11-13
+
+### Fitur E-Commerce Fase 2: Checkout Voucher Selector Mandiri & Auto-Discount Recommendation
+
+- **Komponen Pemilih Voucher Checkout Mandiri (`CheckoutVoucherSelector.vue`, 289 baris)**:
+  - Menggantikan ketergantungan `CartCouponInput.vue` pada ringkasan pesanan (`CheckoutOrderSummary.vue`) dengan komponen mandiri yang dioptimasi khusus untuk konteks alur checkout.
+  - Menampilkan rekomendasi cerdas diskon terbaik ("Diskon Terbaik: [CODE] Hemat Rp XX.XXX") secara otomatis saat subtotal belanja memenuhi syarat voucher yang paling menguntungkan.
+  - Mendukung 1-klik aplikasi diskon terbaik langsung dari etalase checkout tanpa harus membuka dialog modal.
+  - Kartu voucher aktif menampilkan kode promo monospace berhuruf kapital, nominal potongan harga, status validitas minimum belanja, serta tombol "Ubah" dan "Hapus" dengan feedback toast khusus checkout.
+- **Penyelarasan Composable Voucher & Idempotensi Checkout (`useVoucherSelection.ts`, `useCheckoutOrder.ts`, `checkout-pricing.ts`)**:
+  - Penambahan parameter `context: 'cart' | 'checkout'` pada `useVoucherSelection.ts` agar notifikasi toast pelepasan voucher menyesuaikan dengan halaman saat ini.
+  - Penambahan komputasi `allEligibleCoupons`, `bestEligibleCoupon`, `bestSavingsCents`, dan metode `applyBestCoupon` untuk abstraksi reaktif pemilihan voucher terbaik.
+  - Penambahan `() => cartStore.appliedCoupon` pada watch list `useCheckoutOrder.ts` untuk memastikan regenerasi `Idempotency-Key` saat voucher diubah atau dilepas.
+  - Ekstraksi fungsi pembangun payload pesanan `buildCheckoutOrderPayload` pada `shared/utils/checkout-pricing.ts` sehingga `useCheckoutOrder.ts` patuh batasan maksimal 300 baris (295 baris).
+- **Verifikasi Kualitas & Pengujian Komprehensif**:
+  - Menambahkan rangkaian pengujian unit baru pada `tests/unit/checkout-voucher-selector.spec.ts` (7 tests).
+  - Total pengujian unit root aplikasi meningkat menjadi 101 file / 1.024 test cases yang lulus 100%.
+  - `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
+
 ## [1.0.3] - 2026-11-13
 
 ### Fitur E-Commerce Fase 1: Modal Seleksi Alamat 1-Klik, Estimasi Tiba (ETA) Dinamis & Catatan Kurir

@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 21 (Fitur E-Commerce Fase 1: Checkout Address Picker & Dynamic ETA)**
-- **Versi Rilis:** `v1.0.3` (`version.json`, `CHANGELOG.md` : sinkron)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 100 file / 1.017 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · Playwright E2E 29 passed · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 21 (Fitur E-Commerce Fase 2: Checkout Voucher Selector & Auto-Discount Recommendation)**
+- **Versi Rilis:** `v1.0.4` (`version.json`, `CHANGELOG.md` : sinkron)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 101 file / 1.024 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -309,6 +309,11 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Kalkulasi Estimasi Waktu Tiba Dinamis (`shared/utils/shipping-eta.ts`)**: Pemetaan tier logistik (Instan, Express, Reguler, Kargo) menjadi tanggal kalender dan rentang hari kerja dalam Bahasa Indonesia pada `ShippingMethodSelector.vue`.
     - **Catatan Pengiriman Pelanggan**: Input catatan instruksi kurir/penjual dengan batas 300 karakter pada `CheckoutAddressForm.vue`.
     - **Suite Pengujian Unit Komprehensif (`tests/unit/shipping-eta.spec.ts`, `tests/unit/checkout-address-picker.spec.ts`)**: 12 unit test baru. Total unit suite 100 file / 1.017 test lolos 100%.
+
+43. **Fitur E-Commerce Fase 2: Checkout Voucher Selector Mandiri & Auto-Discount Recommendation (SELESAI, v1.0.4).**
+    - **Komponen Pemilih Voucher Checkout Mandiri (`CheckoutVoucherSelector.vue`, 289 baris)**: Komponen mandiri di ringkasan pesanan (`CheckoutOrderSummary.vue`) yang dioptimasi khusus untuk alur checkout dengan kartu rekomendasi "Diskon Terbaik", 1-klik aplikasi diskon, kartu voucher aktif dengan rincian potongan dan peringatan batas belanja minimum, serta tombol Ubah dan Hapus dengan feedback toast khusus checkout.
+    - **Composable Voucher & Idempotensi Checkout (`useVoucherSelection.ts`, `useCheckoutOrder.ts`, `checkout-pricing.ts`)**: Abstraksi reaktif `allEligibleCoupons`, `bestEligibleCoupon`, `bestSavingsCents`, `applyBestCoupon`, watch list `appliedCoupon` untuk regenerasi `Idempotency-Key` aman, dan fungsi pembangun payload `buildCheckoutOrderPayload`.
+    - **Suite Pengujian Unit Komprehensif (`tests/unit/checkout-voucher-selector.spec.ts`)**: 7 unit test baru memvalidasi trigger default, kartu rekomendasi, 1-klik apply, kartu aktif, pelepasan kupon, shortfall alert, dan pembukaan modal. Total unit suite 101 file / 1.024 test lolos 100%.
 
 ---
 
