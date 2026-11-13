@@ -2,6 +2,24 @@
 
 Catatan update untuk **Product Management** (rebrand portofolio: **ShelfStack**).
 
+## [1.0.3] - 2026-11-13
+
+### Fitur E-Commerce Fase 1: Modal Seleksi Alamat 1-Klik, Estimasi Tiba (ETA) Dinamis & Catatan Kurir
+
+- **Modal Pemilih Alamat Tersimpan 1-Klik (`AddressPickerModal.vue`, `AddressPickerCard.vue` & `CheckoutSelectedAddressCard.vue`)**:
+  - Menggantikan tampilan inline formulir yang panjang dengan kartu ringkasan alamat aktif (`CheckoutSelectedAddressCard.vue`, 71 baris) dan tombol "Ganti Alamat".
+  - Membuka dialog modal accessible (`AddressPickerModal.vue`, 243 baris) berbasis `UiModal` lengkap dengan filter pencarian instan, status default, kartu radio taktil, dan form penambahan alamat baru inline (`SavedAddressForm.vue`) tanpa berpindah halaman.
+  - Komponen kartu alamat mandiri (`AddressPickerCard.vue`, 102 baris) memastikan kepatuhan batas maksimal komponen 300 baris.
+- **Kalkulasi Estimasi Waktu Tiba (Dynamic Delivery ETA) Dinamis (`shared/utils/shipping-eta.ts`)**:
+  - Utilitas murni TypeScript (`shared/utils/shipping-eta.ts`, 132 baris) untuk memetakan tier layanan logistik (Instan, Express/Next Day, Reguler, Kargo) menjadi tanggal kalender aktual dan rentang hari kerja dalam Bahasa Indonesia.
+  - Menampilkan badge kalender dinamis pada pemilih ekspedisi checkout (`ShippingMethodSelector.vue`) untuk transparansi jadwal tiba kepada pembeli.
+- **Catatan Pengiriman Pelanggan untuk Kurir/Penjual (`CheckoutAddressForm.vue`)**:
+  - Menyediakan input instruksi pengiriman opsional dengan batasan 300 karakter untuk memudahkan kurir saat proses antar paket.
+- **Verifikasi Kualitas & Pengujian Komprehensif**:
+  - Menambahkan pengujian unit di `tests/unit/shipping-eta.spec.ts` (7 tests) dan `tests/unit/checkout-address-picker.spec.ts` (5 tests).
+  - Seluruh rangkaian pengujian (100 test files, 1.017 test cases di root app + 25 tests di order-service) lolos 100%.
+  - `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
+
 ## [1.0.2] - 2026-11-11
 
 ### Pengujian Beban Terautentikasi Grafana k6 & Verifikasi Anti-Overselling Produksi
