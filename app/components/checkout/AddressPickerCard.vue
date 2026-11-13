@@ -50,10 +50,10 @@ const labelInfo = computed(() => {
     tabindex="0"
     :data-testid="`modal-address-card-${address.id}`"
     :class="[
-      'relative p-4 sm:p-5 rounded-card border transition-all duration-200 text-left cursor-pointer flex flex-col justify-between gap-3 focus:outline-none focus:ring-2 focus:ring-brand-ink/20',
+      'group relative p-4 sm:p-5 rounded-card border-2 transition-all duration-150 text-left cursor-pointer flex flex-col justify-between gap-3 outline-none focus-visible:ring-2 focus-visible:ring-brand-ink/20',
       isSelected
-        ? 'border-brand-ink bg-brand-canvas-soft/50 ring-2 ring-brand-ink shadow-floating'
-        : 'border-brand-hair bg-white hover:border-brand-ink/40 hover:shadow-whisper',
+        ? 'border-brand-ink bg-brand-canvas-soft/40 shadow-whisper'
+        : 'border-brand-hair bg-white hover:border-brand-ink/30 hover:shadow-whisper',
     ]"
     @click="emit('select', address)"
     @keydown.enter.prevent="emit('select', address)"

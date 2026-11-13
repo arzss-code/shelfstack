@@ -172,10 +172,10 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
         v-for="addr in addresses"
         :key="addr.id"
         :class="[
-          'relative p-4 rounded-card border transition-all text-left cursor-pointer flex flex-col justify-between gap-3',
+          'relative p-4 rounded-card border-2 transition-all duration-150 text-left cursor-pointer flex flex-col justify-between gap-3',
           selectedId === addr.id
-            ? 'border-brand-accent bg-brand-accent-tint/30 ring-2 ring-brand-accent shadow-whisper'
-            : 'border-brand-hair bg-brand-canvas hover:border-brand-ink/40 hover:shadow-whisper',
+            ? 'border-brand-ink bg-brand-canvas-soft/40 shadow-whisper'
+            : 'border-brand-hair bg-white hover:border-brand-ink/30 hover:shadow-whisper',
         ]"
         @click="handleSelect(addr)"
       >
