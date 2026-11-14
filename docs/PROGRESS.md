@@ -8,7 +8,7 @@
 
 - **Sprint Aktif:** **Sprint 26 (Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview)**
 - **Versi Rilis:** `v1.1.0-beta.1` (Pre-release Staging / develop aktif : sinkron dengan `version.json`)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 108 file / 1.084 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 112 file / 1.118 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -357,6 +357,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Penyelarasan Template Email Transaksional (`shared/utils/email-templates.ts`, 264 baris)**: Memperbarui aksen wordmark `STACK` pada header email menjadi Electric Blue (`#0066ff`), total tagihan finansial menjadi Electric Blue (`#0066ff`), dan lencana status pengiriman menjadi Electric Blue (`#0066ff`).
     - **Penyempurnaan Suite Pengujian Unit**: Memperbarui `tests/unit/admin-sales-trends.spec.ts` dan `tests/unit/transactional-email.spec.ts` dengan penegasan warna Electric Blue (`#0066ff`), ketiadaan styling monospace, serta ketiadaan kelas `font-mono`. 108 file / 1.081 tests lulus 100%.
 
+50. **Live Omnibox Instant Search di Navbar & Layanan Pencarian Cepat (SELESAI 2026-11-14, v1.1.0-beta.2, Tiket E-02).**
+    - **Endpoint Pencarian Latensi Rendah (`server/api/products/search-instant.get.ts`) & Service Layer (`server/utils/instant-search.ts`)**: Endpoint cepat non-blocking dengan sanitasi karakter wildcard SQL (`%` dan `_`), proyeksi kolom minimalis (`id, name, slug, price, image_url, stock, categories`), limit 5 produk dan 3 kategori rekomendasi, serta header `Cache-Control` (`public, max-age=30, stale-while-revalidate=60`).
+    - **Floating Autocomplete Popover (`SearchAutocompletePopover.vue`, 202 baris)**: Panel melayang modern di bawah bilah pencarian navbar yang menerapkan 5 status antarmuka wajib (Idle, Loading Skeleton, Error dengan tombol Coba Lagi, Empty state ramah dengan link katalog, dan Success dengan kartu produk thumbnail 40x40px, status stok dinamis Habis/Sisa, format Rupiah presisi, chip kategori bertag, serta tombol footer "Lihat semua hasil").
+    - **Composable Navigasi Keyboard Penuh (`useInstantSearch.ts`, 192 baris)**: Debounce 250ms, pembatalan request lama via `AbortController`, penjelajahan berputar (`ArrowDown`/`ArrowUp`), pemilihan instan (`Enter`), penutupan cepat (`Esc` dan outside click), serta kesesuaian aksesibilitas ARIA (`role="listbox"`, `role="option"`, `aria-busy`, `aria-selected`).
+    - **Pengujian & Penjaminan Mutu**: 3 suite pengujian baru (`tests/unit/instant-search-api.spec.ts`, `tests/unit/use-instant-search.spec.ts`, `tests/unit/search-autocomplete-popover.spec.ts`, total 22 test baru). Total unit suite root mencapai 112 file / 1.118 test cases lolos 100%. `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
+
 ---
 
 ## 📌 Inventaris Fitur Belum Diimplementasikan (Backlog Lanjutan)
@@ -389,8 +395,8 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
     - Status: ✅ **SELESAI 2026-11-06** (Antrean `order-expiry` + `order-expiry-dlq` berbasis Redis 7 dan BullMQ v6 di `@shelfstack/order-service`, delayed job per order saat checkout secara fail-open, repeatable reconciliation sweep setiap 5 menit, exponential retry 3 percobaan, endpoint telemetri dan replay DLQ di `/admin/orders`, serta 25 unit test di `@shelfstack/order-service`).
 11. ~~**Otomasi Pengiriman Email Transaksional Backend (E-01)**~~:
     - Status: ✅ **SELESAI 2026-11-14** (Dispatcher server-side asinkron multi-provider Resend / Mock di `server/utils/email-dispatcher.ts`, fail-open resilience, in-memory audit logs, endpoint back-office `/api/admin/emails/logs`, trigger hook pada `orders/index.ts` untuk `order_placed`, `midtrans/notification.post.ts` untuk `payment_success`, dan `orders/[id]/status.put.ts` untuk `order_shipped`, serta 12 unit test di `tests/unit/email-dispatcher.spec.ts`).
-12. **Live Omnibox Instant Search di Navbar (E-02)**:
-    - Status: ⏳ Direncanakan. Endpoint latensi rendah `/api/products/search-instant`, floating autocomplete popover dengan preview thumbnail dan harga, serta navigasi keyboard penuh (ArrowUp, ArrowDown, Enter, Esc).
+12. ~~**Live Omnibox Instant Search di Navbar (E-02)**~~:
+    - Status: ✅ **SELESAI 2026-11-14** (Endpoint latensi rendah `/api/products/search-instant`, floating autocomplete popover dengan preview thumbnail dan harga, serta navigasi keyboard penuh ArrowUp, ArrowDown, Enter, Esc).
 13. **Filter Rentang Harga Min-Max Rupiah & In-Stock Only (E-03)**:
     - Status: ⏳ Direncanakan. Filter harga interaktif dengan quick chips dan toggle ketersediaan stok produk.
 14. **Unifikasi Geometri Primitif Etalase (E-04)**:
