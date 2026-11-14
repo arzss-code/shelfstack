@@ -3,6 +3,8 @@ import { formatRupiah } from '~/utils/format'
 import OrderTrackingTimeline from '~/components/orders/OrderTrackingTimeline.vue'
 import AdminOrderStatusModal from '~/features/orders/components/AdminOrderStatusModal.vue'
 import AdminOrderCustomerCard from '~/features/orders/components/AdminOrderCustomerCard.vue'
+import AdminShippingLabelModal from '~/features/orders/components/AdminShippingLabelModal.vue'
+import OrderInvoiceModal from '~/features/orders/components/OrderInvoiceModal.vue'
 
 definePageMeta({
   layout: 'admin',
@@ -11,6 +13,9 @@ definePageMeta({
 
 const route = useRoute()
 const orderId = computed(() => route.params.id as string)
+
+const isShippingLabelOpen = ref(false)
+const isInvoiceModalOpen = ref(false)
 
 const {
   order,
@@ -93,8 +98,29 @@ useSeoMeta({
           <p class="text-xs text-brand-muted m-0">Dibuat pada {{ formatDate(order.created_at) }}</p>
         </div>
 
-        <!-- State Machine Action Buttons -->
+        <!-- State Machine & Document Action Buttons -->
         <div class="flex flex-wrap items-center gap-2">
+          <UiButton
+            v-if="['paid', 'shipped', 'completed'].includes(order.status)"
+            variant="outline"
+            size="sm"
+            class="font-semibold"
+            @click="isShippingLabelOpen = true"
+          >
+            <i class="pi pi-tag mr-1 text-xs" />
+            Cetak Label Resi
+          </UiButton>
+          <UiButton
+            v-if="['paid', 'shipped', 'completed'].includes(order.status)"
+            variant="outline"
+            size="sm"
+            class="font-semibold"
+            @click="isInvoiceModalOpen = true"
+          >
+            <i class="pi pi-print mr-1 text-xs" />
+            Cetak Invoice
+          </UiButton>
+
           <template v-if="availableTransitions.length > 0">
             <UiButton
               v-for="target in availableTransitions"
@@ -197,5 +223,11 @@ useSeoMeta({
       @auto-generate-tracking="handleAutoGenerateTracking"
       @confirm="confirmStatusChange"
     />
+
+    <!-- Shipping Waybill & Invoice Modals -->
+    <template v-if="order">
+      <AdminShippingLabelModal v-model:visible="isShippingLabelOpen" :order="order" />
+      <OrderInvoiceModal v-model:visible="isInvoiceModalOpen" :order="order" />
+    </template>
   </div>
 </template>

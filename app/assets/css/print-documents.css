@@ -1,0 +1,73 @@
+/*
+ * ShelfStack Logistics & Business Documents Print Stylesheet
+ * Handles isolation and page geometry for invoices (A4) and shipping waybills (A6).
+ * Activated via :has() selectors only when the respective document modal is open.
+ */
+
+@media print {
+  /* Common Print Isolation */
+  body:has(.invoice-sheet),
+  body:has(.shipping-label-sheet) {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  body:has(.invoice-sheet) #__nuxt,
+  body:has(.shipping-label-sheet) #__nuxt {
+    display: none !important;
+  }
+
+  body:has(.invoice-sheet) > div,
+  body:has(.shipping-label-sheet) > div {
+    position: static !important;
+    display: block !important;
+    padding: 0 !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    overflow: visible !important;
+  }
+
+  body:has(.invoice-sheet) > div > div,
+  body:has(.shipping-label-sheet) > div > div {
+    max-width: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  body:has(.invoice-sheet) > div > div > header,
+  body:has(.invoice-sheet) > div > div > footer,
+  body:has(.shipping-label-sheet) > div > div > header,
+  body:has(.shipping-label-sheet) > div > div > footer,
+  body:has(.invoice-sheet) .no-print,
+  body:has(.shipping-label-sheet) .no-print {
+    display: none !important;
+  }
+
+  body:has(.invoice-sheet) > div > div > div,
+  body:has(.shipping-label-sheet) > div > div > div {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  /* Invoice A4 Sheet Layout */
+  body:has(.invoice-sheet) .invoice-sheet {
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  /* Thermal Shipping Waybill A6 Layout (100mm x 150mm) */
+  body:has(.shipping-label-sheet) .shipping-label-sheet {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100mm !important;
+    max-width: 100mm !important;
+    border: 2px solid black !important;
+    padding: 4mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+}
