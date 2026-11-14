@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 23 (Fitur E-Commerce Fase 4: Paritas Rincian Finansial Pesanan, Invoice Resmi & Penegakan Batas 300 Baris)**
-- **Versi Rilis:** `v1.0.6` (`version.json`, `CHANGELOG.md` : sinkron)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 102 file / 1.034 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 24 (Dokumen Bisnis Resmi: Thermal Shipping Waybill A6 & Verifikasi QR Dokumen Resmi)**
+- **Versi Rilis:** `v1.0.7` (`version.json`, `CHANGELOG.md` : sinkron)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 103 file / 1.045 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -326,6 +326,14 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Rincian Finansial Faktur Penjualan / Invoice Resmi (`OrderInvoiceModal.vue`, 286 baris)**: Menyisipkan baris `Subtotal Produk`, `Diskon Voucher` (beserta kode voucher promo), dan `Potongan Koin` pada ringkasan perhitungan tagihan invoice sebelum biaya pengiriman.
     - **Penegakan Batas Maksimal 300 Baris Kode Talenavi SOP**: Merampingkan `AppNavbar.vue` (293), `AccountSidebar.vue` (261), `useOrdersList.ts` (295), `useSupportChat.ts` (295), `useCheckoutOrder.ts` (292), `useVoucherSelection.ts` (298), `useAdminSupportChat.ts` (297), dan `wishlist.ts` (296) dengan penghapusan tipe `any`. Seluruh 100% file authored di `app/`, `server/`, `shared/` kini di bawah batas ketat 300 baris.
     - **Suite Pengujian Unit**: Menambahkan skenario uji diskon voucher dan koin pada `tests/unit/order-detail-payment-card.spec.ts` dan `tests/unit/order-invoice-modal.spec.ts`. Total unit suite 102 file / 1.034 test lolos 100%.
+
+46. **Fitur Logistik & Dokumen Bisnis: Thermal Shipping Waybill A6 & Verifikasi QR Dokumen Resmi (SELESAI, v1.0.7).**
+    - **Generator Vektor Logistik Murni (`logistics-vector.ts`, 191 baris)**: Implementasi murni Code 128 (Subset B) barcode generator dengan checksum otomatis, quiet zone, dan garis tajam (`shape-rendering="crispEdges"`), serta matriks deterministik 21x21 QR code generator dengan 3 pola pencari standar (finder patterns) dan timing tracks tanpa ketergantungan paket eksternal runtime.
+    - **Modal Label Pengiriman Thermal Standar A6 (`AdminShippingLabelModal.vue`, 229 baris)**: Dirancang khusus untuk printer thermal stiker ukuran A6 (100 x 150 mm) dengan tata letak satu halaman presisi tanpa terpotong. Menampilkan nama kurir ekspedisi, pill jenis layanan pengiriman (REGULER, NEXT DAY, INSTAN, KARGO), kode routing hub logistik, barcode nomor resi, blok alamat penerima dan hub pengirim ShelfStack, kotak khusus instruksi pengiriman/catatan kurir, serta ringkasan checklist pengecekan barang gudang (packing slip) dengan checkbox verifikasi `[ ✓ ]` dan QR code pelacakan cepat.
+    - **Verifikasi QR Keaslian Transaksi pada Faktur Penjualan (`OrderInvoiceModal.vue`, 271 baris)**: Menyisipkan modul verifikasi digital QR code yang mengarah ke URL validasi status pesanan resmi ShelfStack beserta kode referensi unik transaksi.
+    - **Lembar Gaya Cetak Terpusat Dokumen (`print-documents.css`, 74 baris)**: Mengisolasi tata letak cetak dokumen faktur (A4) dan resi thermal (A6) menggunakan pemilih modern `:has()`, menonaktifkan seluruh elemen UI web lain saat dialog cetak browser aktif, terdaftar global di `nuxt.config.ts`.
+    - **Integrasi Tombol Aksi Dokumen pada Halaman Admin Order Detail (`app/pages/admin/orders/[id].vue`, 240 baris)**: Menambahkan tombol aksi `Cetak Label Resi` dan `Cetak Invoice` pada status pesanan yang valid (paid, shipped, completed).
+    - **Pengujian & Penjaminan Mutu**: Menambahkan 11 test case baru pada `tests/unit/invoice-and-waybill.spec.ts`. Total unit suite aplikasi meningkat menjadi 103 file / 1.045 test cases yang lolos 100%. `pnpm lint` 0 error / 0 warning dan `pnpm typecheck` EXIT 0.
 
 ---
 

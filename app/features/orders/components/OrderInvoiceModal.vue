@@ -7,6 +7,7 @@ import {
   getInvoiceShippingServiceName,
   getInvoiceShippingFeeDisplay,
 } from '../utils/order-invoice'
+import { renderQrCodeSvg } from '../utils/logistics-vector'
 
 const props = defineProps<{
   visible: boolean
@@ -28,6 +29,9 @@ const shippingServiceName = computed(() =>
 )
 const shippingFeeDisplay = computed(() =>
   getInvoiceShippingFeeDisplay(props.order.shipping_cost_cents),
+)
+const verificationQrSvg = computed(() =>
+  renderQrCodeSvg(`https://shelfstack.co.id/tracking?order_id=${props.order.id}`, { size: 54 }),
 )
 
 const handlePrint = () => {
@@ -159,8 +163,26 @@ const handlePrint = () => {
         </table>
       </div>
 
-      <!-- Financial Calculation Summary -->
-      <div class="flex justify-end border-t border-brand-hair pt-4">
+      <!-- Financial Calculation Summary & Verification QR -->
+      <div
+        class="flex flex-col-reverse items-start justify-between gap-6 border-t border-brand-hair pt-4 sm:flex-row"
+      >
+        <div
+          class="flex items-center gap-3 rounded-lg border border-brand-hair bg-brand-canvas p-2.5"
+        >
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <div class="shrink-0" v-html="verificationQrSvg" />
+          <div class="text-[10px] leading-tight text-brand-muted">
+            <p class="m-0 font-bold text-brand-ink">Verifikasi Dokumen</p>
+            <p class="m-0 mt-0.5 text-brand-faint">
+              Pindai kode QR untuk memvalidasi keaslian transaksi digital ini.
+            </p>
+            <p class="m-0 mt-1 font-mono text-[9px] text-brand-muted">
+              REF: {{ order.id.slice(0, 8).toUpperCase() }}
+            </p>
+          </div>
+        </div>
+
         <div class="w-full space-y-2 text-xs sm:w-64">
           <div v-if="order.subtotal_cents" class="flex justify-between text-brand-muted">
             <span>Subtotal Produk:</span>
@@ -246,43 +268,3 @@ const handlePrint = () => {
     </template>
   </UiModal>
 </template>
-
-<style>
-/*
- * Pratinjau cetak: hanya lembar invoice yang dicetak.
- * Gate body:has(.invoice-sheet) hanya aktif selama modal terbuka.
- */
-@media print {
-  body:has(.invoice-sheet) #__nuxt {
-    display: none !important;
-  }
-  body:has(.invoice-sheet) > div {
-    position: static !important;
-    display: block !important;
-    padding: 0 !important;
-    background: none !important;
-    backdrop-filter: none !important;
-    overflow: visible !important;
-  }
-  body:has(.invoice-sheet) > div > div {
-    max-width: none !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    overflow: visible !important;
-  }
-  body:has(.invoice-sheet) > div > div > header,
-  body:has(.invoice-sheet) > div > div > footer,
-  body:has(.invoice-sheet) .no-print {
-    display: none !important;
-  }
-  body:has(.invoice-sheet) > div > div > div {
-    overflow: visible !important;
-    padding: 0 !important;
-  }
-  body:has(.invoice-sheet) .invoice-sheet {
-    padding: 0 !important;
-    background: white !important;
-  }
-}
-</style>

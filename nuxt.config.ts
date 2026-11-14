@@ -37,7 +37,7 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ['primeicons/primeicons.css'],
+  css: ['primeicons/primeicons.css', '~/assets/css/print-documents.css'],
 
   modules: [
     '@pinia/nuxt',

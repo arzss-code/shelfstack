@@ -2,6 +2,31 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [1.0.7] - 2026-11-14
+
+### Fitur Logistik & Dokumen Bisnis: Thermal Shipping Waybill A6 & Verifikasi QR Dokumen Resmi
+
+- **Generator Vektor Logistik Murni Tanpa Ketergantungan Eksternal (`logistics-vector.ts`, 191 baris)**:
+  - Mengimplementasikan `renderBarcodeSvg` berbasis standar industri Code 128 (Subset B) dengan checksum otomatis, quiet zone, dan garis tajam (`shape-rendering="crispEdges"`).
+  - Mengimplementasikan `renderQrCodeSvg` dengan matriks deterministik 21x21, 3 pola pencari standar (finder patterns), dan timing track untuk pemindaian resi dan faktur.
+- **Modal Label Pengiriman Thermal Standar A6 (`AdminShippingLabelModal.vue`, 229 baris)**:
+  - Dirancang khusus untuk printer thermal stiker ukuran A6 (100 x 150 mm) dengan tata letak satu halaman presisi tanpa risiko terpotong.
+  - Memuat logo/nama kurir ekspedisi, pill jenis layanan pengiriman (REGULER, NEXT DAY, INSTAN, KARGO), dan kode routing hub logistik.
+  - Menampilkan barcode nomor resi, blok alamat penerima lengkap, alamat hub pengirim ShelfStack, dan kotak khusus instruksi pengiriman/catatan kurir.
+  - Dilengkapi ringkasan checklist pengecekan barang gudang (packing slip) dengan checkbox verifikasi `[ ✓ ]` dan QR code pelacakan cepat.
+- **Verifikasi QR Keaslian Transaksi pada Faktur Penjualan (`OrderInvoiceModal.vue`, 271 baris)**:
+  - Menyisipkan modul verifikasi digital QR code yang mengarah ke URL validasi status pesanan resmi ShelfStack.
+  - Menampilkan kode referensi unik transaksi dan instruksi pemindaian untuk verifikasi keaslian dokumen digital.
+- **Lembar Gaya Cetak Terpusat Dokumen (`print-documents.css`, 74 baris)**:
+  - Mengisolasi tata letak cetak dokumen faktur (A4) dan resi thermal (A6) menggunakan pemilih modern `:has()`, menonaktifkan seluruh elemen UI web lain saat dialog cetak browser aktif.
+  - Didaftarkan secara global pada konfigurasi `nuxt.config.ts`.
+- **Integrasi Tombol Aksi Dokumen pada Halaman Admin Order Detail (`app/pages/admin/orders/[id].vue`, 240 baris)**:
+  - Menambahkan tombol aksi `Cetak Label Resi` dan `Cetak Invoice` pada status pesanan yang valid (paid, shipped, completed).
+- **Pengujian & Penjaminan Mutu**:
+  - Menambahkan 11 test case baru pada `tests/unit/invoice-and-waybill.spec.ts` yang memverifikasi output SVG barcode, QR code, rendering modal waybill, instruksi kurir, interaksi cetak, dan invoice QR verification.
+  - Total pengujian unit root aplikasi meningkat menjadi 103 file / 1.045 test cases yang lolos 100%.
+  - `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
+
 ## [1.0.6] - 2026-11-14
 
 ### Fitur E-Commerce Fase 4: Paritas Rincian Finansial Pesanan, Invoice Resmi & Penegakan Batas 300 Baris
