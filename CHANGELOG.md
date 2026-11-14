@@ -2,6 +2,19 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [1.0.11] - 2026-11-14
+
+### Perbaikan Tampilan Modal Pratinjau Email: Full-Screen Backdrop Teleport & Scroll Lock
+
+- **Full-Screen Backdrop Teleport (`AdminEmailPreviewModal.vue`, 278 baris)**:
+  - Memindahkan rendering modal keluar dari kontainer layout lokal menggunakan `<Teleport to="body">` yang dilindungi pembatas `<ClientOnly>`.
+  - Menaikkan stacking context layer overlay menjadi `z-[1000]` sehingga backdrop hitam semi-transparan (`bg-black/60 backdrop-blur-sm`) menutupi 100% viewport layar secara menyeluruh tanpa menyisakan celah putih pada header sticky dan sidebar admin.
+  - Menambahkan penguncian scroll background (`modal-open` class pada `<html>`) dan event listener tombol `Escape` untuk menutup modal dengan aman dan responsif.
+- **Ekstraksi Adaptor Data Email (`app/features/orders/utils/order-email.ts`, 65 baris)**:
+  - Memisahkan logika mapping dan mock fallback data order ke utility independen `buildEmailOrderData` untuk menjaga ukuran komponen `AdminEmailPreviewModal.vue` tetap ringkas dan mematuhi batas arsitektural maksimal 300 baris kode.
+- **Verifikasi & Pengujian Komponen (`tests/unit/transactional-email.spec.ts`, 275 baris)**:
+  - Menambahkan pengujian otomatis untuk validasi scroll lock `modal-open`, penutupan modal via tombol `Escape`, keutuhan backdrop `fixed inset-0 z-[1000]`, dan pemetaan adaptor data order fallback.
+
 ## [1.0.10] - 2026-11-14
 
 ### Harmonisasi Desain & Responsivitas Mobile: Penyelarasan Layout Badge, Eliminasi Font Mono, dan Aksen Electric Blue
