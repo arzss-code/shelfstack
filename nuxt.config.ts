@@ -62,6 +62,9 @@ export default defineNuxtConfig({
       process.env.MIDTRANS_API_URL || 'https://app.sandbox.midtrans.com/snap/v1/transactions',
     orderServiceUrl: process.env.ORDER_SERVICE_URL || 'http://127.0.0.1:4000',
     internalServiceKey: process.env.INTERNAL_SERVICE_KEY || '',
+    resendApiKey: process.env.RESEND_API_KEY || '',
+    emailFrom: process.env.EMAIL_FROM || 'ShelfStack <noreply@shelfstack.co.id>',
+    emailProvider: process.env.EMAIL_PROVIDER || '',
     public: {
       enableMidtransSandbox: process.env.NUXT_PUBLIC_ENABLE_MIDTRANS_SANDBOX === 'true',
       midtransClientKey: process.env.NUXT_PUBLIC_MIDTRANS_CLIENT_KEY || '',
