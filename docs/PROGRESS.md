@@ -387,6 +387,18 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
    - Status: ✅ **SELESAI 2026-10-30** (Tabel `public.product_reviews`, migrasi `20261122000001_product_reviews_and_ratings.sql`, trigger kalkulasi rating atomik pada tabel `products`, endpoint Nitro GET/POST/DELETE, validasi Zod tervalidasi, eligibility check pembeli pesanan berstatus `completed`, sensor inisial nama pengulas privasi `Budi S.` tanpa badge generik, komponen modular `ProductReviewsSection`, modal submit ulasan interaktif dengan rating bintang dan hitung karakter, tombol ulasan di rincian pesanan, filter rating bintang, dan 46 unit test lolos 100%).
 10. ~~**Antrean Pekerja Latar Belakang (BullMQ Worker untuk Order Expiry Sweep)**~~:
     - Status: ✅ **SELESAI 2026-11-06** (Antrean `order-expiry` + `order-expiry-dlq` berbasis Redis 7 dan BullMQ v6 di `@shelfstack/order-service`, delayed job per order saat checkout secara fail-open, repeatable reconciliation sweep setiap 5 menit, exponential retry 3 percobaan, endpoint telemetri dan replay DLQ di `/admin/orders`, serta 25 unit test di `@shelfstack/order-service`).
+11. **Otomasi Pengiriman Email Transaksional Backend (E-01)**:
+    - Status: ⏳ Direncanakan (Spesifikasi: `docs/roadmap/extended-enhancements-plan.md`). Dispatcher server-side asinkron (Resend / SMTP / Mock), fail-open resilience, audit logs, dan trigger hook pada pembuatan pesanan, konfirmasi pembayaran Midtrans, dan fulfillment kurir.
+12. **Live Omnibox Instant Search di Navbar (E-02)**:
+    - Status: ⏳ Direncanakan. Endpoint latensi rendah `/api/products/search-instant`, floating autocomplete popover dengan preview thumbnail dan harga, serta navigasi keyboard penuh (ArrowUp, ArrowDown, Enter, Esc).
+13. **Filter Rentang Harga Min-Max Rupiah & In-Stock Only (E-03)**:
+    - Status: ⏳ Direncanakan. Filter harga interaktif dengan quick chips dan toggle ketersediaan stok produk.
+14. **Unifikasi Geometri Primitif Etalase (E-04)**:
+    - Status: ⏳ Direncanakan (Known Gap). Penyelarasan kontrol katalog, keranjang, dan checkout menggunakan primitif `Ui*` resmi.
+15. **Customer Portal: Ledger Koin, Voucher & Alamat Utama (E-05, E-06)**:
+    - Status: ⏳ Direncanakan. Halaman `/account/coins`, `/account/vouchers`, dan opsi alamat pengiriman utama otomatis.
+16. **Admin CRM Pelanggan & Rate Limiting Token Bucket (E-07, E-08)**:
+    - Status: ⏳ Direncanakan. Halaman `/admin/users` (LTV dan riwayat order pembeli) serta middleware proteksi brute-force/spam HTTP 429.
 
 ## 📋 Catatan Teknis & Konvensi Wajib
 

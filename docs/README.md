@@ -39,7 +39,9 @@ Direktori ini menyimpan seluruh spesifikasi teknis, dokumen arsitektur, rencana 
   - `security.md`: Panduan keamanan server, proteksi webhook, dan sanitasi PII.
   - `production-hardening.md`: Strategi idempoten, penanganan race condition, dan pencegahan overselling.
   - `load-testing.md`: Skenario uji beban k6 dan verifikasi konkurensi.
-- [`roadmap/`](./roadmap/): Roadmap rekayasa berorientasi produksi (`production-roadmap.md`).
+- [`roadmap/`](./roadmap/): Roadmap rekayasa berorientasi produksi:
+  - `production-roadmap.md`: Peta jalan keandalan dan skala produksi.
+  - `extended-enhancements-plan.md`: Cetak biru peningkatan mendalam pasca-v1 (EPIC 6: email dispatcher, live omnibox search, unifikasi geometri etalase, dan customer portal).
 
 ---
 
