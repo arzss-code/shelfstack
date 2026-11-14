@@ -125,6 +125,7 @@ describe('Admin Sales Trends & Analytics', () => {
 
       expect(wrapper.text()).toContain('Total Omzet')
       expect(wrapper.text()).toContain('17 Pesanan')
+      expect(wrapper.html()).not.toContain('font-mono')
     })
 
     it('renders pure SVG elements with grid lines and data points in brand electric blue', async () => {

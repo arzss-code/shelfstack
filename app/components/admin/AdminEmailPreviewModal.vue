@@ -261,7 +261,7 @@ const handleCopyHtml = async () => {
           v-if="viewMode === 'rendered'"
           :class="[
             'transition-all duration-200 bg-white shadow-card rounded-lg overflow-hidden border border-slate-200',
-            viewport === 'desktop' ? 'w-full max-w-[620px]' : 'w-[375px]',
+            viewport === 'desktop' ? 'w-full max-w-[620px]' : 'w-[375px] max-w-full',
           ]"
         >
           <iframe

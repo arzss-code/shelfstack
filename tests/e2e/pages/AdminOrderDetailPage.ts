@@ -13,12 +13,12 @@ export class AdminOrderDetailPage extends BasePage {
 
   constructor(page: Page) {
     super(page)
-    this.heading = page.locator('h1.font-mono')
+    this.heading = page.getByRole('heading', { level: 1 })
     this.backToOrdersLink = page.getByRole('link', { name: 'Kelola Pesanan' })
     this.transitionButtons = page.locator(
       'div.flex-wrap button:not([aria-label]), div.flex-wrap button',
     )
-    this.statusBadge = page.locator('.space-y-1 .font-mono + span, .space-y-1 span.rounded-full')
+    this.statusBadge = page.locator('span.rounded-full, [role="status"]')
     this.itemsCardHeading = page.getByRole('heading', { name: 'Daftar Produk' })
     this.shippingCardHeading = page.getByRole('heading', { name: 'Informasi Pengiriman' })
     this.finalStatusNotice = page.getByText(/status final \(tidak dapat diubah\)/i)

@@ -133,13 +133,14 @@ useSeoMeta({
         class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
         <div>
-          <div class="flex items-center gap-3">
+          <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
             <h1 class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0">
-              Pesanan #{{ order.id.slice(0, 8) }}
+              Pesanan #{{ order.id.slice(0, 8).toUpperCase() }}
             </h1>
             <UiBadge
               :variant="getStatusBadge(order.status).variant"
               :label="getStatusBadge(order.status).label"
+              class="shrink-0"
             />
           </div>
           <p class="font-body text-xs text-brand-muted m-0 mt-1">
@@ -161,7 +162,7 @@ useSeoMeta({
               order.courier_name || 'Kurir'
             }}</span>
             <span class="text-brand-faint">·</span>
-            <span class="font-mono font-semibold text-brand-ink text-[11px]">{{
+            <span class="font-semibold text-brand-ink text-[11px]">{{
               order.tracking_number
             }}</span>
             <button

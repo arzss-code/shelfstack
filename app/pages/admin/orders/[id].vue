@@ -59,7 +59,9 @@ useSeoMeta({
         Kelola Pesanan
       </NuxtLink>
       <span>/</span>
-      <span class="font-mono text-brand-ink tabular">#{{ orderId.slice(0, 8) }}</span>
+      <span class="font-semibold text-brand-ink tabular"
+        >#{{ orderId.slice(0, 8).toUpperCase() }}</span
+      >
     </div>
 
     <!-- Loading State -->
@@ -87,17 +89,24 @@ useSeoMeta({
       <div
         class="flex flex-col gap-4 rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper sm:flex-row sm:items-center sm:justify-between"
       >
-        <div class="space-y-1">
-          <div class="flex items-center gap-3">
-            <h1 class="m-0 font-mono text-xl font-bold tabular text-brand-ink sm:text-2xl">
-              #{{ order.id }}
+        <div class="space-y-1.5 min-w-0">
+          <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <h1
+              class="m-0 font-display text-xl font-bold tracking-tight text-brand-ink sm:text-2xl"
+            >
+              Pesanan #{{ order.id.slice(0, 8).toUpperCase() }}
             </h1>
             <UiBadge
               :label="getStatusBadge(order.status).label"
               :variant="getStatusBadge(order.status).variant"
+              class="shrink-0"
             />
           </div>
-          <p class="text-xs text-brand-muted m-0">Dibuat pada {{ formatDate(order.created_at) }}</p>
+          <p class="text-xs text-brand-muted m-0 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span class="text-brand-faint">ID: {{ order.id }}</span>
+            <span class="hidden sm:inline text-brand-hair">·</span>
+            <span>Dibuat pada {{ formatDate(order.created_at) }}</span>
+          </p>
         </div>
 
         <!-- State Machine & Document Action Buttons -->

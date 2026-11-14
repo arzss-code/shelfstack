@@ -150,7 +150,7 @@ const shouldShowLabel = (idx: number, total: number) => {
         <span class="text-[11px] font-medium text-brand-muted uppercase tracking-wider block">
           Total Omzet
         </span>
-        <span class="font-mono text-base font-bold text-brand-ink block tabular">
+        <span class="font-display text-base font-bold text-brand-ink block tabular">
           {{ formatRupiah(trendsData?.summary.total_revenue || 0) }}
         </span>
       </div>
@@ -158,7 +158,7 @@ const shouldShowLabel = (idx: number, total: number) => {
         <span class="text-[11px] font-medium text-brand-muted uppercase tracking-wider block">
           Volume Transaksi
         </span>
-        <span class="font-mono text-base font-bold text-brand-ink block tabular">
+        <span class="font-display text-base font-bold text-brand-ink block tabular">
           {{ trendsData?.summary.total_orders || 0 }} Pesanan
         </span>
       </div>
@@ -166,7 +166,7 @@ const shouldShowLabel = (idx: number, total: number) => {
         <span class="text-[11px] font-medium text-brand-muted uppercase tracking-wider block">
           Rata-rata Nilai Pesanan (AOV)
         </span>
-        <span class="font-mono text-base font-bold text-brand-ink block tabular">
+        <span class="font-display text-base font-bold text-brand-ink block tabular">
           {{ formatRupiah(trendsData?.summary.average_order_value || 0) }}
         </span>
       </div>
@@ -185,7 +185,7 @@ const shouldShowLabel = (idx: number, total: number) => {
           }"
         >
           <p class="font-bold text-brand-ink m-0">{{ activeHoverData.pt.label }}</p>
-          <p class="font-mono text-brand-accent font-semibold m-0 mt-0.5 tabular">
+          <p class="font-display text-brand-accent font-bold m-0 mt-0.5 tabular">
             {{ formatRupiah(activeHoverData.pt.revenue) }}
           </p>
           <p class="text-[11px] text-brand-muted m-0">
@@ -223,7 +223,7 @@ const shouldShowLabel = (idx: number, total: number) => {
               :x="padLeft - 8"
               :y="grid.y + 3"
               text-anchor="end"
-              class="text-[9px] fill-brand-muted font-mono"
+              class="text-[9px] fill-brand-muted font-medium"
             >
               {{ grid.value >= 1000000 ? (grid.value / 1000000).toFixed(1) + 'M' : grid.value }}
             </text>

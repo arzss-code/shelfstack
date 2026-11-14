@@ -91,6 +91,8 @@ describe('Transactional Email Service & Preview Modal', () => {
       expect(html).toContain('GRATIS')
       expect(html).toContain('Jl. Sudirman No. 45 Blok B')
       expect(html).toContain('color: #0066ff;')
+      expect(html).toContain('white-space: nowrap;')
+      expect(html).not.toContain('monospace')
     })
 
     it('includes tracking section only when type is order_shipped', () => {

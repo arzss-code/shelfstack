@@ -4,8 +4,17 @@ Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
 ## [1.0.10] - 2026-11-14
 
-### Harmonisasi Desain: Penyelarasan Palet Warna Electric Blue Sesuai Standar Gallery Modernist
+### Harmonisasi Desain & Responsivitas Mobile: Penyelarasan Layout Badge, Eliminasi Font Mono, dan Aksen Electric Blue
 
+- **Penyesuaian Tata Letak Badge pada Tampilan Mobile (`app/pages/admin/orders/[id].vue`, `app/pages/orders/[id].vue`)**:
+  - Mengubah penataan judul pesanan pada banner header dari UUID panjang 36 karakter menjadi format ringkas kanonikal `Pesanan #XXXXXXXX`.
+  - Mencegah badge status terdorong turun ke bawah pada viewport mobile dengan menambahkan wrapping fleksibel serta pembatas `shrink-0` pada komponen `UiBadge`.
+  - Menampilkan UUID lengkap sebagai metadata sekunder yang rapi di bawah judul tanpa merusak struktur visual header.
+  - Memperbarui header pesanan pembeli pada `app/pages/orders/[id].vue` dengan proteksi `shrink-0` serupa.
+- **Eliminasi Tipografi Monospace pada Elemen Komersial**:
+  - Menghapus kelas `font-mono` dari seluruh metrik omzet, volume transaksi, AOV, dan tooltip pada `AdminSalesChart.vue`, menggantikannya dengan tipografi proporsional resmi `font-display` (DM Sans).
+  - Menghapus seluruh deklarasi `font-family: monospace;` dari template email transaksional (`shared/utils/email-templates.ts`), termasuk rincian harga barang, nomor resi kurir, ID pesanan, dan total tagihan.
+  - Mengamankan sel badge status pada header email dengan `white-space: nowrap;` agar tidak terpotong atau terlipat dua baris pada layar sempit.
 - **Penyelarasan Warna Grafik Tren Penjualan Admin (`AdminSalesChart.vue`, 282 baris)**:
   - Mengganti gradasi dan garis aksen oranye menjadi Electric Blue (`#0066ff`) khas ShelfStack sesuai panduan `DESIGN.md`.
   - Area fill SVG kini menggunakan gradasi halus Electric Blue (`#0066ff`, opasitas 20% ke 0%).
@@ -16,8 +25,8 @@ Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
   - Menyelaraskan teks ringkasan total tagihan akhir dengan warna aksen Electric Blue (`#0066ff`).
   - Menyelaraskan lencana status pengiriman (`order_shipped`) dengan token warna Electric Blue (`#0066ff`).
 - **Penyempurnaan Pengujian & Regresi**:
-  - Memperbarui `tests/unit/admin-sales-trends.spec.ts` untuk memverifikasi garis polyline SVG beraksen Electric Blue (`#0066ff`).
-  - Memperbarui `tests/unit/transactional-email.spec.ts` untuk memvalidasi penerapan styling warna Electric Blue (`#0066ff`) pada template HTML. Total pengujian unit root mencapai 108 file / 1.081 test cases yang lolos 100%.
+  - Memperbarui `tests/unit/admin-sales-trends.spec.ts` untuk memverifikasi ketiadaan kelas `font-mono` dan garis polyline SVG beraksen Electric Blue (`#0066ff`).
+  - Memperbarui `tests/unit/transactional-email.spec.ts` untuk memvalidasi penerapan styling warna Electric Blue (`#0066ff`), penjaminan `white-space: nowrap;`, serta ketiadaan styling `monospace`. Total pengujian unit root mencapai 108 file / 1.081 test cases yang lolos 100%.
 
 ## [1.0.9] - 2026-11-14
 
