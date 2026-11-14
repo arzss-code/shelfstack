@@ -2,7 +2,33 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
-## [1.0.5] - 2026-11-13
+## [1.0.6] - 2026-11-14
+
+### Fitur E-Commerce Fase 4: Paritas Rincian Finansial Pesanan, Invoice Resmi & Penegakan Batas 300 Baris
+
+- **Paritas Rincian Finansial Koin & Voucher pada Ringkasan Pembayaran (`OrderDetailPaymentCard.vue`, 205 baris)**:
+  - Menambahkan baris potongan koin loyalitas dengan aksen warna amber/emas (`text-amber-700 dark:text-amber-400`, badge koin `bg-amber-50 border-amber-200`) yang konsisten dengan ringkasan checkout (`CheckoutOrderSummary.vue`).
+  - Menampilkan jumlah koin yang terpakai (`X Koin`) dan nominal pengurang tagihan secara presisi dari kolom database `order.coins_used` dan `order.coins_discount_cents`.
+  - Memperbarui interface `Order` pada `app/types/order.ts` dengan properti opsional `coins_used`, `coins_discount_cents`, dan `coins_earned`.
+- **Lengkapnya Rincian Finansial pada Faktur Penjualan / Invoice Resmi (`OrderInvoiceModal.vue`, 286 baris)**:
+  - Menyisipkan baris `Subtotal Produk`, `Diskon Voucher` (beserta kode voucher promo), dan `Potongan Koin` pada ringkasan perhitungan tagihan invoice sebelum biaya pengiriman.
+  - Mempertahankan tata letak cetak dokumen resmi yang rapi dan elegan tanpa overflow atau pemotongan konten.
+- **Penegakan Batas Maksimal 300 Baris Kode Talenavi Engineering SOP di Seluruh Repositori**:
+  - Merampingkan dan mengaudit seluruh file kode di direktori `app/`, `server/`, dan `shared/`.
+  - `AppNavbar.vue` dirampingkan dari 301 menjadi 293 baris.
+  - `AccountSidebar.vue` dirampingkan dari 303 menjadi 261 baris.
+  - `useOrdersList.ts` dirampingkan dari 301 menjadi 295 baris.
+  - `useSupportChat.ts` dirampingkan dari 301 menjadi 295 baris.
+  - `useCheckoutOrder.ts` dirampingkan dari 306 menjadi 292 baris.
+  - `useVoucherSelection.ts` dirampingkan dari 314 menjadi 298 baris.
+  - `useAdminSupportChat.ts` dirampingkan dari 316 menjadi 297 baris.
+  - `wishlist.ts` (store) dirampingkan dari 327 menjadi 296 baris sekaligus mengganti seluruh tipe `any` dengan interface database terstruktur `WishlistDbRow`.
+  - Hasil audit: 100% file authored kini berada di bawah batas ketat 300 baris kode.
+- **Pengujian & Verifikasi Kualitas**:
+  - Menambahkan skenario uji coba diskon voucher dan potongan koin pada `tests/unit/order-detail-payment-card.spec.ts` dan `tests/unit/order-invoice-modal.spec.ts`.
+  - Seluruh rangkaian unit test: 102 test files / 1.034 unit test cases lolos 100%.
+  - `order-service` 2 test files / 25 test cases lolos 100%.
+  - `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
 
 ### Fitur E-Commerce Fase 3: Redesign & Elevasi Penukaran Koin Loyalitas di Checkout
 

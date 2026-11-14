@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 22 (Fitur E-Commerce Fase 3: Redesign & Elevasi Penukaran Koin Loyalitas di Checkout)**
-- **Versi Rilis:** `v1.0.5` (`version.json`, `CHANGELOG.md` : sinkron)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 102 file / 1.032 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 23 (Fitur E-Commerce Fase 4: Paritas Rincian Finansial Pesanan, Invoice Resmi & Penegakan Batas 300 Baris)**
+- **Versi Rilis:** `v1.0.6` (`version.json`, `CHANGELOG.md` : sinkron)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 102 file / 1.034 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -320,6 +320,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Aksesibilitas & Standar Saklar Web Modern**: Saklar toggle switch accessible (`role="switch"`, `aria-checked`, `data-testid="coins-toggle-switch"`) dengan target sentuh 44px, transisi halus, dan dukungan navigasi keyboard lengkap (`Space` dan `Enter`).
     - **Perampingan Composable & Utilitas Checkout (`useCheckoutOrder.ts`, `checkout-pricing.ts`)**: Mengekstraksi helper pemetaan alamat form dan penyimpanan ke `app/utils/checkout-pricing.ts`, merampingkan `useCheckoutOrder.ts` dari 315 baris menjadi 286 baris kode (100% patuh batas maksimal 300 baris SOP).
     - **Suite Pengujian Unit Komprehensif (`tests/unit/checkout-coins-toggle.spec.ts`)**: 8 unit test baru memvalidasi rendering bersyarat, interaksi klik, aksesibilitas keyboard, kondisi saldo nol/subtotal tidak memenuhi syarat, status disabled, dan ketiadaan karakter em dash. Total unit suite 102 file / 1.032 test lolos 100%.
+
+45. **Fitur E-Commerce Fase 4: Paritas Rincian Finansial Pesanan, Invoice Resmi & Penegakan Batas 300 Baris (SELESAI, v1.0.6).**
+    - **Paritas Finansial Ringkasan Pembayaran (`OrderDetailPaymentCard.vue`, 205 baris)**: Menambahkan baris potongan koin loyalitas dengan aksen warna amber/emas (`text-amber-700 dark:text-amber-400`, badge koin `bg-amber-50 border-amber-200`) yang konsisten dengan ringkasan checkout (`CheckoutOrderSummary.vue`). Menampilkan jumlah koin yang terpakai (`X Koin`) dan nominal potongan harga secara presisi dari database.
+    - **Rincian Finansial Faktur Penjualan / Invoice Resmi (`OrderInvoiceModal.vue`, 286 baris)**: Menyisipkan baris `Subtotal Produk`, `Diskon Voucher` (beserta kode voucher promo), dan `Potongan Koin` pada ringkasan perhitungan tagihan invoice sebelum biaya pengiriman.
+    - **Penegakan Batas Maksimal 300 Baris Kode Talenavi SOP**: Merampingkan `AppNavbar.vue` (293), `AccountSidebar.vue` (261), `useOrdersList.ts` (295), `useSupportChat.ts` (295), `useCheckoutOrder.ts` (292), `useVoucherSelection.ts` (298), `useAdminSupportChat.ts` (297), dan `wishlist.ts` (296) dengan penghapusan tipe `any`. Seluruh 100% file authored di `app/`, `server/`, `shared/` kini di bawah batas ketat 300 baris.
+    - **Suite Pengujian Unit**: Menambahkan skenario uji diskon voucher dan koin pada `tests/unit/order-detail-payment-card.spec.ts` dan `tests/unit/order-invoice-modal.spec.ts`. Total unit suite 102 file / 1.034 test lolos 100%.
 
 ---
 

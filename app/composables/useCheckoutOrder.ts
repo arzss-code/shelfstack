@@ -243,11 +243,12 @@ export function useCheckoutOrder() {
       }
 
       if (config.public?.enableMidtrans) {
+        const toOrder = () => router.push(`/orders/${orderId}`)
         await launchSnapPayment(orderId, {
-          onSuccess: () => router.push(`/orders/${orderId}`),
-          onPending: () => router.push(`/orders/${orderId}`),
-          onError: () => router.push(`/orders/${orderId}`),
-          onClose: () => router.push(`/orders/${orderId}`),
+          onSuccess: toOrder,
+          onPending: toOrder,
+          onError: toOrder,
+          onClose: toOrder,
         })
         return
       }

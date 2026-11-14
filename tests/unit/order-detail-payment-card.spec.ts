@@ -124,4 +124,32 @@ describe('OrderDetailPaymentCard Component', () => {
     await reorderBtn?.trigger('click')
     expect(wrapper.emitted('reorder')).toHaveLength(1)
   })
+
+  it('merender baris diskon voucher dan potongan koin saat order memiliki diskon tersebut', () => {
+    const discountedOrder: Order = {
+      ...baseOrder,
+      subtotal_cents: 10000000,
+      discount_cents: 2000000,
+      coupon_code: 'HEMAT20',
+      coins_used: 5000,
+      coins_discount_cents: 500000,
+      shipping_cost_cents: 1000000,
+      total_cents: 8500000,
+    }
+
+    const wrapper = mount(OrderDetailPaymentCard, {
+      props: {
+        ...defaultProps,
+        order: discountedOrder,
+      },
+      global: { stubs: globalStubs },
+    })
+
+    const text = wrapper.text().replace(/\u00a0/g, ' ')
+    expect(text).toContain('Diskon Voucher (HEMAT20)')
+    expect(text).toContain('-Rp 20.000')
+    expect(text).toContain('Potongan Koin')
+    expect(text).toContain('5.000 Koin')
+    expect(text).toContain('-Rp 5.000')
+  })
 })

@@ -30,13 +30,9 @@ const dropdownCategories = computed(() => [
   'Semua Kategori',
   ...dynamicCategories.value.map((c) => c.name),
 ])
-
 const subNavCategories = computed(() => [
   { name: 'Semua Produk', path: '/katalog' },
-  ...dynamicCategories.value.map((c) => ({
-    name: c.name,
-    path: `/katalog?category=${c.slug}`,
-  })),
+  ...dynamicCategories.value.map((c) => ({ name: c.name, path: `/katalog?category=${c.slug}` })),
 ])
 
 const displayName = computed(

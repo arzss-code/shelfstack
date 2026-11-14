@@ -65,6 +65,30 @@ defineEmits<{
           -{{ formatRupiah(order.discount_cents / 100) }}
         </span>
       </div>
+      <div
+        v-if="
+          (order.coins_discount_cents && order.coins_discount_cents > 0) ||
+          (order.coins_used && order.coins_used > 0)
+        "
+        class="flex items-center justify-between font-medium text-amber-700 dark:text-amber-400"
+      >
+        <span class="flex items-center gap-1.5 truncate">
+          <span>Potongan Koin</span>
+          <span
+            v-if="order.coins_used"
+            class="rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 font-mono text-[10px] text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+          >
+            {{ new Intl.NumberFormat('id-ID').format(order.coins_used) }} Koin
+          </span>
+        </span>
+        <span class="font-bold tabular-nums">
+          -{{
+            formatRupiah(
+              (order.coins_discount_cents ?? (order.coins_used ? order.coins_used * 100 : 0)) / 100,
+            )
+          }}
+        </span>
+      </div>
       <div class="flex items-center justify-between">
         <span>
           Biaya Pengiriman

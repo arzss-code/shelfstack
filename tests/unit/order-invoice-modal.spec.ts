@@ -90,4 +90,35 @@ describe('OrderInvoiceModal Component', () => {
     // 25000000 cents = Rp 250.000
     expect(wrapper.text()).toContain('250.000')
   })
+
+  it('renders subtotal, voucher discount, and loyalty coin deduction in invoice calculation', () => {
+    const discountedOrder: Order = {
+      ...mockOrder,
+      subtotal_cents: 25000000,
+      discount_cents: 2500000,
+      coupon_code: 'DISC10',
+      coins_used: 10000,
+      coins_discount_cents: 1000000,
+      shipping_cost_cents: 0,
+      total_cents: 21500000,
+    }
+
+    const wrapper = mount(OrderInvoiceModal, {
+      props: {
+        visible: true,
+        order: discountedOrder,
+      },
+      global: {
+        stubs: globalStubs,
+      },
+    })
+
+    const text = wrapper.text().replace(/\u00a0/g, ' ')
+    expect(text).toContain('Subtotal Produk:')
+    expect(text).toContain('250.000')
+    expect(text).toContain('Diskon Voucher (DISC10):')
+    expect(text).toContain('-Rp 25.000')
+    expect(text).toContain('Potongan Koin (10.000 Koin):')
+    expect(text).toContain('-Rp 10.000')
+  })
 })

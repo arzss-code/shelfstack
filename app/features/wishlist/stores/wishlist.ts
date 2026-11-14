@@ -19,6 +19,20 @@ export interface WishlistItem {
 const STORAGE_KEY = 'shelfstack-wishlist'
 const GUEST_FLAG_KEY = 'shelfstack-wishlist-is-guest'
 
+interface WishlistDbRow {
+  product: {
+    id: number
+    name: string
+    slug?: string | null
+    price: number
+    price_cents?: number | null
+    image_url: string | null
+    stock: number
+    category_id?: string | null
+  }
+  created_at: string
+}
+
 export const useWishlistStore = defineStore('wishlist', () => {
   const items = ref<WishlistItem[]>([])
   const isSyncing = ref(false)
@@ -44,7 +58,7 @@ export const useWishlistStore = defineStore('wishlist', () => {
   }
 
   // Helper pemetaan baris relasi database ke WishlistItem
-  const mapWishlistRow = (row: any): WishlistItem => ({
+  const mapWishlistRow = (row: WishlistDbRow): WishlistItem => ({
     productId: row.product.id,
     name: row.product.name,
     slug: row.product.slug,
@@ -64,7 +78,7 @@ export const useWishlistStore = defineStore('wishlist', () => {
 
     try {
       isSyncing.value = true
-      const response = await $fetch<{ status?: string; success?: boolean; data: any[] }>(
+      const response = await $fetch<{ status?: string; success?: boolean; data: WishlistDbRow[] }>(
         '/api/wishlist',
       )
       if ((response?.status === 'success' || response?.success) && Array.isArray(response.data)) {
@@ -84,7 +98,7 @@ export const useWishlistStore = defineStore('wishlist', () => {
     const localProductIds = items.value.map((i) => i.productId)
     try {
       isSyncing.value = true
-      const response = await $fetch<{ status?: string; success?: boolean; data: any[] }>(
+      const response = await $fetch<{ status?: string; success?: boolean; data: WishlistDbRow[] }>(
         '/api/wishlist/sync',
         {
           method: 'POST',
