@@ -25,7 +25,7 @@ When operating inside Orca or using the `orca` CLI in this repository, you MUST 
   ```bash
   orca worktree create --repo id:4b9dea79-206c-4d7c-b37a-3a6519d14cf2 --branch feat/<domain-slug> --base origin/main --json
   ```
-- **Branch Naming**: Always use domain-scoped branch prefixes (`feat/<domain-slug>`, `fix/<domain-slug>`, `hotfix/<domain-slug>`, `refactor/<domain-slug>`, `chore/<domain-slug>`, `docs/<domain-slug>`). Never use `production` in feature branch names, and never push directly to `main`.
+- **Branch Naming**: Always use concise, domain-scoped branch prefixes (`feat/<domain-slug>`, `fix/<domain-slug>`, `hotfix/<domain-slug>`, `refactor/<domain-slug>`, `chore/<domain-slug>`, `docs/<domain-slug>`), ideally 2 to 4 words. Never use `production` in feature branch names, and never push directly to `main`.
 - **Base Ref**: Keep the repository base ref pointed at `origin/main`.
 
 ## 3. Package Manager & Quality Gates in Orca Terminals
