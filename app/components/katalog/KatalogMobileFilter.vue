@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import type { CategoryOption, PriceRange } from './KatalogSidebar.vue'
+import type { CategoryOption } from './KatalogSidebar.vue'
 import type { RatingOption } from '~/composables/useKatalogFilters'
+import KatalogPriceRangeFilter from './KatalogPriceRangeFilter.vue'
 
 defineProps<{
   show: boolean
   categories: CategoryOption[]
   selectedCategory: string
-  priceRanges: PriceRange[]
-  selectedPriceRange: string
+  minPrice?: number
+  maxPrice?: number
+  selectedPriceChip?: string
+  inStockOnly?: boolean
   ratingOptions?: RatingOption[]
   selectedRating?: string
   filteredProductsCount: number
@@ -16,7 +19,9 @@ defineProps<{
 const emit = defineEmits<{
   close: []
   'update:selectedCategory': [value: string]
-  'update:selectedPriceRange': [value: string]
+  applyPriceRange: [min?: number, max?: number, chipId?: string]
+  clearPriceRange: []
+  toggleInStock: []
   'update:selectedRating': [value: string]
   reset: []
 }>()
@@ -65,64 +70,81 @@ const emit = defineEmits<{
         </div>
       </div>
 
-      <!-- Mobile Price Filter -->
-      <div class="space-y-2 pt-2 border-t border-brand-hairsoft">
+      <!-- Mobile In-Stock Toggle -->
+      <div class="py-3 border-t border-b border-brand-hairsoft flex items-center justify-between">
+        <div>
+          <span class="text-xs font-semibold text-brand-ink block">Produk Tersedia</span>
+          <span class="text-[11px] text-brand-muted block">Sembunyikan stok habis</span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          :aria-checked="inStockOnly"
+          class="w-10 h-6 rounded-full transition-colors relative cursor-pointer border-0 p-0.5"
+          :class="inStockOnly ? 'bg-brand-ink' : 'bg-brand-hair'"
+          @click="emit('toggleInStock')"
+        >
+          <span
+            class="w-5 h-5 rounded-full bg-white block shadow-whisper transition-transform duration-200"
+            :class="inStockOnly ? 'translate-x-4' : 'translate-x-0'"
+          />
+        </button>
+      </div>
+
+      <!-- Mobile Price Range Filter -->
+      <div class="space-y-2">
         <label class="text-[11px] font-bold uppercase tracking-wider text-brand-muted block">
           Rentang Harga
         </label>
-        <div class="grid grid-cols-2 gap-1.5">
-          <button
-            v-for="range in priceRanges"
-            :key="range.id"
-            type="button"
-            :class="[
-              'p-2.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer truncate',
-              selectedPriceRange === range.id
-                ? 'bg-brand-ink text-white border-brand-ink font-semibold'
-                : 'bg-brand-canvas-soft border-brand-hair text-brand-muted hover:text-brand-ink',
-            ]"
-            @click="emit('update:selectedPriceRange', range.id)"
-          >
-            {{ range.label }}
-          </button>
-        </div>
+        <KatalogPriceRangeFilter
+          :min-price="minPrice"
+          :max-price="maxPrice"
+          :selected-chip="selectedPriceChip"
+          @apply-range="(min, max, chip) => emit('applyPriceRange', min, max, chip)"
+          @clear-range="emit('clearPriceRange')"
+        />
       </div>
 
       <!-- Mobile Rating Filter -->
-      <div
-        v-if="ratingOptions && ratingOptions.length > 0"
-        class="space-y-2 pt-2 border-t border-brand-hairsoft"
-      >
+      <div v-if="ratingOptions && ratingOptions.length > 0" class="space-y-2">
         <label class="text-[11px] font-bold uppercase tracking-wider text-brand-muted block">
           Rating Ulasan
         </label>
-        <div class="grid grid-cols-1 gap-1.5">
+        <div class="grid grid-cols-2 gap-1.5">
           <button
             v-for="r in ratingOptions"
             :key="r.id"
             type="button"
             :class="[
-              'p-2.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer truncate flex items-center justify-center gap-1.5',
+              'p-2.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer flex items-center justify-center gap-1.5',
               selectedRating === r.id
                 ? 'bg-brand-ink text-white border-brand-ink font-semibold'
                 : 'bg-brand-canvas-soft border-brand-hair text-brand-muted hover:text-brand-ink',
             ]"
             @click="emit('update:selectedRating', r.id)"
           >
-            <i v-if="r.id !== 'all'" class="pi pi-star-fill text-[11px] text-brand-warning" />
+            <i v-if="r.id !== 'all'" class="pi pi-star-fill text-[10px] text-brand-warning" />
             <span>{{ r.label }}</span>
           </button>
         </div>
       </div>
 
-      <!-- Mobile Actions using UiButton -->
-      <div class="pt-4 border-t border-brand-hairsoft flex items-center gap-3">
-        <UiButton variant="secondary" size="sm" block @click="emit('reset')">
-          Reset Filter
-        </UiButton>
-        <UiButton variant="primary" size="sm" block @click="emit('close')">
-          Terapkan ({{ filteredProductsCount }})
-        </UiButton>
+      <!-- Modal Footer -->
+      <div class="pt-4 border-t border-brand-hairsoft flex items-center gap-2">
+        <button
+          type="button"
+          class="flex-1 py-2.5 rounded-field bg-brand-ink text-white text-xs font-semibold hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
+          @click="emit('close')"
+        >
+          Tampilkan {{ filteredProductsCount }} Produk
+        </button>
+        <button
+          type="button"
+          class="py-2.5 px-3 rounded-field border border-brand-hair text-xs font-medium text-brand-muted hover:text-brand-ink transition-colors cursor-pointer"
+          @click="emit('reset')"
+        >
+          Reset
+        </button>
       </div>
     </div>
   </div>

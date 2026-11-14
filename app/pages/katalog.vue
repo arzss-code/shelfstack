@@ -19,7 +19,11 @@ const { categories: dynamicCategories, fetchCategories } = useCategories()
 const {
   searchQuery,
   selectedCategory,
-  selectedPriceRange,
+  minPrice,
+  maxPrice,
+  selectedPriceChip,
+  priceRangeLabel,
+  inStockOnly,
   selectedRating,
   selectedSort,
   currentPage,
@@ -28,15 +32,15 @@ const {
   itemsPerPage,
   queryParams,
   sortOptions,
-  priceRanges,
   ratingOptions,
   activeFiltersCount,
   selectCategory,
   clearSearch,
   handleSearchUpdate,
   handleSortUpdate,
-  handlePriceRangeUpdate,
+  handlePriceRangeApply,
   handleClearPriceRange,
+  toggleInStockOnly,
   handleRatingUpdate,
   handleClearRating,
   resetAllFilters,
@@ -150,13 +154,14 @@ onMounted(async () => {
       :search-query="searchQuery"
       :selected-category="selectedCategory"
       :category-label="categories.find((c) => c.id === selectedCategory)?.label"
-      :selected-price-range="selectedPriceRange"
-      :price-range-label="priceRanges.find((p) => p.id === selectedPriceRange)?.label"
+      :price-range-label="priceRangeLabel"
+      :in-stock-only="inStockOnly"
       :selected-rating="selectedRating"
       :rating-label="ratingLabel"
       @clear-search="clearSearch"
       @clear-category="selectCategory('all')"
       @clear-price-range="handleClearPriceRange"
+      @clear-in-stock="toggleInStockOnly"
       @clear-rating="handleClearRating"
       @reset-all="resetAllFilters"
     />
@@ -166,12 +171,16 @@ onMounted(async () => {
       <KatalogSidebar
         :categories="categories"
         :selected-category="selectedCategory"
-        :price-ranges="priceRanges"
-        :selected-price-range="selectedPriceRange"
+        :min-price="minPrice"
+        :max-price="maxPrice"
+        :selected-price-chip="selectedPriceChip"
+        :in-stock-only="inStockOnly"
         :rating-options="ratingOptions"
         :selected-rating="selectedRating"
         @update:selected-category="selectCategory"
-        @update:selected-price-range="handlePriceRangeUpdate"
+        @apply-price-range="handlePriceRangeApply"
+        @clear-price-range="handleClearPriceRange"
+        @toggle-in-stock="toggleInStockOnly"
         @update:selected-rating="handleRatingUpdate"
         @reset="resetAllFilters"
       />
@@ -224,14 +233,18 @@ onMounted(async () => {
       :show="showMobileFilterModal"
       :categories="categories"
       :selected-category="selectedCategory"
-      :price-ranges="priceRanges"
-      :selected-price-range="selectedPriceRange"
+      :min-price="minPrice"
+      :max-price="maxPrice"
+      :selected-price-chip="selectedPriceChip"
+      :in-stock-only="inStockOnly"
       :rating-options="ratingOptions"
       :selected-rating="selectedRating"
       :filtered-products-count="totalProducts"
       @close="showMobileFilterModal = false"
       @update:selected-category="selectCategory"
-      @update:selected-price-range="handlePriceRangeUpdate"
+      @apply-price-range="handlePriceRangeApply"
+      @clear-price-range="handleClearPriceRange"
+      @toggle-in-stock="toggleInStockOnly"
       @update:selected-rating="handleRatingUpdate"
       @reset="resetAllFilters"
     />

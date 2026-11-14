@@ -8,7 +8,7 @@
 
 - **Sprint Aktif:** **Sprint 26 (Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview)**
 - **Versi Rilis:** `v1.1.0-beta.1` (Pre-release Staging / develop aktif : sinkron dengan `version.json`)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 112 file / 1.118 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 113 file / 1.127 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -363,6 +363,12 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Composable Navigasi Keyboard Penuh (`useInstantSearch.ts`, 192 baris)**: Debounce 250ms, pembatalan request lama via `AbortController`, penjelajahan berputar (`ArrowDown`/`ArrowUp`), pemilihan instan (`Enter`), penutupan cepat (`Esc` dan outside click), serta kesesuaian aksesibilitas ARIA (`role="listbox"`, `role="option"`, `aria-busy`, `aria-selected`).
     - **Pengujian & Penjaminan Mutu**: 3 suite pengujian baru (`tests/unit/instant-search-api.spec.ts`, `tests/unit/use-instant-search.spec.ts`, `tests/unit/search-autocomplete-popover.spec.ts`, total 22 test baru). Total unit suite root mencapai 112 file / 1.118 test cases lolos 100%. `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
 
+51. **Filter Rentang Harga Min-Max Rupiah & Ketersediaan Stok Katalog (SELESAI 2026-11-14, v1.1.0-beta.3, Tiket E-03).**
+    - **Filter Rentang Harga Dinamis (`KatalogPriceRangeFilter.vue`, 156 baris)**: 4 tombol cepat rentang harga populer (Semua, < Rp 250rb, Rp 250rb - 1jt, > Rp 1jt), 2 input teks numerik terformat Rupiah untuk batas kustom min dan max dengan validasi min <= max, serta tombol Terapkan dan Hapus.
+    - **Toggle Ketersediaan Stok ("Produk Tersedia")**: Switch interaktif yang menyaring dan menyembunyikan produk stok habis (`stock_status: 'in_stock'`) secara reaktif tanpa kehilangan parameter kategori, rating, atau sortir.
+    - **Sinkronisasi Query URL & Tag Filter Aktif (`useKatalogFilters.ts`, `KatalogActiveFilters.vue`, `KatalogSidebar.vue`, `KatalogMobileFilter.vue`)**: Parameter `min_price`, `max_price`, `price_chip`, dan `stock_status` tersinkronisasi 2 arah ke URL query browser (shareable URL), didukung chip tag aktif dengan tombol hapus 1-klik (`clearPriceRange`, `clearInStock`) dan integrasi penuh pada desktop sidebar maupun mobile sheet.
+    - **Pengujian & Penjaminan Mutu**: Suite pengujian unit baru `tests/unit/katalog-price-and-stock-filter.spec.ts` (9 test) memvalidasi quick chips, input kustom, validasi batas harga, toggle stok, serta chip tag aktif. Total unit suite root mencapai 113 file / 1.127 test cases lolos 100%. `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
+
 ---
 
 ## 📌 Inventaris Fitur Belum Diimplementasikan (Backlog Lanjutan)
@@ -397,13 +403,19 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
     - Status: ✅ **SELESAI 2026-11-14** (Dispatcher server-side asinkron multi-provider Resend / Mock di `server/utils/email-dispatcher.ts`, fail-open resilience, in-memory audit logs, endpoint back-office `/api/admin/emails/logs`, trigger hook pada `orders/index.ts` untuk `order_placed`, `midtrans/notification.post.ts` untuk `payment_success`, dan `orders/[id]/status.put.ts` untuk `order_shipped`, serta 12 unit test di `tests/unit/email-dispatcher.spec.ts`).
 12. ~~**Live Omnibox Instant Search di Navbar (E-02)**~~:
     - Status: ✅ **SELESAI 2026-11-14** (Endpoint latensi rendah `/api/products/search-instant`, floating autocomplete popover dengan preview thumbnail dan harga, serta navigasi keyboard penuh ArrowUp, ArrowDown, Enter, Esc).
-13. **Filter Rentang Harga Min-Max Rupiah & In-Stock Only (E-03)**:
-    - Status: ⏳ Direncanakan. Filter harga interaktif dengan quick chips dan toggle ketersediaan stok produk.
+13. ~~**Filter Rentang Harga Min-Max Rupiah & In-Stock Only (E-03)**~~:
+    - Status: ✅ **SELESAI 2026-11-14** (Filter harga interaktif dengan quick chips, input batas min-max rupiah tervalidasi, toggle produk tersedia, sinkronisasi URL query, dan tag filter aktif).
 14. **Unifikasi Geometri Primitif Etalase (E-04)**:
     - Status: ⏳ Direncanakan (Known Gap). Penyelarasan kontrol katalog, keranjang, dan checkout menggunakan primitif `Ui*` resmi.
 15. **Customer Portal: Ledger Koin, Voucher & Alamat Utama (E-05, E-06)**:
     - Status: ⏳ Direncanakan. Halaman `/account/coins`, `/account/vouchers`, dan opsi alamat pengiriman utama otomatis.
 16. **Admin CRM Pelanggan & Rate Limiting Token Bucket (E-07, E-08)**:
+    - Status: ⏳ Direncanakan. Halaman `/admin/users` (LTV dan riwayat order pembeli) serta middleware proteksi brute-force/spam HTTP 429.
+17. **Unifikasi Geometri Primitif Etalase (E-04)**:
+    - Status: ⏳ Direncanakan (Known Gap). Penyelarasan kontrol katalog, keranjang, dan checkout menggunakan primitif `Ui*` resmi.
+18. **Customer Portal: Ledger Koin, Voucher & Alamat Utama (E-05, E-06)**:
+    - Status: ⏳ Direncanakan. Halaman `/account/coins`, `/account/vouchers`, dan opsi alamat pengiriman utama otomatis.
+19. **Admin CRM Pelanggan & Rate Limiting Token Bucket (E-07, E-08)**:
     - Status: ⏳ Direncanakan. Halaman `/admin/users` (LTV dan riwayat order pembeli) serta middleware proteksi brute-force/spam HTTP 429.
 
 ## 📋 Catatan Teknis & Konvensi Wajib

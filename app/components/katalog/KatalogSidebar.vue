@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import type { RatingOption } from '~/composables/useKatalogFilters'
-
-export interface PriceRange {
-  id: string
-  label: string
-}
+import KatalogPriceRangeFilter from './KatalogPriceRangeFilter.vue'
 
 export interface CategoryOption {
   id: string
@@ -14,15 +10,19 @@ export interface CategoryOption {
 defineProps<{
   categories: CategoryOption[]
   selectedCategory: string
-  priceRanges: PriceRange[]
-  selectedPriceRange: string
+  minPrice?: number
+  maxPrice?: number
+  selectedPriceChip?: string
+  inStockOnly?: boolean
   ratingOptions?: RatingOption[]
   selectedRating?: string
 }>()
 
 const emit = defineEmits<{
   'update:selectedCategory': [value: string]
-  'update:selectedPriceRange': [value: string]
+  applyPriceRange: [min?: number, max?: number, chipId?: string]
+  clearPriceRange: []
+  toggleInStock: []
   'update:selectedRating': [value: string]
   reset: []
 }>()
@@ -70,35 +70,53 @@ const emit = defineEmits<{
         </div>
       </div>
 
+      <!-- In-Stock Only Toggle Section -->
+      <div class="py-4 border-b border-brand-hairsoft flex items-center justify-between">
+        <div>
+          <span class="text-xs font-semibold text-brand-ink block">Produk Tersedia</span>
+          <span class="text-[11px] text-brand-muted block">Sembunyikan stok habis</span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          :aria-checked="inStockOnly"
+          class="w-10 h-6 rounded-full transition-colors relative cursor-pointer border-0 p-0.5"
+          :class="inStockOnly ? 'bg-brand-ink' : 'bg-brand-hair'"
+          @click="emit('toggleInStock')"
+        >
+          <span
+            class="w-5 h-5 rounded-full bg-white block shadow-whisper transition-transform duration-200"
+            :class="inStockOnly ? 'translate-x-4' : 'translate-x-0'"
+          />
+        </button>
+      </div>
+
       <!-- Price Range Filter Section -->
-      <div class="space-y-2.5 pt-5">
-        <h3 class="text-[11px] font-bold uppercase tracking-wider text-brand-muted m-0">
-          Rentang Harga
-        </h3>
-        <div class="flex flex-col gap-1">
+      <div class="space-y-2.5 py-5 border-b border-brand-hairsoft">
+        <div class="flex items-center justify-between">
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-brand-muted m-0">
+            Rentang Harga
+          </h3>
           <button
-            v-for="range in priceRanges"
-            :key="range.id"
+            v-if="minPrice !== undefined || maxPrice !== undefined"
             type="button"
-            :class="[
-              'text-left px-3 py-2 rounded-field text-xs font-medium transition-all cursor-pointer border-0 flex items-center justify-between',
-              selectedPriceRange === range.id
-                ? 'bg-brand-ink text-white font-semibold shadow-whisper'
-                : 'text-brand-muted bg-transparent hover:bg-brand-canvas-soft hover:text-brand-ink',
-            ]"
-            @click="emit('update:selectedPriceRange', range.id)"
+            class="text-[11px] text-brand-accent hover:underline cursor-pointer border-0 bg-transparent p-0"
+            @click="emit('clearPriceRange')"
           >
-            <span>{{ range.label }}</span>
-            <i v-if="selectedPriceRange === range.id" class="pi pi-check text-[10px]" />
+            Hapus
           </button>
         </div>
+        <KatalogPriceRangeFilter
+          :min-price="minPrice"
+          :max-price="maxPrice"
+          :selected-chip="selectedPriceChip"
+          @apply-range="(min, max, chip) => emit('applyPriceRange', min, max, chip)"
+          @clear-range="emit('clearPriceRange')"
+        />
       </div>
 
       <!-- Rating Filter Section -->
-      <div
-        v-if="ratingOptions && ratingOptions.length > 0"
-        class="space-y-2.5 pt-5 border-t border-brand-hairsoft"
-      >
+      <div v-if="ratingOptions && ratingOptions.length > 0" class="space-y-2.5 pt-5">
         <h3 class="text-[11px] font-bold uppercase tracking-wider text-brand-muted m-0">
           Rating Ulasan
         </h3>
