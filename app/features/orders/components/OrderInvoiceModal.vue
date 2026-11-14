@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import type { Order } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
+import {
+  formatInvoiceDate as formatDate,
+  formatInvoiceNumber,
+  getInvoiceShippingServiceName,
+  getInvoiceShippingFeeDisplay,
+} from '../utils/order-invoice'
 
 const props = defineProps<{
   visible: boolean
@@ -16,46 +22,13 @@ const isOpen = computed({
   set: (val: boolean) => emit('update:visible', val),
 })
 
-const formatDate = (dateStr: string) => {
-  try {
-    return new Intl.DateTimeFormat('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(dateStr))
-  } catch {
-    return dateStr
-  }
-}
-
-const invoiceNumber = computed(() => {
-  return `INV-${props.order.id.slice(0, 8).toUpperCase()}`
-})
-
-const shippingServiceName = computed(() => {
-  const service = props.order.shipping_service || 'reguler'
-  switch (service.toLowerCase()) {
-    case 'express':
-      return 'Kilat / Next Day'
-    case 'instant':
-      return 'Instan / Sameday'
-    case 'cargo':
-      return 'Kargo Ekonomis'
-    case 'reguler':
-    default:
-      return 'Reguler'
-  }
-})
-
-const shippingFeeDisplay = computed(() => {
-  const cost = props.order.shipping_cost_cents ?? 0
-  if (cost === 0) {
-    return 'Gratis'
-  }
-  return formatRupiah(cost / 100)
-})
+const invoiceNumber = computed(() => formatInvoiceNumber(props.order.id))
+const shippingServiceName = computed(() =>
+  getInvoiceShippingServiceName(props.order.shipping_service),
+)
+const shippingFeeDisplay = computed(() =>
+  getInvoiceShippingFeeDisplay(props.order.shipping_cost_cents),
+)
 
 const handlePrint = () => {
   if (import.meta.client) {

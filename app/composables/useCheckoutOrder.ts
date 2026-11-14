@@ -1,7 +1,6 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useCartStore, type CartItem } from '~/features/cart/stores/cart'
-import { checkoutAddressSchema } from '~~/shared/schemas/order'
 import { formatRupiah } from '~/utils/format'
 import { useOrderPaymentSync } from '~/composables/useOrderPaymentSync'
 import { useAddresses } from '~/composables/useAddresses'
@@ -16,6 +15,7 @@ import {
   buildCheckoutOrderPayload,
   mapUserAddressToForm,
   buildAddressSavePayload,
+  validateCheckoutAddress,
 } from '~/utils/checkout-pricing'
 
 export function useCheckoutOrder() {
@@ -88,30 +88,27 @@ export function useCheckoutOrder() {
   const displayTotalPrice = computed(
     () => placedOrderSnapshot.value?.totalPriceFormatted ?? cartStore.formattedTotalPrice,
   )
-  const displayDiscountAmount = computed(() => {
-    return (
+  const displayDiscountAmount = computed(
+    () =>
       placedOrderSnapshot.value?.discountFormatted ??
-      (cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null)
-    )
-  })
+      (cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null),
+  )
   const displayCouponCode = computed(
     () => placedOrderSnapshot.value?.couponCode ?? cartStore.appliedCoupon?.code ?? null,
   )
-  const displayCoinsDiscountAmount = computed(() => {
-    return (
+  const displayCoinsDiscountAmount = computed(
+    () =>
       placedOrderSnapshot.value?.coinsDiscountFormatted ??
-      (actualCoinsUsed.value > 0 ? formatRupiah(actualCoinsUsed.value) : null)
-    )
-  })
+      (actualCoinsUsed.value > 0 ? formatRupiah(actualCoinsUsed.value) : null),
+  )
   const displayCoinsUsed = computed(
     () => placedOrderSnapshot.value?.coinsUsed ?? actualCoinsUsed.value,
   )
-  const displayShippingFeeFormatted = computed(() => {
-    return (
+  const displayShippingFeeFormatted = computed(
+    () =>
       placedOrderSnapshot.value?.shippingFeeFormatted ??
-      (isFreeShipping.value ? 'Gratis Ongkir' : formatRupiah(shippingFeeCents.value / 100))
-    )
-  })
+      (isFreeShipping.value ? 'Gratis Ongkir' : formatRupiah(shippingFeeCents.value / 100)),
+  )
   const displayIsFreeShipping = computed(
     () => placedOrderSnapshot.value?.isFreeShipping ?? isFreeShipping.value,
   )
@@ -167,16 +164,8 @@ export function useCheckoutOrder() {
   )
 
   const validateForm = () => {
-    errors.value = {}
-    const result = checkoutAddressSchema.safeParse(address.value)
-    if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors
-      for (const [key, messages] of Object.entries(fieldErrors)) {
-        if (messages?.[0]) errors.value[key] = messages[0]
-      }
-      return false
-    }
-    return true
+    errors.value = validateCheckoutAddress(address.value)
+    return Object.keys(errors.value).length === 0
   }
 
   const handleCreateOrder = async () => {

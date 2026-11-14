@@ -50,6 +50,13 @@ export function useOrdersList() {
   const tabItems = computed<UiTabItem[]>(() => createOrderTabItems(statusCounts.value))
   const filteredOrders = computed(() => filterOrdersByQuery(orders.value, searchQuery.value))
 
+  const updateOrderInList = (id: string, patch: Partial<Order>) => {
+    const idx = orders.value.findIndex((o) => o.id === id)
+    if (idx !== -1 && orders.value[idx]) {
+      orders.value[idx] = { ...orders.value[idx], ...patch }
+    }
+  }
+
   const syncPendingOrders = async () => {
     if (isSyncingPending.value) return
     const pendingOrders = orders.value.filter((o) => o.status === 'pending')
@@ -64,23 +71,18 @@ export function useOrdersList() {
         pendingOrders.map(async (pendingOrder) => {
           const res = await syncOrderPaymentStatus(pendingOrder.id)
           if (res?.is_paid) {
-            const idx = orders.value.findIndex((o) => o.id === pendingOrder.id)
-            const current = orders.value[idx]
-            if (idx !== -1 && current) {
-              orders.value[idx] = {
-                ...current,
-                status: res.status,
-                payment_type: res.payment_type || current.payment_type,
-                paid_at: new Date().toISOString(),
-              }
-              if (statusCounts.value.pending) statusCounts.value.pending -= 1
-              statusCounts.value.paid = (statusCounts.value.paid || 0) + 1
-              toast.show({
-                title: 'Pembayaran Diterima',
-                message: `Pesanan #${pendingOrder.id.slice(0, 8).toUpperCase()} terkonfirmasi dan sedang diproses.`,
-                tone: 'success',
-              })
-            }
+            updateOrderInList(pendingOrder.id, {
+              status: res.status,
+              payment_type: res.payment_type || undefined,
+              paid_at: new Date().toISOString(),
+            })
+            if (statusCounts.value.pending) statusCounts.value.pending -= 1
+            statusCounts.value.paid = (statusCounts.value.paid || 0) + 1
+            toast.show({
+              title: 'Pembayaran Diterima',
+              message: `Pesanan #${pendingOrder.id.slice(0, 8).toUpperCase()} terkonfirmasi dan sedang diproses.`,
+              tone: 'success',
+            })
           }
         }),
       )
@@ -90,16 +92,10 @@ export function useOrdersList() {
     }
   }
 
-  const {
-    startPolling: startPendingPolling,
-    stopPolling: stopPendingPolling,
-    setupVisibilityListeners,
-    teardownVisibilityListeners,
-  } = useOrderPolling(async () => {
-    if (orders.value.some((o) => o.status === 'pending')) {
-      await syncPendingOrders()
-    }
+  const polling = useOrderPolling(async () => {
+    if (orders.value.some((o) => o.status === 'pending')) await syncPendingOrders()
   })
+  const { startPolling: startPendingPolling, stopPolling: stopPendingPolling } = polling
 
   // --- Fetch orders ---
   const fetchInitialOrders = async (silent = false) => {
@@ -163,9 +159,9 @@ export function useOrdersList() {
     payingOrderId.value = orderToPay.id
     try {
       await launchSnapPayment(orderToPay.id, {
-        onSuccess: () => syncPendingOrders(),
-        onPending: () => startPendingPolling(),
-        onClose: () => syncPendingOrders(),
+        onSuccess: syncPendingOrders,
+        onPending: startPendingPolling,
+        onClose: syncPendingOrders,
       })
     } finally {
       payingOrderId.value = null
@@ -195,22 +191,19 @@ export function useOrdersList() {
         (payload) => {
           if (!payload.new) return
           const updated = payload.new as Record<string, unknown>
-          const idx = orders.value.findIndex((o) => o.id === updated.id)
-          if (idx === -1) return
-          const current = orders.value[idx]
-          if (!current) return
-          const prevStatus = current.status
+          const prev = orders.value.find((o) => o.id === updated.id)
+          if (!prev) return
+          const prevStatus = prev.status
           const nextStatus = updated.status as OrderStatus
-          orders.value[idx] = {
-            ...current,
+          updateOrderInList(updated.id as string, {
             status: nextStatus,
-            payment_type: (updated.payment_type as string) || current.payment_type,
-            paid_at: (updated.paid_at as string) || current.paid_at,
-          }
+            payment_type: (updated.payment_type as string) || prev.payment_type,
+            paid_at: (updated.paid_at as string) || prev.paid_at,
+          })
           if (prevStatus === 'pending' && nextStatus === 'paid') {
             toast.show({
               title: 'Status Diperbarui',
-              message: `Pesanan #${current.id.slice(0, 8).toUpperCase()} terkonfirmasi dan sedang diproses.`,
+              message: `Pesanan #${prev.id.slice(0, 8).toUpperCase()} terkonfirmasi dan sedang diproses.`,
               tone: 'success',
             })
           }
@@ -262,11 +255,11 @@ export function useOrdersList() {
     await fetchInitialOrders()
     setupIntersectionObserver()
     setupRealtimeSubscription()
-    setupVisibilityListeners()
+    polling.setupVisibilityListeners()
   })
 
   onUnmounted(() => {
-    teardownVisibilityListeners()
+    polling.teardownVisibilityListeners()
     observer?.disconnect()
     observer = null
     teardownRealtimeSubscription()
