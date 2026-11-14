@@ -2,6 +2,7 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import type { OrderStatus } from '../../../../shared/constants/order-transitions'
 import type { CourierCode } from '../../../../shared/schemas/shipping'
+import { dispatchOrderTransactionalEmail } from '../../../utils/email-dispatcher'
 
 export default defineEventHandler(async (event) => {
   // Hanya administrator yang dapat memperbarui status pesanan secara manual
@@ -127,6 +128,9 @@ export default defineEventHandler(async (event) => {
         notifTitle = 'Pesanan Sedang Dikirim'
         notifMessage = `Pesanan Anda telah diserahkan ke kurir ${courierName} dengan no resi ${trackingNumber}. Paket sedang dalam perjalanan.`
         notifType = 'order_shipped'
+
+        // Kirim email notifikasi pesanan dikirim (order_shipped) secara fail-open
+        void dispatchOrderTransactionalEmail(client, orderId, 'order_shipped')
       } else if (result.current_status === 'completed') {
         const deliveredAt = new Date().toISOString()
 

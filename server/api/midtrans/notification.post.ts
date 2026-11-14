@@ -10,6 +10,7 @@ import {
 } from '../../utils/midtrans'
 import { logger } from '../../utils/logger'
 import { metrics } from '../../utils/metrics'
+import { dispatchOrderTransactionalEmail } from '../../utils/email-dispatcher'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
@@ -188,6 +189,9 @@ export default defineEventHandler(async (event) => {
       }).catch((err) => {
         logger.warn('Gagal membuat notifikasi payment_success', {}, err)
       })
+
+      // Kirim email pembayaran sukses (payment_success) secara fail-open
+      void dispatchOrderTransactionalEmail(client, baseOrderId, 'payment_success')
     }
   }
 

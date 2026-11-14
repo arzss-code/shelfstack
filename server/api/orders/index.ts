@@ -4,6 +4,7 @@ import { checkoutSchema } from '../../../shared/schemas/order'
 import { calculateCheckoutHash, validateIdempotencyKey } from '../../utils/idempotency'
 import { logger } from '../../utils/logger'
 import { enqueueOrderExpiryNotification } from '../../utils/order-service'
+import { dispatchOrderTransactionalEmail } from '../../utils/email-dispatcher'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
@@ -173,6 +174,11 @@ export default defineEventHandler(async (event) => {
 
     // Jadwalkan job kedaluwarsa pesanan di BullMQ (@shelfstack/order-service) secara fail-open
     void enqueueOrderExpiryNotification(String(orderId), event.context?.requestId)
+
+    // Kirim notifikasi email konfirmasi pesanan (order_placed) secara fail-open
+    void dispatchOrderTransactionalEmail(client, String(orderId), 'order_placed', {
+      customerEmail: user.email,
+    })
 
     // Buat notifikasi otomatis pesanan dibuat
     await createNotification(client, {
