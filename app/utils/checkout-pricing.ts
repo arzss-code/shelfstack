@@ -109,3 +109,42 @@ export function buildCheckoutOrderPayload(input: BuildCheckoutOrderPayloadInput)
     coins_used: input.coinsUsed,
   }
 }
+
+export interface AddressFormModel {
+  name: string
+  phone: string
+  street: string
+  city: string
+  postal: string
+  note: string
+}
+
+export function mapUserAddressToForm(saved: {
+  name: string
+  phone: string
+  street: string
+  city: string
+  postal: string
+  note?: string | null
+}): AddressFormModel {
+  return {
+    name: saved.name,
+    phone: saved.phone,
+    street: saved.street,
+    city: saved.city,
+    postal: saved.postal,
+    note: saved.note || '',
+  }
+}
+
+export function buildAddressSavePayload(address: AddressFormModel) {
+  return {
+    name: address.name.trim(),
+    phone: address.phone.trim(),
+    street: address.street.trim(),
+    city: address.city.trim(),
+    postal: address.postal.trim(),
+    note: address.note?.trim() || undefined,
+    is_default: false,
+  }
+}

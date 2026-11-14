@@ -2,6 +2,23 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [1.0.5] - 2026-11-13
+
+### Fitur E-Commerce Fase 3: Redesign & Elevasi Penukaran Koin Loyalitas di Checkout
+
+- **Komponen Penukaran Koin Loyalitas Checkout (`CheckoutCoinsToggle.vue`, 139 baris)**:
+  - Mengeliminasi kelas warna legacy non-standar dan menyelaraskan dengan token semantik resmi ShelfStack (`rounded-card`, `shadow-whisper`, `border-brand-hair`, `bg-brand-canvas`) dengan tetap mempertahankan palet hangat aksen amber/orange yang khas untuk identitas koin loyalitas.
+  - Menampilkan badge ketersediaan saldo dinamis dengan indikator dot emas/amber (`Tersedia X Koin`), transparansi rasio konversi (`1 Koin = Rp 1`), serta feedback interaktif saat potongan koin aktif diterapkan (`Hemat Rp X (X Koin) berhasil diterapkan ke pesanan`).
+  - Menyempurnakan saklar toggle switch (`role="switch"`, `aria-checked`, `data-testid="coins-toggle-switch"`) dengan target sentuh ramah seluler, transisi mulus, dan dukungan navigasi keyboard lengkap (`Space` dan `Enter`).
+  - Menangani status batas belanja dan saldo nol secara elegan tanpa error DOM atau gangguan visual.
+- **Perampingan Composable & Utilitas Checkout (`useCheckoutOrder.ts`, `checkout-pricing.ts`)**:
+  - Mengekstraksi model form alamat `AddressFormModel`, helper pemetaan alamat tersimpan `mapUserAddressToForm`, dan builder payload penyimpanan `buildAddressSavePayload` ke `app/utils/checkout-pricing.ts`.
+  - Merampingkan `app/composables/useCheckoutOrder.ts` dari 315 baris menjadi 286 baris kode, sehingga 100% patuh terhadap batas maksimal 300 baris kode Talenavi Engineering SOP.
+- **Verifikasi Kualitas & Pengujian Komprehensif**:
+  - Menambahkan rangkaian pengujian unit baru pada `tests/unit/checkout-coins-toggle.spec.ts` (8 tests) yang mencakup rendering bersyarat, interaksi klik, aksesibilitas keyboard, kondisi saldo nol/subtotal tidak memenuhi syarat, status disabled, dan audit kepatuhan anti-slop tanpa karakter em dash.
+  - Total pengujian unit root aplikasi meningkat menjadi 102 file / 1.032 test cases yang lulus 100%.
+  - `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
+
 ## [1.0.4] - 2026-11-13
 
 ### Fitur E-Commerce Fase 2: Checkout Voucher Selector Mandiri & Auto-Discount Recommendation

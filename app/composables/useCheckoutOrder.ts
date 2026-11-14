@@ -14,6 +14,8 @@ import {
   calculateCheckoutTotalCents,
   createPlacedOrderSnapshot,
   buildCheckoutOrderPayload,
+  mapUserAddressToForm,
+  buildAddressSavePayload,
 } from '~/utils/checkout-pricing'
 
 export function useCheckoutOrder() {
@@ -86,27 +88,30 @@ export function useCheckoutOrder() {
   const displayTotalPrice = computed(
     () => placedOrderSnapshot.value?.totalPriceFormatted ?? cartStore.formattedTotalPrice,
   )
-  const displayDiscountAmount = computed(
-    () =>
+  const displayDiscountAmount = computed(() => {
+    return (
       placedOrderSnapshot.value?.discountFormatted ??
-      (cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null),
-  )
+      (cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null)
+    )
+  })
   const displayCouponCode = computed(
     () => placedOrderSnapshot.value?.couponCode ?? cartStore.appliedCoupon?.code ?? null,
   )
-  const displayCoinsDiscountAmount = computed(
-    () =>
+  const displayCoinsDiscountAmount = computed(() => {
+    return (
       placedOrderSnapshot.value?.coinsDiscountFormatted ??
-      (actualCoinsUsed.value > 0 ? formatRupiah(actualCoinsUsed.value) : null),
-  )
+      (actualCoinsUsed.value > 0 ? formatRupiah(actualCoinsUsed.value) : null)
+    )
+  })
   const displayCoinsUsed = computed(
     () => placedOrderSnapshot.value?.coinsUsed ?? actualCoinsUsed.value,
   )
-  const displayShippingFeeFormatted = computed(
-    () =>
+  const displayShippingFeeFormatted = computed(() => {
+    return (
       placedOrderSnapshot.value?.shippingFeeFormatted ??
-      (isFreeShipping.value ? 'Gratis Ongkir' : formatRupiah(shippingFeeCents.value / 100)),
-  )
+      (isFreeShipping.value ? 'Gratis Ongkir' : formatRupiah(shippingFeeCents.value / 100))
+    )
+  })
   const displayIsFreeShipping = computed(
     () => placedOrderSnapshot.value?.isFreeShipping ?? isFreeShipping.value,
   )
@@ -132,14 +137,7 @@ export function useCheckoutOrder() {
 
   const handleSelectSavedAddress = (saved: UserAddress) => {
     selectedSavedAddressId.value = saved.id
-    address.value = {
-      name: saved.name,
-      phone: saved.phone,
-      street: saved.street,
-      city: saved.city,
-      postal: saved.postal,
-      note: saved.note || '',
-    }
+    address.value = mapUserAddressToForm(saved)
     errors.value = {}
   }
 
@@ -241,15 +239,7 @@ export function useCheckoutOrder() {
       cartStore.clearCart()
 
       if (saveAddressForNextOrder.value && user.value) {
-        saveAddress({
-          name: address.value.name.trim(),
-          phone: address.value.phone.trim(),
-          street: address.value.street.trim(),
-          city: address.value.city.trim(),
-          postal: address.value.postal.trim(),
-          note: address.value.note?.trim() || undefined,
-          is_default: false,
-        }).catch(() => {})
+        saveAddress(buildAddressSavePayload(address.value)).catch(() => {})
       }
 
       if (config.public?.enableMidtrans) {
