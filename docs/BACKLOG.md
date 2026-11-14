@@ -77,6 +77,21 @@
 | Q-05 | Sebagai dev, saya ukur a11y + perf                        | Should    | ✅ SELESAI (2026-11-07, v0.33.0): Dimensi gambar eksplisit, `fetchpriority="high"` untuk LCP, `loading="lazy"` offscreen, eliminasi CLS (< 0.1), dan standar target sentuh WCAG 2.1 AA |
 | Q-06 | Sebagai dev, saya punya suite load testing k6 reproduktif | Must      | ✅ SELESAI (v1.0.2): Skenario catalog, checkout concurrency terautentikasi (anti-overselling terbukti), webhook dedup, health probe, runner CLI `pnpm test:load`, dan unit tests       |
 
+## EPIC 6 : Post-v1 Commerce Enhancements & Hardening (Fase 6)
+
+Spesifikasi arsitektural lengkap tercatat pada `docs/roadmap/extended-enhancements-plan.md`.
+
+| ID   | Story                                                                                   | Prioritas | AC                                                                                                                             |
+| ---- | --------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| E-01 | Sebagai sistem, saya kirim email transaksional otomatis saat order dibuat/bayar/kirim   | Must      | Dispatcher non-blocking & fail-open (`server/utils/email-dispatcher.ts`), audit log tercatat, transaksi DB tidak terganggu     |
+| E-02 | Sebagai pembeli, saya dapatkan saran autocomplete live di bilah pencarian navbar        | Should    | Latensi < 50ms (`/api/products/search-instant`), debounced 250ms, navigasi keyboard Arrow/Enter/Esc, preview thumbnail & harga |
+| E-03 | Sebagai pembeli, saya filter katalog berdasarkan rentang harga rupiah dan stok tersedia | Should    | Input min-max rupiah, quick chips, toggle in-stock only, sinkron query URL                                                     |
+| E-04 | Sebagai pembeli, saya menikmati kontrol etalase yang geometrinya selaras dengan admin   | Must      | Toolbar katalog, cart, dan checkout 100% menggunakan primitif `UiInput`, `UiSelect`, `UiCard`, `UiBadge`                       |
+| E-05 | Sebagai pembeli, saya lihat buku kas mutasi koin loyalitas dan dompet voucher saya      | Should    | Halaman `/account/coins` dan `/account/vouchers` dengan ledger mutasi transparan                                               |
+| E-06 | Sebagai pembeli, saya atur alamat utama agar otomatis terpilih saat checkout            | Should    | Flag `is_default`, update atomik, auto-select alamat utama saat checkout dibuka                                                |
+| E-07 | Sebagai admin, saya kelola data pelanggan dan lihat Customer Lifetime Value (LTV)       | Should    | Halaman `/admin/users`, total belanja pelanggan, order count, pencarian pelanggan                                              |
+| E-08 | Sebagai dev, saya amankan endpoint publik dengan rate limiting token bucket             | Must      | Limit login (5/min), checkout (10/min), search (30/min), response HTTP 429 Retry-After                                         |
+
 ## Out of Scope & Backlog Lanjutan (Belum Diimplementasikan)
 
 Fitur berikut tercatat resmi selesai pada siklus pengembangan berjalan:
