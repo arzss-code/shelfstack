@@ -2,6 +2,23 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [1.0.10] - 2026-11-14
+
+### Harmonisasi Desain: Penyelarasan Palet Warna Electric Blue Sesuai Standar Gallery Modernist
+
+- **Penyelarasan Warna Grafik Tren Penjualan Admin (`AdminSalesChart.vue`, 282 baris)**:
+  - Mengganti gradasi dan garis aksen oranye menjadi Electric Blue (`#0066ff`) khas ShelfStack sesuai panduan `DESIGN.md`.
+  - Area fill SVG kini menggunakan gradasi halus Electric Blue (`#0066ff`, opasitas 20% ke 0%).
+  - Garis tren polyline dan titik interaktif pada data points kini menggunakan warna Electric Blue murni (`#0066ff`).
+  - Menghilangkan diskrepansi warna antara grafik garis dengan tooltip angka omzet yang telah menggunakan `text-brand-accent`.
+- **Penyelarasan Template Email Transaksional (`shared/utils/email-templates.ts`, 264 baris)**:
+  - Memperbarui aksen tipografi wordmark header email menjadi Electric Blue (`#0066ff`) pada suku kata `STACK`.
+  - Menyelaraskan teks ringkasan total tagihan akhir dengan warna aksen Electric Blue (`#0066ff`).
+  - Menyelaraskan lencana status pengiriman (`order_shipped`) dengan token warna Electric Blue (`#0066ff`).
+- **Penyempurnaan Pengujian & Regresi**:
+  - Memperbarui `tests/unit/admin-sales-trends.spec.ts` untuk memverifikasi garis polyline SVG beraksen Electric Blue (`#0066ff`).
+  - Memperbarui `tests/unit/transactional-email.spec.ts` untuk memvalidasi penerapan styling warna Electric Blue (`#0066ff`) pada template HTML. Total pengujian unit root mencapai 108 file / 1.081 test cases yang lolos 100%.
+
 ## [1.0.9] - 2026-11-14
 
 ### Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview
@@ -13,7 +30,7 @@ Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
   - Melindungi akses endpoint menggunakan otorisasi ketat admin `requireAdmin(event)`.
 - **Komponen Visualisasi Grafik Responsif SVG Semantik (`AdminSalesChart.vue`, 282 baris)**:
   - Grafik tren omzet berbasis vektor murni tanpa ketergantungan library grafik eksternal yang berat.
-  - Dilengkapi area fill bergradasi oranye khas ShelfStack, garis tren polyline presisi, garis panduan horizontal bertingkat, serta titik interaktif dengan floating tooltip saat di-hover.
+  - Dilengkapi area fill bergradasi Electric Blue khas ShelfStack, garis tren polyline presisi, garis panduan horizontal bertingkat, serta titik interaktif dengan floating tooltip saat di-hover.
   - Kartu ringkasan metrik Total Omzet, Total Pesanan, dan Rata-rata Nilai Pesanan (AOV).
   - Terintegrasi langsung pada Dashboard Eksekutif Admin (`app/pages/admin/index.vue`, 169 baris).
 - **Layanan Template Email Transaksional Bersih (`shared/utils/email-templates.ts`, 268 baris)**:
@@ -844,7 +861,7 @@ Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 - **Bugfix Double Prefix**:
   - `formatCityDisplay()`: Memperbaiki bug duplikasi string seperti `Kota Kota Jakarta Selatan` dan `Kabupaten Kabupaten Bogor` dengan normalisasi regex guard clause berlapis, memastikan output kanonikal tepat dan bersih.
 - **Frontend 4-Tier Cascading Selector (Shopee-Style)**:
-  - `app/components/checkout/LocationPickerModal.vue`: Implementasi antarmuka 4 tab bertingkat (`Provinsi` -> `Kota` -> `Kecamatan` -> `Kode Pos`) dengan garis aktif aksen oranye, transisi otomatis saat item dipilih, navigasi fleksibel kembali ke tab sebelumnya, serta pencarian autocomplete instan di bar atas.
+  - `app/components/checkout/LocationPickerModal.vue`: Implementasi antarmuka 4 tab bertingkat (`Provinsi` -> `Kota` -> `Kecamatan` -> `Kode Pos`) dengan garis aktif aksen Primary Ink, transisi otomatis saat item dipilih, navigasi fleksibel kembali ke tab sebelumnya, serta pencarian autocomplete instan di bar atas.
   - Tetap ringkas dan modular di bawah 280 baris kode (mematuhi batasan <= 300 baris Talenavi SOP).
 - **Refactoring Modularitas Komponen**:
   - `app/components/checkout/SavedAddressForm.vue`: Mengekstrak form tambah alamat baru menjadi komponen mandiri (182 baris) sehingga `SavedAddressSelector.vue` terpangkas dari 447 baris menjadi 230 baris (keduanya <= 300 baris).

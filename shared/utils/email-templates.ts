@@ -68,7 +68,7 @@ export function generateEmailHtml(type: TransactionalEmailType, order: EmailOrde
     bannerTitle = 'Pesanan Sedang Dikirim'
     bannerDesc =
       'Kabar gembira! Paket pesanan Anda telah diserahkan kepada kurir mitra ekspedisi dan sedang menuju alamat Anda.'
-    statusBadgeColor = '#2563eb'
+    statusBadgeColor = '#0066ff'
     statusBadgeText = 'Dalam Pengiriman'
   }
 
@@ -114,7 +114,7 @@ export function generateEmailHtml(type: TransactionalEmailType, order: EmailOrde
               <table width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td>
-                    <div style="font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">SHELF<span style="color: #ea580c;">STACK</span></div>
+                    <div style="font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">SHELF<span style="color: #0066ff;">STACK</span></div>
                     <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">Kurasi Alat Presisi & Ruang Kerja</div>
                   </td>
                   <td align="right">
@@ -217,7 +217,7 @@ export function generateEmailHtml(type: TransactionalEmailType, order: EmailOrde
                 </tr>
                 <tr>
                   <td style="font-size: 14px; font-weight: 700; color: #0f172a; padding-top: 8px; border-top: 1px solid #e2e8f0;">Total Tagihan</td>
-                  <td align="right" style="font-size: 15px; font-weight: 800; font-family: monospace; color: #ea580c; padding-top: 8px; border-top: 1px solid #e2e8f0;">${formatCurrency(order.total_cents)}</td>
+                  <td align="right" style="font-size: 15px; font-weight: 800; font-family: monospace; color: #0066ff; padding-top: 8px; border-top: 1px solid #e2e8f0;">${formatCurrency(order.total_cents)}</td>
                 </tr>
               </table>
             </td>
