@@ -2,6 +2,17 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.1] - 2026-11-14
+
+### Standardisasi Versioning Staging & Konvensi Penamaan Branch
+
+- **Standardisasi SemVer Pre-release Staging (`version.json`)**:
+  - Menyelaraskan versi branch `develop` menjadi pre-release `1.1.0-beta.1` sesuai format SemVer 2.0.0 dan SOP Talenavi (`SOP-VERSIONING.md`).
+  - Menandai rilis minor baru (Sprint 26: Analitik Tren Penjualan SVG, Layanan Email Transaksional, dan Modal Pratinjau Interaktif) sebagai tahap pengujian/staging sebelum rilis stabil `v1.1.0` ke branch `main`.
+- **Harmonisasi Konvensi Penamaan Branch (`.agents/rules/pr-template-standards.md`, `AGENTS.md`)**:
+  - Menetapkan batas panjang rekomendasi nama branch fitur/fix antara 15 hingga 35 karakter (2 sampai 4 kata deskriptif).
+  - Melarang penamaan branch yang berbentuk kalimat panjang, merekomendasikan slug domain ringkas dan fokus (misal: `fix/email-preview-backdrop` atau `feat/analytics-chart`).
+
 ## [1.0.11] - 2026-11-14
 
 ### Perbaikan Tampilan Modal Pratinjau Email: Full-Screen Backdrop Teleport & Scroll Lock

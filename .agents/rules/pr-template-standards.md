@@ -4,16 +4,24 @@ Every Pull Request and branch created in this repository MUST follow industry-st
 
 ---
 
-## 1. Branch Naming Convention
+## 1. Branch Naming & Versioning Convention
 
-- Always use descriptive, domain-scoped branch names matching the actual technical scope:
-  - `feat/<domain-slug>` (e.g., `feat/seed-ecosystem-and-health-telemetry`)
-  - `fix/<domain-slug>` (e.g., `fix/order-detail-layout-grid`)
-  - `hotfix/<domain-slug>`
-  - `refactor/<domain-slug>`
-  - `chore/<domain-slug>`
-  - `docs/<domain-slug>`
-- **NEVER** use misleading labels like `production` or `prod` on feature/development branches.
+- **Allowed Branch Prefixes**:
+  - `feat/<domain-slug>`: New user-facing or technical features
+  - `fix/<domain-slug>`: Bug fixes and visual adjustments
+  - `hotfix/<domain-slug>`: Urgent critical production patches
+  - `refactor/<domain-slug>`: Code restructuring without behavior changes
+  - `chore/<domain-slug>`: Tooling, dependency, and configuration updates
+  - `docs/<domain-slug>`: Documentation, guides, and architectural notes
+- **Branch Name Length & Clarity Guidelines**:
+  - Keep domain slugs concise and focused: ideal length is **2 to 4 words** (around 15 to 35 characters).
+  - Avoid long sentence-like names (e.g., prefer `fix/email-preview-backdrop` over `fix/email-preview-modal-full-backdrop-and-scroll-lock`).
+  - Use lowercase alphanumeric characters and hyphens only (kebab-case).
+  - **NEVER** use misleading labels like `production` or `prod` on feature or development branches.
+  - Branch lifecycle is ephemeral: always delete the branch upon successful merge into `develop` or `main`.
+- **Environment & SemVer Alignment**:
+  - `develop` branch: Represents active integration and staging testing. Uses pre-release SemVer labels (`X.Y.Z-beta.N` during active sprint testing, `X.Y.Z-rc.N` during pre-release freeze).
+  - `main` branch: Represents stable production. Receives release merges from `develop` accompanied by official stable Git tags (`vX.Y.Z`).
 
 ---
 
