@@ -63,7 +63,7 @@ export default defineNuxtConfig({
     orderServiceUrl: process.env.ORDER_SERVICE_URL || 'http://127.0.0.1:4000',
     internalServiceKey: process.env.INTERNAL_SERVICE_KEY || '',
     resendApiKey: process.env.RESEND_API_KEY || '',
-    emailFrom: process.env.EMAIL_FROM || 'ShelfStack <noreply@shelfstack.co.id>',
+    emailFrom: process.env.EMAIL_FROM || 'ShelfStack <noreply@shelfstack.atsiilaarya.me>',
     emailProvider: process.env.EMAIL_PROVIDER || '',
     public: {
       enableMidtransSandbox: process.env.NUXT_PUBLIC_ENABLE_MIDTRANS_SANDBOX === 'true',

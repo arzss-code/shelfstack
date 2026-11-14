@@ -225,7 +225,7 @@ const handleCopyHtml = async () => {
               <div class="flex items-center gap-2 text-brand-muted">
                 <span class="w-16 font-semibold">Pengirim:</span>
                 <span class="text-brand-ink"
-                  >ShelfStack Official &lt;noreply@shelfstack.co.id&gt;</span
+                  >ShelfStack Official &lt;noreply@shelfstack.atsiilaarya.me&gt;</span
                 >
               </div>
               <div class="flex items-center gap-2 text-brand-muted">

@@ -53,7 +53,7 @@ function resolveEmailConfig(options?: DispatchEmailOptions) {
     options?.fromEmail ||
     process.env.EMAIL_FROM ||
     envFrom ||
-    'ShelfStack <noreply@shelfstack.co.id>'
+    'ShelfStack <noreply@shelfstack.atsiilaarya.me>'
 
   const raw = (
     options?.provider ||
