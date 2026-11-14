@@ -127,7 +127,7 @@ describe('Admin Sales Trends & Analytics', () => {
       expect(wrapper.text()).toContain('17 Pesanan')
     })
 
-    it('renders pure SVG elements with grid lines and data points', async () => {
+    it('renders pure SVG elements with grid lines and data points in brand electric blue', async () => {
       const wrapper = mount(AdminSalesChart, {
         props: { initialPeriod: '7d' },
       })
@@ -141,6 +141,9 @@ describe('Admin Sales Trends & Analytics', () => {
 
       const circles = wrapper.findAll('.data-points circle')
       expect(circles.length).toBeGreaterThan(0)
+
+      const line = wrapper.find('path[stroke="#0066ff"]')
+      expect(line.exists()).toBe(true)
     })
 
     it('switches period and triggers refetch when another period button is clicked', async () => {

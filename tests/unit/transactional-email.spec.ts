@@ -90,6 +90,7 @@ describe('Transactional Email Service & Preview Modal', () => {
       expect(html).toContain('Potongan Koin (100 Koin)')
       expect(html).toContain('GRATIS')
       expect(html).toContain('Jl. Sudirman No. 45 Blok B')
+      expect(html).toContain('color: #0066ff;')
     })
 
     it('includes tracking section only when type is order_shipped', () => {

@@ -200,8 +200,8 @@ const shouldShowLabel = (idx: number, total: number) => {
         >
           <defs>
             <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ea580c" stop-opacity="0.28" />
-              <stop offset="100%" stop-color="#ea580c" stop-opacity="0.0" />
+              <stop offset="0%" stop-color="#0066ff" stop-opacity="0.2" />
+              <stop offset="100%" stop-color="#0066ff" stop-opacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -233,7 +233,7 @@ const shouldShowLabel = (idx: number, total: number) => {
           <path
             :d="linePath"
             fill="none"
-            stroke="#ea580c"
+            stroke="#0066ff"
             stroke-width="2.5"
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -253,7 +253,7 @@ const shouldShowLabel = (idx: number, total: number) => {
                 :cx="coord.x"
                 :cy="coord.y"
                 r="6.5"
-                fill="#ea580c"
+                fill="#0066ff"
                 opacity="0.25"
               />
               <circle
@@ -261,7 +261,7 @@ const shouldShowLabel = (idx: number, total: number) => {
                 :cy="coord.y"
                 :r="hoveredIndex === idx ? 4 : 2.5"
                 fill="#ffffff"
-                stroke="#ea580c"
+                stroke="#0066ff"
                 stroke-width="2"
               />
               <text
