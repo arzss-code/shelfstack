@@ -4,7 +4,6 @@ import { checkoutSchema } from '../../../shared/schemas/order'
 import { calculateCheckoutHash, validateIdempotencyKey } from '../../utils/idempotency'
 import { logger } from '../../utils/logger'
 import { enqueueOrderExpiryNotification } from '../../utils/order-service'
-import { dispatchOrderTransactionalEmail } from '../../utils/email-dispatcher'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
