@@ -2,6 +2,40 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [1.0.8] - 2026-11-14
+
+### Fitur Storefront & Konfigurasi Produk: Product Variants SKU Matrix, Flash Sale Countdown, Social Share & Rating Filter
+
+- **Matriks Varian Produk & SKU Independen (`20261130000003_product_variants_and_sku_matrix.sql`, 412 baris)**:
+  - Membuat tabel `product_variants` dengan penegakan integritas data: `id` (UUID), `product_id` (FK cascade), `sku` (UNIQUE), `name`, `price_cents`, `stock`, `attributes` (JSONB), `is_active`, dan `deleted_at` untuk soft delete.
+  - Memperbarui tabel `order_items` dengan kolom opsional `variant_id` (FK set null).
+  - Memperbarui RPC transaksi `create_order` dengan penguncian baris deterministik (`FOR UPDATE`) pada tingkat varian maupun produk induk, validasi kecukupan stok, pemotongan stok atomik, dan snapshot data harga/nama varian.
+  - Memperbarui RPC `cancel_order` untuk mengembalikan kuantitas stok varian secara aman ketika pesanan dibatalkan atau kedaluwarsa.
+  - Endpoint `server/api/products/[id]/variants.get.ts` (75 baris) untuk mengambil daftar varian aktif produk.
+- **Konfigurasi Interaktif Varian Produk & Keranjang Belanja**:
+  - `useProductConfigurator.ts` (170 baris) menghitung `selectedVariant`, `effectivePrice`, `effectiveStock`, dan `effectiveSku` secara reaktif saat opsi warna dan atribut dipilih.
+  - `ProductConfigurator.vue` (260 baris) menampilkan pembaruan harga dan badge status stok varian secara dinamis.
+  - `app/features/cart/stores/cart.ts` (287 baris) mendukung pemisahan varian produk yang berbeda dalam keranjang serta agregasi kuantitas yang akurat untuk varian yang sama.
+  - `app/utils/checkout-pricing.ts` (169 baris) memetakan `variant_id` ke payload pemesanan checkout.
+- **Pemberitahuan & Pembagian Sosial Produk (`ProductSocialShare.vue`, 129 baris)**:
+  - Menyediakan tombol Bagikan ke WhatsApp dengan pesan terformat (nama produk, harga terformat rupiah, dan tautan kanonikal produk).
+  - Menyediakan tombol Salin Tautan dengan feedback status tersalin dan notifikasi toast.
+  - Mendukung Web Share API bawaan peramban pada perangkat mobile yang kompatibel.
+  - Terintegrasi pada halaman detail produk `app/pages/product/[id].vue` (240 baris).
+- **Penghitung Waktu Mundur Dinamis Flash Sale Harian (`app/pages/index.vue`, 189 baris)**:
+  - Menyediakan target waktu midnight harian (`dailyFlashSaleEnd`) yang dipassing ke komponen `HomeFlashDeals.vue`.
+  - Berdetak setiap detik secara reaktif dengan kalkulasi jam, menit, dan detik.
+- **Filter Rating Ulasan pada Etalase Katalog**:
+  - Menambahkan validasi `min_rating` pada `shared/schemas/product.ts` (58 baris) dan filter query database pada `server/api/products/index.ts` (178 baris).
+  - Menambahkan `ratingOptions`, `selectedRating`, dan sinkronisasi URL query pada `useKatalogFilters.ts` (205 baris).
+  - Menyediakan pilihan rating ulasan pada `KatalogSidebar.vue` (149 baris) dan `KatalogMobileFilter.vue` (129 baris).
+  - Menampilkan tag filter rating aktif dengan tombol hapus pada `KatalogActiveFilters.vue` (110 baris) dan halaman `app/pages/katalog.vue` (241 baris).
+- **Pengujian & Penjaminan Mutu**:
+  - Menambahkan 3 suite pengujian baru: `tests/unit/product-variants.spec.ts` (189 baris, 7 tests), `tests/unit/product-social-share.spec.ts` (151 baris, 5 tests), dan `tests/unit/katalog-rating-filter.spec.ts` (176 baris, 9 tests).
+  - Memperbarui `tests/unit/product-schema.spec.ts` (129 baris, 15 tests) dengan validasi rentang `min_rating`.
+  - Total pengujian unit root aplikasi mencapai 106 file / 1.067 test cases yang lolos 100% tanpa kegagalan.
+  - `pnpm lint` 0 error, `pnpm typecheck` EXIT 0, dan 100% berkas kode yang dibuat atau diubah mematuhi batas maksimal 300 baris.
+
 ## [1.0.7] - 2026-11-14
 
 ### Fitur Logistik & Dokumen Bisnis: Thermal Shipping Waybill A6 & Verifikasi QR Dokumen Resmi

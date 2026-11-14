@@ -15,12 +15,18 @@ export interface OrderItem {
   id: string
   order_id: string
   product_id: number
+  variant_id?: string | null
   qty: number
   price_cents: number
   product?: {
     id: number
     name: string
     image_url: string | null
+  } | null
+  variant?: {
+    id: string
+    name: string
+    sku?: string | null
   } | null
 }
 

@@ -1,10 +1,14 @@
-import type { Product } from '~/types/product'
+import type { Product, ProductVariant } from '~/types/product'
 import { getProductVariants } from '~/utils/product-specs'
 
 export interface ProductSelectionPayload {
   quantity: number
   color: string
   material: string
+  variantId?: string | null
+  variantName?: string | null
+  sku?: string | null
+  price?: number
 }
 
 export function useProductConfigurator(
@@ -32,14 +36,49 @@ export function useProductConfigurator(
     { immediate: true },
   )
 
+  const selectedVariant = computed<ProductVariant | null>(() => {
+    const p = getProduct()
+    if (!p.variants || p.variants.length === 0) return null
+    const match = p.variants.find((v) => {
+      if (!v.is_active || v.deleted_at) return false
+      const colorAttr = v.attributes.color || v.name
+      return (
+        colorAttr.toLowerCase() === selectedColor.value.toLowerCase() ||
+        v.name.toLowerCase().includes(selectedColor.value.toLowerCase())
+      )
+    })
+    return match || p.variants[0] || null
+  })
+
+  const effectivePrice = computed(() => {
+    if (selectedVariant.value?.price_cents) {
+      return selectedVariant.value.price_cents / 100
+    }
+    return getProduct().price
+  })
+
+  const effectiveStock = computed(() => {
+    if (selectedVariant.value) {
+      return selectedVariant.value.stock
+    }
+    return getProduct().stock
+  })
+
+  const effectiveSku = computed(() => {
+    if (selectedVariant.value?.sku) {
+      return selectedVariant.value.sku
+    }
+    return getProduct().sku || `SS-MOD-0${getProduct().id}`
+  })
+
   const ratingValue = computed(() => {
     const r = getProduct().rating
     return r && Number(r) > 0 ? Number(r) : null
   })
   const reviewCountValue = computed(() => getProduct().review_count ?? null)
 
-  const isOutOfStock = computed(() => getProduct().stock === 0)
-  const maxQuantity = computed(() => Math.max(1, getProduct().stock))
+  const isOutOfStock = computed(() => effectiveStock.value === 0)
+  const maxQuantity = computed(() => Math.max(1, effectiveStock.value))
 
   const incrementQty = () => {
     if (quantity.value < maxQuantity.value) {
@@ -88,6 +127,10 @@ export function useProductConfigurator(
       quantity: quantity.value,
       color: selectedColor.value,
       material: selectedMaterial.value,
+      variantId: selectedVariant.value?.id || null,
+      variantName: selectedVariant.value?.name || null,
+      sku: effectiveSku.value,
+      price: effectivePrice.value,
     })
   }
 
@@ -97,11 +140,19 @@ export function useProductConfigurator(
       quantity: quantity.value,
       color: selectedColor.value,
       material: selectedMaterial.value,
+      variantId: selectedVariant.value?.id || null,
+      variantName: selectedVariant.value?.name || null,
+      sku: effectiveSku.value,
+      price: effectivePrice.value,
     })
   }
 
   return {
     variants,
+    selectedVariant,
+    effectivePrice,
+    effectiveStock,
+    effectiveSku,
     quantity,
     selectedColor,
     selectedMaterial,

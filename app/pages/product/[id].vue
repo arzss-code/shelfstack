@@ -2,10 +2,12 @@
 import { useProductStore } from '~/features/products/stores/product'
 import { useCartStore } from '~/features/cart/stores/cart'
 import type { Product } from '~/types/product'
+import type { ProductSelectionPayload } from '~/composables/useProductConfigurator'
 import ProductGallery from '~/components/product/ProductGallery.vue'
 import ProductConfigurator from '~/components/product/ProductConfigurator.vue'
 import ProductReviewsSection from '~/components/product/ProductReviewsSection.vue'
 import ProductRelatedSection from '~/components/product/ProductRelatedSection.vue'
+import ProductSocialShare from '~/components/product/ProductSocialShare.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -113,19 +115,21 @@ onMounted(async () => {
   }
 })
 
-const onAddToBag = (payload: { quantity: number; color: string; material: string }) => {
+const onAddToBag = (payload: ProductSelectionPayload) => {
   if (!product.value) return
 
   cartStore.addItem({
     productId: product.value.id,
     slug: product.value.slug,
     name: product.value.name,
-    price: product.value.price,
+    price: payload.price || product.value.price,
     imageUrl: product.value.image_url,
     quantity: payload.quantity,
     stock: product.value.stock,
     color: payload.color,
     material: payload.material,
+    variantId: payload.variantId,
+    variantName: payload.variantName,
     openCartDrawer: true,
   })
 
@@ -137,19 +141,21 @@ const onAddToBag = (payload: { quantity: number; color: string; material: string
   })
 }
 
-const onBuyNow = (payload: { quantity: number; color: string; material: string }) => {
+const onBuyNow = (payload: ProductSelectionPayload) => {
   if (!product.value) return
 
   cartStore.addItem({
     productId: product.value.id,
     slug: product.value.slug,
     name: product.value.name,
-    price: product.value.price,
+    price: payload.price || product.value.price,
     imageUrl: product.value.image_url,
     quantity: payload.quantity,
     stock: product.value.stock,
     color: payload.color,
     material: payload.material,
+    variantId: payload.variantId,
+    variantName: payload.variantName,
     openCartDrawer: false,
   })
 
@@ -198,8 +204,9 @@ const onBuyNow = (payload: { quantity: number; color: string; material: string }
         <div class="lg:col-span-7">
           <ProductGallery :product="product" />
         </div>
-        <div class="lg:col-span-5">
+        <div class="lg:col-span-5 space-y-6">
           <ProductConfigurator :product="product" @add-to-bag="onAddToBag" @buy-now="onBuyNow" />
+          <ProductSocialShare :product="product" />
         </div>
       </div>
 

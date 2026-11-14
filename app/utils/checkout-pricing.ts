@@ -85,7 +85,11 @@ export function createPlacedOrderSnapshot<T = unknown>(input: PlacedOrderSnapsho
 }
 
 export interface BuildCheckoutOrderPayloadInput {
-  items: Array<{ productId: number; quantity: number }>
+  items: Array<{
+    productId: number
+    quantity: number
+    variantId?: string | null
+  }>
   address: {
     name: string
     phone: string
@@ -105,7 +109,11 @@ export interface BuildCheckoutOrderPayloadInput {
  */
 export function buildCheckoutOrderPayload(input: BuildCheckoutOrderPayloadInput) {
   return {
-    items: input.items.map((item) => ({ product_id: item.productId, qty: item.quantity })),
+    items: input.items.map((item) => ({
+      product_id: item.productId,
+      qty: item.quantity,
+      variant_id: item.variantId || undefined,
+    })),
     address: {
       name: input.address.name.trim(),
       phone: input.address.phone.trim(),

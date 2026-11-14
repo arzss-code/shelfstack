@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CategoryOption, PriceRange } from './KatalogSidebar.vue'
+import type { RatingOption } from '~/composables/useKatalogFilters'
 
 defineProps<{
   show: boolean
@@ -7,6 +8,8 @@ defineProps<{
   selectedCategory: string
   priceRanges: PriceRange[]
   selectedPriceRange: string
+  ratingOptions?: RatingOption[]
+  selectedRating?: string
   filteredProductsCount: number
 }>()
 
@@ -14,6 +17,7 @@ const emit = defineEmits<{
   close: []
   'update:selectedCategory': [value: string]
   'update:selectedPriceRange': [value: string]
+  'update:selectedRating': [value: string]
   reset: []
 }>()
 </script>
@@ -80,6 +84,33 @@ const emit = defineEmits<{
             @click="emit('update:selectedPriceRange', range.id)"
           >
             {{ range.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Rating Filter -->
+      <div
+        v-if="ratingOptions && ratingOptions.length > 0"
+        class="space-y-2 pt-2 border-t border-brand-hairsoft"
+      >
+        <label class="text-[11px] font-bold uppercase tracking-wider text-brand-muted block">
+          Rating Ulasan
+        </label>
+        <div class="grid grid-cols-1 gap-1.5">
+          <button
+            v-for="r in ratingOptions"
+            :key="r.id"
+            type="button"
+            :class="[
+              'p-2.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer truncate flex items-center justify-center gap-1.5',
+              selectedRating === r.id
+                ? 'bg-brand-ink text-white border-brand-ink font-semibold'
+                : 'bg-brand-canvas-soft border-brand-hair text-brand-muted hover:text-brand-ink',
+            ]"
+            @click="emit('update:selectedRating', r.id)"
+          >
+            <i v-if="r.id !== 'all'" class="pi pi-star-fill text-[11px] text-brand-warning" />
+            <span>{{ r.label }}</span>
           </button>
         </div>
       </div>

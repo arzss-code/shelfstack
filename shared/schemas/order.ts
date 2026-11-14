@@ -4,6 +4,7 @@ import { courierCodeSchema, shippingServiceSchema } from './shipping'
 export const checkoutItemSchema = z.object({
   product_id: z.number().int().positive('ID produk tidak valid.'),
   qty: z.number().int().min(1, 'Kuantitas minimal 1.').max(99, 'Kuantitas maksimal 99.'),
+  variant_id: z.string().uuid('ID varian tidak valid.').optional(),
 })
 
 export const checkoutAddressSchema = z.object({

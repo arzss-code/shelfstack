@@ -13,8 +13,19 @@ export default defineEventHandler(async (event) => {
       return errorResponse(event, 'Validation error', parsedQuery.error.flatten().fieldErrors, 400)
     }
 
-    const { from, to, q, category, min_price, max_price, stock_status, sort, page, limit } =
-      parsedQuery.data
+    const {
+      from,
+      to,
+      q,
+      category,
+      min_price,
+      max_price,
+      stock_status,
+      sort,
+      page,
+      limit,
+      min_rating,
+    } = parsedQuery.data
 
     // Kalkulasi range pagination: prioritaskan page & limit jika disediakan
     let rangeFrom = from
@@ -71,7 +82,12 @@ export default defineEventHandler(async (event) => {
       dbQuery = dbQuery.gt('stock', 0).lt('stock', 5)
     }
 
-    // 5. Sorting Profesional sekelas Shopee / Tokopedia
+    // 5. Filter Rating Minimum Ulasan
+    if (min_rating !== undefined && min_rating > 0) {
+      dbQuery = dbQuery.gte('rating', min_rating)
+    }
+
+    // 6. Sorting Profesional sekelas Shopee / Tokopedia
     if (sort === 'price-low') {
       dbQuery = dbQuery.order('price', { ascending: true })
     } else if (sort === 'price-high') {
