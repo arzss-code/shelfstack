@@ -94,6 +94,7 @@ describe('productListQuerySchema', () => {
       category: 'meja-kerja',
       min_price: '500000',
       max_price: '2000000',
+      min_rating: '4.5',
       stock_status: 'in_stock',
       sort: 'popular',
       page: '2',
@@ -106,11 +107,19 @@ describe('productListQuerySchema', () => {
       category: 'meja-kerja',
       min_price: 500000,
       max_price: 2000000,
+      min_rating: 4.5,
       stock_status: 'in_stock',
       sort: 'popular',
       page: 2,
       limit: 12,
     })
+  })
+
+  it('memvalidasi jangkauan min_rating (0-5)', () => {
+    expect(productListQuerySchema.parse({ min_rating: '0' }).min_rating).toBe(0)
+    expect(productListQuerySchema.parse({ min_rating: '5' }).min_rating).toBe(5)
+    expect(productListQuerySchema.safeParse({ min_rating: '-1' }).success).toBe(false)
+    expect(productListQuerySchema.safeParse({ min_rating: '5.1' }).success).toBe(false)
   })
 
   it('menolak sort dan stock_status yang tidak terdaftar', () => {

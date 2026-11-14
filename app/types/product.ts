@@ -1,3 +1,17 @@
+export interface ProductVariant {
+  id: string
+  product_id: number
+  sku: string
+  name: string
+  attributes: Record<string, string>
+  price_cents?: number | null
+  stock: number
+  is_active: boolean
+  created_at?: string
+  updated_at?: string
+  deleted_at?: string | null
+}
+
 export interface Product {
   id: number
   name: string
@@ -19,4 +33,5 @@ export interface Product {
   review_count?: number
   sold_count?: number
   is_featured?: boolean
+  variants?: ProductVariant[]
 }

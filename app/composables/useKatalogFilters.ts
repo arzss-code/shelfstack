@@ -1,6 +1,18 @@
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, getCurrentInstance } from 'vue'
 import type { SortOption } from '~/components/katalog/KatalogToolbar.vue'
 import type { PriceRange } from '~/components/katalog/KatalogSidebar.vue'
+
+export interface RatingOption {
+  id: string
+  label: string
+  minRating: number
+}
+
+export const ratingOptions: RatingOption[] = [
+  { id: 'all', label: 'Semua Rating', minRating: 0 },
+  { id: '4.5', label: 'Bintang 4.5 ke atas', minRating: 4.5 },
+  { id: '4.0', label: 'Bintang 4.0 ke atas', minRating: 4.0 },
+]
 
 export const sortOptions: SortOption[] = [
   { id: 'featured', label: 'Pilihan Kurator' },
@@ -24,6 +36,7 @@ export function useKatalogFilters() {
   const searchQuery = ref((route.query.q as string) || '')
   const selectedCategory = ref((route.query.category as string) || 'all')
   const selectedPriceRange = ref((route.query.price as string) || 'all')
+  const selectedRating = ref((route.query.rating as string) || 'all')
   const selectedSort = ref((route.query.sort as string) || 'featured')
   const currentPage = ref(parseInt((route.query.page as string) || '1', 10) || 1)
   const gridDensity = ref<'compact' | 'spacious'>('compact')
@@ -48,6 +61,13 @@ export function useKatalogFilters() {
       params.min_price = 2000000
     }
 
+    if (selectedRating.value !== 'all') {
+      const r = parseFloat(selectedRating.value)
+      if (!isNaN(r) && r > 0) {
+        params.min_rating = r
+      }
+    }
+
     return params
   })
 
@@ -56,6 +76,7 @@ export function useKatalogFilters() {
     if (searchQuery.value.trim()) query.q = searchQuery.value.trim()
     if (selectedCategory.value !== 'all') query.category = selectedCategory.value
     if (selectedPriceRange.value !== 'all') query.price = selectedPriceRange.value
+    if (selectedRating.value !== 'all') query.rating = selectedRating.value
     if (selectedSort.value !== 'featured') query.sort = selectedSort.value
     if (currentPage.value > 1) query.page = String(currentPage.value)
     router.replace({ query })
@@ -66,6 +87,7 @@ export function useKatalogFilters() {
     if (searchQuery.value.trim()) count++
     if (selectedCategory.value !== 'all') count++
     if (selectedPriceRange.value !== 'all') count++
+    if (selectedRating.value !== 'all') count++
     if (selectedSort.value !== 'featured') count++
     return count
   })
@@ -78,11 +100,13 @@ export function useKatalogFilters() {
 
   let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
-  onUnmounted(() => {
-    if (searchDebounceTimer) {
-      clearTimeout(searchDebounceTimer)
-    }
-  })
+  if (getCurrentInstance()) {
+    onUnmounted(() => {
+      if (searchDebounceTimer) {
+        clearTimeout(searchDebounceTimer)
+      }
+    })
+  }
 
   const clearSearch = () => {
     if (searchDebounceTimer) {
@@ -121,10 +145,23 @@ export function useKatalogFilters() {
     syncQuery()
   }
 
+  const handleRatingUpdate = (val: string) => {
+    selectedRating.value = val
+    currentPage.value = 1
+    syncQuery()
+  }
+
+  const handleClearRating = () => {
+    selectedRating.value = 'all'
+    currentPage.value = 1
+    syncQuery()
+  }
+
   const resetAllFilters = () => {
     searchQuery.value = ''
     selectedCategory.value = 'all'
     selectedPriceRange.value = 'all'
+    selectedRating.value = 'all'
     selectedSort.value = 'featured'
     currentPage.value = 1
     router.replace({ query: {} })
@@ -143,6 +180,7 @@ export function useKatalogFilters() {
     searchQuery,
     selectedCategory,
     selectedPriceRange,
+    selectedRating,
     selectedSort,
     currentPage,
     gridDensity,
@@ -151,6 +189,7 @@ export function useKatalogFilters() {
     queryParams,
     sortOptions,
     priceRanges,
+    ratingOptions,
     activeFiltersCount,
     selectCategory,
     clearSearch,
@@ -158,6 +197,8 @@ export function useKatalogFilters() {
     handleSortUpdate,
     handlePriceRangeUpdate,
     handleClearPriceRange,
+    handleRatingUpdate,
+    handleClearRating,
     resetAllFilters,
     changePage,
   }

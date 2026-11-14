@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 24 (Dokumen Bisnis Resmi: Thermal Shipping Waybill A6 & Verifikasi QR Dokumen Resmi)**
-- **Versi Rilis:** `v1.0.7` (`version.json`, `CHANGELOG.md` : sinkron)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 103 file / 1.045 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 25 (Fitur Storefront & Konfigurasi Produk: Product Variants SKU Matrix, Flash Sale Countdown, Social Share & Rating Filter)**
+- **Versi Rilis:** `v1.0.8` (`version.json`, `CHANGELOG.md` : sinkron)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 106 file / 1.067 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -334,6 +334,14 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Lembar Gaya Cetak Terpusat Dokumen (`print-documents.css`, 74 baris)**: Mengisolasi tata letak cetak dokumen faktur (A4) dan resi thermal (A6) menggunakan pemilih modern `:has()`, menonaktifkan seluruh elemen UI web lain saat dialog cetak browser aktif, terdaftar global di `nuxt.config.ts`.
     - **Integrasi Tombol Aksi Dokumen pada Halaman Admin Order Detail (`app/pages/admin/orders/[id].vue`, 240 baris)**: Menambahkan tombol aksi `Cetak Label Resi` dan `Cetak Invoice` pada status pesanan yang valid (paid, shipped, completed).
     - **Pengujian & Penjaminan Mutu**: Menambahkan 11 test case baru pada `tests/unit/invoice-and-waybill.spec.ts`. Total unit suite aplikasi meningkat menjadi 103 file / 1.045 test cases yang lolos 100%. `pnpm lint` 0 error / 0 warning dan `pnpm typecheck` EXIT 0.
+
+47. **Fitur Storefront & Konfigurasi Produk: Product Variants SKU Matrix, Flash Sale Countdown, Social Share & Rating Filter (SELESAI, v1.0.8).**
+    - **Matriks Varian Produk & SKU Independen (`20261130000003_product_variants_and_sku_matrix.sql`, 412 baris)**: Tabel `product_variants` dengan integritas data ketat, soft deletes (`deleted_at`), penambahan `order_items.variant_id`, pembaruan transaksi RPC `create_order` dengan penguncian deterministik (`FOR UPDATE`) pada tingkat varian, dan pembaruan RPC `cancel_order` untuk pengembalian stok varian. Endpoint `server/api/products/[id]/variants.get.ts` (75 baris).
+    - **Konfigurasi Interaktif Varian Produk & Keranjang Belanja**: Composable `useProductConfigurator.ts` (170 baris) menghitung `selectedVariant`, `effectivePrice`, `effectiveStock`, dan `effectiveSku` secara reaktif. `ProductConfigurator.vue` (260 baris) menampilkan harga dinamis dan badge stok. Toko keranjang `cart.ts` (287 baris) mendukung pemisahan varian berbeda dan agregasi kuantitas untuk varian sama. `checkout-pricing.ts` (169 baris) memetakan `variant_id` ke payload checkout.
+    - **Pemberitahuan & Pembagian Sosial Produk (`ProductSocialShare.vue`, 129 baris)**: Tombol Bagikan ke WhatsApp dengan pesan terformat (nama produk, harga rupiah, URL produk), tombol Salin Tautan dengan status tersalin dan toast feedback, serta integrasi Web Share API peramban pada halaman `app/pages/product/[id].vue` (240 baris).
+    - **Penghitung Waktu Mundur Dinamis Flash Sale Harian (`app/pages/index.vue`, 189 baris)**: Target waktu midnight harian (`dailyFlashSaleEnd`) yang dipassing ke `HomeFlashDeals.vue`, berdetak setiap detik secara reaktif.
+    - **Filter Rating Ulasan pada Etalase Katalog**: Validasi Zod `min_rating` pada `shared/schemas/product.ts` (58 baris), filter database pada `server/api/products/index.ts` (178 baris), opsi rating dan sinkronisasi URL query pada `useKatalogFilters.ts` (205 baris), pilihan rating ulasan pada `KatalogSidebar.vue` (149 baris) dan `KatalogMobileFilter.vue` (129 baris), serta chip filter aktif pada `KatalogActiveFilters.vue` (110 baris) dan `app/pages/katalog.vue` (241 baris).
+    - **Pengujian & Penjaminan Mutu**: 3 suite pengujian baru (`tests/unit/product-variants.spec.ts`, `tests/unit/product-social-share.spec.ts`, `tests/unit/katalog-rating-filter.spec.ts`) dan pembaruan `tests/unit/product-schema.spec.ts`. Total unit suite root mencapai 106 file / 1.067 test cases yang lolos 100%. `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
 
 ---
 

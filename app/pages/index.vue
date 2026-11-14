@@ -15,6 +15,13 @@ const toast = useUiToast()
 
 const featured = computed(() => productStore.products.slice(0, 4))
 
+// Waktu target promo kilat harian resmi (berakhir pada pergantian hari tengah malam)
+const dailyFlashSaleEnd = computed(() => {
+  const endOfDay = new Date()
+  endOfDay.setHours(24, 0, 0, 0)
+  return endOfDay.toISOString()
+})
+
 onMounted(async () => {
   try {
     await productStore.fetchProducts()
@@ -34,7 +41,7 @@ onMounted(async () => {
     <HomeHero />
     <HomeAssurances />
     <HomeFeaturedCategories />
-    <HomeFlashDeals />
+    <HomeFlashDeals :promo-ends-at="dailyFlashSaleEnd" />
     <HomeFeaturedProducts :products="featured" :loading="productStore.loading" />
     <HomeFeatures />
     <HomeReviews />

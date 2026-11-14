@@ -6,12 +6,15 @@ defineProps<{
   categoryLabel?: string
   selectedPriceRange: string
   priceRangeLabel?: string
+  selectedRating?: string
+  ratingLabel?: string
 }>()
 
 const emit = defineEmits<{
   clearSearch: []
   clearCategory: []
   clearPriceRange: []
+  clearRating: []
   resetAll: []
 }>()
 </script>
@@ -68,6 +71,27 @@ const emit = defineEmits<{
           class="hover:text-red-500 cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
           aria-label="Hapus filter harga"
           @click="emit('clearPriceRange')"
+        >
+          <i class="pi pi-times text-[10px]" />
+        </button>
+      </UiTooltip>
+    </span>
+
+    <!-- Rating tag -->
+    <span
+      v-if="selectedRating && selectedRating !== 'all' && ratingLabel"
+      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-field text-xs text-brand-ink border border-brand-hairsoft"
+    >
+      <span class="inline-flex items-center gap-1">
+        <i class="pi pi-star-fill text-[10px] text-brand-warning" />
+        <span>Rating: {{ ratingLabel }}</span>
+      </span>
+      <UiTooltip text="Hapus filter rating" position="top">
+        <button
+          type="button"
+          class="hover:text-red-500 cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
+          aria-label="Hapus filter rating"
+          @click="emit('clearRating')"
         >
           <i class="pi pi-times text-[10px]" />
         </button>

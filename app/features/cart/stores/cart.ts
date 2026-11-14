@@ -14,6 +14,8 @@ export interface CartItem {
   stock: number
   color?: string
   material?: string
+  variantId?: string | null
+  variantName?: string | null
 }
 
 export interface AppliedCoupon {
@@ -161,14 +163,18 @@ export const useCartStore = defineStore('cart', () => {
     stock: number
     color?: string
     material?: string
+    variantId?: string | null
+    variantName?: string | null
     openCartDrawer?: boolean
   }) => {
     const qtyToAdd = payload.quantity ?? 1
     const priceCents = payload.priceCents ?? Math.round(payload.price * 100)
+    const targetVariantId = payload.variantId || null
 
     const existingIndex = items.value.findIndex(
       (item) =>
         item.productId === payload.productId &&
+        (item.variantId || null) === targetVariantId &&
         item.color === payload.color &&
         item.material === payload.material,
     )
@@ -191,6 +197,8 @@ export const useCartStore = defineStore('cart', () => {
         stock: payload.stock,
         color: payload.color,
         material: payload.material,
+        variantId: payload.variantId || null,
+        variantName: payload.variantName || null,
       })
     }
 

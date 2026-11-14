@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { Product } from '~/types/product'
 import { formatRupiah } from '~/utils/format'
-import { useProductConfigurator } from '~/composables/useProductConfigurator'
+import {
+  useProductConfigurator,
+  type ProductSelectionPayload,
+} from '~/composables/useProductConfigurator'
 import WishlistButton from '~/components/wishlist/WishlistButton.vue'
 
 const props = defineProps<{
@@ -9,12 +12,16 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  addToBag: [payload: { quantity: number; color: string; material: string }]
-  buyNow: [payload: { quantity: number; color: string; material: string }]
+  addToBag: [payload: ProductSelectionPayload]
+  buyNow: [payload: ProductSelectionPayload]
 }>()
 
 const {
   variants,
+  selectedVariant,
+  effectivePrice,
+  effectiveStock,
+  effectiveSku,
   quantity,
   selectedColor,
   selectedMaterial,
@@ -41,14 +48,12 @@ const {
       <div class="flex items-center gap-2 mb-2">
         <UiBadge v-if="isOutOfStock" label="Stok Habis" variant="danger" />
         <UiBadge
-          v-else-if="product.stock < 5"
-          :label="`Sisa ${product.stock} Unit`"
+          v-else-if="effectiveStock < 5"
+          :label="`Sisa ${effectiveStock} Unit`"
           variant="warning"
         />
         <UiBadge v-else label="Tersedia · Siap Kirim" variant="success" />
-        <span class="text-xs text-brand-muted">
-          {{ product.sku ? `SKU: ${product.sku}` : `SKU: SS-MOD-0${product.id}` }}
-        </span>
+        <span class="text-xs text-brand-muted"> SKU: {{ effectiveSku }} </span>
       </div>
 
       <h1
@@ -89,7 +94,13 @@ const {
     <UiCard :padded="true" class="space-y-2 bg-brand-canvas-soft">
       <div class="flex items-baseline gap-3">
         <span class="font-display text-3xl font-bold text-brand-ink tabular-nums">
-          {{ formatRupiah(product.price) }}
+          {{ formatRupiah(effectivePrice) }}
+        </span>
+        <span
+          v-if="selectedVariant && selectedVariant.name"
+          class="text-xs font-semibold text-brand-muted"
+        >
+          ({{ selectedVariant.name }})
         </span>
       </div>
       <p class="font-body text-xs text-brand-muted m-0">
@@ -206,7 +217,7 @@ const {
           @click="handleAddToBag"
         >
           <span v-if="isOutOfStock">Stok Habis</span>
-          <span v-else> Tambah ke Bag · {{ formatRupiah(product.price * quantity) }} </span>
+          <span v-else> Tambah ke Bag · {{ formatRupiah(effectivePrice * quantity) }} </span>
         </UiButton>
 
         <!-- Wishlist Action Button -->

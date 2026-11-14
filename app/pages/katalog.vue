@@ -20,6 +20,7 @@ const {
   searchQuery,
   selectedCategory,
   selectedPriceRange,
+  selectedRating,
   selectedSort,
   currentPage,
   gridDensity,
@@ -28,6 +29,7 @@ const {
   queryParams,
   sortOptions,
   priceRanges,
+  ratingOptions,
   activeFiltersCount,
   selectCategory,
   clearSearch,
@@ -35,6 +37,8 @@ const {
   handleSortUpdate,
   handlePriceRangeUpdate,
   handleClearPriceRange,
+  handleRatingUpdate,
+  handleClearRating,
   resetAllFilters,
   changePage,
 } = useKatalogFilters()
@@ -97,6 +101,8 @@ const categories = computed(() => [
   }),
 ])
 
+const ratingLabel = computed(() => ratingOptions.find((r) => r.id === selectedRating.value)?.label)
+
 onMounted(async () => {
   await fetchCategories()
 })
@@ -146,9 +152,12 @@ onMounted(async () => {
       :category-label="categories.find((c) => c.id === selectedCategory)?.label"
       :selected-price-range="selectedPriceRange"
       :price-range-label="priceRanges.find((p) => p.id === selectedPriceRange)?.label"
+      :selected-rating="selectedRating"
+      :rating-label="ratingLabel"
       @clear-search="clearSearch"
       @clear-category="selectCategory('all')"
       @clear-price-range="handleClearPriceRange"
+      @clear-rating="handleClearRating"
       @reset-all="resetAllFilters"
     />
 
@@ -159,8 +168,11 @@ onMounted(async () => {
         :selected-category="selectedCategory"
         :price-ranges="priceRanges"
         :selected-price-range="selectedPriceRange"
+        :rating-options="ratingOptions"
+        :selected-rating="selectedRating"
         @update:selected-category="selectCategory"
         @update:selected-price-range="handlePriceRangeUpdate"
+        @update:selected-rating="handleRatingUpdate"
         @reset="resetAllFilters"
       />
 
@@ -214,10 +226,13 @@ onMounted(async () => {
       :selected-category="selectedCategory"
       :price-ranges="priceRanges"
       :selected-price-range="selectedPriceRange"
+      :rating-options="ratingOptions"
+      :selected-rating="selectedRating"
       :filtered-products-count="totalProducts"
       @close="showMobileFilterModal = false"
       @update:selected-category="selectCategory"
       @update:selected-price-range="handlePriceRangeUpdate"
+      @update:selected-rating="handleRatingUpdate"
       @reset="resetAllFilters"
     />
   </div>

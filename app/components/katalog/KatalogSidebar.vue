@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { RatingOption } from '~/composables/useKatalogFilters'
+
 export interface PriceRange {
   id: string
   label: string
@@ -14,11 +16,14 @@ defineProps<{
   selectedCategory: string
   priceRanges: PriceRange[]
   selectedPriceRange: string
+  ratingOptions?: RatingOption[]
+  selectedRating?: string
 }>()
 
 const emit = defineEmits<{
   'update:selectedCategory': [value: string]
   'update:selectedPriceRange': [value: string]
+  'update:selectedRating': [value: string]
   reset: []
 }>()
 </script>
@@ -85,6 +90,36 @@ const emit = defineEmits<{
           >
             <span>{{ range.label }}</span>
             <i v-if="selectedPriceRange === range.id" class="pi pi-check text-[10px]" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Rating Filter Section -->
+      <div
+        v-if="ratingOptions && ratingOptions.length > 0"
+        class="space-y-2.5 pt-5 border-t border-brand-hairsoft"
+      >
+        <h3 class="text-[11px] font-bold uppercase tracking-wider text-brand-muted m-0">
+          Rating Ulasan
+        </h3>
+        <div class="flex flex-col gap-1">
+          <button
+            v-for="r in ratingOptions"
+            :key="r.id"
+            type="button"
+            :class="[
+              'text-left px-3 py-2 rounded-field text-xs font-medium transition-all cursor-pointer border-0 flex items-center justify-between',
+              selectedRating === r.id
+                ? 'bg-brand-ink text-white font-semibold shadow-whisper'
+                : 'text-brand-muted bg-transparent hover:bg-brand-canvas-soft hover:text-brand-ink',
+            ]"
+            @click="emit('update:selectedRating', r.id)"
+          >
+            <div class="flex items-center gap-1.5">
+              <i v-if="r.id !== 'all'" class="pi pi-star-fill text-[11px] text-brand-warning" />
+              <span>{{ r.label }}</span>
+            </div>
+            <i v-if="selectedRating === r.id" class="pi pi-check text-[10px]" />
           </button>
         </div>
       </div>
