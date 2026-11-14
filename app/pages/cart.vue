@@ -108,9 +108,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
     <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       <!-- Items List -->
       <div class="lg:col-span-8 space-y-4">
-        <div
-          class="bg-brand-canvas border border-brand-hair rounded-card shadow-whisper divide-y divide-brand-hairsoft overflow-hidden"
-        >
+        <UiCard :padded="false" class="divide-y divide-brand-hairsoft">
           <article
             v-for="item in cartStore.items"
             :key="`${item.productId}-${item.color}-${item.material}`"
@@ -219,18 +217,17 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
 
               <!-- Delete Button -->
               <UiTooltip text="Hapus item" position="top" align="end">
-                <button
-                  type="button"
-                  class="text-brand-faint hover:text-brand-danger transition-colors p-1.5 cursor-pointer rounded-full hover:bg-brand-danger-tint"
-                  aria-label="Hapus produk"
+                <UiIconButton
+                  icon="pi-trash"
+                  label="Hapus produk"
+                  variant="danger"
+                  size="sm"
                   @click="cartStore.removeItem(item.productId, item.color, item.material)"
-                >
-                  <i class="pi pi-trash text-sm" />
-                </button>
+                />
               </UiTooltip>
             </div>
           </article>
-        </div>
+        </UiCard>
 
         <div class="flex items-center justify-between pt-2">
           <UiButton to="/katalog" variant="secondary" size="sm" icon="pi-arrow-left">

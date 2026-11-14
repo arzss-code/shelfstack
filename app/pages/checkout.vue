@@ -94,10 +94,7 @@ const {
     </div>
 
     <!-- Auth Guard Check -->
-    <div
-      v-if="!user"
-      class="mx-auto max-w-md space-y-4 rounded-card border border-brand-hair bg-brand-canvas p-8 text-center shadow-whisper"
-    >
+    <UiCard v-if="!user" class="mx-auto max-w-md space-y-4 p-8 text-center">
       <div
         class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-brand-ink"
       >
@@ -118,12 +115,12 @@ const {
       >
         Masuk ke Akun
       </UiButton>
-    </div>
+    </UiCard>
 
     <!-- Empty Cart Check -->
-    <div
+    <UiCard
       v-else-if="cartStore.isEmpty && !isOrderPlaced && !isSubmitting"
-      class="mx-auto max-w-md space-y-4 rounded-card border border-brand-hair bg-brand-canvas px-6 py-16 text-center shadow-whisper"
+      class="mx-auto max-w-md space-y-4 px-6 py-16 text-center"
     >
       <div
         class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-brand-muted"
@@ -142,7 +139,7 @@ const {
       <UiButton to="/katalog" variant="primary" size="sm" class="rounded-full px-5">
         Kembali ke Katalog
       </UiButton>
-    </div>
+    </UiCard>
 
     <!-- Checkout Main Content -->
     <div v-else class="grid grid-cols-1 gap-8 lg:grid-cols-12">
