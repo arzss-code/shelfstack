@@ -85,31 +85,8 @@ const navGroups = computed<NavGroup[]>(() => [
 ])
 
 const horizontalTabs = computed<NavItem[]>(() => [
-  { id: 'profile', label: 'Profil Saya', to: '/account/profile', icon: 'pi pi-user' },
-  { id: 'addresses', label: 'Daftar Alamat', to: '/account/addresses', icon: 'pi pi-map-marker' },
-  { id: 'points', label: 'Koin & Rewards', to: '/account/points', icon: 'pi pi-dollar' },
-  { id: 'orders', label: 'Pesanan Saya', to: '/orders', icon: 'pi pi-box' },
-  {
-    id: 'wishlist',
-    label: 'Wishlist',
-    to: '/wishlist',
-    icon: 'pi pi-heart',
-    badge: wishlistStore.totalItems,
-  },
-  {
-    id: 'vouchers',
-    label: 'Voucher Saya',
-    to: '/account/vouchers',
-    icon: 'pi pi-ticket',
-    badge: activeVoucherCount.value,
-  },
-  {
-    id: 'notifications',
-    label: 'Notifikasi',
-    to: '/notifications',
-    icon: 'pi pi-bell',
-    badge: notificationStore.unreadCount,
-  },
+  ...(navGroups.value[1]?.items || []),
+  ...(navGroups.value[0]?.items || []),
 ])
 
 const isItemActive = (to: string) => {

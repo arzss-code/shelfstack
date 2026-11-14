@@ -13,6 +13,10 @@ import {
   sendAdminSupportMessageApi,
   updateAdminSupportStatusApi,
   createAdminSupportState,
+  updateThreadFromInboxPayload,
+  sortAdminThreads,
+  validateAdminMessagePayload,
+  appendAdminSentMessage,
 } from '~/utils/support-chat-admin'
 import { SUPPORT_CANNED_RESPONSES, SUPPORT_STATUS_MAP } from '~~/server/utils/support-chat'
 import type {
@@ -96,20 +100,8 @@ export function useAdminSupportChat() {
       fetchThreads()
       return
     }
-    Object.assign(existing, {
-      last_message_text: updated.last_message_text,
-      last_message_at: updated.last_message_at,
-      status: updated.status,
-      updated_at: updated.updated_at,
-      unread_by_customer_count: updated.unread_by_customer_count,
-      unread_by_admin_count:
-        activeThreadId.value === updated.id ? 0 : updated.unread_by_admin_count,
-    })
-    threads.value.sort(
-      (a, b) =>
-        new Date(b.last_message_at || b.created_at).getTime() -
-        new Date(a.last_message_at || a.created_at).getTime(),
-    )
+    updateThreadFromInboxPayload(existing, updated, activeThreadId.value === updated.id)
+    sortAdminThreads(threads.value)
   }
 
   const subscribeInbox = () => {
@@ -227,15 +219,9 @@ export function useAdminSupportChat() {
       error.value = 'Pilih thread terlebih dahulu untuk mengirim balasan.'
       return false
     }
-    const payload: AdminSendSupportMessageInput =
-      typeof payloadOrText === 'string' ? { message_text: payloadOrText } : payloadOrText
-    const text = payload.message_text?.trim() || ''
-    if (!text) {
-      error.value = 'Balasan tidak boleh kosong.'
-      return false
-    }
-    if (text.length > 1000) {
-      error.value = 'Balasan maksimal 1000 karakter.'
+    const { payload, error: valErr } = validateAdminMessagePayload(payloadOrText)
+    if (valErr) {
+      error.value = valErr
       return false
     }
     isSending.value = true
@@ -243,16 +229,7 @@ export function useAdminSupportChat() {
     try {
       const newMsg = await sendAdminSupportMessageApi(activeThreadId.value, payload)
       if (newMsg) {
-        if (!messages.value.some((m) => m.id === newMsg.id)) messages.value.push(newMsg)
-        const current = threads.value.find((t) => t.id === activeThreadId.value)
-        if (current) {
-          Object.assign(current, {
-            last_message_text: newMsg.message_text,
-            last_message_at: newMsg.created_at,
-            status: 'waiting_customer' as const,
-            unread_by_admin_count: 0,
-          })
-        }
+        appendAdminSentMessage(threads.value, messages.value, newMsg, activeThreadId.value)
         return true
       }
       return false

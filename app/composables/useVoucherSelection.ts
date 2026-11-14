@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { useCartStore, type AppliedCoupon } from '~/features/cart/stores/cart'
-import type { CouponSummary } from '~~/shared/schemas/coupon'
+import type { AvailableCoupon, CouponSummary } from '~~/shared/schemas/coupon'
 import {
   calculateCouponDiscountCents,
   isCouponEligible,
@@ -11,29 +11,7 @@ import { useUiToast } from '~/composables/useUiToast'
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useUserVouchers } from '~/composables/useUserVouchers'
 
-export interface AvailableCoupon {
-  id: string
-  coupon_id?: string
-  code: string
-  name: string
-  description?: string | null
-  discount_type: 'percentage' | 'fixed'
-  discount_value: number
-  formatted_discount: string
-  max_discount_cents?: number | null
-  formatted_max_discount?: string | null
-  min_purchase_cents: number
-  formatted_min_purchase: string
-  usage_limit?: number | null
-  usage_count?: number
-  remaining_quota?: number | null
-  user_limit?: number | null
-  starts_at?: string | null
-  expires_at?: string | null
-  is_expired: boolean
-  is_available?: boolean
-  status?: string
-}
+export type { AvailableCoupon } from '~~/shared/schemas/coupon'
 
 export function useVoucherSelection(
   options: {

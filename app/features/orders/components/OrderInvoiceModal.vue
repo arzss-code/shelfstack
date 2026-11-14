@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import type { Order } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
+import {
+  formatInvoiceDate as formatDate,
+  formatInvoiceNumber,
+  getInvoiceShippingServiceName,
+  getInvoiceShippingFeeDisplay,
+} from '../utils/order-invoice'
 
 const props = defineProps<{
   visible: boolean
@@ -16,46 +22,13 @@ const isOpen = computed({
   set: (val: boolean) => emit('update:visible', val),
 })
 
-const formatDate = (dateStr: string) => {
-  try {
-    return new Intl.DateTimeFormat('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(dateStr))
-  } catch {
-    return dateStr
-  }
-}
-
-const invoiceNumber = computed(() => {
-  return `INV-${props.order.id.slice(0, 8).toUpperCase()}`
-})
-
-const shippingServiceName = computed(() => {
-  const service = props.order.shipping_service || 'reguler'
-  switch (service.toLowerCase()) {
-    case 'express':
-      return 'Kilat / Next Day'
-    case 'instant':
-      return 'Instan / Sameday'
-    case 'cargo':
-      return 'Kargo Ekonomis'
-    case 'reguler':
-    default:
-      return 'Reguler'
-  }
-})
-
-const shippingFeeDisplay = computed(() => {
-  const cost = props.order.shipping_cost_cents ?? 0
-  if (cost === 0) {
-    return 'Gratis'
-  }
-  return formatRupiah(cost / 100)
-})
+const invoiceNumber = computed(() => formatInvoiceNumber(props.order.id))
+const shippingServiceName = computed(() =>
+  getInvoiceShippingServiceName(props.order.shipping_service),
+)
+const shippingFeeDisplay = computed(() =>
+  getInvoiceShippingFeeDisplay(props.order.shipping_cost_cents),
+)
 
 const handlePrint = () => {
   if (import.meta.client) {
@@ -189,6 +162,42 @@ const handlePrint = () => {
       <!-- Financial Calculation Summary -->
       <div class="flex justify-end border-t border-brand-hair pt-4">
         <div class="w-full space-y-2 text-xs sm:w-64">
+          <div v-if="order.subtotal_cents" class="flex justify-between text-brand-muted">
+            <span>Subtotal Produk:</span>
+            <span class="font-medium tabular text-brand-ink">
+              {{ formatRupiah(order.subtotal_cents / 100) }}
+            </span>
+          </div>
+          <div
+            v-if="order.discount_cents && order.discount_cents > 0"
+            class="flex justify-between font-medium text-brand-success-text"
+          >
+            <span>Diskon Voucher{{ order.coupon_code ? ` (${order.coupon_code})` : '' }}:</span>
+            <span class="font-bold tabular"> -{{ formatRupiah(order.discount_cents / 100) }} </span>
+          </div>
+          <div
+            v-if="
+              (order.coins_discount_cents && order.coins_discount_cents > 0) ||
+              (order.coins_used && order.coins_used > 0)
+            "
+            class="flex justify-between font-medium text-amber-700 dark:text-amber-400"
+          >
+            <span
+              >Potongan Koin{{
+                order.coins_used
+                  ? ` (${new Intl.NumberFormat('id-ID').format(order.coins_used)} Koin)`
+                  : ''
+              }}:</span
+            >
+            <span class="font-bold tabular">
+              -{{
+                formatRupiah(
+                  (order.coins_discount_cents ?? (order.coins_used ? order.coins_used * 100 : 0)) /
+                    100,
+                )
+              }}
+            </span>
+          </div>
           <div class="flex justify-between text-brand-muted">
             <span>Biaya Pengiriman ({{ shippingServiceName }}):</span>
             <span
@@ -241,15 +250,12 @@ const handlePrint = () => {
 <style>
 /*
  * Pratinjau cetak: hanya lembar invoice yang dicetak.
- * Gate `body:has(.invoice-sheet)` membuat aturan ini hanya aktif selama modal terbuka,
- * sehingga kerangka aplikasi dan chrome modal (header, footer, overlay) tidak ikut tercetak.
- * Dibuat global karena chrome modal dirender di dalam UiModal, di luar scope komponen ini.
+ * Gate body:has(.invoice-sheet) hanya aktif selama modal terbuka.
  */
 @media print {
   body:has(.invoice-sheet) #__nuxt {
     display: none !important;
   }
-
   body:has(.invoice-sheet) > div {
     position: static !important;
     display: block !important;
@@ -258,7 +264,6 @@ const handlePrint = () => {
     backdrop-filter: none !important;
     overflow: visible !important;
   }
-
   body:has(.invoice-sheet) > div > div {
     max-width: none !important;
     border: 0 !important;
@@ -266,18 +271,15 @@ const handlePrint = () => {
     box-shadow: none !important;
     overflow: visible !important;
   }
-
   body:has(.invoice-sheet) > div > div > header,
   body:has(.invoice-sheet) > div > div > footer,
   body:has(.invoice-sheet) .no-print {
     display: none !important;
   }
-
   body:has(.invoice-sheet) > div > div > div {
     overflow: visible !important;
     padding: 0 !important;
   }
-
   body:has(.invoice-sheet) .invoice-sheet {
     padding: 0 !important;
     background: white !important;

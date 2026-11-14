@@ -13,6 +13,7 @@ import {
   parseSendPayload,
 } from '~/utils/support-chat-common'
 import type {
+  SendSupportMessageInput,
   SupportAttachmentType,
   SupportMessageItem,
   SupportThreadItem,
@@ -127,17 +128,7 @@ export function useSupportChat() {
     }
   }
 
-  const sendMessage = async (
-    payloadOrText:
-      | string
-      | {
-          message_text: string
-          attachment_url?: string | null
-          attachment_type?: SupportAttachmentType | null
-          attached_order_id?: string | null
-          attached_product_id?: number | null
-        },
-  ): Promise<boolean> => {
+  const sendMessage = async (payloadOrText: string | SendSupportMessageInput): Promise<boolean> => {
     if (!isLoggedIn.value) {
       error.value = 'Silakan masuk terlebih dahulu untuk mengirim pesan.'
       return false

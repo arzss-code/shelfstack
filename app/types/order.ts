@@ -32,6 +32,9 @@ export interface Order {
   discount_cents?: number
   coupon_id?: string | null
   coupon_code?: string | null
+  coins_used?: number
+  coins_discount_cents?: number
+  coins_earned?: number
   status: OrderStatus
   address: OrderAddress
   snap_token?: string | null

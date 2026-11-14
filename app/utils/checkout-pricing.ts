@@ -1,4 +1,15 @@
 import { formatRupiah } from '~/utils/format'
+import { checkoutAddressSchema } from '~~/shared/schemas/order'
+
+export function validateCheckoutAddress(address: unknown): Record<string, string> {
+  const result = checkoutAddressSchema.safeParse(address)
+  if (result.success) return {}
+  const errors: Record<string, string> = {}
+  for (const [key, msgs] of Object.entries(result.error.flatten().fieldErrors)) {
+    if (msgs?.[0]) errors[key] = msgs[0]
+  }
+  return errors
+}
 
 export interface CheckoutPricingInput {
   finalPriceCents: number
