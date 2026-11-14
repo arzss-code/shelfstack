@@ -6,6 +6,7 @@ import {
   generateEmailHtml,
   type EmailOrderData,
 } from '../../shared/utils/email-templates'
+import { buildEmailOrderData } from '../../app/features/orders/utils/order-email'
 import type { Order } from '../../app/types/order'
 
 const mockToastAdd = vi.fn()
@@ -144,6 +145,8 @@ describe('Transactional Email Service & Preview Modal', () => {
     }
 
     const globalStubs = {
+      Teleport: true,
+      ClientOnly: { template: '<slot />' },
       UiButton: {
         template: '<button type="button"><slot /></button>',
         props: ['variant', 'size', 'icon'],
@@ -228,6 +231,45 @@ describe('Transactional Email Service & Preview Modal', () => {
       await closeBtn?.trigger('click')
 
       expect(wrapper.emitted('close')).toBeTruthy()
+    })
+
+    it('manages modal-open scroll lock and closes on Escape key', async () => {
+      const wrapper = mount(AdminEmailPreviewModal, {
+        props: { show: true, order: mockOrder },
+        global: { stubs: globalStubs },
+      })
+
+      expect(document.documentElement.classList.contains('modal-open')).toBe(true)
+
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+      expect(wrapper.emitted('close')).toBeTruthy()
+
+      await wrapper.setProps({ show: false })
+      expect(document.documentElement.classList.contains('modal-open')).toBe(false)
+    })
+
+    it('renders full-screen overlay with z-[1000] for complete backdrop coverage', () => {
+      const wrapper = mount(AdminEmailPreviewModal, {
+        props: { show: true, order: mockOrder },
+        global: { stubs: globalStubs },
+      })
+
+      const overlay = wrapper.find('.fixed.inset-0')
+      expect(overlay.exists()).toBe(true)
+      expect(overlay.classes()).toContain('z-[1000]')
+      expect(overlay.classes()).toContain('bg-black/60')
+    })
+
+    it('adapts order data via buildEmailOrderData with correct fallbacks', () => {
+      const adapted = buildEmailOrderData(mockOrder)
+      expect(adapted.id).toBe(mockOrder.id)
+      expect(adapted.items[0]?.name).toBe('Headphone Studio ANC')
+      expect(adapted.items[0]?.price).toBe(2680000)
+
+      const fallback = buildEmailOrderData(null)
+      expect(fallback.id).toBe('ord-sample-9921')
+      expect(fallback.customer_name).toBe('Budi Santoso')
+      expect(fallback.items).toHaveLength(2)
     })
   })
 })
