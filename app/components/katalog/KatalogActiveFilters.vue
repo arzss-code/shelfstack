@@ -4,8 +4,8 @@ defineProps<{
   searchQuery: string
   selectedCategory: string
   categoryLabel?: string
-  selectedPriceRange: string
   priceRangeLabel?: string
+  inStockOnly?: boolean
   selectedRating?: string
   ratingLabel?: string
 }>()
@@ -14,6 +14,7 @@ const emit = defineEmits<{
   clearSearch: []
   clearCategory: []
   clearPriceRange: []
+  clearInStock: []
   clearRating: []
   resetAll: []
 }>()
@@ -61,7 +62,7 @@ const emit = defineEmits<{
 
     <!-- Price range tag -->
     <span
-      v-if="selectedPriceRange !== 'all' && priceRangeLabel"
+      v-if="priceRangeLabel"
       class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-field text-xs text-brand-ink border border-brand-hairsoft"
     >
       <span>Harga: {{ priceRangeLabel }}</span>
@@ -71,6 +72,27 @@ const emit = defineEmits<{
           class="hover:text-red-500 cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
           aria-label="Hapus filter harga"
           @click="emit('clearPriceRange')"
+        >
+          <i class="pi pi-times text-[10px]" />
+        </button>
+      </UiTooltip>
+    </span>
+
+    <!-- In-Stock Only tag -->
+    <span
+      v-if="inStockOnly"
+      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-field text-xs text-brand-ink border border-brand-hairsoft"
+    >
+      <span class="inline-flex items-center gap-1">
+        <i class="pi pi-check text-[10px] text-brand-success" />
+        <span>Stok Tersedia</span>
+      </span>
+      <UiTooltip text="Hapus filter stok tersedia" position="top">
+        <button
+          type="button"
+          class="hover:text-red-500 cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
+          aria-label="Hapus filter stok tersedia"
+          @click="emit('clearInStock')"
         >
           <i class="pi pi-times text-[10px]" />
         </button>

@@ -1,6 +1,5 @@
 import { ref, computed, onUnmounted, getCurrentInstance } from 'vue'
 import type { SortOption } from '~/components/katalog/KatalogToolbar.vue'
-import type { PriceRange } from '~/components/katalog/KatalogSidebar.vue'
 
 export interface RatingOption {
   id: string
@@ -22,26 +21,30 @@ export const sortOptions: SortOption[] = [
   { id: 'name-asc', label: 'Nama: A-Z' },
 ]
 
-export const priceRanges: PriceRange[] = [
-  { id: 'all', label: 'Semua Harga' },
-  { id: 'under500k', label: 'Di bawah Rp 500rb' },
-  { id: '500k-2m', label: 'Rp 500rb – Rp 2jt' },
-  { id: 'above2m', label: 'Di atas Rp 2jt' },
-]
-
 export function useKatalogFilters() {
   const route = useRoute()
   const router = useRouter()
 
   const searchQuery = ref((route.query.q as string) || '')
   const selectedCategory = ref((route.query.category as string) || 'all')
-  const selectedPriceRange = ref((route.query.price as string) || 'all')
   const selectedRating = ref((route.query.rating as string) || 'all')
   const selectedSort = ref((route.query.sort as string) || 'featured')
   const currentPage = ref(parseInt((route.query.page as string) || '1', 10) || 1)
   const gridDensity = ref<'compact' | 'spacious'>('compact')
   const showMobileFilterModal = ref(false)
   const itemsPerPage = 12
+
+  // Filter Rentang Harga (Min, Max, dan Quick Chip ID)
+  const minPrice = ref<number | undefined>(
+    route.query.min_price ? parseInt(route.query.min_price as string, 10) : undefined,
+  )
+  const maxPrice = ref<number | undefined>(
+    route.query.max_price ? parseInt(route.query.max_price as string, 10) : undefined,
+  )
+  const selectedPriceChip = ref<string>((route.query.price_chip as string) || 'all')
+
+  // Filter Ketersediaan Stok (In-Stock Only)
+  const inStockOnly = ref<boolean>(route.query.stock_status === 'in_stock')
 
   const queryParams = computed(() => {
     const params: Record<string, string | number> = {
@@ -52,13 +55,11 @@ export function useKatalogFilters() {
     if (searchQuery.value.trim()) params.q = searchQuery.value.trim()
     if (selectedCategory.value !== 'all') params.category = selectedCategory.value
 
-    if (selectedPriceRange.value === 'under500k') {
-      params.max_price = 500000
-    } else if (selectedPriceRange.value === '500k-2m') {
-      params.min_price = 500000
-      params.max_price = 2000000
-    } else if (selectedPriceRange.value === 'above2m') {
-      params.min_price = 2000000
+    if (minPrice.value !== undefined) params.min_price = minPrice.value
+    if (maxPrice.value !== undefined) params.max_price = maxPrice.value
+
+    if (inStockOnly.value) {
+      params.stock_status = 'in_stock'
     }
 
     if (selectedRating.value !== 'all') {
@@ -75,10 +76,16 @@ export function useKatalogFilters() {
     const query: Record<string, string> = {}
     if (searchQuery.value.trim()) query.q = searchQuery.value.trim()
     if (selectedCategory.value !== 'all') query.category = selectedCategory.value
-    if (selectedPriceRange.value !== 'all') query.price = selectedPriceRange.value
+    if (minPrice.value !== undefined) query.min_price = String(minPrice.value)
+    if (maxPrice.value !== undefined) query.max_price = String(maxPrice.value)
+    if (selectedPriceChip.value && selectedPriceChip.value !== 'all') {
+      query.price_chip = selectedPriceChip.value
+    }
+    if (inStockOnly.value) query.stock_status = 'in_stock'
     if (selectedRating.value !== 'all') query.rating = selectedRating.value
     if (selectedSort.value !== 'featured') query.sort = selectedSort.value
     if (currentPage.value > 1) query.page = String(currentPage.value)
+
     router.replace({ query })
   }
 
@@ -86,10 +93,28 @@ export function useKatalogFilters() {
     let count = 0
     if (searchQuery.value.trim()) count++
     if (selectedCategory.value !== 'all') count++
-    if (selectedPriceRange.value !== 'all') count++
+    if (minPrice.value !== undefined || maxPrice.value !== undefined) count++
+    if (inStockOnly.value) count++
     if (selectedRating.value !== 'all') count++
     if (selectedSort.value !== 'featured') count++
     return count
+  })
+
+  const priceRangeLabel = computed(() => {
+    if (selectedPriceChip.value === 'under250k') return '< Rp 250rb'
+    if (selectedPriceChip.value === '250k-1m') return 'Rp 250rb - 1jt'
+    if (selectedPriceChip.value === 'above1m') return '> Rp 1jt'
+
+    if (minPrice.value !== undefined && maxPrice.value !== undefined) {
+      return `Rp ${(minPrice.value / 1000).toLocaleString('id-ID')}rb - ${(maxPrice.value / 1000).toLocaleString('id-ID')}rb`
+    }
+    if (minPrice.value !== undefined) {
+      return `> Rp ${(minPrice.value / 1000).toLocaleString('id-ID')}rb`
+    }
+    if (maxPrice.value !== undefined) {
+      return `< Rp ${(maxPrice.value / 1000).toLocaleString('id-ID')}rb`
+    }
+    return undefined
   })
 
   const selectCategory = (catId: string) => {
@@ -133,14 +158,24 @@ export function useKatalogFilters() {
     syncQuery()
   }
 
-  const handlePriceRangeUpdate = (val: string) => {
-    selectedPriceRange.value = val
+  const handlePriceRangeApply = (min?: number, max?: number, chipId?: string) => {
+    minPrice.value = min
+    maxPrice.value = max
+    selectedPriceChip.value = chipId || 'custom'
     currentPage.value = 1
     syncQuery()
   }
 
   const handleClearPriceRange = () => {
-    selectedPriceRange.value = 'all'
+    minPrice.value = undefined
+    maxPrice.value = undefined
+    selectedPriceChip.value = 'all'
+    currentPage.value = 1
+    syncQuery()
+  }
+
+  const toggleInStockOnly = () => {
+    inStockOnly.value = !inStockOnly.value
     currentPage.value = 1
     syncQuery()
   }
@@ -160,7 +195,10 @@ export function useKatalogFilters() {
   const resetAllFilters = () => {
     searchQuery.value = ''
     selectedCategory.value = 'all'
-    selectedPriceRange.value = 'all'
+    minPrice.value = undefined
+    maxPrice.value = undefined
+    selectedPriceChip.value = 'all'
+    inStockOnly.value = false
     selectedRating.value = 'all'
     selectedSort.value = 'featured'
     currentPage.value = 1
@@ -179,7 +217,11 @@ export function useKatalogFilters() {
   return {
     searchQuery,
     selectedCategory,
-    selectedPriceRange,
+    minPrice,
+    maxPrice,
+    selectedPriceChip,
+    priceRangeLabel,
+    inStockOnly,
     selectedRating,
     selectedSort,
     currentPage,
@@ -188,15 +230,15 @@ export function useKatalogFilters() {
     itemsPerPage,
     queryParams,
     sortOptions,
-    priceRanges,
     ratingOptions,
     activeFiltersCount,
     selectCategory,
     clearSearch,
     handleSearchUpdate,
     handleSortUpdate,
-    handlePriceRangeUpdate,
+    handlePriceRangeApply,
     handleClearPriceRange,
+    toggleInStockOnly,
     handleRatingUpdate,
     handleClearRating,
     resetAllFilters,

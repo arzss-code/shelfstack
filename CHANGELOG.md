@@ -2,6 +2,23 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.2] - 2026-11-14
+
+### Filter Rentang Harga Min-Max Rupiah & Ketersediaan Stok Katalog
+
+- **Komponen Input Filter Rentang Harga (`app/components/katalog/KatalogPriceRangeFilter.vue`, 161 baris)**:
+  - Form input numerik min/max terformat Rupiah otomatis (`useRupiahParser`) dengan validasi interaktif.
+  - Quick-preset chips harga belanja populer (Di bawah 50rb, 50rb-100rb, 100rb-250rb, 250rb-500rb, Di atas 500rb).
+  - Integrasi tombol Terapkan dan Reset dengan debounce input yang mulus.
+- **Toggle Ketersediaan Stok Produk (`in_stock_only`)**:
+  - Switch toggle interaktif pada sidebar desktop dan drawer mobile untuk menyaring produk stok habis.
+  - Indikator aktif pada `KatalogActiveFilters.vue` dengan badge visual dan tombol hapus individual.
+- **Ekstensi Reaktivitas Filter Katalog (`app/composables/useKatalogFilters.ts`, 247 baris)**:
+  - Sinkronisasi dua arah dengan parameter URL (`min_price`, `max_price`, `price_chip`, `in_stock`).
+  - Pembersihan dan reset multi-kriteria tanpa merusak status pencarian atau kategori utama.
+- **Pengujian Unit & Komponen (`tests/unit/katalog-price-and-stock-filter.spec.ts`, 198 baris)**:
+  - 10 unit test komprehensif menguji parser Rupiah, validasi min > max, chip presets, filter stok habis, dan sinkronisasi route URL.
+
 ## [v1.1.0-beta.1] - 2026-11-14
 
 ### Standardisasi Versioning Staging & Konvensi Penamaan Branch
