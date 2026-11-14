@@ -2,7 +2,6 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import type { OrderStatus } from '../../../../shared/constants/order-transitions'
 import type { CourierCode } from '../../../../shared/schemas/shipping'
-import { dispatchOrderTransactionalEmail } from '../../../utils/email-dispatcher'
 
 export default defineEventHandler(async (event) => {
   // Hanya administrator yang dapat memperbarui status pesanan secara manual

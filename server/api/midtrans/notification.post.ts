@@ -10,7 +10,6 @@ import {
 } from '../../utils/midtrans'
 import { logger } from '../../utils/logger'
 import { metrics } from '../../utils/metrics'
-import { dispatchOrderTransactionalEmail } from '../../utils/email-dispatcher'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)

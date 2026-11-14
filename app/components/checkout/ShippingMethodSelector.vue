@@ -82,10 +82,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
 </script>
 
 <template>
-  <div
-    class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-5"
-    :class="{ 'opacity-60 pointer-events-none': disabled }"
-  >
+  <UiCard class="space-y-5" :class="{ 'opacity-60 pointer-events-none': disabled }">
     <!-- Header -->
     <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
       <div class="flex items-center gap-2">
@@ -226,5 +223,5 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
         </button>
       </div>
     </div>
-  </div>
+  </UiCard>
 </template>

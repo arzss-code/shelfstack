@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 26 (Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview)**
-- **Versi Rilis:** `v1.1.0-beta.1` (Pre-release Staging / develop aktif : sinkron dengan `version.json`)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 113 file / 1.127 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v1.1.0-beta.3` (Pre-release Staging / develop aktif : sinkron dengan `version.json`)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 114 file / 1.135 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -405,17 +405,11 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
     - Status: ✅ **SELESAI 2026-11-14** (Endpoint latensi rendah `/api/products/search-instant`, floating autocomplete popover dengan preview thumbnail dan harga, serta navigasi keyboard penuh ArrowUp, ArrowDown, Enter, Esc).
 13. ~~**Filter Rentang Harga Min-Max Rupiah & In-Stock Only (E-03)**~~:
     - Status: ✅ **SELESAI 2026-11-14** (Filter harga interaktif dengan quick chips, input batas min-max rupiah tervalidasi, toggle produk tersedia, sinkronisasi URL query, dan tag filter aktif).
-14. **Unifikasi Geometri Primitif Etalase (E-04)**:
-    - Status: ⏳ Direncanakan (Known Gap). Penyelarasan kontrol katalog, keranjang, dan checkout menggunakan primitif `Ui*` resmi.
+14. ~~**Unifikasi Geometri Primitif Etalase (E-04)**~~:
+    - Status: ✅ **SELESAI 2026-11-14** (Penyelarasan kontrol katalog, keranjang belanja, dan formulir checkout 100% menggunakan primitif `UiInput`, `UiSelect`, `UiCard`, `UiBadge`, `UiIconButton`, dan `UiButton`, serta 8 unit test di `tests/unit/storefront-primitives-unification.spec.ts`).
 15. **Customer Portal: Ledger Koin, Voucher & Alamat Utama (E-05, E-06)**:
     - Status: ⏳ Direncanakan. Halaman `/account/coins`, `/account/vouchers`, dan opsi alamat pengiriman utama otomatis.
 16. **Admin CRM Pelanggan & Rate Limiting Token Bucket (E-07, E-08)**:
-    - Status: ⏳ Direncanakan. Halaman `/admin/users` (LTV dan riwayat order pembeli) serta middleware proteksi brute-force/spam HTTP 429.
-17. **Unifikasi Geometri Primitif Etalase (E-04)**:
-    - Status: ⏳ Direncanakan (Known Gap). Penyelarasan kontrol katalog, keranjang, dan checkout menggunakan primitif `Ui*` resmi.
-18. **Customer Portal: Ledger Koin, Voucher & Alamat Utama (E-05, E-06)**:
-    - Status: ⏳ Direncanakan. Halaman `/account/coins`, `/account/vouchers`, dan opsi alamat pengiriman utama otomatis.
-19. **Admin CRM Pelanggan & Rate Limiting Token Bucket (E-07, E-08)**:
     - Status: ⏳ Direncanakan. Halaman `/admin/users` (LTV dan riwayat order pembeli) serta middleware proteksi brute-force/spam HTTP 429.
 
 ## 📋 Catatan Teknis & Konvensi Wajib

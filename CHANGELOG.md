@@ -2,6 +2,25 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.3] - 2026-11-14
+
+### Unifikasi Geometri Primitif Etalase (Known Gap)
+
+- **Toolbar Pencarian & Sortir Katalog (`app/components/katalog/KatalogToolbar.vue`, 123 baris)**:
+  - Mengintegrasikan primitif resmi `<UiInput size="sm" type="search">` dengan ikon pencarian presisi dan tombol reset.
+  - Menyelaraskan tombol pemicu filter mobile menggunakan `<UiButton variant="secondary" size="sm">` dengan counter badge.
+  - Dropdown pengurutan terintegrasi rapi dengan `<UiSelect size="sm" pill>`.
+- **Harmonisasi Keranjang Belanja (`app/pages/cart.vue` & `CartSummarySidebar.vue`)**:
+  - Membungkus daftar item keranjang belanja menggunakan `<UiCard :padded="false">` dengan pemisah border halus.
+  - Mengganti tombol hapus item menggunakan `<UiIconButton variant="danger" size="sm" icon="pi-trash">`.
+  - Mengonversi kontainer ringkasan belanja pada `CartSummarySidebar.vue` ke `<UiCard>` dan menyematkan `<UiBadge>` untuk total item.
+- **Formulir & Ringkasan Checkout (`CheckoutAddressForm.vue`, `ShippingMethodSelector.vue`, `CheckoutOrderSummary.vue`)**:
+  - Mengganti wrapper panel alamat dan opsi ekspedisi ke `<UiCard>`.
+  - Memastikan input formulir alamat pengiriman menggunakan `<UiInput size="md">` dengan error handling terpadu.
+  - Menyelaraskan kartu ringkasan belanja di checkout menggunakan `<UiCard>` dan `<UiBadge>`.
+- **Pengujian Unit & Verifikasi Geometri (`tests/unit/storefront-primitives-unification.spec.ts`, 219 baris)**:
+  - 8 unit test komprehensif memvalidasi rendering dan interaksi primitif `UiInput`, `UiSelect`, `UiCard`, `UiBadge`, dan `UiButton` pada etalase publik.
+
 ## [v1.1.0-beta.2] - 2026-11-14
 
 ### Filter Rentang Harga Min-Max Rupiah & Ketersediaan Stok Katalog

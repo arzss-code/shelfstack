@@ -74,10 +74,7 @@ const toggleSave = (e: Event) => {
 </script>
 
 <template>
-  <div
-    :class="{ 'opacity-60 pointer-events-none': disabled }"
-    class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-4"
-  >
+  <UiCard :class="{ 'opacity-60 pointer-events-none': disabled }" class="space-y-4">
     <!-- Section Header -->
     <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
       <div class="flex items-center gap-2">
@@ -193,14 +190,16 @@ const toggleSave = (e: Event) => {
               </p>
             </div>
           </div>
-          <button
+          <UiButton
             type="button"
+            variant="ghost"
+            size="sm"
             data-testid="change-location-btn"
-            class="text-xs font-semibold text-brand-ink hover:underline shrink-0 px-2 py-1 rounded cursor-pointer"
+            class="text-xs font-semibold text-brand-ink shrink-0 px-2 py-1 h-auto"
             @click="isLocationModalOpen = true"
           >
             Ubah
-          </button>
+          </UiButton>
         </div>
 
         <button
@@ -269,5 +268,5 @@ const toggleSave = (e: Event) => {
       :selected-id="selectedSavedAddressId"
       @select="handleSelectSavedAddress"
     />
-  </div>
+  </UiCard>
 </template>
