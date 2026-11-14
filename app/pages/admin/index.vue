@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminStatCard from '~/features/admin/components/AdminStatCard.vue'
+import AdminSalesChart from '~/components/admin/AdminSalesChart.vue'
 import AdminOperationalSignals from '~/features/admin/components/AdminOperationalSignals.vue'
 import AdminRecentOrdersTable from '~/features/admin/components/AdminRecentOrdersTable.vue'
 import { formatRupiah } from '~/utils/format'
@@ -155,6 +156,9 @@ onUnmounted(() => {
         :loading="loading"
       />
     </div>
+
+    <!-- Sales & Revenue Trend Chart (Pure SVG) -->
+    <AdminSalesChart />
 
     <!-- Operational Signals & System Telemetry Section -->
     <AdminOperationalSignals />

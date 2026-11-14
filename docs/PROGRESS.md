@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 25 (Fitur Storefront & Konfigurasi Produk: Product Variants SKU Matrix, Flash Sale Countdown, Social Share & Rating Filter)**
-- **Versi Rilis:** `v1.0.8` (`version.json`, `CHANGELOG.md` : sinkron)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 106 file / 1.067 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 26 (Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview)**
+- **Versi Rilis:** `v1.0.9` (`version.json`, `CHANGELOG.md` : sinkron)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 108 file / 1.081 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -342,6 +342,13 @@ Terverifikasi dari kode (audit 2026-10-11), bukan dari klaim dokumen:
     - **Penghitung Waktu Mundur Dinamis Flash Sale Harian (`app/pages/index.vue`, 189 baris)**: Target waktu midnight harian (`dailyFlashSaleEnd`) yang dipassing ke `HomeFlashDeals.vue`, berdetak setiap detik secara reaktif.
     - **Filter Rating Ulasan pada Etalase Katalog**: Validasi Zod `min_rating` pada `shared/schemas/product.ts` (58 baris), filter database pada `server/api/products/index.ts` (178 baris), opsi rating dan sinkronisasi URL query pada `useKatalogFilters.ts` (205 baris), pilihan rating ulasan pada `KatalogSidebar.vue` (149 baris) dan `KatalogMobileFilter.vue` (129 baris), serta chip filter aktif pada `KatalogActiveFilters.vue` (110 baris) dan `app/pages/katalog.vue` (241 baris).
     - **Pengujian & Penjaminan Mutu**: 3 suite pengujian baru (`tests/unit/product-variants.spec.ts`, `tests/unit/product-social-share.spec.ts`, `tests/unit/katalog-rating-filter.spec.ts`) dan pembaruan `tests/unit/product-schema.spec.ts`. Total unit suite root mencapai 106 file / 1.067 test cases yang lolos 100%. `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
+
+48. **Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview (SELESAI, v1.0.9).**
+    - **Backend Agregasi Tren Penjualan (`server/api/admin/stats/trends.get.ts`, 137 baris)**: Menyediakan endpoint agregasi data transaksi lunas dan selesai (`paid`, `shipped`, `completed`) berbasis tanggal kalender dengan 3 rentang filter (`7d`, `30d`, `month`) via `adminTrendsQuerySchema`. Menghasilkan ringkasan metrik eksekutif Total Omzet, Total Pesanan, dan Rata-rata Nilai Pesanan (AOV) dengan proteksi `requireAdmin(event)`.
+    - **Komponen Visualisasi Grafik Responsif SVG Semantik (`AdminSalesChart.vue`, 282 baris)**: Grafik tren omzet berbasis vektor murni tanpa ketergantungan library grafik eksternal yang berat. Dilengkapi area fill bergradasi oranye, garis tren polyline, garis panduan horizontal bertingkat, dan titik interaktif dengan floating tooltip saat di-hover. Terintegrasi langsung pada Dashboard Eksekutif Admin (`app/pages/admin/index.vue`, 169 baris).
+    - **Layanan Template Email Transaksional Bersih (`shared/utils/email-templates.ts`, 268 baris)**: Generator template HTML email responsif dan subjek dinamis untuk 3 siklus hidup pesanan: Konfirmasi Pemesanan (`order_placed`), Pembayaran Diterima (`payment_success`), dan Pesanan Dikirim (`order_shipped`).
+    - **Modal Pratinjau Email Interaktif Admin (`AdminEmailPreviewModal.vue`, 294 baris)**: Fasilitas peninjau email live di panel pesanan admin (`app/pages/admin/orders/[id].vue`, 249 baris) untuk demonstrasi evaluator dan simulasi notifikasi otomatis dengan tab siklus hidup pesanan, pergantian viewport Desktop/Mobile, switch antara Pratinjau Visual (iframe) dan Kode HTML Mentah, serta tombol Salin Kode HTML.
+    - **Pengujian & Penjaminan Mutu**: 2 suite pengujian baru (`tests/unit/admin-sales-trends.spec.ts`, `tests/unit/transactional-email.spec.ts`). Total unit suite root mencapai 108 file / 1.081 test cases yang lolos 100%. `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
 
 ---
 

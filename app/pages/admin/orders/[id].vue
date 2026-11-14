@@ -5,6 +5,7 @@ import AdminOrderStatusModal from '~/features/orders/components/AdminOrderStatus
 import AdminOrderCustomerCard from '~/features/orders/components/AdminOrderCustomerCard.vue'
 import AdminShippingLabelModal from '~/features/orders/components/AdminShippingLabelModal.vue'
 import OrderInvoiceModal from '~/features/orders/components/OrderInvoiceModal.vue'
+import AdminEmailPreviewModal from '~/components/admin/AdminEmailPreviewModal.vue'
 
 definePageMeta({
   layout: 'admin',
@@ -16,6 +17,7 @@ const orderId = computed(() => route.params.id as string)
 
 const isShippingLabelOpen = ref(false)
 const isInvoiceModalOpen = ref(false)
+const isEmailPreviewOpen = ref(false)
 
 const {
   order,
@@ -119,6 +121,15 @@ useSeoMeta({
           >
             <i class="pi pi-print mr-1 text-xs" />
             Cetak Invoice
+          </UiButton>
+          <UiButton
+            variant="outline"
+            size="sm"
+            class="font-semibold"
+            @click="isEmailPreviewOpen = true"
+          >
+            <i class="pi pi-envelope mr-1 text-xs" />
+            Pratinjau Email
           </UiButton>
 
           <template v-if="availableTransitions.length > 0">
@@ -228,6 +239,11 @@ useSeoMeta({
     <template v-if="order">
       <AdminShippingLabelModal v-model:visible="isShippingLabelOpen" :order="order" />
       <OrderInvoiceModal v-model:visible="isInvoiceModalOpen" :order="order" />
+      <AdminEmailPreviewModal
+        :show="isEmailPreviewOpen"
+        :order="order"
+        @close="isEmailPreviewOpen = false"
+      />
     </template>
   </div>
 </template>

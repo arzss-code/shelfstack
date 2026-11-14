@@ -2,6 +2,31 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [1.0.9] - 2026-11-14
+
+### Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview
+
+- **Backend Agregasi Tren Penjualan (`server/api/admin/stats/trends.get.ts`, 137 baris)**:
+  - Menyediakan endpoint agregasi data transaksi lunas dan selesai (`paid`, `shipped`, `completed`) berbasis tanggal kalender.
+  - Mendukung 3 rentang filter periode dinamis via skema Zod `adminTrendsQuerySchema`: 7 Hari Terakhir (`7d`), 30 Hari Terakhir (`30d`), dan Bulan Ini (`month`).
+  - Menghasilkan ringkasan metrik eksekutif: Total Omzet, Volume Transaksi, dan Rata-rata Nilai Pesanan (AOV).
+  - Melindungi akses endpoint menggunakan otorisasi ketat admin `requireAdmin(event)`.
+- **Komponen Visualisasi Grafik Responsif SVG Semantik (`AdminSalesChart.vue`, 282 baris)**:
+  - Grafik tren omzet berbasis vektor murni tanpa ketergantungan library grafik eksternal yang berat.
+  - Dilengkapi area fill bergradasi oranye khas ShelfStack, garis tren polyline presisi, garis panduan horizontal bertingkat, serta titik interaktif dengan floating tooltip saat di-hover.
+  - Kartu ringkasan metrik Total Omzet, Total Pesanan, dan Rata-rata Nilai Pesanan (AOV).
+  - Terintegrasi langsung pada Dashboard Eksekutif Admin (`app/pages/admin/index.vue`, 169 baris).
+- **Layanan Template Email Transaksional Bersih (`shared/utils/email-templates.ts`, 268 baris)**:
+  - Generator template HTML email responsif dan subjek dinamis untuk 3 siklus hidup pesanan: Konfirmasi Pemesanan (`order_placed`), Pembayaran Diterima (`payment_success`), dan Pesanan Dikirim (`order_shipped`).
+  - Memuat kop resmi ShelfStack, kartu rincian pesanan, tabel item produk dan varian, ringkasan rincian finansial (diskon voucher, potongan koin, ongkir), alamat pengiriman, nomor resi kurir, dan tombol CTA rincian pesanan.
+- **Modal Pratinjau Email Interaktif Admin (`AdminEmailPreviewModal.vue`, 294 baris)**:
+  - Fasilitas peninjau email live di panel pesanan admin (`app/pages/admin/orders/[id].vue`, 249 baris) untuk demonstrasi evaluator dan simulasi notifikasi otomatis.
+  - Tab pemilih siklus hidup pesanan, pergantian viewport Desktop/Mobile, switch antara Pratinjau Visual (iframe) dan Kode HTML Mentah, serta tombol Salin Kode HTML 1-klik dengan notifikasi toast.
+- **Pengujian & Penjaminan Mutu**:
+  - Menambahkan 2 suite pengujian baru: `tests/unit/admin-sales-trends.spec.ts` (158 baris, 5 tests) dan `tests/unit/transactional-email.spec.ts` (236 baris, 9 tests).
+  - Total pengujian unit root aplikasi mencapai 108 file / 1.081 test cases yang lolos 100% tanpa kegagalan.
+  - `pnpm lint` 0 error, `pnpm typecheck` EXIT 0, dan 100% berkas kode yang dibuat atau diubah mematuhi batas maksimal 300 baris.
+
 ## [1.0.8] - 2026-11-14
 
 ### Fitur Storefront & Konfigurasi Produk: Product Variants SKU Matrix, Flash Sale Countdown, Social Share & Rating Filter
