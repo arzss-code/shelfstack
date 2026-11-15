@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { useCartStore } from '~/features/cart/stores/cart'
+import { useCartStore, type CartItem } from '~/features/cart/stores/cart'
 import { useUiToast } from '~/composables/useUiToast'
 import type { CartReconcileResponse } from '~~/shared/schemas/cart-reconcile'
 
@@ -16,11 +16,11 @@ export function useCartReconciliation() {
   const driftWarnings = ref<string[]>([])
 
   const hasOutOfStockItems = computed(() =>
-    cartStore.items.some((item) => item.stock <= 0 || item.quantity === 0),
+    cartStore.items.some((item: CartItem) => item.stock <= 0 || item.quantity === 0),
   )
 
   const outOfStockItems = computed(() =>
-    cartStore.items.filter((item) => item.stock <= 0 || item.quantity === 0),
+    cartStore.items.filter((item: CartItem) => item.stock <= 0 || item.quantity === 0),
   )
 
   const dismissWarning = (index: number) => {
@@ -40,7 +40,7 @@ export function useCartReconciliation() {
     isReconciling.value = true
     try {
       const payload = {
-        items: cartStore.items.map((i) => ({
+        items: cartStore.items.map((i: CartItem) => ({
           productId: i.productId,
           variantId: i.variantId || null,
           quantity: i.quantity,
@@ -61,7 +61,7 @@ export function useCartReconciliation() {
 
         for (const r of res.data.items) {
           const matched = cartStore.items.find(
-            (item) =>
+            (item: CartItem) =>
               item.productId === r.productId && (item.variantId || null) === (r.variantId || null),
           )
 

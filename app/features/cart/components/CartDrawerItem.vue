@@ -95,13 +95,32 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
       <div class="flex items-end justify-between pt-2 gap-2">
         <!-- Price -->
         <div class="min-w-0">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span
+              class="font-display text-xs sm:text-[13px] font-bold tabular-nums block leading-tight"
+              :class="
+                item.originalPriceCents && item.originalPriceCents > item.priceCents
+                  ? 'text-rose-600'
+                  : 'text-brand-ink'
+              "
+            >
+              {{ formatRupiah(item.price * item.quantity) }}
+            </span>
+            <span
+              v-if="item.originalPriceCents && item.originalPriceCents > item.priceCents"
+              class="text-[10px] text-brand-muted line-through tabular-nums"
+            >
+              {{ formatRupiah((item.originalPriceCents * item.quantity) / 100) }}
+            </span>
+          </div>
           <span
-            class="font-display text-xs sm:text-[13px] font-bold text-brand-ink tabular-nums block leading-tight"
+            v-if="item.originalPriceCents && item.originalPriceCents > item.priceCents"
+            class="text-[9.5px] font-bold text-rose-600 uppercase tracking-wider block mt-0.5"
           >
-            {{ formatRupiah(item.price * item.quantity) }}
+            Flash Sale
           </span>
           <span
-            v-if="item.quantity > 1"
+            v-else-if="item.quantity > 1"
             class="text-[10px] text-brand-muted tabular-nums block font-normal mt-0.5"
           >
             @ {{ formatRupiah(item.price) }}

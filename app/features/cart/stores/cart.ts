@@ -16,6 +16,7 @@ export interface CartItem {
   material?: string
   variantId?: string | null
   variantName?: string | null
+  originalPriceCents?: number | null
 }
 
 export interface AppliedCoupon {
@@ -102,18 +103,14 @@ export const useCartStore = defineStore('cart', () => {
     clearCart()
   }
 
-  // Inisialisasi saat store dibuat di browser
   if (import.meta.client) {
     initCart()
-
     try {
       const user = useSupabaseUser()
       watch(
         () => user?.value?.id,
         (newUserId, oldUserId) => {
-          if (oldUserId && !newUserId) {
-            resetOnLogout()
-          }
+          if (oldUserId && !newUserId) clearCart()
         },
       )
     } catch {
@@ -171,6 +168,7 @@ export const useCartStore = defineStore('cart', () => {
     name: string
     price: number
     priceCents?: number
+    originalPriceCents?: number | null
     imageUrl?: string | null
     quantity?: number
     stock: number
@@ -212,6 +210,7 @@ export const useCartStore = defineStore('cart', () => {
         material: payload.material,
         variantId: payload.variantId || null,
         variantName: payload.variantName || null,
+        originalPriceCents: payload.originalPriceCents || null,
       })
     }
 

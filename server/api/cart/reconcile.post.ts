@@ -4,6 +4,8 @@ import {
   cartReconcileRequestSchema,
   type ReconciledItemResult,
 } from '~~/shared/schemas/cart-reconcile'
+import { getActiveFlashSaleCampaign } from '../../utils/flash-sale'
+import { successResponse, errorResponse } from '../../utils/response'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event).catch(() => ({}))
@@ -31,6 +33,7 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient<Database>(event)
   const productIds = Array.from(new Set(items.map((i) => i.productId)))
 
+  // Ambil data produk fisik dari database
   const { data: products, error } = await client
     .from('products')
     .select('id, name, price_cents, stock, deleted_at')
@@ -39,6 +42,14 @@ export default defineEventHandler(async (event) => {
   if (error) {
     return errorResponse(event, 'Gagal mengambil data produk terbaru', error, 500)
   }
+
+  // Ambil kampanye flash sale aktif untuk validasi harga diskon yang sah
+  const flashCampaign = await getActiveFlashSaleCampaign(client).catch(() => null)
+  const flashDealsMap = new Map(
+    (flashCampaign?.items || [])
+      .filter((deal) => deal.is_active && deal.claimed < deal.quota)
+      .map((deal) => [deal.product_id, deal]),
+  )
 
   const productMap = new Map((products || []).map((p) => [p.id, p]))
   const reconciledItems: ReconciledItemResult[] = []
@@ -67,7 +78,12 @@ export default defineEventHandler(async (event) => {
     }
 
     const currentStock = Math.max(0, p.stock ?? 0)
-    const currentPriceCents = p.price_cents ?? item.priceCents ?? 0
+    const basePriceCents = p.price_cents ?? 0
+    const activeFlashDeal = flashDealsMap.get(item.productId)
+
+    // Jika produk terdaftar dalam Flash Sale aktif, harga resmi adalah harga promo
+    const currentPriceCents = activeFlashDeal ? activeFlashDeal.promo_price_cents : basePriceCents
+
     const isOutOfStock = currentStock === 0
     const stockReduced = currentStock < item.quantity
     const adjustedQuantity = isOutOfStock ? 0 : Math.min(item.quantity, currentStock)
@@ -99,18 +115,20 @@ export default defineEventHandler(async (event) => {
     }
 
     if (priceChanged) {
-      const prevRp = item.priceCents
-        ? Math.round(item.priceCents / 100).toLocaleString('id-ID')
-        : '0'
-      const currRp = Math.round(currentPriceCents / 100).toLocaleString('id-ID')
-      warnings.push(`Harga ${p.name} berubah dari Rp ${prevRp} menjadi Rp ${currRp}.`)
+      if (activeFlashDeal) {
+        warnings.push(`Harga ${p.name} disesuaikan dengan diskon Flash Sale aktif.`)
+      } else {
+        warnings.push(`Harga ${p.name} telah kembali ke harga normal.`)
+      }
     }
   }
 
-  const hasDrift = warnings.length > 0
+  const hasDrift = reconciledItems.some(
+    (i) => i.priceChanged || i.stockReduced || i.isOutOfStock || i.isUnavailable,
+  )
   const hasOutOfStockItems = reconciledItems.some((i) => i.isOutOfStock || i.isUnavailable)
 
-  return successResponse('Rekonsiliasi keranjang berhasil', {
+  return successResponse('Rekonsiliasi keranjang belanja berhasil', {
     hasDrift,
     items: reconciledItems,
     warnings,

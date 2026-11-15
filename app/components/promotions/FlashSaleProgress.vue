@@ -7,39 +7,57 @@ const props = withDefaults(
     claimed: number
     quota: number
     showLabel?: boolean
+    theme?: 'dark' | 'light'
   }>(),
   {
     showLabel: true,
+    theme: 'dark',
   },
 )
 
 const percentage = computed(() => calculateClaimPercentage(props.claimed, props.quota))
 const remaining = computed(() => Math.max(0, props.quota - props.claimed))
-const isAlmostGone = computed(() => percentage.value >= 80)
+const isAlmostGone = computed(() => percentage.value >= 75)
 </script>
 
 <template>
   <div class="w-full space-y-1.5" role="region" aria-label="Status Kuota Flash Sale">
     <div
       v-if="showLabel"
-      class="flex items-center justify-between text-[11px] font-medium text-brand-muted"
+      class="flex items-center justify-between text-[11px] font-medium"
+      :class="theme === 'dark' ? 'text-white/70' : 'text-brand-muted'"
     >
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-1.5">
         <i
           v-if="isAlmostGone"
-          class="pi pi-bolt text-brand-warning animate-pulse"
+          class="pi pi-bolt text-amber-400 animate-pulse text-[10px]"
           aria-hidden="true"
         />
-        <span :class="{ 'text-brand-warning font-semibold': isAlmostGone }">
+        <span
+          :class="[
+            isAlmostGone
+              ? 'text-amber-400 font-bold'
+              : theme === 'dark'
+                ? 'text-white/90 font-semibold'
+                : 'text-brand-ink font-semibold',
+          ]"
+        >
           Terjual {{ percentage }}%
         </span>
       </div>
-      <span class="text-brand-faint"> Sisa {{ remaining }} unit </span>
+      <span :class="theme === 'dark' ? 'text-white/50' : 'text-brand-faint'">
+        Sisa {{ remaining }} dari {{ quota }} unit
+      </span>
     </div>
 
-    <!-- Progress Track & Fill -->
+    <!-- Progress Track & Fill with Smooth Gradient Fill -->
     <div
-      class="h-2 w-full overflow-hidden rounded-full bg-brand-hairsoft border border-brand-hair"
+      class="h-2 w-full overflow-hidden rounded-full border"
+      :class="
+        theme === 'dark'
+          ? 'bg-white/10 border-white/10'
+          : 'bg-brand-canvas-soft border-brand-hairsoft'
+      "
       role="progressbar"
       :aria-valuenow="percentage"
       aria-valuemin="0"
@@ -47,9 +65,11 @@ const isAlmostGone = computed(() => percentage.value >= 80)
       :aria-label="`Tersisa ${remaining} dari ${quota} unit promo`"
     >
       <div
-        class="h-full rounded-full transition-all duration-500"
+        class="h-full rounded-full transition-all duration-700 shadow-sm"
         :class="[
-          isAlmostGone ? 'bg-gradient-to-r from-brand-warning to-brand-danger' : 'bg-brand-ink',
+          isAlmostGone
+            ? 'bg-gradient-to-r from-amber-400 via-orange-500 to-rose-600'
+            : 'bg-gradient-to-r from-amber-400 to-rose-500',
         ]"
         :style="{ width: `${percentage}%` }"
       />

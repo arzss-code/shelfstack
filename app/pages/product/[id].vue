@@ -145,14 +145,20 @@ onMounted(async () => {
   }
 })
 
-const onAddToBag = (payload: ProductSelectionPayload) => {
-  if (!product.value) return
+const createCartPayload = (payload: ProductSelectionPayload, openCartDrawer: boolean) => {
+  if (!product.value) return null
+  const originalPriceCents = product.value.price_cents || Math.round(product.value.price * 100)
+  const isPromo = Boolean(
+    activeFlashDeal.value && activeFlashDeal.value.promo_price_cents < originalPriceCents,
+  )
 
-  cartStore.addItem({
+  return {
     productId: product.value.id,
     slug: product.value.slug,
     name: product.value.name,
     price: payload.price || product.value.price,
+    priceCents: Math.round((payload.price || product.value.price) * 100),
+    originalPriceCents: isPromo ? originalPriceCents : null,
     imageUrl: product.value.image_url,
     quantity: payload.quantity,
     stock: product.value.stock,
@@ -160,9 +166,15 @@ const onAddToBag = (payload: ProductSelectionPayload) => {
     material: payload.material,
     variantId: payload.variantId,
     variantName: payload.variantName,
-    openCartDrawer: true,
-  })
+    openCartDrawer,
+  }
+}
 
+const onAddToBag = (payload: ProductSelectionPayload) => {
+  const item = createCartPayload(payload, true)
+  if (!item || !product.value) return
+
+  cartStore.addItem(item)
   toast.add({
     severity: 'success',
     summary: 'Ditambahkan ke Bag',
@@ -172,23 +184,10 @@ const onAddToBag = (payload: ProductSelectionPayload) => {
 }
 
 const onBuyNow = (payload: ProductSelectionPayload) => {
-  if (!product.value) return
+  const item = createCartPayload(payload, false)
+  if (!item) return
 
-  cartStore.addItem({
-    productId: product.value.id,
-    slug: product.value.slug,
-    name: product.value.name,
-    price: payload.price || product.value.price,
-    imageUrl: product.value.image_url,
-    quantity: payload.quantity,
-    stock: product.value.stock,
-    color: payload.color,
-    material: payload.material,
-    variantId: payload.variantId,
-    variantName: payload.variantName,
-    openCartDrawer: false,
-  })
-
+  cartStore.addItem(item)
   router.push('/checkout')
 }
 </script>
