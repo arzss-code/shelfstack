@@ -22,12 +22,17 @@ export default defineEventHandler(async (event) => {
     })
 
     return successResponse('Ulasan produk berhasil dihapus.', result)
-  } catch (error: any) {
-    const message = error?.message || 'Gagal menghapus ulasan produk.'
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal menghapus ulasan produk.'
     const isForbidden = message.includes('wewenang')
     const isNotFound = message.includes('tidak ditemukan')
     const statusCode = isForbidden ? 403 : isNotFound ? 404 : 500
 
-    return errorResponse(event, message, error, statusCode)
+    return errorResponse(
+      event,
+      message,
+      error instanceof Error ? error.message : String(error),
+      statusCode,
+    )
   }
 })

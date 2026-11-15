@@ -12,8 +12,10 @@ export function useActivityLog() {
         method: 'POST',
         body: params,
       })
-    } catch (error) {
-      console.error('Failed to log activity:', error)
+    } catch (error: unknown) {
+      if (import.meta.dev) {
+        console.error('Failed to log activity:', error)
+      }
       // We don't want to throw and break the main application flow just because a log failed.
     }
   }

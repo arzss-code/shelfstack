@@ -31,7 +31,7 @@ const fetchTrends = async () => {
     )
     trendsData.value = res.data
   } catch (err: unknown) {
-    console.error('Failed to load sales trends:', err)
+    if (import.meta.dev) console.error('Failed to load sales trends:', err)
   } finally {
     loading.value = false
   }

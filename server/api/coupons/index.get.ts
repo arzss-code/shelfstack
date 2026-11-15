@@ -65,7 +65,12 @@ export default defineEventHandler(async (event) => {
     })
 
     return successResponse('Daftar kupon promosi aktif berhasil diambil', formattedCoupons)
-  } catch (err: any) {
-    return errorResponse(event, 'Terjadi kesalahan internal', err.message, 500)
+  } catch (err: unknown) {
+    return errorResponse(
+      event,
+      'Terjadi kesalahan internal',
+      err instanceof Error ? err.message : String(err),
+      500,
+    )
   }
 })

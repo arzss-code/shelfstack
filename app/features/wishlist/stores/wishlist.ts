@@ -41,8 +41,8 @@ export const useWishlistStore = defineStore('wishlist', () => {
         items.value = response.data.filter((row) => row.product).map(mapWishlistRow)
         saveWishlist()
       }
-    } catch (err) {
-      console.warn('Gagal memuat wishlist dari database:', err)
+    } catch (err: unknown) {
+      if (import.meta.dev) console.warn('Gagal memuat wishlist dari database:', err)
     } finally {
       isSyncing.value = false
     }
@@ -61,8 +61,8 @@ export const useWishlistStore = defineStore('wishlist', () => {
         items.value = response.data.filter((row) => row.product).map(mapWishlistRow)
         saveWishlist()
       }
-    } catch (err) {
-      console.warn('Gagal menyinkronkan wishlist ke database:', err)
+    } catch (err: unknown) {
+      if (import.meta.dev) console.warn('Gagal menyinkronkan wishlist ke database:', err)
     } finally {
       isSyncing.value = false
     }
@@ -107,8 +107,9 @@ export const useWishlistStore = defineStore('wishlist', () => {
       $fetch('/api/wishlist', {
         method: 'POST',
         body: { productId: product.id },
-      }).catch((err) => {
-        console.warn('Gagal menyinkronkan wishlist ke server (tetap tersimpan lokal):', err)
+      }).catch((err: unknown) => {
+        if (import.meta.dev)
+          console.warn('Gagal menyinkronkan wishlist ke server (tetap tersimpan lokal):', err)
       })
     }
     return true
@@ -133,8 +134,9 @@ export const useWishlistStore = defineStore('wishlist', () => {
       $fetch('/api/wishlist', {
         method: 'DELETE',
         body: { productId },
-      }).catch((err) => {
-        console.warn('Gagal menghapus wishlist di server (tetap terhapus lokal):', err)
+      }).catch((err: unknown) => {
+        if (import.meta.dev)
+          console.warn('Gagal menghapus wishlist di server (tetap terhapus lokal):', err)
       })
     }
     return true
@@ -197,7 +199,9 @@ export const useWishlistStore = defineStore('wishlist', () => {
         backup.map((i) =>
           $fetch('/api/wishlist', { method: 'DELETE', body: { productId: i.productId } }),
         ),
-      ).catch((err) => console.warn('Gagal membersihkan wishlist di database:', err))
+      ).catch((err: unknown) => {
+        if (import.meta.dev) console.warn('Gagal membersihkan wishlist di database:', err)
+      })
     }
   }
 

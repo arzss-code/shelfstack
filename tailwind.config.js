@@ -24,6 +24,7 @@ export default {
           'ink-soft': 'var(--brand-ink-soft)',
           onink: 'var(--brand-onink)',
           inkhover: 'var(--brand-inkhover)',
+          obsidian: 'var(--brand-obsidian)',
           body: 'var(--brand-body)',
           muted: 'var(--brand-muted)',
           faint: 'var(--brand-faint)',
