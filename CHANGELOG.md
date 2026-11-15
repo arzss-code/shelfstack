@@ -2,6 +2,19 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.24] - 2026-11-15
+
+### Remediasi Utility Classes Brand Obsidian pada Main CSS untuk Mencegah Transparent Washout
+
+- **Definisi Eksplisit Utility Class Brand Obsidian (`app/assets/css/main.css`)**:
+  - Menambahkan kelas utilitas `.bg-brand-obsidian`, `.text-brand-obsidian`, dan `.border-brand-obsidian` langsung ke `main.css` dengan fallback value `#12131a`.
+  - Mengatasi keterbatasan runtime Vite/Nuxt HMR di mana perubahan `tailwind.config.js` tidak memicu re-evaluasi runtime stylesheet tanpa server restart penuh.
+  - Memastikan container flash sale baik di beranda (`HomeFlashDeals.vue`) maupun di halaman detail produk (`ProductFlashSaleBanner.vue`) selalu merender latar belakang obsidian pekat yang solid (`#12131a`), sehingga teks putih tidak pernah mengalami masalah keterbacaan (white-on-white text washout).
+- **Verifikasi Kualitas**:
+  - `pnpm lint`: 0 error, 0 warning.
+  - `pnpm typecheck`: EXIT 0.
+  - `pnpm exec vitest run`: 130 test files / 1.248 tests passed 100%.
+
 ## [v1.1.0-beta.23] - 2026-11-15
 
 ### Konsistensi Design Tokens, Sinkronisasi Versi, Strict Typing Catch Blocks, dan Client Logging Guard

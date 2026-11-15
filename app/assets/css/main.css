@@ -282,3 +282,14 @@ textarea:-webkit-autofill {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Surface Utilities - Brand Obsidian Solid Base */
+.bg-brand-obsidian {
+  background-color: var(--brand-obsidian, #12131a);
+}
+.text-brand-obsidian {
+  color: var(--brand-obsidian, #12131a);
+}
+.border-brand-obsidian {
+  border-color: var(--brand-obsidian, #12131a);
+}
