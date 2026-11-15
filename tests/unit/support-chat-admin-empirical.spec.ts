@@ -19,7 +19,10 @@ describe('Milestone 2 Adversarial & Empirical Verification', () => {
   describe('1. Admin RBAC & Security Challenge', () => {
     it('menolak akses pengguna dengan peran customer (non-admin) dengan HTTP 403 Forbidden', async () => {
       // Simulasi requireAdmin dengan profil customer
-      const mockCustomerUser = { id: 'cust-uuid-1', email: 'customer@shelfstack.id' }
+      const mockCustomerUser = {
+        id: 'cust-uuid-1',
+        email: 'customer@shelfstack.atsiilaarya.me',
+      }
       const mockCustomerProfile = {
         id: 'cust-uuid-1',
         user_id: 'cust-uuid-1',
@@ -60,7 +63,7 @@ describe('Milestone 2 Adversarial & Empirical Verification', () => {
     })
 
     it('mengizinkan akses pengguna dengan peran admin', async () => {
-      const mockAdminUser = { id: 'admin-uuid-1', email: 'cs@shelfstack.id' }
+      const mockAdminUser = { id: 'admin-uuid-1', email: 'cs@shelfstack.atsiilaarya.me' }
       const mockAdminProfile = {
         id: 'admin-uuid-1',
         user_id: 'admin-uuid-1',

@@ -111,7 +111,7 @@ export default defineEventHandler(async (event) => {
         id: thread.id,
         customer_id: thread.customer_id,
         customer_name: profile?.full_name || 'Pelanggan ShelfStack',
-        customer_email: emailMap.get(thread.customer_id) || 'pelanggan@shelfstack.id',
+        customer_email: emailMap.get(thread.customer_id) || 'pelanggan@shelfstack.atsiilaarya.me',
         customer_avatar_url: profile?.avatar_url || null,
         status: thread.status,
         last_message_text: thread.last_message_text || '',

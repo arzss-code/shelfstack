@@ -34,7 +34,7 @@ function createSwHarness() {
   const fetchMock = vi.fn()
   const skipWaiting = vi.fn().mockResolvedValue(undefined)
   const self = {
-    location: { origin: 'https://shelfstack.id' },
+    location: { origin: 'https://shelfstack.atsiilaarya.me' },
     skipWaiting,
     clients: clientsApi,
     registration: reg,
@@ -101,8 +101,8 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
       const sw = createSwHarness()
       const fetchHandler = sw.listeners.get('fetch')
       const bypassed: Array<[string, string]> = [
-        ['POST', 'https://shelfstack.id/images/auth-showcase.jpg'],
-        ['DELETE', 'https://shelfstack.id/api/orders/1'],
+        ['POST', 'https://shelfstack.atsiilaarya.me/images/auth-showcase.jpg'],
+        ['DELETE', 'https://shelfstack.atsiilaarya.me/api/orders/1'],
         ...[
           '/api/products',
           '/auth/callback',
@@ -112,7 +112,7 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
           '/account/profile',
           '/',
           '/sw.js',
-        ].map((p): [string, string] => ['GET', `https://shelfstack.id${p}`]),
+        ].map((p): [string, string] => ['GET', `https://shelfstack.atsiilaarya.me${p}`]),
         ['GET', 'https://demo.supabase.co/storage/v1/object/public/images/a.png'],
         ['GET', 'https://app.midtrans.com/snap/snap.js'],
       ]
@@ -132,7 +132,7 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
       fetchHandler?.({
         waitUntil: vi.fn(),
         respondWith: (p) => (hitP = p),
-        request: { method: 'GET', url: 'https://shelfstack.id/favicon.svg' },
+        request: { method: 'GET', url: 'https://shelfstack.atsiilaarya.me/favicon.svg' },
       })
       expect(await hitP).toBe(hit)
       expect(sw.fetchMock).not.toHaveBeenCalled()
@@ -143,7 +143,10 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
       fetchHandler?.({
         waitUntil: vi.fn(),
         respondWith: (p) => (missP = p),
-        request: { method: 'GET', url: 'https://shelfstack.id/images/auth-showcase.jpg' },
+        request: {
+          method: 'GET',
+          url: 'https://shelfstack.atsiilaarya.me/images/auth-showcase.jpg',
+        },
       })
       expect((await missP)?.status).toBe(200)
       expect(sw.cacheStore.put).toHaveBeenCalledTimes(1)
@@ -184,20 +187,24 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
       const focusMock = vi.fn().mockResolvedValue(undefined)
       const navigateMock = vi.fn().mockResolvedValue(undefined)
       sw.clientsApi.matchAll.mockResolvedValueOnce([
-        { url: 'https://shelfstack.id/katalog', focus: focusMock, navigate: navigateMock },
+        {
+          url: 'https://shelfstack.atsiilaarya.me/katalog',
+          focus: focusMock,
+          navigate: navigateMock,
+        },
       ])
       await dispatchWaitUntil(clickHandler, {
         notification: { close: closeMock, data: { url: '/orders/ORD-77' } },
       })
       expect(closeMock).toHaveBeenCalledTimes(1)
-      expect(navigateMock).toHaveBeenCalledWith('https://shelfstack.id/orders/ORD-77')
+      expect(navigateMock).toHaveBeenCalledWith('https://shelfstack.atsiilaarya.me/orders/ORD-77')
       expect(focusMock).toHaveBeenCalledTimes(1)
 
       sw.clientsApi.matchAll.mockResolvedValueOnce([])
       await dispatchWaitUntil(clickHandler, {
         notification: { close: closeMock, data: { url: 'https://evil.com' } },
       })
-      expect(sw.clientsApi.openWindow).toHaveBeenCalledWith('https://shelfstack.id/')
+      expect(sw.clientsApi.openWindow).toHaveBeenCalledWith('https://shelfstack.atsiilaarya.me/')
     })
   })
 

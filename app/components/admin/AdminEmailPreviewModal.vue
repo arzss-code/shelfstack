@@ -33,7 +33,18 @@ const emailTypes: Array<{ id: TransactionalEmailType; label: string; icon: strin
 
 const emailOrder = computed(() => buildEmailOrderData(props.order))
 const subjectLine = computed(() => generateEmailSubject(selectedType.value, emailOrder.value))
-const emailHtml = computed(() => generateEmailHtml(selectedType.value, emailOrder.value))
+const emailHtml = computed(() => {
+  let appUrl = 'https://shelfstack.atsiilaarya.me'
+  let supportEmail = 'support@shelfstack.atsiilaarya.me'
+  try {
+    const cfg = useRuntimeConfig()
+    appUrl = (cfg?.public?.siteUrl || cfg?.appUrl || appUrl) as string
+    supportEmail = (cfg?.public?.supportEmail || cfg?.supportEmail || supportEmail) as string
+  } catch {
+    // Fallback for isolated unit tests
+  }
+  return generateEmailHtml(selectedType.value, emailOrder.value, { appUrl, supportEmail })
+})
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {

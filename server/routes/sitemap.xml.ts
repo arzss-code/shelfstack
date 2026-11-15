@@ -18,7 +18,13 @@ function escapeXml(unsafe: string): string {
 }
 
 export default defineEventHandler(async (event) => {
-  const baseUrl = 'https://shelfstack.id'
+  const config = useRuntimeConfig()
+  const rawBaseUrl =
+    (config.public?.siteUrl as string) ||
+    (config.appUrl as string) ||
+    process.env.APP_URL ||
+    'https://shelfstack.atsiilaarya.me'
+  const baseUrl = rawBaseUrl.replace(/\/+$/, '')
   const currentDate = new Date().toISOString().split('T')[0]
 
   // 1. Rute statis kurasi etalase publik

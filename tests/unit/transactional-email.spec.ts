@@ -94,6 +94,18 @@ describe('Transactional Email Service & Preview Modal', () => {
       expect(html).toContain('color: #0066ff;')
       expect(html).toContain('white-space: nowrap;')
       expect(html).not.toContain('monospace')
+      expect(html).toContain(`https://shelfstack.atsiilaarya.me/orders/${sampleEmailOrder.id}`)
+      expect(html).toContain('mailto:support@shelfstack.atsiilaarya.me')
+      expect(html).not.toContain('shelfstack.co.id')
+    })
+
+    it('honors custom appUrl and supportEmail options', () => {
+      const customHtml = generateEmailHtml('order_placed', sampleEmailOrder, {
+        appUrl: 'http://localhost:3000',
+        supportEmail: 'help@shelfstack.atsiilaarya.me',
+      })
+      expect(customHtml).toContain(`http://localhost:3000/orders/${sampleEmailOrder.id}`)
+      expect(customHtml).toContain('mailto:help@shelfstack.atsiilaarya.me')
     })
 
     it('includes tracking section only when type is order_shipped', () => {

@@ -11,6 +11,7 @@ import { logger } from './logger'
 import type {
   EmailDeliveryRecord,
   DispatchEmailOptions,
+  DispatchOrderEmailOptions,
   EmailDispatchResult,
   RawDbOrder,
 } from './email-types'
@@ -38,12 +39,20 @@ function resolveEmailConfig(options?: DispatchEmailOptions) {
   let envProvider = ''
   let envKey = ''
   let envFrom = ''
+  let configAppUrl = ''
+  let configSupportEmail = ''
 
   try {
     const config = useRuntimeConfig()
     if (typeof config.emailProvider === 'string') envProvider = config.emailProvider
     if (typeof config.resendApiKey === 'string') envKey = config.resendApiKey
     if (typeof config.emailFrom === 'string') envFrom = config.emailFrom
+    if (typeof config.appUrl === 'string') configAppUrl = config.appUrl
+    else if (typeof config.public?.siteUrl === 'string') configAppUrl = config.public.siteUrl
+    if (typeof config.supportEmail === 'string') configSupportEmail = config.supportEmail
+    else if (typeof config.public?.supportEmail === 'string') {
+      configSupportEmail = config.public.supportEmail
+    }
   } catch {
     // Context outside Nitro runtime (e.g. unit tests)
   }
@@ -63,7 +72,19 @@ function resolveEmailConfig(options?: DispatchEmailOptions) {
   ).toLowerCase()
 
   const provider = raw === 'resend' && apiKey ? 'resend' : 'mock'
-  return { provider, apiKey, fromEmail }
+  const appUrl =
+    options?.appUrl ||
+    process.env.APP_URL ||
+    process.env.NUXT_PUBLIC_SITE_URL ||
+    configAppUrl ||
+    'https://shelfstack.atsiilaarya.me'
+  const supportEmail =
+    options?.supportEmail ||
+    process.env.SUPPORT_EMAIL ||
+    configSupportEmail ||
+    'support@shelfstack.atsiilaarya.me'
+
+  return { provider, apiKey, fromEmail, appUrl, supportEmail }
 }
 
 async function sendViaResend(
@@ -109,7 +130,7 @@ export async function dispatchTransactionalEmail(
 ): Promise<EmailDispatchResult> {
   const startTime = Date.now()
   const recipient = options?.recipientEmail || order.customer_email || 'pelanggan@example.com'
-  const { provider, apiKey, fromEmail } = resolveEmailConfig(options)
+  const { provider, apiKey, fromEmail, appUrl, supportEmail } = resolveEmailConfig(options)
   const fetchImpl = options?.fetchImpl || fetch
   const timeoutMs = options?.timeoutMs || 3_000
 
@@ -119,7 +140,7 @@ export async function dispatchTransactionalEmail(
 
   try {
     const subject = generateEmailSubject(type, order)
-    const html = generateEmailHtml(type, order)
+    const html = generateEmailHtml(type, order, { appUrl, supportEmail })
 
     if (provider === 'resend' && apiKey) {
       const res = await sendViaResend(
@@ -190,7 +211,7 @@ export async function dispatchOrderTransactionalEmail(
   client: SupabaseClient<Database>,
   orderId: string,
   type: TransactionalEmailType,
-  options?: { customerEmail?: string; fetchImpl?: typeof fetch; apiKey?: string },
+  options?: DispatchOrderEmailOptions,
 ): Promise<EmailDispatchResult> {
   try {
     const { data: order, error } = await client
@@ -228,6 +249,8 @@ export async function dispatchOrderTransactionalEmail(
       apiKey: options?.apiKey,
       fetchImpl: options?.fetchImpl,
       recipientEmail: customerEmail,
+      appUrl: options?.appUrl,
+      supportEmail: options?.supportEmail,
     })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)

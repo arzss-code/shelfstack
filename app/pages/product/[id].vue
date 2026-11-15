@@ -48,7 +48,7 @@ useHead({
           },
           offers: {
             '@type': 'Offer',
-            url: `https://shelfstack.id/product/${product.value.slug || product.value.id}`,
+            url: `https://shelfstack.atsiilaarya.me/product/${product.value.slug || product.value.id}`,
             priceCurrency: 'IDR',
             price: product.value.price,
             availability:

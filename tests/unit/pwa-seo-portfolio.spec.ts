@@ -35,7 +35,7 @@ describe('PWA, SEO & Portfolio Resilience Suite', () => {
       expect(robotsContent).toContain('Disallow: /admin/')
       expect(robotsContent).toContain('Disallow: /api/')
       expect(robotsContent).toContain('Disallow: /checkout')
-      expect(robotsContent).toContain('Sitemap: https://shelfstack.id/sitemap.xml')
+      expect(robotsContent).toContain('Sitemap: https://shelfstack.atsiilaarya.me/sitemap.xml')
     })
   })
 
@@ -45,7 +45,7 @@ describe('PWA, SEO & Portfolio Resilience Suite', () => {
       expect(fs.existsSync(sitemapPath)).toBe(true)
 
       const sitemapCode = fs.readFileSync(sitemapPath, 'utf-8')
-      expect(sitemapCode).toContain('https://shelfstack.id')
+      expect(sitemapCode).toContain('https://shelfstack.atsiilaarya.me')
       expect(sitemapCode).toContain('application/xml')
       expect(sitemapCode).toContain('http://www.sitemaps.org/schemas/sitemap/0.9')
       expect(sitemapCode).toContain('/katalog')
@@ -83,7 +83,7 @@ describe('PWA, SEO & Portfolio Resilience Suite', () => {
         },
         offers: {
           '@type': 'Offer',
-          url: `https://shelfstack.id/product/${mockProduct.slug}`,
+          url: `https://shelfstack.atsiilaarya.me/product/${mockProduct.slug}`,
           priceCurrency: 'IDR',
           price: mockProduct.price,
           availability:

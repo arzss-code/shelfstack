@@ -39,7 +39,7 @@ const returnSteps = [
   {
     number: '01',
     title: 'Hubungi Layanan Pelanggan',
-    desc: 'Laporkan kendala produk melalui formulir /contact atau email resmi kami di support@shelfstack.id.',
+    desc: 'Laporkan kendala produk melalui formulir /contact atau email resmi kami di support@shelfstack.atsiilaarya.me.',
     highlight: 'Respons cepat dalam 1x24 jam kerja.',
   },
   {

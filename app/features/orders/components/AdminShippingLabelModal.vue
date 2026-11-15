@@ -54,7 +54,15 @@ const barcodeSvg = computed(() => {
 })
 
 const quickScanQrSvg = computed(() => {
-  return renderQrCodeSvg(`https://shelfstack.co.id/tracking?ref=${trackingNumber.value}`, {
+  let siteUrl = 'https://shelfstack.atsiilaarya.me'
+  try {
+    const config = useRuntimeConfig()
+    if (config?.public?.siteUrl) siteUrl = String(config.public.siteUrl)
+  } catch {
+    // Fallback for isolated unit tests
+  }
+  siteUrl = siteUrl.replace(/\/+$/, '')
+  return renderQrCodeSvg(`${siteUrl}/tracking?ref=${trackingNumber.value}`, {
     size: 68,
   })
 })

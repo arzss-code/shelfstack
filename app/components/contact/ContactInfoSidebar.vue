@@ -37,10 +37,10 @@ const handleOpenLiveChat = () => {
             Email Dukungan
           </p>
           <a
-            href="mailto:support@shelfstack.id"
+            href="mailto:support@shelfstack.atsiilaarya.me"
             class="font-display text-sm font-semibold text-brand-ink transition-colors hover:text-brand-accent hover:underline"
           >
-            support@shelfstack.id
+            support@shelfstack.atsiilaarya.me
           </a>
           <p class="mt-0.5 text-xs text-brand-muted">Tanggapan langsung dalam 1x24 jam kerja.</p>
         </div>

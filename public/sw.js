@@ -68,7 +68,7 @@ function sanitizeNotificationUrl(rawUrl) {
   }
 
   try {
-    const origin = self.location?.origin || 'https://shelfstack.id'
+    const origin = self.location?.origin || 'https://shelfstack.atsiilaarya.me'
     const parsed = new URL(trimmed, origin)
     if (parsed.origin !== origin || parsed.pathname.startsWith('//')) {
       return '/'

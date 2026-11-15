@@ -30,9 +30,17 @@ const shippingServiceName = computed(() =>
 const shippingFeeDisplay = computed(() =>
   getInvoiceShippingFeeDisplay(props.order.shipping_cost_cents),
 )
-const verificationQrSvg = computed(() =>
-  renderQrCodeSvg(`https://shelfstack.co.id/tracking?order_id=${props.order.id}`, { size: 54 }),
-)
+const verificationQrSvg = computed(() => {
+  let siteUrl = 'https://shelfstack.atsiilaarya.me'
+  try {
+    const config = useRuntimeConfig()
+    if (config?.public?.siteUrl) siteUrl = String(config.public.siteUrl)
+  } catch {
+    // Fallback for isolated unit tests
+  }
+  siteUrl = siteUrl.replace(/\/+$/, '')
+  return renderQrCodeSvg(`${siteUrl}/tracking?order_id=${props.order.id}`, { size: 54 })
+})
 
 const handlePrint = () => {
   if (import.meta.client) {
@@ -256,7 +264,7 @@ const handlePrint = () => {
           secara elektronik oleh sistem.
         </p>
         <p class="m-0 text-brand-faint">
-          Butuh bantuan transaksi? Hubungi support@shelfstack.co.id atau CS 24/7.
+          Butuh bantuan transaksi? Hubungi support@shelfstack.atsiilaarya.me atau CS 24/7.
         </p>
       </div>
     </div>
