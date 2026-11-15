@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { formatRupiah } from '~/utils/format'
 import { shippingRateTiers, type ShippingRateTier } from '~~/shared/schemas/shipping'
+import type { UiSelectOption } from '~/components/ui/UiSelect.vue'
 
 const props = defineProps<{
   productPrice: number
@@ -10,15 +11,15 @@ const props = defineProps<{
 const isOpen = ref(false)
 const selectedCity = ref('Jakarta Selatan')
 
-const popularCities = [
-  'Jakarta Selatan',
-  'Bandung',
-  'Surabaya',
-  'Semarang',
-  'Yogyakarta',
-  'Medan',
-  'Makassar',
-  'Denpasar',
+const cityOptions: UiSelectOption[] = [
+  { label: 'Jakarta Selatan', value: 'Jakarta Selatan' },
+  { label: 'Bandung', value: 'Bandung' },
+  { label: 'Surabaya', value: 'Surabaya' },
+  { label: 'Semarang', value: 'Semarang' },
+  { label: 'Yogyakarta', value: 'Yogyakarta' },
+  { label: 'Medan', value: 'Medan' },
+  { label: 'Makassar', value: 'Makassar' },
+  { label: 'Denpasar', value: 'Denpasar' },
 ]
 
 const subtotalCents = computed(() => Math.round(props.productPrice * 100))
@@ -76,12 +77,7 @@ const freeShippingDeficit = computed(() => {
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
-        <span
-          v-if="freeShippingDeficit === 0"
-          class="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold"
-        >
-          Bebas Ongkir
-        </span>
+        <UiBadge v-if="freeShippingDeficit === 0" label="Bebas Ongkir" variant="success" />
         <i
           class="pi pi-chevron-down text-xs text-brand-muted transition-transform duration-300"
           :class="{ 'rotate-180': isOpen }"
@@ -94,29 +90,25 @@ const freeShippingDeficit = computed(() => {
     <div v-show="isOpen" class="mt-4 pt-3 border-t border-brand-hairsoft space-y-3">
       <!-- Destination City Selector -->
       <div>
-        <label class="block text-[11px] font-semibold text-brand-muted mb-1.5"
-          >Pilih Kota Tujuan Pengiriman</label
-        >
-        <select
+        <label class="block text-[11px] font-semibold text-brand-muted mb-1.5">
+          Pilih Kota Tujuan Pengiriman
+        </label>
+        <UiSelect
           v-model="selectedCity"
-          class="w-full rounded-xl border border-brand-hair bg-brand-canvas px-3 py-2 text-xs font-medium text-brand-ink focus:outline-none focus:ring-1 focus:ring-brand-accent cursor-pointer"
-        >
-          <option v-for="city in popularCities" :key="city" :value="city">
-            {{ city }}
-          </option>
-        </select>
+          :options="cityOptions"
+          size="sm"
+          block
+          placeholder="Pilih kota tujuan..."
+        />
       </div>
 
       <!-- Free Shipping Promotion Tip -->
-      <div
-        v-if="freeShippingDeficit > 0"
-        class="rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-2 text-[11px] text-amber-800"
-      >
-        <p class="m-0">
+      <UiAlert v-if="freeShippingDeficit > 0" variant="warning" class="py-2.5 text-[11px]">
+        <p class="m-0 text-xs">
           Tambah belanja <strong>{{ formatRupiah(freeShippingDeficit) }}</strong> lagi untuk
           mendapatkan <strong>Bebas Ongkir</strong> layanan Reguler.
         </p>
-      </div>
+      </UiAlert>
 
       <!-- Shipping Rates Matrix -->
       <div
@@ -139,7 +131,7 @@ const freeShippingDeficit = computed(() => {
 
           <span
             class="font-display font-bold tabular-nums whitespace-nowrap"
-            :class="tier.isFree ? 'text-emerald-600' : 'text-brand-ink'"
+            :class="tier.isFree ? 'text-brand-success-text' : 'text-brand-ink'"
           >
             {{ tier.formattedCost }}
           </span>
