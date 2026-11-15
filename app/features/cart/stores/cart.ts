@@ -89,59 +89,72 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
+  const clearCart = () => {
+    items.value = []
+    appliedCoupon.value = null
+    if (import.meta.client) {
+      localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(COUPON_STORAGE_KEY)
+    }
+  }
+
+  const resetOnLogout = () => {
+    clearCart()
+  }
+
   // Inisialisasi saat store dibuat di browser
   if (import.meta.client) {
     initCart()
+
+    try {
+      const user = useSupabaseUser()
+      watch(
+        () => user?.value?.id,
+        (newUserId, oldUserId) => {
+          if (oldUserId && !newUserId) {
+            resetOnLogout()
+          }
+        },
+      )
+    } catch {
+      // Abaikan jika useSupabaseUser tidak tersedia di lingkungan non-Nuxt
+    }
   }
 
   // Getters
-  const totalItems = computed(() => {
-    return items.value.reduce((total, item) => total + item.quantity, 0)
-  })
-
-  const totalPrice = computed(() => {
-    return items.value.reduce((total, item) => total + item.price * item.quantity, 0)
-  })
-
-  const totalPriceCents = computed(() => {
-    return items.value.reduce((total, item) => total + item.priceCents * item.quantity, 0)
-  })
-
-  const formattedTotalPrice = computed(() => {
-    return formatRupiah(totalPrice.value)
-  })
-
+  const totalItems = computed(() => items.value.reduce((total, item) => total + item.quantity, 0))
+  const totalPrice = computed(() =>
+    items.value.reduce((total, item) => total + item.price * item.quantity, 0),
+  )
+  const totalPriceCents = computed(() =>
+    items.value.reduce((total, item) => total + item.priceCents * item.quantity, 0),
+  )
+  const formattedTotalPrice = computed(() => formatRupiah(totalPrice.value))
   const isEmpty = computed(() => items.value.length === 0)
 
   // Kalkulasi Diskon Voucher Dinamis
-  const discountCents = computed(() => {
-    return calculateCouponDiscountCents(appliedCoupon.value, totalPriceCents.value)
-  })
-
+  const discountCents = computed(() =>
+    calculateCouponDiscountCents(appliedCoupon.value, totalPriceCents.value),
+  )
   const discountAmount = computed(() => discountCents.value / 100)
   const formattedDiscountAmount = computed(() => formatRupiah(discountAmount.value))
-
   const finalPriceCents = computed(() => Math.max(0, totalPriceCents.value - discountCents.value))
   const finalPrice = computed(() => finalPriceCents.value / 100)
   const formattedFinalPrice = computed(() => formatRupiah(finalPrice.value))
-
-  const isCouponValidForCurrentSubtotal = computed(() => {
-    return isCouponEligible(appliedCoupon.value, totalPriceCents.value)
-  })
+  const isCouponValidForCurrentSubtotal = computed(() =>
+    isCouponEligible(appliedCoupon.value, totalPriceCents.value),
+  )
 
   // Actions
   const openDrawer = () => {
     isDrawerOpen.value = true
   }
-
   const closeDrawer = () => {
     isDrawerOpen.value = false
   }
-
   const toggleDrawer = () => {
     isDrawerOpen.value = !isDrawerOpen.value
   }
-
   const applyCoupon = (coupon: AppliedCoupon) => {
     appliedCoupon.value = coupon
     saveCoupon()
@@ -248,15 +261,6 @@ export const useCartStore = defineStore('cart', () => {
     saveCart()
   }
 
-  const clearCart = () => {
-    items.value = []
-    appliedCoupon.value = null
-    if (import.meta.client) {
-      localStorage.removeItem(STORAGE_KEY)
-      localStorage.removeItem(COUPON_STORAGE_KEY)
-    }
-  }
-
   return {
     items,
     appliedCoupon,
@@ -283,5 +287,6 @@ export const useCartStore = defineStore('cart', () => {
     updateQuantity,
     removeItem,
     clearCart,
+    resetOnLogout,
   }
 })

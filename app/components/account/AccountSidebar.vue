@@ -11,6 +11,7 @@ import { useLoyaltyPoints } from '~/composables/useLoyaltyPoints'
 const route = useRoute()
 const { user, profile, signOut } = useAuth()
 const wishlistStore = useWishlistStore()
+const cartStore = useCartStore()
 const notificationStore = useNotificationStore()
 const { activeCount: activeVoucherCount } = useUserVouchers()
 const { balanceCoins } = useLoyaltyPoints()
@@ -105,6 +106,7 @@ const handleLogout = () => {
     rejectLabel: 'Batal',
     accept: async () => {
       wishlistStore.resetOnLogout()
+      cartStore.resetOnLogout()
       await signOut()
       await navigateTo('/')
     },

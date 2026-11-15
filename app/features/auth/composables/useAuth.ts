@@ -188,6 +188,8 @@ export function useAuth() {
       try {
         localStorage.removeItem('shelfstack-wishlist')
         localStorage.removeItem('shelfstack-wishlist-is-guest')
+        localStorage.removeItem('shelfstack-cart')
+        localStorage.removeItem('shelfstack-applied-coupon')
       } catch {
         // Storage error ignored
       }

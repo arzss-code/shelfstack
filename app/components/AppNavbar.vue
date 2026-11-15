@@ -85,6 +85,7 @@ const handleLogout = async () => {
   isMobileMenuOpen.value = false
   notificationStore.cleanupRealtimeListener()
   wishlistStore.resetOnLogout()
+  cartStore.resetOnLogout()
   await signOut()
   router.push('/')
 }
