@@ -10,6 +10,7 @@ import ProductRelatedSection from '~/components/product/ProductRelatedSection.vu
 import ProductRecentlyViewedSection from '~/components/product/ProductRecentlyViewedSection.vue'
 import ProductSocialShare from '~/components/product/ProductSocialShare.vue'
 import ProductFlashSaleBanner from '~/components/promotions/ProductFlashSaleBanner.vue'
+import ProductShippingEstimator from '~/components/product/ProductShippingEstimator.vue'
 import { useRecentlyViewed } from '~/composables/useRecentlyViewed'
 import { useFlashSale } from '~/composables/useFlashSale'
 
@@ -245,6 +246,7 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
             @add-to-bag="onAddToBag"
             @buy-now="onBuyNow"
           />
+          <ProductShippingEstimator :product-price="product.price" />
           <ProductSocialShare :product="product" />
         </div>
       </div>
