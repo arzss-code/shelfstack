@@ -2,6 +2,43 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.25] - 2026-11-15
+
+### Remediasi Audit Komprehensif: Sinkronisasi Transaksi, Hardening Keamanan, dan Optimasi SSR
+
+- **Aktivasi Modal Pembayaran Midtrans Snap (`useCheckoutOrder.ts`, `nuxt.config.ts`)**:
+  - Memperbaiki evaluasi runtime config `enableMidtransSandbox` sehingga popup Midtrans Snap muncul otomatis saat checkout diproses.
+  - Menambahkan alias `enableMidtrans` pada runtime config `nuxt.config.ts`.
+- **Sinkronisasi Ambang Batas Kedaluwarsa Pesanan 120 Menit (`order-expiry.ts`, `order-service/config.ts`, `docker-compose.prod.yml`)**:
+  - Menyelaraskan konstanta `ORDER_EXPIRY_MINUTES` ke 120 menit di seluruh tumpukan aplikasi: antarmuka UI timer, worker antrean BullMQ, dan deployment Docker produksi.
+  - Mencegah pembatalan prematur pada menit ke-30 saat pengguna masih melihat sisa waktu pembayaran di aplikasi.
+- **Integrasi Database Flash Deals & Seeding Aktif (`flash-sale.ts`, `database.types.ts`, `seed.sql`)**:
+  - Mengarahkan mesin kampanye kilat untuk memverifikasi data langsung dari tabel `public.flash_deals` sebelum menerapkan perhitungan fallback.
+  - Menambahkan definisi tipe TypeScript untuk `flash_deals` dan memasukkan 5 data benih promosi aktif.
+- **Validasi Inventaris Riil pada Alur Pesan Ulang (`orders/[id]/index.ts`, `useOrderDetail.ts`)**:
+  - Menyertakan kolom `stock` pada relasi produk pesanan dan membatasi jumlah pesan ulang sesuai stok gudang aktif, mengeliminasi injeksi nilai stok palsu.
+- **Pemulihan SSR SEO dan Rich Snippet Schema.org (`pages/product/[id].vue`)**:
+  - Memigrasikan pemanggilan data produk ke `useAsyncData` top-level sehingga bot mesin pencari dan crawler media sosial menerima tag Open Graph dan JSON-LD terstruktur secara lengkap pada initial server-rendered HTML.
+- **Pembersihan Kebocoran Memori Rate Limiter (`server/utils/rate-limit.ts`)**:
+  - Menambahkan mekanisme pembersihan berkala `cleanup()` untuk memangkas bucket kadaluwarsa (> 2 interval) dan membatasi kapasitas maksimal pelacakan hingga 5.000 bucket.
+- **Proteksi Endpoint Pelacakan Logistik Publik (`nuxt.config.ts`)**:
+  - Menetapkan aturan pembatasan laju 20 token per menit pada `/api/tracking/**` untuk menangkal serangan IDOR dan enumerasi data nomor resi kurir.
+- **Inspeksi Binary Magic Bytes pada Unggahan Berkas (`file-signature.ts`, `returns/upload.post.ts`, `support/upload.post.ts`)**:
+  - Membuat utilitas validasi byte biner untuk mendeteksi tanda tangan format file JPEG, PNG, dan WebP secara akurat, mencegah manipulasi header MIME content-type.
+- **Verifikasi Tanda Tangan Webhook Timing-Safe (`server/utils/midtrans.ts`)**:
+  - Menerapkan perbandingan hash kriptografi konstan `crypto.timingSafeEqual` yang dilengkapi validasi panjang buffer guna menutup celah serangan waktu (timing attack).
+- **Paralelisasi Kueri Dasbor Akun (`server/api/account/stats.get.ts`)**:
+  - Mempercepat waktu respons endpoint dengan menjalankan 5 kueri database agregat secara simultan menggunakan `Promise.all`.
+- **Pengetatan Tipe Respons API (0 `: any`) (`server/utils/response.ts`)**:
+  - Mengganti seluruh 4 tipe `: any` dengan generic bertipe ketat dan type guard aman.
+- **Kepatuhan Batas Baris useOrderDetail (`app/composables/useOrderDetail.ts`)**:
+  - Merapikan pemanggilan toast dan alur realtime sehingga berkas berukuran 275 baris (patuh di bawah batas 300 baris) setelah format Prettier.
+- **Verifikasi Kualitas**:
+  - `pnpm lint`: 0 error, 0 warning.
+  - `pnpm typecheck`: EXIT 0 (0 compilation errors).
+  - `pnpm exec vitest run`: 130 berkas tes / 1.248 pengujian lolos 100%.
+  - GitHub Actions CI/CD (PR #100): Seluruh 4 job (Docker, Code Quality, Tests, Playwright E2E) lolos 100%.
+
 ## [v1.1.0-beta.24] - 2026-11-15
 
 ### Remediasi Utility Classes Brand Obsidian pada Main CSS untuk Mencegah Transparent Washout
