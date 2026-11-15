@@ -38,20 +38,37 @@ const { getDealForProduct } = useFlashSale()
 <template>
   <section
     ref="flashSectionRef"
-    class="w-full bg-brand-ink text-white rounded-card p-6 sm:p-10 shadow-floating"
+    class="relative w-full overflow-hidden rounded-card bg-gradient-to-br from-[#0c0d12] via-brand-ink to-[#13151f] p-6 sm:p-10 text-white shadow-floating"
   >
+    <!-- Background Ambient Glow -->
     <div
-      class="flex flex-col lg:flex-row lg:items-center justify-between pb-8 gap-4 border-b border-white/10"
+      class="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-gradient-to-br from-amber-500/15 via-rose-500/10 to-transparent blur-3xl"
+      aria-hidden="true"
+    />
+
+    <!-- Header Section -->
+    <div
+      class="relative z-10 flex flex-col justify-between gap-4 border-b border-white/[0.08] pb-8 lg:flex-row lg:items-center"
     >
       <div>
-        <div class="flex items-center gap-2 mb-1.5 text-blue-400">
-          <i class="pi pi-bolt text-base" aria-hidden="true" />
-          <span class="text-xs font-bold tracking-wide uppercase">Penawaran Pilihan Toko</span>
+        <div class="mb-1.5 flex items-center gap-2">
+          <span class="relative flex h-2 w-2">
+            <span
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"
+            />
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+          </span>
+          <span
+            class="inline-flex items-center gap-1 rounded-full bg-rose-500/15 border border-rose-500/30 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-rose-300"
+          >
+            <i class="pi pi-bolt text-[10px] text-amber-400" aria-hidden="true" />
+            Penawaran Pilihan Toko
+          </span>
         </div>
-        <h2 class="font-display text-2xl sm:text-3xl font-bold text-white m-0">
+        <h2 class="m-0 font-display text-2xl font-extrabold text-white sm:text-3xl">
           Koleksi Pilihan Terbatas
         </h2>
-        <p class="text-xs sm:text-sm text-white/70 m-0 mt-1">
+        <p class="m-0 mt-1 text-xs text-white/70 sm:text-sm">
           Koleksi kurasi produk unggulan dengan harga langsung dari katalog resmi ShelfStack.
         </p>
       </div>
@@ -59,24 +76,24 @@ const { getDealForProduct } = useFlashSale()
       <!-- Countdown HANYA TAMPIL jika ada promoEndsAt nyata dari data backend -->
       <div
         v-if="countdownData"
-        class="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-card border border-white/10 shrink-0"
+        class="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 shadow-inner shrink-0"
       >
-        <span class="text-xs text-white/70">Berakhir dalam</span>
-        <span
+        <span class="text-xs font-medium text-white/70">Berakhir dalam:</span>
+        <div
           data-testid="flash-deals-timer"
-          class="font-display text-base font-bold text-white tracking-widest tabular-nums"
+          class="font-mono text-sm font-bold text-amber-300 tabular-nums tracking-widest"
         >
           {{ countdownData.formatted }}
-        </span>
+        </div>
       </div>
 
       <!-- Badge Kurasi Jujur jika tidak ada timer promo data-driven (anti fake urgency) -->
       <div
         v-else
         data-testid="flash-deals-curated-badge"
-        class="flex items-center gap-2 bg-white/10 px-3.5 py-2 rounded-card border border-white/10 shrink-0 text-white/90 text-xs font-medium"
+        class="flex shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-3.5 py-2 text-xs font-medium text-white/90"
       >
-        <i class="pi pi-verified text-brand-accent text-sm" aria-hidden="true" />
+        <i class="pi pi-verified text-sm text-brand-accent" aria-hidden="true" />
         <span>Koleksi Pilihan Resmi</span>
       </div>
     </div>
@@ -85,20 +102,20 @@ const { getDealForProduct } = useFlashSale()
     <div
       v-if="isLoading"
       data-testid="flash-deals-skeleton"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-8 animate-pulse"
+      class="grid grid-cols-1 gap-4 pt-8 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 animate-pulse"
     >
       <div
         v-for="i in 4"
         :key="i"
-        class="bg-white/10 rounded-card p-4 flex flex-col justify-between gap-3 border border-white/5"
+        class="flex flex-col justify-between gap-3 rounded-card border border-white/5 bg-white/10 p-4"
       >
-        <div class="aspect-square rounded-media bg-white/20 w-full" />
-        <div class="space-y-2 mt-2">
-          <div class="h-3 bg-white/20 rounded w-1/3" />
-          <div class="h-4 bg-white/30 rounded w-3/4" />
-          <div class="h-4 bg-white/20 rounded w-1/2" />
+        <div class="aspect-square w-full rounded-media bg-white/20" />
+        <div class="mt-2 space-y-2">
+          <div class="h-3 w-1/3 rounded bg-white/20" />
+          <div class="h-4 w-3/4 rounded bg-white/30" />
+          <div class="h-4 w-1/2 rounded bg-white/20" />
         </div>
-        <div class="h-9 bg-white/20 rounded-full w-full mt-2" />
+        <div class="mt-2 h-9 w-full rounded-full bg-white/20" />
       </div>
     </div>
 
@@ -106,15 +123,15 @@ const { getDealForProduct } = useFlashSale()
     <div
       v-else-if="displayProducts.length === 0"
       data-testid="flash-deals-empty"
-      class="pt-8 pb-4 text-center flex flex-col items-center justify-center py-10"
+      class="flex flex-col items-center justify-center py-12 text-center"
     >
       <div
-        class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-brand-accent mb-3"
+        class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-brand-accent"
       >
         <i class="pi pi-bolt text-xl" />
       </div>
-      <h3 class="font-display text-lg font-bold text-white m-0">Penawaran Spesial Segera Hadir</h3>
-      <p class="text-xs sm:text-sm text-white/70 max-w-md m-0 mt-1">
+      <h3 class="m-0 font-display text-lg font-bold text-white">Penawaran Spesial Segera Hadir</h3>
+      <p class="m-0 mt-1 max-w-md text-xs text-white/70 sm:text-sm">
         Saat ini penawaran terbatas sedang dipersiapkan. Pantau terus halaman ini untuk alokasi
         produk pilihan berikutnya.
       </p>
@@ -134,16 +151,16 @@ const { getDealForProduct } = useFlashSale()
     <div
       v-else
       data-testid="flash-deals-grid"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-8"
+      class="relative z-10 grid grid-cols-1 gap-4 pt-8 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
     >
       <div
         v-for="product in displayProducts"
         :key="product.id"
-        class="bg-white text-brand-ink rounded-card p-4 flex flex-col justify-between gap-3 shadow-whisper group"
+        class="group flex flex-col justify-between gap-3 rounded-card border border-brand-hair bg-white p-4 text-brand-ink shadow-whisper transition-shadow hover:shadow-floating"
         data-testid="flash-deal-card"
       >
         <div
-          class="relative aspect-square rounded-media overflow-hidden bg-brand-canvas-soft border border-brand-hair flex items-center justify-center"
+          class="relative flex aspect-square items-center justify-center overflow-hidden rounded-media border border-brand-hair bg-brand-canvas-soft"
         >
           <img
             v-if="product.image_url && !failedDealImages[product.id]"
@@ -153,61 +170,61 @@ const { getDealForProduct } = useFlashSale()
             width="400"
             height="400"
             decoding="async"
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
             @error="onImageError(product.id)"
           />
           <div
             v-else
-            class="flex flex-col items-center justify-center w-full h-full text-brand-muted gap-1.5 bg-brand-canvas-soft"
+            class="flex h-full w-full flex-col items-center justify-center gap-1.5 bg-brand-canvas-soft text-brand-muted"
           >
             <i class="pi pi-image text-2xl opacity-25" aria-hidden="true" />
-            <span class="text-[10px] font-semibold tracking-widest uppercase opacity-40"
-              >ShelfStack</span
-            >
+            <span class="text-[10px] font-semibold uppercase tracking-widest opacity-40">
+              ShelfStack
+            </span>
           </div>
           <span
             data-testid="deal-badge"
-            class="absolute top-2 left-2 bg-brand-ink text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm"
+            class="absolute top-2 left-2 rounded-full bg-brand-ink px-2.5 py-0.5 text-[10px] font-bold text-white shadow-sm"
           >
             {{ getProductBadge(product) }}
           </span>
         </div>
 
         <div>
-          <!-- Hanya tampilkan rating jika data rating nyata > 0 -->
+          <!-- Rating jika > 0 -->
           <div
             v-if="product.rating && Number(product.rating) > 0"
-            class="flex items-center gap-1 text-[11px] text-brand-muted mb-1 tabular-nums"
+            class="mb-1 flex items-center gap-1 text-[11px] text-brand-muted tabular-nums"
           >
             <i class="pi pi-star-fill text-[10px] text-amber-500" aria-hidden="true" />
             <span class="font-bold text-brand-ink">{{ Number(product.rating).toFixed(1) }}</span>
             <span v-if="product.review_count">({{ product.review_count }})</span>
             <span v-else-if="product.sold_count">· {{ product.sold_count }} terjual</span>
           </div>
-          <!-- Jika tidak ada rating terverifikasi, tampilkan ketersediaan stok fisik -->
-          <div v-else class="flex items-center gap-1 text-[11px] text-brand-muted mb-1">
+          <!-- Stok fisik -->
+          <div v-else class="mb-1 flex items-center gap-1 text-[11px] text-brand-muted">
             <span
               v-if="product.stock > 0"
-              class="text-brand-success font-medium flex items-center gap-1"
+              class="flex items-center gap-1 font-medium text-brand-success"
             >
               <i class="pi pi-check-circle text-[10px]" aria-hidden="true" />
               Stok Tersedia
             </span>
-            <span v-else class="text-brand-danger font-medium">Stok Habis</span>
+            <span v-else class="font-medium text-brand-danger">Stok Habis</span>
           </div>
 
           <h3
-            class="font-display text-sm font-bold text-brand-ink m-0 line-clamp-1"
+            class="m-0 line-clamp-1 font-display text-sm font-bold text-brand-ink"
             :title="product.name"
           >
             {{ product.name }}
           </h3>
-          <div class="flex items-baseline gap-2 mt-1.5 flex-wrap">
+          <div class="mt-1.5 flex flex-wrap items-baseline gap-2">
             <template v-if="getDealForProduct(product.id)">
               <span
                 data-testid="deal-price"
-                class="font-display text-base font-bold text-brand-danger tabular-nums"
+                class="font-display text-base font-extrabold text-rose-600 tabular-nums"
               >
                 {{ formatRupiah(getDealForProduct(product.id)!.promo_price_cents / 100) }}
               </span>
@@ -233,6 +250,7 @@ const { getDealForProduct } = useFlashSale()
             <FlashSaleProgress
               :claimed="getDealForProduct(product.id)!.claimed"
               :quota="getDealForProduct(product.id)!.quota"
+              theme="light"
             />
           </div>
         </div>

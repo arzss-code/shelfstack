@@ -2,6 +2,26 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.21] - 2026-11-15
+
+### Sinkronisasi Harga Promo Flash Sale & Visual Craft Banner PDP
+
+- **Engine Terpadu & Sumber Kebenaran Server (`server/utils/flash-sale.ts`, 137 baris)**:
+  - Menyediakan single source of truth untuk penentuan window kampanye promo 24 jam harian, kalkulasi diskon deterministik (15% - 35%), serta resolver harga promo `resolveProductPromoPrice`.
+- **Rekonsiliasi Keranjang Anti-Drift Promo (`server/api/cart/reconcile.post.ts`, 137 baris)**:
+  - Memperbarui mekanisme rekonsiliasi keranjang agar memeriksa kampanye Flash Sale yang sedang aktif. Mencegah keranjang dan checkout mereset harga promo kembali ke harga normal selama kuota masih tersedia.
+- **Integrasi Transaksional Database (`supabase/migrations/20261201000001_flash_deals_and_campaigns.sql`, 230 baris)**:
+  - Membuat tabel `public.flash_deals` dengan audit kuota `claimed` dan RLS policy.
+  - Memperbarui RPC `create_order` PostgreSQL sehingga secara atomik mengunci dan menerapkan `promo_price_cents` serta memperbarui klaim kuota saat checkout berlangsung.
+- **Peningkatan Visual Taste Banner PDP (`ProductFlashSaleBanner.vue`, 118 baris)**:
+  - Menghilangkan tampilan kotak hitam kaku lama dan menggantinya dengan gradient obsidian mewah (`from-[#0e0f14] via-brand-ink to-[#13141a]`), ambient glow halus, live pulse indicator merah, serta digital ticker timer tersegmentasi bergaya precision watch.
+  - Mengintegrasikan in-set glass quota card dengan progress bar gradasi ember-flame.
+- **Keselarasan Visual Kartu Beranda & Keranjang Belanja (`HomeFlashDeals.vue`, 270 baris & `CartDrawerItem.vue`, 195 baris)**:
+  - Memperbarui kartu Flash Deals di beranda dengan indikator harga promo tajam dan progress bar bertema terang.
+  - Menampilkan badge "Flash Sale" dan perbandingan harga coret langsung pada Cart Drawer agar calon pembeli mendapatkan kepastian diskon sebelum checkout.
+- **Pengujian Unit & Tata Kelola Kode (`tests/unit/flash-sale-price-sync.spec.ts`, 96 baris)**:
+  - 9 pengujian unit memverifikasi matematis diskon, sinkronisasi kuota, kelengkapan ARIA timer/progressbar, batasan berkas <= 300 baris, dan larangan karakter em dash.
+
 ## [v1.1.0-beta.20] - 2026-11-15
 
 ### Standarisasi Elemen UI ke Primitif Sistem Desain & Anti-Slop Sweep
