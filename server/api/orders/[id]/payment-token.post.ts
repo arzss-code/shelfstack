@@ -1,5 +1,6 @@
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { ORDER_EXPIRY_HOURS } from '../../../../shared/constants/order-expiry'
 import { isMidtransDuplicateOrderError } from '../../../utils/midtrans'
 import { logger } from '../../../utils/logger'
 
@@ -90,6 +91,10 @@ export default defineEventHandler(async (event) => {
         customer_details: {
           first_name: (address.name as string) || 'Pelanggan',
           phone: (address.phone as string) || '',
+        },
+        expiry: {
+          duration: ORDER_EXPIRY_HOURS,
+          unit: 'hours',
         },
       },
     })

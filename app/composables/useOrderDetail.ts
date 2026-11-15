@@ -65,7 +65,7 @@ export function useOrderDetail(orderId: string) {
           if (!silent || wasPending) {
             toast.show({
               title: 'Waktu Pembayaran Habis',
-              message: 'Batas waktu 15 menit telah berakhir. Pesanan dibatalkan otomatis.',
+              message: 'Batas waktu pembayaran telah berakhir. Pesanan dibatalkan otomatis.',
               tone: 'warn',
             })
           }

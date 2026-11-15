@@ -2,6 +2,25 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.15] - 2026-11-15
+
+### Standarisasi Batas Waktu Pembayaran Pesanan 2 Jam (E-Commerce Best Practice)
+
+- **Konstanta Terpusat Batas Waktu Pembayaran (`shared/constants/order-expiry.ts`, 8 baris)**:
+  - Menetapkan konstanta baku `ORDER_EXPIRY_MINUTES = 120` (2 jam), `ORDER_EXPIRY_HOURS = 2`, dan `ORDER_EXPIRY_MS`.
+  - Memberikan waktu yang memadai bagi pelanggan untuk menyelesaikan pembayaran melalui kanal transfer bank, e-wallet, maupun virtual account tanpa membatalkan transaksi terburu-buru.
+- **Sinkronisasi Snap Token Midtrans Expiry (`server/api/orders/[id]/payment-token.post.ts`, 159 baris)**:
+  - Menyertakan payload `expiry: { duration: ORDER_EXPIRY_HOURS, unit: 'hours' }` pada transaksi Midtrans Snap, menyelaraskan masa berlaku transaksi di gateway dengan batas waktu di platform ShelfStack.
+- **Rekonsiliasi Batas Waktu di Endpoint Status Server (`server/api/orders/[id]/check-payment-status.post.ts`, 270 baris)**:
+  - Menggantikan evaluasi waktu timeout statis 15 menit dengan konstanta `ORDER_EXPIRY_MS` (120 menit).
+  - Membatalkan pesanan secara otomatis dan aman melalui RPC `handle_payment_webhook` bila telah melampaui 120 menit tanpa pembayaran terkonfirmasi.
+- **Tampilan Timer & Copywriter Reaktif Multi-Format (`OrderPaymentCountdownCard.vue`, `useOrderDetail.ts`)**:
+  - Komponen timer otomatis memformat waktu ke `HH:mm:ss` saat sisa waktu lebih dari 1 jam dan `mm:ss` saat di bawah 1 jam.
+  - Label dan teks penjelasan kedaluwarsa beradaptasi dinamis (`2 jam` / pesan ramah pengguna).
+- **Pengujian Unit & Tata Kelola Kode (`tests/unit/check-payment-status.spec.ts`, 87 baris)**:
+  - Memverifikasi logika evaluasi 120 menit (121 menit memicu pembatalan, 110 menit tetap pending).
+  - 9 pengujian lulus 100%, seluruh file `<= 300` baris, dan bebas karakter em dash.
+
 ## [v1.1.0-beta.14] - 2026-11-15
 
 ### Sinkronisasi Otomatis Status Pembatalan Batas Waktu Pembayaran (15-Minute Expiry Sync)
