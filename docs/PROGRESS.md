@@ -7,7 +7,7 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 26 (Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview)**
-- **Versi Rilis:** `v1.1.0-beta.23` (Pre-release Staging / develop aktif : sinkron dengan `version.json` dan `package.json`)
+- **Versi Rilis:** `v1.1.0-beta.24` (Pre-release Staging / develop aktif : sinkron dengan `version.json` dan `package.json`)
 - **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 130 file / 1.248 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
