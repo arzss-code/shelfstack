@@ -1,21 +1,33 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { formatRupiah } from '~/utils/format'
 import type { InstantSearchProduct, InstantSearchCategory } from '~~/shared/types/search'
 
-const props = defineProps<{
-  isOpen: boolean
-  isLoading: boolean
-  errorMessage: string | null
-  query: string
-  products: InstantSearchProduct[]
-  categories: InstantSearchCategory[]
-  activeIndex: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    isOpen: boolean
+    isLoading: boolean
+    errorMessage: string | null
+    query: string
+    products: InstantSearchProduct[]
+    categories: InstantSearchCategory[]
+    activeIndex: number
+    recentSearches?: string[]
+    popularTags?: readonly string[]
+  }>(),
+  {
+    recentSearches: () => [],
+    popularTags: () => [],
+  },
+)
 
 const emit = defineEmits<{
   selectCategory: [category: InstantSearchCategory]
   selectProduct: [product: InstantSearchProduct]
   submitSearch: [query: string]
+  selectTag: [tag: string]
+  removeRecent: [term: string]
+  clearRecent: []
   retry: []
   close: []
 }>()
@@ -23,6 +35,7 @@ const emit = defineEmits<{
 const getCategoryIndex = (idx: number) => idx
 const getProductIndex = (idx: number) => props.categories.length + idx
 const getFooterIndex = () => props.categories.length + props.products.length
+const isQueryEmpty = computed(() => props.query.trim().length < 2)
 </script>
 
 <template>
@@ -42,8 +55,75 @@ const getFooterIndex = () => props.categories.length + props.products.length
       :aria-busy="isLoading ? 'true' : undefined"
       class="absolute left-0 right-0 top-full mt-2 bg-brand-canvas border border-brand-hair rounded-card shadow-floating overflow-hidden z-50 text-left"
     >
+      <!-- State 0: Discovery Mode (Recent & Popular Searches saat query < 2 karakter) -->
+      <div v-if="isQueryEmpty" class="p-3 space-y-4">
+        <!-- Pencarian Terakhir -->
+        <div v-if="recentSearches.length > 0">
+          <div class="flex items-center justify-between mb-2">
+            <span
+              class="text-[10px] font-semibold text-brand-muted tracking-wider uppercase flex items-center gap-1.5"
+            >
+              <i class="pi pi-history text-xs text-brand-muted" aria-hidden="true" />
+              <span>Pencarian Terakhir</span>
+            </span>
+            <button
+              type="button"
+              class="text-[11px] text-brand-muted hover:text-brand-danger transition-colors cursor-pointer bg-transparent border-0 p-0"
+              @click.stop="emit('clearRecent')"
+            >
+              Hapus Semua
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <div
+              v-for="term in recentSearches"
+              :key="term"
+              class="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 text-xs font-medium rounded-full bg-brand-canvas-soft border border-brand-hair text-brand-ink group hover:border-brand-ink transition-colors"
+            >
+              <button
+                type="button"
+                class="hover:underline cursor-pointer bg-transparent border-0 p-0 text-left text-brand-ink"
+                @click="emit('selectTag', term)"
+              >
+                {{ term }}
+              </button>
+              <button
+                type="button"
+                aria-label="Hapus pencarian ini"
+                class="w-4 h-4 rounded-full flex items-center justify-center text-brand-muted hover:text-brand-danger hover:bg-brand-hair/60 transition-colors cursor-pointer bg-transparent border-0 p-0 ml-0.5"
+                @click.stop="emit('removeRecent', term)"
+              >
+                <i class="pi pi-times text-[9px]" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pencarian Populer -->
+        <div v-if="popularTags.length > 0">
+          <div
+            class="text-[10px] font-semibold text-brand-muted tracking-wider uppercase mb-2 flex items-center gap-1.5"
+          >
+            <i class="pi pi-bolt text-xs text-brand-accent" aria-hidden="true" />
+            <span>Pencarian Populer</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button
+              v-for="tag in popularTags"
+              :key="tag"
+              type="button"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-brand-canvas-soft hover:bg-brand-hair border border-brand-hair text-brand-ink transition-colors cursor-pointer"
+              @click="emit('selectTag', tag)"
+            >
+              <i class="pi pi-search text-[9px] text-brand-muted" aria-hidden="true" />
+              <span>{{ tag }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- State 1: Loading Skeleton -->
-      <div v-if="isLoading" class="p-3 space-y-3">
+      <div v-else-if="isLoading" class="p-3 space-y-3">
         <div class="flex items-center gap-2">
           <div class="h-3 w-16 bg-brand-hair/60 rounded animate-pulse" />
           <div class="h-6 w-20 bg-brand-canvas-soft rounded-full animate-pulse" />

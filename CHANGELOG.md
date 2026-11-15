@@ -2,6 +2,25 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.8] - 2026-11-15
+
+### Recent Searches & Trending Tags di Omnibox Navbar serta Produk Terakhir Dilihat
+
+- **Manajemen Riwayat Pencarian Lokal (`app/composables/useRecentSearches.ts`, 91 baris)**:
+  - Menyediakan composable penyimpan kata kunci pencarian di `localStorage['shelfstack_recent_searches']` dengan batas maksimal 6 entri unik.
+  - Mendukung deduplikasi case-insensitive, pemangkasan spasi, pengurutan LIFO, dan daftar tag kurasi pencarian populer (`POPULAR_SEARCH_TAGS`).
+  - Menghapus entri individual atau mengosongkan seluruh riwayat secara aman.
+- **Peningkatan Omnibox Pencarian Langsung (`app/composables/useInstantSearch.ts`, `app/components/search/SearchAutocompletePopover.vue`, `app/components/navbar/NavbarSearchBar.vue`)**:
+  - Popover pencarian otomatis terbuka saat bilah pencarian difokuskan (pada query kosong atau < 2 karakter) untuk menampilkan status "Pencarian Terakhir" dan chip "Pencarian Populer".
+  - Mengklik tag pencarian langsung mengisi query dan mengeksekusi pencarian katalog secara instan.
+  - Setiap submission pencarian (submit form, klik produk, atau klik kategori) otomatis direkam ke riwayat pencarian.
+- **Fitur Produk Terakhir Dilihat (`app/composables/useRecentlyViewed.ts`, `app/components/product/ProductRecentlyViewedSection.vue`, `app/pages/product/[id].vue`)**:
+  - Composable `useRecentlyViewed` menyimpan maksimal 8 produk terakhir yang dijelajahi pengguna di `localStorage['shelfstack_recently_viewed']`.
+  - Halaman produk (`/product/[id]`) secara otomatis mencatat produk aktif ke riwayat saat berhasil dimuat.
+  - Komponen `ProductRecentlyViewedSection.vue` menampilkan kartu produk terkurasi rapi di bagian bawah halaman produk (mengecualikan produk yang sedang aktif), lengkap dengan tombol "Hapus Riwayat".
+- **Pengujian Unit & Integritas Kode (`tests/unit/recent-searches-and-recently-viewed.spec.ts`, 212 baris)**:
+  - 11 pengujian unit memvalidasi logika composable pencarian, deduplikasi, batas maksimal riwayat, interaksi event popover, rendering kondisional section produk terakhir dilihat, serta batasan arsitektur `<= 300` baris.
+
 ## [v1.1.0-beta.7] - 2026-11-15
 
 ### Konfirmasi Penerimaan Pesanan Pelanggan & Live Payment Countdown Timer

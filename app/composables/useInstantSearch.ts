@@ -1,4 +1,5 @@
-import { getCurrentInstance } from 'vue'
+import { getCurrentInstance, isRef, ref, computed, watch, onBeforeUnmount, type Ref } from 'vue'
+import { useRecentSearches } from '~/composables/useRecentSearches'
 import type {
   InstantSearchProduct,
   InstantSearchCategory,
@@ -14,6 +15,7 @@ export function useInstantSearch(initialQuery: Ref<string> | string = '') {
   }
 
   const query = isRef(initialQuery) ? initialQuery : ref(initialQuery)
+  const recentSearchesManager = useRecentSearches()
 
   const products = ref<InstantSearchProduct[]>([])
   const categories = ref<InstantSearchCategory[]>([])
@@ -99,7 +101,6 @@ export function useInstantSearch(initialQuery: Ref<string> | string = '') {
 
     const trimmed = newVal.trim()
     if (trimmed.length < 2) {
-      isOpen.value = false
       products.value = []
       categories.value = []
       isLoading.value = false
@@ -110,6 +111,14 @@ export function useInstantSearch(initialQuery: Ref<string> | string = '') {
       executeSearch(trimmed)
     }, 250)
   })
+
+  const openOnFocus = () => {
+    isOpen.value = true
+    const trimmed = query.value.trim()
+    if (trimmed.length >= 2) {
+      executeSearch(trimmed)
+    }
+  }
 
   const navigateNext = () => {
     if (!isOpen.value || totalNavigableItems.value === 0) return
@@ -128,6 +137,7 @@ export function useInstantSearch(initialQuery: Ref<string> | string = '') {
   }
 
   const selectCategory = (category: InstantSearchCategory) => {
+    recentSearchesManager.addSearch(category.name)
     close()
     if (router) {
       router.push({ path: `/c/${category.slug}` })
@@ -135,6 +145,7 @@ export function useInstantSearch(initialQuery: Ref<string> | string = '') {
   }
 
   const selectProduct = (product: InstantSearchProduct) => {
+    recentSearchesManager.addSearch(product.name)
     close()
     if (router) {
       router.push({ path: `/product/${product.slug || product.id}` })
@@ -143,6 +154,9 @@ export function useInstantSearch(initialQuery: Ref<string> | string = '') {
 
   const submitFullSearch = (fallbackQuery?: string) => {
     const q = (fallbackQuery ?? query.value).trim()
+    if (q) {
+      recentSearchesManager.addSearch(q)
+    }
     close()
     if (router) {
       if (q) {
@@ -151,6 +165,13 @@ export function useInstantSearch(initialQuery: Ref<string> | string = '') {
         router.push({ path: '/katalog' })
       }
     }
+  }
+
+  const selectSearchTag = (tag: string) => {
+    const trimmed = tag.trim()
+    if (!trimmed) return
+    query.value = trimmed
+    submitFullSearch(trimmed)
   }
 
   const selectActiveItem = () => {
@@ -190,6 +211,13 @@ export function useInstantSearch(initialQuery: Ref<string> | string = '') {
     errorMessage,
     activeIndex,
     totalNavigableItems,
+    recentSearches: recentSearchesManager.recentSearches,
+    popularTags: recentSearchesManager.popularTags,
+    addRecentSearch: recentSearchesManager.addSearch,
+    removeRecentSearch: recentSearchesManager.removeSearch,
+    clearRecentSearches: recentSearchesManager.clearSearches,
+    selectSearchTag,
+    openOnFocus,
     navigateNext,
     navigatePrev,
     selectActiveItem,
