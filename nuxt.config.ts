@@ -82,6 +82,10 @@ export default defineNuxtConfig({
     // Proteksi rateLimiter tetap ditegakkan secara granular pada endpoint sensitif via routeRules.
     rateLimiter: false,
     headers: {
+      xContentTypeOptions: 'nosniff',
+      xFrameOptions: 'SAMEORIGIN',
+      referrerPolicy: 'strict-origin-when-cross-origin',
+      xXSSProtection: '0',
       contentSecurityPolicy: {
         'style-src': [
           "'self'",
@@ -137,6 +141,33 @@ export default defineNuxtConfig({
     '/api/midtrans/notification': {
       security: {
         rateLimiter: false,
+      },
+    },
+    // Authentication endpoints: brute-force mitigation (E-08)
+    '/api/auth/**': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 5,
+          interval: 60000,
+        },
+      },
+    },
+    // Checkout & Order creation: prevent spamming orders (E-08)
+    '/api/orders': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 10,
+          interval: 60000,
+        },
+      },
+    },
+    // Instant search: throttle rapid autocomplete requests (E-08)
+    '/api/products/search-instant': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 30,
+          interval: 60000,
+        },
       },
     },
     // Sensitive mutation endpoints: protected against abuse/fraud attempts
