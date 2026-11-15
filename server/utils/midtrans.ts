@@ -24,9 +24,17 @@ export function verifyMidtransSignature({
   }
 
   const payload = `${orderId}${statusCode}${grossAmount}${serverKey}`
-  const computedHash = crypto.createHash('sha512').update(payload).digest('hex')
+  const computedHash = crypto.createHash('sha512').update(payload).digest('hex').toLowerCase()
+  const expectedHash = signatureKey.toLowerCase()
 
-  return computedHash.toLowerCase() === signatureKey.toLowerCase()
+  if (computedHash.length !== expectedHash.length) {
+    return false
+  }
+
+  const computedBuffer = Buffer.from(computedHash, 'utf8')
+  const expectedBuffer = Buffer.from(expectedHash, 'utf8')
+
+  return crypto.timingSafeEqual(computedBuffer, expectedBuffer)
 }
 
 /**

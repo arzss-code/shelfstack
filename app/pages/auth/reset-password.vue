@@ -8,12 +8,21 @@ useSeoMeta({
 definePageMeta({ layout: 'default' })
 
 const toast = useUiToast()
+const user = useSupabaseUser()
 const { updatePassword, pending } = useAuth()
 
 const newPassword = ref('')
 const confirmPassword = ref('')
 const errors = ref<{ newPassword?: string; confirmPassword?: string }>({})
 const isSuccess = ref(false)
+const hasRecoverySession = ref(true)
+
+onMounted(() => {
+  // Periksa apakah terdapat sesi pemulihan kata sandi aktif
+  if (!user.value) {
+    hasRecoverySession.value = false
+  }
+})
 
 const validate = () => {
   const errs: typeof errors.value = {}
@@ -53,8 +62,27 @@ const handleSubmit = async () => {
     title="Buat Password Baru"
     subtitle="Pilih password yang kuat dan belum pernah digunakan sebelumnya."
   >
+    <!-- Invalid Session State -->
+    <div v-if="!hasRecoverySession" class="flex flex-col items-center text-center gap-4 py-4">
+      <div
+        class="w-14 h-14 rounded-full bg-brand-canvas-soft flex items-center justify-center border border-brand-hair"
+      >
+        <i class="pi pi-exclamation-circle text-2xl text-brand-warn-text" />
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-brand-ink m-0">Sesi Pemulihan Tidak Ditemukan</p>
+        <p class="text-xs text-brand-muted m-0 mt-1.5 leading-relaxed">
+          Tautan pemulihan mungkin sudah kedaluwarsa atau belum dibuka dari email. Silakan minta
+          tautan baru.
+        </p>
+      </div>
+      <UiButton to="/auth/forgot-password" variant="primary" icon="pi-refresh" class="mt-2">
+        Minta Tautan Baru
+      </UiButton>
+    </div>
+
     <!-- Success State -->
-    <div v-if="isSuccess" class="flex flex-col items-center text-center gap-4 py-4">
+    <div v-else-if="isSuccess" class="flex flex-col items-center text-center gap-4 py-4">
       <div
         class="w-14 h-14 rounded-full bg-brand-canvas-soft flex items-center justify-center border border-brand-hair"
       >

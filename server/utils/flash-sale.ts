@@ -79,8 +79,62 @@ export async function getActiveFlashSaleCampaign(
   client: SupabaseClient<Database>,
 ): Promise<FlashSaleCampaign> {
   const { startsAt, endsAt, isActive } = getFlashSaleTimeWindow()
+  const nowIso = new Date().toISOString()
 
-  // Ambil produk kurasi unggulan yang memiliki stok fisik
+  // 1. Ambil dari tabel fisik public.flash_deals terlebih dahulu (Authoritative DB Deals)
+  try {
+    const { data: dbDeals } = await client
+      .from('flash_deals')
+      .select(
+        'id, product_id, promo_price_cents, discount_percentage, quota, claimed, starts_at, ends_at, is_active, products(id, name, slug, price, price_cents, stock, image_url)',
+      )
+      .eq('is_active', true)
+      .lte('starts_at', nowIso)
+      .gte('ends_at', nowIso)
+
+    if (dbDeals && dbDeals.length > 0) {
+      const items: FlashDealItem[] = dbDeals.map((deal) => {
+        const p = deal.products as unknown as {
+          id: number
+          name: string
+          slug?: string | null
+          price?: number | null
+          price_cents?: number | null
+          stock?: number | null
+          image_url?: string | null
+        } | null
+        const originalPrice = p?.price_cents || Math.round(Number(p?.price || 0) * 100)
+        return {
+          product_id: deal.product_id,
+          product_slug: p?.slug || String(deal.product_id),
+          product_name: p?.name || 'Produk Flash Sale',
+          image_url: p?.image_url || null,
+          original_price_cents: originalPrice,
+          promo_price_cents: deal.promo_price_cents,
+          discount_percentage: deal.discount_percentage,
+          quota: deal.quota,
+          claimed: deal.claimed,
+          starts_at: deal.starts_at,
+          ends_at: deal.ends_at,
+          is_active: deal.is_active && deal.claimed < deal.quota,
+        }
+      })
+
+      const campaignDate = startsAt.slice(0, 10)
+      return {
+        id: `flash-sale-${campaignDate}`,
+        title: 'Flash Sale Hari Ini',
+        tagline: 'Koleksi kurasi eksklusif dengan harga promo terbatas. Stok diperbarui otomatis.',
+        ends_at: endsAt,
+        is_active: isActive && items.length > 0,
+        items,
+      }
+    }
+  } catch {
+    // Fail-open: lanjutkan ke kalkulasi deterministik jika query tabel gagal
+  }
+
+  // 2. Fallback deterministik jika database belum memiliki flash deals fisik
   const { data: products } = await client
     .from('products')
     .select('id, name, slug, price, price_cents, stock, image_url, is_featured, sold_count')

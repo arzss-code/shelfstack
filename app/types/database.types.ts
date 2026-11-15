@@ -300,6 +300,53 @@ export type Database = {
         }
         Relationships: []
       }
+      flash_deals: {
+        Row: {
+          claimed: number
+          created_at: string
+          discount_percentage: number
+          ends_at: string
+          id: string
+          is_active: boolean
+          product_id: number
+          promo_price_cents: number
+          quota: number
+          starts_at: string
+        }
+        Insert: {
+          claimed?: number
+          created_at?: string
+          discount_percentage: number
+          ends_at: string
+          id?: string
+          is_active?: boolean
+          product_id: number
+          promo_price_cents: number
+          quota: number
+          starts_at: string
+        }
+        Update: {
+          claimed?: number
+          created_at?: string
+          discount_percentage?: number
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          product_id?: number
+          promo_price_cents?: number
+          quota?: number
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'flash_deals_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       orders: {
         Row: {
           address: Json

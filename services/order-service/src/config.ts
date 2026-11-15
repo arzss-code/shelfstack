@@ -12,7 +12,7 @@ const envSchema = z.object({
   MIDTRANS_SERVER_KEY: z.string().optional(),
   INTERNAL_SERVICE_KEY: z.string().optional(),
   REDIS_URL: z.string().optional(),
-  ORDER_EXPIRY_MINUTES: z.coerce.number().int().min(1).default(30),
+  ORDER_EXPIRY_MINUTES: z.coerce.number().int().min(1).default(120),
   ORDER_SWEEP_INTERVAL_MS: z.coerce.number().int().min(10_000).default(300_000),
   BULLMQ_ENABLED: z.enum(['true', 'false']).default('true'),
 })

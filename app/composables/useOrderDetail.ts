@@ -38,50 +38,36 @@ export function useOrderDetail(orderId: string) {
 
   let channel: RealtimeChannel | null = null
   const tracking = useOrderTracking(orderId, order)
-
-  const formatShippingServiceName = (service?: string | null) => formatShippingServiceLabel(service)
+  const formatShippingServiceName = (s?: string | null) => formatShippingServiceLabel(s)
+  const notify = (
+    title: string,
+    message: string,
+    tone: 'success' | 'warn' | 'info' | 'error' = 'info',
+  ) => toast.show({ title, message, tone })
 
   const handleCheckPaymentStatus = async (silent = false) => {
     if (!order.value) return
     if (!silent) isManualChecking.value = true
     try {
       const res = await syncOrderPaymentStatus(orderId)
-      if (res) {
-        const wasPending = order.value.status === 'pending'
-        order.value.status = res.status
-        if (res.payment_type) order.value.payment_type = res.payment_type
-        if (res.is_paid) {
-          order.value.paid_at = new Date().toISOString()
-          stopPolling()
-          if (!silent || wasPending) {
-            toast.show({
-              title: 'Pembayaran Dikonfirmasi',
-              message: 'Transaksi berhasil diverifikasi. Pesanan sedang diproses.',
-              tone: 'success',
-            })
-          }
-        } else if (res.status === 'cancelled') {
-          stopPolling()
-          if (!silent || wasPending) {
-            toast.show({
-              title: 'Waktu Pembayaran Habis',
-              message: 'Batas waktu pembayaran telah berakhir. Pesanan dibatalkan otomatis.',
-              tone: 'warn',
-            })
-          }
-        } else if (!silent) {
-          toast.show({
-            title: 'Status Terkini',
-            message: 'Pembayaran belum terverifikasi atau transaksi masih pending.',
-            tone: 'info',
-          })
-        }
+      if (!res) {
+        if (!silent) notify('Kendala Sinkronisasi', 'Gagal memeriksa status gateway.', 'warn')
+        return
+      }
+      const wasPending = order.value.status === 'pending'
+      order.value.status = res.status
+      if (res.payment_type) order.value.payment_type = res.payment_type
+      if (res.is_paid) {
+        order.value.paid_at = new Date().toISOString()
+        stopPolling()
+        if (!silent || wasPending)
+          notify('Pembayaran Dikonfirmasi', 'Transaksi berhasil diverifikasi.', 'success')
+      } else if (res.status === 'cancelled') {
+        stopPolling()
+        if (!silent || wasPending)
+          notify('Waktu Pembayaran Habis', 'Pesanan dibatalkan otomatis.', 'warn')
       } else if (!silent) {
-        toast.show({
-          title: 'Kendala Sinkronisasi',
-          message: 'Gagal memeriksa status ke payment gateway.',
-          tone: 'warn',
-        })
+        notify('Status Terkini', 'Pembayaran belum terverifikasi.', 'info')
       }
     } finally {
       if (!silent) isManualChecking.value = false
@@ -95,10 +81,7 @@ export function useOrderDetail(orderId: string) {
     }, 3500)
 
   const fetchOrderDetail = async (silent = false) => {
-    if (!user.value) {
-      router.push(`/auth/login?redirect=/orders/${orderId}`)
-      return
-    }
+    if (!user.value) return router.push(`/auth/login?redirect=/orders/${orderId}`)
     if (!silent) loading.value = true
     errorMsg.value = ''
     try {
@@ -137,26 +120,18 @@ export function useOrderDetail(orderId: string) {
     }
   }
 
-  const notifyError = (title: string, err: unknown, fallback: string) => {
-    const fetchErr = err as { data?: { message?: string } }
-    toast.show({ title, message: fetchErr.data?.message || fallback, tone: 'error' })
-  }
-
   const handleCancelOrder = async (reason: string) => {
     if (!order.value || isCancelling.value) return false
     isCancelling.value = true
     try {
       await $fetch(`/api/orders/${orderId}/cancel`, { method: 'POST', body: { reason } })
       stopPolling()
-      toast.show({
-        title: 'Pesanan Dibatalkan',
-        message: 'Pesanan berhasil dibatalkan dan stok dikembalikan.',
-        tone: 'success',
-      })
+      notify('Pesanan Dibatalkan', 'Pesanan berhasil dibatalkan dan stok dikembalikan.', 'success')
       await fetchOrderDetail()
       return true
     } catch (err: unknown) {
-      notifyError('Gagal Membatalkan', err, 'Gagal membatalkan pesanan.')
+      const fetchErr = err as { data?: { message?: string } }
+      notify('Gagal Membatalkan', fetchErr.data?.message || 'Gagal membatalkan pesanan.', 'error')
       return false
     } finally {
       isCancelling.value = false
@@ -165,24 +140,29 @@ export function useOrderDetail(orderId: string) {
 
   const handleReorder = () => {
     if (!order.value?.items?.length) return
+    let added = 0
     for (const item of order.value.items) {
+      const stock = (item.product as { stock?: number } | undefined)?.stock ?? item.qty
+      if (stock <= 0) continue
       cartStore.addItem({
         productId: item.product_id,
         name: item.product?.name || `Produk #${item.product_id}`,
         price: item.price_cents / 100,
         priceCents: item.price_cents,
         imageUrl: item.product?.image_url ?? null,
-        quantity: item.qty,
-        stock: 99,
+        quantity: Math.min(item.qty, stock),
+        stock,
         openCartDrawer: false,
       })
+      added++
     }
-    toast.show({
-      title: 'Produk Ditambahkan',
-      message: 'Item pesanan telah dimasukkan ke keranjang belanja.',
-      tone: 'success',
-    })
-    router.push('/cart')
+    const hasItems = added > 0
+    notify(
+      hasItems ? 'Produk Ditambahkan' : 'Stok Habis',
+      hasItems ? 'Item pesanan dimasukkan ke keranjang.' : 'Produk pesanan ini tidak tersedia.',
+      hasItems ? 'success' : 'warn',
+    )
+    if (hasItems) router.push('/cart')
   }
 
   const handleConfirmDelivery = async () => {
@@ -191,15 +171,16 @@ export function useOrderDetail(orderId: string) {
     try {
       await $fetch(`/api/orders/${orderId}/confirm-delivery`, { method: 'POST' })
       order.value.status = 'completed'
-      toast.show({
-        title: 'Pesanan Selesai',
-        message: 'Konfirmasi penerimaan berhasil. Koin loyalitas telah dicairkan.',
-        tone: 'success',
-      })
+      notify(
+        'Pesanan Selesai',
+        'Konfirmasi penerimaan berhasil. Koin loyalitas telah dicairkan.',
+        'success',
+      )
       await fetchOrderDetail(true)
       return true
     } catch (err: unknown) {
-      notifyError('Gagal Konfirmasi', err, 'Gagal mengonfirmasi pesanan.')
+      const fetchErr = err as { data?: { message?: string } }
+      notify('Gagal Konfirmasi', fetchErr.data?.message || 'Gagal mengonfirmasi pesanan.', 'error')
       return false
     } finally {
       isConfirmingDelivery.value = false
@@ -226,27 +207,26 @@ export function useOrderDetail(orderId: string) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${orderId}` },
         (payload) => {
-          if (payload.new && order.value) {
-            const updated = payload.new as Record<string, unknown>
-            const prevStatus = order.value.status
-            const nextStatus = updated.status as OrderStatus
-            Object.assign(order.value, {
-              status: nextStatus,
-              payment_type: (updated.payment_type as string) || order.value.payment_type,
-              paid_at: (updated.paid_at as string) || order.value.paid_at,
-              tracking_number: (updated.tracking_number as string) || order.value.tracking_number,
-              courier_name: (updated.courier_name as string) || order.value.courier_name,
-              courier_code: (updated.courier_code as string) || order.value.courier_code,
-            })
-            if (nextStatus !== 'pending') stopPolling()
-            tracking.fetchCustomerTracking()
-            if (prevStatus === 'pending' && nextStatus === 'paid') {
-              toast.show({
-                title: 'Status Diperbarui',
-                message: `Pesanan #${order.value.id.slice(0, 8).toUpperCase()} telah lunas dan sedang diproses.`,
-                tone: 'success',
-              })
-            }
+          if (!payload.new || !order.value) return
+          const updated = payload.new as Record<string, unknown>
+          const prevStatus = order.value.status
+          const nextStatus = updated.status as OrderStatus
+          Object.assign(order.value, {
+            status: nextStatus,
+            payment_type: (updated.payment_type as string) || order.value.payment_type,
+            paid_at: (updated.paid_at as string) || order.value.paid_at,
+            tracking_number: (updated.tracking_number as string) || order.value.tracking_number,
+            courier_name: (updated.courier_name as string) || order.value.courier_name,
+            courier_code: (updated.courier_code as string) || order.value.courier_code,
+          })
+          if (nextStatus !== 'pending') stopPolling()
+          tracking.fetchCustomerTracking()
+          if (prevStatus === 'pending' && nextStatus === 'paid') {
+            notify(
+              'Status Diperbarui',
+              `Pesanan #${order.value.id.slice(0, 8).toUpperCase()} telah lunas dan sedang diproses.`,
+              'success',
+            )
           }
         },
       )

@@ -87,60 +87,55 @@ useHead({
   ],
 })
 
-onMounted(async () => {
-  const param = (route.params.id || (route.params as Record<string, string>).slug) as string
-  if (!param) {
-    loading.value = false
-    return
-  }
+const param = computed(
+  () => (route.params.id || (route.params as Record<string, string>).slug) as string,
+)
 
-  // 1. Instant Cache Render: 0ms load transition jika produk sudah dimuat di katalog/home
-  const cached = productStore.products.find((p) => p.slug === param || String(p.id) === param)
-  if (cached) {
-    product.value = cached
-    loading.value = false
+const { data: asyncProduct } = await useAsyncData(
+  `product-${param.value}`,
+  async () => {
+    if (!param.value) return null
+    return await productStore.fetchProductById(param.value)
+  },
+  {
+    default: () =>
+      productStore.products.find((p) => p.slug === param.value || String(p.id) === param.value) ||
+      null,
+  },
+)
+
+if (asyncProduct.value) {
+  product.value = asyncProduct.value
+  loading.value = false
+}
+
+watch(
+  asyncProduct,
+  (val) => {
+    if (val) {
+      product.value = val
+      loading.value = false
+    }
+  },
+  { immediate: true },
+)
+
+onMounted(() => {
+  if (product.value) {
     recentlyViewed.addItem({
-      id: cached.id,
-      name: cached.name,
-      slug: cached.slug,
-      price: cached.price,
-      imageUrl: cached.image_url,
-      category: cached.category_id || undefined,
-      stock: cached.stock,
+      id: product.value.id,
+      name: product.value.name,
+      slug: product.value.slug,
+      price: product.value.price,
+      imageUrl: product.value.image_url,
+      category: product.value.category_id || undefined,
+      stock: product.value.stock,
     })
-  }
 
-  // 2. Fresh Network Fetch (Stale-While-Revalidate)
-  try {
-    const fresh = await productStore.fetchProductById(param)
-    if (fresh) {
-      product.value = fresh
-      recentlyViewed.addItem({
-        id: fresh.id,
-        name: fresh.name,
-        slug: fresh.slug,
-        price: fresh.price,
-        imageUrl: fresh.image_url,
-        category: fresh.category_id || undefined,
-        stock: fresh.stock,
-      })
-
-      // 3. Canonical URL Normalization: jika dibuka via ID numerik, sinkronkan ke slug di URL bar
-      if (/^\d+$/.test(param) && fresh.slug) {
-        router.replace({ path: `/product/${fresh.slug}` })
-      }
+    if (/^\d+$/.test(param.value) && product.value.slug) {
+      router.replace({ path: `/product/${product.value.slug}` })
     }
-  } catch (error: unknown) {
-    if (!product.value) {
-      toast.add({
-        severity: 'error',
-        summary: 'Gagal Memuat Produk',
-        detail:
-          error instanceof Error ? error.message : 'Produk tidak ditemukan atau telah diarsipkan.',
-        life: 5000,
-      })
-    }
-  } finally {
+  } else if (!asyncProduct.value) {
     loading.value = false
   }
 })

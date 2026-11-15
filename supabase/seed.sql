@@ -764,3 +764,38 @@ insert into public.notifications (
     now() - interval '5 days'
   )
 on conflict (id) do nothing;
+
+-- 13. Seed Flash Deals Aktif (Flash Sale Engine Synchronization)
+insert into public.flash_deals (
+  id,
+  product_id,
+  promo_price_cents,
+  discount_percentage,
+  quota,
+  claimed,
+  starts_at,
+  ends_at,
+  is_active
+)
+select
+  ('f0000000-0000-0000-0000-00000000000' || p.row_num)::uuid as id,
+  p.id as product_id,
+  round(coalesce(p.price_cents, (p.price * 100)) * (1 - (15 + ((p.id * 7 + p.row_num * 5) % 21))::numeric / 100)) as promo_price_cents,
+  (15 + ((p.id * 7 + p.row_num * 5) % 21)) as discount_percentage,
+  20 as quota,
+  3 as claimed,
+  now() - interval '1 hour' as starts_at,
+  now() + interval '23 hours' as ends_at,
+  true as is_active
+from (
+  select id, price, price_cents, row_number() over (order by id asc) as row_num
+  from public.products
+  where deleted_at is null
+  limit 5
+) p
+on conflict (id) do update set
+  promo_price_cents = excluded.promo_price_cents,
+  discount_percentage = excluded.discount_percentage,
+  starts_at = excluded.starts_at,
+  ends_at = excluded.ends_at,
+  is_active = excluded.is_active;

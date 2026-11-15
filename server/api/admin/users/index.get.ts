@@ -29,13 +29,19 @@ export default defineEventHandler(async (event): Promise<AdminCustomersResponse>
         .from('profiles')
         .select('id, user_id, full_name, role, avatar_url, created_at')
         .order('created_at', { ascending: false }),
-      client.from('orders').select('id, user_id, status, total_cents, created_at'),
+      client
+        .from('orders')
+        .select('id, user_id, status, total_cents, created_at')
+        .in('status', ['paid', 'shipped', 'completed', 'pending']),
     ])
 
     const emailMap = new Map<string, string>()
     try {
       const serviceClient = serverSupabaseServiceRole(event)
-      const { data: authData } = await serviceClient.auth.admin.listUsers({ perPage: 100 })
+      const { data: authData } = await serviceClient.auth.admin.listUsers({
+        page: 1,
+        perPage: 1000,
+      })
       authData?.users?.forEach((u) => {
         if (u.id && u.email) {
           emailMap.set(u.id, u.email)
