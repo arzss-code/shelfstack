@@ -7,13 +7,16 @@ import ProductGallery from '~/components/product/ProductGallery.vue'
 import ProductConfigurator from '~/components/product/ProductConfigurator.vue'
 import ProductReviewsSection from '~/components/product/ProductReviewsSection.vue'
 import ProductRelatedSection from '~/components/product/ProductRelatedSection.vue'
+import ProductRecentlyViewedSection from '~/components/product/ProductRecentlyViewedSection.vue'
 import ProductSocialShare from '~/components/product/ProductSocialShare.vue'
+import { useRecentlyViewed } from '~/composables/useRecentlyViewed'
 
 const route = useRoute()
 const router = useRouter()
 const productStore = useProductStore()
 const cartStore = useCartStore()
 const toast = useUiToast()
+const recentlyViewed = useRecentlyViewed()
 
 const product = ref<Product | null>(null)
 const loading = ref(true)
@@ -87,6 +90,15 @@ onMounted(async () => {
   if (cached) {
     product.value = cached
     loading.value = false
+    recentlyViewed.addItem({
+      id: cached.id,
+      name: cached.name,
+      slug: cached.slug,
+      price: cached.price,
+      imageUrl: cached.image_url,
+      category: cached.category_id || undefined,
+      stock: cached.stock,
+    })
   }
 
   // 2. Fresh Network Fetch (Stale-While-Revalidate)
@@ -94,6 +106,15 @@ onMounted(async () => {
     const fresh = await productStore.fetchProductById(param)
     if (fresh) {
       product.value = fresh
+      recentlyViewed.addItem({
+        id: fresh.id,
+        name: fresh.name,
+        slug: fresh.slug,
+        price: fresh.price,
+        imageUrl: fresh.image_url,
+        category: fresh.category_id || undefined,
+        stock: fresh.stock,
+      })
 
       // 3. Canonical URL Normalization: jika dibuka via ID numerik, sinkronkan ke slug di URL bar
       if (/^\d+$/.test(param) && fresh.slug) {
@@ -215,6 +236,9 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
 
       <!-- Product Related Recommendations Section (Backlog C-03) -->
       <ProductRelatedSection :product="product" />
+
+      <!-- Recently Viewed Products Section -->
+      <ProductRecentlyViewedSection :current-product-id="product.id" />
     </div>
 
     <!-- Product Not Found View -->
