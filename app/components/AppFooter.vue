@@ -44,19 +44,19 @@ const { isLoggedIn, isAdmin } = useAuth()
                 Semua Produk
               </NuxtLink>
               <NuxtLink
-                to="/katalog"
+                to="/c/tech"
                 class="text-white/80 hover:text-white transition-colors no-underline"
               >
                 Tech &amp; Gadget
               </NuxtLink>
               <NuxtLink
-                to="/katalog"
+                to="/c/home"
                 class="text-white/80 hover:text-white transition-colors no-underline"
               >
                 Rumah &amp; Dapur
               </NuxtLink>
               <NuxtLink
-                to="/katalog"
+                to="/c/furniture"
                 class="text-white/80 hover:text-white transition-colors no-underline"
               >
                 Furnitur &amp; Meja

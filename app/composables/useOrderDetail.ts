@@ -33,6 +33,7 @@ export function useOrderDetail(orderId: string) {
   const isPaying = ref(false)
   const isCancelling = ref(false)
   const isManualChecking = ref(false)
+  const isConfirmingDelivery = ref(false)
   const errorMsg = ref('')
 
   let channel: RealtimeChannel | null = null
@@ -139,14 +140,14 @@ export function useOrderDetail(orderId: string) {
   }
 
   const handleCancelOrder = async (reason: string) => {
-    if (!order.value || isCancelling.value) return
+    if (!order.value || isCancelling.value) return false
     isCancelling.value = true
     try {
       await $fetch(`/api/orders/${orderId}/cancel`, { method: 'POST', body: { reason } })
       stopPolling()
       toast.show({
         title: 'Pesanan Dibatalkan',
-        message: 'Pesanan berhasil dibatalkan dan persediaan stok telah dikembalikan.',
+        message: 'Pesanan berhasil dibatalkan dan stok dikembalikan.',
         tone: 'success',
       })
       await fetchOrderDetail()
@@ -155,7 +156,7 @@ export function useOrderDetail(orderId: string) {
       const fetchErr = err as { data?: { message?: string } }
       toast.show({
         title: 'Gagal Membatalkan',
-        message: fetchErr.data?.message || 'Terjadi kesalahan saat membatalkan pesanan.',
+        message: fetchErr.data?.message || 'Gagal membatalkan pesanan.',
         tone: 'error',
       })
       return false
@@ -166,7 +167,6 @@ export function useOrderDetail(orderId: string) {
 
   const handleReorder = () => {
     if (!order.value?.items || order.value.items.length === 0) return
-
     for (const item of order.value.items) {
       cartStore.addItem({
         productId: item.product_id,
@@ -179,19 +179,43 @@ export function useOrderDetail(orderId: string) {
         openCartDrawer: false,
       })
     }
-
     toast.show({
       title: 'Produk Ditambahkan',
-      message: 'Item dari pesanan ini telah dimasukkan kembali ke keranjang belanja Anda.',
+      message: 'Item pesanan telah dimasukkan ke keranjang belanja.',
       tone: 'success',
     })
-
     router.push('/cart')
   }
 
-  const getStatusBadge = (status: OrderStatus) => getOrderStatusBadge(status)
-  const getBadgePayment = (orderData: Order) => getPaymentStatusBadge(orderData)
-  const formatDate = (dateStr: string) => formatOrderDate(dateStr)
+  const handleConfirmDelivery = async () => {
+    if (!order.value || isConfirmingDelivery.value) return false
+    isConfirmingDelivery.value = true
+    try {
+      await $fetch(`/api/orders/${orderId}/confirm-delivery`, { method: 'POST' })
+      order.value.status = 'completed'
+      toast.show({
+        title: 'Pesanan Selesai',
+        message: 'Konfirmasi penerimaan berhasil. Koin loyalitas telah dicairkan.',
+        tone: 'success',
+      })
+      await fetchOrderDetail(true)
+      return true
+    } catch (err: unknown) {
+      const fetchErr = err as { data?: { message?: string } }
+      toast.show({
+        title: 'Gagal Konfirmasi',
+        message: fetchErr.data?.message || 'Gagal mengonfirmasi pesanan.',
+        tone: 'error',
+      })
+      return false
+    } finally {
+      isConfirmingDelivery.value = false
+    }
+  }
+
+  const getStatusBadge = getOrderStatusBadge
+  const getBadgePayment = getPaymentStatusBadge
+  const formatDate = formatOrderDate
   const getSegmentColor = (idx: number) => getTimelineSegmentColor(idx, order.value?.status)
   const orderSteps = computed<OrderStep[]>(() =>
     order.value ? computeOrderDetailSteps(order.value) : [],
@@ -210,12 +234,7 @@ export function useOrderDetail(orderId: string) {
     channel = acquireRealtimeChannel(supabase, `order-realtime-${orderId}`)
       .on(
         'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'orders',
-          filter: `id=eq.${orderId}`,
-        },
+        { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${orderId}` },
         (payload) => {
           if (payload.new && order.value) {
             const updated = payload.new as Record<string, unknown>
@@ -270,6 +289,7 @@ export function useOrderDetail(orderId: string) {
     isPaying,
     isCancelling,
     isManualChecking,
+    isConfirmingDelivery,
     copiedHeaderResi,
     customerCheckpoints,
     activeCheckpoints,
@@ -288,6 +308,7 @@ export function useOrderDetail(orderId: string) {
     handlePayNow,
     handleCheckPaymentStatus,
     handleCancelOrder,
+    handleConfirmDelivery,
     handleReorder,
   }
 }

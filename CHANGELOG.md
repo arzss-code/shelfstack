@@ -2,6 +2,26 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.7] - 2026-11-15
+
+### Konfirmasi Penerimaan Pesanan Pelanggan & Live Payment Countdown Timer
+
+- **Endpoint Konfirmasi Penerimaan Pelanggan (`server/api/orders/[id]/confirm-delivery.post.ts`, 83 baris)**:
+  - Menyediakan endpoint POST aman dengan validasi kepemilikan (`order.user_id === user.id` atau peran admin).
+  - Memverifikasi status pesanan harus `shipped` sebelum transisi ke `completed`.
+  - Mengeksekusi RPC atomik database `transition_order_status` yang mentransisikan status order, memberikan cashback loyalti koin 1%, mencatat log aktivitas audit, dan mengirim notifikasi in-app kepada pelanggan.
+- **Komponen Live Countdown Timer Pembayaran (`app/features/orders/components/OrderPaymentCountdownCard.vue`, 118 baris)**:
+  - Menghitung sisa batas waktu pembayaran (default 15 menit) secara live (MM:SS) dengan interval 1 detik dan aksesibilitas `role="timer"` serta `aria-live="polite"`.
+  - Memberikan visual feedback dinamis: amber saat aktif dan merah berstatus expired saat waktu habis, meng-emit event `expired` untuk memicu pengecekan status otomatis.
+- **Integrasi UI Rincian Pesanan (`app/features/orders/components/OrderDetailPaymentCard.vue`, `app/composables/useOrderDetail.ts`, `app/pages/orders/[id].vue`)**:
+  - Menyematkan kartu hitung mundur pembayaran pada status pesanan pending.
+  - Menyediakan tombol aksi utama "Konfirmasi Pesanan Diterima" pada pesanan berstatus shipped dengan dialog konfirmasi aman `useUiConfirm()`.
+  - Membuka modal ulasan produk (`ReviewFormModal`) otomatis setelah pelanggan mengonfirmasi penerimaan pesanan.
+- **Penyelarasan Navigasi Footer (`app/components/AppFooter.vue`)**:
+  - Memperbarui tautan kategori pada footer ke rute kanonikal `/c/tech`, `/c/home`, `/c/furniture`.
+- **Pengujian Unit & Kualitas Kode (`tests/unit/order-confirm-delivery-and-countdown.spec.ts`, 139 baris)**:
+  - 9 pengujian unit mencakup validasi akses, transisi status, rendering format MM:SS timer, emit expired event, unmount cleanup, dan verifikasi batas kode.
+
 ## [v1.1.0-beta.6] - 2026-11-15
 
 ### Proteksi Endpoint Publik dengan Token Bucket Rate Limiting & Security Headers (E-08)
