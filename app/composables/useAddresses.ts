@@ -1,6 +1,15 @@
 import { ref, computed } from 'vue'
 import type { UserAddress, CreateAddressInput, UpdateAddressInput } from '~~/shared/schemas/address'
 
+function getErrorMessage(err: unknown, fallback: string): string {
+  if (err && typeof err === 'object') {
+    const dataErr = err as { data?: { message?: string } }
+    if (dataErr.data?.message) return dataErr.data.message
+    if (err instanceof Error && err.message) return err.message
+  }
+  return fallback
+}
+
 export function useAddresses() {
   const addresses = ref<UserAddress[]>([])
   const loading = ref(false)
@@ -32,9 +41,8 @@ export function useAddresses() {
         selectedAddressId.value = defaultAddress.value.id
       }
       return addresses.value
-    } catch (err: any) {
-      const message = err?.data?.message || err?.message || 'Gagal memuat daftar alamat.'
-      error.value = message
+    } catch (err: unknown) {
+      error.value = getErrorMessage(err, 'Gagal memuat daftar alamat.')
       return []
     } finally {
       loading.value = false
@@ -59,9 +67,8 @@ export function useAddresses() {
       addresses.value.unshift(saved)
       selectedAddressId.value = saved.id
       return saved
-    } catch (err: any) {
-      const message = err?.data?.message || err?.message || 'Gagal menyimpan alamat.'
-      error.value = message
+    } catch (err: unknown) {
+      error.value = getErrorMessage(err, 'Gagal menyimpan alamat.')
       throw err
     } finally {
       loading.value = false
@@ -90,9 +97,8 @@ export function useAddresses() {
         addresses.value[idx] = updated
       }
       return updated
-    } catch (err: any) {
-      const message = err?.data?.message || err?.message || 'Gagal memperbarui alamat.'
-      error.value = message
+    } catch (err: unknown) {
+      error.value = getErrorMessage(err, 'Gagal memperbarui alamat.')
       throw err
     } finally {
       loading.value = false
@@ -112,9 +118,8 @@ export function useAddresses() {
       if (selectedAddressId.value === id) {
         selectedAddressId.value = defaultAddress.value ? defaultAddress.value.id : null
       }
-    } catch (err: any) {
-      const message = err?.data?.message || err?.message || 'Gagal menghapus alamat.'
-      error.value = message
+    } catch (err: unknown) {
+      error.value = getErrorMessage(err, 'Gagal menghapus alamat.')
       throw err
     } finally {
       loading.value = false
@@ -125,9 +130,8 @@ export function useAddresses() {
     try {
       await updateAddress(id, { is_default: true })
       selectedAddressId.value = id
-    } catch (err: any) {
-      const message = err?.data?.message || err?.message || 'Gagal menjadikan alamat utama.'
-      error.value = message
+    } catch (err: unknown) {
+      error.value = getErrorMessage(err, 'Gagal menjadikan alamat utama.')
       throw err
     }
   }

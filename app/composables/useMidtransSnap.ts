@@ -38,7 +38,7 @@ export function useMidtransSnap() {
         resolve()
       }
       script.onerror = (err) => {
-        console.error('Failed to load Midtrans Snap script:', err)
+        if (import.meta.dev) console.error('Failed to load Midtrans Snap script:', err)
         reject(err)
       }
       document.head.appendChild(script)
@@ -61,7 +61,7 @@ export function useMidtransSnap() {
     if (windowAny.snap) {
       windowAny.snap.pay(token, callbacks)
     } else {
-      console.warn('Midtrans Snap SDK is not loaded.')
+      if (import.meta.dev) console.warn('Midtrans Snap SDK is not loaded.')
     }
   }
 

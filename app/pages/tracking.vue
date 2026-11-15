@@ -182,9 +182,10 @@ const executeTrackingSearch = async (queryStr: string) => {
     } else {
       errorMessage.value = 'Data pengiriman tidak ditemukan.'
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errObj = err as { data?: { message?: string } } | null
     errorMessage.value =
-      err?.data?.message ||
+      errObj?.data?.message ||
       'Nomor resi tidak ditemukan. Pastikan nomor resi atau ID pesanan yang Anda masukkan sudah sesuai.'
   } finally {
     isLoading.value = false

@@ -38,8 +38,8 @@ export default defineEventHandler(async (event) => {
     })
 
     return successResponse('Ulasan produk berhasil dikirim.', review)
-  } catch (error: any) {
-    const message = error?.message || 'Gagal mengirim ulasan produk.'
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal mengirim ulasan produk.'
     const isClientError =
       message.includes('Pesanan') ||
       message.includes('akses') ||
@@ -47,6 +47,11 @@ export default defineEventHandler(async (event) => {
       message.includes('selesai')
 
     const statusCode = isClientError ? 400 : 500
-    return errorResponse(event, message, error, statusCode)
+    return errorResponse(
+      event,
+      message,
+      error instanceof Error ? error.message : String(error),
+      statusCode,
+    )
   }
 })

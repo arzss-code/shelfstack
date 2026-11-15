@@ -40,7 +40,7 @@ export const useProductStore = defineStore('product', () => {
       } else {
         products.value = newProducts
       }
-    } catch (e) {
+    } catch (e: unknown) {
       throw e
     } finally {
       loading.value = false
@@ -72,7 +72,7 @@ export const useProductStore = defineStore('product', () => {
       } else {
         deletedProducts.value = newDeleted
       }
-    } catch (e) {
+    } catch (e: unknown) {
       throw e
     } finally {
       loading.value = false
@@ -84,7 +84,7 @@ export const useProductStore = defineStore('product', () => {
     loading.value = true
     try {
       return await productRepository.getProductById(supabase, idOrSlug)
-    } catch (e) {
+    } catch (e: unknown) {
       throw e
     } finally {
       loading.value = false
@@ -129,7 +129,7 @@ export const useProductStore = defineStore('product', () => {
           new_data: newProduct,
         })
       }
-    } catch (e) {
+    } catch (e: unknown) {
       throw e
     } finally {
       loading.value = false
@@ -180,7 +180,7 @@ export const useProductStore = defineStore('product', () => {
           new_data: updatedProduct,
         })
       }
-    } catch (e) {
+    } catch (e: unknown) {
       throw e
     } finally {
       loading.value = false
@@ -204,7 +204,7 @@ export const useProductStore = defineStore('product', () => {
           old_data: existing,
         })
       }
-    } catch (e) {
+    } catch (e: unknown) {
       throw e
     } finally {
       loading.value = false
@@ -227,7 +227,7 @@ export const useProductStore = defineStore('product', () => {
           new_data: existing,
         })
       }
-    } catch (e) {
+    } catch (e: unknown) {
       throw e
     } finally {
       loading.value = false

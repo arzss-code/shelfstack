@@ -81,8 +81,8 @@ export const useNotificationStore = defineStore('notifications', () => {
         hasMore.value = Boolean(res.data.has_more)
         nextCursor.value = res.data.next_cursor || null
       }
-    } catch (err) {
-      console.error('[NotificationStore] Gagal memuat notifikasi:', err)
+    } catch (err: unknown) {
+      if (import.meta.dev) console.error('[NotificationStore] Gagal memuat notifikasi:', err)
     } finally {
       isLoading.value = false
     }
@@ -115,8 +115,9 @@ export const useNotificationStore = defineStore('notifications', () => {
         hasMore.value = Boolean(res.data.has_more)
         nextCursor.value = res.data.next_cursor || null
       }
-    } catch (err) {
-      console.error('[NotificationStore] Gagal memuat notifikasi berikutnya:', err)
+    } catch (err: unknown) {
+      if (import.meta.dev)
+        console.error('[NotificationStore] Gagal memuat notifikasi berikutnya:', err)
     } finally {
       isLoadingMore.value = false
     }
@@ -136,8 +137,9 @@ export const useNotificationStore = defineStore('notifications', () => {
       await $fetch(`/api/notifications/${id}/read`, {
         method: 'PATCH',
       })
-    } catch (err) {
-      console.error('[NotificationStore] Gagal menandai notifikasi dibaca:', err)
+    } catch (err: unknown) {
+      if (import.meta.dev)
+        console.error('[NotificationStore] Gagal menandai notifikasi dibaca:', err)
       // Rollback jika request gagal
       target.is_read = false
       target.read_at = null
@@ -163,8 +165,9 @@ export const useNotificationStore = defineStore('notifications', () => {
       await $fetch('/api/notifications/read-all', {
         method: 'PATCH',
       })
-    } catch (err) {
-      console.error('[NotificationStore] Gagal menandai semua notifikasi dibaca:', err)
+    } catch (err: unknown) {
+      if (import.meta.dev)
+        console.error('[NotificationStore] Gagal menandai semua notifikasi dibaca:', err)
       // Rollback jika request gagal
       items.value = previousItems
       unreadCount.value = previousUnread
@@ -229,8 +232,9 @@ export const useNotificationStore = defineStore('notifications', () => {
           },
         )
         .subscribe()
-    } catch (err) {
-      console.error('[NotificationStore] Gagal menginisialisasi listener realtime:', err)
+    } catch (err: unknown) {
+      if (import.meta.dev)
+        console.error('[NotificationStore] Gagal menginisialisasi listener realtime:', err)
     }
   }
 

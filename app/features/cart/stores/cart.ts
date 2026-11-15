@@ -50,8 +50,8 @@ export const useCartStore = defineStore('cart', () => {
             items.value = parsed
           }
         }
-      } catch (e) {
-        console.error('Failed to parse cart from localStorage:', e)
+      } catch (e: unknown) {
+        if (import.meta.dev) console.error('Failed to parse cart from localStorage:', e)
       }
 
       try {
@@ -59,8 +59,8 @@ export const useCartStore = defineStore('cart', () => {
         if (storedCoupon) {
           appliedCoupon.value = JSON.parse(storedCoupon)
         }
-      } catch (e) {
-        console.error('Failed to parse applied coupon from localStorage:', e)
+      } catch (e: unknown) {
+        if (import.meta.dev) console.error('Failed to parse applied coupon from localStorage:', e)
       }
     }
   }
@@ -70,8 +70,8 @@ export const useCartStore = defineStore('cart', () => {
     if (import.meta.client) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items.value))
-      } catch (e) {
-        console.error('Failed to save cart to localStorage:', e)
+      } catch (e: unknown) {
+        if (import.meta.dev) console.error('Failed to save cart to localStorage:', e)
       }
     }
   }
@@ -84,8 +84,8 @@ export const useCartStore = defineStore('cart', () => {
         } else {
           localStorage.removeItem(COUPON_STORAGE_KEY)
         }
-      } catch (e) {
-        console.error('Failed to save coupon to localStorage:', e)
+      } catch (e: unknown) {
+        if (import.meta.dev) console.error('Failed to save coupon to localStorage:', e)
       }
     }
   }

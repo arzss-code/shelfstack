@@ -2,6 +2,24 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.23] - 2026-11-15
+
+### Konsistensi Design Tokens, Sinkronisasi Versi, Strict Typing Catch Blocks, dan Client Logging Guard
+
+- **Konsistensi Design Token Obsidian (`main.css`, `tailwind.config.js`, `ProductFlashSaleBanner.vue`, `HomeFlashDeals.vue`)**:
+  - Mendaftarkan variabel token CSS resmi `--brand-obsidian: #12131a;` pada `:root` dan `.dark` di `main.css`.
+  - Mendaftarkan utilitas Tailwind `brand.obsidian` di `tailwind.config.js` sehingga seluruh kartu permukaan gelap bertema etalase menggunakan `bg-brand-obsidian` secara konsisten tanpa hex hardcoded `bg-[#12131a]`.
+- **Sinkronisasi Versi Proyek (`package.json`, `version.json`)**:
+  - Menyelaraskan nomor versi di `package.json` menjadi `1.1.0-beta.23`, sinkron dengan `version.json`.
+- **Pengetatan Tipe Data (Strict Typing) pada Blok Catch**:
+  - Mentransformasikan seluruh ~43 blok `catch (err: any)` dan untyped `catch (e)` di lapisan composables, stores, komponen checkout/tracking, dan endpoint API server menjadi `catch (err: unknown)`.
+  - Mengimplementasikan type guard aman (`err instanceof Error`, pemeriksaan aman properti FetchError `data.message`) untuk mencegah runtime TypeError dan mematuhi aturan strict typing tanpa tipe `any`.
+- **Pengamanan Logging Sisi Klien (Client Logging Guard)**:
+  - Membungkus seluruh pemanggilan `console.error` dan `console.warn` di sisi klien (`cart`, `notifications`, `wishlist`, `useActivities`, `useActivityLog`, `useMidtransSnap`, `AdminSalesChart`, `OrderTrackingTimeline`) dengan guard `if (import.meta.dev)`.
+  - Memastikan konsol browser pengguna di lingkungan production tetap bersih tanpa polusi log yang tidak perlu.
+- **Verifikasi Kualitas**:
+  - Seluruh 130 berkas / 1.248 test lolos 100%. `pnpm lint` 0 error dan `pnpm typecheck` EXIT 0.
+
 ## [v1.1.0-beta.22] - 2026-11-15
 
 ### Pembersihan Elemen AI-Slop, Penegasan Warna Solid, dan Penyederhanaan Copy Banner Flash Sale

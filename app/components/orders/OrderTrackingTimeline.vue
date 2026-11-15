@@ -156,8 +156,8 @@ const copyTrackingNumber = async () => {
     setTimeout(() => {
       copied.value = false
     }, 2000)
-  } catch (err) {
-    console.error('Gagal menyalin nomor resi:', err)
+  } catch (err: unknown) {
+    if (import.meta.dev) console.error('Gagal menyalin nomor resi:', err)
   }
 }
 

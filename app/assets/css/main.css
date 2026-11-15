@@ -40,6 +40,7 @@
   --brand-success: #00875a;
   --brand-warning: #e28e00;
   --brand-danger: #e41e3f;
+  --brand-obsidian: #12131a;
 
   /* Status ramp: satu resep untuk badge, alert, toast, dan tint tabel.
      Tiap status punya tiga lapis, yaitu warna teks, latar, dan garis tepi. */
@@ -98,6 +99,7 @@
   --brand-success: #00a86b;
   --brand-warning: #ffb822;
   --brand-danger: #ff5c78;
+  --brand-obsidian: #12131a;
 
   --brand-success-tint: rgb(0 168 107 / 0.16);
   --brand-success-edge: rgb(0 168 107 / 0.4);

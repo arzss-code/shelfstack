@@ -32,8 +32,10 @@ export function useActivities() {
 
       if (error) throw error
       activities.value = (data || []) as ActivityLog[]
-    } catch (e) {
-      console.error(e)
+    } catch (e: unknown) {
+      if (import.meta.dev) {
+        console.error(e)
+      }
     } finally {
       loading.value = false
     }

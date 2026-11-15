@@ -28,7 +28,7 @@ const timerSegments = computed(() => {
 
 <template>
   <div
-    class="relative overflow-hidden rounded-2xl border border-white/10 bg-[#12131a] text-white shadow-floating"
+    class="relative overflow-hidden rounded-2xl border border-white/10 bg-brand-obsidian text-white shadow-floating"
     role="region"
     aria-label="Penawaran Flash Sale Produk"
   >

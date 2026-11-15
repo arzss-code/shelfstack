@@ -38,7 +38,7 @@ const { getDealForProduct } = useFlashSale()
 <template>
   <section
     ref="flashSectionRef"
-    class="relative w-full overflow-hidden rounded-card bg-[#12131a] p-6 sm:p-8 text-white shadow-floating"
+    class="relative w-full overflow-hidden rounded-card bg-brand-obsidian p-6 sm:p-8 text-white shadow-floating"
   >
     <!-- Header Section -->
     <div

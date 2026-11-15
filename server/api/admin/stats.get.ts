@@ -60,7 +60,12 @@ export default defineEventHandler(async (event) => {
       },
       recent_orders: recentOrdersRes.data || [],
     })
-  } catch (error: any) {
-    return errorResponse(event, 'Gagal memuat statistik admin', error, 500)
+  } catch (error: unknown) {
+    return errorResponse(
+      event,
+      'Gagal memuat statistik admin',
+      error instanceof Error ? error.message : String(error),
+      500,
+    )
   }
 })

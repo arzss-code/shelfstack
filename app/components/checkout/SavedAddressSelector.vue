@@ -67,8 +67,12 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
     const created = await saveAddress(data)
     isAddingNew.value = false
     emit('select', created)
-  } catch (err: any) {
-    addFormError.value = err?.data?.message || err?.message || 'Gagal menyimpan alamat baru.'
+  } catch (err: unknown) {
+    const errObj = err as { data?: { message?: string } } | null
+    addFormError.value =
+      errObj?.data?.message ||
+      (err instanceof Error ? err.message : '') ||
+      'Gagal menyimpan alamat baru.'
   } finally {
     isSubmittingNew.value = false
   }
