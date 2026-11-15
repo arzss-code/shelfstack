@@ -1,10 +1,23 @@
 # ShelfStack
 
-Aplikasi e-commerce single-vendor berbasis **Nuxt 4**, **Nitro**, **Supabase (PostgreSQL + Auth + Storage + Realtime)**, **Midtrans Sandbox**, dan worker mikroservis **Fastify + Redis 7 + BullMQ** (`@shelfstack/order-service`). Dirancang mengikuti estetika **Gallery Modernist** (`DESIGN.md`) dengan integritas transaksional di level database, pemisahan state pesanan dan pembayaran, serta komponen modular (`<= 300` baris per berkas `.vue`).
+[![CI/CD Pipeline](https://github.com/arzss-code/shelfstack/actions/workflows/ci.yml/badge.svg)](https://github.com/arzss-code/shelfstack/actions/workflows/ci.yml)
+[![Nuxt 4](https://img.shields.io/badge/Nuxt-4.x-00DC82?logo=nuxt.js&logoColor=white)](https://nuxt.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20%2B%20RLS-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
+[![Fastify & BullMQ](https://img.shields.io/badge/Worker-Fastify%20%2B%20Redis%207%20%2B%20BullMQ-black?logo=fastify&logoColor=white)](https://bullmq.io)
+[![Vitest](<https://img.shields.io/badge/Vitest-100%25%20Passing%20(1248%20tests)-6E9F18?logo=vitest&logoColor=white>)](https://vitest.dev)
 
-> Sumber kebenaran dokumentasi: [docs/README.md](docs/README.md), [docs/PROGRESS.md](docs/PROGRESS.md), [docs/BACKLOG.md](docs/BACKLOG.md), dan [DESIGN.md](DESIGN.md).
+Aplikasi e-commerce berbasis **Nuxt 4**, **Nitro**, **Supabase (PostgreSQL, Auth, Storage, Realtime)**, **Midtrans Sandbox**, dan worker mikroservis **Fastify + Redis 7 + BullMQ** (`@shelfstack/order-service`).
+
+Proyek ini dibangun untuk mendemonstrasikan praktik rekayasa perangkat lunak production-grade: integritas transaksional atomik di level basis data, pemisahan mutlak status pesanan dan pembayaran via finite state machine, antrean asinkron toleran kegagalan (delayed queue + DLQ), pengujian beban empiris terautentikasi (k6), serta arsitektur komponen modular (maksimal 300 baris per berkas).
+
+> Dokumentasi rujukan: [docs/README.md](docs/README.md), [docs/PROGRESS.md](docs/PROGRESS.md), [docs/BACKLOG.md](docs/BACKLOG.md), dan [DESIGN.md](DESIGN.md).
+
+---
 
 ## Arsitektur Sistem
+
+Topologi sistem memisahkan layanan web storefront/API gateway dengan worker pemroses antrean latar belakang:
 
 ```mermaid
 flowchart LR
@@ -15,50 +28,137 @@ flowchart LR
   Nitro -. "Fail-Open Schedule & Admin Telemetry" .-> Fastify
   Fastify --> BullMQ[("Redis 7: Cache + BullMQ + DLQ")]
   Fastify --> Supabase
-  Midtrans["Midtrans Sandbox"] --> Nginx
+  Midtrans["Midtrans Sandbox Gateway"] --> Nginx
 ```
 
-## Kapabilitas Utama
-
-### Etalase Pelanggan (Storefront)
-
-- **Katalog & Pencarian Sinkron URL**: Filter kategori, rute cantik per kategori (`/c/[slug]`), rentang harga, penyortiran, badge ketersediaan stok aktual, dan detail produk SEO-friendly (`/katalog`, `/product/[id]`).
-- **Keranjang, Voucher, Koin Loyalitas & Ongkir**: Keranjang persisten (`Pinia`), klaim voucher/promo (`/promos`), penukaran koin loyalitas (`1 Koin = Rp 1`), dan 4 opsi kurir bertingkat dengan Bebas Ongkir otomatis untuk subtotal `>= Rp 500.000`.
-- **Checkout Atomik & Midtrans Snap**: RPC PostgreSQL `create_order()` mengunci baris produk secara deterministik (`ORDER BY id FOR UPDATE`), memvalidasi harga/kupon/koin di sisi server, dan memproses pembayaran via Midtrans Snap Sandbox.
-- **Pelacakan Realtime, Retur (RMA), Ulasan & Live Chat**: Linimasa status pesanan dan resi kurir (`/orders/[id]`, `/tracking`), pengajuan komplain/retur beserta bukti foto (`/returns`), ulasan terverifikasi pasca pesanan selesai, pusat notifikasi realtime, serta widget Live Chat dua arah dengan tim CS.
-- **PWA Standalone & Notifikasi Web Push Progresif**: Web App Manifest resmi (`public/site.webmanifest`), Service Worker mandiri (`public/sw.js`) dengan caching shell statis dan bypass rute transaksional/API, serta notifikasi browser progresif untuk desktop dan mobile PWA Android.
-- **Pengujian Beban Terautentikasi (Grafana k6)**: Suite uji beban konkurensi (`pnpm test:load`) dengan injeksi cookie sesi `@supabase/ssr` otomatis, memvalidasi integritas penguncian baris PostgreSQL RPC `create_order` (anti-overselling), idempotensi webhook Midtrans, dan probe observabilitas.
-
-### Akun Demo Evaluasi Portofolio (1-Klik di `/auth/login`)
-
-Tersedia pemilih kredensial instan 1-klik di halaman login publik tanpa perlu mengetik manual:
-
-| Peran              | Alamat Email                     | Kata Sandi     | Lingkup Hak Akses                                                                                                                    |
-| :----------------- | :------------------------------- | :------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
-| **Demo Pelanggan** | `demo-customer@shelfstack.local` | `Password123!` | Etalase publik, keranjang belanja, checkout Snap Midtrans, pelacakan pesanan, riwayat ulasan, wishlist, dan komplain retur           |
-| **Demo Admin Ops** | `demo-admin@shelfstack.local`    | `Password123!` | Panel operasional `/admin`, dashboard KPI, transisi status pesanan, refund, audit log, inventaris & stok, kupon, dan inbox Live Chat |
-
-### Telemetri & Observabilitas Multi-Layanan
-
-- `GET /api/health` : Liveness probe proses Nitro (status service, uptime, timestamp, dan SemVer `version.json`).
-- `GET /api/ready` : Readiness probe multi-layanan (konektivitas Supabase PostgreSQL, Redis cache, dan Fastify `@shelfstack/order-service`).
-
-### Ruang Kerja Operasional Admin (`/admin`)
-
-- **Dashboard Eksekutif & Analitik**: Ringkasan omzet bulanan, pesanan tertunda, peringatan stok kritis (`< 5`), dan mutasi transaksi terbaru.
-- **Manajemen Pesanan, Refund & Telemetri BullMQ/DLQ**: Transisi status pesanan tervalidasi state-machine, alur refund bertahap (`create_refund_attempt` & `finalize_refund`), ekspor CSV, serta kartu pemantauan antrean kedaluwarsa BullMQ dan pemutaran ulang (_replay_) job Dead Letter Queue (`order-expiry-dlq`).
-- **Inventaris, Kupon, Retur, Live Chat & Audit Log**: CRUD produk + _trash/restore_ (`deleted_at`), mutasi stok teraudit (`stock_movements`), manajemen kupon, pemrosesan tiket retur, inbox Live Chat multi-pelanggan, dan `activity_logs` lengkap.
+---
 
 ## Sorotan Rekayasa Perangkat Lunak
 
-1. **Integritas Transaksional PostgreSQL**: Seluruh mutasi stok, kuota kupon (`coupon_usages` dengan _soft delete_ `deleted_at`), dan saldo koin (`user_coins` + `coin_transactions`) dieksekusi secara atomik di dalam fungsi PL/pgSQL (`create_order`, `cancel_order`, `handle_payment_webhook`, `transition_order_status`, `finalize_refund`).
-2. **State Machine Pesanan & Pembayaran Terpisah**: Trigger database `enforce_order_status_state_machine` memblokir perubahan status sembarangan di luar RPC resmi (`app.order_transition_source`).
-3. **Antrean Kedaluwarsa BullMQ + Dead Letter Queue (DLQ)**: Checkout mendaftarkan delayed job per pesanan (`expire-order-<uuid>`) secara _fail-open_ ke `@shelfstack/order-service`, didukung _repeatable reconciliation sweep_ setiap 5 menit, _exponential backoff retry_ (`3` percobaan), dan eskalasi ke `order-expiry-dlq`.
-4. **Primitif UI Mandiri & Standar Web Modern**: 16 primitif bebas pustaka komponen berat di `app/components/ui/`, pemuatan font `DM Sans` via `preconnect` tanpa rantai `@import` CSS, `fetchpriority="high"` terarah pada citra utama LCP, landmark `<search>`, _skip link_ keyboard, serta dukungan `prefers-reduced-motion`.
-5. **Pengujian Beban & Konkurensi Empiris (k6)**: Menguji ketahanan sistem di bawah beban konkurensi tinggi dengan 0 server crash (500) dan pembuktian empiris pencegahan overselling saat puluhan pengguna berebut stok terbatas secara bersamaan.
-6. **PWA Standalone & Progressive Web Push**: Service Worker (`public/sw.js`) tanpa library eksternal berlebih, mendukung installability PWA, banner koneksi offline reaktif, dan pengiriman notifikasi browser berfitur deep-link.
+1. **Integritas Transaksional PostgreSQL (Anti-Overselling)**:
+   Seluruh mutasi stok, alokasi voucher kupon, dan saldo koin loyalitas dieksekusi atomik di dalam fungsi PL/pgSQL `create_order` dengan penguncian baris deterministik (`ORDER BY id FOR UPDATE`). Tidak ada harga, stok, atau diskon yang dipercayakan dari input klien.
+2. **Pemisahan State Machine Pesanan & Pembayaran**:
+   Status pesanan (`pending`, `paid`, `processing`, `shipped`, `completed`, `cancelled`) dan status pembayaran (`unpaid`, `pending`, `paid`, `failed`, `refunded`) dikelola terpisah. Trigger basis data `enforce_order_status_state_machine` memblokir transisi ilegal di luar alur resmi.
+3. **Antrean Pembatalan Asinkron BullMQ + Dead Letter Queue (DLQ)**:
+   Saat pesanan dibuat, delayed job 120 menit (`expire-order-<uuid>`) didaftarkan ke antrean Redis BullMQ di `@shelfstack/order-service`. Didukung oleh rekonsiliasi berkala per 5 menit, mekanisme _exponential backoff retry_ (3 kali), dan eskalasi otomatis ke `order-expiry-dlq` jika eksekusi gagal.
+4. **Hardening Keamanan Sisi Server (OWASP Compliance)**:
+   - **Timing-Safe Webhook Hash**: Verifikasi tanda tangan Midtrans menggunakan `crypto.timingSafeEqual` untuk mencegah _timing attack_.
+   - **Inspeksi Binary Magic Bytes**: Unggahan berkas retur (RMA) dan lampiran chat divalidasi langsung dari _byte signature_ biner (JPEG, PNG, WebP) untuk menangkal manipulasi MIME header.
+   - **Rate Limiting In-Memory**: Pembatasan kuota token pada endpoint publik (termasuk `/api/tracking/**`) dengan mekanisme pemangkasan _bucket_ berkala untuk mencegah kebocoran memori.
+   - **Strict Typing 100%**: 0 penggunaan tipe `: any` di seluruh kode aplikasi dan server.
+5. **Kinerja Web & SSR SEO**:
+   - Pengambilan data detail produk (`/product/[id]`) menggunakan `useAsyncData` top-level untuk memastikan tag Open Graph dan Schema.org JSON-LD ter-render utuh pada initial server-rendered HTML.
+   - Pemuatan aset tipografi mandiri via `preconnect` tanpa rantai `@import` CSS pemblokir render.
+   - Penandaan `fetchpriority="high"` pada citra utama untuk optimalisasi Largest Contentful Paint (LCP).
+6. **Pengujian Beban Terautentikasi (Grafana k6)**:
+   Suite pengujian konkurensi (`pnpm test:load`) dengan injeksi cookie sesi `@supabase/ssr` otomatis membuktikan bahwa sistem tidak mengalami _race condition_ atau _deadlock_ saat puluhan klien berebut kuota stok terbatas secara bersamaan.
+
+---
+
+## Fitur Aplikasi
+
+### Etalase Pelanggan (Storefront)
+
+- **Katalog & Navigasi Kanonikal**: Filter kategori dinamis dengan sinkronisasi URL (`/c/[slug]`), rentang harga, penyortiran stok, pencarian instan, dan badge ketersediaan real-time.
+- **Keranjang, Voucher, Koin Loyalitas & Ongkir**: Keranjang persisten (Pinia), diskon kupon bertingkat, penukaran koin loyalitas (1 Koin = Rp 1), serta 4 pilihan kurir logistik dengan Bebas Ongkir otomatis untuk pesanan minimal Rp 500.000.
+- **Checkout & Midtrans Snap Modal**: Alur checkout terintegrasi dengan popup Midtrans Snap Sandbox, mendukung Virtual Account (BCA, BNI, BRI, Mandiri) dan simulasi QRIS.
+- **Pelacakan Resi & Realtime Status**: Linimasa status pesanan dan checkpoint kurir secara live (`/orders/[id]`, `/tracking`) dengan sinkronisasi Supabase Realtime channel.
+- **Pengajuan Retur / Komplain (RMA)**: Pengajuan retur barang dengan unggahan bukti foto tervalidasi magic bytes (`/returns`).
+- **PWA Standalone**: Manifest resmi (`public/site.webmanifest`) dan Service Worker kustom (`public/sw.js`) dengan caching shell statis dan bypass rute transaksional.
+
+### Panel Operasional Admin (`/admin`)
+
+- **Dashboard KPI & Analitik**: Metrik pendapatan bulanan, volume transaksi harian, grafik performa penjualan, dan peringatan dini stok menipis (`< 5`).
+- **Manajemen Pesanan & Refund**: Transisi status tervalidasi state-machine, input nomor resi pengiriman, pencetakan label termal A6, alur pengembalian dana bertahap, dan ekspor data ke format CSV.
+- **Telemetri BullMQ & Replay DLQ**: Kartu pemantauan antrean keterlambatan pembatalan pesanan dan fitur pemutaran ulang (_replay_) job pada Dead Letter Queue langsung dari antarmuka web.
+- **Katalog Inventaris & Audit Log**: Operasi CRUD produk lengkap dengan penghapusan lunak (_soft delete_ `deleted_at`), riwayat mutasi stok gudang (_stock movements ledger_), dan pencatatan jejak aktivitas admin (_activity logs_).
+- **Inbox Live Chat Dua Arah**: Panel obrolan multi-pelanggan untuk merespons kendala transaksi secara real-time.
+
+---
+
+## Akun Demo Pengujian (1-Klik di `/auth/login`)
+
+Tersedia tombol pemilih akun instan pada halaman login tanpa perlu memasukkan kredensial manual:
+
+| Peran              | Alamat Email                     | Kata Sandi     | Lingkup Hak Akses                                                                                                    |
+| :----------------- | :------------------------------- | :------------- | :------------------------------------------------------------------------------------------------------------------- |
+| **Demo Pelanggan** | `demo-customer@shelfstack.local` | `Password123!` | Etalase publik, keranjang, checkout Snap Midtrans, pelacakan pesanan, wishlist, ulasan produk, dan klaim retur       |
+| **Demo Admin Ops** | `demo-admin@shelfstack.local`    | `Password123!` | Dasbor analitik `/admin`, manajemen pesanan, pemrosesan refund, monitor BullMQ/DLQ, kontrol inventaris, dan inbox CS |
+
+---
+
+## Panduan Instalasi Lokal (Quickstart 5 Menit)
+
+> Repositori ini menggunakan **pnpm** secara eksklusif (`pnpm@11.5.3`). Dilarang menggunakan `npm`, `npx`, `yarn`, atau `bun`.
+
+### Prasyarat
+
+- Node.js >= 22.0.0
+- pnpm >= 11.5.0
+- Docker & Docker Compose (untuk menjalankan Redis & stack Supabase lokal)
+
+### Langkah Pemasangan
+
+1. Salin berkas konfigurasi lingkungan:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Lengkapi variabel `NUXT_PUBLIC_SUPABASE_URL`, `NUXT_PUBLIC_SUPABASE_KEY`, kredensial Midtrans Sandbox, dan `INTERNAL_SERVICE_KEY`.
+
+2. Instal dependensi workspace:
+
+   ```bash
+   pnpm install --frozen-lockfile
+   ```
+
+3. Jalankan migrasi dan data awal (menghasilkan 5 kategori kanonik, produk kurasi, voucher, pesanan multi-status, data flash sale, dan akun demo):
+
+   ```bash
+   # Untuk koneksi langsung ke Supabase Cloud:
+   pnpm db:seed
+
+   # Atau untuk stack lokal Supabase Docker:
+   pnpm db:seed:local
+   ```
+
+4. Jalankan server pengembangan Nuxt:
+
+   ```bash
+   pnpm dev
+   ```
+
+   Aplikasi dapat diakses melalui `http://localhost:3000`.
+
+5. _(Opsional)_ Jalankan Redis dan mikroservis order worker:
+   ```bash
+   docker compose -f docker-compose.dev.yml up -d
+   pnpm --filter @shelfstack/order-service dev
+   ```
+
+---
+
+## Matriks Pengujian & Verifikasi Kualitas
+
+Seluruh kode diverifikasi secara otomatis melalui rangkaian pengujian lokal dan GitHub Actions CI/CD:
+
+| Perintah                                            | Ruang Lingkup                                               | Standar Kelulusan                       |
+| :-------------------------------------------------- | :---------------------------------------------------------- | :-------------------------------------- |
+| `pnpm lint`                                         | Analisis statis ESLint (root app + server)                  | 0 error, 0 warning                      |
+| `pnpm typecheck`                                    | Pemeriksaan tipe penuh TypeScript via `nuxi typecheck`      | EXIT 0 (0 compilation error)            |
+| `pnpm --filter @shelfstack/order-service typecheck` | Pemeriksaan tipe mikroservis Fastify                        | EXIT 0                                  |
+| `pnpm exec vitest run`                              | Unit & integration tests Nuxt, domain model, dan server API | 130 test files / 1.248 tests lolos 100% |
+| `pnpm --filter @shelfstack/order-service test`      | Unit tests Fastify, BullMQ delayed queue, dan DLQ replay    | 2 test files / 25 tests lolos 100%      |
+| `pnpm test:e2e`                                     | Pengujian fungsional browser Playwright Chromium            | Skenario checkout dan pelacakan lolos   |
+| `pnpm test:load`                                    | Pengujian beban konkurensi Grafana k6                       | 0 transaksi gagal, 0 overselling        |
+| `pnpm build`                                        | Verifikasi kompilasi bundel produksi Nuxt + Nitro           | Build sukses tanpa warning degradasi    |
+
+---
 
 ## Indeks Architecture Decision Records (ADR)
+
+Keputusan arsitektur yang melandasi perancangan sistem didokumentasikan secara rinci:
 
 - [ADR-001: Nuxt 4 + Supabase Fullstack Topology](docs/ADR/001-nuxt-supabase.md)
 - [ADR-002: Feature-Sliced Design Lite (`app/features/`)](docs/ADR/002-fsd-lite.md)
@@ -66,47 +166,8 @@ Tersedia pemilih kredensial instan 1-klik di halaman login publik tanpa perlu me
 - [ADR-004: Single Supabase Project & Strict RLS Governance](docs/ADR/004-single-supabase-project.md)
 - [ADR-005: Order State & Payment State Separation](docs/ADR/005-order-state-payment-state-separation.md)
 
-## Persiapan Lokal (Quickstart 5 Menit)
+---
 
-> Repositori ini menggunakan **pnpm** secara eksklusif (`pnpm@11.5.3`). Jangan gunakan `npm`, `npx`, `yarn`, atau `bun`.
+## Lisensi
 
-1. Salin berkas variabel lingkungan dari `.env.example` menjadi `.env`, lalu lengkapi kredensial Supabase, Midtrans Sandbox, dan `INTERNAL_SERVICE_KEY`.
-2. Instal seluruh dependensi workspace:
-   ```bash
-   pnpm install --frozen-lockfile
-   ```
-3. Terapkan migrasi dan data awal (menghasilkan 5 kategori kanonik, produk kurasi, voucher, pesanan 5 status, ulasan, komplain retur, dan akun demo sesuai `supabase/seed.sql`):
-   ```bash
-   # Untuk project Supabase Cloud yang terhubung:
-   pnpm db:seed
-
-   # Atau untuk stack lokal Supabase Docker:
-   pnpm db:seed:local
-   ```
-4. Jalankan server pengembangan Nuxt:
-   ```bash
-   pnpm dev
-   ```
-5. _(Opsional)_ Jalankan Redis dan mikroservis `@shelfstack/order-service` untuk menguji webhook terisolasi serta worker BullMQ/DLQ:
-   ```bash
-   docker compose -f docker-compose.dev.yml up -d
-   pnpm --filter @shelfstack/order-service dev
-   ```
-
-## Perintah Verifikasi & Pengujian
-
-| Perintah                                            | Deskripsi                                                                            |
-| :-------------------------------------------------- | :----------------------------------------------------------------------------------- |
-| `pnpm dev`                                          | Menjalankan server pengembangan Nuxt lokal                                           |
-| `pnpm db:seed`                                      | Menjalankan SQL seeder idempoten ke remote database Supabase Cloud                   |
-| `pnpm db:seed:local`                                | Menjalankan SQL seeder idempoten ke lokal Supabase Docker                            |
-| `pnpm lint`                                         | Pemeriksaan statis ESLint pada aplikasi utama dan server                             |
-| `pnpm typecheck`                                    | Pemeriksaan tipe penuh via `nuxi typecheck` (`app` + `server`)                       |
-| `pnpm --filter @shelfstack/order-service typecheck` | Pemeriksaan tipe TypeScript pada mikroservis `order-service`                         |
-| `pnpm exec vitest run`                              | Menjalankan seluruh unit test Nuxt sekali jalan (bukan watch mode)                   |
-| `pnpm --filter @shelfstack/order-service test`      | Menjalankan unit test Fastify, BullMQ, dan DLQ pada `order-service`                  |
-| `pnpm test:e2e`                                     | Menjalankan skenario end-to-end Playwright (`tests/e2e/`)                            |
-| `pnpm test:load`                                    | Menjalankan suite pengujian beban konkurensi k6 (catalog, checkout, webhook, health) |
-| `pnpm build`                                        | Membangun bundel produksi Nuxt + Nitro                                               |
-
-> Pipeline CI di [.github/workflows/ci.yml](.github/workflows/ci.yml) memvalidasi `lint -> typecheck -> build -> vitest -> docker compose config` pada setiap push dan Pull Request.
+Proyek ini dirilis di bawah lisensi MIT. Hak cipta dilindungi undang-undang.
