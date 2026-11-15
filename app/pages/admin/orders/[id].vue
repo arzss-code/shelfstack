@@ -6,6 +6,7 @@ import AdminOrderCustomerCard from '~/features/orders/components/AdminOrderCusto
 import AdminShippingLabelModal from '~/features/orders/components/AdminShippingLabelModal.vue'
 import OrderInvoiceModal from '~/features/orders/components/OrderInvoiceModal.vue'
 import AdminEmailPreviewModal from '~/components/admin/AdminEmailPreviewModal.vue'
+import AdminAddCheckpointModal from '~/components/admin/orders/AdminAddCheckpointModal.vue'
 
 definePageMeta({
   layout: 'admin',
@@ -18,6 +19,7 @@ const orderId = computed(() => route.params.id as string)
 const isShippingLabelOpen = ref(false)
 const isInvoiceModalOpen = ref(false)
 const isEmailPreviewOpen = ref(false)
+const isAddCheckpointOpen = ref(false)
 
 const {
   order,
@@ -217,9 +219,15 @@ useSeoMeta({
 
       <!-- Tracking & Logistics Timeline Card (if shipped or completed) -->
       <div v-if="order.tracking_number" class="space-y-3">
-        <h2 class="font-display text-base font-bold text-brand-ink m-0">
-          Linimasa Pengiriman &amp; Ekspedisi
-        </h2>
+        <div class="flex items-center justify-between">
+          <h2 class="font-display text-base font-bold text-brand-ink m-0">
+            Linimasa Pengiriman &amp; Ekspedisi
+          </h2>
+          <UiButton variant="secondary" size="sm" @click="isAddCheckpointOpen = true">
+            <i class="pi pi-plus text-xs mr-1.5" />
+            Tambah Checkpoint
+          </UiButton>
+        </div>
         <OrderTrackingTimeline
           :tracking-number="order.tracking_number"
           :courier-name="order.courier_name || 'JNE Express'"
@@ -252,6 +260,13 @@ useSeoMeta({
         :show="isEmailPreviewOpen"
         :order="order"
         @close="isEmailPreviewOpen = false"
+      />
+      <AdminAddCheckpointModal
+        v-if="order.tracking_number"
+        v-model:visible="isAddCheckpointOpen"
+        :order-id="order.id"
+        :tracking-number="order.tracking_number"
+        @checkpoint-added="fetchOrderDetail"
       />
     </template>
   </div>

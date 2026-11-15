@@ -2,6 +2,24 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.17] - 2026-11-15
+
+### Simulator Logistik & Checkpoint Kurir Admin (Paket 2 Auto-Loop)
+
+- **Kontrak Skema Checkpoint Logistik (`shared/schemas/shipping-checkpoint-input.ts`, 54 baris)**:
+  - Menyediakan `createShippingCheckpointSchema` dengan validasi status ekspedisi, nama fasilitas logistik, judul, dan keterangan rincian kurir.
+  - Menyediakan template judul dan deskripsi standar (`defaultCheckpointTemplates`) untuk 6 status logistik (`manifested`, `picked_up`, `in_transit`, `out_for_delivery`, `delivered`, `returned`).
+- **Endpoint API Pembaruan Checkpoint Ekspedisi Admin (`server/api/admin/orders/[id]/checkpoints.post.ts`, 92 baris)**:
+  - Otorisasi ketat `requireAdmin(event)` dan pemeriksaan keberadaan nomor resi pada pesanan.
+  - Menyimpan peristiwa transit ke tabel `shipping_checkpoints` secara atomik, memicu siaran instan via Supabase Realtime ke pelanggan, serta memperbarui timestamp `delivered_at` otomatis saat status adalah `delivered`.
+- **Komponen Modal Checkpoint Pengiriman (`app/components/admin/orders/AdminAddCheckpointModal.vue`, 173 baris)**:
+  - Antarmuka interaktif bagi administrator untuk menyimulasikan pergerakan kurir (transit, hub sortir, kurir jalan, terkirim).
+  - Mengisi otomatis judul dan keterangan sesuai pilihan status logistik dengan opsi kustomisasi bebas.
+- **Integrasi Halaman Detail Pesanan Admin (`app/pages/admin/orders/[id].vue`, 277 baris)**:
+  - Menambahkan tombol aksi "+ Tambah Checkpoint" pada kartu linimasa ekspedisi yang menyegarkan data riwayat secara instan setelah checkpoint berhasil dikirim.
+- **Pengujian Unit & Tata Kelola Kode (`tests/unit/admin-shipping-checkpoints.spec.ts`, 105 baris)**:
+  - 8 pengujian unit memverifikasi aturan skema Zod, kelengkapan template 6 status logistik, kepatuhan batas file <= 300 baris, dan penegakan bebas em dash.
+
 ## [v1.1.0-beta.16] - 2026-11-15
 
 ### Flash Sale & Limited-Time Promotion Engine (Paket 1 Auto-Loop)
