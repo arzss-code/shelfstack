@@ -83,7 +83,31 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    const isTimeout =
+      order.status === 'pending' &&
+      Boolean(order.created_at) &&
+      Date.now() - new Date(order.created_at || 0).getTime() >= 15 * 60 * 1000
+
     if (!midtransData || !midtransData.transaction_status) {
+      if (isTimeout) {
+        const serviceRoleClient = serverSupabaseServiceRole<Database>(event)
+        await serviceRoleClient.rpc('handle_payment_webhook', {
+          p_order_id: order.id,
+          p_target_status: 'cancelled',
+          p_payment_type: 'auto_timeout',
+          p_midtrans_id: null,
+        })
+        return successResponse(
+          'Batas waktu pembayaran 15 menit telah habis. Pesanan dibatalkan otomatis.',
+          {
+            order_id: order.id,
+            status: 'cancelled',
+            is_paid: false,
+            is_cancelled: true,
+          },
+        )
+      }
+
       return successResponse('Status belum diperbarui oleh Payment Gateway', {
         order_id: order.id,
         status: order.status,
@@ -181,7 +205,10 @@ export default defineEventHandler(async (event) => {
     const txStatus = String(midtransData.transaction_status || '')
     const fraudStatus =
       typeof midtransData.fraud_status === 'string' ? midtransData.fraud_status : null
-    const targetStatus = mapMidtransStatus(txStatus, fraudStatus)
+    let targetStatus = mapMidtransStatus(txStatus, fraudStatus)
+    if (targetStatus === 'pending' && isTimeout) {
+      targetStatus = 'cancelled'
+    }
 
     if (targetStatus !== order.status) {
       const serviceRoleClient = serverSupabaseServiceRole<Database>(event)

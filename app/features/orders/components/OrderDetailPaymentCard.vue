@@ -54,8 +54,16 @@ const onPaymentExpired = () => {
       <div class="flex items-center justify-between">
         <span>Status Pembayaran</span>
         <UiBadge
-          :variant="getPaymentStatusBadge(order).variant"
-          :label="getPaymentStatusBadge(order).label"
+          :variant="
+            isPaymentExpired && order.status === 'pending'
+              ? 'danger'
+              : getPaymentStatusBadge(order).variant
+          "
+          :label="
+            isPaymentExpired && order.status === 'pending'
+              ? 'Waktu Habis'
+              : getPaymentStatusBadge(order).label
+          "
         />
       </div>
       <div v-if="order.payment_type" class="flex items-center justify-between">
@@ -136,7 +144,7 @@ const onPaymentExpired = () => {
     </div>
 
     <!-- Action Button if pending -->
-    <div v-if="order.status === 'pending'" class="space-y-3 pt-2">
+    <div v-if="order.status === 'pending' && !isPaymentExpired" class="space-y-3 pt-2">
       <OrderPaymentCountdownCard :created-at="order.created_at" @expired="onPaymentExpired" />
       <UiButton
         variant="primary"
@@ -192,8 +200,13 @@ const onPaymentExpired = () => {
       </p>
     </div>
 
-    <!-- Action Button if cancelled: Single primary CTA for reorder -->
-    <div v-else-if="order.status === 'cancelled'" class="space-y-3 pt-2">
+    <!-- Action Button if cancelled or expired: Single primary CTA for reorder -->
+    <div v-else-if="order.status === 'cancelled' || isPaymentExpired" class="space-y-3 pt-2">
+      <OrderPaymentCountdownCard
+        v-if="isPaymentExpired"
+        :created-at="order.created_at"
+        @expired="onPaymentExpired"
+      />
       <UiButton
         variant="primary"
         size="md"

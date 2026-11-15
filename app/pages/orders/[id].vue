@@ -40,6 +40,7 @@ const {
   getPaymentStatusBadge,
   handlePayNow,
   handleCheckPaymentStatus,
+  handlePaymentExpired,
   handleCancelOrder,
   handleConfirmDelivery,
   handleReorder,
@@ -254,7 +255,7 @@ useSeoMeta({
           @open-cancel-modal="isCancelModalOpen = true"
           @reorder="handleReorder"
           @confirm-delivery="handleConfirmDeliveryClick"
-          @payment-expired="handleCheckPaymentStatus(true)"
+          @payment-expired="handlePaymentExpired"
           @open-return-modal="isReturnModalOpen = true"
           @open-invoice-modal="isInvoiceModalOpen = true"
         />

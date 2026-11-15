@@ -60,6 +60,15 @@ export function useOrderDetail(orderId: string) {
               tone: 'success',
             })
           }
+        } else if (res.status === 'cancelled') {
+          stopPolling()
+          if (!silent || wasPending) {
+            toast.show({
+              title: 'Waktu Pembayaran Habis',
+              message: 'Batas waktu 15 menit telah berakhir. Pesanan dibatalkan otomatis.',
+              tone: 'warn',
+            })
+          }
         } else if (!silent) {
           toast.show({
             title: 'Status Terkini',
@@ -104,6 +113,13 @@ export function useOrderDetail(orderId: string) {
     }
   }
 
+  const handlePaymentExpired = async () => {
+    if (!order.value || order.value.status !== 'pending') return
+    order.value.status = 'cancelled'
+    stopPolling()
+    await handleCheckPaymentStatus(true)
+  }
+
   const handlePayNow = async () => {
     if (!order.value || isPaying.value) return
     isPaying.value = true
@@ -121,6 +137,11 @@ export function useOrderDetail(orderId: string) {
     }
   }
 
+  const notifyError = (title: string, err: unknown, fallback: string) => {
+    const fetchErr = err as { data?: { message?: string } }
+    toast.show({ title, message: fetchErr.data?.message || fallback, tone: 'error' })
+  }
+
   const handleCancelOrder = async (reason: string) => {
     if (!order.value || isCancelling.value) return false
     isCancelling.value = true
@@ -135,12 +156,7 @@ export function useOrderDetail(orderId: string) {
       await fetchOrderDetail()
       return true
     } catch (err: unknown) {
-      const fetchErr = err as { data?: { message?: string } }
-      toast.show({
-        title: 'Gagal Membatalkan',
-        message: fetchErr.data?.message || 'Gagal membatalkan pesanan.',
-        tone: 'error',
-      })
+      notifyError('Gagal Membatalkan', err, 'Gagal membatalkan pesanan.')
       return false
     } finally {
       isCancelling.value = false
@@ -148,7 +164,7 @@ export function useOrderDetail(orderId: string) {
   }
 
   const handleReorder = () => {
-    if (!order.value?.items || order.value.items.length === 0) return
+    if (!order.value?.items?.length) return
     for (const item of order.value.items) {
       cartStore.addItem({
         productId: item.product_id,
@@ -183,21 +199,13 @@ export function useOrderDetail(orderId: string) {
       await fetchOrderDetail(true)
       return true
     } catch (err: unknown) {
-      const fetchErr = err as { data?: { message?: string } }
-      toast.show({
-        title: 'Gagal Konfirmasi',
-        message: fetchErr.data?.message || 'Gagal mengonfirmasi pesanan.',
-        tone: 'error',
-      })
+      notifyError('Gagal Konfirmasi', err, 'Gagal mengonfirmasi pesanan.')
       return false
     } finally {
       isConfirmingDelivery.value = false
     }
   }
 
-  const getStatusBadge = getOrderStatusBadge
-  const getBadgePayment = getPaymentStatusBadge
-  const formatDate = formatOrderDate
   const getSegmentColor = (idx: number) => getTimelineSegmentColor(idx, order.value?.status)
   const orderSteps = computed<OrderStep[]>(() =>
     order.value ? computeOrderDetailSteps(order.value) : [],
@@ -222,15 +230,14 @@ export function useOrderDetail(orderId: string) {
             const updated = payload.new as Record<string, unknown>
             const prevStatus = order.value.status
             const nextStatus = updated.status as OrderStatus
-            order.value = {
-              ...order.value,
+            Object.assign(order.value, {
               status: nextStatus,
               payment_type: (updated.payment_type as string) || order.value.payment_type,
               paid_at: (updated.paid_at as string) || order.value.paid_at,
               tracking_number: (updated.tracking_number as string) || order.value.tracking_number,
               courier_name: (updated.courier_name as string) || order.value.courier_name,
               courier_code: (updated.courier_code as string) || order.value.courier_code,
-            }
+            })
             if (nextStatus !== 'pending') stopPolling()
             tracking.fetchCustomerTracking()
             if (prevStatus === 'pending' && nextStatus === 'paid') {
@@ -271,14 +278,15 @@ export function useOrderDetail(orderId: string) {
     isConfirmingDelivery,
     ...tracking,
     orderSteps,
-    formatDate,
+    formatDate: formatOrderDate,
     formatShippingServiceName,
     getSegmentColor,
-    getStatusBadge,
-    getPaymentStatusBadge: getBadgePayment,
+    getStatusBadge: getOrderStatusBadge,
+    getPaymentStatusBadge,
     fetchOrderDetail,
     handlePayNow,
     handleCheckPaymentStatus,
+    handlePaymentExpired,
     handleCancelOrder,
     handleConfirmDelivery,
     handleReorder,

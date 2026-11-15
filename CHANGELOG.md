@@ -2,6 +2,21 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.14] - 2026-11-15
+
+### Sinkronisasi Otomatis Status Pembatalan Batas Waktu Pembayaran (15-Minute Expiry Sync)
+
+- **Rekonsiliasi Otomatis Batas Waktu pada Server (`server/api/orders/[id]/check-payment-status.post.ts`, 270 baris)**:
+  - Memeriksa selisih waktu `created_at` pesanan saat sinkronisasi pembayaran dijalankan. Jika pesanan `pending` telah melampaui 15 menit dan pembayaran tidak terkonfirmasi di Midtrans, sistem secara atomik membatalkan pesanan via RPC `handle_payment_webhook('cancelled', 'auto_timeout')` dan mengembalikan stok.
+- **Pembaruan Reaktif Status pada Detail Pesanan (`app/composables/useOrderDetail.ts`, 295 baris)**:
+  - Menambahkan handler `handlePaymentExpired` yang secara optimistik dan instan memperbarui `order.status = 'cancelled'`, menghentikan polling, serta memicu verifikasi status ke server.
+  - Memperbarui toast pemberitahuan saat pembatalan waktu habis terdeteksi.
+- **Sinkronisasi UI Kartu Pembayaran & Aksi Beli Lagi (`OrderDetailPaymentCard.vue`, `app/pages/orders/[id].vue`)**:
+  - Badge status pembayaran di kartu ringkasan secara reaktif beralih ke "Waktu Habis" (danger) saat hitung mundur berakhir.
+  - Tombol aksi utama otomatis berganti dari "Bayar Sekarang" ke tombol primer "Beli Lagi" (`reorder`).
+- **Pengujian Unit & Integritas Arsitektur (`tests/unit/check-payment-status.spec.ts`, 82 baris)**:
+  - 9 pengujian memvalidasi pemetaan status Midtrans, evaluasi ambang batas 15 menit, batas baris `<= 300`, dan ketiadaan karakter em dash.
+
 ## [v1.1.0-beta.13] - 2026-11-15
 
 ### Hardening Alur Checkout, Pemecahan Modular Composable & Penghapusan Tipe Any
