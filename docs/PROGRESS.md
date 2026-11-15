@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 26 (Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview)**
-- **Versi Rilis:** `v1.1.0-beta.6` (Pre-release Staging / develop aktif : sinkron dengan `version.json`)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 118 file / 1.159 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v1.1.0-beta.7` (Pre-release Staging / develop aktif : sinkron dengan `version.json`)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 120 file / 1.182 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -413,6 +413,8 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
     - Status: ✅ **SELESAI 2026-11-15** (Halaman `/admin/users`, 4 kartu KPI CRM, kalkulasi agregasi LTV berbasis pesanan lunas di `server/utils/admin-users.ts`, sorting/filtering pelanggan, modal detail profil, dan 6 unit test di `tests/unit/admin-users-crm.spec.ts`).
 17. ~~**Proteksi Endpoint Publik dengan Token Bucket Rate Limiting (E-08)**~~:
     - Status: ✅ **SELESAI 2026-11-15** (Implementasi algoritma token bucket murni di `server/utils/rate-limit.ts`, middleware `server/middleware/03.rate-limit.ts` untuk proteksi auth 5/min, checkout 10/min, search 30/min, respon HTTP 429 Retry-After, penegasan security headers di `nuxt.config.ts`, serta 9 unit test di `tests/unit/rate-limiting-and-security.spec.ts`).
+18. ~~**Konfirmasi Penerimaan Pesanan Pelanggan & Live Countdown Pembayaran (E-09)**~~:
+    - Status: ✅ **SELESAI 2026-11-15** (Endpoint `POST /api/orders/[id]/confirm-delivery` dengan RPC database atomik `transition_order_status` yang mentransisikan `shipped -> completed`, memberikan cashback loyalti koin 1%, komponen `OrderPaymentCountdownCard.vue` dengan hitung mundur 15 menit live MM:SS dan penanganan auto-cancel, tombol konfirmasi penerimaan di rincian order beserta dialog konfirmasi dan auto-prompt modal ulasan, penyelarasan link footer ke `/c/[slug]`, serta 9 unit test di `tests/unit/order-confirm-delivery-and-countdown.spec.ts`).
 
 ## 📋 Catatan Teknis & Konvensi Wajib
 

@@ -1,14 +1,17 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { Order } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiButton from '~/components/ui/UiButton.vue'
+import OrderPaymentCountdownCard from './OrderPaymentCountdownCard.vue'
 
 defineProps<{
   order: Order
   isPaying: boolean
   isCancelling: boolean
   isManualChecking: boolean
+  isConfirmingDelivery?: boolean
   getPaymentStatusBadge: (order: Order) => {
     variant: 'default' | 'info' | 'warning' | 'success' | 'danger'
     label: string
@@ -18,14 +21,23 @@ defineProps<{
   returnTicket?: unknown
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   pay: []
   checkStatus: []
   openCancelModal: []
   reorder: []
   openReturnModal: []
   openInvoiceModal: []
+  confirmDelivery: []
+  paymentExpired: []
 }>()
+
+const isPaymentExpired = ref(false)
+
+const onPaymentExpired = () => {
+  isPaymentExpired.value = true
+  emit('paymentExpired')
+}
 </script>
 
 <template>
@@ -125,13 +137,14 @@ defineEmits<{
 
     <!-- Action Button if pending -->
     <div v-if="order.status === 'pending'" class="space-y-3 pt-2">
+      <OrderPaymentCountdownCard :created-at="order.created_at" @expired="onPaymentExpired" />
       <UiButton
         variant="primary"
         size="md"
         class="w-full justify-center"
         icon="pi-credit-card"
         :loading="isPaying"
-        :disabled="isCancelling || isManualChecking"
+        :disabled="isCancelling || isManualChecking || isPaymentExpired"
         @click="$emit('pay')"
       >
         Bayar Sekarang (Midtrans)
@@ -159,6 +172,23 @@ defineEmits<{
       </UiButton>
       <p class="text-[11px] text-brand-muted text-center m-0">
         Pembayaran diproses secara instan dan aman melalui jaringan Midtrans.
+      </p>
+    </div>
+
+    <!-- Action Button if shipped: Konfirmasi Pesanan Diterima -->
+    <div v-else-if="order.status === 'shipped'" class="space-y-2 pt-2">
+      <UiButton
+        variant="primary"
+        size="md"
+        class="w-full justify-center !bg-brand-success hover:!bg-brand-success-text !text-white font-semibold"
+        icon="pi-check-circle"
+        :loading="isConfirmingDelivery"
+        @click="$emit('confirmDelivery')"
+      >
+        Konfirmasi Pesanan Diterima
+      </UiButton>
+      <p class="text-[11px] text-brand-muted text-center m-0">
+        Pastikan seluruh paket telah tiba dan sesuai sebelum menyelesaikan pesanan.
       </p>
     </div>
 

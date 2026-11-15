@@ -12,6 +12,7 @@ import OrderDetailDeliveryCard from '~/features/orders/components/OrderDetailDel
 import OrderDetailPaymentCard from '~/features/orders/components/OrderDetailPaymentCard.vue'
 import { useReturnRequest } from '~/composables/useReturnRequest'
 import { useOrderDetail } from '~/composables/useOrderDetail'
+import { useUiConfirm } from '~/composables/useUiConfirm'
 
 definePageMeta({
   middleware: 'auth',
@@ -27,6 +28,7 @@ const {
   isPaying,
   isCancelling,
   isManualChecking,
+  isConfirmingDelivery,
   copiedHeaderResi,
   activeCheckpoints,
   activeLatestCheckpointLocation,
@@ -41,9 +43,11 @@ const {
   handlePayNow,
   handleCheckPaymentStatus,
   handleCancelOrder,
+  handleConfirmDelivery,
   handleReorder,
 } = useOrderDetail(orderId)
 
+const confirm = useUiConfirm()
 const { ticket: returnTicket, eligibility: returnEligibility, fetchReturnData } = useReturnRequest()
 
 const isCancelModalOpen = ref(false)
@@ -61,6 +65,23 @@ const openReviewModal = (item: {
     name: item.product?.name || `Produk #${item.product_id}`,
   }
   isReviewModalOpen.value = true
+}
+
+const handleConfirmDeliveryClick = () => {
+  confirm.require({
+    header: 'Konfirmasi Penerimaan',
+    message:
+      'Apakah seluruh produk pesanan ini telah tiba dengan baik dan sesuai? Tindakan ini akan menyelesaikan pesanan dan mencairkan koin loyalitas Anda.',
+    tone: 'success',
+    acceptLabel: 'Ya, Pesanan Diterima',
+    rejectLabel: 'Batal',
+    accept: async () => {
+      const ok = await handleConfirmDelivery()
+      if (ok && order.value?.items?.[0]) {
+        openReviewModal(order.value.items[0])
+      }
+    },
+  })
 }
 
 const onConfirmCancel = async (reason: string) => {
@@ -244,6 +265,7 @@ useSeoMeta({
           :is-paying="isPaying"
           :is-cancelling="isCancelling"
           :is-manual-checking="isManualChecking"
+          :is-confirming-delivery="isConfirmingDelivery"
           :get-payment-status-badge="getPaymentStatusBadge"
           :format-shipping-service-name="formatShippingServiceName"
           :return-eligibility="returnEligibility"
@@ -252,6 +274,8 @@ useSeoMeta({
           @check-status="handleCheckPaymentStatus(false)"
           @open-cancel-modal="isCancelModalOpen = true"
           @reorder="handleReorder"
+          @confirm-delivery="handleConfirmDeliveryClick"
+          @payment-expired="handleCheckPaymentStatus(true)"
           @open-return-modal="isReturnModalOpen = true"
           @open-invoice-modal="isInvoiceModalOpen = true"
         />
