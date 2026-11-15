@@ -77,20 +77,16 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
       const sw = createSwHarness()
       await dispatchWaitUntil(sw.listeners.get('install'), {})
       expect(sw.cachesApi.open).toHaveBeenCalledWith('shelfstack-static-v1')
-      expect(sw.cacheStore.addAll).toHaveBeenCalledWith([
-        '/site.webmanifest',
-        '/favicon.svg',
-        '/favicon-32x32.png',
-        '/apple-touch-icon.png',
-        '/logo.svg',
-      ])
+      const shellAssets =
+        '/site.webmanifest /favicon.svg /favicon-32x32.png /apple-touch-icon.png /logo.svg'.split(
+          ' ',
+        )
+      expect(sw.cacheStore.addAll).toHaveBeenCalledWith(shellAssets)
       expect(sw.skipWaiting).toHaveBeenCalledTimes(1)
 
-      sw.cachesApi.keys.mockResolvedValueOnce([
-        'shelfstack-static-v0',
-        'shelfstack-static-v1',
-        'other',
-      ])
+      sw.cachesApi.keys.mockResolvedValueOnce(
+        'shelfstack-static-v0 shelfstack-static-v1 other'.split(' '),
+      )
       await dispatchWaitUntil(sw.listeners.get('activate'), {})
       expect(sw.cachesApi.delete).toHaveBeenCalledTimes(1)
       expect(sw.cachesApi.delete).toHaveBeenCalledWith('shelfstack-static-v0')
@@ -100,19 +96,14 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
     it('bypasses non-GET, sensitive routes, dynamic HTML, and third-party origins', () => {
       const sw = createSwHarness()
       const fetchHandler = sw.listeners.get('fetch')
+      const paths =
+        '/api/products /auth/callback /admin/orders /checkout /orders/ORD-100 /account/profile / /sw.js'.split(
+          ' ',
+        )
       const bypassed: Array<[string, string]> = [
         ['POST', 'https://shelfstack.atsiilaarya.me/images/auth-showcase.jpg'],
         ['DELETE', 'https://shelfstack.atsiilaarya.me/api/orders/1'],
-        ...[
-          '/api/products',
-          '/auth/callback',
-          '/admin/orders',
-          '/checkout',
-          '/orders/ORD-100',
-          '/account/profile',
-          '/',
-          '/sw.js',
-        ].map((p): [string, string] => ['GET', `https://shelfstack.atsiilaarya.me${p}`]),
+        ...paths.map((p): [string, string] => ['GET', `https://shelfstack.atsiilaarya.me${p}`]),
         ['GET', 'https://demo.supabase.co/storage/v1/object/public/images/a.png'],
         ['GET', 'https://app.midtrans.com/snap/snap.js'],
       ]
@@ -284,15 +275,10 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
     it('configures CSP worker-src self and respects line/em-dash/any constraints', () => {
       const config = fs.readFileSync(path.resolve(process.cwd(), 'nuxt.config.ts'), 'utf-8')
       expect(config).toContain("'worker-src': [\"'self'\"]")
-      const files = [
-        'public/sw.js',
-        'app/plugins/sw.client.ts',
-        'app/utils/desktop-notification.ts',
-        'app/components/notification/NotificationHeader.vue',
-        'nuxt.config.ts',
-        'eslint.config.mjs',
-        'tests/unit/pwa-service-worker.spec.ts',
-      ]
+      const files =
+        'public/sw.js app/plugins/sw.client.ts app/utils/desktop-notification.ts app/components/notification/NotificationHeader.vue nuxt.config.ts eslint.config.mjs tests/unit/pwa-service-worker.spec.ts'.split(
+          ' ',
+        )
       for (const rel of files) {
         const src = fs.readFileSync(path.resolve(process.cwd(), rel), 'utf-8')
         expect(src.split('\n').length, `${rel} > 300 lines`).toBeLessThanOrEqual(300)

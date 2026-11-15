@@ -2,6 +2,15 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.11] - 2026-11-15
+
+### Hardening Batasan Baris Kode Prettier (Prettier Format Line Limit Immunity)
+
+- **Optimasi Template Halaman Detail Pesanan (`app/pages/orders/[id].vue`, 286 baris)**:
+  - Merampingkan struktur template dan binding komponen sehingga tahan terhadap ekspansi formatting Prettier dan stabil pada 286 baris.
+- **Kompaksi Uji Layanan PWA (`tests/unit/pwa-service-worker.spec.ts`, 282 baris)**:
+  - Memadatkan struktur array string literal aset dan rute bypass sehingga stabil pada 282 baris setelah pemformatan Prettier.
+
 ## [v1.1.0-beta.10] - 2026-11-15
 
 ### Hardening Batasan Baris Kode Arsitektur (Architectural Line Limits & Composable Optimization)

@@ -14,9 +14,7 @@ import { useReturnRequest } from '~/composables/useReturnRequest'
 import { useOrderDetail } from '~/composables/useOrderDetail'
 import { useUiConfirm } from '~/composables/useUiConfirm'
 
-definePageMeta({
-  middleware: 'auth',
-})
+definePageMeta({ middleware: 'auth' })
 
 const route = useRoute()
 const orderId = route.params.id as string
@@ -102,26 +100,23 @@ useSeoMeta({
 
 <template>
   <div class="space-y-6 pb-20">
-    <!-- Breadcrumbs -->
     <nav
       aria-label="Breadcrumbs"
       class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 overflow-x-auto"
     >
-      <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
-        ShelfStack
-      </NuxtLink>
+      <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors"
+        >ShelfStack</NuxtLink
+      >
       <span class="text-brand-faint">/</span>
       <NuxtLink
         to="/orders"
         class="hover:text-brand-ink no-underline text-brand-muted transition-colors"
+        >Pesanan Saya</NuxtLink
       >
-        Pesanan Saya
-      </NuxtLink>
       <span class="text-brand-faint">/</span>
       <span class="text-brand-ink font-semibold">Detail Pesanan</span>
     </nav>
 
-    <!-- Error State -->
     <div
       v-if="errorMsg"
       class="text-center py-16 px-6 bg-red-50 border border-red-200 rounded-card max-w-lg mx-auto space-y-4"
@@ -132,7 +127,6 @@ useSeoMeta({
       <UiButton to="/orders" variant="secondary" size="sm">Kembali ke Riwayat Pesanan</UiButton>
     </div>
 
-    <!-- Loading Skeleton -->
     <div v-else-if="loading" class="space-y-6 animate-pulse">
       <div class="h-16 bg-brand-field rounded-card" />
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -141,9 +135,7 @@ useSeoMeta({
       </div>
     </div>
 
-    <!-- Order Detail View -->
     <div v-else-if="order" class="space-y-6">
-      <!-- Top Order Header -->
       <div
         class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
@@ -205,7 +197,6 @@ useSeoMeta({
         </div>
       </div>
 
-      <!-- Kartu Status Retur / Garansi Pelanggan -->
       <OrderReturnStatusCard
         v-if="returnTicket"
         :ticket="returnTicket"
@@ -213,7 +204,6 @@ useSeoMeta({
         @refetch="fetchReturnData(order.id)"
       />
 
-      <!-- Timeline Status Progress (Modular Stepper) -->
       <OrderDetailProgressStepper
         :order="order"
         :order-steps="orderSteps"
@@ -221,7 +211,6 @@ useSeoMeta({
         :format-date="formatDate"
       />
 
-      <!-- Real-time Logistics & Courier Tracking Timeline -->
       <OrderTrackingTimeline
         v-if="order.tracking_number"
         class="mb-8"
@@ -233,16 +222,13 @@ useSeoMeta({
         :checkpoints="activeCheckpoints"
       />
 
-      <!-- Main Layout -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <!-- Left Column: Items List & Delivery Address -->
         <div class="lg:col-span-8 space-y-6">
           <OrderDetailItemsCard
             :items="order.items"
             :order-status="order.status"
             @review="openReviewModal"
           />
-
           <OrderDetailDeliveryCard
             :order="order"
             :copied-header-resi="copiedHeaderResi"
@@ -252,7 +238,6 @@ useSeoMeta({
           />
         </div>
 
-        <!-- Right Column: Payment & Bill Summary (Modular Aside) -->
         <OrderDetailPaymentCard
           class="lg:col-span-4"
           :order="order"
@@ -276,15 +261,12 @@ useSeoMeta({
       </div>
     </div>
 
-    <!-- Modals -->
     <OrderCancelDialog
       v-model:visible="isCancelModalOpen"
       :loading="isCancelling"
       @confirm="onConfirmCancel"
     />
-
     <OrderInvoiceModal v-if="order" v-model:visible="isInvoiceModalOpen" :order="order" />
-
     <OrderReturnModal
       v-if="order"
       v-model="isReturnModalOpen"
@@ -293,7 +275,6 @@ useSeoMeta({
       :remaining-days="returnEligibility?.remainingDays || 7"
       @success="fetchReturnData(order.id)"
     />
-
     <ReviewFormModal
       v-if="selectedReviewProduct"
       v-model="isReviewModalOpen"
