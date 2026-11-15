@@ -1,17 +1,20 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useAuth } from '~/features/auth/composables/useAuth'
-import { useCartStore, type CartItem } from '~/features/cart/stores/cart'
-import { formatRupiah } from '~/utils/format'
+import { useCartStore } from '~/features/cart/stores/cart'
+import { useCartReconciliation } from '~/features/cart/composables/useCartReconciliation'
 import { useOrderPaymentSync } from '~/composables/useOrderPaymentSync'
 import { useAddresses } from '~/composables/useAddresses'
 import { useLoyaltyPoints } from '~/composables/useLoyaltyPoints'
+import {
+  useCheckoutSummaryDisplay,
+  createCheckoutPlacedSnapshot,
+  type PlacedOrderSnapshot,
+} from '~/composables/useCheckoutSummaryDisplay'
 import type { UserAddress } from '~~/shared/schemas/address'
 import { type ShippingService, calculateShippingFee } from '~~/shared/schemas/shipping'
 import {
   calculateMaxUsableCoins,
   calculateCoinsDiscountCents,
-  calculateCheckoutTotalCents,
-  createPlacedOrderSnapshot,
   buildCheckoutOrderPayload,
   mapUserAddressToForm,
   buildAddressSavePayload,
@@ -28,22 +31,31 @@ export function useCheckoutOrder() {
   const { launchSnapPayment } = useOrderPaymentSync()
   const { saveAddress, fetchAddresses } = useAddresses()
   const { balanceCoins, fetchPointsSummary } = useLoyaltyPoints()
+  const { reconcileCart, hasOutOfStockItems } = useCartReconciliation()
 
   const syncDefaultAddress = async () => {
     if (!user.value || selectedSavedAddressId.value) return
     try {
-      const list = await fetchAddresses()
-      const target = resolveDefaultSavedAddress(list)
+      const target = resolveDefaultSavedAddress(await fetchAddresses())
       if (target) handleSelectSavedAddress(target)
     } catch {
-      // Abaikan kendala sinkronisasi alamat saat fetch awal gagal
+      // Abaikan kegagalan sinkronisasi alamat saat fetch awal
     }
   }
 
-  onMounted(() => {
+  onMounted(async () => {
     if (user.value) {
       fetchPointsSummary().catch(() => {})
       syncDefaultAddress()
+    }
+    await reconcileCart(true)
+    if (hasOutOfStockItems.value) {
+      toast.show({
+        title: 'Barang Tidak Tersedia',
+        message: 'Terdapat barang di keranjang yang telah habis. Keranjang Anda telah disesuaikan.',
+        tone: 'error',
+      })
+      router.push('/cart')
     }
   })
 
@@ -96,52 +108,15 @@ export function useCheckoutOrder() {
   const shippingFeeCents = computed(() => shippingFeeCalculation.value.feeCents)
   const isFreeShipping = computed(() => shippingFeeCalculation.value.isFree)
 
-  type PlacedOrderSnapshot = ReturnType<typeof createPlacedOrderSnapshot<CartItem>>
   const placedOrderSnapshot = ref<PlacedOrderSnapshot | null>(null)
 
-  const displayItems = computed(() => placedOrderSnapshot.value?.items ?? cartStore.items)
-  const displayTotalItems = computed(
-    () => placedOrderSnapshot.value?.totalItems ?? cartStore.totalItems,
-  )
-  const displayTotalPrice = computed(
-    () => placedOrderSnapshot.value?.totalPriceFormatted ?? cartStore.formattedTotalPrice,
-  )
-  const displayDiscountAmount = computed(
-    () =>
-      placedOrderSnapshot.value?.discountFormatted ??
-      (cartStore.discountCents > 0 ? cartStore.formattedDiscountAmount : null),
-  )
-  const displayCouponCode = computed(
-    () => placedOrderSnapshot.value?.couponCode ?? cartStore.appliedCoupon?.code ?? null,
-  )
-  const displayCoinsDiscountAmount = computed(
-    () =>
-      placedOrderSnapshot.value?.coinsDiscountFormatted ??
-      (actualCoinsUsed.value > 0 ? formatRupiah(actualCoinsUsed.value) : null),
-  )
-  const displayCoinsUsed = computed(
-    () => placedOrderSnapshot.value?.coinsUsed ?? actualCoinsUsed.value,
-  )
-  const displayShippingFeeFormatted = computed(
-    () =>
-      placedOrderSnapshot.value?.shippingFeeFormatted ??
-      (isFreeShipping.value ? 'Gratis Ongkir' : formatRupiah(shippingFeeCents.value / 100)),
-  )
-  const displayIsFreeShipping = computed(
-    () => placedOrderSnapshot.value?.isFreeShipping ?? isFreeShipping.value,
-  )
-
-  const displayFinalPrice = computed(() => {
-    return (
-      placedOrderSnapshot.value?.finalPriceFormatted ??
-      formatRupiah(
-        calculateCheckoutTotalCents(
-          cartStore.finalPriceCents,
-          coinsDiscountCents.value,
-          shippingFeeCents.value,
-        ) / 100,
-      )
-    )
+  const summaryDisplay = useCheckoutSummaryDisplay({
+    cartStore,
+    actualCoinsUsed,
+    coinsDiscountCents,
+    shippingFeeCents,
+    isFreeShipping,
+    placedOrderSnapshot,
   })
 
   const submitButtonLabel = computed(() => {
@@ -158,23 +133,25 @@ export function useCheckoutOrder() {
 
   const getOrCreateCheckoutKey = () => {
     if (!checkoutIdempotencyKey.value) {
+      const rnd = Math.random().toString(36).slice(2)
       checkoutIdempotencyKey.value =
         typeof crypto !== 'undefined' && crypto.randomUUID
           ? crypto.randomUUID()
-          : `chk-${Date.now()}-${Math.random().toString(36).slice(2)}`
+          : `chk-${Date.now()}-${rnd}`
     }
     return checkoutIdempotencyKey.value
   }
 
+  const monitoredDeps = [
+    () => cartStore.items,
+    () => cartStore.appliedCoupon,
+    address,
+    selectedShippingService,
+    selectedCourierCode,
+    useCoins,
+  ]
   watch(
-    [
-      () => cartStore.items,
-      () => cartStore.appliedCoupon,
-      address,
-      selectedShippingService,
-      selectedCourierCode,
-      useCoins,
-    ],
+    monitoredDeps,
     () => {
       checkoutIdempotencyKey.value = ''
     },
@@ -194,6 +171,12 @@ export function useCheckoutOrder() {
     }
     if (cartStore.isEmpty) {
       generalError.value = 'Keranjang belanja Anda kosong. Silakan pilih produk terlebih dahulu.'
+      return
+    }
+    if (hasOutOfStockItems.value) {
+      generalError.value =
+        'Terdapat barang yang telah habis di keranjang Anda. Mohon sesuaikan kembali keranjang Anda.'
+      router.push('/cart')
       return
     }
     if (!validateForm()) {
@@ -227,19 +210,13 @@ export function useCheckoutOrder() {
       const orderId = response.data.order_id
       createdOrderId.value = orderId
 
-      placedOrderSnapshot.value = createPlacedOrderSnapshot({
-        items: cartStore.items,
-        totalItems: cartStore.totalItems,
-        formattedTotalPrice: cartStore.formattedTotalPrice,
-        discountCents: cartStore.discountCents,
-        formattedDiscountAmount: cartStore.formattedDiscountAmount,
-        couponCode: cartStore.appliedCoupon?.code,
+      placedOrderSnapshot.value = createCheckoutPlacedSnapshot({
+        cartStore,
         actualCoinsUsed: actualCoinsUsed.value,
-        isFreeShipping: isFreeShipping.value,
-        shippingFeeCents: shippingFeeCents.value,
-        shippingService: selectedShippingService.value,
-        finalPriceCents: cartStore.finalPriceCents,
         coinsDiscountCents: coinsDiscountCents.value,
+        shippingFeeCents: shippingFeeCents.value,
+        isFreeShipping: isFreeShipping.value,
+        shippingService: selectedShippingService.value,
       })
       isOrderPlaced.value = true
       checkoutIdempotencyKey.value = ''
@@ -296,16 +273,7 @@ export function useCheckoutOrder() {
     balanceCoins,
     maxUsableCoins,
     actualCoinsUsed,
-    displayItems,
-    displayTotalItems,
-    displayTotalPrice,
-    displayDiscountAmount,
-    displayCouponCode,
-    displayCoinsDiscountAmount,
-    displayCoinsUsed,
-    displayShippingFeeFormatted,
-    displayIsFreeShipping,
-    displayFinalPrice,
+    ...summaryDisplay,
     submitButtonLabel,
     handleSelectSavedAddress,
     handleCreateOrder,
