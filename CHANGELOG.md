@@ -2,6 +2,19 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.18] - 2026-11-15
+
+### Kalkulator Estimasi Ongkos Kirim Cepat di Halaman Produk (Paket 5 Auto-Loop)
+
+- **Komponen Estimasi Logistik Interaktif PDP (`ProductShippingEstimator.vue`, 129 baris)**:
+  - Antarmuka accordion ringkas pada halaman detail produk yang memungkinkan calon pembeli memeriksa tarif ongkir dan estimasi hari tiba (ETA) ke 8 kota utama di Indonesia sebelum memasukkan barang ke keranjang belanja.
+  - Menampilkan kalkulasi instan untuk 4 tier layanan kurir resmi: Reguler (2-3 hari), Next Day (1 hari), Instan / Sameday (3-6 jam), dan Kargo (3-5 hari).
+  - Peringatan insentif Bebas Ongkir otomatis ("Bebas Ongkir Tersedia" jika harga produk >= Rp 500.000 atau rekomendasi belanja nominal sisa).
+- **Integrasi Halaman Detail Produk (`app/pages/product/[id].vue`, 283 baris)**:
+  - Menyematkan `ProductShippingEstimator` secara elegan di bawah formulir konfigurator produk dan tombol tindakan bag.
+- **Pengujian Unit & Tata Kelola Kode (`tests/unit/product-shipping-estimator.spec.ts`, 73 baris)**:
+  - 5 pengujian unit memvalidasi kelengkapan 4 tier layanan ekspedisi, formula ambang batas gratis ongkir Rp 500.000, kepatuhan batas file <= 300 baris, dan larangan karakter em dash.
+
 ## [v1.1.0-beta.17] - 2026-11-15
 
 ### Simulator Logistik & Checkpoint Kurir Admin (Paket 2 Auto-Loop)
