@@ -47,11 +47,7 @@ defineProps<{
         <span class="text-sm text-white/50 line-through tabular-nums">
           {{ formatRupiah(deal.original_price_cents / 100) }}
         </span>
-        <span
-          class="rounded-full bg-brand-danger/90 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm"
-        >
-          Hemat {{ deal.discount_percentage }}%
-        </span>
+        <UiBadge :label="`Hemat ${deal.discount_percentage}%`" variant="danger" />
       </div>
 
       <!-- Quota Progress Bar -->

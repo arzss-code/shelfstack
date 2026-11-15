@@ -92,8 +92,8 @@ watch(
     :class="[
       'p-3.5 rounded-xl border transition-colors',
       isExpired
-        ? 'bg-red-50/60 dark:bg-red-950/30 border-red-200 dark:border-red-900/50 text-red-900 dark:text-red-200'
-        : 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-200/80 dark:border-amber-900/50 text-amber-900 dark:text-amber-200',
+        ? 'bg-brand-danger-tint border-brand-danger-edge text-brand-danger-text'
+        : 'bg-brand-warning-tint border-brand-warning-edge text-brand-warning-text',
     ]"
     role="timer"
     aria-live="polite"
@@ -104,18 +104,19 @@ watch(
           :class="[
             'text-xs',
             isExpired
-              ? 'pi pi-times-circle text-red-600'
-              : 'pi pi-clock text-amber-600 animate-pulse',
+              ? 'pi pi-times-circle text-brand-danger-text'
+              : 'pi pi-clock text-brand-warning-text animate-pulse',
           ]"
+          aria-hidden="true"
         />
         <span>{{ isExpired ? 'Waktu Pembayaran Habis' : 'Batas Waktu Pembayaran' }}</span>
       </div>
       <span
         :class="[
-          'font-mono text-sm font-bold tracking-wider tabular-nums px-2 py-0.5 rounded',
+          'font-mono text-sm font-bold tracking-wider tabular-nums px-2 py-0.5 rounded border',
           isExpired
-            ? 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
-            : 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300',
+            ? 'bg-brand-danger-edge/20 text-brand-danger-text border-brand-danger-edge'
+            : 'bg-brand-warning-edge/20 text-brand-warning-text border-brand-warning-edge',
         ]"
       >
         {{ formattedTime }}

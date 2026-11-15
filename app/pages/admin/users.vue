@@ -7,6 +7,7 @@ import UiSelect from '~/components/ui/UiSelect.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import UiCard from '~/components/ui/UiCard.vue'
 import UiEmptyState from '~/components/ui/UiEmptyState.vue'
+import UiBadge from '~/components/ui/UiBadge.vue'
 import AdminCustomer360Drawer from '~/components/admin/users/AdminCustomer360Drawer.vue'
 import type { AdminCustomerSummary } from '~~/shared/types/admin-crm'
 
@@ -173,11 +174,7 @@ const formatDate = (dateStr?: string | null) => {
                 {{ formatDate(c.createdAt) }}
               </td>
               <td class="py-3 px-4 text-center">
-                <span
-                  class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-brand-canvas-soft border border-brand-hair"
-                >
-                  {{ c.totalOrders }} order
-                </span>
+                <UiBadge :label="`${c.totalOrders} order`" variant="default" />
               </td>
               <td class="py-3 px-4 text-right">
                 <span class="font-display font-bold text-sm text-brand-ink tabular">{{

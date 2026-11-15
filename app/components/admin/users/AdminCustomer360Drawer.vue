@@ -59,6 +59,21 @@ const formatDate = (dateStr?: string | null) => {
   }
 }
 
+const getOrderBadgeVariant = (
+  status: string,
+): 'default' | 'success' | 'warning' | 'danger' | 'info' => {
+  switch (status) {
+    case 'completed':
+      return 'success'
+    case 'cancelled':
+      return 'danger'
+    case 'shipped':
+      return 'info'
+    default:
+      return 'warning'
+  }
+}
+
 const navigateToOrder = (orderId: string) => {
   handleClose()
   router.push(`/admin/orders/${orderId}`)
@@ -93,14 +108,13 @@ const navigateToSupport = () => {
             </span>
             <h2 class="font-display text-base font-bold text-brand-ink m-0">Customer 360° View</h2>
           </div>
-          <button
-            type="button"
-            class="text-brand-muted hover:text-brand-ink p-1.5 rounded-lg hover:bg-brand-canvas-soft border-0 bg-transparent cursor-pointer transition-colors"
-            aria-label="Tutup Drawer"
+          <UiIconButton
+            icon="pi-times"
+            label="Tutup Profil 360"
+            variant="neutral"
+            size="sm"
             @click="handleClose"
-          >
-            <i class="pi pi-times text-sm" />
-          </button>
+          />
         </div>
 
         <!-- Body / Content -->
@@ -151,11 +165,10 @@ const navigateToSupport = () => {
                   <h3 class="font-display text-base font-bold text-brand-ink truncate m-0">
                     {{ customerDetail?.fullName || fallbackCustomer?.fullName }}
                   </h3>
-                  <span
-                    class="rounded-full bg-brand-canvas-soft border border-brand-hair px-2 py-0.5 text-[10px] font-semibold text-brand-muted uppercase"
-                  >
-                    {{ customerDetail?.role || fallbackCustomer?.role || 'Customer' }}
-                  </span>
+                  <UiBadge
+                    :label="customerDetail?.role || fallbackCustomer?.role || 'Customer'"
+                    variant="default"
+                  />
                 </div>
                 <p class="text-xs text-brand-muted truncate m-0 mt-0.5">
                   {{ customerDetail?.email || fallbackCustomer?.email || 'Email terdaftar' }}
@@ -184,7 +197,7 @@ const navigateToSupport = () => {
               <div class="p-3.5 rounded-xl border border-brand-hair bg-brand-canvas-soft">
                 <span class="text-[11px] font-medium text-brand-muted block">Pesanan Selesai</span>
                 <span
-                  class="font-display text-base font-bold text-emerald-600 block mt-0.5 tabular"
+                  class="font-display text-base font-bold text-brand-success-text block mt-0.5 tabular"
                 >
                   {{ customerDetail?.completedOrders || fallbackCustomer?.completedOrders || 0 }} /
                   {{ customerDetail?.totalOrders || fallbackCustomer?.totalOrders || 0 }}
@@ -193,7 +206,9 @@ const navigateToSupport = () => {
 
               <div class="p-3.5 rounded-xl border border-brand-hair bg-brand-canvas-soft">
                 <span class="text-[11px] font-medium text-brand-muted block">Saldo Koin</span>
-                <span class="font-display text-base font-bold text-amber-600 block mt-0.5 tabular">
+                <span
+                  class="font-display text-base font-bold text-brand-warning-text block mt-0.5 tabular"
+                >
                   {{ (customerDetail?.loyaltyCoinBalance || 0).toLocaleString('id-ID') }} Koin
                 </span>
               </div>
@@ -227,18 +242,10 @@ const navigateToSupport = () => {
                       <span class="font-semibold text-brand-ink tabular"
                         >#{{ order.id.slice(0, 8).toUpperCase() }}</span
                       >
-                      <span
-                        class="rounded px-1.5 py-0.2 text-[10px] font-bold uppercase"
-                        :class="[
-                          order.status === 'completed'
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : order.status === 'cancelled'
-                              ? 'bg-rose-50 text-rose-700'
-                              : 'bg-amber-50 text-amber-700',
-                        ]"
-                      >
-                        {{ order.status }}
-                      </span>
+                      <UiBadge
+                        :label="order.status"
+                        :variant="getOrderBadgeVariant(order.status)"
+                      />
                     </div>
                     <p class="text-[11px] text-brand-muted m-0">
                       {{ formatDate(order.createdAt) }} · {{ order.itemCount }} produk
@@ -259,10 +266,10 @@ const navigateToSupport = () => {
           <UiButton
             variant="outline"
             size="sm"
+            icon="pi-comments"
             class="flex-1 justify-center"
             @click="navigateToSupport"
           >
-            <i class="pi pi-comments text-xs mr-1.5" />
             Live Chat
           </UiButton>
           <UiButton variant="primary" size="sm" class="flex-1 justify-center" @click="handleClose">

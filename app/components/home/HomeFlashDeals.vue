@@ -118,13 +118,16 @@ const { getDealForProduct } = useFlashSale()
         Saat ini penawaran terbatas sedang dipersiapkan. Pantau terus halaman ini untuk alokasi
         produk pilihan berikutnya.
       </p>
-      <NuxtLink
+      <UiButton
         to="/katalog"
-        class="mt-4 inline-flex items-center gap-2 bg-brand-accent hover:bg-brand-accent-hover text-white text-xs font-semibold px-5 py-2.5 rounded-full no-underline transition-colors shadow-whisper"
+        variant="accent"
+        size="sm"
+        icon="pi-arrow-right"
+        icon-pos="right"
+        class="mt-4"
       >
-        <span>Jelajahi Semua Produk</span>
-        <i class="pi pi-arrow-right text-xs" />
-      </NuxtLink>
+        Jelajahi Semua Produk
+      </UiButton>
     </div>
 
     <!-- Real Deal Cards Grid -->
@@ -186,12 +189,12 @@ const { getDealForProduct } = useFlashSale()
           <div v-else class="flex items-center gap-1 text-[11px] text-brand-muted mb-1">
             <span
               v-if="product.stock > 0"
-              class="text-emerald-600 font-medium flex items-center gap-1"
+              class="text-brand-success font-medium flex items-center gap-1"
             >
               <i class="pi pi-check-circle text-[10px]" aria-hidden="true" />
               Stok Tersedia
             </span>
-            <span v-else class="text-rose-600 font-medium">Stok Habis</span>
+            <span v-else class="text-brand-danger font-medium">Stok Habis</span>
           </div>
 
           <h3
@@ -211,11 +214,10 @@ const { getDealForProduct } = useFlashSale()
               <span class="text-xs text-brand-muted line-through tabular-nums">
                 {{ formatRupiah(product.price) }}
               </span>
-              <span
-                class="rounded-full bg-brand-danger/10 text-brand-danger font-bold text-[10px] px-1.5 py-0.2"
-              >
-                -{{ getDealForProduct(product.id)!.discount_percentage }}%
-              </span>
+              <UiBadge
+                :label="`-${getDealForProduct(product.id)!.discount_percentage}%`"
+                variant="danger"
+              />
             </template>
             <span
               v-else
@@ -235,13 +237,15 @@ const { getDealForProduct } = useFlashSale()
           </div>
         </div>
 
-        <NuxtLink
+        <UiButton
           :to="`/product/${product.id}`"
           data-testid="deal-link"
-          class="w-full bg-brand-ink hover:bg-black text-white text-xs font-semibold py-2.5 rounded-full text-center no-underline transition-colors shadow-whisper inline-block"
+          variant="primary"
+          size="sm"
+          block
         >
           Lihat Produk
-        </NuxtLink>
+        </UiButton>
       </div>
     </div>
   </section>

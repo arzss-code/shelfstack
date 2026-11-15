@@ -2,6 +2,28 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.20] - 2026-11-15
+
+### Standarisasi Elemen UI ke Primitif Sistem Desain & Anti-Slop Sweep
+
+- **Standarisasi Kontrol Form & Selektor (`ProductShippingEstimator.vue`, 154 baris)**:
+  - Menggantikan elemen native HTML `<select>` dengan komponen sistem desain resmi `UiSelect` lengkap dengan tipe `UiSelectOption[]`, properti `size="sm"`, dan dukungan `block`.
+  - Menggantikan elemen badge status manual dengan `UiBadge` semantik (`variant="success"` untuk Bebas Ongkir).
+  - Menggantikan kotak saran promo dengan `UiAlert` (`variant="warning"`).
+- **Standarisasi Drawer CRM & Aksi Ikon (`AdminCustomer360Drawer.vue`, 277 baris)**:
+  - Menggantikan tombol penutup manual dengan `UiIconButton` berlabel aksesibel (`label="Tutup Profil 360"`, `icon="pi-times"`).
+  - Menggantikan span role pengguna dengan `UiBadge` (`variant="default"`).
+  - Menggantikan span status pesanan manual dengan pemetaan dinamis `UiBadge` (`variant`: `success`, `danger`, `info`, `warning`).
+  - Mengadopsi token warna semantik Gallery Modernist (`text-brand-success-text`, `text-brand-warning-text`).
+- **Standarisasi Promosi & Navigasi Berbasis Tombol Primitif (`ProductFlashSaleBanner.vue`, 57 baris & `HomeFlashDeals.vue`, 251 baris)**:
+  - Menggantikan badge hemat manual dengan `UiBadge` (`variant="danger"`).
+  - Menggantikan elemen tautan manual `NuxtLink` di kartu penawaran dan status kosong dengan `UiButton` (`variant="accent"` dan `variant="primary"`).
+- **Standarisasi Indikator CRM & Kartu Hitung Mundur (`app/pages/admin/users.vue`, 239 baris & `OrderPaymentCountdownCard.vue`, 132 baris)**:
+  - Menggantikan pill manual frekuensi pesanan di tabel admin dengan `UiBadge` (`variant="default"`).
+  - Menyelaraskan kartu hitung mundur pembayaran pesanan dengan token desain `brand-danger-tint` dan `brand-warning-tint`.
+- **Pengujian Unit & Tata Kelola Kode (`tests/unit/standardize-ui-primitives.spec.ts`, 74 baris)**:
+  - 6 pengujian unit memverifikasi kepatuhan komponen sistem desain, ketiadaan tag `<select>` manual, ketiadaan karakter em dash, dan batasan panjang berkas <= 300 baris.
+
 ## [v1.1.0-beta.19] - 2026-11-15
 
 ### Customer 360 Slide-Over Drawer di Admin CRM (Paket 4 Auto-Loop)
