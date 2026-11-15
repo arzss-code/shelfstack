@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { ORDER_EXPIRY_MS, ORDER_EXPIRY_MINUTES } from '../../shared/constants/order-expiry'
 import { mapMidtransStatus } from '../../server/utils/midtrans'
 
 describe('Payment Status Verification & Sync Logic (check-payment-status)', () => {
@@ -39,23 +40,29 @@ describe('Payment Status Verification & Sync Logic (check-payment-status)', () =
     expect(newStatusPaid !== alreadyPaid).toBe(false)
   })
 
-  it('evaluates order 15-minute expiry logic correctly', () => {
+  it('evaluates order 2-hour (120-minute) expiry logic correctly', () => {
+    expect(ORDER_EXPIRY_MINUTES).toBe(120)
+    expect(ORDER_EXPIRY_MS).toBe(120 * 60 * 1000)
+
     const now = Date.now()
-    const createdAt16MinsAgo = new Date(now - 16 * 60 * 1000).toISOString()
-    const createdAt10MinsAgo = new Date(now - 10 * 60 * 1000).toISOString()
+    const createdAt121MinsAgo = new Date(now - 121 * 60 * 1000).toISOString()
+    const createdAt110MinsAgo = new Date(now - 110 * 60 * 1000).toISOString()
 
-    const isExpired16 = now - new Date(createdAt16MinsAgo).getTime() >= 15 * 60 * 1000
-    const isExpired10 = now - new Date(createdAt10MinsAgo).getTime() >= 15 * 60 * 1000
+    const isExpired121 = now - new Date(createdAt121MinsAgo).getTime() >= ORDER_EXPIRY_MS
+    const isExpired110 = now - new Date(createdAt110MinsAgo).getTime() >= ORDER_EXPIRY_MS
 
-    expect(isExpired16).toBe(true)
-    expect(isExpired10).toBe(false)
+    expect(isExpired121).toBe(true)
+    expect(isExpired110).toBe(false)
   })
 
   describe('Architectural Line Limits & Governance', () => {
     const files = [
+      'shared/constants/order-expiry.ts',
       'server/api/orders/[id]/check-payment-status.post.ts',
+      'server/api/orders/[id]/payment-token.post.ts',
       'app/composables/useOrderDetail.ts',
       'app/features/orders/components/OrderDetailPaymentCard.vue',
+      'app/features/orders/components/OrderPaymentCountdownCard.vue',
       'app/pages/orders/[id].vue',
       'tests/unit/check-payment-status.spec.ts',
     ]

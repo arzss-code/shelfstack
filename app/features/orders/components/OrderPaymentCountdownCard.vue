@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ORDER_EXPIRY_MINUTES } from '~~/shared/constants/order-expiry'
 
 const props = withDefaults(
   defineProps<{
@@ -7,7 +8,7 @@ const props = withDefaults(
     expiryMinutes?: number
   }>(),
   {
-    expiryMinutes: 15,
+    expiryMinutes: ORDER_EXPIRY_MINUTES,
   },
 )
 
@@ -29,10 +30,19 @@ const calculateRemaining = () => {
 const remainingSeconds = ref(calculateRemaining())
 
 const formattedTime = computed(() => {
-  const mins = Math.floor(remainingSeconds.value / 60)
+  const hours = Math.floor(remainingSeconds.value / 3600)
+  const mins = Math.floor((remainingSeconds.value % 3600) / 60)
   const secs = remainingSeconds.value % 60
   const pad = (n: number) => n.toString().padStart(2, '0')
+  if (hours > 0) {
+    return `${pad(hours)}:${pad(mins)}:${pad(secs)}`
+  }
   return `${pad(mins)}:${pad(secs)}`
+})
+
+const expiryLabel = computed(() => {
+  const hours = Math.round(props.expiryMinutes / 60)
+  return hours >= 1 ? `${hours} jam` : `${props.expiryMinutes} menit`
 })
 
 const isExpired = computed(() => remainingSeconds.value <= 0)
@@ -114,7 +124,7 @@ watch(
     <p class="text-[11px] leading-relaxed text-brand-muted m-0">
       {{
         isExpired
-          ? 'Batas waktu 15 menit telah berakhir. Pesanan ini dibatalkan otomatis oleh antrean sistem.'
+          ? `Batas waktu ${expiryLabel} telah berakhir. Pesanan ini dibatalkan otomatis oleh antrean sistem.`
           : 'Selesaikan transaksi Anda sebelum batas waktu berakhir untuk mengamankan stok produk.'
       }}
     </p>

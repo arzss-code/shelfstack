@@ -1,5 +1,6 @@
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { ORDER_EXPIRY_MS } from '../../../../shared/constants/order-expiry'
 import { fetchMidtransTransactionStatus, mapMidtransStatus } from '../../../utils/midtrans'
 import {
   resolveCandidateLookupIds,
@@ -86,7 +87,7 @@ export default defineEventHandler(async (event) => {
     const isTimeout =
       order.status === 'pending' &&
       Boolean(order.created_at) &&
-      Date.now() - new Date(order.created_at || 0).getTime() >= 15 * 60 * 1000
+      Date.now() - new Date(order.created_at || 0).getTime() >= ORDER_EXPIRY_MS
 
     if (!midtransData || !midtransData.transaction_status) {
       if (isTimeout) {
@@ -97,15 +98,12 @@ export default defineEventHandler(async (event) => {
           p_payment_type: 'auto_timeout',
           p_midtrans_id: null,
         })
-        return successResponse(
-          'Batas waktu pembayaran 15 menit telah habis. Pesanan dibatalkan otomatis.',
-          {
-            order_id: order.id,
-            status: 'cancelled',
-            is_paid: false,
-            is_cancelled: true,
-          },
-        )
+        return successResponse('Batas waktu pembayaran telah habis. Pesanan dibatalkan otomatis.', {
+          order_id: order.id,
+          status: 'cancelled',
+          is_paid: false,
+          is_cancelled: true,
+        })
       }
 
       return successResponse('Status belum diperbarui oleh Payment Gateway', {
