@@ -77,24 +77,18 @@ const handleConfirmDeliveryClick = () => {
     rejectLabel: 'Batal',
     accept: async () => {
       const ok = await handleConfirmDelivery()
-      if (ok && order.value?.items?.[0]) {
-        openReviewModal(order.value.items[0])
-      }
+      if (ok && order.value?.items?.[0]) openReviewModal(order.value.items[0])
     },
   })
 }
 
 const onConfirmCancel = async (reason: string) => {
   const success = await handleCancelOrder(reason)
-  if (success) {
-    isCancelModalOpen.value = false
-  }
+  if (success) isCancelModalOpen.value = false
 }
 
-onMounted(async () => {
-  if (orderId) {
-    await fetchReturnData(orderId)
-  }
+onMounted(() => {
+  if (orderId) fetchReturnData(orderId)
 })
 
 useSeoMeta({
