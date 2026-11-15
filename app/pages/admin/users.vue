@@ -1,0 +1,288 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useAdminUsers } from '~/composables/useAdminUsers'
+import AdminUserMetrics from '~/components/admin/users/AdminUserMetrics.vue'
+import UiInput from '~/components/ui/UiInput.vue'
+import UiSelect from '~/components/ui/UiSelect.vue'
+import UiButton from '~/components/ui/UiButton.vue'
+import UiCard from '~/components/ui/UiCard.vue'
+import UiEmptyState from '~/components/ui/UiEmptyState.vue'
+import UiModal from '~/components/ui/UiModal.vue'
+import type { AdminCustomerSummary } from '~~/shared/types/admin-crm'
+
+definePageMeta({ layout: 'admin', middleware: 'admin' })
+useSeoMeta({
+  title: 'CRM Pelanggan & LTV - ShelfStack Admin',
+  description:
+    'Kelola basis data pelanggan resmi ShelfStack, pantau Customer Lifetime Value (LTV), dan riwayat belanja.',
+})
+
+const {
+  customers,
+  metrics,
+  loading,
+  error,
+  searchQuery,
+  selectedSort,
+  currentPage,
+  totalPages,
+  totalCustomersCount,
+  sortOptions,
+  hasCustomers,
+  fetchCustomers,
+} = useAdminUsers()
+
+const selectedCustomer = ref<AdminCustomerSummary | null>(null)
+const isDetailModalOpen = ref(false)
+
+const openCustomerDetail = (customer: AdminCustomerSummary) => {
+  selectedCustomer.value = customer
+  isDetailModalOpen.value = true
+}
+
+const formatDate = (dateStr?: string | null) => {
+  if (!dateStr) return '-'
+  try {
+    return new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date(dateStr))
+  } catch {
+    return dateStr
+  }
+}
+</script>
+
+<template>
+  <div class="admin-users-page space-y-6">
+    <!-- Header Section -->
+    <div
+      class="flex flex-col justify-between gap-4 border-b border-brand-hair pb-4 sm:flex-row sm:items-center"
+    >
+      <div>
+        <div class="mb-1 flex items-center gap-2 text-xs text-brand-muted">
+          <NuxtLink to="/admin" class="no-underline hover:text-brand-ink">Dashboard</NuxtLink>
+          <span class="text-brand-faint">/</span>
+          <span class="font-semibold text-brand-ink">CRM Pelanggan</span>
+        </div>
+        <h1 class="font-display text-2xl font-bold tracking-tight text-brand-ink sm:text-3xl">
+          Pelanggan &amp; Customer Lifetime Value
+        </h1>
+        <p class="mt-0.5 text-xs text-brand-muted sm:text-sm">
+          Pantau akumulasi belanja pembeli (LTV), total frekuensi pesanan, dan profil pelanggan
+          aktif.
+        </p>
+      </div>
+
+      <UiButton
+        variant="outline"
+        size="sm"
+        icon="pi-refresh"
+        :loading="loading"
+        @click="fetchCustomers"
+      >
+        Segarkan Data
+      </UiButton>
+    </div>
+
+    <!-- Executive Metrics Grid -->
+    <AdminUserMetrics :metrics="metrics" />
+
+    <!-- Toolbar Filters -->
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="w-full sm:max-w-xs">
+        <UiInput
+          v-model="searchQuery"
+          size="sm"
+          type="search"
+          left-icon="pi-search"
+          placeholder="Cari nama atau email..."
+        />
+      </div>
+      <div class="flex items-center gap-2">
+        <UiSelect v-model="selectedSort" size="sm" prefix="Urutkan:" :options="sortOptions" pill />
+      </div>
+    </div>
+
+    <!-- Customers Table Card -->
+    <UiCard :padded="false" class="overflow-hidden">
+      <!-- Error state -->
+      <div v-if="error" class="p-6 text-center text-xs text-brand-danger">
+        <i class="pi pi-exclamation-circle text-lg mb-1 block" />
+        <p class="m-0 font-medium">{{ error }}</p>
+        <UiButton size="xs" variant="outline" class="mt-2" @click="fetchCustomers"
+          >Coba Lagi</UiButton
+        >
+      </div>
+
+      <!-- Loading skeleton state -->
+      <div v-else-if="loading && !hasCustomers" class="p-6 space-y-4">
+        <div v-for="i in 5" :key="i" class="h-12 w-full animate-pulse rounded-lg bg-brand-field" />
+      </div>
+
+      <!-- Empty state -->
+      <UiEmptyState
+        v-else-if="!hasCustomers"
+        title="Tidak Ada Pelanggan Ditemukan"
+        description="Tidak ada data akun pelanggan yang sesuai dengan kriteria pencarian Anda."
+        icon="pi-users"
+      />
+
+      <!-- Table View -->
+      <div v-else class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr
+              class="border-b border-brand-hairsoft bg-brand-canvas-soft/60 text-brand-muted uppercase tracking-wider text-[11px]"
+            >
+              <th class="py-3 px-4 font-semibold">Pelanggan</th>
+              <th class="py-3 px-4 font-semibold">Terdaftar</th>
+              <th class="py-3 px-4 font-semibold text-center">Total Pesanan</th>
+              <th class="py-3 px-4 font-semibold text-right">Nilai Belanja (LTV)</th>
+              <th class="py-3 px-4 font-semibold">Pesanan Terakhir</th>
+              <th class="py-3 px-4 font-semibold text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
+            <tr
+              v-for="c in customers"
+              :key="c.userId"
+              class="hover:bg-brand-canvas-soft/40 transition-colors"
+            >
+              <td class="py-3 px-4">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-field text-brand-ink font-bold text-xs border border-brand-hair"
+                  >
+                    <img
+                      v-if="c.avatarUrl"
+                      :src="c.avatarUrl"
+                      :alt="c.fullName"
+                      class="h-full w-full rounded-full object-cover"
+                    />
+                    <span v-else>{{ c.fullName.charAt(0).toUpperCase() }}</span>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="font-semibold text-brand-ink m-0 truncate">{{ c.fullName }}</p>
+                    <p class="text-[11px] text-brand-muted m-0 truncate">{{ c.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-3 px-4 text-brand-muted whitespace-nowrap">
+                {{ formatDate(c.createdAt) }}
+              </td>
+              <td class="py-3 px-4 text-center">
+                <span
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-brand-canvas-soft border border-brand-hair"
+                >
+                  {{ c.totalOrders }} order
+                </span>
+              </td>
+              <td class="py-3 px-4 text-right">
+                <span class="font-display font-bold text-sm text-brand-ink tabular">{{
+                  c.formattedLtv
+                }}</span>
+                <span
+                  v-if="c.completedOrders > 0"
+                  class="block text-[10.5px] text-brand-success font-medium"
+                >
+                  {{ c.completedOrders }} lunas
+                </span>
+              </td>
+              <td class="py-3 px-4 text-brand-muted whitespace-nowrap">
+                {{ formatDate(c.lastOrderAt) }}
+              </td>
+              <td class="py-3 px-4 text-center">
+                <UiButton size="xs" variant="ghost" icon="pi-eye" @click="openCustomerDetail(c)"
+                  >Rincian</UiButton
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div
+        v-if="totalPages > 1"
+        class="flex items-center justify-between border-t border-brand-hairsoft px-4 py-3 text-xs text-brand-muted"
+      >
+        <span
+          >Menampilkan halaman {{ currentPage }} dari {{ totalPages }} (Total
+          {{ totalCustomersCount }} pelanggan)</span
+        >
+        <div class="flex items-center gap-1.5">
+          <UiButton
+            size="xs"
+            variant="outline"
+            :disabled="currentPage <= 1 || loading"
+            @click="currentPage--"
+          >
+            Sebelumnya
+          </UiButton>
+          <UiButton
+            size="xs"
+            variant="outline"
+            :disabled="currentPage >= totalPages || loading"
+            @click="currentPage++"
+          >
+            Selanjutnya
+          </UiButton>
+        </div>
+      </div>
+    </UiCard>
+
+    <!-- Modal Rincian Pelanggan -->
+    <UiModal v-model="isDetailModalOpen" title="Rincian Profil Pelanggan">
+      <div v-if="selectedCustomer" class="space-y-4">
+        <div class="flex items-center gap-3 pb-3 border-b border-brand-hairsoft">
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-field text-brand-ink font-bold text-base border border-brand-hair"
+          >
+            <span>{{ selectedCustomer.fullName.charAt(0).toUpperCase() }}</span>
+          </div>
+          <div>
+            <h3 class="font-display text-base font-bold text-brand-ink m-0">
+              {{ selectedCustomer.fullName }}
+            </h3>
+            <p class="text-xs text-brand-muted m-0 mt-0.5">{{ selectedCustomer.email }}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="p-3 rounded-lg border border-brand-hair bg-brand-canvas-soft">
+            <span class="text-brand-muted block text-[11px]">Customer Lifetime Value (LTV)</span>
+            <span class="font-display text-lg font-bold text-brand-ink block mt-0.5">{{
+              selectedCustomer.formattedLtv
+            }}</span>
+          </div>
+          <div class="p-3 rounded-lg border border-brand-hair bg-brand-canvas-soft">
+            <span class="text-brand-muted block text-[11px]">Total Frekuensi Pesanan</span>
+            <span class="font-display text-lg font-bold text-brand-ink block mt-0.5"
+              >{{ selectedCustomer.totalOrders }} Pesanan</span
+            >
+          </div>
+          <div class="p-3 rounded-lg border border-brand-hair bg-brand-canvas-soft">
+            <span class="text-brand-muted block text-[11px]">Pesanan Selesai / Lunas</span>
+            <span class="font-display text-lg font-bold text-brand-success block mt-0.5"
+              >{{ selectedCustomer.completedOrders }} Pesanan</span
+            >
+          </div>
+          <div class="p-3 rounded-lg border border-brand-hair bg-brand-canvas-soft">
+            <span class="text-brand-muted block text-[11px]">Pesanan Terakhir</span>
+            <span class="font-medium text-brand-ink block mt-0.5">{{
+              formatDate(selectedCustomer.lastOrderAt)
+            }}</span>
+          </div>
+        </div>
+
+        <div class="pt-2 text-right">
+          <UiButton size="sm" variant="secondary" @click="isDetailModalOpen = false"
+            >Tutup</UiButton
+          >
+        </div>
+      </div>
+    </UiModal>
+  </div>
+</template>

@@ -2,6 +2,24 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.5] - 2026-11-15
+
+### Admin CRM Pelanggan & Customer Lifetime Value (LTV)
+
+- **Panel Admin CRM Pelanggan (`app/pages/admin/users.vue`, 223 baris & `app/components/admin/users/AdminUserMetrics.vue`, 63 baris)**:
+  - Menyediakan dasbor eksekutif CRM dengan 4 kartu metrik (Total Pelanggan Terdaftar, Omzet Pesanan Lunas, Rerata Nilai Belanja LTV, dan Pelanggan Aktif Belanja).
+  - Menampilkan tabel pelanggan komprehensif dengan avatar, nama lengkap, email, tanggal registrasi, jumlah order, akumulasi LTV, dan tanggal pesanan terakhir.
+  - Fitur pencarian instan nama/email dan opsi pengurutan (LTV Tertinggi, Pesanan Terbanyak, Paling Baru Terdaftar, Nama A-Z).
+  - Modal detail profil pelanggan yang menampilkan metrik individu secara terperinci.
+- **Service Layer Agregasi & Controller API (`server/utils/admin-users.ts`, 142 baris & `server/api/admin/users/index.get.ts`, 88 baris)**:
+  - Mengisolasi kalkulasi agregasi LTV (`calculateCustomerAggregations`), penyaringan/pengurutan (`filterAndSortCustomers`), dan metrik KPI (`calculateCrmMetrics`) ke utility murni.
+  - Menjaga invariant akuntansi: hanya pesanan dengan status `completed`, `paid`, atau `shipped` yang dihitung ke dalam nilai belanja (LTV).
+  - Memproteksi endpoint dengan otorisasi admin (`requireAdmin`) dan menyediakan paginasi server-side.
+- **Navigasi Sidebar Admin Terpadu (`app/layouts/admin.vue`, 279 baris)**:
+  - Menambahkan menu navigasi "Pelanggan & CRM" (`/admin/users`) dengan ikon pengguna pada sidebar desktop dan drawer mobile.
+- **Pengujian Unit & Verifikasi Kontrak (`tests/unit/admin-users-crm.spec.ts`, 159 baris)**:
+  - 6 unit test memvalidasi kalkulasi LTV dengan eliminasi pesanan dibatalkan, metrik eksekutif, filter pencarian, pengurutan, format mata uang rupiah, dan rendering kartu KPI.
+
 ## [v1.1.0-beta.4] - 2026-11-15
 
 ### Portal Pelanggan Koin Loyalitas & Pemilihan Alamat Pengiriman Utama Otomatis
