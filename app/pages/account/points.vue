@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useLoyaltyPoints } from '~/composables/useLoyaltyPoints'
 import AccountSidebar from '~/components/account/AccountSidebar.vue'
 import CoinBalanceCard from '~/components/account/points/CoinBalanceCard.vue'
@@ -35,7 +36,23 @@ const {
   exchangeForVoucher,
 } = useLoyaltyPoints()
 
-const activeTab = ref<'exchange' | 'transactions'>('exchange')
+const route = useRoute()
+const isTransactionsTab = (val: unknown) =>
+  val === 'transactions' || val === 'ledger' || val === 'mutasi'
+const activeTab = ref<'exchange' | 'transactions'>(
+  isTransactionsTab(route.query.tab) ? 'transactions' : 'exchange',
+)
+
+watch(
+  () => route.query.tab,
+  (newTab) => {
+    if (isTransactionsTab(newTab)) {
+      activeTab.value = 'transactions'
+    } else if (newTab === 'exchange' || newTab === 'tukar') {
+      activeTab.value = 'exchange'
+    }
+  },
+)
 
 onMounted(async () => {
   await Promise.all([fetchPointsSummary(), fetchExchangeCatalog()])
