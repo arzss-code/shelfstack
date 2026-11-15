@@ -2,6 +2,21 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.4] - 2026-11-15
+
+### Portal Pelanggan Koin Loyalitas & Pemilihan Alamat Pengiriman Utama Otomatis
+
+- **Portal Koin & Ledger Mutasi Transparan (`app/pages/account/coins.vue`, `points.vue`, `CoinTransactionList.vue`)**:
+  - Menyediakan rute langsung `/account/coins` yang terintegrasi dengan tab transaksi mutasi koin.
+  - Menyelaraskan token styling daftar mutasi ke desain resmi `brand-*` (border, ink, field, canvas).
+  - Mendukung deep-linking query `?tab=transactions` / `?tab=ledger` untuk membuka riwayat debit/kredit koin secara instan.
+- **Auto-Select Alamat Pengiriman Utama di Checkout (`useCheckoutOrder.ts`, `checkout-pricing.ts`)**:
+  - Mengambil buku alamat secara asinkron saat checkout dimuat oleh pengguna terotentikasi.
+  - Memilih secara otomatis alamat bertanda `is_default === true` (atau alamat pertama jika belum ada default) ke dalam formulir pengiriman.
+  - Mengekstrak helper murni `resolveDefaultSavedAddress` di `app/utils/checkout-pricing.ts` untuk menjaga ukuran composable tetap 288 baris (patuh SOP <= 300 baris).
+- **Pengujian Unit & Verifikasi Kontrak (`tests/unit/customer-portal-and-default-address.spec.ts`, 114 baris)**:
+  - 6 unit test memvalidasi resolusi alamat default, fallback alamat pertama, rendering daftar mutasi koin, serta status loading dan empty state.
+
 ## [v1.1.0-beta.3] - 2026-11-14
 
 ### Unifikasi Geometri Primitif Etalase (Known Gap)

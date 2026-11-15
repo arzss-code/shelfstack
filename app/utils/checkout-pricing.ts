@@ -167,3 +167,10 @@ export function buildAddressSavePayload(address: AddressFormModel) {
     is_default: false,
   }
 }
+
+export function resolveDefaultSavedAddress<T extends { is_default?: boolean }>(
+  addresses: T[],
+): T | null {
+  if (!addresses || addresses.length === 0) return null
+  return addresses.find((a) => a.is_default) || addresses[0] || null
+}

@@ -16,6 +16,7 @@ import {
   mapUserAddressToForm,
   buildAddressSavePayload,
   validateCheckoutAddress,
+  resolveDefaultSavedAddress,
 } from '~/utils/checkout-pricing'
 
 export function useCheckoutOrder() {
@@ -25,14 +26,31 @@ export function useCheckoutOrder() {
   const toast = useUiToast()
   const config = useRuntimeConfig()
   const { launchSnapPayment } = useOrderPaymentSync()
-  const { saveAddress } = useAddresses()
+  const { saveAddress, fetchAddresses } = useAddresses()
   const { balanceCoins, fetchPointsSummary } = useLoyaltyPoints()
+
+  const syncDefaultAddress = async () => {
+    if (!user.value || selectedSavedAddressId.value) return
+    try {
+      const list = await fetchAddresses()
+      const target = resolveDefaultSavedAddress(list)
+      if (target) handleSelectSavedAddress(target)
+    } catch {
+      // Abaikan kendala sinkronisasi alamat saat fetch awal gagal
+    }
+  }
 
   onMounted(() => {
     if (user.value) {
       fetchPointsSummary().catch(() => {})
+      syncDefaultAddress()
     }
   })
+
+  watch(
+    () => user.value,
+    () => syncDefaultAddress(),
+  )
 
   const address = ref({
     name: profile.value?.full_name || '',

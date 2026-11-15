@@ -53,33 +53,31 @@ const getTransactionBadge = (type: CoinTransactionType) => {
       <div
         v-for="i in 4"
         :key="i"
-        class="flex animate-pulse items-center justify-between rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"
+        class="flex animate-pulse items-center justify-between rounded-xl border border-brand-hair bg-brand-canvas p-4"
       >
         <div class="flex items-center gap-3">
-          <div class="h-10 w-10 rounded-lg bg-neutral-200 dark:bg-neutral-800" />
+          <div class="h-10 w-10 rounded-lg bg-brand-field" />
           <div class="space-y-2">
-            <div class="h-4 w-36 rounded bg-neutral-200 dark:bg-neutral-800" />
-            <div class="h-3 w-24 rounded bg-neutral-100 dark:bg-neutral-800/60" />
+            <div class="h-4 w-36 rounded bg-brand-field" />
+            <div class="h-3 w-24 rounded bg-brand-canvas-soft" />
           </div>
         </div>
-        <div class="h-5 w-20 rounded bg-neutral-200 dark:bg-neutral-800" />
+        <div class="h-5 w-20 rounded bg-brand-field" />
       </div>
     </div>
 
     <!-- Empty state -->
     <div
       v-else-if="transactions.length === 0"
-      class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 px-6 py-12 text-center dark:border-neutral-800 dark:bg-neutral-900/50"
+      class="flex flex-col items-center justify-center rounded-card border border-dashed border-brand-hair bg-brand-canvas-soft px-6 py-12 text-center"
     >
       <div
         class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400"
       >
         <i class="pi pi-history text-2xl" />
       </div>
-      <h3 class="text-base font-bold text-neutral-900 dark:text-neutral-100">
-        Belum Ada Riwayat Mutasi
-      </h3>
-      <p class="mt-1 max-w-sm text-xs text-neutral-500 dark:text-neutral-400">
+      <h3 class="text-base font-bold text-brand-ink">Belum Ada Riwayat Mutasi</h3>
+      <p class="mt-1 max-w-sm text-xs text-brand-muted">
         Koin Anda akan otomatis bertambah dari bonus sambutan dan cashback 1% setiap kali pesanan
         Anda selesai.
       </p>
@@ -88,29 +86,29 @@ const getTransactionBadge = (type: CoinTransactionType) => {
     <!-- Transaction list -->
     <div
       v-else
-      class="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:divide-neutral-800 dark:border-neutral-800 dark:bg-neutral-900"
+      class="divide-y divide-brand-hairsoft overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper"
     >
       <div
         v-for="tx in transactions"
         :key="tx.id"
-        class="flex items-center justify-between p-4 transition-colors hover:bg-neutral-50/70 dark:hover:bg-neutral-800/40"
+        class="flex items-center justify-between p-4 transition-colors hover:bg-brand-field/70"
       >
         <div class="flex items-center gap-3.5">
           <div
             :class="[
-              'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-base shadow-sm',
+              'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-base shadow-whisper',
               getTransactionBadge(tx.type).bgClass,
             ]"
           >
             <i :class="['pi', getTransactionBadge(tx.type).icon]" />
           </div>
           <div>
-            <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+            <p class="text-sm font-semibold text-brand-ink">
               {{ tx.description }}
             </p>
-            <div class="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+            <div class="flex items-center gap-2 text-xs text-brand-muted">
               <span>{{ tx.formatted_date || tx.created_at }}</span>
-              <span class="text-neutral-300 dark:text-neutral-700">&bull;</span>
+              <span class="text-brand-faint">&bull;</span>
               <span>Sisa: {{ new Intl.NumberFormat('id-ID').format(tx.balance_after) }} Koin</span>
             </div>
           </div>
