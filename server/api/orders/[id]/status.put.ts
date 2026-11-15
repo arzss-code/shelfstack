@@ -106,7 +106,8 @@ export default defineEventHandler(async (event) => {
           .eq('id', orderId)
 
         // 2. Generate initial checkpoints ekspedisi
-        const destinationCity = (orderData.address as any)?.city || 'Kota Tujuan'
+        const destinationCity =
+          (orderData.address as { city?: string } | null)?.city || 'Kota Tujuan'
         const initialCheckpoints = buildInitialShippingCheckpoints(
           orderId,
           trackingNumber,

@@ -2,6 +2,21 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.13] - 2026-11-15
+
+### Hardening Alur Checkout, Pemecahan Modular Composable & Penghapusan Tipe Any
+
+- **Modularisasi Kalkulasi Ringkasan Checkout (`app/composables/useCheckoutSummaryDisplay.ts`, 120 baris)**:
+  - Memisahkan kalkulasi display reaktif untuk total kuantitas, harga, diskon voucher, potongan koin, ongkos kirim, dan snapshot pesanan yang telah dibuat (`createCheckoutPlacedSnapshot`).
+  - Mengurangi ukuran `useCheckoutOrder.ts` dari 314 baris menjadi 279 baris (100% mematuhi batas maksimal 300 baris kode).
+- **Proteksi Sinkronisasi Stok Habis di Halaman Checkout (`app/composables/useCheckoutOrder.ts`, 279 baris)**:
+  - Mengintegrasikan `useCartReconciliation` pada saat checkout dibuka (`onMounted`), memastikan keranjang pembeli tervalidasi secara instan dengan inventaris database terkini.
+  - Secara otomatis mencegah transaksi dan mengarahkan kembali ke keranjang (`/cart`) jika terdapat produk yang habis saat proses checkout berjalan.
+- **Pengetikan Ketat Tanpa Tipe Any pada Endpoint Tracking & Status Pesanan (`server/api/orders/[id]/status.put.ts`, `server/api/orders/[id]/tracking.get.ts`)**:
+  - Menggantikan tipe `as any` pada parsing alamat JSONB dengan interface typed terstruktur (`OrderAddressPayload`).
+- **Pengujian Unit & Integritas Kepatuhan Arsitektur (`tests/unit/checkout-drift-guard.spec.ts`, 132 baris)**:
+  - 4 pengujian unit memvalidasi komputasi ringkasan checkout, pembuatan snapshot pesanan, kepatuhan batas maksimal 300 baris kode pada seluruh berkas terkait, dan ketiadaan karakter em dash terlarang.
+
 ## [v1.1.0-beta.12] - 2026-11-15
 
 ### Live Cart Drift Guard & Stale Inventory Reconciliation

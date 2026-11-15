@@ -48,7 +48,12 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Gagal memuat checkpoint pengiriman', checkpointError, 500)
   }
 
-  const rawAddress = (order.address as any) || {}
+  interface OrderAddressPayload {
+    name?: string
+    phone?: string
+    city?: string
+  }
+  const rawAddress = (order.address as OrderAddressPayload | null) || {}
 
   return successResponse('Data pelacakan pesanan berhasil dimuat', {
     order_id: order.id,
