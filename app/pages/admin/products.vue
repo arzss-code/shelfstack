@@ -31,6 +31,13 @@ const {
   handleDelete,
   handleRestore,
 } = useAdminProducts()
+
+const handleProductRestocked = (newStock: number) => {
+  if (stockAuditProduct.value) {
+    stockAuditProduct.value.stock = newStock
+  }
+  productStore.fetchProducts()
+}
 </script>
 
 <template>
@@ -151,6 +158,7 @@ const {
       :show="isStockModalVisible"
       :product="stockAuditProduct"
       @close="isStockModalVisible = false"
+      @restocked="handleProductRestocked"
     />
   </div>
 </template>

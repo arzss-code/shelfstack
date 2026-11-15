@@ -2,6 +2,24 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.9] - 2026-11-15
+
+### Aksi Cepat Tambah Stok Produk Gudang (Quick Stock Restock Modal)
+
+- **Endpoint Restock Cepat Back-Office (`server/api/admin/products/[id]/restock.post.ts`, 96 baris)**:
+  - Menyediakan endpoint POST terproteksi khusus peran admin (`requireAdmin`).
+  - Validasi ketat via Zod: kuantitas bilangan bulat positif (1 - 10.000 unit) dan catatan pengadaan opsional maks 255 karakter.
+  - Memperbarui stok produk secara atomik, mencatat entri double-entry ledger ke `public.stock_movements` dengan alasan `manual_adjustment` beserta delta dan `balance_after`, serta mencatat audit trail ke `public.activity_logs`.
+- **Komponen Formulir Restock Cepat (`app/features/products/components/QuickRestockForm.vue`, 92 baris)**:
+  - Komponen formulir restock modular dengan input kuantitas, catatan pengadaan, indikator loading, dan penanganan feedback toast `useUiToast`.
+  - Mengirimkan event `restocked` dengan nilai stok terbaru untuk sinkronisasi state instan.
+- **Integrasi Modal Audit Stok & Halaman Admin (`StockMovementsModal.vue`, `app/pages/admin/products.vue`)**:
+  - Tombol aksi primer "Restock Cepat" di header modal audit mutasi stok.
+  - Panel form expandable yang memungkinkan admin memasukkan stok baru dan melihat riwayat mutasi ter-refresh secara real-time tanpa keluar dari modal.
+  - Reaktivitas instan pada tabel katalog admin tanpa refresh halaman.
+- **Pengujian Unit & Integritas Kode (`tests/unit/admin-quick-restock.spec.ts`, 187 baris)**:
+  - 9 pengujian unit memvalidasi skema Zod, kalkulasi deterministik mutasi stok, render komponen formulir, interaksi tombol tutup/batal, integrasi modal audit stok, dan kepatuhan batasan arsitektur `<= 300` baris.
+
 ## [v1.1.0-beta.8] - 2026-11-15
 
 ### Recent Searches & Trending Tags di Omnibox Navbar serta Produk Terakhir Dilihat
