@@ -89,7 +89,7 @@ Spesifikasi arsitektural lengkap tercatat pada `docs/roadmap/extended-enhancemen
 | E-04 | Sebagai pembeli, saya menikmati kontrol etalase yang geometrinya selaras dengan admin   | Must (✅ Selesai)   | Toolbar katalog, cart, dan checkout 100% menggunakan primitif `UiInput`, `UiSelect`, `UiCard`, `UiBadge`                       |
 | E-05 | Sebagai pembeli, saya lihat buku kas mutasi koin loyalitas dan dompet voucher saya      | Should (✅ Selesai) | Halaman `/account/coins` dan `/account/vouchers` dengan ledger mutasi transparan                                               |
 | E-06 | Sebagai pembeli, saya atur alamat utama agar otomatis terpilih saat checkout            | Should (✅ Selesai) | Flag `is_default`, update atomik, auto-select alamat utama saat checkout dibuka                                                |
-| E-07 | Sebagai admin, saya kelola data pelanggan dan lihat Customer Lifetime Value (LTV)       | Should              | Halaman `/admin/users`, total belanja pelanggan, order count, pencarian pelanggan                                              |
+| E-07 | Sebagai admin, saya kelola data pelanggan dan lihat Customer Lifetime Value (LTV)       | Should (✅ Selesai) | Halaman `/admin/users`, total belanja pelanggan, order count, pencarian pelanggan                                              |
 | E-08 | Sebagai dev, saya amankan endpoint publik dengan rate limiting token bucket             | Must                | Limit login (5/min), checkout (10/min), search (30/min), response HTTP 429 Retry-After                                         |
 
 ## Out of Scope & Backlog Lanjutan (Belum Diimplementasikan)

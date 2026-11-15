@@ -17,6 +17,7 @@ const unreadSupportCount = computed(() => {
 const navLinks = [
   { to: '/admin', label: 'Dashboard', icon: 'pi-chart-bar', exact: true },
   { to: '/admin/orders', label: 'Kelola Pesanan', icon: 'pi-shopping-bag', exact: false },
+  { to: '/admin/users', label: 'Pelanggan & CRM', icon: 'pi-users', exact: false },
   { to: '/admin/returns', label: 'Komplain & Retur', icon: 'pi-replay', exact: false },
   { to: '/admin/support', label: 'Bantuan & Live Chat', icon: 'pi-comments', exact: false },
   { to: '/admin/products', label: 'Kelola Produk', icon: 'pi-th-large', exact: false },
