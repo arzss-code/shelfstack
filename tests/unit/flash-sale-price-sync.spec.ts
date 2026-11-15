@@ -94,14 +94,15 @@ describe('Flash Sale Price Synchronization & Visual Card Integrity Suite', () =>
   })
 
   describe('Design System, Visual Taste & Accessibility Verifications', () => {
-    it('verifies ProductFlashSaleBanner contains live event pulse and segmented ticker', () => {
+    it('verifies ProductFlashSaleBanner follows anti-slop rules without animate-ping and with solid-danger badge', () => {
       const fullPath = resolve(
         process.cwd(),
         'app/components/promotions/ProductFlashSaleBanner.vue',
       )
       const content = readFileSync(fullPath, 'utf-8')
 
-      expect(content).toContain('animate-ping')
+      expect(content).not.toContain('animate-ping')
+      expect(content).toContain('variant="solid-danger"')
       expect(content).toContain('timerSegments')
       expect(content).toContain('role="timer"')
       expect(content).toContain('aria-live="polite"')

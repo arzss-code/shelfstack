@@ -38,38 +38,21 @@ const { getDealForProduct } = useFlashSale()
 <template>
   <section
     ref="flashSectionRef"
-    class="relative w-full overflow-hidden rounded-card bg-gradient-to-br from-[#0c0d12] via-brand-ink to-[#13151f] p-6 sm:p-10 text-white shadow-floating"
+    class="relative w-full overflow-hidden rounded-card bg-[#12131a] p-6 sm:p-8 text-white shadow-floating"
   >
-    <!-- Background Ambient Glow -->
-    <div
-      class="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-gradient-to-br from-amber-500/15 via-rose-500/10 to-transparent blur-3xl"
-      aria-hidden="true"
-    />
-
     <!-- Header Section -->
     <div
-      class="relative z-10 flex flex-col justify-between gap-4 border-b border-white/[0.08] pb-8 lg:flex-row lg:items-center"
+      class="relative z-10 flex flex-col justify-between gap-4 border-b border-white/10 pb-6 lg:flex-row lg:items-center"
     >
       <div>
-        <div class="mb-1.5 flex items-center gap-2">
-          <span class="relative flex h-2 w-2">
-            <span
-              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"
-            />
-            <span class="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
-          </span>
-          <span
-            class="inline-flex items-center gap-1 rounded-full bg-rose-500/15 border border-rose-500/30 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-rose-300"
-          >
-            <i class="pi pi-bolt text-[10px] text-amber-400" aria-hidden="true" />
-            Penawaran Pilihan Toko
-          </span>
+        <div class="mb-2 flex items-center gap-2">
+          <UiBadge label="Flash Deals" variant="solid-danger" />
+          <h2 class="m-0 font-display text-2xl font-extrabold text-white sm:text-3xl">
+            Promo Terbatas Hari Ini
+          </h2>
         </div>
-        <h2 class="m-0 font-display text-2xl font-extrabold text-white sm:text-3xl">
-          Koleksi Pilihan Terbatas
-        </h2>
-        <p class="m-0 mt-1 text-xs text-white/70 sm:text-sm">
-          Koleksi kurasi produk unggulan dengan harga langsung dari katalog resmi ShelfStack.
+        <p class="m-0 text-xs text-white/70 sm:text-sm">
+          Diskon spesial produk pilihan dengan alokasi kuota harian.
         </p>
       </div>
 
@@ -233,7 +216,7 @@ const { getDealForProduct } = useFlashSale()
               </span>
               <UiBadge
                 :label="`-${getDealForProduct(product.id)!.discount_percentage}%`"
-                variant="danger"
+                variant="solid-danger"
               />
             </template>
             <span

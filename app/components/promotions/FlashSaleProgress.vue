@@ -28,15 +28,10 @@ const isAlmostGone = computed(() => percentage.value >= 75)
       :class="theme === 'dark' ? 'text-white/70' : 'text-brand-muted'"
     >
       <div class="flex items-center gap-1.5">
-        <i
-          v-if="isAlmostGone"
-          class="pi pi-bolt text-amber-400 animate-pulse text-[10px]"
-          aria-hidden="true"
-        />
         <span
           :class="[
             isAlmostGone
-              ? 'text-amber-400 font-bold'
+              ? 'text-rose-400 font-bold'
               : theme === 'dark'
                 ? 'text-white/90 font-semibold'
                 : 'text-brand-ink font-semibold',
@@ -50,7 +45,7 @@ const isAlmostGone = computed(() => percentage.value >= 75)
       </span>
     </div>
 
-    <!-- Progress Track & Fill with Smooth Gradient Fill -->
+    <!-- Progress Track & Fill with High-Contrast Solid Red -->
     <div
       class="h-2 w-full overflow-hidden rounded-full border"
       :class="
@@ -65,12 +60,7 @@ const isAlmostGone = computed(() => percentage.value >= 75)
       :aria-label="`Tersisa ${remaining} dari ${quota} unit promo`"
     >
       <div
-        class="h-full rounded-full transition-all duration-700 shadow-sm"
-        :class="[
-          isAlmostGone
-            ? 'bg-gradient-to-r from-amber-400 via-orange-500 to-rose-600'
-            : 'bg-gradient-to-r from-amber-400 to-rose-500',
-        ]"
+        class="h-full rounded-full transition-all duration-500 shadow-sm bg-gradient-to-r from-rose-600 to-rose-500"
         :style="{ width: `${percentage}%` }"
       />
     </div>

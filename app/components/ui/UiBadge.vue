@@ -5,13 +5,15 @@ const props = withDefaults(
   defineProps<{
     label: string
     /** Resep warna status, satu ramp yang sama dipakai badge, alert, dan toast. */
-    variant?: 'default' | 'success' | 'warning' | 'danger' | 'info'
+    variant?: 'default' | 'success' | 'warning' | 'danger' | 'solid-danger' | 'info'
   }>(),
   { variant: 'default' },
 )
 
 const variantClasses = computed(() => {
   switch (props.variant) {
+    case 'solid-danger':
+      return 'bg-rose-600 text-white border-rose-600 font-bold'
     case 'success':
       return 'bg-brand-success-tint text-brand-success-text border-brand-success-edge'
     case 'warning':
