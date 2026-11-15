@@ -2,6 +2,27 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.22] - 2026-11-15
+
+### Pembersihan Elemen AI-Slop, Penegasan Warna Solid, dan Penyederhanaan Copy Banner Flash Sale
+
+- **Pembersihan Animasi Berlebih dan Ikon Tumpuk (`ProductFlashSaleBanner.vue`, 88 baris)**:
+  - Menghapus animasi `animate-ping` dan ornamen dot berkedip yang mengganggu fokus pengguna.
+  - Menghapus ikon petir dan ornamen visual bertumpuk pada badge penawaran.
+  - Menggantikan pill badge transparan pudar (`bg-rose-500/15`) dengan badge merah tegas dan solid melalui `UiBadge variant="solid-danger"` berkontras tinggi (`bg-rose-600 text-white font-bold`).
+  - Menghapus paragraf penjelasan bertele-tele di bagian bawah kartu agar informasi harga, sisa kuota, dan timer tampil ringkas, padat, dan jelas.
+- **Pembersihan Komponen Penawaran Beranda (`HomeFlashDeals.vue`, 236 baris)**:
+  - Menghapus efek pinging dot dan ikon ganda pada header flash deals.
+  - Mengganti teks subjudul template bertele-tele dengan copy informatif yang ringkas: "Diskon spesial produk pilihan dengan alokasi kuota harian."
+  - Mengadopsi `UiBadge variant="solid-danger"` pada badge header dan badge diskon tiap kartu produk di grid.
+- **Penyempurnaan Progress Bar Kuota (`FlashSaleProgress.vue`, 70 baris)**:
+  - Menghapus animasi `animate-pulse` dan ikon petir berlebih pada saat kuota hampir habis.
+  - Menerapkan warna merah tegas (`from-rose-600 to-rose-500`) dengan kontras tinggi untuk melacak keterisian kuota promo.
+- **Ekstensi Primitif Sistem Desain (`UiBadge.vue`, 40 baris)**:
+  - Menambahkan varian resmi `solid-danger` (`bg-rose-600 text-white border-rose-600 font-bold`) untuk kebutuhan penandaan promo agresif dengan kontras tinggi tanpa transparansi pudar.
+- **Penyesuaian Suite Pengujian Unit (`tests/unit/flash-sale-price-sync.spec.ts`, 129 baris)**:
+  - Memperbarui assertion pengujian untuk memverifikasi ketiadaan `animate-ping` dan kehadiran varian `solid-danger` pada banner. Seluruh 130 berkas / 1.248 pengujian vitest lolos 100%.
+
 ## [v1.1.0-beta.21] - 2026-11-15
 
 ### Sinkronisasi Harga Promo Flash Sale & Visual Craft Banner PDP
