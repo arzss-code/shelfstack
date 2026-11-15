@@ -2,6 +2,24 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.6] - 2026-11-15
+
+### Proteksi Endpoint Publik dengan Token Bucket Rate Limiting & Security Headers (E-08)
+
+- **Service Layer Token Bucket Rate Limiter (`server/utils/rate-limit.ts`, 116 baris)**:
+  - Mengimplementasikan algoritma token bucket murni (`TokenBucketLimiter`) dengan pengisian ulang token kontinu (continuous refill) dan isolasi memori per alamat IP klien.
+  - Aturan kuota: Autentikasi (`/api/auth/**`, 5 req/menit), Checkout pesanan (`/api/orders` POST, 10 req/menit), dan Pencarian instan katalog (`/api/products/search-instant`, 30 req/menit).
+  - Menyediakan helper pemetaan kategori endpoint `resolveEndpointCategory` dan perhitungan presisi detik tunggu `Retry-After`.
+- **Middleware Proteksi Permintaan Nitro (`server/middleware/03.rate-limit.ts`, 69 baris)**:
+  - Mengekstrak alamat IP klien secara aman dari proxy headers (`x-forwarded-for`, `cf-connecting-ip`, `x-real-ip`).
+  - Menyematkan header telemetri HTTP standar pada respon: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, dan `X-RateLimit-Reset`.
+  - Mengembalikan respon terstruktur HTTP 429 Too Many Requests beserta header `Retry-After` saat kuota token terlampaui.
+- **Harmonisasi Konfigurasi Keamanan Browser (`nuxt.config.ts`)**:
+  - Menyelaraskan `routeRules` pada modul `nuxt-security` untuk endpoint auth, orders, dan instant search.
+  - Menegakkan header keamanan browser: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, dan `X-XSS-Protection: 0`.
+- **Pengujian Unit & Verifikasi Kontrak (`tests/unit/rate-limiting-and-security.spec.ts`, 142 baris)**:
+  - 9 unit test memvalidasi inisialisasi kuota penuh, penolakan saat kuota habis, pengisian ulang proporsional berdasarkan waktu, isolasi antar klien, pembersihan memori (reset), dan pemetaan kategori endpoint.
+
 ## [v1.1.0-beta.5] - 2026-11-15
 
 ### Admin CRM Pelanggan & Customer Lifetime Value (LTV)

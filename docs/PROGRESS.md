@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 26 (Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview)**
-- **Versi Rilis:** `v1.1.0-beta.5` (Pre-release Staging / develop aktif : sinkron dengan `version.json`)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 117 file / 1.150 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v1.1.0-beta.6` (Pre-release Staging / develop aktif : sinkron dengan `version.json`)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 118 file / 1.159 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -411,8 +411,8 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
     - Status: ✅ **SELESAI 2026-11-15** (Rute portal koin `/account/coins`, sinkronisasi parameter tab ledger transaksi, integrasi auto-select alamat default pada `useCheckoutOrder`, harmonisasi token `brand-*` pada `CoinTransactionList.vue`, serta 6 unit test di `tests/unit/customer-portal-and-default-address.spec.ts`).
 16. ~~**Admin CRM Pelanggan & Customer Lifetime Value (E-07)**~~:
     - Status: ✅ **SELESAI 2026-11-15** (Halaman `/admin/users`, 4 kartu KPI CRM, kalkulasi agregasi LTV berbasis pesanan lunas di `server/utils/admin-users.ts`, sorting/filtering pelanggan, modal detail profil, dan 6 unit test di `tests/unit/admin-users-crm.spec.ts`).
-17. **Proteksi Endpoint Publik dengan Token Bucket Rate Limiting (E-08)**:
-    - Status: ⏳ Direncanakan. Limit login (5/min), checkout (10/min), search (30/min), response HTTP 429 Retry-After dan security headers.
+17. ~~**Proteksi Endpoint Publik dengan Token Bucket Rate Limiting (E-08)**~~:
+    - Status: ✅ **SELESAI 2026-11-15** (Implementasi algoritma token bucket murni di `server/utils/rate-limit.ts`, middleware `server/middleware/03.rate-limit.ts` untuk proteksi auth 5/min, checkout 10/min, search 30/min, respon HTTP 429 Retry-After, penegasan security headers di `nuxt.config.ts`, serta 9 unit test di `tests/unit/rate-limiting-and-security.spec.ts`).
 
 ## 📋 Catatan Teknis & Konvensi Wajib
 
