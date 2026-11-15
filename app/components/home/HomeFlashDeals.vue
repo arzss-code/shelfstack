@@ -2,6 +2,8 @@
 import type { Product } from '~/types/product'
 import { formatRupiah } from '~/utils/format'
 import { useHomeFlashDeals } from '~/composables/useHomeFlashDeals'
+import { useFlashSale } from '~/composables/useFlashSale'
+import FlashSaleProgress from '~/components/promotions/FlashSaleProgress.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -29,6 +31,8 @@ const {
   onImageError,
   flashSectionRef,
 } = useHomeFlashDeals(props)
+
+const { getDealForProduct } = useFlashSale()
 </script>
 
 <template>
@@ -196,13 +200,38 @@ const {
           >
             {{ product.name }}
           </h3>
-          <div class="flex items-baseline gap-2 mt-1.5">
+          <div class="flex items-baseline gap-2 mt-1.5 flex-wrap">
+            <template v-if="getDealForProduct(product.id)">
+              <span
+                data-testid="deal-price"
+                class="font-display text-base font-bold text-brand-danger tabular-nums"
+              >
+                {{ formatRupiah(getDealForProduct(product.id)!.promo_price_cents / 100) }}
+              </span>
+              <span class="text-xs text-brand-muted line-through tabular-nums">
+                {{ formatRupiah(product.price) }}
+              </span>
+              <span
+                class="rounded-full bg-brand-danger/10 text-brand-danger font-bold text-[10px] px-1.5 py-0.2"
+              >
+                -{{ getDealForProduct(product.id)!.discount_percentage }}%
+              </span>
+            </template>
             <span
+              v-else
               data-testid="deal-price"
               class="font-display text-base font-bold text-brand-ink tabular-nums"
             >
               {{ formatRupiah(product.price) }}
             </span>
+          </div>
+
+          <!-- Flash Sale Progress Bar (Jika terdaftar dalam promo aktif) -->
+          <div v-if="getDealForProduct(product.id)" class="mt-2.5">
+            <FlashSaleProgress
+              :claimed="getDealForProduct(product.id)!.claimed"
+              :quota="getDealForProduct(product.id)!.quota"
+            />
           </div>
         </div>
 

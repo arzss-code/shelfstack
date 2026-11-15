@@ -7,9 +7,15 @@ import {
 } from '~/composables/useProductConfigurator'
 import WishlistButton from '~/components/wishlist/WishlistButton.vue'
 
-const props = defineProps<{
-  product: Product
-}>()
+const props = withDefaults(
+  defineProps<{
+    product: Product
+    flashPrice?: number | null
+  }>(),
+  {
+    flashPrice: null,
+  },
+)
 
 const emit = defineEmits<{
   addToBag: [payload: ProductSelectionPayload]
@@ -35,10 +41,16 @@ const {
   handleQuantityBlur,
   handleAddToBag,
   handleBuyNow,
-} = useProductConfigurator(() => props.product, {
-  onAddToBag: (payload) => emit('addToBag', payload),
-  onBuyNow: (payload) => emit('buyNow', payload),
-})
+} = useProductConfigurator(
+  () => props.product,
+  {
+    onAddToBag: (payload) => emit('addToBag', payload),
+    onBuyNow: (payload) => emit('buyNow', payload),
+  },
+  {
+    promoPrice: () => props.flashPrice,
+  },
+)
 </script>
 
 <template>
@@ -92,9 +104,24 @@ const {
 
     <!-- Pricing Container -->
     <UiCard :padded="true" class="space-y-2 bg-brand-canvas-soft">
-      <div class="flex items-baseline gap-3">
-        <span class="font-display text-3xl font-bold text-brand-ink tabular-nums">
+      <div class="flex items-baseline gap-3 flex-wrap">
+        <span
+          class="font-display text-3xl font-bold tabular-nums"
+          :class="[flashPrice ? 'text-brand-danger' : 'text-brand-ink']"
+        >
           {{ formatRupiah(effectivePrice) }}
+        </span>
+        <span
+          v-if="flashPrice && product.price > effectivePrice"
+          class="text-sm font-semibold text-brand-muted line-through tabular-nums"
+        >
+          {{ formatRupiah(product.price) }}
+        </span>
+        <span
+          v-if="flashPrice && product.price > effectivePrice"
+          class="rounded-full bg-brand-danger/10 px-2 py-0.5 text-xs font-bold text-brand-danger"
+        >
+          Hemat {{ Math.round(((product.price - effectivePrice) / product.price) * 100) }}%
         </span>
         <span
           v-if="selectedVariant && selectedVariant.name"

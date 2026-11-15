@@ -2,6 +2,29 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.16] - 2026-11-15
+
+### Flash Sale & Limited-Time Promotion Engine (Paket 1 Auto-Loop)
+
+- **Kontrak Skema & Formula Bisnis Flash Sale (`shared/schemas/flash-deals.ts`, 47 baris)**:
+  - Menyediakan `flashDealItemSchema` dan `flashSaleCampaignSchema` tervalidasi Zod.
+  - Menetapkan fungsi pembantu `calculateClaimPercentage` (terbatas 0-100%) dan `calculateDiscountPrice` untuk kalkulasi diskon deterministik.
+- **Endpoint API Kampanye Promo Terbatas (`server/api/promotions/flash-deals.get.ts`, 81 baris)**:
+  - Melakukan query produk aktif dengan stok tersedia, menghitung diskon promo (15% hingga 35%), alokasi kuota flash sale, dan unit terklaim.
+  - Menyertakan batas akhir kampanye dinamis hingga pergantian hari (23:59:59 WIB).
+- **Composable Reaktif Flash Sale (`app/composables/useFlashSale.ts`, 97 baris)**:
+  - Mengelola data kampanye, ticker countdown detik-ke-detik (`formattedTimer`), pendeteksi status urgensi stok promo (`isUrgent` bila klaim >= 70%), dan pencarian promo per produk (`getDealForProduct`).
+- **Komponen Visual Progress Bar Kuota (`app/components/promotions/FlashSaleProgress.vue`, 52 baris)**:
+  - Menampilkan bilah progres persentase klaim promo ("Terjual X% | Sisa Y unit") dengan animasi pulse dan ikon peringatan saat stok menipis.
+- **Banner Flash Sale PDP (`app/components/promotions/ProductFlashSaleBanner.vue`, 68 baris & `app/pages/product/[id].vue`)**:
+  - Menampilkan banner promosi gelap bergaya galeri modern di halaman detail produk saat produk masuk dalam daftar Flash Sale.
+  - Terintegrasi langsung dengan timer countdown dan badge hemat diskon.
+- **Integrasi Harga Promo pada Konfigurator & Beranda (`ProductConfigurator.vue`, `HomeFlashDeals.vue`)**:
+  - Konfigurator produk mendukung `flashPrice` opsional, menampilkan coretan harga asli dan diskon persen, serta meneruskan harga promo ke keranjang dan checkout instan.
+  - Beranda menampilkan badge diskon persentase dan bilah klaim kuota pada kartu penawaran pilihan.
+- **Pengujian Unit & Tata Kelola Kode (`tests/unit/flash-deals.spec.ts`, 141 baris)**:
+  - 7 pengujian unit memverifikasi parsing skema, boundary diskon, kalkulasi formula kuota, batas file <= 300 baris, dan larangan em dash.
+
 ## [v1.1.0-beta.15] - 2026-11-15
 
 ### Standarisasi Batas Waktu Pembayaran Pesanan 2 Jam (E-Commerce Best Practice)
