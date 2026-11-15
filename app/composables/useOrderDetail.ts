@@ -37,32 +37,19 @@ export function useOrderDetail(orderId: string) {
   const errorMsg = ref('')
 
   let channel: RealtimeChannel | null = null
-
-  // Tracking sub-module
-  const {
-    customerCheckpoints,
-    copiedHeaderResi,
-    copyHeaderResi,
-    fetchCustomerTracking,
-    activeCheckpoints,
-    activeLatestCheckpoint,
-    activeLatestCheckpointLocation,
-    activeLatestCheckpointTitle,
-  } = useOrderTracking(orderId, order)
+  const tracking = useOrderTracking(orderId, order)
 
   const formatShippingServiceName = (service?: string | null) => formatShippingServiceLabel(service)
 
   const handleCheckPaymentStatus = async (silent = false) => {
     if (!order.value) return
     if (!silent) isManualChecking.value = true
-
     try {
       const res = await syncOrderPaymentStatus(orderId)
       if (res) {
         const wasPending = order.value.status === 'pending'
         order.value.status = res.status
         if (res.payment_type) order.value.payment_type = res.payment_type
-
         if (res.is_paid) {
           order.value.paid_at = new Date().toISOString()
           stopPolling()
@@ -94,11 +81,8 @@ export function useOrderDetail(orderId: string) {
 
   const { startPolling, stopPolling, setupVisibilityListeners, teardownVisibilityListeners } =
     useOrderPolling(async () => {
-      if (order.value?.status === 'pending') {
-        await handleCheckPaymentStatus(true)
-      } else {
-        stopPolling()
-      }
+      if (order.value?.status === 'pending') await handleCheckPaymentStatus(true)
+      else stopPolling()
     }, 3500)
 
   const fetchOrderDetail = async (silent = false) => {
@@ -106,14 +90,12 @@ export function useOrderDetail(orderId: string) {
       router.push(`/auth/login?redirect=/orders/${orderId}`)
       return
     }
-
     if (!silent) loading.value = true
     errorMsg.value = ''
-
     try {
       const res = await $fetch<{ status: string; data: Order }>(`/api/orders/${orderId}`)
       order.value = res.data
-      await fetchCustomerTracking()
+      await tracking.fetchCustomerTracking()
     } catch (err: unknown) {
       const fetchErr = err as { data?: { message?: string } }
       errorMsg.value = fetchErr.data?.message || 'Pesanan tidak ditemukan atau akses ditolak.'
@@ -240,7 +222,6 @@ export function useOrderDetail(orderId: string) {
             const updated = payload.new as Record<string, unknown>
             const prevStatus = order.value.status
             const nextStatus = updated.status as OrderStatus
-
             order.value = {
               ...order.value,
               status: nextStatus,
@@ -250,10 +231,8 @@ export function useOrderDetail(orderId: string) {
               courier_name: (updated.courier_name as string) || order.value.courier_name,
               courier_code: (updated.courier_code as string) || order.value.courier_code,
             }
-
             if (nextStatus !== 'pending') stopPolling()
-            fetchCustomerTracking()
-
+            tracking.fetchCustomerTracking()
             if (prevStatus === 'pending' && nextStatus === 'paid') {
               toast.show({
                 title: 'Status Diperbarui',
@@ -290,21 +269,14 @@ export function useOrderDetail(orderId: string) {
     isCancelling,
     isManualChecking,
     isConfirmingDelivery,
-    copiedHeaderResi,
-    customerCheckpoints,
-    activeCheckpoints,
-    activeLatestCheckpoint,
-    activeLatestCheckpointLocation,
-    activeLatestCheckpointTitle,
+    ...tracking,
     orderSteps,
-    copyHeaderResi,
     formatDate,
     formatShippingServiceName,
     getSegmentColor,
     getStatusBadge,
     getPaymentStatusBadge: getBadgePayment,
     fetchOrderDetail,
-    fetchCustomerTracking,
     handlePayNow,
     handleCheckPaymentStatus,
     handleCancelOrder,

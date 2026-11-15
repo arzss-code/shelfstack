@@ -2,6 +2,17 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.10] - 2026-11-15
+
+### Hardening Batasan Baris Kode Arsitektur (Architectural Line Limits & Composable Optimization)
+
+- **Optimasi Destrukturisasi `useOrderDetail` (`app/composables/useOrderDetail.ts`, 286 baris)**:
+  - Menggabungkan sub-modul tracking secara delegatif dan memadatkan ekspresi logika sehingga composable berukuran 286 baris (mematuhi batas maksimal 300 baris).
+- **Perapian Skrip Halaman Detail Pesanan (`app/pages/orders/[id].vue`, 284 baris)**:
+  - Memadatkan impor dan binding composable, menjaga reaktivitas utuh tanpa memecah arsitektur halaman.
+- **Kompaksi Uji Layanan PWA (`tests/unit/pwa-service-worker.spec.ts`, 288 baris)**:
+  - Menyederhanakan deklarasi rute bypass dan ekspektasi cache sehingga berkas uji berukuran 288 baris.
+
 ## [v1.1.0-beta.9] - 2026-11-15
 
 ### Aksi Cepat Tambah Stok Produk Gudang (Quick Stock Restock Modal)
