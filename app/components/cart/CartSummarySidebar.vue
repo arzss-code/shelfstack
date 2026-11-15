@@ -5,6 +5,10 @@ import UiButton from '~/components/ui/UiButton.vue'
 
 const cartStore = useCartStore()
 
+defineProps<{
+  hasOutOfStockItems?: boolean
+}>()
+
 defineEmits<{
   checkout: []
 }>()
@@ -46,7 +50,7 @@ defineEmits<{
       </div>
 
       <div class="pt-4 border-t border-brand-hairsoft flex items-center justify-between">
-        <span class="font-display font-bold text-sm text-brand-ink">Total Tagihan</span>
+        <span class="font-display text-sm font-bold text-brand-ink">Total Tagihan</span>
         <span class="font-display text-xl font-bold text-brand-ink tabular-nums">
           {{ cartStore.formattedFinalPrice }}
         </span>
@@ -55,11 +59,12 @@ defineEmits<{
       <UiButton
         variant="primary"
         size="md"
-        class="w-full justify-center text-xs font-semibold py-3 rounded-full shadow-whisper"
+        class="w-full justify-center text-xs font-semibold py-3 rounded-full shadow-whisper disabled:opacity-50 disabled:cursor-not-allowed"
         icon="pi-lock"
+        :disabled="hasOutOfStockItems"
         @click="$emit('checkout')"
       >
-        Lanjut ke Pembayaran
+        {{ hasOutOfStockItems ? 'Ada Barang Habis di Keranjang' : 'Lanjut ke Pembayaran' }}
       </UiButton>
 
       <!-- Trust Badges -->

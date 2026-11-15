@@ -239,11 +239,8 @@ export const useCartStore = defineStore('cart', () => {
 
     if (quantity <= 0) {
       items.value.splice(targetIndex, 1)
-    } else {
-      const item = items.value[targetIndex]
-      if (item) {
-        item.quantity = Math.min(quantity, item.stock)
-      }
+    } else if (items.value[targetIndex]) {
+      items.value[targetIndex].quantity = Math.min(quantity, items.value[targetIndex].stock)
     }
 
     saveCart()
@@ -286,6 +283,7 @@ export const useCartStore = defineStore('cart', () => {
     addItem,
     updateQuantity,
     removeItem,
+    saveCart,
     clearCart,
     resetOnLogout,
   }

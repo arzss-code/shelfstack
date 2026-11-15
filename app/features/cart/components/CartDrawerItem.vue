@@ -69,14 +69,24 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
           {{ item.name }}
         </h3>
 
-        <!-- Variant Pill (if any) -->
-        <div v-if="item.color || item.material" class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+        <!-- Variant Pill & Out of Stock Badge -->
+        <div
+          v-if="item.color || item.material || item.stock <= 0"
+          class="flex items-center gap-1.5 mt-0.5 flex-wrap"
+        >
           <span
+            v-if="item.color || item.material"
             class="inline-flex items-center rounded bg-brand-canvas-soft border border-brand-hairsoft px-1.5 py-0.5 text-[10px] text-brand-muted font-medium"
           >
             <span v-if="item.color">{{ item.color }}</span>
             <span v-if="item.color && item.material"> · </span>
             <span v-if="item.material">{{ item.material }}</span>
+          </span>
+          <span
+            v-if="item.stock <= 0"
+            class="inline-flex items-center gap-1 rounded bg-red-50 border border-red-200 px-1.5 py-0.5 text-[10px] text-red-700 font-bold"
+          >
+            <i class="pi pi-times-circle text-[9px]" /> Stok Habis
           </span>
         </div>
       </div>
@@ -145,7 +155,7 @@ const handleManualQuantityBlur = (event: Event, item: CartItem) => {
             <button
               type="button"
               class="w-5 h-5 flex items-center justify-center text-brand-ink hover:bg-brand-canvas rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed border-0 bg-transparent"
-              :disabled="item.quantity >= item.stock"
+              :disabled="item.stock <= 0 || item.quantity >= item.stock"
               aria-label="Tambah kuantitas"
               @click="
                 cartStore.updateQuantity(
