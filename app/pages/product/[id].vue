@@ -9,7 +9,9 @@ import ProductReviewsSection from '~/components/product/ProductReviewsSection.vu
 import ProductRelatedSection from '~/components/product/ProductRelatedSection.vue'
 import ProductRecentlyViewedSection from '~/components/product/ProductRecentlyViewedSection.vue'
 import ProductSocialShare from '~/components/product/ProductSocialShare.vue'
+import ProductFlashSaleBanner from '~/components/promotions/ProductFlashSaleBanner.vue'
 import { useRecentlyViewed } from '~/composables/useRecentlyViewed'
+import { useFlashSale } from '~/composables/useFlashSale'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,6 +22,12 @@ const recentlyViewed = useRecentlyViewed()
 
 const product = ref<Product | null>(null)
 const loading = ref(true)
+
+const { getDealForProduct, formattedTimer, isCampaignActive } = useFlashSale()
+const activeFlashDeal = computed(() => {
+  if (!product.value || !isCampaignActive.value) return null
+  return getDealForProduct(product.value.id)
+})
 
 useSeoMeta({
   title: () =>
@@ -226,7 +234,17 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
           <ProductGallery :product="product" />
         </div>
         <div class="lg:col-span-5 space-y-6">
-          <ProductConfigurator :product="product" @add-to-bag="onAddToBag" @buy-now="onBuyNow" />
+          <ProductFlashSaleBanner
+            v-if="activeFlashDeal"
+            :deal="activeFlashDeal"
+            :timer-text="formattedTimer"
+          />
+          <ProductConfigurator
+            :product="product"
+            :flash-price="activeFlashDeal ? activeFlashDeal.promo_price_cents / 100 : null"
+            @add-to-bag="onAddToBag"
+            @buy-now="onBuyNow"
+          />
           <ProductSocialShare :product="product" />
         </div>
       </div>

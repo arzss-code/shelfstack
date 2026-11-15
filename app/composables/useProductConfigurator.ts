@@ -17,6 +17,9 @@ export function useProductConfigurator(
     onAddToBag: (payload: ProductSelectionPayload) => void
     onBuyNow: (payload: ProductSelectionPayload) => void
   },
+  options?: {
+    promoPrice?: () => number | null | undefined
+  },
 ) {
   const variants = computed(() => getProductVariants(getProduct()))
 
@@ -51,6 +54,10 @@ export function useProductConfigurator(
   })
 
   const effectivePrice = computed(() => {
+    const promo = options?.promoPrice?.()
+    if (typeof promo === 'number' && promo > 0) {
+      return promo
+    }
     if (selectedVariant.value?.price_cents) {
       return selectedVariant.value.price_cents / 100
     }
