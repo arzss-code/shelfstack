@@ -2,6 +2,23 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.19] - 2026-11-15
+
+### Customer 360 Slide-Over Drawer di Admin CRM (Paket 4 Auto-Loop)
+
+- **Tipe Data & Model Customer 360 (`shared/types/admin-crm.ts`, 62 baris)**:
+  - Menyediakan kontrak antarmuka `Customer360Detail` dan `Customer360RecentOrder` yang mencakup identitas pelanggan, Customer Lifetime Value (LTV), Average Order Value (AOV), ringkasan status pesanan, saldo koin, dan tiket komplain.
+- **Endpoint API Agregasi Profil 360 Pelanggan (`server/api/admin/users/[id]/360.get.ts`, 129 baris)**:
+  - Otorisasi `requireAdmin` yang mengambil data profil pelanggan, histori transaksi lengkap, saldo koin loyalitas (`balance_coins`), dan jumlah tiket retur aktif.
+  - Menghasilkan metrik keuangan AOV dan LTV secara terstruktur dan terformat.
+- **Komponen Slide-Over Drawer Customer 360 (`AdminCustomer360Drawer.vue`, 243 baris)**:
+  - Antarmuka slide-over dari sisi kanan dengan backdrop blur, kartu metrik finansial, daftar 5 pesanan terakhir dengan status berwarna, dan aksi navigasi instan ke Live Support atau seluruh pesanan.
+- **Integrasi Admin Users & Order Detail (`app/pages/admin/users.vue`, 243 baris & `AdminOrderCustomerCard.vue`, 87 baris)**:
+  - Menggantikan modal statis lama di halaman CRM pengguna dengan slide-over drawer yang komprehensif.
+  - Menyediakan tombol aksi cepat "Profil 360°" pada kartu pelanggan di detail pesanan admin.
+- **Pengujian Unit & Tata Kelola Kode (`tests/unit/admin-customer-360.spec.ts`, 97 baris)**:
+  - 5 pengujian unit memverifikasi kalkulasi agregasi LTV/AOV, penanganan kasus 0 pesanan, kepatuhan batas file <= 300 baris, dan larangan karakter em dash.
+
 ## [v1.1.0-beta.18] - 2026-11-15
 
 ### Kalkulator Estimasi Ongkos Kirim Cepat di Halaman Produk (Paket 5 Auto-Loop)
