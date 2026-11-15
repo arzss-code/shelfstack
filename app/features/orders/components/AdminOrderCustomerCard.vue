@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { Order } from '~/types/order'
 import { formatRupiah } from '~/utils/format'
+import AdminCustomer360Drawer from '~/components/admin/users/AdminCustomer360Drawer.vue'
 
 defineProps<{
   order: Order
   formatDate: (dateStr?: string | null) => string
 }>()
+
+const isCustomer360Open = ref(false)
 </script>
 
 <template>
@@ -14,7 +18,18 @@ defineProps<{
     <div
       class="rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper space-y-3"
     >
-      <h2 class="font-display text-base font-bold text-brand-ink m-0">Informasi Pengiriman</h2>
+      <div class="flex items-center justify-between">
+        <h2 class="font-display text-base font-bold text-brand-ink m-0">Informasi Pengiriman</h2>
+        <UiButton
+          v-if="order.user_id"
+          size="xs"
+          variant="outline"
+          @click="isCustomer360Open = true"
+        >
+          <i class="pi pi-user text-[10px] mr-1" />
+          Profil 360°
+        </UiButton>
+      </div>
       <div class="text-xs text-brand-ink space-y-1.5 pt-1">
         <p class="font-semibold m-0">{{ order.address.name }}</p>
         <p class="text-brand-muted m-0">{{ order.address.phone }}</p>
@@ -60,5 +75,13 @@ defineProps<{
         </div>
       </div>
     </div>
+
+    <!-- Customer 360 Slide-Over Drawer -->
+    <AdminCustomer360Drawer
+      v-if="order.user_id"
+      v-model:visible="isCustomer360Open"
+      :user-id="order.user_id"
+      :fallback-customer="null"
+    />
   </div>
 </template>

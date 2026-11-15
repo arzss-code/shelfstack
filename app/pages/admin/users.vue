@@ -7,7 +7,7 @@ import UiSelect from '~/components/ui/UiSelect.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import UiCard from '~/components/ui/UiCard.vue'
 import UiEmptyState from '~/components/ui/UiEmptyState.vue'
-import UiModal from '~/components/ui/UiModal.vue'
+import AdminCustomer360Drawer from '~/components/admin/users/AdminCustomer360Drawer.vue'
 import type { AdminCustomerSummary } from '~~/shared/types/admin-crm'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
@@ -33,11 +33,11 @@ const {
 } = useAdminUsers()
 
 const selectedCustomer = ref<AdminCustomerSummary | null>(null)
-const isDetailModalOpen = ref(false)
+const isDetailDrawerOpen = ref(false)
 
 const openCustomerDetail = (customer: AdminCustomerSummary) => {
   selectedCustomer.value = customer
-  isDetailModalOpen.value = true
+  isDetailDrawerOpen.value = true
 }
 
 const formatDate = (dateStr?: string | null) => {
@@ -233,56 +233,11 @@ const formatDate = (dateStr?: string | null) => {
       </div>
     </UiCard>
 
-    <!-- Modal Rincian Pelanggan -->
-    <UiModal v-model="isDetailModalOpen" title="Rincian Profil Pelanggan">
-      <div v-if="selectedCustomer" class="space-y-4">
-        <div class="flex items-center gap-3 pb-3 border-b border-brand-hairsoft">
-          <div
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-field text-brand-ink font-bold text-base border border-brand-hair"
-          >
-            <span>{{ selectedCustomer.fullName.charAt(0).toUpperCase() }}</span>
-          </div>
-          <div>
-            <h3 class="font-display text-base font-bold text-brand-ink m-0">
-              {{ selectedCustomer.fullName }}
-            </h3>
-            <p class="text-xs text-brand-muted m-0 mt-0.5">{{ selectedCustomer.email }}</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 text-xs">
-          <div class="p-3 rounded-lg border border-brand-hair bg-brand-canvas-soft">
-            <span class="text-brand-muted block text-[11px]">Customer Lifetime Value (LTV)</span>
-            <span class="font-display text-lg font-bold text-brand-ink block mt-0.5">{{
-              selectedCustomer.formattedLtv
-            }}</span>
-          </div>
-          <div class="p-3 rounded-lg border border-brand-hair bg-brand-canvas-soft">
-            <span class="text-brand-muted block text-[11px]">Total Frekuensi Pesanan</span>
-            <span class="font-display text-lg font-bold text-brand-ink block mt-0.5"
-              >{{ selectedCustomer.totalOrders }} Pesanan</span
-            >
-          </div>
-          <div class="p-3 rounded-lg border border-brand-hair bg-brand-canvas-soft">
-            <span class="text-brand-muted block text-[11px]">Pesanan Selesai / Lunas</span>
-            <span class="font-display text-lg font-bold text-brand-success block mt-0.5"
-              >{{ selectedCustomer.completedOrders }} Pesanan</span
-            >
-          </div>
-          <div class="p-3 rounded-lg border border-brand-hair bg-brand-canvas-soft">
-            <span class="text-brand-muted block text-[11px]">Pesanan Terakhir</span>
-            <span class="font-medium text-brand-ink block mt-0.5">{{
-              formatDate(selectedCustomer.lastOrderAt)
-            }}</span>
-          </div>
-        </div>
-
-        <div class="pt-2 text-right">
-          <UiButton size="sm" variant="secondary" @click="isDetailModalOpen = false"
-            >Tutup</UiButton
-          >
-        </div>
-      </div>
-    </UiModal>
+    <!-- Customer 360 Slide-Over Drawer -->
+    <AdminCustomer360Drawer
+      v-model:visible="isDetailDrawerOpen"
+      :user-id="selectedCustomer?.userId || null"
+      :fallback-customer="selectedCustomer"
+    />
   </div>
 </template>
