@@ -7,8 +7,8 @@
 ## 📌 Status Terkini
 
 - **Sprint Aktif:** **Sprint 26 (Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview)**
-- **Versi Rilis:** `v1.1.0-beta.8` (Pre-release Staging / develop aktif : sinkron dengan `version.json`)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 121 file / 1.193 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Versi Rilis:** `v1.1.0-beta.9` (Pre-release Staging / develop aktif : sinkron dengan `version.json`)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 122 file / 1.202 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -417,6 +417,8 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
     - Status: ✅ **SELESAI 2026-11-15** (Endpoint `POST /api/orders/[id]/confirm-delivery` dengan RPC database atomik `transition_order_status` yang mentransisikan `shipped -> completed`, memberikan cashback loyalti koin 1%, komponen `OrderPaymentCountdownCard.vue` dengan hitung mundur 15 menit live MM:SS dan penanganan auto-cancel, tombol konfirmasi penerimaan di rincian order beserta dialog konfirmasi dan auto-prompt modal ulasan, penyelarasan link footer ke `/c/[slug]`, serta 9 unit test di `tests/unit/order-confirm-delivery-and-countdown.spec.ts`).
 19. ~~**Recent Searches & Trending Tags di Omnibox Navbar serta Produk Terakhir Dilihat (E-10)**~~:
     - Status: ✅ **SELESAI 2026-11-15** (Composable `useRecentSearches` dengan batasan 6 kata kunci dan chip pencarian populer, integrasi popover otomatis saat fokus pencarian, perekaman otomatis histori saat submit, composable `useRecentlyViewed` dengan batasan 8 produk, komponen `ProductRecentlyViewedSection.vue` di halaman detail produk, tombol hapus riwayat, serta 11 unit test di `tests/unit/recent-searches-and-recently-viewed.spec.ts`).
+20. ~~**Aksi Cepat Tambah Stok Produk Gudang (E-11)**~~:
+    - Status: ✅ **SELESAI 2026-11-15** (Endpoint `POST /api/admin/products/[id]/restock` dengan validasi Zod kuantitas positif dan catatan pengadaan, mutasi atomik stok produk, pencatatan double-entry ledger ke `public.stock_movements` dan `public.activity_logs`, komponen `QuickRestockForm.vue` terintegrasi pada `StockMovementsModal.vue`, reaktivitas instan pada tabel katalog admin, serta 9 unit test di `tests/unit/admin-quick-restock.spec.ts`).
 
 ## 📋 Catatan Teknis & Konvensi Wajib
 

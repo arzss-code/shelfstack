@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import type { Product } from '~/types/product'
+import QuickRestockForm from './QuickRestockForm.vue'
 
 interface StockMovement {
   id: number
@@ -9,27 +10,13 @@ interface StockMovement {
   reason: string
   order_id: string | null
   created_at: string
-  order?: {
-    id: string
-    status: string
-    total_cents: number
-  } | null
+  order?: { id: string; status: string; total_cents: number } | null
 }
 
 interface ApiResponse {
-  product: {
-    id: number
-    name: string
-    sku: string
-    current_stock: number
-  }
+  product: { id: number; name: string; sku: string; current_stock: number }
   movements: StockMovement[]
-  meta: {
-    total: number
-    page: number
-    limit: number
-    totalPages: number
-  }
+  meta: { total: number; page: number; limit: number; totalPages: number }
 }
 
 const props = defineProps<{
@@ -39,6 +26,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: []
+  restocked: [newStock: number]
 }>()
 
 const loading = ref(false)
@@ -46,6 +34,7 @@ const error = ref<string | null>(null)
 const movements = ref<StockMovement[]>([])
 const totalMovements = ref(0)
 const selectedReason = ref('all')
+const showRestockForm = ref(false)
 
 /* Jembatan kontrak lama (`show` + emit `close`) ke v-model milik UiModal. */
 const isVisible = computed({
@@ -64,30 +53,30 @@ const reasonOptions = [
 
 const formatDateTime = (isoString: string) => {
   try {
-    const d = new Date(isoString)
-    return new Intl.DateTimeFormat('id-ID', {
+    return new Date(isoString).toLocaleString('id-ID', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    }).format(d)
+    })
   } catch {
     return isoString
   }
 }
 
-const getReasonLabel = (reason: string) => {
-  switch (reason) {
-    case 'order_fulfillment':
-      return 'Pesanan Diproses'
-    case 'order_cancelled_restock':
-      return 'Restock Pembatalan'
-    case 'manual_adjustment':
-      return 'Penyesuaian Admin'
-    default:
-      return reason.replace(/_/g, ' ')
-  }
+const reasonLabels: Record<string, string> = {
+  order_fulfillment: 'Pesanan Diproses',
+  order_cancelled_restock: 'Restock Pembatalan',
+  manual_adjustment: 'Penyesuaian Admin',
+}
+
+const getReasonLabel = (reason: string) => reasonLabels[reason] || reason.replace(/_/g, ' ')
+
+const onRestocked = async (newStock: number) => {
+  showRestockForm.value = false
+  emit('restocked', newStock)
+  await fetchMovements()
 }
 
 const fetchMovements = async () => {
@@ -136,28 +125,47 @@ watch(
 <template>
   <UiModal v-model:visible="isVisible" title="Audit Mutasi Stok" size="lg">
     <template #header>
-      <div class="flex min-w-0 items-center gap-3">
-        <div
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-field text-brand-ink"
-        >
-          <i class="pi pi-history text-base" />
-        </div>
-        <div class="min-w-0">
-          <div class="flex items-center gap-2">
-            <h3 class="m-0 font-display text-base font-bold text-brand-ink">Audit Mutasi Stok</h3>
-            <span
-              class="rounded border border-brand-hairsoft bg-brand-field px-2 py-0.5 font-mono text-xs text-brand-muted"
-            >
-              {{ product?.sku || 'SKU-N/A' }}
-            </span>
+      <div class="flex min-w-0 items-center justify-between w-full pr-4">
+        <div class="flex min-w-0 items-center gap-3">
+          <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-field text-brand-ink"
+          >
+            <i class="pi pi-history text-base" />
           </div>
-          <p class="mt-0.5 text-xs text-brand-muted">
-            {{ product?.name }} &bull; Stok Saat Ini:
-            <span class="font-bold tabular text-brand-ink">{{ product?.stock }} unit</span>
-          </p>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h3 class="m-0 font-display text-base font-bold text-brand-ink">Audit Mutasi Stok</h3>
+              <span
+                class="rounded border border-brand-hairsoft bg-brand-field px-2 py-0.5 font-mono text-xs text-brand-muted"
+              >
+                {{ product?.sku || 'SKU-N/A' }}
+              </span>
+            </div>
+            <p class="mt-0.5 text-xs text-brand-muted">
+              {{ product?.name }} &bull; Stok Saat Ini:
+              <span class="font-bold tabular text-brand-ink">{{ product?.stock }} unit</span>
+            </p>
+          </div>
         </div>
+        <UiButton
+          v-if="!showRestockForm"
+          variant="secondary"
+          size="sm"
+          icon="pi-plus"
+          @click="showRestockForm = true"
+        >
+          Restock Cepat
+        </UiButton>
       </div>
     </template>
+
+    <!-- Form Restock Cepat -->
+    <QuickRestockForm
+      v-if="showRestockForm && product?.id"
+      :product-id="product.id"
+      @restocked="onRestocked"
+      @cancel="showRestockForm = false"
+    />
 
     <!-- Filter Bar -->
     <div class="mb-4 flex items-center justify-between gap-3">
