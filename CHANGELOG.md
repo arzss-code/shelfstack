@@ -2,6 +2,27 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.12] - 2026-11-15
+
+### Live Cart Drift Guard & Stale Inventory Reconciliation
+
+- **Kontrak Skema Zod Rekonsiliasi Keranjang (`shared/schemas/cart-reconcile.ts`, 37 baris)**:
+  - Validasi payload batch rekonsiliasi keranjang: validasi `productId` integer positif, batas maksimal 50 item per request, dan tipe data TypeScript terstruktur (`CartReconcileResponse`, `ReconciledItemResult`).
+- **Endpoint API Rekonsiliasi Stok & Harga Real-Time (`server/api/cart/reconcile.post.ts`, 119 baris)**:
+  - Melakukan lookup batch ke database PostgreSQL Supabase untuk memverifikasi harga (`price_cents`), ketersediaan produk, dan stok terkini.
+  - Mendeteksi selisih harga (price drift) dan stok berkurang / habis akibat transaksi pengguna lain.
+  - Menghasilkan pesan peringatan transparan dalam bahasa Indonesia yang ramah pelanggan.
+- **Composable Sinkronisasi Keranjang (`app/features/cart/composables/useCartReconciliation.ts`, 125 baris)**:
+  - Menyediakan fungsi `reconcileCart(silent?: boolean)` yang membandingkan dan memperbarui keranjang lokal secara atomik.
+  - Menyediakan reactive states: `isReconciling`, `driftWarnings`, `hasOutOfStockItems`, dan `outOfStockItems`.
+  - Terintegrasi aman dengan `useUiToast` dengan penanganan fallback di lingkungan pengujian atau SSR.
+- **Integrasi UI Keranjang Belanja & Drawer (`CartSummarySidebar.vue`, `CartDrawer.vue`, `CartDrawerItem.vue`, `app/pages/cart.vue`)**:
+  - Peringatan banner penyesuaian inventaris di halaman keranjang dan drawer.
+  - Badge visual "Stok Habis" dan penonaktifan tombol checkout ketika terdapat produk yang stoknya habis.
+  - Pengamanan routing navigasi checkout saat barang keranjang tidak tersedia.
+- **Pengujian Unit & Kepatuhan Tata Kelola (`tests/unit/cart-drift-reconciliation.spec.ts`, 217 baris)**:
+  - 8 pengujian unit mencakup validasi skema Zod, deteksi perubahan harga dan pembaruan kuantitas, pemblokiran stok habis, penanganan kegagalan jaringan yang fail-open, kepatuhan batas maksimal 300 baris kode, dan ketiadaan karakter em dash.
+
 ## [v1.1.0-beta.11] - 2026-11-15
 
 ### Hardening Batasan Baris Kode Prettier (Prettier Format Line Limit Immunity)

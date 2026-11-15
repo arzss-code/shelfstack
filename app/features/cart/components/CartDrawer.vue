@@ -1,15 +1,29 @@
 <script setup lang="ts">
+import { watch } from 'vue'
 import { type CartItem, useCartStore } from '~/features/cart/stores/cart'
+import { useCartReconciliation } from '~/features/cart/composables/useCartReconciliation'
 import CartDrawerItem from './CartDrawerItem.vue'
 
 const cartStore = useCartStore()
 const router = useRouter()
+const { driftWarnings, hasOutOfStockItems, reconcileCart } = useCartReconciliation()
+
+watch(
+  () => cartStore.isDrawerOpen,
+  (isOpen) => {
+    if (isOpen) reconcileCart(true)
+  },
+)
 
 const close = () => {
   cartStore.closeDrawer()
 }
 
 const goToCheckout = () => {
+  if (hasOutOfStockItems.value) {
+    goToCartPage()
+    return
+  }
   close()
   router.push('/checkout')
 }
@@ -94,6 +108,29 @@ const goToProduct = (item: CartItem) => {
             </button>
           </UiTooltip>
         </header>
+
+        <!-- Drift Warnings Banner in Drawer -->
+        <div
+          v-if="driftWarnings.length > 0"
+          class="mx-5 mt-3 p-2.5 rounded-field bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1"
+        >
+          <div class="flex items-center justify-between font-bold text-[11px]">
+            <span class="flex items-center gap-1">
+              <i class="pi pi-exclamation-triangle text-amber-600 text-[10px]" />
+              Penyesuaian Stok Gudang
+            </span>
+            <button
+              type="button"
+              class="text-amber-700 hover:text-amber-900 text-[10px] underline border-0 bg-transparent p-0 cursor-pointer"
+              @click="driftWarnings = []"
+            >
+              Tutup
+            </button>
+          </div>
+          <p class="text-[10px] text-amber-800 m-0 leading-tight">
+            {{ driftWarnings[0] }}
+          </p>
+        </div>
 
         <!-- Body / Items List -->
         <div class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -182,11 +219,12 @@ const goToProduct = (item: CartItem) => {
             <UiButton
               variant="primary"
               size="md"
-              class="w-full justify-center text-xs font-semibold py-2.5 rounded-full shadow-whisper"
+              class="w-full justify-center text-xs font-semibold py-2.5 rounded-full shadow-whisper disabled:opacity-50 disabled:cursor-not-allowed"
               icon="pi-lock"
+              :disabled="hasOutOfStockItems"
               @click="goToCheckout"
             >
-              Checkout Sekarang
+              {{ hasOutOfStockItems ? 'Ada Barang Habis' : 'Checkout Sekarang' }}
             </UiButton>
 
             <UiButton
