@@ -25,6 +25,27 @@ export const RATE_LIMIT_RULES: Record<string, RateLimitConfig> = {
 
 export class TokenBucketLimiter {
   private buckets = new Map<string, TokenBucketState>()
+  private readonly maxBuckets = 5000
+
+  /**
+   * Bersihkan bucket yang sudah tidak aktif untuk mencegah kebocoran memori.
+   */
+  private cleanup(now: number, maxAgeMs: number): void {
+    if (this.buckets.size < this.maxBuckets) return
+    for (const [k, v] of this.buckets.entries()) {
+      if (now - v.lastRefill > maxAgeMs) {
+        this.buckets.delete(k)
+      }
+    }
+    if (this.buckets.size >= this.maxBuckets) {
+      const excess = this.buckets.size - Math.floor(this.maxBuckets * 0.8)
+      let count = 0
+      for (const k of this.buckets.keys()) {
+        if (count++ >= excess) break
+        this.buckets.delete(k)
+      }
+    }
+  }
 
   /**
    * Evaluasi ketersediaan token bucket untuk kunci spesifik.
@@ -35,6 +56,7 @@ export class TokenBucketLimiter {
     config: RateLimitConfig,
     now: number = Date.now(),
   ): RateLimitResult {
+    this.cleanup(now, config.intervalMs * 2)
     const cost = config.cost ?? 1
     let state = this.buckets.get(key)
 

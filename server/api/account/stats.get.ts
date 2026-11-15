@@ -9,62 +9,51 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient<Database>(event)
 
   try {
-    // 1. Total seluruh pesanan
-    const { count: totalOrders, error: totalOrdersErr } = await client
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', targetUserId)
+    // Jalankan seluruh kueri ringkasan akun secara paralel untuk memangkas latensi
+    const [totalOrdersRes, activeOrdersRes, completedOrdersRes, addressesRes, profileRecordRes] =
+      await Promise.all([
+        client
+          .from('orders')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', targetUserId),
+        client
+          .from('orders')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', targetUserId)
+          .in('status', ['pending', 'paid', 'shipped']),
+        client
+          .from('orders')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', targetUserId)
+          .eq('status', 'completed'),
+        client
+          .from('user_addresses')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', targetUserId)
+          .is('deleted_at', null),
+        client.from('profiles').select('created_at').eq('user_id', targetUserId).maybeSingle(),
+      ])
 
-    if (totalOrdersErr) {
-      return errorResponse(event, 'Gagal memuat metrik pesanan', totalOrdersErr, 500)
+    if (totalOrdersRes.error) {
+      return errorResponse(event, 'Gagal memuat metrik pesanan', totalOrdersRes.error, 500)
     }
-
-    // 2. Pesanan aktif (pending, paid, shipped)
-    const { count: activeOrders, error: activeOrdersErr } = await client
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', targetUserId)
-      .in('status', ['pending', 'paid', 'shipped'])
-
-    if (activeOrdersErr) {
-      return errorResponse(event, 'Gagal memuat pesanan aktif', activeOrdersErr, 500)
+    if (activeOrdersRes.error) {
+      return errorResponse(event, 'Gagal memuat pesanan aktif', activeOrdersRes.error, 500)
     }
-
-    // 3. Pesanan selesai (completed)
-    const { count: completedOrders, error: completedOrdersErr } = await client
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', targetUserId)
-      .eq('status', 'completed')
-
-    if (completedOrdersErr) {
-      return errorResponse(event, 'Gagal memuat pesanan selesai', completedOrdersErr, 500)
+    if (completedOrdersRes.error) {
+      return errorResponse(event, 'Gagal memuat pesanan selesai', completedOrdersRes.error, 500)
     }
-
-    // 4. Total buku alamat tersimpan
-    const { count: totalAddresses } = await client
-      .from('user_addresses')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', targetUserId)
-      .is('deleted_at', null)
-
-    // 5. Waktu bergabung (member since)
-    const { data: profileRecord } = await client
-      .from('profiles')
-      .select('created_at')
-      .eq('user_id', targetUserId)
-      .maybeSingle()
 
     const memberSince =
-      profileRecord?.created_at ||
+      profileRecordRes.data?.created_at ||
       (user as { created_at?: string }).created_at ||
       new Date().toISOString()
 
     return successResponse('Statistik akun berhasil dimuat', {
-      totalOrders: totalOrders ?? 0,
-      activeOrders: activeOrders ?? 0,
-      completedOrders: completedOrders ?? 0,
-      totalAddresses: totalAddresses ?? 0,
+      totalOrders: totalOrdersRes.count ?? 0,
+      activeOrders: activeOrdersRes.count ?? 0,
+      completedOrders: completedOrdersRes.count ?? 0,
+      totalAddresses: addressesRes.count ?? 0,
       memberSince,
     })
   } catch (err: unknown) {

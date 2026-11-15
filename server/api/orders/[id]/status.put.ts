@@ -95,7 +95,7 @@ export default defineEventHandler(async (event) => {
         const shippedAt = new Date().toISOString()
 
         // 1. Simpan data resi dan kurir ke tabel orders
-        await client
+        const { error: trackingUpdateError } = await client
           .from('orders')
           .update({
             tracking_number: trackingNumber,
@@ -104,6 +104,13 @@ export default defineEventHandler(async (event) => {
             shipped_at: shippedAt,
           })
           .eq('id', orderId)
+
+        if (trackingUpdateError) {
+          console.error(
+            '[Admin Fulfillment] Gagal memperbarui resi pengiriman:',
+            trackingUpdateError,
+          )
+        }
 
         // 2. Generate initial checkpoints ekspedisi
         const destinationCity =

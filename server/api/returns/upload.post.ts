@@ -1,6 +1,7 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { requireUser } from '../../utils/auth'
+import { detectImageMagicBytes } from '../../utils/file-signature'
 import { errorResponse, successResponse } from '../../utils/response'
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -30,12 +31,13 @@ export default defineEventHandler(async (event) => {
     )
   }
 
-  // Validasi MIME type
-  const mimeType = filePart.type?.toLowerCase() || 'image/jpeg'
-  if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
+  // Validasi fisik berkas (magic bytes) dan MIME type
+  const detectedType = detectImageMagicBytes(filePart.data)
+  const mimeType = detectedType || filePart.type?.toLowerCase() || ''
+  if (!detectedType || !ALLOWED_MIME_TYPES.includes(mimeType)) {
     return errorResponse(
       event,
-      'Format file tidak didukung. Harap unggah foto dengan format JPG, PNG, atau WEBP.',
+      'Format file tidak valid atau rusak. Harap unggah foto asli berformat JPG, PNG, atau WEBP.',
       null,
       400,
     )

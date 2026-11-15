@@ -165,24 +165,31 @@ export function useOrderDetail(orderId: string) {
 
   const handleReorder = () => {
     if (!order.value?.items?.length) return
+    let added = 0
     for (const item of order.value.items) {
+      const stock = (item.product as { stock?: number } | undefined)?.stock ?? item.qty
+      if (stock <= 0) continue
       cartStore.addItem({
         productId: item.product_id,
         name: item.product?.name || `Produk #${item.product_id}`,
         price: item.price_cents / 100,
         priceCents: item.price_cents,
         imageUrl: item.product?.image_url ?? null,
-        quantity: item.qty,
-        stock: 99,
+        quantity: Math.min(item.qty, stock),
+        stock,
         openCartDrawer: false,
       })
+      added++
     }
+    const hasItems = added > 0
     toast.show({
-      title: 'Produk Ditambahkan',
-      message: 'Item pesanan telah dimasukkan ke keranjang belanja.',
-      tone: 'success',
+      title: hasItems ? 'Produk Ditambahkan' : 'Stok Habis',
+      message: hasItems
+        ? 'Item pesanan dimasukkan ke keranjang.'
+        : 'Produk pesanan ini tidak tersedia.',
+      tone: hasItems ? 'success' : 'warn',
     })
-    router.push('/cart')
+    if (hasItems) router.push('/cart')
   }
 
   const handleConfirmDelivery = async () => {

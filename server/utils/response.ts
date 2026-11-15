@@ -1,6 +1,11 @@
+import type { H3Event } from 'h3'
 import { logger, resolveRequestId } from './logger'
 
-export function successResponse(message: string, data: any = null, meta?: Record<string, any>) {
+export function successResponse<T = unknown>(
+  message: string,
+  data: T = null as T,
+  meta?: Record<string, unknown>,
+) {
   return {
     status: 'success',
     message,
@@ -10,7 +15,7 @@ export function successResponse(message: string, data: any = null, meta?: Record
   }
 }
 
-function sanitizeErrorPayload(errors: any, statusCode: number): any {
+function sanitizeErrorPayload(errors: unknown, statusCode: number): unknown {
   if (!errors) return null
 
   // If status is internal server error (5xx), avoid leaking internal database/SQL stack
@@ -21,10 +26,12 @@ function sanitizeErrorPayload(errors: any, statusCode: number): any {
     // In dev/test, sanitize internal database error details
     if (
       typeof errors === 'object' &&
+      errors !== null &&
       ('hint' in errors || 'details' in errors || 'internalPosition' in errors)
     ) {
+      const errObj = errors as { message?: string }
       return {
-        message: errors.message || 'Database error occurred',
+        message: errObj.message || 'Database error occurred',
       }
     }
   }
@@ -40,20 +47,27 @@ function sanitizeErrorPayload(errors: any, statusCode: number): any {
 }
 
 export function errorResponse(
-  event: any,
+  event: unknown,
   message: string,
-  errors: any = null,
+  errors: unknown = null,
   statusCode: number = 400,
 ): never {
   const safeErrors = sanitizeErrorPayload(errors, statusCode)
 
   let requestId: string | undefined = undefined
-  if (event) {
-    if (event.context?.requestId) {
-      requestId = event.context.requestId
+  const eventObj = event as {
+    context?: { requestId?: string }
+    path?: string
+    method?: string
+    node?: { req?: { url?: string; method?: string } }
+  } | null
+
+  if (eventObj) {
+    if (eventObj.context?.requestId) {
+      requestId = eventObj.context.requestId
     } else if (typeof getHeader === 'function') {
       try {
-        const headerVal = getHeader(event, 'x-request-id')
+        const headerVal = getHeader(event as H3Event, 'x-request-id')
         if (headerVal) {
           requestId = resolveRequestId(headerVal)
         }
@@ -65,8 +79,8 @@ export function errorResponse(
 
   // Structured logging for API errors (fail-safe)
   try {
-    const route = event?.path || event?.node?.req?.url || undefined
-    const method = event?.method || event?.node?.req?.method || undefined
+    const route = eventObj?.path || eventObj?.node?.req?.url || undefined
+    const method = eventObj?.method || eventObj?.node?.req?.method || undefined
     const context = {
       requestId,
       route,

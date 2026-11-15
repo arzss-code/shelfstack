@@ -1,4 +1,4 @@
-# Progress Tracker — ShelfStack
+# Progress Tracker : ShelfStack
 
 > **Catatan Status Proyek:** Dokumen ini adalah sumber kebenaran terkini mengenai progress implementasi fitur, status sprint, dan milestone yang telah dicapai. **Setiap agen AI WAJIB membaca dokumen ini sebelum mulai bekerja.**
 
@@ -6,7 +6,7 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 26 (Fitur Visual Analytics Admin & Layanan Email Transaksional: Sales Trends SVG Chart & Email Live Preview)**
+- **Sprint Aktif:** **Sprint 27 (Pengerasan Sistem & Remediasi Audit Kritis: Midtrans Snap, Expiry Sync, Flash Deals DB, Magic Bytes, & Zero Any Strict Typing)**
 - **Versi Rilis:** `v1.1.0-beta.24` (Pre-release Staging / develop aktif : sinkron dengan `version.json` dan `package.json`)
 - **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 130 file / 1.248 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
@@ -419,6 +419,8 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
     - Status: ✅ **SELESAI 2026-11-15** (Composable `useRecentSearches` dengan batasan 6 kata kunci dan chip pencarian populer, integrasi popover otomatis saat fokus pencarian, perekaman otomatis histori saat submit, composable `useRecentlyViewed` dengan batasan 8 produk, komponen `ProductRecentlyViewedSection.vue` di halaman detail produk, tombol hapus riwayat, serta 11 unit test di `tests/unit/recent-searches-and-recently-viewed.spec.ts`).
 20. ~~**Aksi Cepat Tambah Stok Produk Gudang (E-11)**~~:
     - Status: ✅ **SELESAI 2026-11-15** (Endpoint `POST /api/admin/products/[id]/restock` dengan validasi Zod kuantitas positif dan catatan pengadaan, mutasi atomik stok produk, pencatatan double-entry ledger ke `public.stock_movements` dan `public.activity_logs`, komponen `QuickRestockForm.vue` terintegrasi pada `StockMovementsModal.vue`, reaktivitas instan pada tabel katalog admin, serta 9 unit test di `tests/unit/admin-quick-restock.spec.ts`).
+21. ~~**Pengerasan Sistem & Remediasi Audit Kritis (Sprint 27)**~~:
+    - Status: ✅ **SELESAI 2026-11-15** (Perbaikan typo `enableMidtransSandbox` di checkout untuk mengaktifkan kembali popup Snap Midtrans otomatis, sinkronisasi batas waktu pembatalan otomatis pesanan menjadi 120 menit seragam di BullMQ config dan docker-compose, integrasi database promo `public.flash_deals` pada `server/utils/flash-sale.ts` dan `supabase/seed.sql`, pencegahan hardcoded stok 99 pada fitur beli lagi di `useOrderDetail.ts`, pemulihan SSR SEO PDP dengan `useAsyncData`, migrasi anti-memory leak pada rate limiter token bucket, proteksi rate limit route tracking resi publik, validasi biner magic bytes berkas upload di `server/utils/file-signature.ts`, timing-safe hash webhook Midtrans, paralelisasi kueri ringkasan akun dengan `Promise.all`, guard sesi recovery reset password, serta eliminasi 100% tipe `any` di seluruh basis kode).
 
 ## 📋 Catatan Teknis & Konvensi Wajib
 

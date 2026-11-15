@@ -30,7 +30,8 @@ export default defineEventHandler(async (event) => {
         product:products (
           id,
           name,
-          image_url
+          image_url,
+          stock
         )
       ),
       checkpoints:shipping_checkpoints (

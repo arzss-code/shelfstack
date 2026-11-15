@@ -226,7 +226,11 @@ export function useCheckoutOrder() {
         saveAddress(buildAddressSavePayload(address.value)).catch(() => {})
       }
 
-      if (config.public?.enableMidtrans) {
+      const isMidtransEnabled = Boolean(
+        config.public?.enableMidtransSandbox || config.public?.enableMidtrans,
+      )
+
+      if (isMidtransEnabled) {
         const toOrder = () => router.push(`/orders/${orderId}`)
         await launchSnapPayment(orderId, {
           onSuccess: toOrder,

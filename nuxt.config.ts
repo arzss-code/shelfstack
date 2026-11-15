@@ -77,6 +77,7 @@ export default defineNuxtConfig({
         'https://shelfstack.atsiilaarya.me',
       supportEmail: process.env.SUPPORT_EMAIL || 'support@shelfstack.atsiilaarya.me',
       enableMidtransSandbox: process.env.NUXT_PUBLIC_ENABLE_MIDTRANS_SANDBOX === 'true',
+      enableMidtrans: process.env.NUXT_PUBLIC_ENABLE_MIDTRANS_SANDBOX === 'true',
       midtransClientKey: process.env.NUXT_PUBLIC_MIDTRANS_CLIENT_KEY || '',
       midtransSnapUrl:
         process.env.NUXT_PUBLIC_MIDTRANS_SNAP_URL ||
@@ -225,6 +226,15 @@ export default defineNuxtConfig({
       security: {
         rateLimiter: {
           tokensPerInterval: 15,
+          interval: 60000,
+        },
+      },
+    },
+    // Public tracking lookup: prevent IDOR enumeration and scraping
+    '/api/tracking/**': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 20,
           interval: 60000,
         },
       },
