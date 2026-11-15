@@ -13,4 +13,4 @@ Disallow: /api/
 Disallow: /checkout
 Disallow: /orders/
 
-Sitemap: https://shelfstack.id/sitemap.xml
+Sitemap: https://shelfstack.atsiilaarya.me/sitemap.xml

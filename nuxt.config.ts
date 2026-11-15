@@ -65,7 +65,17 @@ export default defineNuxtConfig({
     resendApiKey: process.env.RESEND_API_KEY || '',
     emailFrom: process.env.EMAIL_FROM || 'ShelfStack <noreply@shelfstack.atsiilaarya.me>',
     emailProvider: process.env.EMAIL_PROVIDER || '',
+    appUrl:
+      process.env.APP_URL ||
+      process.env.NUXT_PUBLIC_SITE_URL ||
+      'https://shelfstack.atsiilaarya.me',
+    supportEmail: process.env.SUPPORT_EMAIL || 'support@shelfstack.atsiilaarya.me',
     public: {
+      siteUrl:
+        process.env.NUXT_PUBLIC_SITE_URL ||
+        process.env.APP_URL ||
+        'https://shelfstack.atsiilaarya.me',
+      supportEmail: process.env.SUPPORT_EMAIL || 'support@shelfstack.atsiilaarya.me',
       enableMidtransSandbox: process.env.NUXT_PUBLIC_ENABLE_MIDTRANS_SANDBOX === 'true',
       midtransClientKey: process.env.NUXT_PUBLIC_MIDTRANS_CLIENT_KEY || '',
       midtransSnapUrl:

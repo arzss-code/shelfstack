@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
       .eq('user_id', thread.customer_id)
       .maybeSingle()
 
-    let customerEmail = 'customer@shelfstack.id'
+    let customerEmail = 'customer@shelfstack.atsiilaarya.me'
     try {
       const { data: userData } = await (client as any).auth.admin.getUserById(thread.customer_id)
       if (userData?.user?.email) {

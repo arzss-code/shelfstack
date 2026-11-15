@@ -48,9 +48,30 @@ export function generateEmailSubject(type: TransactionalEmailType, order: { id: 
   }
 }
 
-export function generateEmailHtml(type: TransactionalEmailType, order: EmailOrderData): string {
+export interface EmailHtmlOptions {
+  appUrl?: string
+  supportEmail?: string
+}
+
+export function generateEmailHtml(
+  type: TransactionalEmailType,
+  order: EmailOrderData,
+  options?: EmailHtmlOptions,
+): string {
   const shortId = order.id.slice(0, 8).toUpperCase()
   const customerName = order.customer_name || 'Pelanggan Setia'
+
+  const rawAppUrl =
+    options?.appUrl ||
+    (typeof process !== 'undefined' &&
+      (process.env?.APP_URL || process.env?.NUXT_PUBLIC_SITE_URL)) ||
+    'https://shelfstack.atsiilaarya.me'
+  const appUrl = rawAppUrl.replace(/\/+$/, '')
+
+  const supportEmail =
+    options?.supportEmail ||
+    (typeof process !== 'undefined' && process.env?.SUPPORT_EMAIL) ||
+    'support@shelfstack.atsiilaarya.me'
 
   let bannerTitle = 'Konfirmasi Pemesanan'
   let bannerDesc =
@@ -238,7 +259,7 @@ export function generateEmailHtml(type: TransactionalEmailType, order: EmailOrde
           <!-- Action Button CTA -->
           <tr>
             <td align="center" style="padding: 0 32px 32px 32px;">
-              <a href="https://shelfstack.co.id/orders/${order.id}" target="_blank" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 600; padding: 12px 28px; border-radius: 8px;">
+              <a href="${appUrl}/orders/${order.id}" target="_blank" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 600; padding: 12px 28px; border-radius: 8px;">
                 Buka Rincian Pesanan
               </a>
             </td>
@@ -249,7 +270,7 @@ export function generateEmailHtml(type: TransactionalEmailType, order: EmailOrde
             <td style="background-color: #f1f5f9; padding: 20px 32px; text-align: center; border-top: 1px solid #e2e8f0;">
               <p style="margin: 0; font-size: 11px; color: #94a3b8; line-height: 1.5;">
                 Email ini dikirim secara otomatis oleh sistem ShelfStack.<br>
-                Jika Anda memiliki pertanyaan, hubungi tim kami di <a href="mailto:support@shelfstack.co.id" style="color: #64748b; text-decoration: underline;">support@shelfstack.co.id</a>.
+                Jika Anda memiliki pertanyaan, hubungi tim kami di <a href="mailto:${supportEmail}" style="color: #64748b; text-decoration: underline;">${supportEmail}</a>.
               </p>
               <p style="margin: 8px 0 0 0; font-size: 10px; color: #cbd5e1;">&copy; 2026 ShelfStack Indonesia. Hak cipta dilindungi.</p>
             </td>

@@ -18,8 +18,18 @@ export interface DispatchEmailOptions {
   apiKey?: string
   fromEmail?: string
   recipientEmail?: string
+  appUrl?: string
+  supportEmail?: string
   fetchImpl?: typeof fetch
   timeoutMs?: number
+}
+
+export interface DispatchOrderEmailOptions {
+  customerEmail?: string
+  apiKey?: string
+  appUrl?: string
+  supportEmail?: string
+  fetchImpl?: typeof fetch
 }
 
 export interface EmailDispatchResult {

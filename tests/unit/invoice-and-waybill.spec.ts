@@ -108,7 +108,7 @@ describe('Logistics Vector Generator', () => {
 
   describe('renderQrCodeSvg', () => {
     it('menghasilkan matriks 21x21 QR code deterministik dengan finder patterns', () => {
-      const svg = renderQrCodeSvg('https://shelfstack.co.id/tracking?order_id=ord-123', {
+      const svg = renderQrCodeSvg('https://shelfstack.atsiilaarya.me/tracking?order_id=ord-123', {
         size: 68,
       })
       expect(svg).toContain('<svg xmlns="http://www.w3.org/2000/svg"')

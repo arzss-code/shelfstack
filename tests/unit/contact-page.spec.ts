@@ -63,7 +63,7 @@ describe('Contact Page (app/pages/contact.vue)', () => {
     })
 
     const text = wrapper.text()
-    expect(text).toContain('support@shelfstack.id')
+    expect(text).toContain('support@shelfstack.atsiilaarya.me')
     expect(text).toContain('Semarang, Jawa Tengah 50181')
     expect(text).toContain('Senin - Jumat 09:00 - 18:00 WIB')
 

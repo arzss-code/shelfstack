@@ -74,7 +74,7 @@ describe('ProductSocialShare.vue', () => {
     expect(decodeURIComponent(openedUrl)).toContain('Headphone Studio ANC')
     expect(decodeURIComponent(openedUrl)).toContain(formatRupiah(sampleProduct.price))
     expect(decodeURIComponent(openedUrl)).toContain(
-      'https://shelfstack.co.id/product/headphone-studio-anc',
+      'https://shelfstack.atsiilaarya.me/product/headphone-studio-anc',
     )
   })
 
@@ -96,7 +96,7 @@ describe('ProductSocialShare.vue', () => {
 
     expect(writeTextMock).toHaveBeenCalledTimes(1)
     expect(writeTextMock).toHaveBeenCalledWith(
-      'https://shelfstack.co.id/product/headphone-studio-anc',
+      'https://shelfstack.atsiilaarya.me/product/headphone-studio-anc',
     )
     expect(mockToastAdd).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -150,7 +150,7 @@ describe('ProductSocialShare.vue', () => {
     expect(shareMock).toHaveBeenCalledWith({
       title: 'Headphone Studio ANC',
       text: 'Beli Headphone Studio ANC di ShelfStack',
-      url: 'https://shelfstack.co.id/product/headphone-studio-anc',
+      url: 'https://shelfstack.atsiilaarya.me/product/headphone-studio-anc',
     })
   })
 })

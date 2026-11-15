@@ -53,7 +53,7 @@ mockNuxtImport('useSupabaseClient', () => () => mockSupabaseClient)
 const isLoggedInRef = ref(true)
 const userRef = ref<{ id: string; email: string } | null>({
   id: 'cust-uuid-1',
-  email: 'customer@shelfstack.id',
+  email: 'customer@shelfstack.atsiilaarya.me',
 })
 const profileRef = ref<{ id: string; full_name: string; role: 'customer' | 'admin' } | null>({
   id: 'cust-uuid-1',
@@ -75,7 +75,7 @@ describe('Challenger M3.2: Realtime Deduplication, Channel Teardown, Unread Coun
     stateStore.clear()
     channelCallbacks.onCallback = null
     isLoggedInRef.value = true
-    userRef.value = { id: 'cust-uuid-1', email: 'customer@shelfstack.id' }
+    userRef.value = { id: 'cust-uuid-1', email: 'customer@shelfstack.atsiilaarya.me' }
     profileRef.value = { id: 'cust-uuid-1', full_name: 'Customer Testing', role: 'customer' }
   })
 

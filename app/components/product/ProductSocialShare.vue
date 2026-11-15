@@ -20,8 +20,16 @@ const currentUrl = computed(() => {
   ) {
     return window.location.href
   }
+  let siteUrl = 'https://shelfstack.atsiilaarya.me'
+  try {
+    const config = useRuntimeConfig()
+    if (config?.public?.siteUrl) siteUrl = String(config.public.siteUrl)
+  } catch {
+    // Fallback for isolated unit tests
+  }
+  siteUrl = siteUrl.replace(/\/+$/, '')
   const identifier = props.product.slug || props.product.id
-  return `https://shelfstack.co.id/product/${identifier}`
+  return `${siteUrl}/product/${identifier}`
 })
 
 const shareMessage = computed(() => {

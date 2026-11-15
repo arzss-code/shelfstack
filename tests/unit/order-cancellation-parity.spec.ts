@@ -254,7 +254,7 @@ describe('Order Cancellation Transactional Parity & Shared Product Schema', () =
       const wrapper = mount(UiInput, {
         props: {
           id: 'email',
-          modelValue: 'pembeli@shelfstack.id',
+          modelValue: 'pembeli@shelfstack.atsiilaarya.me',
           type: 'email',
           autocomplete: 'email',
         },
