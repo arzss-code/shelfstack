@@ -2,6 +2,32 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.26] - 2026-11-16
+
+### Implementasi Toolbar Kategori, Mode Tampilan Compact List, dan Sinkronisasi State Etalase
+
+- **Toolbar Halaman Kategori (`app/components/category/CategoryToolbar.vue`)**:
+  - Menyediakan bilah kendali navigasi khusus untuk halaman kategori publik (`/c/[slug]`).
+  - Dilengkapi counter dinamis total produk per kategori, toggle chip filter stok "Hanya Tersedia" berbasis `UiBadge`, dropdown sortir `UiSelect` 5 opsi (Terbaru, Harga Terendah, Harga Tertinggi, Rating Tertinggi, Paling Populer), serta tombol switcher mode tampilan Grid (`pi-th-large`) vs List (`pi-bars`).
+- **Komponen Tampilan Kartu Kompak (`ProductCompactCard.vue`, `ProductCompactList.vue`)**:
+  - Mengimplementasikan `ProductCompactCard.vue` berformat horizontal dengan thumbnail produk 96x96px (`NuxtImg`), badge ketersediaan stok (`UiBadge`), rating bintang dan review count, format harga rupiah, badge diskon hemat persentase, wishlist inline button, dan tombol aksi cepat `Tambah ke Bag` menggunakan `UiButton`.
+  - Mengimplementasikan `ProductCompactList.vue` sebagai orkestrator kontainer list dengan integrasi loading skeleton (`UiSkeleton`), penanganan kondisi kosong (`UiEmptyState`), dan rendering daftar produk terstruktur.
+- **Modernisasi Reaktif Halaman Kategori (`app/pages/c/[slug].vue`)**:
+  - Mentransformasikan halaman kategori yang sebelumnya statis menjadi dinamis dan interaktif.
+  - Mendukung sinkronisasi state 2 arah ke query parameter URL (`?sort=...&stock=...&view=...`) agar tautan dapat dibagikan dengan konsistensi filter yang terjaga.
+  - Menambahkan pagination interaktif "Muat Lebih Banyak" berbasis batch 24 produk per pemanggilan.
+- **Ekspansi Mode List ke Etalase Utama (`app/pages/katalog.vue`, `KatalogToolbar.vue`, `useKatalogFilters.ts`)**:
+  - Menghubungkan toggle `viewMode` ('grid' | 'list') di `KatalogToolbar.vue` berdampingan dengan pengatur kepadatan kolom.
+  - Memperluas composable `useKatalogFilters.ts` dengan penanganan state `viewMode` dan sinkronisasi otomatis ke query URL.
+- **Suite Pengujian Unit Komprehensif (`tests/unit/category-page-and-compact-list.spec.ts`)**:
+  - Menambahkan 8 unit tests menguji interaksi `CategoryToolbar`, render `ProductCompactList`, layout `ProductCompactCard`, dan reaktivitas `useKatalogFilters`.
+  - Memperbarui `tests/unit/category-slug-page.spec.ts` dengan mock `useRouter` untuk mendukung navigasi query URL.
+- **Verifikasi Kualitas**:
+  - `pnpm lint`: 0 error, 0 warning.
+  - `pnpm typecheck`: EXIT 0 (0 compilation errors).
+  - `pnpm exec vitest run`: 131 berkas tes / 1.256 pengujian lolos 100%.
+  - `pnpm build`: EXIT 0 (Client dan Nitro server production bundle berhasil di-compile tanpa peringatan kritis).
+
 ## [v1.1.0-beta.25] - 2026-11-15
 
 ### Remediasi Audit Komprehensif: Sinkronisasi Transaksi, Hardening Keamanan, dan Optimasi SSR

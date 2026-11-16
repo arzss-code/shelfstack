@@ -31,6 +31,7 @@ export function useKatalogFilters() {
   const selectedSort = ref((route.query.sort as string) || 'featured')
   const currentPage = ref(parseInt((route.query.page as string) || '1', 10) || 1)
   const gridDensity = ref<'compact' | 'spacious'>('compact')
+  const viewMode = ref<'grid' | 'list'>((route.query.view as 'grid' | 'list') || 'grid')
   const showMobileFilterModal = ref(false)
   const itemsPerPage = 12
 
@@ -84,6 +85,7 @@ export function useKatalogFilters() {
     if (inStockOnly.value) query.stock_status = 'in_stock'
     if (selectedRating.value !== 'all') query.rating = selectedRating.value
     if (selectedSort.value !== 'featured') query.sort = selectedSort.value
+    if (viewMode.value !== 'grid') query.view = viewMode.value
     if (currentPage.value > 1) query.page = String(currentPage.value)
 
     router.replace({ query })
@@ -226,6 +228,7 @@ export function useKatalogFilters() {
     selectedSort,
     currentPage,
     gridDensity,
+    viewMode,
     showMobileFilterModal,
     itemsPerPage,
     queryParams,

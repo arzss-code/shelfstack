@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 27 (Pengerasan Sistem & Remediasi Audit Kritis: Midtrans Snap, Expiry Sync, Flash Deals DB, Magic Bytes, & Zero Any Strict Typing)**
-- **Versi Rilis:** `v1.1.0-beta.24` (Pre-release Staging / develop aktif : sinkron dengan `version.json` dan `package.json`)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 130 file / 1.248 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Sprint Aktif:** **Sprint 28 (Modernisasi Halaman Kategori, Toolbar Interaktif, & Mode Tampilan Compact List)**
+- **Versi Rilis:** `v1.1.0-beta.26` (Pre-release Staging / develop aktif : sinkron dengan `version.json` dan `package.json`)
+- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 131 file / 1.256 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm build` EXIT 0 · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -421,6 +421,8 @@ Berikut adalah pencatatan resmi fitur etalase dan operasional yang saat ini **be
     - Status: ✅ **SELESAI 2026-11-15** (Endpoint `POST /api/admin/products/[id]/restock` dengan validasi Zod kuantitas positif dan catatan pengadaan, mutasi atomik stok produk, pencatatan double-entry ledger ke `public.stock_movements` dan `public.activity_logs`, komponen `QuickRestockForm.vue` terintegrasi pada `StockMovementsModal.vue`, reaktivitas instan pada tabel katalog admin, serta 9 unit test di `tests/unit/admin-quick-restock.spec.ts`).
 21. ~~**Pengerasan Sistem & Remediasi Audit Kritis (Sprint 27)**~~:
     - Status: ✅ **SELESAI 2026-11-15** (Perbaikan typo `enableMidtransSandbox` di checkout untuk mengaktifkan kembali popup Snap Midtrans otomatis, sinkronisasi batas waktu pembatalan otomatis pesanan menjadi 120 menit seragam di BullMQ config dan docker-compose, integrasi database promo `public.flash_deals` pada `server/utils/flash-sale.ts` dan `supabase/seed.sql`, pencegahan hardcoded stok 99 pada fitur beli lagi di `useOrderDetail.ts`, pemulihan SSR SEO PDP dengan `useAsyncData`, migrasi anti-memory leak pada rate limiter token bucket, proteksi rate limit route tracking resi publik, validasi biner magic bytes berkas upload di `server/utils/file-signature.ts`, timing-safe hash webhook Midtrans, paralelisasi kueri ringkasan akun dengan `Promise.all`, guard sesi recovery reset password, serta eliminasi 100% tipe `any` di seluruh basis kode).
+22. ~~**Toolbar Kategori Interaktif, Mode Tampilan Compact List & Penyelarasan Etalase (Sprint 28 / Klaster 3 Item 3)**~~:
+    - Status: ✅ **SELESAI 2026-11-16** (Modernisasi halaman `/c/[slug]` dengan `CategoryToolbar.vue`, filter chip Stok Tersedia berbasis `UiBadge`, dropdown sortir `UiSelect` 5 opsi, pagination interaktif "Muat Lebih Banyak", dan sinkronisasi 2 arah URL parameter `?sort=...&stock=...&view=...`; implementasi kartu horizontal kompak `ProductCompactCard.vue` dengan thumbnail 96x96px, badge stok, rating bintang, harga format rupiah, badge diskon hemat, dan tombol aksi `Tambah ke Bag` via `UiButton`; implementasi kontainer `ProductCompactList.vue` dengan loading skeleton `UiSkeleton` dan `UiEmptyState`; integrasi mode tampilan Grid vs List di `app/pages/katalog.vue`, `KatalogToolbar.vue`, dan `useKatalogFilters.ts`; serta 8 unit test di `tests/unit/category-page-and-compact-list.spec.ts`, total 131 file / 1.256 tests lolos 100%).
 
 ## 📋 Catatan Teknis & Konvensi Wajib
 
