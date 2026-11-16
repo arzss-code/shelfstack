@@ -2,6 +2,7 @@
 import { useCategories } from '~/composables/useCategories'
 import { useKatalogFilters } from '~/composables/useKatalogFilters'
 import ProductList from '~/features/products/components/ProductList.vue'
+import ProductCompactList from '~/features/products/components/ProductCompactList.vue'
 import KatalogToolbar from '~/components/katalog/KatalogToolbar.vue'
 import KatalogSidebar from '~/components/katalog/KatalogSidebar.vue'
 import KatalogActiveFilters from '~/components/katalog/KatalogActiveFilters.vue'
@@ -28,6 +29,7 @@ const {
   selectedSort,
   currentPage,
   gridDensity,
+  viewMode,
   showMobileFilterModal,
   itemsPerPage,
   queryParams,
@@ -140,10 +142,12 @@ onMounted(async () => {
       :selected-sort="selectedSort"
       :sort-options="sortOptions"
       :grid-density="gridDensity"
+      :view-mode="viewMode"
       :active-filters-count="activeFiltersCount"
       @update:search-query="handleSearchUpdate"
       @update:selected-sort="handleSortUpdate"
       @update:grid-density="gridDensity = $event"
+      @update:view-mode="viewMode = $event"
       @open-mobile-filter="showMobileFilterModal = true"
       @clear-search="clearSearch"
     />
@@ -187,10 +191,19 @@ onMounted(async () => {
 
       <section class="lg:col-span-9 space-y-6">
         <ProductList
+          v-if="viewMode === 'grid'"
           :products="products"
           :loading="pending"
           :is-searching="activeFiltersCount > 0"
           :density="gridDensity"
+          hide-actions
+          @reset-filters="resetAllFilters"
+        />
+        <ProductCompactList
+          v-else
+          :products="products"
+          :loading="pending"
+          :is-searching="activeFiltersCount > 0"
           hide-actions
           @reset-filters="resetAllFilters"
         />

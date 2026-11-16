@@ -6,7 +6,7 @@ import UiBadge from '../../app/components/ui/UiBadge.vue'
 import UiButton from '../../app/components/ui/UiButton.vue'
 import UiEmptyState from '../../app/components/ui/UiEmptyState.vue'
 
-const { mockRoute, mockSeoMeta, mockAsyncData } = await vi.hoisted(async () => {
+const { mockRoute, mockRouter, mockSeoMeta, mockAsyncData } = await vi.hoisted(async () => {
   const { reactive, ref } = await import('vue')
   return {
     mockRoute: reactive({
@@ -14,6 +14,10 @@ const { mockRoute, mockSeoMeta, mockAsyncData } = await vi.hoisted(async () => {
       query: {},
       path: '/c/tech',
     }),
+    mockRouter: {
+      replace: vi.fn(),
+      push: vi.fn(),
+    },
     mockSeoMeta: vi.fn(),
     mockAsyncData: vi.fn(() => ({
       data: ref({
@@ -44,6 +48,7 @@ mockNuxtImport(
       ref(init ? init() : undefined),
 )
 mockNuxtImport('useRoute', () => () => mockRoute)
+mockNuxtImport('useRouter', () => () => mockRouter)
 mockNuxtImport('useSeoMeta', () => mockSeoMeta)
 mockNuxtImport('useAsyncData', () => mockAsyncData)
 
