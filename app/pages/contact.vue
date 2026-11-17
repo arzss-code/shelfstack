@@ -100,10 +100,14 @@ const handleSubmit = async () => {
 
   isLoading.value = true
   try {
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    const res = await $fetch<{ status: string; message: string }>('/api/contact', {
+      method: 'POST',
+      body: form.value,
+    }).catch(() => null)
+
     toast.show({
       title: 'Pesan Terkirim',
-      message: 'Tim dukungan ShelfStack akan merespons dalam 1x24 jam kerja.',
+      message: res?.message || 'Tim dukungan ShelfStack akan merespons dalam 1x24 jam kerja.',
       tone: 'success',
     })
     form.value = {
@@ -114,6 +118,12 @@ const handleSubmit = async () => {
       message: '',
     }
     errors.value = {}
+  } catch {
+    toast.show({
+      title: 'Gagal Mengirim Pesan',
+      message: 'Terjadi kendala jaringan. Silakan coba kembali atau gunakan live chat bantuan.',
+      tone: 'error',
+    })
   } finally {
     isLoading.value = false
   }

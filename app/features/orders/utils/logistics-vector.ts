@@ -4,6 +4,8 @@
  * Zero external runtime dependencies.
  */
 
+import { encodeQrMatrix } from './qr-encoder'
+
 // Code 128 pattern table (module widths for 107 symbols: 6 widths per pattern + stop code)
 const CODE128_PATTERNS: readonly string[] = [
   '212222',
@@ -201,76 +203,17 @@ export interface QrSvgOptions {
 }
 
 /**
- * Generate a deterministic 21x21 QR code matrix SVG with standard finder patterns.
+ * Generate standard ISO/IEC 18004 QR code matrix SVG with Reed-Solomon Error Correction.
  * Designed for invoice verification and logistics package validation.
  */
 export function renderQrCodeSvg(payloadText: string, options: QrSvgOptions = {}): string {
   const size = options.size ?? 80
-  const matrixSize = 21
-  const matrix: boolean[] = new Array(matrixSize * matrixSize).fill(false)
+  const { size: matrixSize, modules } = encodeQrMatrix(payloadText || ' ')
 
-  const setModule = (r: number, c: number, val: boolean) => {
-    if (r >= 0 && r < matrixSize && c >= 0 && c < matrixSize) {
-      matrix[r * matrixSize + c] = val
-    }
-  }
-
-  const getModule = (r: number, c: number): boolean => {
-    return matrix[r * matrixSize + c] === true
-  }
-
-  // 1. Draw 7x7 Finder Pattern with 1-module separator
-  const placeFinder = (startX: number, startY: number) => {
-    for (let r = 0; r < 7; r++) {
-      for (let c = 0; c < 7; c++) {
-        const isOuterBorder = r === 0 || r === 6 || c === 0 || c === 6
-        const isInnerCore = r >= 2 && r <= 4 && c >= 2 && c <= 4
-        setModule(startY + r, startX + c, isOuterBorder || isInnerCore)
-      }
-    }
-  }
-
-  placeFinder(0, 0) // Top-Left
-  placeFinder(14, 0) // Top-Right
-  placeFinder(0, 14) // Bottom-Left
-
-  // 2. Timing Patterns (alternating black and white at row 6 and col 6)
-  for (let i = 7; i < 14; i++) {
-    setModule(6, i, i % 2 === 0)
-    setModule(i, 6, i % 2 === 0)
-  }
-
-  // 3. Deterministic hash-based data encoding for data modules
-  let hash = 0
-  for (let i = 0; i < payloadText.length; i++) {
-    hash = (hash << 5) - hash + payloadText.charCodeAt(i)
-    hash |= 0
-  }
-
-  const isReserved = (r: number, c: number): boolean => {
-    if (r < 9 && c < 9) return true // Top-left + separator
-    if (r < 9 && c >= 13) return true // Top-right + separator
-    if (r >= 13 && c < 9) return true // Bottom-left + separator
-    if (r === 6 || c === 6) return true // Timing patterns
-    return false
-  }
-
-  let bitIndex = 0
-  for (let r = 0; r < matrixSize; r++) {
-    for (let c = 0; c < matrixSize; c++) {
-      if (!isReserved(r, c)) {
-        const derivedBit = ((hash >> (bitIndex % 31)) ^ (r * 7 + c * 13)) % 2 !== 0
-        setModule(r, c, derivedBit)
-        bitIndex++
-      }
-    }
-  }
-
-  // 4. Build SVG Rectangles
   const rects: string[] = []
   for (let r = 0; r < matrixSize; r++) {
     for (let c = 0; c < matrixSize; c++) {
-      if (getModule(r, c)) {
+      if (modules[r]![c]) {
         rects.push(`<rect x="${c}" y="${r}" width="1" height="1" fill="currentColor" />`)
       }
     }

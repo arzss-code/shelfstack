@@ -215,6 +215,18 @@ const handleCardClick = () => {
           </UiButton>
 
           <UiButton
+            v-if="['paid', 'shipped', 'completed'].includes(order.status)"
+            :to="`/orders/${order.id}/invoice`"
+            variant="ghost"
+            size="sm"
+            icon="pi-print"
+            class="hidden sm:inline-flex text-brand-muted hover:text-brand-ink"
+            title="Lihat Faktur Penjualan"
+          >
+            Invoice
+          </UiButton>
+
+          <UiButton
             :to="`/orders/${order.id}`"
             variant="secondary"
             size="sm"

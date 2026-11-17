@@ -1,11 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
+import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import ContactPage from '~/pages/contact.vue'
 import UiSelect from '~/components/ui/UiSelect.vue'
 
-const { mockShowToast } = vi.hoisted(() => ({
+const { mockShowToast, mockFetch } = vi.hoisted(() => ({
   mockShowToast: vi.fn(),
+  mockFetch: vi.fn(),
 }))
+
+mockNuxtImport('$fetch', () => mockFetch)
 
 vi.mock('~/composables/useUiToast', () => ({
   useUiToast: () => ({
@@ -49,10 +53,15 @@ describe('Contact Page (app/pages/contact.vue)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.useFakeTimers()
+    mockFetch.mockResolvedValue({
+      status: 'success',
+      message: 'Tim dukungan ShelfStack akan merespons dalam 1x24 jam kerja.',
+    })
   })
 
   afterEach(() => {
     vi.useRealTimers()
+    vi.unstubAllGlobals()
   })
 
   it('merender saluran resmi, informasi layanan, dan tombol tautan cepat ke /help dan /tracking', () => {

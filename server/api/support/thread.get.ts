@@ -2,6 +2,8 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { requireUser } from '~~/server/utils/auth'
 import { errorResponse, successResponse } from '~~/server/utils/response'
+import { getSupportOrder } from '~~/server/utils/support-order'
+import type { SupportMessageItem } from '~~/shared/schemas/support-chat'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -68,23 +70,9 @@ export default defineEventHandler(async (event) => {
       return errorResponse(event, 'Gagal memuat pesan bantuan.', messagesError.message, 500)
     }
 
-    let attachedOrder = null
-    if (thread.attached_order_id) {
-      const { data: orderData } = await client
-        .from('orders')
-        .select('id, total_cents, status, created_at')
-        .eq('id', thread.attached_order_id)
-        .maybeSingle()
-
-      if (orderData) {
-        attachedOrder = {
-          id: orderData.id,
-          order_number: `ORD-${orderData.id.slice(0, 8).toUpperCase()}`,
-          total_cents: orderData.total_cents,
-          status: orderData.status,
-        }
-      }
-    }
+    const attachedOrder = thread.attached_order_id
+      ? await getSupportOrder(client, targetUserId, thread.attached_order_id)
+      : null
 
     let attachedProduct = null
     if (thread.attached_product_id) {
@@ -105,7 +93,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const messages = (rawMessages || []).reverse().map((m) => {
-      const enriched = { ...m } as any
+      const enriched: SupportMessageItem = { ...m }
       if (m.attachment_type === 'order_card' && attachedOrder) {
         enriched.attached_order = attachedOrder
       } else if (m.attachment_type === 'product_card' && attachedProduct) {

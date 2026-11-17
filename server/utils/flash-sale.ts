@@ -131,29 +131,18 @@ export async function getActiveFlashSaleCampaign(
       }
     }
   } catch {
-    // Fail-open: lanjutkan ke kalkulasi deterministik jika query tabel gagal
+    // Fail-safe: jika query tabel gagal, kembalikan kampanye non-aktif tanpa promo sintetis
   }
 
-  // 2. Fallback deterministik jika database belum memiliki flash deals fisik
-  const { data: products } = await client
-    .from('products')
-    .select('id, name, slug, price, price_cents, stock, image_url, is_featured, sold_count')
-    .is('deleted_at', null)
-    .gt('stock', 0)
-    .order('is_featured', { ascending: false })
-    .order('sold_count', { ascending: false })
-    .limit(6)
-
-  const items: FlashDealItem[] = (products || []).map((p, idx) => buildFlashDealItem(p, idx))
-
+  // Jika tidak ada promo flash sale aktif di database, jangan buat diskon sintetis (Audit 3.2)
   const campaignDate = startsAt.slice(0, 10)
   return {
     id: `flash-sale-${campaignDate}`,
     title: 'Flash Sale Hari Ini',
     tagline: 'Koleksi kurasi eksklusif dengan harga promo terbatas. Stok diperbarui otomatis.',
     ends_at: endsAt,
-    is_active: isActive,
-    items,
+    is_active: false,
+    items: [],
   }
 }
 

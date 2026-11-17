@@ -107,21 +107,27 @@ describe('Logistics Vector Generator', () => {
   })
 
   describe('renderQrCodeSvg', () => {
-    it('menghasilkan matriks 21x21 QR code deterministik dengan finder patterns', () => {
-      const svg = renderQrCodeSvg('https://shelfstack.atsiilaarya.me/tracking?order_id=ord-123', {
+    it('menghasilkan matriks QR code deterministik dengan format SVG valid dan finder patterns', () => {
+      const svg = renderQrCodeSvg('https://shelfstack.atsiilaarya.me/tracking?q=ord-123', {
         size: 68,
       })
       expect(svg).toContain('<svg xmlns="http://www.w3.org/2000/svg"')
-      expect(svg).toContain('viewBox="0 0 21 21"')
       expect(svg).toContain('width="68"')
       expect(svg).toContain('height="68"')
       expect(svg).toContain('<rect')
     })
 
-    it('menerapkan kelas kustom dan ukuran default yang ditentukan', () => {
+    it('menghasilkan matriks 21x21 untuk teks pendek dan menerapkan kelas kustom', () => {
       const svg = renderQrCodeSvg('TEST-QR', { className: 'custom-qr-class' })
       expect(svg).toContain('class="custom-qr-class"')
+      expect(svg).toContain('viewBox="0 0 21 21"')
       expect(svg).toContain('width="80"')
+    })
+
+    it('menghasilkan matriks SVG berbeda untuk URL dengan akhiran berbeda (pencegahan collision Aa vs BB)', () => {
+      const svgAa = renderQrCodeSvg('https://shelfstack.atsiilaarya.me/tracking?q=ord-Aa')
+      const svgBb = renderQrCodeSvg('https://shelfstack.atsiilaarya.me/tracking?q=ord-BB')
+      expect(svgAa).not.toBe(svgBb)
     })
   })
 })

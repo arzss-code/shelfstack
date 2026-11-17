@@ -128,3 +128,17 @@ export function buildDeliveredShippingCheckpoints(
     },
   ]
 }
+
+/**
+ * Menyensor nama penerima di dalam teks deskripsi checkpoint publik
+ */
+export function maskCheckpointDescription(description: string, rawRecipientName?: string): string {
+  if (!description) return ''
+  let sanitized = description
+  if (rawRecipientName && rawRecipientName.trim().length > 1) {
+    const rawTrimmed = rawRecipientName.trim()
+    const masked = maskRecipientName(rawTrimmed)
+    sanitized = sanitized.replaceAll(rawTrimmed, masked)
+  }
+  return sanitized
+}

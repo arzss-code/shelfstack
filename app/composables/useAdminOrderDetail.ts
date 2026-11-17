@@ -219,6 +219,29 @@ export function useAdminOrderDetail(orderId: string) {
     }
   }
 
+  const simulatingTracking = ref(false)
+  const handleSimulateTracking = async () => {
+    if (simulatingTracking.value) return
+    simulatingTracking.value = true
+    try {
+      const res = await $fetch<{ message: string }>(
+        `/api/admin/orders/${orderId}/simulate-tracking`,
+        { method: 'POST', body: { mode: 'all' } },
+      )
+      toast.show({ title: 'Simulasi Berhasil', message: res.message, tone: 'success' })
+      await fetchOrderDetail()
+    } catch (err: unknown) {
+      const fetchErr = err as { data?: { message?: string } }
+      toast.show({
+        title: 'Gagal Simulasi',
+        message: fetchErr.data?.message || 'Gagal memproses simulasi perjalanan kurir.',
+        tone: 'error',
+      })
+    } finally {
+      simulatingTracking.value = false
+    }
+  }
+
   onMounted(() => {
     fetchOrderDetail()
   })
@@ -227,6 +250,8 @@ export function useAdminOrderDetail(orderId: string) {
     order,
     loading,
     updating,
+    simulatingTracking,
+    handleSimulateTracking,
     errorMessage,
     isConfirmModalOpen,
     targetStatus,

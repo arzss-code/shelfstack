@@ -11,6 +11,7 @@ import {
   buildDeliveredShippingCheckpoints,
   buildInitialShippingCheckpoints,
   generateTrackingNumber,
+  maskCheckpointDescription,
   maskRecipientName,
   maskRecipientPhone,
 } from '../../server/utils/shipping'
@@ -142,5 +143,12 @@ describe('Shipping Utilities & Generator Logic', () => {
     expect(cps[1]?.status).toBe('delivered')
     expect(cps[1]?.description).toContain('Arya Setiawan')
     expect(cps[1]?.location).toBe('Bandung')
+  })
+
+  it('menyensor nama penerima di dalam deskripsi checkpoint untuk endpoint publik', () => {
+    const rawDesc = 'Paket telah diterima dengan baik di alamat tujuan oleh Arya Setiawan.'
+    const maskedDesc = maskCheckpointDescription(rawDesc, 'Arya Setiawan')
+    expect(maskedDesc).toContain('Arya S***')
+    expect(maskedDesc).not.toContain('Arya Setiawan')
   })
 })

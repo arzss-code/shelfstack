@@ -4,6 +4,7 @@ import { sendSupportMessageSchema } from '~~/shared/schemas/support-chat'
 import { requireUser } from '~~/server/utils/auth'
 import { errorResponse, successResponse } from '~~/server/utils/response'
 import { WELCOME_BOT_MESSAGE } from '~~/server/utils/support-chat'
+import { getSupportOrder } from '~~/server/utils/support-order'
 
 type SupportThreadUpdate = Database['public']['Tables']['support_threads']['Update']
 
@@ -25,6 +26,13 @@ export default defineEventHandler(async (event) => {
 
     const payload = parsed.data
     const client = serverSupabaseServiceRole<Database>(event)
+    const attachedOrder = payload.attached_order_id
+      ? await getSupportOrder(client, targetUserId, payload.attached_order_id)
+      : null
+
+    if (payload.attached_order_id && !attachedOrder) {
+      return errorResponse(event, 'Pesanan tidak ditemukan.', null, 404)
+    }
 
     let { data: thread } = await client
       .from('support_threads')
@@ -109,23 +117,6 @@ export default defineEventHandler(async (event) => {
 
     if (insertError) {
       return errorResponse(event, 'Gagal mengirim pesan bantuan.', insertError.message, 500)
-    }
-
-    let attachedOrder = null
-    if (payload.attached_order_id) {
-      const { data: ord } = await client
-        .from('orders')
-        .select('id, total_cents, status, created_at')
-        .eq('id', payload.attached_order_id)
-        .maybeSingle()
-      if (ord) {
-        attachedOrder = {
-          id: ord.id,
-          order_number: `ORD-${ord.id.slice(0, 8).toUpperCase()}`,
-          total_cents: ord.total_cents,
-          status: ord.status,
-        }
-      }
     }
 
     let attachedProduct = null
