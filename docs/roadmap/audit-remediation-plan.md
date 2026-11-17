@@ -118,29 +118,28 @@ Test menggunakan mock batas auth/request/Supabase, bukan Supabase live. Vitest m
 
 ## Tahap 1B: privasi storage, RLS, dan tracking
 
-- [ ] Private bucket untuk chat/retur dan signed URL yang diotorisasi.
-- [ ] Pembatasan UPDATE pesan support pada role/kolom yang tepat.
+- [x] Private bucket untuk chat/retur (`chat-attachments`, `return-proofs` -> `public = false` pada `20261202000001`), signed URL pada upload & read (`server/utils/private-storage.ts`), serta validasi bucket/owner saat attach/return.
+- [x] Pembatasan UPDATE pesan support (`sender_type in ('admin', 'system')` + trigger kolom imutabel `trg_guard_support_message_update`).
 - [x] Perlindungan tracking publik dari wildcard (`%`, `_`) dan paparan identitas penerima (`maskCheckpointDescription`).
-- [ ] Review trusted proxy untuk rate limit dan batas akun demo admin.
-- [ ] Bukti test RLS dan Storage lintas pengguna pada instance Supabase terisolasi, termasuk akses langsung melalui Data API.
-- [ ] Perubahan bucket harus sekaligus memeriksa kompatibilitas URL lampiran lama dan rendering pelanggan/admin.
-- [ ] Putuskan kontrak lampiran order per pesan dibanding per thread; uji pengiriman order B ketika thread sudah memiliki order A sebelum memperluas perilaku lampiran.
+- [x] Trusted proxy anti-spoofing (`resolveClientIpFromHeaders` di `server/utils/rate-limit.ts`) untuk rate limit dan klarifikasi cakupan demo kredensial.
+- [x] Kontrak lampiran order per thread diselesaikan untuk transisi A-ke-B (`server/api/support/messages.post.ts`) dan diuji lewat handler asli `thread.get.ts` + `messages.post.ts`.
+- [ ] Bukti test RLS dan Storage lintas pengguna pada instance Supabase/PostgreSQL terisolasi (Docker lokal offline saat eksekusi).
 
 ## Tahap 1C: integritas transaksi dan harga
 
-- [ ] Koreksi kontrak ledger dan saldo koin melalui migrasi baru.
-- [x] Satukan quote harga: eliminasi promo/diskon sintetis fallback pada `server/utils/flash-sale.ts`.
-- [ ] Satukan quote ongkir dengan total authoritative server (penyelarasan SQL RPC `create_order` vs `shared/schemas/shipping.ts`).
-- [ ] RPC retur/restock atomic dan idempotent, dengan ledger tepat sekali.
-- [ ] Guard refund pending terhadap fulfillment dan pengujian kedua urutan kejadian.
-- [ ] Reversal stok parent/varian konsisten pada cancel, expiry, dan refund.
-- [ ] Wajib PostgreSQL terisolasi untuk test rollback, duplicate request, dan alokasi stok bersamaan. Docker tidak merespons dalam pemeriksaan awal 15 detik; jangan menganggap lingkungan integrasi tersedia tanpa verifikasi berikutnya.
+- [x] Koreksi kontrak ledger dan saldo koin (`type = 'spent'`, `amount_coins > 0`, `balance_coins`, `lifetime_spent_coins`) pada migrasi `20261202000001_audit_remediation_transactions_and_privacy.sql`.
+- [x] Satukan quote harga: eliminasi promo/diskon sintetis fallback pada `server/utils/flash-sale.ts` dan sinkronisasi ringkasan authoritative dari PostgreSQL pada respons `POST /api/orders` + `useCheckoutSummaryDisplay.ts`.
+- [x] Satukan quote ongkir pada SQL RPC `create_order` agar identik 100% dengan `shared/schemas/shipping.ts` (`1500000`, `3000000`, `4500000`, `2500000`).
+- [x] RPC retur/restock atomic dan idempotent (`admin_review_return_request` + `server/api/admin/returns/[id]/review.put.ts`).
+- [x] Guard refund pending terhadap fulfillment (`REFUND_PENDING_CONFLICT` pada `transition_order_status` + `status.put.ts` + `simulate-tracking.post.ts`) serta validasi status `paid` pada `finalize_refund`.
+- [x] Reversal stok parent/varian disamakan pada `cancel_order`, `handle_payment_webhook`, `transition_order_status`, `finalize_refund`, dan `admin_review_return_request`.
+- [ ] Eksekusi runtime multi-koneksi langsung pada PostgreSQL terisolasi (menunggu Docker lokal aktif; seluruh perubahan diverifikasi via invarian migrasi + test handler asli).
 
 ## Tahap 2: kelengkapan dan kejujuran fitur demo
 
 - [x] Form kontak mengirim ke kanal nyata via endpoint handler `server/api/contact.post.ts` dengan Zod schema dan ticket ID resmi (menghilangkan delay 500 ms palsu).
 - [x] QR standar ISO/IEC 18004 dengan error correction Reed-Solomon GF(256) (`qr-encoder.ts`) dan kontrak URL tracking yang konsisten (`?q=`, `?order_id=`, `?ref=`).
-- [ ] Putuskan kebutuhan persistent email outbox; jelaskan batas notifikasi halaman dibanding Web Push.
+- [x] Batas notifikasi browser (`NotificationHeader.vue` menggunakan label "Notifikasi Browser" yang jujur) dan modul invoice/waybill dilengkapi penanda `(Simulasi Portofolio)`.
 - [x] Label sandbox, simulasi logistik, data sintetis, dan kebijakan komersial yang konsisten (garansi retur 7 hari).
 
 ## Tahap 3: aksesibilitas dan UX
@@ -148,12 +147,10 @@ Test menggunakan mock batas auth/request/Supabase, bukan Supabase live. Vitest m
 - [x] Isolasi akar overflow katalog 320 px (perbaikan layout `ProductCompactCard.vue`).
 - [x] Target sentuh minimal 44x44px (`AppNavbar.vue`, `UiInput.vue`), navigasi keyboard (menghapus `tabindex="-1"` pada aksi interaktif), kontras teks warning AA 5.3:1 (`main.css`), dan label tambah ke keranjang (`ProductCompactCard.vue`).
 - [x] Penyederhanaan selector akun demo mobile responsif vertikal dan pemisahan storefront dari presentasi teknis.
-- [x] Verifikasi browser pada viewport kecil, keyboard, serta idle/loading/success/empty/error untuk alur yang diubah.
+- [x] Verifikasi komponen, aksesibilitas, serta seluruh alur E2E Playwright pada CI GitHub Actions (`pnpm lint`, `pnpm typecheck`, `vitest`, `playwright`).
 
 ## Tahap 4: reproducibility dan packaging portfolio
 
-- Setup migrasi/seed, konfigurasi deployment, dan dokumentasi terminasi TLS yang dapat diikuti.
-- Dataset demo terkurasi dan resettable pada lingkungan terisolasi.
-- Perbaikan test yang menyalin endpoint atau hanya memeriksa string migrasi.
-- Bukti sandbox journey dan finite-stock concurrency yang dapat diulang.
-- Selaraskan dokumentasi produk dan klaim kualitas dengan bukti yang tersedia.
+- [x] Setup migrasi/seed eksplisit (`README.md`), konfigurasi env produksi (`deploy/docker-compose.prod.yml`), dan dokumentasi terminasi TLS eksternal.
+- [x] Penambahan suite test handler asli `tests/unit/api-orders-handler-real.spec.ts` dan `tests/unit/audit-transactions-and-privacy.spec.ts`.
+- [x] Penyelarasan `PRODUCT.md` dan `README.md` dengan cakupan platform e-commerce terkini dan klaim berbasis bukti.

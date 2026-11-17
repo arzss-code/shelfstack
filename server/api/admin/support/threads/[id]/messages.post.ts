@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { Database } from '~/types/database.types'
 import { adminSendSupportMessageSchema } from '~~/shared/schemas/support-chat'
 import { requireAdmin } from '~~/server/utils/auth'
+import { validateOwnedBucketAttachmentUrl } from '~~/server/utils/private-storage'
 import { errorResponse, successResponse } from '~~/server/utils/response'
 
 export default defineEventHandler(async (event) => {
@@ -41,6 +42,17 @@ export default defineEventHandler(async (event) => {
     }
 
     const payload = parseResult.data
+    if (payload.attachment_url) {
+      const validatedAttachment = await validateOwnedBucketAttachmentUrl(
+        client,
+        'chat-attachments',
+        payload.attachment_url,
+        null,
+      )
+      if (!validatedAttachment) {
+        return errorResponse(event, 'URL lampiran tidak valid.', null, 400)
+      }
+    }
 
     const { data: newMessage, error: insertError } = await client
       .from('support_messages')

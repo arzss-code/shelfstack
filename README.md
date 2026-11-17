@@ -5,7 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20%2B%20RLS-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
 [![Fastify & BullMQ](https://img.shields.io/badge/Worker-Fastify%20%2B%20Redis%207%20%2B%20BullMQ-black?logo=fastify&logoColor=white)](https://bullmq.io)
-[![Vitest](<https://img.shields.io/badge/Vitest-100%25%20Passing%20(1248%20tests)-6E9F18?logo=vitest&logoColor=white>)](https://vitest.dev)
+[![Vitest](<https://img.shields.io/badge/Vitest-100%25%20Passing%20(1377%20tests)-6E9F18?logo=vitest&logoColor=white>)](https://vitest.dev)
 
 Aplikasi e-commerce berbasis **Nuxt 4**, **Nitro**, **Supabase (PostgreSQL, Auth, Storage, Realtime)**, **Midtrans Sandbox**, dan worker mikroservis **Fastify + Redis 7 + BullMQ** (`@shelfstack/order-service`).
 
@@ -35,23 +35,23 @@ flowchart LR
 
 ## Sorotan Rekayasa Perangkat Lunak
 
-1. **Integritas Transaksional PostgreSQL (Anti-Overselling)**:
-   Seluruh mutasi stok, alokasi voucher kupon, dan saldo koin loyalitas dieksekusi atomik di dalam fungsi PL/pgSQL `create_order` dengan penguncian baris deterministik (`ORDER BY id FOR UPDATE`). Tidak ada harga, stok, atau diskon yang dipercayakan dari input klien.
+1. **Integritas Transaksional PostgreSQL (Mitigasi Overselling)**:
+   Seluruh mutasi stok, alokasi voucher kupon, dan saldo koin loyalitas dieksekusi atomik di dalam fungsi PL/pgSQL `create_order` dengan penguncian baris deterministik (`ORDER BY product_id ASC FOR UPDATE`). Tidak ada harga, stok, atau diskon yang dipercayakan dari input klien.
 2. **Pemisahan State Machine Pesanan & Pembayaran**:
-   Status pesanan (`pending`, `paid`, `processing`, `shipped`, `completed`, `cancelled`) dan status pembayaran (`unpaid`, `pending`, `paid`, `failed`, `refunded`) dikelola terpisah. Trigger basis data `enforce_order_status_state_machine` memblokir transisi ilegal di luar alur resmi.
+   Status pesanan (`pending`, `paid`, `shipped`, `completed`, `cancelled`, `refunded`) dan status pembayaran (`pending`, `succeeded`, `failed`) dikelola terpisah. Trigger basis data `enforce_order_status_state_machine` dan validasi `REFUND_PENDING_CONFLICT` menjaga transisi tetap konsisten.
 3. **Antrean Pembatalan Asinkron BullMQ + Dead Letter Queue (DLQ)**:
    Saat pesanan dibuat, delayed job 120 menit (`expire-order-<uuid>`) didaftarkan ke antrean Redis BullMQ di `@shelfstack/order-service`. Didukung oleh rekonsiliasi berkala per 5 menit, mekanisme _exponential backoff retry_ (3 kali), dan eskalasi otomatis ke `order-expiry-dlq` jika eksekusi gagal.
 4. **Hardening Keamanan Sisi Server (OWASP Compliance)**:
    - **Timing-Safe Webhook Hash**: Verifikasi tanda tangan Midtrans menggunakan `crypto.timingSafeEqual` untuk mencegah _timing attack_.
-   - **Inspeksi Binary Magic Bytes**: Unggahan berkas retur (RMA) dan lampiran chat divalidasi langsung dari _byte signature_ biner (JPEG, PNG, WebP) untuk menangkal manipulasi MIME header.
-   - **Rate Limiting In-Memory**: Pembatasan kuota token pada endpoint publik (termasuk `/api/tracking/**`) dengan mekanisme pemangkasan _bucket_ berkala untuk mencegah kebocoran memori.
+   - **Inspeksi Binary Magic Bytes & Bucket Privat**: Unggahan berkas retur (`return-proofs`) dan lampiran chat (`chat-attachments`) disimpan di bucket privat, divalidasi langsung dari _byte signature_ biner (JPEG, PNG, WebP) serta folder pemilik, dan diakses melalui signed URL berbatas waktu.
+   - **Rate Limiting & Trusted Proxy**: Pembatasan kuota token pada endpoint sensitif (`auth`, `checkout`, `search`) dengan resolusi IP tahan spoofing header `X-Forwarded-For` serta pemangkasan _bucket_ berkala.
    - **Strict Typing 100%**: 0 penggunaan tipe `: any` di seluruh kode aplikasi dan server.
 5. **Kinerja Web & SSR SEO**:
    - Pengambilan data detail produk (`/product/[id]`) menggunakan `useAsyncData` top-level untuk memastikan tag Open Graph dan Schema.org JSON-LD ter-render utuh pada initial server-rendered HTML.
    - Pemuatan aset tipografi mandiri via `preconnect` tanpa rantai `@import` CSS pemblokir render.
    - Penandaan `fetchpriority="high"` pada citra utama untuk optimalisasi Largest Contentful Paint (LCP).
 6. **Pengujian Beban Terautentikasi (Grafana k6)**:
-   Suite pengujian konkurensi (`pnpm test:load`) dengan injeksi cookie sesi `@supabase/ssr` otomatis membuktikan bahwa sistem tidak mengalami _race condition_ atau _deadlock_ saat puluhan klien berebut kuota stok terbatas secara bersamaan.
+   Suite pengujian konkurensi (`pnpm test:load`) dengan injeksi cookie sesi `@supabase/ssr` otomatis memverifikasi ketahanan sistem di bawah permintaan paralel (termasuk skenario katalog, webhook deduplication, health probe, dan penanganan stok kosong tanpa error HTTP 500 pada pengujian terukur di `docs/engineering/load-testing.md`).
 
 ---
 
@@ -113,15 +113,21 @@ Tersedia tombol pemilih akun instan pada halaman login tanpa perlu memasukkan kr
    pnpm install --frozen-lockfile
    ```
 
-3. Jalankan migrasi dan data awal (menghasilkan 5 kategori kanonik, produk kurasi, voucher, pesanan multi-status, data flash sale, dan akun demo):
+3. Jalankan migrasi skema SQL (`supabase/migrations/`) lalu isi data demo awal (menghasilkan 5 kategori kanonik, produk kurasi, voucher, pesanan multi-status, data flash sale, dan akun demo):
 
    ```bash
-   # Untuk koneksi langsung ke Supabase Cloud:
-   pnpm db:seed
-
-   # Atau untuk stack lokal Supabase Docker:
+   # Opsi A: Stack lokal Supabase Docker (otomatis reset migrasi + seed.sql):
+   pnpm dlx supabase start
+   pnpm dlx supabase db reset
    pnpm db:seed:local
+
+   # Opsi B: Koneksi langsung ke proyek Supabase Cloud:
+   pnpm dlx supabase link --project-ref <project-ref>
+   pnpm dlx supabase db push
+   pnpm db:seed
    ```
+
+   > Catatan akun demo & lingkungan: Seed default menyediakan akun `.local` (`demo-customer@shelfstack.local` / `demo-admin@shelfstack.local` untuk demo lokal), sedangkan runner CI/staging dapat meng-override via variabel lingkungan `E2E_CUSTOMER_EMAIL` / `E2E_ADMIN_EMAIL` (misal akun `.test`). Pembayaran menggunakan Midtrans Sandbox, pelacakan kurir mendukung simulator admin untuk pengujian, dan notifikasi desktop aktif selama tab aplikasi atau Service Worker terdaftar di peramban.
 
 4. Jalankan server pengembangan Nuxt:
 
@@ -148,10 +154,10 @@ Seluruh kode diverifikasi secara otomatis melalui rangkaian pengujian lokal dan 
 | `pnpm lint`                                         | Analisis statis ESLint (root app + server)                  | 0 error, 0 warning                      |
 | `pnpm typecheck`                                    | Pemeriksaan tipe penuh TypeScript via `nuxi typecheck`      | EXIT 0 (0 compilation error)            |
 | `pnpm --filter @shelfstack/order-service typecheck` | Pemeriksaan tipe mikroservis Fastify                        | EXIT 0                                  |
-| `pnpm exec vitest run`                              | Unit & integration tests Nuxt, domain model, dan server API | 130 test files / 1.248 tests lolos 100% |
+| `pnpm exec vitest run`                              | Unit & integration tests Nuxt, domain model, dan server API | 138 test files / 1.377 tests lolos 100% |
 | `pnpm --filter @shelfstack/order-service test`      | Unit tests Fastify, BullMQ delayed queue, dan DLQ replay    | 2 test files / 25 tests lolos 100%      |
 | `pnpm test:e2e`                                     | Pengujian fungsional browser Playwright Chromium            | Skenario checkout dan pelacakan lolos   |
-| `pnpm test:load`                                    | Pengujian beban konkurensi Grafana k6                       | 0 transaksi gagal, 0 overselling        |
+| `pnpm test:load`                                    | Pengujian beban konkurensi Grafana k6                       | Skenario terukur bebas error HTTP 500   |
 | `pnpm build`                                        | Verifikasi kompilasi bundel produksi Nuxt + Nitro           | Build sukses tanpa warning degradasi    |
 
 ---

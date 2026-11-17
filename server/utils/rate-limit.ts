@@ -136,3 +136,61 @@ export function resolveEndpointCategory(
   }
   return null
 }
+
+function normalizeIpAddress(rawIp?: string | null): string {
+  const cleaned = (rawIp || '').trim()
+  if (!cleaned) return ''
+  return cleaned.startsWith('::ffff:') ? cleaned.slice(7) : cleaned
+}
+
+function isPrivateOrLoopbackIp(ip: string): boolean {
+  if (!ip) return false
+  if (ip === '127.0.0.1' || ip === '::1') return true
+  if (ip.startsWith('10.') || ip.startsWith('192.168.')) return true
+  if (ip.startsWith('172.')) {
+    const secondOctet = Number(ip.split('.')[1])
+    return Number.isInteger(secondOctet) && secondOctet >= 16 && secondOctet <= 31
+  }
+  return false
+}
+
+export function isTrustedProxyAddress(
+  remoteAddress?: string | null,
+  trustProxyEnv = process.env.TRUST_PROXY === 'true',
+): boolean {
+  const normalized = normalizeIpAddress(remoteAddress)
+  if (isPrivateOrLoopbackIp(normalized)) return true
+  return trustProxyEnv && Boolean(normalized)
+}
+
+export interface ClientIpHeaderInput {
+  remoteAddress?: string | null
+  xRealIp?: string | null
+  xForwardedFor?: string | null
+  trustProxyEnv?: boolean
+}
+
+/**
+ * Resolve client IP without trusting spoofable X-Forwarded-For prefixes.
+ * Only honors X-Real-IP or the rightmost X-Forwarded-For hop added by a trusted reverse proxy.
+ */
+export function resolveClientIpFromHeaders(input: ClientIpHeaderInput): string {
+  const socketIp = normalizeIpAddress(input.remoteAddress) || '127.0.0.1'
+  if (!isTrustedProxyAddress(input.remoteAddress, input.trustProxyEnv)) {
+    return socketIp
+  }
+
+  const realIp = normalizeIpAddress(input.xRealIp)
+  if (realIp) return realIp
+
+  if (input.xForwardedFor) {
+    const hops = input.xForwardedFor
+      .split(',')
+      .map((part) => normalizeIpAddress(part))
+      .filter(Boolean)
+    const rightmostHop = hops[hops.length - 1]
+    if (rightmostHop) return rightmostHop
+  }
+
+  return socketIp
+}

@@ -1,4 +1,4 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import {
   createReturnRequestSchema,
@@ -10,6 +10,10 @@ import {
   checkReturnWindowEligibility,
   RETURN_SOLUTION_LABELS,
 } from '../../../../utils/return-request'
+import {
+  rehydratePrivateStorageUrl,
+  validateOwnedBucketAttachmentUrl,
+} from '../../../../utils/private-storage'
 import { createNotification } from '../../../../utils/notifications'
 import { logger } from '../../../../utils/logger'
 
@@ -35,6 +39,30 @@ export default defineEventHandler(async (event) => {
     )
   }
   const payload = parseResult.data
+
+  let storageClient = client
+  try {
+    storageClient = serverSupabaseServiceRole<Database>(event)
+  } catch {
+    // Fallback to authenticated client when service role binding is omitted in tests
+  }
+
+  for (const proofUrl of payload.proof_image_urls) {
+    const validPath = await validateOwnedBucketAttachmentUrl(
+      storageClient,
+      'return-proofs',
+      proofUrl,
+      targetUserId,
+    )
+    if (!validPath) {
+      return errorResponse(
+        event,
+        'URL foto bukti retur tidak valid atau bukan milik akun Anda.',
+        null,
+        400,
+      )
+    }
+  }
 
   // 2. Ambil data pesanan dan verifikasi hak kepemilikan
   const { data: order, error: orderError } = await client
@@ -140,8 +168,14 @@ export default defineEventHandler(async (event) => {
     // non-blocking
   }
 
-  return successResponse(
-    'Pengajuan retur berhasil dikirim dan sedang ditinjau tim ShelfStack',
-    createdRequest,
+  const signedProofUrls = await Promise.all(
+    (createdRequest.proof_image_urls || []).map((url) =>
+      rehydratePrivateStorageUrl(storageClient, 'return-proofs', url),
+    ),
   )
+
+  return successResponse('Pengajuan retur berhasil dikirim dan sedang ditinjau tim ShelfStack', {
+    ...createdRequest,
+    proof_image_urls: signedProofUrls.filter((u): u is string => Boolean(u)),
+  })
 })

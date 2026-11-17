@@ -2,6 +2,7 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { requireUser } from '~~/server/utils/auth'
 import { detectImageMagicBytes } from '~~/server/utils/file-signature'
+import { createAuthorizedSignedUrl } from '~~/server/utils/private-storage'
 import { errorResponse, successResponse } from '~~/server/utils/response'
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -65,11 +66,18 @@ export default defineEventHandler(async (event) => {
     }
 
     const { data: urlData } = serviceClient.storage.from('chat-attachments').getPublicUrl(filePath)
+    const signedUrl = await createAuthorizedSignedUrl(
+      serviceClient,
+      'chat-attachments',
+      filePath,
+      urlData.publicUrl,
+      3600,
+    )
 
     return successResponse('Lampiran berhasil diunggah', {
       file_path: filePath,
-      file_url: urlData.publicUrl,
-      url: urlData.publicUrl,
+      file_url: signedUrl,
+      url: signedUrl,
       filename: filePart.filename || `lampiran_${Date.now()}.${ext}`,
       mime_type: mimeType,
       size: filePart.data.length,

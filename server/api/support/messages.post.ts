@@ -5,6 +5,7 @@ import { requireUser } from '~~/server/utils/auth'
 import { errorResponse, successResponse } from '~~/server/utils/response'
 import { WELCOME_BOT_MESSAGE } from '~~/server/utils/support-chat'
 import { getSupportOrder } from '~~/server/utils/support-order'
+import { validateOwnedBucketAttachmentUrl } from '~~/server/utils/private-storage'
 
 type SupportThreadUpdate = Database['public']['Tables']['support_threads']['Update']
 
@@ -26,6 +27,23 @@ export default defineEventHandler(async (event) => {
 
     const payload = parsed.data
     const client = serverSupabaseServiceRole<Database>(event)
+    if (payload.attachment_url) {
+      const validatedAttachment = await validateOwnedBucketAttachmentUrl(
+        client,
+        'chat-attachments',
+        payload.attachment_url,
+        targetUserId,
+      )
+      if (!validatedAttachment) {
+        return errorResponse(
+          event,
+          'URL lampiran tidak valid atau bukan milik akun Anda.',
+          null,
+          400,
+        )
+      }
+    }
+
     const attachedOrder = payload.attached_order_id
       ? await getSupportOrder(client, targetUserId, payload.attached_order_id)
       : null
@@ -71,10 +89,13 @@ export default defineEventHandler(async (event) => {
       }
     } else {
       const updateFields: SupportThreadUpdate = {}
-      if (payload.attached_order_id && !thread.attached_order_id) {
+      if (payload.attached_order_id && thread.attached_order_id !== payload.attached_order_id) {
         updateFields.attached_order_id = payload.attached_order_id
       }
-      if (payload.attached_product_id && !thread.attached_product_id) {
+      if (
+        payload.attached_product_id &&
+        thread.attached_product_id !== payload.attached_product_id
+      ) {
         updateFields.attached_product_id = payload.attached_product_id
       }
       if (Object.keys(updateFields).length > 0) {

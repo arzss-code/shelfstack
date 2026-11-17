@@ -1,3 +1,4 @@
+import { defineEventHandler, getHeader, getMethod, getQuery, readBody } from 'h3'
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { checkoutSchema } from '../../../shared/schemas/order'
@@ -191,7 +192,24 @@ export default defineEventHandler(async (event) => {
       logger.warn('Gagal membuat notifikasi order_created', {}, err)
     })
 
-    return successResponse('Pesanan berhasil dibuat', { order_id: orderId })
+    let orderSummary: Record<string, unknown> | null = null
+    try {
+      const { data: fetchedSummary } = await client
+        .from('orders')
+        .select(
+          'id, total_cents, subtotal_cents, discount_cents, coupon_code, coins_used, coins_discount_cents, shipping_cost_cents, shipping_service',
+        )
+        .eq('id', String(orderId))
+        .maybeSingle()
+      if (fetchedSummary) orderSummary = fetchedSummary
+    } catch {
+      // Optional enrichment fallback for minimal unit test client mocks
+    }
+
+    return successResponse('Pesanan berhasil dibuat', {
+      order_id: orderId,
+      summary: orderSummary,
+    })
   }
 
   return errorResponse(event, 'Metode HTTP tidak diizinkan', null, 405)

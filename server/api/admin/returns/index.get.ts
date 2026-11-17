@@ -2,6 +2,7 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { requireAdmin } from '../../../utils/auth'
 import { errorResponse, successResponse } from '../../../utils/response'
+import { rehydratePrivateStorageUrl } from '../../../utils/private-storage'
 import type { ReturnRequestItem } from '../../../../shared/schemas/return-request'
 
 export default defineEventHandler(async (event) => {
@@ -63,16 +64,24 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // 3. Format hasil return requests
-    let formattedList: ReturnRequestItem[] = returnsList.map((r) => {
-      const ord = orderMap.get(r.order_id)
-      return {
-        ...r,
-        order_number: ord?.order_number || `ORD-${r.order_id.slice(0, 8).toUpperCase()}`,
-        total_price_cents: ord?.total_cents ?? r.refund_amount_cents ?? 0,
-        customer_name: profileMap.get(r.user_id) || 'Pelanggan ShelfStack',
-      } as ReturnRequestItem
-    })
+    // 3. Format hasil return requests + tanda tangani ulang URL bukti retur privat
+    let formattedList: ReturnRequestItem[] = await Promise.all(
+      returnsList.map(async (r) => {
+        const ord = orderMap.get(r.order_id)
+        const signedUrls = await Promise.all(
+          (r.proof_image_urls || []).map((url) =>
+            rehydratePrivateStorageUrl(client, 'return-proofs', url),
+          ),
+        )
+        return {
+          ...r,
+          proof_image_urls: signedUrls.filter((u): u is string => Boolean(u)),
+          order_number: ord?.order_number || `ORD-${r.order_id.slice(0, 8).toUpperCase()}`,
+          total_price_cents: ord?.total_cents ?? r.refund_amount_cents ?? 0,
+          customer_name: profileMap.get(r.user_id) || 'Pelanggan ShelfStack',
+        } as ReturnRequestItem
+      }),
+    )
 
     // 4. Client-side search filter jika search query terisi
     if (searchQuery) {
