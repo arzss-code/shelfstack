@@ -11,6 +11,9 @@ describe('Order Standalone Documents & Tracking Simulator Suite', () => {
     'app/pages/orders/[id]/waybill.vue',
     'app/pages/account/orders.vue',
     'app/features/orders/components/OrderCard.vue',
+    'app/features/orders/components/InvoiceItemsTable.vue',
+    'app/features/orders/components/InvoiceSummaryFooter.vue',
+    'app/features/orders/utils/qr-encoder.ts',
     'app/composables/useAdminOrderDetail.ts',
     'app/pages/admin/orders/[id].vue',
   ]
@@ -38,6 +41,7 @@ describe('Order Standalone Documents & Tracking Simulator Suite', () => {
     const codeFiles = [
       'server/api/admin/orders/[id]/simulate-tracking.post.ts',
       'app/composables/useAdminOrderDetail.ts',
+      'app/features/orders/utils/qr-encoder.ts',
     ]
     for (const rel of codeFiles) {
       const fullPath = path.resolve(root, rel)
