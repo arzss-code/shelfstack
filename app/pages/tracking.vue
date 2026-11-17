@@ -199,9 +199,9 @@ const handleSearch = () => {
   }
 }
 
-// Deep linking support via ?q=xxx
+// Deep linking support via ?q=xxx, ?order_id=xxx, or ?ref=xxx
 onMounted(() => {
-  const queryParam = route.query.q as string
+  const queryParam = ((route.query.q || route.query.order_id || route.query.ref) as string)?.trim()
   if (queryParam) {
     searchQuery.value = queryParam
     executeTrackingSearch(queryParam)

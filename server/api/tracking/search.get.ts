@@ -1,20 +1,30 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { errorResponse, successResponse } from '../../utils/response'
-import { maskRecipientName, maskRecipientPhone } from '../../utils/shipping'
+import {
+  maskCheckpointDescription,
+  maskRecipientName,
+  maskRecipientPhone,
+} from '../../utils/shipping'
 import type { CourierCode } from '../../../shared/schemas/shipping'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
-  const searchQuery = typeof query.q === 'string' ? query.q.trim() : ''
+  const rawQuery = typeof query.q === 'string' ? query.q.trim() : ''
 
-  if (!searchQuery || searchQuery.length < 3) {
+  if (!rawQuery || rawQuery.length < 3 || rawQuery.length > 50) {
     return errorResponse(
       event,
-      'Parameter pencarian (q) minimal 3 karakter nomor resi atau ID pesanan',
+      'Parameter pencarian (q) harus berupa nomor resi atau ID pesanan antara 3 hingga 50 karakter',
       null,
       400,
     )
+  }
+
+  // Sanitasi karakter wildcard SQL (% dan _) untuk mencegah ekspansi enumerasi publik
+  const sanitizedQuery = rawQuery.replace(/[%_]/g, '')
+  if (sanitizedQuery.length < 3) {
+    return errorResponse(event, 'Parameter pencarian mengandung karakter tidak valid', null, 400)
   }
 
   // Gunakan service role agar pengunjung publik dapat melacak resi tanpa wajib login
@@ -26,7 +36,7 @@ export default defineEventHandler(async (event) => {
     .select(
       'id, status, tracking_number, courier_code, courier_name, address, shipped_at, delivered_at, created_at',
     )
-    .ilike('tracking_number', searchQuery)
+    .ilike('tracking_number', sanitizedQuery)
     .limit(1)
 
   const { data: initialOrder, error: orderError } = await dbQuery.maybeSingle()
@@ -35,7 +45,7 @@ export default defineEventHandler(async (event) => {
   // Jika tidak ditemukan via no resi, coba cari via order UUID jika format cocok
   if (!order) {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      searchQuery,
+      sanitizedQuery,
     )
     if (isUuid) {
       const { data: orderById } = await client
@@ -43,7 +53,7 @@ export default defineEventHandler(async (event) => {
         .select(
           'id, status, tracking_number, courier_code, courier_name, address, shipped_at, delivered_at, created_at',
         )
-        .eq('id', searchQuery)
+        .eq('id', sanitizedQuery)
         .maybeSingle()
       order = orderById
     }
@@ -92,7 +102,10 @@ export default defineEventHandler(async (event) => {
     destination_city: destinationCity,
     shipped_at: order.shipped_at,
     delivered_at: order.delivered_at,
-    checkpoints: rawCheckpoints || [],
+    checkpoints: (rawCheckpoints || []).map((cp) => ({
+      ...cp,
+      description: maskCheckpointDescription(cp.description, rawAddress.name),
+    })),
   }
 
   return successResponse('Data pelacakan pengiriman berhasil ditemukan', result)

@@ -32,16 +32,15 @@ const {
 
 <template>
   <article
-    class="product-compact-card group relative flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-card border border-brand-hair bg-brand-canvas hover:border-brand-muted/40 shadow-whisper hover:shadow-floating transition-all duration-200 cursor-pointer overflow-hidden"
+    class="product-compact-card group relative flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-card border border-brand-hair bg-brand-canvas hover:border-brand-muted/40 shadow-whisper hover:shadow-floating transition-all duration-200 cursor-pointer overflow-hidden max-w-full"
     data-testid="product-compact-card"
     @click="navigateToDetail"
   >
-    <!-- Stretched Semantic Link for Accessibility, Hover URL & SEO -->
+    <!-- Stretched Semantic Link for Accessibility, Hover URL & SEO (Tabbable) -->
     <NuxtLink
       :to="`/product/${product.slug || product.id}`"
       class="absolute inset-0 z-0 rounded-card"
       :aria-label="product.name"
-      tabindex="-1"
     />
 
     <!-- Left Media Thumbnail -->
@@ -132,22 +131,22 @@ const {
 
     <!-- Right Price Block & Quick Actions -->
     <div
-      class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-brand-hairsoft z-10"
+      class="flex flex-wrap sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-brand-hairsoft z-10 w-full sm:w-auto"
       @click.stop
     >
-      <div class="text-left sm:text-right">
+      <div class="text-left sm:text-right min-w-0">
         <div class="font-display text-base sm:text-lg font-extrabold text-brand-ink tabular-nums">
           {{ formatRupiah(product.price) }}
         </div>
         <div
           v-if="product.stock > 0 && product.stock <= 3"
-          class="text-[11px] text-brand-warning font-medium"
+          class="text-[11px] text-brand-warning-text font-medium"
         >
           Sisa {{ product.stock }} unit
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <WishlistButton
           v-if="hideActions"
           :product="product"
@@ -162,17 +161,18 @@ const {
           size="sm"
           icon="pi-shopping-bag"
           :loading="justAdded"
-          class="text-xs h-8 px-3"
+          class="text-xs h-8 px-2.5 sm:px-3 whitespace-nowrap"
+          :aria-label="`Tambah ${product.name} ke keranjang`"
           @click.stop="handleQuickAdd"
         >
-          {{ justAdded ? 'Ditambah' : 'Beli' }}
+          {{ justAdded ? 'Ditambah' : '+ Keranjang' }}
         </UiButton>
         <UiButton
           v-else-if="hideActions"
           variant="secondary"
           size="sm"
           disabled
-          class="text-xs h-8 px-3 opacity-60"
+          class="text-xs h-8 px-2.5 sm:px-3 opacity-60 whitespace-nowrap"
         >
           Habis
         </UiButton>

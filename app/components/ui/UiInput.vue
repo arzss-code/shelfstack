@@ -90,8 +90,8 @@ const controlClass = computed(() => {
   const trailing =
     props.rightIcon || (props.showPasswordToggle && props.type === 'password')
       ? props.size === 'sm'
-        ? 'pr-8'
-        : 'pr-10'
+        ? 'pr-10'
+        : 'pr-11'
       : ''
 
   return [
@@ -150,10 +150,11 @@ const controlClass = computed(() => {
       <button
         v-if="showPasswordToggle && type === 'password'"
         type="button"
-        tabindex="-1"
         :class="[
-          'absolute top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-ink transition-colors p-1.5 flex items-center justify-center focus-visible:outline-brand-accent rounded-field',
-          size === 'sm' ? 'right-2' : 'right-2.5',
+          'absolute top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-ink transition-colors flex items-center justify-center focus-visible:outline-brand-accent rounded-field cursor-pointer',
+          size === 'sm'
+            ? 'right-0 w-10 h-10 min-w-[40px] min-h-[40px]'
+            : 'right-0 w-11 h-11 min-w-[44px] min-h-[44px]',
         ]"
         :aria-label="isPasswordVisible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
         @click="isPasswordVisible = !isPasswordVisible"

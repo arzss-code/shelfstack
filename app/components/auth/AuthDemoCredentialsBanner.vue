@@ -39,8 +39,8 @@ function selectRole(role: 'customer' | 'admin') {
       </span>
     </div>
 
-    <!-- Compact Selector Grid (44px min tap target compliant) -->
-    <div class="grid grid-cols-2 gap-1.5 pt-2">
+    <!-- Compact Selector Grid (Vertical on mobile, 2-col on sm+, 44px min tap target) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
       <!-- Role: Pelanggan (Buyer) -->
       <button
         type="button"

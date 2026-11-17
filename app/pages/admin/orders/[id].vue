@@ -25,6 +25,8 @@ const {
   order,
   loading,
   updating,
+  simulatingTracking,
+  handleSimulateTracking,
   errorMessage,
   isConfirmModalOpen,
   targetStatus,
@@ -223,10 +225,22 @@ useSeoMeta({
           <h2 class="font-display text-base font-bold text-brand-ink m-0">
             Linimasa Pengiriman &amp; Ekspedisi
           </h2>
-          <UiButton variant="secondary" size="sm" @click="isAddCheckpointOpen = true">
-            <i class="pi pi-plus text-xs mr-1.5" />
-            Tambah Checkpoint
-          </UiButton>
+          <div class="flex items-center gap-2">
+            <UiButton
+              v-if="order.status === 'shipped'"
+              variant="outline"
+              size="sm"
+              :loading="simulatingTracking"
+              @click="handleSimulateTracking"
+            >
+              <i class="pi pi-play text-xs mr-1" />
+              Simulasi Kurir
+            </UiButton>
+            <UiButton variant="secondary" size="sm" @click="isAddCheckpointOpen = true">
+              <i class="pi pi-plus text-xs mr-1.5" />
+              Tambah Checkpoint
+            </UiButton>
+          </div>
         </div>
         <OrderTrackingTimeline
           :tracking-number="order.tracking_number"

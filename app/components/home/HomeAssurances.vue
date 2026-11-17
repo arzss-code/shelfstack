@@ -40,7 +40,7 @@
           <i class="pi pi-replay text-lg" aria-hidden="true" />
         </div>
         <div>
-          <p class="font-display m-0 text-sm font-bold text-brand-ink">Garansi Retur 30 Hari</p>
+          <p class="font-display m-0 text-sm font-bold text-brand-ink">Garansi Retur 7 Hari</p>
           <p class="font-body m-0 text-xs text-brand-muted mt-0.5">
             Jaminan tukar baru jika barang cacat atau tidak sesuai
           </p>

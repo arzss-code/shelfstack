@@ -160,7 +160,7 @@ describe('Storefront Craft & Copywriting Suite', () => {
 
       expect(text).toContain('100% Produk Original')
       expect(text).toContain('Gratis Ongkir Se-Indonesia')
-      expect(text).toContain('Garansi Retur 30 Hari')
+      expect(text).toContain('Garansi Retur 7 Hari')
       expect(text).toContain('Layanan Bantuan 24/7')
     })
   })

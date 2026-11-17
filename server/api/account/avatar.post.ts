@@ -1,6 +1,7 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { requireUser } from '../../utils/auth'
+import { removeOwnedAvatar } from '../../utils/avatar-storage'
 import { errorResponse, successResponse } from '../../utils/response'
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -91,13 +92,7 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Gagal memperbarui profil pengguna.', updateError, 500)
   }
 
-  // 5. Bersihkan berkas lama dari storage jika ada
-  if (oldAvatarUrl && oldAvatarUrl.includes('/avatars/')) {
-    const oldPath = oldAvatarUrl.split('/avatars/')[1]
-    if (oldPath && oldPath !== filePath) {
-      await serviceClient.storage.from('avatars').remove([oldPath])
-    }
-  }
+  await removeOwnedAvatar(serviceClient, targetUserId, oldAvatarUrl, filePath)
 
   // 6. Selaraskan user_metadata di auth Supabase
   try {

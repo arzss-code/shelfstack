@@ -6,9 +6,10 @@
 
 ## 📌 Status Terkini
 
-- **Sprint Aktif:** **Sprint 28 (Modernisasi Halaman Kategori, Toolbar Interaktif, & Mode Tampilan Compact List)**
-- **Versi Rilis:** `v1.1.0-beta.26` (Pre-release Staging / develop aktif : sinkron dengan `version.json` dan `package.json`)
-- **Baseline Quality Gate (dijalankan aktual):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 131 file / 1.256 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm build` EXIT 0 · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
+- **Pekerjaan aktif:** remediasi audit tahap 1A, isolasi resource pada API support dan cleanup avatar. Implementasi dan unit regression lolos; gate build produksi masih terbuka. Lihat [rencana dan hasil verifikasi](./roadmap/audit-remediation-plan.md).
+- **Sprint rilis terdokumentasi:** **Sprint 28 (Modernisasi Halaman Kategori, Toolbar Interaktif, & Mode Tampilan Compact List)**
+- **Versi rilis terdokumentasi (historis Sprint 28):** `v1.1.0-beta.26`. Remediasi audit tidak mengubah manifest rilis. Working tree saat verifikasi sudah berisi `1.1.0-beta.27` pada `package.json`; ini bukan bukti rilis baru telah dipublikasikan.
+- **Baseline Quality Gate historis Sprint 28 (bukan hasil remediasi audit):** `pnpm lint` 0 error / 0 warning · `nuxi typecheck` EXIT 0 · `vitest run` 131 file / 1.256 test lolos 100% · `order-service` 25 test lolos 100% · `pnpm build` EXIT 0 · `pnpm audit --audit-level=high` EXIT 0 (0 critical, 0 high) · 0 file `.vue` atau `.ts` di `app/`, `server/`, `shared/` melampaui 300 baris (100% patuh SOP).
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -18,6 +19,40 @@
   - PWA / SEO: **PWA Standalone Manifest** (`site.webmanifest`), dynamic XML sitemap (`/sitemap.xml`), robots crawl directives, `Schema.org/Product` JSON-LD rich snippets, dan offline resilience banner.
 
 ---
+
+## Remediasi audit: tahap 1A, 1B (Tracking Privacy), Tahap 2 (Form Kontak & QR Standar), serta Tahap 3 (Aksesibilitas & UI/UX)
+
+**Status:** implementasi dan regresi unit lolos (`pnpm lint` 0 error, `nuxi typecheck` EXIT 0, `vitest run` 136 file / 1.366 test lolos 100%). Snapshot audit awal dipertahankan di [`PROJECT-AUDIT.md`](./PROJECT-AUDIT.md).
+
+- **1A (Isolasi Resource API):** POST support memvalidasi pemilik order sebelum mutasi thread/pesan, dan GET memeriksa ulang lampiran historis sebelum mengembalikan total/status order. Kedua handler avatar hanya melakukan cleanup URL bucket kanonis pada folder pengguna sendiri. Bukti: `server/api/support/messages.post.ts`, `server/utils/support-order.ts`, `server/api/account/avatar.post.ts`, `server/utils/avatar-storage.ts`.
+- **1B (Privasi Tracking Publik):** Sanitasi input pencarian resi publik mencegah enumerasi wildcard SQL (`%` dan `_`), serta penyensoran nama penerima pada riwayat checkpoint publik (`maskCheckpointDescription`). Bukti: `server/api/tracking/search.get.ts`, `server/utils/shipping.ts`, `tests/unit/shipping-tracking.spec.ts`.
+- **2 (Kejujuran Form Kontak & QR Dokumen):** Form kontak terhubung ke endpoint nyata `server/api/contact.post.ts` dengan Zod schema dan ticket ID resmi; generator QR dokumen (`logistics-vector.ts`) ditingkatkan ke encoder QR standar ISO/IEC 18004 dengan koreksi Reed-Solomon GF(256) (`qr-encoder.ts`), menghilangkan tabrakan pola identik URL; deep-linking halaman tracking kini mendukung query param `q`, `order_id`, dan `ref`. Bukti: `server/api/contact.post.ts`, `app/features/orders/utils/qr-encoder.ts`, `app/features/orders/utils/logistics-vector.ts`, `app/pages/tracking.vue`.
+- **3 (Aksesibilitas & UI/UX):**
+  - Aksesibilitas keyboard: toggle password dan link compact card dapat dijangkau via Tab (menghapus `tabindex="-1"`).
+  - Target sentuh mobile: kontrol navigasi dan toggle password diperbesar ke standar minimal 44x44px.
+  - Label aksi jujur: tombol compact card diubah dari 'Beli' menjadi '+ Keranjang'.
+  - Kontras teks WCAG AA: token `--brand-warning` dinaikkan ke rasio kontras 5.3:1 (`#8a5a00`).
+  - Responsiveness: grid selector demo mobile responsif vertikal dan kartu compact list bebas overflow pada viewport 320px.
+  - Konsistensi kebijakan komersial: homepage diselaraskan ke jaminan retur 7 hari sesuai dokumen kebijakan.
+  - Flash sale pricing: penghapusan diskon sintetis fallback jika deal database tidak aktif.
+
+| Verifikasi yang dieksekusi pada batch ini      | Hasil aktual                       |
+| ---------------------------------------------- | ---------------------------------- |
+| `pnpm lint`                                    | EXIT 0, tanpa error/warning ESLint |
+| `pnpm typecheck`                               | EXIT 0                             |
+| `pnpm exec vitest run`                         | 136 file, 1.366 test lolos 100%    |
+| `pnpm --filter @shelfstack/order-service test` | 2 file, 25 test lolos              |
+
+**Batas bukti:** unit test memock batas autentikasi, request, dan Supabase. Tidak menjalankan database/RLS/Storage integration maupun browser/E2E. Vitest menampilkan warning URL/key Supabase tidak tersedia dan sejumlah warning komponen Nuxt pada suite UI. Build menampilkan warning esbuild/oxc, deprecation dependency, dan anotasi Zod. Hasil test lolos bukan bukti bebas warning runtime atau deployment berhasil.
+
+**Known gaps yang tetap terbuka:**
+
+- Bucket chat/retur public, policy UPDATE pesan support, tracking publik, trusted proxy, dan pembatasan demo admin belum diperbaiki pada batch ini.
+- Koin, harga authoritative, restock retur atomic/idempotent, guard refund/fulfillment, dan reversal stok varian menunggu tahap transaksi dengan PostgreSQL terisolasi. Docker tidak merespons pada pemeriksaan awal 15 detik.
+- Cleanup avatar best-effort dapat menyisakan file jika Storage gagal atau URL lama ditolak validator. Batch ini tidak menambahkan retry durable maupun menyelesaikan race upload/update avatar bersamaan.
+- Lampiran order masih berada di level thread. Mengirim order B setelah thread memiliki order A dapat menampilkan B pada respons POST, tetapi A saat GET ulang. Perilaku ini sudah ada sebelum batch ini; membutuhkan keputusan kontrak dan regresi terpisah. Bukti: `server/api/support/messages.post.ts:74`, `server/api/support/thread.get.ts:73`.
+
+Daftar file, acceptance criteria, hasil review, dan urutan tahap berikutnya tersedia pada [`roadmap/audit-remediation-plan.md`](./roadmap/audit-remediation-plan.md). Tidak ada migrasi atau perubahan finansial pada tahap 1A.
 
 ## 🚀 Riwayat Kemajuan per Fase
 

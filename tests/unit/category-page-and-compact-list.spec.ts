@@ -168,6 +168,11 @@ describe('Category Page & Compact List View Suite', () => {
       expect(wrapper.text()).toContain(formatRupiah(sampleProduct.price))
       expect(wrapper.text()).toContain('4.8')
       expect(wrapper.text()).toContain('Tersedia')
+      expect(wrapper.text()).toContain('+ Keranjang')
+
+      // Verifikasi aksesibilitas keyboard: tautan utama tidak diblokir dengan tabindex="-1"
+      const link = wrapper.find('a')
+      expect(link.attributes('tabindex')).toBeUndefined()
     })
   })
 

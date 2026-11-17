@@ -39,7 +39,9 @@ const verificationQrSvg = computed(() => {
     // Fallback for isolated unit tests
   }
   siteUrl = siteUrl.replace(/\/+$/, '')
-  return renderQrCodeSvg(`${siteUrl}/tracking?order_id=${props.order.id}`, { size: 54 })
+  return renderQrCodeSvg(`${siteUrl}/tracking?q=${encodeURIComponent(props.order.id)}`, {
+    size: 54,
+  })
 })
 
 const handlePrint = () => {

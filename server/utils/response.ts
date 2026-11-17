@@ -99,6 +99,7 @@ export function errorResponse(
 
   throw createError({
     statusCode,
+    statusMessage: message,
     message,
     data: {
       status: 'error',

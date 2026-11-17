@@ -2,6 +2,53 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.28] - 2026-11-17
+
+### Standar Encoding QR Code, Deep-Linking Tracking, Remediasi Aksesibilitas, dan Integritas Fitur
+
+- **Encoder QR Code Standar ISO/IEC 18004 (`app/features/orders/utils/qr-encoder.ts`, `logistics-vector.ts`)**:
+  - Mengimplementasikan generator matriks QR Code Byte-Mode standar industri dengan operasi Galois Field GF(256) dan kalkulasi Reed-Solomon Error Correction Code (Level L) murni TypeScript tanpa dependensi eksternal runtime.
+  - Menggantikan generator berbasis 32-bit integer hash pada dokumen invoice dan waybill pengiriman, menghilangkan risiko tabrakan visual dan membuktikan dua URL dengan akhiran berbeda (contoh: `Aa` vs `BB`) menghasilkan keluaran matriks SVG yang berbeda secara deterministik.
+- **Dukungan Deep-Linking Rute Pelacakan Pengiriman (`app/pages/tracking.vue`)**:
+  - Memperluas deteksi query URL pada halaman `/tracking` untuk membaca parameter `q`, `order_id`, dan `ref` secara adaptif sehingga pemindaian kode QR faktur atau tautan eksternal langsung menjalankan pelacakan tanpa gagal hening.
+  - Menyelaraskan URL QR pada modal dan halaman invoice mandiri untuk mengarahkan ke `/tracking?q=<id_pesanan>`.
+- **Peningkatan Aksesibilitas Keyboard, Target Sentuh, dan Kontras UI**:
+  - `ProductCompactCard.vue`: Menghapus `tabindex="-1"` pada link produk, memperbarui label aksi menjadi `+ Keranjang` dengan `aria-label` yang jujur, serta menata ulang layout harga agar bebas overflow pada viewport 320px.
+  - `UiInput.vue`: Menghapus `tabindex="-1"` pada tombol intip kata sandi dan memperbesar area sentuh menjadi 44x44px.
+  - `AppNavbar.vue`: Memperbesar area sentuh mobile trigger hamburger, wishlist, dan keranjang menjadi minimal 44x44px.
+  - `main.css`: Memperbarui token `--brand-warning` menjadi `#8a5a00` dengan rasio kontras 5.3:1 terhadap latar putih (memenuhi standar WCAG 2.1 AA >= 4.5:1).
+  - `AuthDemoCredentialsBanner.vue`: Menjadikan selektor kredensial demo responsif vertikal pada layar mobile.
+- **Kejujuran Fitur Form Kontak dan Konsistensi Kebijakan Komersial**:
+  - `contact.vue` & `server/api/contact.post.ts`: Menghubungkan formulir kontak ke handler API nyata dengan validasi Zod schema (`shared/schemas/contact.ts`) dan pembuatan ID tiket resmi (`CTK-...`).
+  - `HomeAssurances.vue`: Menyelaraskan kebijakan retur menjadi "Garansi Retur 7 Hari" agar konsisten 100% dengan dokumen kebijakan `returns.vue` dan validasi server.
+  - `server/utils/flash-sale.ts`: Menghapus diskon sintetis fallback jika database tidak memiliki promo aktif guna menjaga integritas kalkulasi harga checkout.
+- **Sanitasi Kueri Tracking Publik dan Sensor Privasi**:
+  - `server/api/tracking/search.get.ts` & `server/utils/shipping.ts`: Menambahkan pembersihan karakter wildcard SQL (`%` dan `_`) serta fungsi sensor nama penerima `maskCheckpointDescription` untuk melindungi privasi pelanggan.
+- **Suite Pengujian Unit dan Quality Gate**:
+  - 136 berkas tes dengan 1.366 unit tests lulus 100% (`pnpm exec vitest run`).
+  - 0 error, 0 warning ESLint (`pnpm lint`).
+  - Validasi ketat TypeScript lulus (`nuxi typecheck`).
+
+## [v1.1.0-beta.27] - 2026-11-16
+
+### Dokumen Tagihan Mandiri Cetak, Label Resi Pengiriman Termal, dan Simulator Logistik
+
+- **Dokumen Tagihan Mandiri Cetak (`app/pages/orders/[id]/invoice.vue`)**:
+  - Halaman invoice resmi terisolasi (`/orders/[id]/invoice`) yang siap cetak dan bebas gangguan elemen navigasi aplikasi.
+  - Lengkap dengan rincian identitas entitas bisnis PT ShelfStack Niaga Digital, NPWP, kode verifikasi QR SVG terenkapsulasi, rincian biaya terperinci (subtotal, ongkos kirim, diskon kupon, potongan koin kustom, biaya layanan), dan aturan `@media print` presisi tinggi.
+- **Label Resi Pengiriman Termal Standar Logistik (`app/pages/orders/[id]/waybill.vue`)**:
+  - Halaman cetak label pengiriman termal mandiri (`/orders/[id]/waybill`) dengan ukuran standar industri 100mm x 150mm (format A6).
+  - Dilengkapi kode barcode vektor berbasis SVG, rincian kode sortir hub transit kurir (contoh: JNE-REG-CGK01), data penerima, data pengirim, deskripsi muatan paket, serta instruksi penanganan paket rapuh.
+- **Simulator Pelacakan Logistik Otomatis (`server/api/admin/orders/[id]/simulate-tracking.post.ts`, `useAdminOrderDetail.ts`, `pages/admin/orders/[id].vue`)**:
+  - Endpoint simulator kurir logistik khusus admin untuk mensimulasikan 5 tahapan perjalanan paket secara realistis (`manifested` -> `picked_up` -> `in_transit` -> `out_for_delivery` -> `delivered`).
+  - Terintegrasi langsung dengan RPC database PostgreSQL `transition_order_status` untuk memastikan integritas transaksional status pesanan (`shipped` dan `completed`) serta pembaruan riwayat pelacakan real-time.
+  - Tombol aksi cepat "Simulasi Kurir" di panel admin detail pesanan dengan proteksi loading state dan notifikasi toast.
+- **Penyelarasan Rute Akun & Tombol Aksi Cepat Invoice (`app/pages/account/orders.vue`, `OrderCard.vue`)**:
+  - Menghilangkan potensi 404 pada tautan `/account/orders` melalui rute redirect mulus ke `/orders`.
+  - Tombol pintasan langsung "Invoice" pada kartu pesanan `OrderCard.vue` untuk pesanan berstatus bayar (`paid`, `shipped`, `completed`).
+- **Suite Pengujian Unit Berkas Mandiri & Simulator (`tests/unit/order-standalone-documents-and-simulator.spec.ts`)**:
+  - Menambahkan 8 unit tests komprehensif menguji kepatuhan batas 300 baris, zero em dashes, zero `: any`, rendering vektor dokumen cetak, dan logika simulator logistik.
+
 ## [v1.1.0-beta.26] - 2026-11-16
 
 ### Implementasi Toolbar Kategori, Mode Tampilan Compact List, dan Sinkronisasi State Etalase
