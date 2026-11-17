@@ -1,3 +1,4 @@
+import { defineEventHandler, getRouterParam, H3Error, readBody } from 'h3'
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import {
@@ -8,7 +9,10 @@ import { requireAdmin } from '../../../../utils/auth'
 import { errorResponse, successResponse } from '../../../../utils/response'
 import { createNotification } from '../../../../utils/notifications'
 import { RETURN_STATUS_MAP } from '../../../../utils/return-request'
+import { rehydratePrivateStorageUrl } from '../../../../utils/private-storage'
 import { logger } from '../../../../utils/logger'
+
+type ReturnRequestRow = Database['public']['Tables']['return_requests']['Row']
 
 export default defineEventHandler(async (event) => {
   try {
@@ -20,7 +24,6 @@ export default defineEventHandler(async (event) => {
       return errorResponse(event, 'ID tiket retur tidak valid', null, 400)
     }
 
-    // 1. Validasi body keputusan admin
     const body = await readBody(event)
     const parseResult = adminReviewReturnRequestSchema.safeParse(body)
     if (!parseResult.success) {
@@ -33,87 +36,46 @@ export default defineEventHandler(async (event) => {
     }
     const payload = parseResult.data
 
-    // 2. Ambil tiket retur
-    const { data: ticket, error: ticketError } = await client
-      .from('return_requests')
-      .select('*')
-      .eq('id', returnId)
-      .is('deleted_at', null)
-      .maybeSingle()
+    // Eksekusi review + restock stok & varian atomik via PostgreSQL RPC
+    const { data: rpcData, error: rpcError } = await client.rpc('admin_review_return_request', {
+      p_return_id: returnId,
+      p_status: payload.status,
+      p_admin_notes: payload.admin_notes || null,
+      p_replacement_courier: payload.replacement_courier || null,
+      p_replacement_tracking_number: payload.replacement_tracking_number || null,
+      p_refund_amount_cents: payload.refund_amount_cents ?? null,
+      p_restock_inventory: payload.restock_inventory,
+    })
 
-    if (ticketError) {
-      return errorResponse(event, 'Gagal mengambil data tiket retur', ticketError.message, 500)
-    }
-
-    if (!ticket) {
-      return errorResponse(event, 'Tiket retur tidak ditemukan', null, 404)
-    }
-
-    // 3. Persiapkan payload update
-    const isResolving = payload.status === 'completed' || payload.status === 'rejected'
-    const nowIso = new Date().toISOString()
-
-    const updatePayload: Database['public']['Tables']['return_requests']['Update'] = {
-      status: payload.status,
-      admin_notes: payload.admin_notes || ticket.admin_notes,
-      updated_at: nowIso,
-      resolved_at: isResolving ? nowIso : ticket.resolved_at,
-    }
-
-    if (payload.replacement_courier) updatePayload.replacement_courier = payload.replacement_courier
-    if (payload.replacement_tracking_number) {
-      updatePayload.replacement_tracking_number = payload.replacement_tracking_number
-    }
-    if (payload.refund_amount_cents !== undefined) {
-      updatePayload.refund_amount_cents = payload.refund_amount_cents
-    }
-
-    // 4. Jika selesai dan restock disetujui: kembalikan stok produk ke inventaris
-    if (payload.status === 'completed' && payload.restock_inventory && !ticket.restocked_at) {
-      const { data: orderItems } = await client
-        .from('order_items')
-        .select('product_id, qty')
-        .eq('order_id', ticket.order_id)
-
-      if (orderItems && orderItems.length > 0) {
-        for (const item of orderItems) {
-          const { data: prod } = await client
-            .from('products')
-            .select('id, stock')
-            .eq('id', item.product_id)
-            .single()
-
-          if (prod) {
-            const newStock = prod.stock + item.qty
-            await client.from('products').update({ stock: newStock }).eq('id', item.product_id)
-
-            await client.from('stock_movements').insert({
-              product_id: item.product_id,
-              delta: item.qty,
-              balance_after: newStock,
-              reason: 'return_restock',
-              order_id: ticket.order_id,
-              notes: `Restock pengembalian barang retur tiket ${ticket.id.slice(0, 8)}`,
-            })
-          }
-        }
-        updatePayload.restocked_at = nowIso
+    if (rpcError) {
+      const msg = rpcError.message || 'Gagal memperbarui status tiket retur'
+      if (msg.includes('RETURN_NOT_FOUND')) {
+        return errorResponse(event, 'Tiket retur tidak ditemukan', null, 404)
       }
+      if (msg.includes('FORBIDDEN_NOT_ADMIN')) {
+        return errorResponse(event, 'Akses ditolak', null, 403)
+      }
+      if (msg.includes('INVALID_RETURN_')) {
+        return errorResponse(event, msg, rpcError, 409)
+      }
+      return errorResponse(event, 'Gagal memperbarui status tiket retur', msg, 500)
     }
 
-    // 5. Simpan pembaruan tiket
-    const { data: updatedTicket, error: updateError } = await client
-      .from('return_requests')
-      .update(updatePayload)
-      .eq('id', returnId)
-      .select()
-      .single()
-
-    if (updateError) {
-      return errorResponse(event, 'Gagal memperbarui status tiket retur', updateError.message, 500)
+    const updatedTicket = rpcData as unknown as ReturnRequestRow
+    if (!updatedTicket || !updatedTicket.id) {
+      return errorResponse(event, 'Respons RPC review retur tidak valid', null, 500)
     }
 
-    // 6. Buat notifikasi in-app untuk pelanggan
+    const signedUrls = updatedTicket.proof_image_urls?.length
+      ? (
+          await Promise.all(
+            updatedTicket.proof_image_urls.map((url) =>
+              rehydratePrivateStorageUrl(client, 'return-proofs', url),
+            ),
+          )
+        ).filter((u): u is string => Boolean(u))
+      : []
+
     const statusMeta = RETURN_STATUS_MAP[payload.status as ReturnRequestStatus]
     let notifMessage = statusMeta.description
     if (payload.status === 'rejected' && payload.admin_notes) {
@@ -123,17 +85,16 @@ export default defineEventHandler(async (event) => {
     }
 
     await createNotification(client, {
-      user_id: ticket.user_id,
+      user_id: updatedTicket.user_id,
       title: `Update Tiket Retur: ${statusMeta.label}`,
       message: notifMessage,
       type: 'system',
-      reference_id: ticket.id,
-      reference_url: `/orders/${ticket.order_id}`,
+      reference_id: updatedTicket.id,
+      reference_url: `/orders/${updatedTicket.order_id}`,
     }).catch((err) => {
       logger.warn('[RMA Review] Gagal mengirim notifikasi', {}, err)
     })
 
-    // 7. Audit log
     try {
       await client.from('activity_logs').insert({
         entity_type: 'return_request',
@@ -145,8 +106,17 @@ export default defineEventHandler(async (event) => {
       // non-blocking
     }
 
-    return successResponse('Keputusan tiket retur berhasil disimpan', updatedTicket)
+    return successResponse('Keputusan tiket retur berhasil disimpan', {
+      ...updatedTicket,
+      proof_image_urls: signedUrls,
+    })
   } catch (err: unknown) {
+    if (
+      err instanceof H3Error ||
+      (typeof err === 'object' && err !== null && 'statusCode' in err)
+    ) {
+      throw err
+    }
     const message = err instanceof Error ? err.message : 'Terjadi kesalahan internal'
     return errorResponse(event, message, null, 500)
   }

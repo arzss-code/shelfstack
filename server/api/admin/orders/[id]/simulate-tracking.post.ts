@@ -30,6 +30,15 @@ export default defineEventHandler(async (event) => {
   if (orderErr) return errorResponse(event, 'Gagal mengambil data pesanan', orderErr, 500)
   if (!order) return errorResponse(event, 'Pesanan tidak ditemukan', null, 404)
 
+  if (order.status === 'pending' || order.status === 'cancelled' || order.status === 'refunded') {
+    return errorResponse(
+      event,
+      `Pesanan berstatus ${order.status} tidak dapat disimulasikan pengirimannya`,
+      null,
+      409,
+    )
+  }
+
   const rawAddress = (order.address as { name?: string; city?: string } | null) || {}
   const destinationCity = rawAddress.city || 'Kota Tujuan'
   const courierCode = (order.courier_code as CourierCode) || 'jne'
@@ -38,7 +47,25 @@ export default defineEventHandler(async (event) => {
   let trackingNumber = order.tracking_number
   let currentStatus = order.status
 
-  // 2. Pastikan pesanan memiliki nomor resi dan berstatus shipped
+  // 2. Transisikan status paid -> shipped via RPC dulu (memicu guard REFUND_PENDING_CONFLICT)
+  if (currentStatus === 'paid') {
+    const { error: shipErr } = await client.rpc('transition_order_status', {
+      p_order_id: orderId,
+      p_target_status: 'shipped',
+      p_reason: 'Simulasi pengiriman ekspedisi otomatis oleh admin',
+    })
+    if (shipErr) {
+      return errorResponse(
+        event,
+        shipErr.message || 'Pesanan tidak dapat ditransisikan ke status dikirim',
+        shipErr,
+        409,
+      )
+    }
+    currentStatus = 'shipped'
+  }
+
+  // 3. Pastikan pesanan memiliki nomor resi
   if (!trackingNumber) {
     trackingNumber = generateTrackingNumber(courierCode)
     await client
@@ -48,15 +75,6 @@ export default defineEventHandler(async (event) => {
         shipped_at: new Date().toISOString(),
       })
       .eq('id', orderId)
-  }
-
-  if (currentStatus === 'paid' || currentStatus === 'pending') {
-    await client.rpc('transition_order_status', {
-      p_order_id: orderId,
-      p_target_status: 'shipped',
-      p_reason: 'Simulasi pengiriman ekspedisi otomatis oleh admin',
-    })
-    currentStatus = 'shipped'
   }
 
   // 3. Ambil checkpoint yang sudah ada

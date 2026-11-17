@@ -350,6 +350,7 @@ export type Database = {
       orders: {
         Row: {
           address: Json
+          coins_discount_cents: number
           coins_earned: number
           coins_used: number
           coupon_code: string | null
@@ -379,6 +380,7 @@ export type Database = {
         }
         Insert: {
           address: Json
+          coins_discount_cents?: number
           coins_earned?: number
           coins_used?: number
           coupon_code?: string | null
@@ -408,6 +410,7 @@ export type Database = {
         }
         Update: {
           address?: Json
+          coins_discount_cents?: number
           coins_earned?: number
           coins_used?: number
           coupon_code?: string | null
@@ -1292,6 +1295,18 @@ export type Database = {
           p_gateway_refund_id?: string | null
           p_failure_reason?: string | null
           p_bank_confirmed_at?: string | null
+        }
+        Returns: Json
+      }
+      admin_review_return_request: {
+        Args: {
+          p_return_id: string
+          p_status: string
+          p_admin_notes?: string | null
+          p_replacement_courier?: string | null
+          p_replacement_tracking_number?: string | null
+          p_refund_amount_cents?: number | null
+          p_restock_inventory?: boolean
         }
         Returns: Json
       }

@@ -93,6 +93,7 @@ export interface SupportMessageItem {
     order_number?: string | null
     total_cents: number
     status: string
+    created_at?: string | null
   } | null
   attached_product?: {
     id: number

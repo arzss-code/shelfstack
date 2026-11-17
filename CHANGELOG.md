@@ -2,6 +2,27 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.29] - 2026-11-17
+
+### Penuntasan Remediasi Audit: Transaksi Atomik, Privasi Storage, Trusted Proxy, dan Reproducibility
+
+- **Migrasi Korektif Integritas Transaksi & Privasi (`supabase/migrations/20261202000001_audit_remediation_transactions_and_privacy.sql`)**:
+  - Menetapkan bucket `chat-attachments` dan `return-proofs` menjadi privat (`public = false`) beserta kebijakan `SELECT` terotorisasi pada `storage.objects`.
+  - Menambahkan trigger `trg_guard_support_message_update` dan pembatasan policy UPDATE pada `support_messages` agar pelanggan hanya dapat menandai read receipt pesan admin/system tanpa dapat mengubah isi pesan.
+  - Menyelaraskan `create_order` dan `cancel_order` dengan skema koin loyalitas resmi (`balance_coins`, `lifetime_spent_coins`, `type = 'spent'`, nominal `amount_coins > 0`) serta menyamakan tarif ongkir RPC dengan `shared/schemas/shipping.ts` (`Rp15k`, `Rp30k`, `Rp45k`, `Rp25k`).
+  - Memasang guard `REFUND_PENDING_CONFLICT` pada transisi `paid -> shipped` di `transition_order_status` dan validasi status `paid` pada `finalize_refund`.
+  - Menyamakan pengembalian stok parent dan varian produk di seluruh jalur pembatalan, kedaluwarsa webhook, refund, dan retur.
+  - Menambahkan RPC `admin_review_return_request` untuk keputusan retur dan restock inventaris secara atomik dan idempoten.
+- **Privasi Signed URL, Validasi Kepemilikan Lampiran, & Pembaruan Order Thread (`server/utils/private-storage.ts`, `support/*`, `returns/*`)**:
+  - Menerbitkan signed URL berbatas waktu saat unggah serta melakukan validasi kepemilikan bucket/folder dan re-signing saat pembacaan thread support maupun daftar retur.
+  - Memperbaiki pembaruan `attached_order_id` transisi order A-ke-B yang terotorisasi pada `support/messages.post.ts`, serta mengeliminasi seluruh sisa type cast `as any` di handler pesan dan status order.
+- **Trusted Proxy Anti-Spoofing & Ringkasan Checkout Authoritative (`rate-limit.ts`, `orders/index.ts`, `useCheckoutSummaryDisplay.ts`)**:
+  - Memperbarui resolusi IP client rate limiter (`resolveClientIpFromHeaders`) agar mengabaikan header `X-Forwarded-For` palsu dari peer non-proxy dan hanya mempercayai `X-Real-IP` atau hop terakhir dari proxy tepercaya.
+  - Mengembalikan ringkasan biaya otoritatif PostgreSQL dari `POST /api/orders` ke snapshot konfirmasi checkout, serta merombak `server/api/admin/returns/[id]/review.put.ts` untuk memanggil RPC atomik baru dengan propagasi error `H3Error` yang benar.
+- **Modularisasi Invoice, Reproducibility Deployment, dan Suite Pengujian Handler Asli**:
+  - Memisahkan `InvoiceItemsTable.vue` (48 baris) dan `InvoiceSummaryFooter.vue` (79 baris) agar `app/pages/orders/[id]/invoice.vue` (228 baris) konsisten di bawah batas 300 baris setelah Prettier.
+  - Melengkapi `deploy/docker-compose.prod.yml`, memutakhirkan `PRODUCT.md` dan `README.md`, serta menambahkan suite test handler asli `tests/unit/api-orders-handler-real.spec.ts` dan `tests/unit/audit-transactions-and-privacy.spec.ts`.
+
 ## [v1.1.0-beta.28] - 2026-11-17
 
 ### Standar Encoding QR Code, Deep-Linking Tracking, Remediasi Aksesibilitas, dan Integritas Fitur

@@ -1,8 +1,9 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { requireUser } from '../../../../utils/auth'
 import { errorResponse, successResponse } from '../../../../utils/response'
 import { checkReturnWindowEligibility } from '../../../../utils/return-request'
+import { rehydratePrivateStorageUrl } from '../../../../utils/private-storage'
 
 export default defineEventHandler(async (event) => {
   const orderId = getRouterParam(event, 'id')
@@ -49,15 +50,34 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Gagal mengambil data tiket retur', returnError.message, 500)
   }
 
-  // 4. Hitung eligibilitas jendela retur
+  // 4. Hitung eligibilitas jendela retur dan tanda tangani ulang URL bukti privat
   const eligibility = checkReturnWindowEligibility({
     status: order.status,
     completed_at: order.updated_at,
   })
 
+  let hydratedReturn = returnRequest
+  if (returnRequest && returnRequest.proof_image_urls?.length) {
+    let storageClient = client
+    try {
+      storageClient = serverSupabaseServiceRole<Database>(event)
+    } catch {
+      // Fallback for unit test environment
+    }
+    const signedUrls = await Promise.all(
+      returnRequest.proof_image_urls.map((url) =>
+        rehydratePrivateStorageUrl(storageClient, 'return-proofs', url),
+      ),
+    )
+    hydratedReturn = {
+      ...returnRequest,
+      proof_image_urls: signedUrls.filter((u): u is string => Boolean(u)),
+    }
+  }
+
   return successResponse('Data retur pesanan berhasil diambil', {
     order_id: orderId,
     eligibility,
-    return_request: returnRequest || null,
+    return_request: hydratedReturn || null,
   })
 })

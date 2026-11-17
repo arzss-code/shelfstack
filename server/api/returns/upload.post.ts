@@ -2,6 +2,7 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { requireUser } from '../../utils/auth'
 import { detectImageMagicBytes } from '../../utils/file-signature'
+import { createAuthorizedSignedUrl } from '../../utils/private-storage'
 import { errorResponse, successResponse } from '../../utils/response'
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -66,11 +67,18 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Gagal mengunggah foto bukti retur.', uploadError.message, 500)
   }
 
-  // Dapatkan URL publik file
+  // Dapatkan signed URL privat terotorisasi (fallback ke publicUrl jika mock tidak menyediakan signer)
   const { data: urlData } = serviceClient.storage.from('return-proofs').getPublicUrl(filePath)
+  const signedUrl = await createAuthorizedSignedUrl(
+    serviceClient,
+    'return-proofs',
+    filePath,
+    urlData.publicUrl,
+    3600,
+  )
 
   return successResponse('Foto bukti berhasil diunggah', {
     file_path: filePath,
-    file_url: urlData.publicUrl,
+    file_url: signedUrl,
   })
 })

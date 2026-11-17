@@ -1,4 +1,9 @@
-import { globalRateLimiter, RATE_LIMIT_RULES, resolveEndpointCategory } from '../utils/rate-limit'
+import {
+  globalRateLimiter,
+  RATE_LIMIT_RULES,
+  resolveClientIpFromHeaders,
+  resolveEndpointCategory,
+} from '../utils/rate-limit'
 
 export default defineEventHandler((event) => {
   const path = event.path?.split('?')[0] || ''
@@ -10,19 +15,14 @@ export default defineEventHandler((event) => {
   const rule = RATE_LIMIT_RULES[category]
   if (!rule) return
 
-  // Ekstrak alamat IP klien secara aman dari proxy headers
+  // Ekstrak alamat IP klien secara aman tanpa mempercayai prefix spoofing klien
   let clientIp: string
   try {
-    const xForwardedFor = getHeader(event, 'x-forwarded-for')
-    if (xForwardedFor) {
-      clientIp = xForwardedFor.split(',')[0]?.trim() || '127.0.0.1'
-    } else {
-      clientIp =
-        getHeader(event, 'cf-connecting-ip') ||
-        getHeader(event, 'x-real-ip') ||
-        event.node?.req?.socket?.remoteAddress ||
-        '127.0.0.1'
-    }
+    clientIp = resolveClientIpFromHeaders({
+      remoteAddress: event.node?.req?.socket?.remoteAddress,
+      xRealIp: getHeader(event, 'x-real-ip'),
+      xForwardedFor: getHeader(event, 'x-forwarded-for'),
+    })
   } catch {
     clientIp = '127.0.0.1'
   }

@@ -9,6 +9,7 @@ import {
   useCheckoutSummaryDisplay,
   createCheckoutPlacedSnapshot,
   type PlacedOrderSnapshot,
+  type ServerOrderSummary,
 } from '~/composables/useCheckoutSummaryDisplay'
 import type { UserAddress } from '~~/shared/schemas/address'
 import { type ShippingService, calculateShippingFee } from '~~/shared/schemas/shipping'
@@ -201,7 +202,10 @@ export function useCheckoutOrder() {
       })
 
       const idempotencyKey = getOrCreateCheckoutKey()
-      const response = await $fetch<{ status: string; data: { order_id: string } }>('/api/orders', {
+      const response = await $fetch<{
+        status: string
+        data: { order_id: string; summary?: ServerOrderSummary | null }
+      }>('/api/orders', {
         method: 'POST',
         headers: { 'Idempotency-Key': idempotencyKey },
         body: orderPayload,
@@ -217,6 +221,7 @@ export function useCheckoutOrder() {
         shippingFeeCents: shippingFeeCents.value,
         isFreeShipping: isFreeShipping.value,
         shippingService: selectedShippingService.value,
+        serverSummary: response.data.summary ?? null,
       })
       isOrderPlaced.value = true
       checkoutIdempotencyKey.value = ''

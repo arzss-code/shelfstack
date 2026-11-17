@@ -3,6 +3,7 @@ import type { Database } from '~/types/database.types'
 import { requireUser } from '~~/server/utils/auth'
 import { errorResponse, successResponse } from '~~/server/utils/response'
 import { getSupportOrder } from '~~/server/utils/support-order'
+import { rehydratePrivateStorageUrl } from '~~/server/utils/private-storage'
 import type { SupportMessageItem } from '~~/shared/schemas/support-chat'
 
 export default defineEventHandler(async (event) => {
@@ -92,27 +93,32 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const messages = (rawMessages || []).reverse().map((m) => {
-      const enriched: SupportMessageItem = { ...m }
-      if (m.attachment_type === 'order_card' && attachedOrder) {
-        enriched.attached_order = attachedOrder
-      } else if (m.attachment_type === 'product_card' && attachedProduct) {
-        enriched.attached_product = attachedProduct
-      } else if (
-        attachedOrder &&
-        m.sender_type === 'customer' &&
-        m.message_text.includes('Pesanan')
-      ) {
-        enriched.attached_order = attachedOrder
-      } else if (
-        attachedProduct &&
-        m.sender_type === 'customer' &&
-        m.message_text.includes('Produk')
-      ) {
-        enriched.attached_product = attachedProduct
-      }
-      return enriched
-    })
+    const messages = await Promise.all(
+      (rawMessages || []).reverse().map(async (m) => {
+        const attachmentUrl = m.attachment_url
+          ? await rehydratePrivateStorageUrl(client, 'chat-attachments', m.attachment_url)
+          : null
+        const enriched: SupportMessageItem = { ...m, attachment_url: attachmentUrl }
+        if (m.attachment_type === 'order_card' && attachedOrder) {
+          enriched.attached_order = attachedOrder
+        } else if (m.attachment_type === 'product_card' && attachedProduct) {
+          enriched.attached_product = attachedProduct
+        } else if (
+          attachedOrder &&
+          m.sender_type === 'customer' &&
+          m.message_text.includes('Pesanan')
+        ) {
+          enriched.attached_order = attachedOrder
+        } else if (
+          attachedProduct &&
+          m.sender_type === 'customer' &&
+          m.message_text.includes('Produk')
+        ) {
+          enriched.attached_product = attachedProduct
+        }
+        return enriched
+      }),
+    )
 
     return successResponse('Thread bantuan berhasil dimuat', {
       thread,

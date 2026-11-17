@@ -58,7 +58,8 @@ export default defineEventHandler(async (event) => {
       errorMsg.includes('INVALID_ORDER_TRANSITION') ||
       errorMsg.includes('ADMIN_PAYMENT_OVERRIDE_DISABLED') ||
       errorMsg.includes('DIRECT_STATUS_MUTATION_FORBIDDEN') ||
-      errorMsg.includes('TERMINAL_ORDER_STATE')
+      errorMsg.includes('TERMINAL_ORDER_STATE') ||
+      errorMsg.includes('REFUND_PENDING_CONFLICT')
     ) {
       return errorResponse(event, errorMsg, rpcError, 409)
     }
@@ -147,8 +148,9 @@ export default defineEventHandler(async (event) => {
         // 2. Generate checkpoint delivered jika pesanan memiliki resi
         const activeTrackingNumber = orderData.tracking_number || (body?.tracking_number as string)
         if (activeTrackingNumber) {
-          const recipientName = (orderData.address as any)?.name || 'Penerima'
-          const destinationCity = (orderData.address as any)?.city || 'Kota Tujuan'
+          const parsedAddress = orderData.address as { name?: string; city?: string } | null
+          const recipientName = parsedAddress?.name || 'Penerima'
+          const destinationCity = parsedAddress?.city || 'Kota Tujuan'
           const deliveredCheckpoints = buildDeliveredShippingCheckpoints(
             orderId,
             activeTrackingNumber,

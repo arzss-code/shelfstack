@@ -5,6 +5,17 @@ import type { CartItem, useCartStore } from '~/features/cart/stores/cart'
 
 export type PlacedOrderSnapshot = ReturnType<typeof createPlacedOrderSnapshot<CartItem>>
 
+export interface ServerOrderSummary {
+  total_cents: number
+  subtotal_cents?: number | null
+  discount_cents?: number | null
+  coupon_code?: string | null
+  coins_used?: number | null
+  coins_discount_cents?: number | null
+  shipping_cost_cents?: number | null
+  shipping_service?: string | null
+}
+
 export function createCheckoutPlacedSnapshot(params: {
   cartStore: ReturnType<typeof useCartStore>
   actualCoinsUsed: number
@@ -12,6 +23,7 @@ export function createCheckoutPlacedSnapshot(params: {
   shippingFeeCents: number
   isFreeShipping: boolean
   shippingService: string
+  serverSummary?: ServerOrderSummary | null
 }): PlacedOrderSnapshot {
   const {
     cartStore,
@@ -20,22 +32,46 @@ export function createCheckoutPlacedSnapshot(params: {
     shippingFeeCents,
     isFreeShipping,
     shippingService,
+    serverSummary,
   } = params
 
-  return createPlacedOrderSnapshot({
+  const authSubtotal = serverSummary?.subtotal_cents ?? null
+  const authDiscount = serverSummary?.discount_cents ?? null
+  const authCoinsUsed = serverSummary?.coins_used ?? actualCoinsUsed
+  const authCoinsDiscount = serverSummary?.coins_discount_cents ?? coinsDiscountCents
+  const authShippingCost = serverSummary?.shipping_cost_cents ?? shippingFeeCents
+  const authFreeShipping =
+    serverSummary?.shipping_cost_cents !== undefined && serverSummary?.shipping_cost_cents !== null
+      ? serverSummary.shipping_cost_cents === 0
+      : isFreeShipping
+
+  const snapshot = createPlacedOrderSnapshot({
     items: cartStore.items,
     totalItems: cartStore.totalItems,
-    formattedTotalPrice: cartStore.formattedTotalPrice,
-    discountCents: cartStore.discountCents,
-    formattedDiscountAmount: cartStore.formattedDiscountAmount,
-    couponCode: cartStore.appliedCoupon?.code,
-    actualCoinsUsed,
-    isFreeShipping,
-    shippingFeeCents,
-    shippingService,
+    formattedTotalPrice:
+      authSubtotal !== null ? formatRupiah(authSubtotal / 100) : cartStore.formattedTotalPrice,
+    discountCents: authDiscount ?? cartStore.discountCents,
+    formattedDiscountAmount:
+      authDiscount !== null && authDiscount > 0
+        ? formatRupiah(authDiscount / 100)
+        : cartStore.formattedDiscountAmount,
+    couponCode: serverSummary?.coupon_code ?? cartStore.appliedCoupon?.code,
+    actualCoinsUsed: authCoinsUsed,
+    isFreeShipping: authFreeShipping,
+    shippingFeeCents: authShippingCost,
+    shippingService: serverSummary?.shipping_service || shippingService,
     finalPriceCents: cartStore.finalPriceCents,
-    coinsDiscountCents,
+    coinsDiscountCents: authCoinsDiscount,
   })
+
+  if (serverSummary && typeof serverSummary.total_cents === 'number') {
+    return {
+      ...snapshot,
+      finalPriceFormatted: formatRupiah(serverSummary.total_cents / 100),
+    }
+  }
+
+  return snapshot
 }
 
 interface CheckoutSummaryDeps {
