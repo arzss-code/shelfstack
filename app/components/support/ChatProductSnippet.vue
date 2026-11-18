@@ -43,7 +43,7 @@ const formattedPrice = computed(() => {
         {{ formattedPrice }}
       </div>
       <a
-        :href="`/products/${product.id}`"
+        :href="`/product/${product.id}`"
         target="_blank"
         rel="noopener noreferrer"
         class="product-link mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-brand-accent hover:underline no-underline"

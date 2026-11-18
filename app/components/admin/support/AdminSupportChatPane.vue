@@ -108,7 +108,7 @@ const onUpdateStatus = async (newStatus: string) => {
 
 const onProductSelect = (product: { id: number; title: string; price_cents: number }) => {
   const rupiah = Math.round(product.price_cents / 100).toLocaleString('id-ID')
-  const rec = `Rekomendasi Produk: ${product.title} (Rp ${rupiah}) - /products/${product.id}`
+  const rec = `Rekomendasi Produk: ${product.title} (Rp ${rupiah}) - /product/${product.id}`
   if (composerRef.value) {
     composerRef.value.appendText(rec)
   }

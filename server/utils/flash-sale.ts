@@ -120,12 +120,18 @@ export async function getActiveFlashSaleCampaign(
         }
       })
 
+      const campaignEndsAt =
+        items
+          .map((item) => item.ends_at)
+          .filter(Boolean)
+          .sort()[0] || endsAt
+
       const campaignDate = startsAt.slice(0, 10)
       return {
         id: `flash-sale-${campaignDate}`,
         title: 'Flash Sale Hari Ini',
         tagline: 'Koleksi kurasi eksklusif dengan harga promo terbatas. Stok diperbarui otomatis.',
-        ends_at: endsAt,
+        ends_at: campaignEndsAt,
         is_active: isActive && items.length > 0,
         items,
       }

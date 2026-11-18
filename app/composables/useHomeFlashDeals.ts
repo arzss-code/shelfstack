@@ -8,7 +8,10 @@ export interface UseHomeFlashDealsProps {
   promoEndsAt?: string | Date | null
 }
 
-export function useHomeFlashDeals(props: UseHomeFlashDealsProps) {
+export function useHomeFlashDeals(
+  props: UseHomeFlashDealsProps,
+  dbPromoEndsAt?: Ref<string | null | undefined>,
+) {
   let productStore: ReturnType<typeof useProductStore> | null = null
   try {
     productStore = useProductStore()
@@ -16,14 +19,16 @@ export function useHomeFlashDeals(props: UseHomeFlashDealsProps) {
     productStore = null
   }
 
+  const resolvedPromoEndsAt = computed(() => props.promoEndsAt ?? dbPromoEndsAt?.value ?? null)
+
   const countdownData = ref<CountdownTime | null>(
-    props.promoEndsAt ? calculateCountdownUntil(props.promoEndsAt) : null,
+    resolvedPromoEndsAt.value ? calculateCountdownUntil(resolvedPromoEndsAt.value) : null,
   )
   let timerInterval: ReturnType<typeof setInterval> | null = null
 
   const updateCountdown = () => {
-    if (props.promoEndsAt) {
-      countdownData.value = calculateCountdownUntil(props.promoEndsAt)
+    if (resolvedPromoEndsAt.value) {
+      countdownData.value = calculateCountdownUntil(resolvedPromoEndsAt.value)
     } else {
       countdownData.value = null
     }
@@ -31,24 +36,21 @@ export function useHomeFlashDeals(props: UseHomeFlashDealsProps) {
 
   onMounted(() => {
     updateCountdown()
-    if (props.promoEndsAt) {
+    if (resolvedPromoEndsAt.value) {
       timerInterval = setInterval(updateCountdown, 1000)
     }
   })
 
-  watch(
-    () => props.promoEndsAt,
-    (newVal) => {
-      if (timerInterval) {
-        clearInterval(timerInterval)
-        timerInterval = null
-      }
-      updateCountdown()
-      if (newVal) {
-        timerInterval = setInterval(updateCountdown, 1000)
-      }
-    },
-  )
+  watch(resolvedPromoEndsAt, (newVal) => {
+    if (timerInterval) {
+      clearInterval(timerInterval)
+      timerInterval = null
+    }
+    updateCountdown()
+    if (newVal) {
+      timerInterval = setInterval(updateCountdown, 1000)
+    }
+  })
 
   onUnmounted(() => {
     if (timerInterval) {

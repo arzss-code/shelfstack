@@ -6,7 +6,9 @@ test('beranda: hero + CTA katalog', async ({ page }) => {
 
   await expect(page).toHaveTitle(/ShelfStack/)
   await expect(
-    page.getByRole('heading', { name: 'Etalase rapi di depan, operasional tertib di belakang.' }),
+    page.getByRole('heading', {
+      name: 'Perlengkapan kerja dan ruang hidup yang dirancang tahan lama.',
+    }),
   ).toBeVisible()
   await expect(page.getByRole('link', { name: 'Lihat Katalog' })).toBeVisible()
 })
@@ -25,9 +27,11 @@ test('beranda: bagian unggulan + admin CTA tampil', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: 'Produk Unggulan' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Kenapa ShelfStack' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Kelola katalogmu sendiri' })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Hemat 10% untuk Pesanan Pertamamu' }),
+  ).toBeVisible()
   const ctaBand = page.locator('section', {
-    has: page.getByRole('heading', { name: 'Kelola katalogmu sendiri' }),
+    has: page.getByRole('heading', { name: 'Hemat 10% untuk Pesanan Pertamamu' }),
   })
   await expect(ctaBand.getByRole('link', { name: 'Masuk' })).toBeVisible()
 })

@@ -97,11 +97,10 @@ const handleLogout = async () => {
     <div class="bg-brand-ink text-white py-1.5 border-b border-white/10 hidden sm:block">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between text-xs">
         <div class="flex items-center gap-2.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" aria-hidden="true" />
           <p class="tracking-wide m-0 text-[11px] sm:text-xs flex items-center gap-2.5">
             <span>Gratis Ongkir min. belanja Rp500.000</span>
             <span class="h-3 w-px bg-white/20" aria-hidden="true" />
-            <span>Garansi Pengembalian 30 Hari</span>
+            <span>Garansi Retur 7 Hari</span>
             <span class="h-3 w-px bg-white/20" aria-hidden="true" />
             <span>Koleksi Produk Original</span>
           </p>

@@ -18,7 +18,7 @@ export class ProductDetailPage extends BasePage {
     super(page)
     this.title = page.locator('h1, h2.font-display').first()
     this.addToCartButton = page.getByRole('button', {
-      name: /tambah ke bag/i,
+      name: /tambah ke (?:keranjang|bag)/i,
     })
     this.buyNowButton = page.getByRole('button', {
       name: /pesan cepat 1-klik|beli sekarang/i,
@@ -38,7 +38,9 @@ export class ProductDetailPage extends BasePage {
 
   async assertPageLoaded(): Promise<void> {
     await expect(this.title).toBeVisible({ timeout: 15000 })
-    await expect(this.page.getByRole('button', { name: /tambah ke bag|stok habis/i })).toBeVisible({
+    await expect(
+      this.page.getByRole('button', { name: /tambah ke (?:keranjang|bag)|stok habis/i }),
+    ).toBeVisible({
       timeout: 15000,
     })
   }

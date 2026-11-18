@@ -38,9 +38,9 @@ const guarantees = [
 const returnSteps = [
   {
     number: '01',
-    title: 'Hubungi Layanan Pelanggan',
-    desc: 'Laporkan kendala produk melalui formulir /contact atau email resmi kami di support@shelfstack.atsiilaarya.me.',
-    highlight: 'Respons cepat dalam 1x24 jam kerja.',
+    title: 'Ajukan Retur dari Pesanan',
+    desc: 'Buka menu Detail Pesanan di /orders (maks. 7 hari setelah diterima) atau hubungi tim kami via /contact.',
+    highlight: 'Terintegrasi otomatis dengan nomor pesanan resmi.',
   },
   {
     number: '02',
@@ -241,8 +241,8 @@ const eligibilityCriteria = [
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-3 shrink-0">
-        <UiButton to="/contact" variant="primary" icon="pi-arrow-right" icon-pos="right">
-          Ajukan Pengembalian
+        <UiButton to="/orders" variant="primary" icon="pi-arrow-right" icon-pos="right">
+          Ajukan Pengembalian di Pesanan
         </UiButton>
         <UiButton to="/help#pengembalian" variant="secondary" icon="pi-question-circle">
           Pelajari FAQ

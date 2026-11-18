@@ -35,6 +35,7 @@ Direktori ini menyimpan seluruh spesifikasi teknis, dokumen arsitektur, rencana 
 ## 3. Rekayasa Produksi, Keamanan & Keandalan
 
 - [`PROJECT-AUDIT.md`](./PROJECT-AUDIT.md): Snapshot audit implementasi, keamanan, kelengkapan fitur, UI/UX, hasil pengujian aktual, serta prioritas perbaikan untuk portfolio. Temuan bukan pernyataan sudah diperbaiki.
+- [`AUDIT-NEXT-PHASE.md`](./AUDIT-NEXT-PHASE.md): Audit lanjutan pasca `v1.1.0-beta.29` (fitur setengah jadi, bug fungsional, kontradiksi copywriting/kebijakan, penyimpangan `DESIGN.md`, celah UI/UX 5-states/mobile/a11y, dan roadmap 3 tahap berikutnya).
 - [`engineering/`](./engineering/): Standar operasional dan keandalan sistem:
   - `observability.md`: Runbook logging terstruktur JSON, request tracing, dan health checks.
   - `security.md`: Panduan keamanan server, proteksi webhook, dan sanitasi PII.

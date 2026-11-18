@@ -150,30 +150,87 @@ export type Database = {
       categories: {
         Row: {
           created_at: string | null
+          deleted_at: string | null
           description: string | null
           display_order: number | null
           id: string
           image_url: string | null
           name: string
           slug: string
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           display_order?: number | null
           id?: string
           image_url?: string | null
           name: string
           slug: string
+          updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           display_order?: number | null
           id?: string
           image_url?: string | null
           name?: string
           slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          admin_notes: string | null
+          category: string
+          created_at: string
+          deleted_at: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+          order_number: string | null
+          resolved_at: string | null
+          status: 'open' | 'in_progress' | 'resolved'
+          ticket_code: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          category: string
+          created_at?: string
+          deleted_at?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+          order_number?: string | null
+          resolved_at?: string | null
+          status?: 'open' | 'in_progress' | 'resolved'
+          ticket_code: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          category?: string
+          created_at?: string
+          deleted_at?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          order_number?: string | null
+          resolved_at?: string | null
+          status?: 'open' | 'in_progress' | 'resolved'
+          ticket_code?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -304,6 +361,7 @@ export type Database = {
         Row: {
           claimed: number
           created_at: string
+          deleted_at: string | null
           discount_percentage: number
           ends_at: string
           id: string
@@ -312,10 +370,12 @@ export type Database = {
           promo_price_cents: number
           quota: number
           starts_at: string
+          updated_at: string | null
         }
         Insert: {
           claimed?: number
           created_at?: string
+          deleted_at?: string | null
           discount_percentage: number
           ends_at: string
           id?: string
@@ -324,10 +384,12 @@ export type Database = {
           promo_price_cents: number
           quota: number
           starts_at: string
+          updated_at?: string | null
         }
         Update: {
           claimed?: number
           created_at?: string
+          deleted_at?: string | null
           discount_percentage?: number
           ends_at?: string
           id?: string
@@ -336,6 +398,7 @@ export type Database = {
           promo_price_cents?: number
           quota?: number
           starts_at?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -1307,6 +1370,15 @@ export type Database = {
           p_replacement_tracking_number?: string | null
           p_refund_amount_cents?: number | null
           p_restock_inventory?: boolean
+        }
+        Returns: Json
+      }
+      admin_restock_product: {
+        Args: {
+          p_product_id: number
+          p_quantity: number
+          p_notes?: string | null
+          p_variant_id?: string | null
         }
         Returns: Json
       }

@@ -18,7 +18,7 @@ export const faqs: FaqItem[] = [
     categoryLabel: 'Pemesanan',
     question: 'Bagaimana cara berbelanja dan melakukan pemesanan di ShelfStack?',
     answer:
-      'Pilih produk kurasi yang Anda inginkan dari katalog, tentukan opsi varian serta kuantitas, kemudian klik tombol "Tambah ke Bag". Buka keranjang belanja Anda untuk meninjau pesanan, lalu klik "Lanjut ke Pembayaran". Lengkapi alamat pengiriman, pilih jasa kurir yang diinginkan, dan selesaikan transaksi pembayaran.',
+      'Pilih produk kurasi yang Anda inginkan dari katalog, tentukan opsi varian serta kuantitas, kemudian klik tombol "Tambah ke Keranjang". Buka keranjang belanja Anda untuk meninjau pesanan, lalu klik "Lanjut ke Pembayaran". Lengkapi alamat pengiriman, pilih jasa kurir yang diinginkan, dan selesaikan transaksi pembayaran.',
   },
   {
     id: 'order-cancellation',
@@ -68,7 +68,7 @@ export const faqs: FaqItem[] = [
     categoryLabel: 'Pembayaran',
     question: 'Berapa batas waktu pelunasan pembayaran transaksi?',
     answer:
-      'Batas waktu penyelesaian pembayaran Virtual Account dan QRIS adalah 24 jam sejak faktur diterbitkan. Apabila pembayaran tidak diselesaikan dalam jendela waktu tersebut, pesanan akan kedaluwarsa dan dibatalkan otomatis oleh sistem untuk membebaskan kuota stok produk.',
+      'Batas waktu penyelesaian pembayaran Virtual Account dan QRIS adalah 2 jam (120 menit) sejak pesanan dibuat. Apabila pembayaran tidak diselesaikan dalam jendela waktu tersebut, pesanan akan kedaluwarsa dan dibatalkan otomatis oleh sistem untuk membebaskan kuota stok produk.',
   },
 
   // Pengiriman
@@ -152,8 +152,8 @@ export const faqs: FaqItem[] = [
     answer:
       'Setelah paket retur tiba di gudang dan lolos inspeksi kualitas, proses refund diproses dalam 1-3 hari kerja. Dana transaksi VA dan QRIS dikembalikan ke rekening bank atau saldo e-wallet Anda, sedangkan transaksi Kartu Kredit dikreditkan kembali ke limit kartu sesuai siklus penagihan bank penerbit (5-14 hari kerja).',
     actionLink: {
-      text: 'Ajukan Pengembalian via Kontak',
-      to: '/contact',
+      text: 'Ajukan Retur dari Pesanan Saya',
+      to: '/orders',
     },
   },
 ]

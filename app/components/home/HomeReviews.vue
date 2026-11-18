@@ -40,11 +40,11 @@ const commitments: TrustCommitment[] = [
     metric: 'Inspeksi Fisik Mandiri',
   },
   {
-    title: 'Jaminan Pengembalian 30 Hari',
+    title: 'Jaminan Pengembalian 7 Hari',
     tag: 'Garansi Resmi',
     icon: 'pi pi-refresh',
     description:
-      'Kebijakan purna jual transparan. Dapatkan penggantian unit atau pengembalian dana penuh jika produk mengalami cacat produksi.',
+      'Kebijakan purna jual transparan. Dapatkan penggantian unit atau pengembalian dana penuh jika produk cacat produksi dalam 7 hari.',
     metric: 'Garansi Purna Jual',
   },
   {
@@ -184,7 +184,7 @@ const featuredReviews = computed<FeaturedReview[]>(() => reviews.value)
 
           <!-- Product Context Link Pill -->
           <NuxtLink
-            :to="`/products/${review.product_slug || review.product_id}`"
+            :to="`/product/${review.product_slug || review.product_id}`"
             class="pt-3 border-t border-brand-hairsoft flex items-center justify-between gap-3 no-underline group/link min-h-[44px]"
             :aria-label="`Buka detail produk ${review.product_name}`"
           >

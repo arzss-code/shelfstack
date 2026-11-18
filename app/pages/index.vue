@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { useProductStore } from '~/features/products/stores/product'
 
-// Komponen otomatis ter-import oleh Nuxt dari folder app/components/home/
-// seperti: HomeHero, HomeAssurances, HomeFeaturedCategories, dsb.
-
 useSeoMeta({
-  title: 'ShelfStack - Toko Produk Esensial & Perlengkapan Modern',
+  title: 'ShelfStack - Perlengkapan Kerja & Ruang Hidup Modern',
   description:
     'ShelfStack: Toko online kebutuhan kerja, rumah tangga, audio studio, dan furnitur minimalis modern. Belanja aman, original, dan bergaransi.',
 })
@@ -14,13 +11,6 @@ const productStore = useProductStore()
 const toast = useUiToast()
 
 const featured = computed(() => productStore.products.slice(0, 4))
-
-// Waktu target promo kilat harian resmi (berakhir pada pergantian hari tengah malam)
-const dailyFlashSaleEnd = computed(() => {
-  const endOfDay = new Date()
-  endOfDay.setHours(24, 0, 0, 0)
-  return endOfDay.toISOString()
-})
 
 onMounted(async () => {
   try {
@@ -41,7 +31,7 @@ onMounted(async () => {
     <HomeHero />
     <HomeAssurances />
     <HomeFeaturedCategories />
-    <HomeFlashDeals :promo-ends-at="dailyFlashSaleEnd" />
+    <HomeFlashDeals />
     <HomeFeaturedProducts :products="featured" :loading="productStore.loading" />
     <HomeFeatures />
     <HomeReviews />

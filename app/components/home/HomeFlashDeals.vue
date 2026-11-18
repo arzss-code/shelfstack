@@ -22,6 +22,11 @@ const props = withDefaults(
   },
 )
 
+const { campaign, isCampaignActive, getDealForProduct } = useFlashSale()
+const dbPromoEndsAt = computed(() =>
+  isCampaignActive.value ? (campaign.value?.ends_at ?? null) : null,
+)
+
 const {
   countdownData,
   isLoading,
@@ -30,9 +35,7 @@ const {
   failedDealImages,
   onImageError,
   flashSectionRef,
-} = useHomeFlashDeals(props)
-
-const { getDealForProduct } = useFlashSale()
+} = useHomeFlashDeals(props, dbPromoEndsAt)
 </script>
 
 <template>
@@ -46,13 +49,20 @@ const { getDealForProduct } = useFlashSale()
     >
       <div>
         <div class="mb-2 flex items-center gap-2">
-          <UiBadge label="Flash Deals" variant="solid-danger" />
+          <UiBadge
+            :label="countdownData ? 'Flash Deals' : 'Pilihan Kurator'"
+            :variant="countdownData ? 'solid-danger' : 'info'"
+          />
           <h2 class="m-0 font-display text-2xl font-extrabold text-white sm:text-3xl">
-            Promo Terbatas Hari Ini
+            {{ countdownData ? 'Promo Terbatas Hari Ini' : 'Sorotan Koleksi Pilihan' }}
           </h2>
         </div>
         <p class="m-0 text-xs text-white/70 sm:text-sm">
-          Diskon spesial produk pilihan dengan alokasi kuota harian.
+          {{
+            countdownData
+              ? 'Diskon spesial produk pilihan dengan alokasi kuota promo aktif.'
+              : 'Produk pilihan berkualitas dengan ketersediaan stok siap kirim.'
+          }}
         </p>
       </div>
 
@@ -239,7 +249,7 @@ const { getDealForProduct } = useFlashSale()
         </div>
 
         <UiButton
-          :to="`/product/${product.id}`"
+          :to="`/product/${product.slug || product.id}`"
           data-testid="deal-link"
           variant="primary"
           size="sm"

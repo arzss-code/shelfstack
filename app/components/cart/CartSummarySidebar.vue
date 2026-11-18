@@ -41,7 +41,13 @@ defineEmits<{
         </div>
         <div class="flex items-center justify-between">
           <span>Biaya Pengiriman</span>
-          <span class="text-brand-success font-semibold">Gratis Ongkir</span>
+          <span
+            v-if="cartStore.totalPriceCents >= 50000000"
+            class="text-brand-success font-semibold"
+          >
+            Gratis Ongkir
+          </span>
+          <span v-else class="text-brand-muted font-medium">Dihitung saat checkout</span>
         </div>
         <div class="flex items-center justify-between">
           <span>Estimasi Pajak (PPN 11%)</span>
@@ -75,7 +81,7 @@ defineEmits<{
         </div>
         <div class="flex items-center gap-2">
           <i class="pi pi-sync text-brand-ink" />
-          <span>Garansi Pengembalian 30 Hari</span>
+          <span>Garansi Pengembalian 7 Hari</span>
         </div>
         <div class="flex items-center gap-2">
           <i class="pi pi-check-circle text-brand-success" />

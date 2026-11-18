@@ -224,8 +224,8 @@ describe('Returns Page (app/pages/returns.vue)', () => {
     expect(text).toContain('Tahapan Pengajuan Retur & Klaim Garansi')
 
     // Step 1
-    expect(text).toContain('Hubungi Layanan Pelanggan')
-    expect(text).toContain('formulir /contact atau email resmi')
+    expect(text).toContain('Ajukan Retur dari Pesanan')
+    expect(text).toContain('Detail Pesanan di /orders')
 
     // Step 2
     expect(text).toContain('Verifikasi Bukti')
@@ -254,7 +254,7 @@ describe('Returns Page (app/pages/returns.vue)', () => {
     expect(text).toContain('Kondisi Bebas Modifikasi')
   })
 
-  it('merender direct CTA strip dengan tombol ke /contact dan /help#pengembalian', () => {
+  it('merender direct CTA strip dengan tombol ke /orders dan /help#pengembalian', () => {
     const wrapper = mount(ReturnsPage, {
       global: {
         stubs: globalStubs,
@@ -263,9 +263,9 @@ describe('Returns Page (app/pages/returns.vue)', () => {
 
     expect(wrapper.text()).toContain('Ada Kendala dengan Produk Anda?')
 
-    const contactLink = wrapper.find('a[href="/contact"]')
-    expect(contactLink.exists()).toBe(true)
-    expect(contactLink.text()).toContain('Ajukan Pengembalian')
+    const ordersLink = wrapper.find('a[href="/orders"]')
+    expect(ordersLink.exists()).toBe(true)
+    expect(ordersLink.text()).toContain('Ajukan Pengembalian di Pesanan')
 
     const faqLink = wrapper.find('a[href="/help#pengembalian"]')
     expect(faqLink.exists()).toBe(true)

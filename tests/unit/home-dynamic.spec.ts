@@ -254,7 +254,7 @@ describe('Home Dynamic Features & Integrity', () => {
 
       expect(wrapper.text()).toContain('Standar Kualitas & Kepuasan Pelanggan ShelfStack')
       expect(wrapper.text()).toContain('Kurasi Fisik 100% Asli')
-      expect(wrapper.text()).toContain('Jaminan Pengembalian 30 Hari')
+      expect(wrapper.text()).toContain('Jaminan Pengembalian 7 Hari')
       expect(wrapper.text()).toContain('Pengemasan Tahan Benturan')
       expect(wrapper.text()).toContain('Layanan Pelanggan Responsif')
 

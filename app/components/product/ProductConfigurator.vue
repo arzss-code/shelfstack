@@ -244,7 +244,7 @@ const {
           @click="handleAddToBag"
         >
           <span v-if="isOutOfStock">Stok Habis</span>
-          <span v-else> Tambah ke Bag · {{ formatRupiah(effectivePrice * quantity) }} </span>
+          <span v-else> Tambah ke Keranjang · {{ formatRupiah(effectivePrice * quantity) }} </span>
         </UiButton>
 
         <!-- Wishlist Action Button -->
