@@ -191,13 +191,13 @@ const handleUpdatePassword = async (newPass: string, confirmPass: string) => {
             />
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-brand-muted pt-1">
-              <div class="p-3 rounded-field bg-white border border-brand-hair">
+              <div class="p-3 rounded-field bg-brand-canvas border border-brand-hair">
                 <span class="text-[11px] text-brand-muted block font-medium">Tipe Akun</span>
                 <span class="font-bold text-brand-ink uppercase">{{
                   profile?.role || 'Customer'
                 }}</span>
               </div>
-              <div class="p-3 rounded-field bg-white border border-brand-hair">
+              <div class="p-3 rounded-field bg-brand-canvas border border-brand-hair">
                 <span class="text-[11px] text-brand-muted block font-medium"
                   >Tanggal Bergabung</span
                 >

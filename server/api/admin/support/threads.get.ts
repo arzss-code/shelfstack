@@ -94,7 +94,7 @@ export default defineEventHandler(async (event) => {
       await Promise.allSettled(
         customerIds.map(async (uid) => {
           try {
-            const { data: userData } = await (client as any).auth.admin.getUserById(uid)
+            const { data: userData } = await client.auth.admin.getUserById(uid)
             if (userData?.user?.email) {
               emailMap.set(uid, userData.user.email)
             }

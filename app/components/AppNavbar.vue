@@ -7,8 +7,10 @@ import { useWishlistStore } from '~/features/wishlist/stores/wishlist'
 import { useNotificationStore } from '~/features/notifications/stores/notifications'
 import NotificationBell from '~/components/notifications/NotificationBell.vue'
 import NavbarSearchBar from '~/components/navbar/NavbarSearchBar.vue'
+import NavbarCartButton from '~/components/navbar/NavbarCartButton.vue'
 import NavbarUserMenu from '~/components/navbar/NavbarUserMenu.vue'
 import NavbarMobileDrawer from '~/components/navbar/NavbarMobileDrawer.vue'
+import UiThemeToggle from '~/components/ui/UiThemeToggle.vue'
 import AppLogo from './AppLogo.vue'
 
 const { user, profile, isAdmin, isLoggedIn, fetchProfile, signOut } = useAuth()
@@ -92,7 +94,7 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <header class="w-full bg-white sticky top-0 z-50 shadow-[0_1px_3px_rgba(0,0,0,0.05)] select-none">
+  <header class="w-full bg-brand-canvas sticky top-0 z-50 shadow-nav select-none">
     <!-- LAYER 1: Top Announcement Bar (Inverted Ink Strip) -->
     <div class="bg-brand-ink text-white py-1.5 border-b border-white/10 hidden sm:block">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between text-xs">
@@ -118,7 +120,7 @@ const handleLogout = async () => {
     </div>
 
     <!-- LAYER 2: Main E-Commerce Header Bar -->
-    <div class="w-full bg-white border-b border-brand-hair">
+    <div class="w-full bg-brand-canvas border-b border-brand-hair">
       <div
         class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between gap-4 sm:gap-6"
       >
@@ -142,6 +144,8 @@ const handleLogout = async () => {
 
         <!-- Right Commerce Actions -->
         <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+          <UiThemeToggle />
+
           <!-- Notification Bell -->
           <template v-if="isLoggedIn && user">
             <NotificationBell variant="light" />
@@ -161,7 +165,7 @@ const handleLogout = async () => {
               <i class="pi pi-heart text-base sm:text-lg text-brand-ink" />
               <span
                 v-if="wishlistStore.totalItems > 0"
-                class="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-rose-600 text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
+                class="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-brand-danger text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none"
                 aria-hidden="true"
               >
                 {{ wishlistStore.totalItems > 99 ? '99+' : wishlistStore.totalItems }}
@@ -170,54 +174,11 @@ const handleLogout = async () => {
           </UiTooltip>
 
           <!-- Cart Icon Button -->
-          <UiTooltip position="bottom" align="end">
-            <button
-              type="button"
-              class="relative w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 cursor-pointer"
-              :aria-label="
-                cartStore.totalItems > 0
-                  ? `Buka Keranjang Belanja (${cartStore.totalItems} item)`
-                  : 'Buka Keranjang Belanja'
-              "
-              @click="cartStore.openDrawer"
-            >
-              <i class="pi pi-shopping-bag text-base sm:text-lg text-brand-ink" />
-              <span
-                v-if="cartStore.totalItems > 0"
-                class="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-brand-ink text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
-                aria-hidden="true"
-              >
-                {{ cartStore.totalItems > 99 ? '99+' : cartStore.totalItems }}
-              </span>
-            </button>
-
-            <template #content>
-              <div v-if="cartStore.totalItems > 0" class="space-y-1 min-w-[190px]">
-                <div
-                  class="flex items-center justify-between gap-3 text-[11px] font-medium text-zinc-300"
-                >
-                  <span>Subtotal ({{ cartStore.totalItems }} item)</span>
-                </div>
-                <div class="flex items-baseline justify-between gap-3">
-                  <span
-                    class="font-display text-sm font-bold text-white tabular-nums tracking-tight"
-                  >
-                    {{ cartStore.formattedTotalPrice }}
-                  </span>
-                  <span class="text-[10px] text-blue-400 font-semibold flex items-center gap-0.5">
-                    Buka <i class="pi pi-arrow-right text-[8px]" />
-                  </span>
-                </div>
-              </div>
-              <div
-                v-else
-                class="text-[11px] text-zinc-300 flex items-center gap-2 py-0.5 min-w-[170px]"
-              >
-                <i class="pi pi-shopping-bag text-xs text-zinc-400" />
-                <span>Keranjang belanja kosong</span>
-              </div>
-            </template>
-          </UiTooltip>
+          <NavbarCartButton
+            :total-items="cartStore.totalItems"
+            :formatted-total-price="cartStore.formattedTotalPrice"
+            @open="cartStore.openDrawer"
+          />
 
           <!-- User Authentication Section -->
           <NavbarUserMenu
@@ -262,14 +223,14 @@ const handleLogout = async () => {
             v-for="cat in subNavCategories"
             :key="cat.name"
             :to="cat.path"
-            class="px-3 py-1 rounded-full text-brand-muted hover:text-brand-ink hover:bg-white transition-colors no-underline"
+            class="px-3 py-1 rounded-full text-brand-muted hover:text-brand-ink hover:bg-brand-canvas transition-colors no-underline"
           >
             {{ cat.name }}
           </NuxtLink>
 
           <NuxtLink
             to="/promos"
-            class="px-3 py-1 rounded-full text-brand-accent font-semibold hover:bg-white transition-colors no-underline flex items-center gap-1"
+            class="px-3 py-1 rounded-full text-brand-accent font-semibold hover:bg-brand-canvas transition-colors no-underline flex items-center gap-1"
           >
             <span>Voucher &amp; Promo</span>
             <span

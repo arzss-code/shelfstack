@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import AppLogo from '~/components/AppLogo.vue'
 import AdminSidebarNav, { type AdminNavLink } from '~/components/admin/AdminSidebarNav.vue'
+import UiThemeToggle from '~/components/ui/UiThemeToggle.vue'
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useAdminSupportChat } from '~/composables/useAdminSupportChat'
 
@@ -129,7 +130,7 @@ onMounted(() => {
           </NuxtLink>
           <button
             type="button"
-            class="w-8 h-8 rounded-full border border-brand-hair flex items-center justify-center text-brand-ink hover:bg-brand-canvas"
+            class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border border-brand-hair flex items-center justify-center text-brand-ink hover:bg-brand-canvas"
             aria-label="Tutup navigasi"
             @click="isMobileMenuOpen = false"
           >
@@ -175,7 +176,7 @@ onMounted(() => {
           <!-- Mobile Hamburger Toggle -->
           <button
             type="button"
-            class="relative flex h-9 w-9 items-center justify-center rounded-lg border border-brand-hair text-brand-ink hover:bg-brand-canvas-soft md:hidden"
+            class="relative flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-brand-hair text-brand-ink hover:bg-brand-canvas-soft md:hidden"
             aria-label="Buka menu navigasi admin"
             @click="isMobileMenuOpen = true"
           >
@@ -196,7 +197,9 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <UiThemeToggle />
+
           <NuxtLink
             to="/"
             class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-brand-hair text-xs font-medium text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft no-underline transition-colors"

@@ -210,7 +210,7 @@ const onSearchInput = (e: Event) => {
         class="thread-card thread-item flex cursor-pointer items-center justify-between p-3.5 transition-colors hover:bg-brand-canvas-soft/80"
         :class="[
           effectiveActiveThreadId === thread.id
-            ? 'active-thread is-active bg-brand-canvas-soft border-l-4 border-l-brand-ink pl-2.5'
+            ? 'active-thread is-active bg-brand-accent-tint/60 ring-1 ring-inset ring-brand-accent-edge'
             : '',
         ]"
         @click="onSelectThread(thread.id)"

@@ -225,7 +225,7 @@ try {
     <section class="mb-8">
       <UiCard
         :padded="true"
-        class="border border-brand-hair bg-white px-6 py-10 text-center sm:py-14"
+        class="border border-brand-hair bg-brand-canvas px-6 py-10 text-center sm:py-14"
       >
         <div class="mx-auto max-w-2xl space-y-4">
           <h2 class="font-display text-2xl font-bold tracking-tight text-brand-ink sm:text-3xl">

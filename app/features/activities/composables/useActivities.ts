@@ -45,9 +45,9 @@ export function useActivities() {
     channel = supabase
       .channel('public:activity_logs')
       .on(
-        'postgres_changes' as any,
+        'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'activity_logs' },
-        (payload: { new: Record<string, unknown> }) => {
+        (payload) => {
           // Add temporary 'isNew' flag for UI highlighting
           const newActivity: ActivityLog = {
             ...(payload.new as unknown as ActivityLog),

@@ -77,7 +77,7 @@ onBeforeUnmount(() => {
     class="relative flex-1 max-w-2xl mx-2 sm:mx-6 hidden md:block"
   >
     <form
-      class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full px-2 border border-brand-hair focus-within:border-brand-ink focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-ink/20 transition-colors shadow-whisper"
+      class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full pl-1 pr-0.5 border border-brand-hair focus-within:border-brand-ink focus-within:bg-brand-canvas focus-within:ring-2 focus-within:ring-brand-ink/20 transition-colors shadow-whisper"
       @submit.prevent="handleSubmit"
     >
       <!-- Single Category Dropdown Button -->
@@ -86,7 +86,7 @@ onBeforeUnmount(() => {
           type="button"
           :aria-expanded="isCategoryDropdownOpen"
           aria-haspopup="listbox"
-          class="whitespace-nowrap flex items-center gap-1.5 text-xs text-brand-ink font-semibold px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors cursor-pointer"
+          class="whitespace-nowrap flex items-center gap-1.5 text-xs text-brand-ink font-semibold px-3 py-1.5 min-h-[44px] rounded-full hover:bg-black/5 transition-colors cursor-pointer"
           @click="isCategoryDropdownOpen = !isCategoryDropdownOpen"
         >
           <span>{{ selectedCategory }}</span>
@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
       <UiTooltip text="Cari produk" position="bottom">
         <button
           type="submit"
-          class="w-8 h-8 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0 hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
+          class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-brand-ink text-brand-onink flex items-center justify-center shrink-0 hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
           aria-label="Cari produk"
         >
           <i class="pi pi-search text-xs" aria-hidden="true" />

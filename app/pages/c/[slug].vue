@@ -116,7 +116,12 @@ useSeoMeta({
   ogImage: () => currentCategory.value?.image_url || '/logo.svg',
 })
 
-const { data: catalogResponse, pending } = useAsyncData<CatalogApiResponse>(
+const {
+  data: catalogResponse,
+  pending,
+  error: categoryError,
+  refresh: refreshCategoryProducts,
+} = useAsyncData<CatalogApiResponse>(
   () =>
     `category-products-${slug.value}-${selectedSort.value}-${inStockOnly.value}-${currentPage.value}`,
   () =>
@@ -223,11 +228,25 @@ function onExploreCatalog() {
       />
 
       <!-- Daftar Produk Sesuai Mode Tampilan -->
-      <section aria-label="Daftar Produk Kategori" class="space-y-6">
+      <section aria-label="Daftar Produk Kategori" class="min-w-0 space-y-6">
         <h2 class="sr-only">Katalog Produk {{ currentCategory.name }}</h2>
 
+        <UiAlert
+          v-if="categoryError"
+          tone="danger"
+          title="Gagal memuat produk kategori"
+          class="text-xs"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <span>Terjadi kendala saat mengambil daftar produk kategori.</span>
+            <UiButton size="sm" variant="outline" @click="refreshCategoryProducts()">
+              Coba Lagi
+            </UiButton>
+          </div>
+        </UiAlert>
+
         <ProductList
-          v-if="viewMode === 'grid'"
+          v-else-if="viewMode === 'grid'"
           :products="products"
           :loading="pending"
           density="spacious"

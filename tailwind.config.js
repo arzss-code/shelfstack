@@ -60,6 +60,10 @@ export default {
         mono: ['var(--font-body)', 'sans-serif'],
         saans: ['Saans', 'DM Sans', '-apple-system', 'sans-serif'],
       },
+      fontSize: {
+        micro: ['0.6875rem', { lineHeight: '1rem' }],
+        caption: ['0.75rem', { lineHeight: '1.125rem' }],
+      },
       borderRadius: {
         card: 'var(--radius-card)',
         field: 'var(--radius-field)',

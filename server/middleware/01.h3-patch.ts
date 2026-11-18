@@ -1,16 +1,19 @@
-export default defineEventHandler((event) => {
-  if (
-    event.node &&
-    event.node.req &&
-    event.node.req.headers &&
-    typeof (event.node.req.headers as any).get !== 'function'
-  ) {
-    ;(event.node.req.headers as any).get = (name: string) =>
-      event.node.req.headers[name.toLowerCase()] as string | undefined
-  }
+type PatchableHeaders = Record<string, string | string[] | undefined> & {
+  get?: (name: string) => string | undefined
+}
 
-  if (event.req && event.req.headers && typeof (event.req.headers as any).get !== 'function') {
-    ;(event.req.headers as any).get = (name: string) =>
-      (event.req.headers as any)[name.toLowerCase()] as string | undefined
+function ensureHeadersGet(headersObj: unknown): void {
+  if (!headersObj || typeof headersObj !== 'object') return
+  const hdrs = headersObj as PatchableHeaders
+  if (typeof hdrs.get !== 'function') {
+    hdrs.get = (name: string) => {
+      const val = hdrs[name.toLowerCase()]
+      return typeof val === 'string' ? val : Array.isArray(val) ? val[0] : undefined
+    }
   }
+}
+
+export default defineEventHandler((event) => {
+  ensureHeadersGet(event.node?.req?.headers)
+  ensureHeadersGet(event.req?.headers)
 })

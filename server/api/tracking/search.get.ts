@@ -88,7 +88,16 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Gagal memuat linimasa checkpoint ekspedisi', checkpointError, 500)
   }
 
-  const rawAddress = (order.address as any) || {}
+  interface OrderAddressSnapshot {
+    city?: string
+    name?: string
+    phone?: string
+  }
+  const rawAddress = (
+    order.address && typeof order.address === 'object' && !Array.isArray(order.address)
+      ? order.address
+      : {}
+  ) as OrderAddressSnapshot
   const destinationCity = rawAddress.city || 'Kota Tujuan'
 
   const result = {
@@ -97,14 +106,14 @@ export default defineEventHandler(async (event) => {
     courier_code: (order.courier_code as CourierCode) || 'jne',
     courier_name: order.courier_name || 'JNE Express',
     status: order.status,
-    recipient_name_masked: maskRecipientName(rawAddress.name),
-    recipient_phone_masked: maskRecipientPhone(rawAddress.phone),
+    recipient_name_masked: maskRecipientName(rawAddress.name || ''),
+    recipient_phone_masked: maskRecipientPhone(rawAddress.phone || ''),
     destination_city: destinationCity,
     shipped_at: order.shipped_at,
     delivered_at: order.delivered_at,
     checkpoints: (rawCheckpoints || []).map((cp) => ({
       ...cp,
-      description: maskCheckpointDescription(cp.description, rawAddress.name),
+      description: maskCheckpointDescription(cp.description, rawAddress.name || ''),
     })),
   }
 

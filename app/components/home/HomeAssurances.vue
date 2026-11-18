@@ -1,5 +1,7 @@
 <template>
-  <section class="w-full bg-white border border-brand-hair rounded-card p-5 sm:p-6 shadow-whisper">
+  <section
+    class="w-full bg-brand-canvas border border-brand-hair rounded-card p-5 sm:p-6 shadow-whisper"
+  >
     <div
       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4 divide-y sm:divide-y-0 sm:divide-x divide-brand-hairsoft"
     >

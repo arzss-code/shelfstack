@@ -102,7 +102,7 @@ const {
       >
         <button
           type="button"
-          class="w-8 h-8 rounded-full bg-white text-brand-ink shadow-sm flex items-center justify-center cursor-pointer hover:bg-brand-ink hover:text-white transition-colors duration-150 active:scale-95"
+          class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-brand-canvas text-brand-ink shadow-sm border border-brand-hair flex items-center justify-center cursor-pointer hover:bg-brand-ink hover:text-brand-onink transition-colors duration-150 active:scale-95"
           :title="justAdded ? 'Ditambahkan ke Bag' : `Tambah ${product.name} ke Bag`"
           :aria-label="`Tambah ${product.name} ke Keranjang`"
           @click.stop.prevent="handleQuickAdd"
@@ -132,7 +132,7 @@ const {
             v-if="formattedRating"
             class="flex items-center gap-1 shrink-0 text-[11px] font-bold text-brand-ink tabular-nums"
           >
-            <i class="pi pi-star-fill text-amber-400 text-[10px]" />
+            <i class="pi pi-star-fill text-brand-warning text-[10px]" />
             <span>{{ formattedRating }}</span>
           </div>
         </div>

@@ -113,7 +113,7 @@ const officialCouriers = [
           v-for="feature in featureCards"
           :key="feature.id"
           :padded="true"
-          class="flex flex-col justify-between border-brand-hair bg-white"
+          class="flex flex-col justify-between border-brand-hair bg-brand-canvas"
         >
           <div>
             <div class="mb-4 flex items-center justify-between">
@@ -155,7 +155,7 @@ const officialCouriers = [
         </p>
       </div>
 
-      <UiCard :padded="false" class="border-brand-hair bg-white overflow-hidden">
+      <UiCard :padded="false" class="border-brand-hair bg-brand-canvas overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full min-w-[560px] text-left text-sm">
             <thead
@@ -225,7 +225,7 @@ const officialCouriers = [
           v-for="courier in officialCouriers"
           :key="courier.name"
           :padded="true"
-          class="border-brand-hair bg-white"
+          class="border-brand-hair bg-brand-canvas"
         >
           <div class="mb-3 flex items-center justify-between">
             <h3 class="font-display text-xl font-bold text-brand-ink">

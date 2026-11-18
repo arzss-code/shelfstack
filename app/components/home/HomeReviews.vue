@@ -115,7 +115,7 @@ const featuredReviews = computed<FeaturedReview[]>(() => reviews.value)
       <div
         class="flex items-center gap-2 bg-brand-canvas-soft border border-brand-hair px-4 py-2 rounded-card text-xs text-brand-ink shrink-0 shadow-whisper"
       >
-        <i class="pi pi-check-circle text-emerald-600 text-sm" aria-hidden="true" />
+        <i class="pi pi-check-circle text-brand-success text-sm" aria-hidden="true" />
         <span class="font-semibold">Standar Operasional Terverifikasi</span>
       </div>
     </div>
@@ -136,7 +136,7 @@ const featuredReviews = computed<FeaturedReview[]>(() => reviews.value)
         <article
           v-for="review in featuredReviews"
           :key="review.id"
-          class="bg-white border border-brand-hair rounded-card p-6 flex flex-col justify-between gap-5 shadow-whisper transition-all hover:border-brand-accent/40"
+          class="bg-brand-canvas border border-brand-hair rounded-card p-6 flex flex-col justify-between gap-5 shadow-whisper transition-all hover:border-brand-accent/40"
           data-testid="featured-review-card"
         >
           <div class="space-y-3">
@@ -152,7 +152,9 @@ const featuredReviews = computed<FeaturedReview[]>(() => reviews.value)
                   <p class="font-display text-xs sm:text-sm font-bold text-brand-ink m-0 truncate">
                     {{ review.reviewer_name }}
                   </p>
-                  <p class="font-body text-[10px] text-emerald-700 m-0 flex items-center gap-1">
+                  <p
+                    class="font-body text-[10px] text-brand-success-text m-0 flex items-center gap-1"
+                  >
                     <i class="pi pi-verified text-[10px]" aria-hidden="true" />
                     <span>Pembeli Terverifikasi</span>
                   </p>
@@ -161,7 +163,7 @@ const featuredReviews = computed<FeaturedReview[]>(() => reviews.value)
 
               <!-- Rating Stars -->
               <div
-                class="flex items-center gap-1 text-amber-500 shrink-0"
+                class="flex items-center gap-1 text-brand-warning shrink-0"
                 :aria-label="`Rating ${review.rating} dari 5 bintang`"
               >
                 <i

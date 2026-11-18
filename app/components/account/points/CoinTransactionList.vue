@@ -13,34 +13,34 @@ const getTransactionBadge = (type: CoinTransactionType) => {
     case 'earned':
       return {
         icon: 'pi-arrow-down-left',
-        bgClass: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
-        amountClass: 'text-emerald-600 dark:text-emerald-400',
+        bgClass: 'bg-brand-success-tint text-brand-success-text',
+        amountClass: 'text-brand-success-text',
       }
     case 'welcome_bonus':
       return {
         icon: 'pi-gift',
-        bgClass: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
-        amountClass: 'text-amber-600 dark:text-amber-400',
+        bgClass: 'bg-brand-warning-tint text-brand-warning-text',
+        amountClass: 'text-brand-warning-text',
       }
     case 'refunded_order':
     case 'cancelled_order':
       return {
         icon: 'pi-refresh',
-        bgClass: 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-400',
-        amountClass: 'text-sky-600 dark:text-sky-400',
+        bgClass: 'bg-brand-accent-tint text-brand-accent-text',
+        amountClass: 'text-brand-accent-text',
       }
     case 'redeemed_voucher':
       return {
         icon: 'pi-ticket',
-        bgClass: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400',
-        amountClass: 'text-rose-600 dark:text-rose-400',
+        bgClass: 'bg-brand-accent-tint text-brand-accent-text',
+        amountClass: 'text-brand-danger-text',
       }
     case 'spent':
     default:
       return {
         icon: 'pi-shopping-bag',
-        bgClass: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400',
-        amountClass: 'text-rose-600 dark:text-rose-400',
+        bgClass: 'bg-brand-danger-tint text-brand-danger-text',
+        amountClass: 'text-brand-danger-text',
       }
   }
 }
@@ -72,7 +72,7 @@ const getTransactionBadge = (type: CoinTransactionType) => {
       class="flex flex-col items-center justify-center rounded-card border border-dashed border-brand-hair bg-brand-canvas-soft px-6 py-12 text-center"
     >
       <div
-        class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400"
+        class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-brand-warning-tint text-brand-warning-text"
       >
         <i class="pi pi-history text-2xl" />
       </div>

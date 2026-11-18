@@ -124,7 +124,7 @@ const handleToggle = (e: Event) => {
       <i
         class="text-base transition-colors duration-200"
         :class="[
-          isSaved ? 'pi pi-heart-fill text-rose-600' : 'pi pi-heart',
+          isSaved ? 'pi pi-heart-fill text-brand-danger' : 'pi pi-heart',
           isPopping ? 'animate-heart-pop' : '',
         ]"
       />
@@ -137,14 +137,8 @@ const handleToggle = (e: Event) => {
   0% {
     transform: scale(1);
   }
-  30% {
-    transform: scale(0.65);
-  }
-  60% {
-    transform: scale(1.35);
-  }
-  80% {
-    transform: scale(0.92);
+  45% {
+    transform: scale(1.14);
   }
   100% {
     transform: scale(1);
@@ -152,7 +146,7 @@ const handleToggle = (e: Event) => {
 }
 
 .animate-heart-pop {
-  animation: heartPop 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: heartPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-block;
   transform-origin: center;
 }

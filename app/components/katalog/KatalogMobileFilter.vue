@@ -40,7 +40,8 @@ const emit = defineEmits<{
         <h2 class="font-display text-base font-bold text-brand-ink m-0">Filter Katalog</h2>
         <button
           type="button"
-          class="w-8 h-8 rounded-full bg-brand-field flex items-center justify-center text-brand-muted hover:text-brand-ink cursor-pointer border-0"
+          aria-label="Tutup filter"
+          class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-brand-field flex items-center justify-center text-brand-muted hover:text-brand-ink cursor-pointer border-0"
           @click="emit('close')"
         >
           <i class="pi pi-times text-xs" />
@@ -58,9 +59,9 @@ const emit = defineEmits<{
             :key="cat.id"
             type="button"
             :class="[
-              'p-2.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer truncate',
+              'min-h-[44px] p-2.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer truncate',
               selectedCategory === cat.id
-                ? 'bg-brand-ink text-white border-brand-ink font-semibold'
+                ? 'bg-brand-ink text-brand-onink border-brand-ink font-semibold'
                 : 'bg-brand-canvas-soft border-brand-hair text-brand-muted hover:text-brand-ink',
             ]"
             @click="emit('update:selectedCategory', cat.id)"
@@ -116,9 +117,9 @@ const emit = defineEmits<{
             :key="r.id"
             type="button"
             :class="[
-              'p-2.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer flex items-center justify-center gap-1.5',
+              'min-h-[44px] p-2.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer flex items-center justify-center gap-1.5',
               selectedRating === r.id
-                ? 'bg-brand-ink text-white border-brand-ink font-semibold'
+                ? 'bg-brand-ink text-brand-onink border-brand-ink font-semibold'
                 : 'bg-brand-canvas-soft border-brand-hair text-brand-muted hover:text-brand-ink',
             ]"
             @click="emit('update:selectedRating', r.id)"
@@ -133,7 +134,7 @@ const emit = defineEmits<{
       <div class="pt-4 border-t border-brand-hairsoft flex items-center gap-2">
         <button
           type="button"
-          class="flex-1 py-2.5 rounded-field bg-brand-ink text-white text-xs font-semibold hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
+          class="min-h-[44px] flex-1 py-2.5 rounded-field bg-brand-ink text-brand-onink text-xs font-semibold hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
           @click="emit('close')"
         >
           Tampilkan {{ filteredProductsCount }} Produk

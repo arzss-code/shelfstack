@@ -115,10 +115,10 @@ const handleRefresh = async () => {
             <div class="flex items-center gap-1.5 sm:gap-2">
               <button
                 type="button"
-                class="min-h-[40px] cursor-pointer rounded-field border-0 px-3.5 py-1.5 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                class="min-h-[44px] cursor-pointer rounded-field border-0 px-3.5 py-1.5 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-warning"
                 :class="
                   activeTab === 'exchange'
-                    ? 'bg-amber-600 text-white shadow-whisper'
+                    ? 'bg-brand-warning text-white shadow-whisper'
                     : 'text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink'
                 "
                 @click="activeTab = 'exchange'"
@@ -128,10 +128,10 @@ const handleRefresh = async () => {
 
               <button
                 type="button"
-                class="min-h-[40px] cursor-pointer rounded-field border-0 px-3.5 py-1.5 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                class="min-h-[44px] cursor-pointer rounded-field border-0 px-3.5 py-1.5 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
                 :class="
                   activeTab === 'transactions'
-                    ? 'bg-brand-ink text-white shadow-whisper'
+                    ? 'bg-brand-ink text-brand-onink shadow-whisper'
                     : 'text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink'
                 "
                 @click="activeTab = 'transactions'"
@@ -142,7 +142,7 @@ const handleRefresh = async () => {
 
             <button
               type="button"
-              class="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              class="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs font-medium text-brand-muted transition-colors hover:bg-brand-canvas-soft hover:text-brand-ink cursor-pointer"
               :disabled="isLoading"
               @click="handleRefresh"
             >

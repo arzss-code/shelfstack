@@ -113,7 +113,7 @@ const eligibilityCriteria = [
           v-for="item in guarantees"
           :key="item.id"
           :padded="true"
-          class="flex flex-col justify-between border-brand-hair bg-white"
+          class="flex flex-col justify-between border-brand-hair bg-brand-canvas"
         >
           <div>
             <div class="mb-4 flex items-center justify-between">
@@ -158,7 +158,7 @@ const eligibilityCriteria = [
           v-for="step in returnSteps"
           :key="step.number"
           :padded="true"
-          class="border-brand-hair bg-white flex flex-col justify-between"
+          class="border-brand-hair bg-brand-canvas flex flex-col justify-between"
         >
           <div>
             <div class="mb-4 flex items-center justify-between">
@@ -200,7 +200,7 @@ const eligibilityCriteria = [
         </p>
       </div>
 
-      <UiCard :padded="true" class="border-brand-hair bg-white">
+      <UiCard :padded="true" class="border-brand-hair bg-brand-canvas">
         <div
           class="grid grid-cols-1 gap-6 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-brand-hair"
         >

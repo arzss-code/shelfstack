@@ -36,7 +36,7 @@ const editState = reactive<{
 
 const selectedItem = computed(() => items.value.find((i) => i.id === selectedId.value) || null)
 
-const statusFilterOptions = [
+const statusFilterOptions: Array<{ value: 'all' | ContactMessageStatus; label: string }> = [
   { value: 'all', label: 'Semua' },
   { value: 'open', label: 'Baru' },
   { value: 'in_progress', label: 'Diproses' },
@@ -129,6 +129,11 @@ async function saveUpdate() {
   }
 }
 
+function applyStatusFilter(value: 'all' | ContactMessageStatus) {
+  statusFilter.value = value
+  fetchContacts()
+}
+
 onMounted(() => {
   fetchContacts()
 })
@@ -142,16 +147,13 @@ onMounted(() => {
           v-for="opt in statusFilterOptions"
           :key="opt.value"
           type="button"
-          class="min-h-[36px] px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors cursor-pointer"
+          class="min-h-[44px] px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors cursor-pointer"
           :class="
             statusFilter === opt.value
               ? 'bg-brand-ink text-brand-onink border-brand-ink'
               : 'bg-brand-canvas text-brand-muted border-brand-hair hover:text-brand-ink'
           "
-          @click="
-            statusFilter = opt.value as 'all' | ContactMessageStatus
-            fetchContacts()
-          "
+          @click="applyStatusFilter(opt.value)"
         >
           {{ opt.label }}
         </button>

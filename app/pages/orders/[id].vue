@@ -137,11 +137,13 @@ useSeoMeta({
 
     <div
       v-if="errorMsg"
-      class="text-center py-16 px-6 bg-red-50 border border-red-200 rounded-card max-w-lg mx-auto space-y-4"
+      class="text-center py-16 px-6 bg-brand-danger-tint border border-brand-danger-edge rounded-card max-w-lg mx-auto space-y-4"
     >
-      <i class="pi pi-exclamation-triangle text-3xl text-red-600" />
-      <h2 class="font-display text-lg font-bold text-red-900 m-0">Gagal Memuat Pesanan</h2>
-      <p class="text-xs text-red-700 m-0">{{ errorMsg }}</p>
+      <i class="pi pi-exclamation-triangle text-3xl text-brand-danger" />
+      <h2 class="font-display text-lg font-bold text-brand-danger-text m-0">
+        Gagal Memuat Pesanan
+      </h2>
+      <p class="text-xs text-brand-danger-text m-0">{{ errorMsg }}</p>
       <UiButton to="/orders" variant="secondary" size="sm">Kembali ke Riwayat Pesanan</UiButton>
     </div>
 
