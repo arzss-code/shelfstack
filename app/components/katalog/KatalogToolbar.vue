@@ -50,7 +50,7 @@ const emit = defineEmits<{
       >
         <button
           type="button"
-          class="w-5 h-5 rounded-full bg-brand-hair flex items-center justify-center text-[10px] text-brand-ink hover:bg-brand-muted hover:text-white transition-colors cursor-pointer border-0"
+          class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-[10px] text-brand-ink hover:text-brand-accent transition-colors cursor-pointer border-0"
           aria-label="Hapus pencarian"
           @click="emit('clearSearch')"
         >
@@ -66,14 +66,14 @@ const emit = defineEmits<{
         type="button"
         variant="secondary"
         size="sm"
-        class="lg:hidden rounded-full font-semibold text-xs h-8"
+        class="lg:hidden rounded-full font-semibold text-xs min-h-[44px]"
         icon="pi-filter"
         @click="emit('openMobileFilter')"
       >
         <span>Filter</span>
         <span
           v-if="activeFiltersCount > 0"
-          class="ml-1 w-4 h-4 rounded-full bg-brand-ink text-white text-[10px] flex items-center justify-center font-bold"
+          class="ml-1 w-4 h-4 rounded-full bg-brand-ink text-brand-onink text-[10px] flex items-center justify-center font-bold"
         >
           {{ activeFiltersCount }}
         </span>
@@ -99,7 +99,7 @@ const emit = defineEmits<{
           <button
             type="button"
             :class="[
-              'w-8 h-8 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+              'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
               viewMode === 'grid'
                 ? 'bg-brand-canvas text-brand-ink shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:text-brand-ink',
@@ -115,7 +115,7 @@ const emit = defineEmits<{
           <button
             type="button"
             :class="[
-              'w-8 h-8 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+              'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
               viewMode === 'list'
                 ? 'bg-brand-canvas text-brand-ink shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:text-brand-ink',
@@ -135,7 +135,7 @@ const emit = defineEmits<{
             <button
               type="button"
               :class="[
-                'w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+                'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
                 gridDensity === 'compact'
                   ? 'bg-brand-canvas text-brand-ink shadow-whisper font-bold'
                   : 'text-brand-muted bg-transparent hover:text-brand-ink',
@@ -150,7 +150,7 @@ const emit = defineEmits<{
             <button
               type="button"
               :class="[
-                'w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+                'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
                 gridDensity === 'spacious'
                   ? 'bg-brand-canvas text-brand-ink shadow-whisper font-bold'
                   : 'text-brand-muted bg-transparent hover:text-brand-ink',

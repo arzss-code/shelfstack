@@ -186,7 +186,7 @@ const resetFilters = () => {
       <div
         v-for="n in 4"
         :key="n"
-        class="p-4 rounded-2xl border border-brand-hair bg-white flex gap-4"
+        class="p-4 rounded-2xl border border-brand-hair bg-brand-canvas flex gap-4"
       >
         <UiSkeleton width="w-28" height="h-32" />
         <div class="flex-1 space-y-2 py-2">

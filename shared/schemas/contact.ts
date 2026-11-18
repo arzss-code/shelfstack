@@ -33,3 +33,18 @@ export const contactMessageSchema = z.object({
 })
 
 export type ContactMessageInput = z.infer<typeof contactMessageSchema>
+
+export const contactStatusSchema = z.enum(['open', 'in_progress', 'resolved'])
+export type ContactMessageStatus = z.infer<typeof contactStatusSchema>
+
+export const adminContactUpdateSchema = z.object({
+  status: contactStatusSchema,
+  admin_notes: z
+    .string()
+    .trim()
+    .max(1000, 'Catatan admin maksimal 1000 karakter')
+    .nullable()
+    .optional(),
+})
+
+export type AdminContactUpdateInput = z.infer<typeof adminContactUpdateSchema>

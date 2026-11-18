@@ -2,6 +2,26 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.30] - 2026-11-18
+
+### Penuntasan Audit Lanjutan (`docs/AUDIT-NEXT-PHASE.md`): Integritas Storefront, Modul Admin Lengkap, & Unifikasi Design System
+
+- **Tahap 1: Kejujuran Storefront, Persistensi Kontak, Restock Atomik, & Settlement RMA (`20261203000001`)**:
+  - Menambahkan tabel `public.contact_messages` (dengan soft-delete `deleted_at`, RLS admin/service role) serta menyambungkan `POST /api/contact` ke penyimpanan database nyata dan pengiriman alert email (`server/utils/contact-email.ts`).
+  - Memperbarui trigger `trg_record_stock_movement()` dan menambahkan RPC `admin_restock_product(p_product_id, p_quantity, p_notes, p_variant_id)` untuk menghilangkan race condition dan error RLS ledger pada `POST /api/admin/products/[id]/restock`.
+  - Melengkapi `admin_review_return_request` untuk tiket retur bertipe `refund` agar mencatat baris `rma_settlement` idempoten di `public.refunds`, menurunkan `sold_count`, mengembalikan `coins_used`, serta mencabut cashback `coins_earned`.
+  - Memperbaiki tautan 404 `/products/` -> `/product/` di `HomeReviews.vue`, `AdminSupportChatPane.vue`, dan `ChatProductSnippet.vue`; menghapus timer tengah malam palsu dari `index.vue` & `HomeFlashDeals.vue`; mengikat kartu hero ke data produk nyata; menyelaraskan kebijakan garansi retur **7 Hari**, batas bayar **2 jam (120 menit)**, dan syarat minimal Gratis Ongkir **Rp500.000**.
+- **Tahap 2: Penuntasan Fitur Admin Setengah Jadi & Pembatalan Mandiri**:
+  - **Admin Varian Produk (`product_variants`)**: Menambahkan endpoint CRUD `GET/POST/PUT/DELETE` di `server/api/admin/products/[id]/variants/` serta modal `AdminProductVariantsModal.vue` (`useAdminProductVariants.ts`) terhubung ke `POST /api/admin/products/[id]/restock` dan membersihkan field/placeholder warisan pada `ProductForm.vue`.
+  - **Admin Promo & Flash Sale (`flash_deals`)**: Membangun `/admin/promotions` (`AdminFlashDealModal.vue` + endpoint `server/api/admin/promotions/flash-deals/*`) dan menambahkan tautan navigasi sidebar melalui `AdminSidebarNav.vue`.
+  - **Admin Kategori (`categories`)**: Menambahkan endpoint `POST/PUT/DELETE` di `server/api/admin/categories/*` (dengan guard 409 bila masih ada produk aktif), modal `AdminCategoryManagerModal.vue`, serta mengganti URL aset eksternal kedaluwarsa di `CANONICAL_CATEGORIES` menjadi `/logo.svg`.
+  - **Inbox Pesan Kontak (`/admin/support`)**: Membangun `GET /api/admin/contacts` dan `PATCH /api/admin/contacts/[id]` bersama panel `AdminContactInboxPanel.vue` untuk menindaklanjuti tiket formulir kontak.
+  - **Pembatalan Mandiri Pesanan `paid` Belum Dikirim**: Menambahkan `GET/POST /api/orders/[id]/request-refund`, `OrderPaidRefundModal.vue`, `usePaidOrderRefundRequest.ts`, serta korelasi idempotency key `cust-refund-req-*` pada `server/api/orders/[id]/refund.post.ts`; mengubah `/account/coins` menjadi redirect permanen 301 ke `/account/points`.
+- **Tahap 3: Unifikasi Design System (`DESIGN.md`), Theme Toggle, UX 5-States, & Strict Typing**:
+  - Menambahkan token tipografi `micro` (`11px`) dan `caption` (`12px`) di `tailwind.config.js`, serta pengubah tema Light/Dark fungsional di pengaturan akun (`useThemeMode.ts` + `ProfileThemeCard.vue` pada `/account/profile`) dengan inisialisasi otomatis di `app.vue` tanpa membebani navbar.
+  - Mengganti hardcoded `bg-white`, class warna mentah Tailwind, dan `font-mono` konsumen pada permukaan utama storefront, order, profil, dan koin loyalitas menggunakan token semantik `brand-*`, serta memperbaiki temuan `impeccable` di `AdminSupportInboxList.vue` (`border-l-4`) dan `WishlistButton.vue` (`cubic-bezier(0.16, 1, 0.3, 1)`).
+  - Menambahkan Error State eksplisit + tombol **Coba Lagi** serta `min-w-0` di `/katalog` dan `/c/[slug]`, memperbesar target sentuh `< 44x44px` di navbar, toolbar, konfigurator produk, dan drawer mobile, serta mengeliminasi seluruh 22 type cast `any` di luar `app/types/database.types.ts`.
+
 ## [v1.1.0-beta.29] - 2026-11-17
 
 ### Penuntasan Remediasi Audit: Transaksi Atomik, Privasi Storage, Trusted Proxy, dan Reproducibility

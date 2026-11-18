@@ -48,8 +48,8 @@ try {
     <section class="mb-16 sm:mb-20">
       <div class="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
         <UiCard :padded="true" class="text-left">
-          <p class="mb-1 font-display text-3xl font-bold text-brand-ink sm:text-4xl">34+</p>
-          <p class="text-xs font-semibold text-brand-ink sm:text-sm">Produk Terkurasi</p>
+          <p class="mb-1 font-display text-3xl font-bold text-brand-ink sm:text-4xl">5 Kategori</p>
+          <p class="text-xs font-semibold text-brand-ink sm:text-sm">Koleksi Terkurasi</p>
           <p class="mt-1 text-xs leading-normal text-brand-muted">
             Katalog terpilih yang diuji untuk beban kerja produktivitas intensif.
           </p>
@@ -225,7 +225,7 @@ try {
     <section class="mb-8">
       <UiCard
         :padded="true"
-        class="border border-brand-hair bg-white px-6 py-10 text-center sm:py-14"
+        class="border border-brand-hair bg-brand-canvas px-6 py-10 text-center sm:py-14"
       >
         <div class="mx-auto max-w-2xl space-y-4">
           <h2 class="font-display text-2xl font-bold tracking-tight text-brand-ink sm:text-3xl">

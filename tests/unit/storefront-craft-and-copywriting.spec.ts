@@ -64,7 +64,7 @@ describe('Storefront Craft & Copywriting Suite', () => {
 
       expect(wrapper.text()).toContain('Standar Kualitas & Kepuasan Pelanggan ShelfStack')
       expect(wrapper.text()).toContain('Kurasi Fisik 100% Asli')
-      expect(wrapper.text()).toContain('Jaminan Pengembalian 30 Hari')
+      expect(wrapper.text()).toContain('Jaminan Pengembalian 7 Hari')
       expect(wrapper.text()).toContain('Pengemasan Tahan Benturan')
       expect(wrapper.text()).toContain('Layanan Pelanggan Responsif')
 
@@ -96,22 +96,22 @@ describe('Storefront Craft & Copywriting Suite', () => {
 
       // Cek tautan produk
       const productLink = reviewCards[0].find('a')
-      expect(productLink.attributes('href')).toBe('/products/headphone-studio-anc')
+      expect(productLink.attributes('href')).toBe('/product/headphone-studio-anc')
     })
   })
 
   describe('HomePromoCTA Component', () => {
-    it('merender heading kelola katalogmu sendiri dan badge voucher WELCOME10', () => {
+    it('merender heading penawaran pelanggan baru dan badge voucher WELCOME10', () => {
       const wrapper = mount(HomePromoCTA, {
         global: {
           stubs: globalStubs,
         },
       })
 
-      expect(wrapper.text()).toContain('Kelola katalogmu sendiri')
+      expect(wrapper.text()).toContain('Hemat 10% untuk Pesanan Pertamamu')
       expect(wrapper.text()).toContain('WELCOME10')
       expect(wrapper.text()).toContain('Diskon 10% Pesanan Pertama')
-      expect(wrapper.text()).toContain('Bebas Ongkir se-Indonesia')
+      expect(wrapper.text()).toContain('Bebas Ongkir min. Rp500.000')
 
       const voucherLink = wrapper.find('a[href="/promos"]')
       expect(voucherLink.exists()).toBe(true)

@@ -22,6 +22,11 @@ const props = withDefaults(
   },
 )
 
+const { campaign, isCampaignActive, getDealForProduct } = useFlashSale()
+const dbPromoEndsAt = computed(() =>
+  isCampaignActive.value ? (campaign.value?.ends_at ?? null) : null,
+)
+
 const {
   countdownData,
   isLoading,
@@ -30,9 +35,7 @@ const {
   failedDealImages,
   onImageError,
   flashSectionRef,
-} = useHomeFlashDeals(props)
-
-const { getDealForProduct } = useFlashSale()
+} = useHomeFlashDeals(props, dbPromoEndsAt)
 </script>
 
 <template>
@@ -46,13 +49,20 @@ const { getDealForProduct } = useFlashSale()
     >
       <div>
         <div class="mb-2 flex items-center gap-2">
-          <UiBadge label="Flash Deals" variant="solid-danger" />
+          <UiBadge
+            :label="countdownData ? 'Flash Deals' : 'Pilihan Kurator'"
+            :variant="countdownData ? 'solid-danger' : 'info'"
+          />
           <h2 class="m-0 font-display text-2xl font-extrabold text-white sm:text-3xl">
-            Promo Terbatas Hari Ini
+            {{ countdownData ? 'Promo Terbatas Hari Ini' : 'Sorotan Koleksi Pilihan' }}
           </h2>
         </div>
         <p class="m-0 text-xs text-white/70 sm:text-sm">
-          Diskon spesial produk pilihan dengan alokasi kuota harian.
+          {{
+            countdownData
+              ? 'Diskon spesial produk pilihan dengan alokasi kuota promo aktif.'
+              : 'Produk pilihan berkualitas dengan ketersediaan stok siap kirim.'
+          }}
         </p>
       </div>
 
@@ -64,7 +74,7 @@ const { getDealForProduct } = useFlashSale()
         <span class="text-xs font-medium text-white/70">Berakhir dalam:</span>
         <div
           data-testid="flash-deals-timer"
-          class="font-mono text-sm font-bold text-amber-300 tabular-nums tracking-widest"
+          class="font-display text-sm font-bold text-brand-warning tabular-nums tracking-widest"
         >
           {{ countdownData.formatted }}
         </div>
@@ -139,7 +149,7 @@ const { getDealForProduct } = useFlashSale()
       <div
         v-for="product in displayProducts"
         :key="product.id"
-        class="group flex flex-col justify-between gap-3 rounded-card border border-brand-hair bg-white p-4 text-brand-ink shadow-whisper transition-shadow hover:shadow-floating"
+        class="group flex flex-col justify-between gap-3 rounded-card border border-brand-hair bg-brand-canvas p-4 text-brand-ink shadow-whisper transition-shadow hover:shadow-floating"
         data-testid="flash-deal-card"
       >
         <div
@@ -180,7 +190,7 @@ const { getDealForProduct } = useFlashSale()
             v-if="product.rating && Number(product.rating) > 0"
             class="mb-1 flex items-center gap-1 text-[11px] text-brand-muted tabular-nums"
           >
-            <i class="pi pi-star-fill text-[10px] text-amber-500" aria-hidden="true" />
+            <i class="pi pi-star-fill text-[10px] text-brand-warning" aria-hidden="true" />
             <span class="font-bold text-brand-ink">{{ Number(product.rating).toFixed(1) }}</span>
             <span v-if="product.review_count">({{ product.review_count }})</span>
             <span v-else-if="product.sold_count">· {{ product.sold_count }} terjual</span>
@@ -207,7 +217,7 @@ const { getDealForProduct } = useFlashSale()
             <template v-if="getDealForProduct(product.id)">
               <span
                 data-testid="deal-price"
-                class="font-display text-base font-extrabold text-rose-600 tabular-nums"
+                class="font-display text-base font-extrabold text-brand-danger tabular-nums"
               >
                 {{ formatRupiah(getDealForProduct(product.id)!.promo_price_cents / 100) }}
               </span>
@@ -239,7 +249,7 @@ const { getDealForProduct } = useFlashSale()
         </div>
 
         <UiButton
-          :to="`/product/${product.id}`"
+          :to="`/product/${product.slug || product.id}`"
           data-testid="deal-link"
           variant="primary"
           size="sm"

@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Pekerjaan aktif:** Penuntasan seluruh remediasi audit Tahap 1A-4 (`v1.1.0-beta.29`): modularisasi dokumen invoice, privasi bucket & signed URL (`chat-attachments`, `return-proofs`), anti-spoofing trusted proxy, migrasi korektif transaksi/koin/ongkir/varian (`20261202000001`), RPC retur atomik `admin_review_return_request`, sinkronisasi `coins_discount_cents` pada `database.types.ts`, serta kelengkapan konfigurasi `docker-compose.prod.yml` dan dokumentasi. Lihat [rencana dan hasil verifikasi](./roadmap/audit-remediation-plan.md).
-- **Versi rilis aktif:** `v1.1.0-beta.29` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
-- **Quality Gate Terkini (2026-11-17):** `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `order-service typecheck` EXIT 0 · `order-service test` 2 file / 25 test lolos 100% · `vitest run` 138 file / 1.377 test lolos 100% · 0 file authored melampaui 300 baris.
+- **Pekerjaan aktif:** Penuntasan seluruh temuan [`AUDIT-NEXT-PHASE.md`](./AUDIT-NEXT-PHASE.md) Tahap 1, 2, dan 3 (`v1.1.0-beta.30`): migrasi `20261203000001` (persistensi `contact_messages`, RPC `admin_restock_product`, settlement finansial/koin/sold_count RMA `refund`), CRUD Admin Varian Produk, Flash Deals (`/admin/promotions`), Kategori (dengan guard 409 produk aktif), Inbox Pesan Kontak (`/admin/support`), pengajuan pembatalan/refund pesanan `paid` belum dikirim, redirect kanonis `/account/coins` -> `/account/points`, Theme Switcher Light/Dark di `/account/profile` (`ProfileThemeCard` + `useThemeMode`), penyelarasan alignment/badge navbar (`44x44px`), pembersihan token `brand-*` & temuan `impeccable`, Error State + `min-w-0` di `/katalog` + `/c/[slug]`, perluasan target sentuh `>= 44px`, dan zero `any` di luar `database.types.ts`.
+- **Versi rilis aktif:** `v1.1.0-beta.30` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
+- **Quality Gate Terkini (2026-11-18):** `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `order-service typecheck` EXIT 0 · `order-service test` 2 file / 25 test lolos 100% · `vitest run` 141 file / 1.391 test lolos 100% · `pnpm build` EXIT 0 · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -47,8 +47,9 @@
 
 **Known gaps terdokumentasi:**
 
-- Runtime test PostgreSQL multi-koneksi untuk migrasi `20261202000001` belum dieksekusi lokal karena daemon Docker offline.
+- Runtime test PostgreSQL multi-koneksi untuk migrasi `20261202000001` dan `20261203000001` belum dieksekusi lokal karena daemon Docker offline; pada instance Supabase target wajib dijalankan `pnpm dlx supabase db push` sebelum mengaktifkan fitur tabel baru (`contact_messages`, kolom `deleted_at` kategori/flash deals, RPC `admin_restock_product`). Endpoint publik memiliki fallback defensif bila kolom `deleted_at` belum ada.
 - Cleanup avatar best-effort tetap tidak memakai antrean retry terpisah bila Storage API gagal sementara setelah update profil sukses.
+- Pengiriman notifikasi email dan pesan kontak mengandalkan dispatcher asinkron tanpa tabel persistent email outbox/retry worker terpisah di database.
 
 ## 🚀 Riwayat Kemajuan per Fase
 

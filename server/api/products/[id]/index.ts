@@ -1,9 +1,10 @@
 import { serverSupabaseClient } from '#supabase/server'
+import type { Database } from '~/types/database.types'
 import { productSchema } from '../../../../shared/schemas/product'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
-  const client = await serverSupabaseClient(event)
+  const client = await serverSupabaseClient<Database>(event)
   const rawParam = getRouterParam(event, 'id')
 
   if (!rawParam || typeof rawParam !== 'string') {
@@ -54,7 +55,11 @@ export default defineEventHandler(async (event) => {
       errorResponse(event, 'Validation error', parsed.error.flatten().fieldErrors, 400)
     }
 
-    let updateQuery = client.from('products').update(parsed.data as any)
+    const updatePayload: Database['public']['Tables']['products']['Update'] = {
+      ...parsed.data,
+      specs: parsed.data.specs as Database['public']['Tables']['products']['Row']['specs'],
+    }
+    let updateQuery = client.from('products').update(updatePayload)
     if (numericId !== null) {
       updateQuery = updateQuery.eq('id', numericId)
     } else {

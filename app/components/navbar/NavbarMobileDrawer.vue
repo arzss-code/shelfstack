@@ -23,12 +23,12 @@ function closeDrawer() {
 <template>
   <div
     v-if="open"
-    class="md:hidden w-full bg-white border-b border-brand-hair px-4 py-4 space-y-4 shadow-floating animate-fadeIn"
+    class="md:hidden w-full bg-brand-canvas border-b border-brand-hair px-4 py-4 space-y-4 shadow-floating animate-fadeIn"
   >
     <!-- Mobile Search Form -->
     <search>
       <form
-        class="flex items-center gap-2 bg-brand-field rounded-full px-3 py-1.5 border border-brand-hair"
+        class="flex items-center gap-2 bg-brand-field rounded-full pl-3.5 pr-1.5 py-1 border border-brand-hair"
         @submit.prevent="emit('search')"
       >
         <input
@@ -41,38 +41,38 @@ function closeDrawer() {
           spellcheck="false"
           aria-label="Cari produk"
           placeholder="Cari produk..."
-          class="w-full bg-transparent text-xs text-brand-ink placeholder-brand-faint focus:outline-none"
+          class="w-full bg-transparent text-xs text-brand-ink placeholder-brand-faint focus:outline-none min-h-[36px]"
           @input="emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
         />
         <button
           type="submit"
           aria-label="Cari produk"
-          class="w-6 h-6 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0"
+          class="relative w-8 h-8 rounded-full bg-brand-ink text-brand-onink flex items-center justify-center shrink-0 before:content-[''] before:absolute before:-inset-1.5"
         >
-          <i class="pi pi-search text-[10px]" aria-hidden="true" />
+          <i class="pi pi-search text-xs" aria-hidden="true" />
         </button>
       </form>
     </search>
 
     <!-- Mobile Links -->
-    <nav class="flex flex-col gap-2 text-xs font-semibold" aria-label="Navigasi Mobile">
+    <nav class="flex flex-col gap-1 text-xs font-semibold" aria-label="Navigasi Mobile">
       <NuxtLink
         to="/"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
         @click="closeDrawer"
       >
         Beranda
       </NuxtLink>
       <NuxtLink
         to="/katalog"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
         @click="closeDrawer"
       >
         Katalog Lengkap
       </NuxtLink>
       <NuxtLink
         to="/promos"
-        class="py-2 text-brand-accent no-underline border-b border-brand-hairsoft flex items-center justify-between font-semibold"
+        class="min-h-[44px] py-2.5 text-brand-accent no-underline border-b border-brand-hairsoft flex items-center justify-between font-semibold"
         @click="closeDrawer"
       >
         <span class="flex items-center gap-2">
@@ -87,13 +87,13 @@ function closeDrawer() {
       </NuxtLink>
       <NuxtLink
         to="/wishlist"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft flex items-center justify-between"
+        class="min-h-[44px] py-2.5 text-brand-ink no-underline border-b border-brand-hairsoft flex items-center justify-between"
         @click="closeDrawer"
       >
         <span>Wishlist</span>
         <span
           v-if="wishlistCount > 0"
-          class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold"
+          class="px-2 py-0.5 rounded-full bg-brand-danger text-white text-[10px] font-bold"
         >
           {{ wishlistCount }}
         </span>
@@ -101,7 +101,7 @@ function closeDrawer() {
       <NuxtLink
         v-if="isLoggedIn"
         to="/notifications"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft flex items-center justify-between"
+        class="min-h-[44px] py-2.5 text-brand-ink no-underline border-b border-brand-hairsoft flex items-center justify-between"
         @click="closeDrawer"
       >
         <span class="flex items-center gap-2">
@@ -110,7 +110,7 @@ function closeDrawer() {
         </span>
         <span
           v-if="unreadNotificationsCount > 0"
-          class="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold tabular-nums"
+          class="px-2 py-0.5 rounded-full bg-brand-danger text-white text-[10px] font-bold tabular-nums"
         >
           {{ unreadNotificationsCount }}
         </span>
@@ -118,7 +118,7 @@ function closeDrawer() {
       <NuxtLink
         v-if="isLoggedIn"
         to="/account/profile"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
         @click="closeDrawer"
       >
         Profil Saya
@@ -126,7 +126,7 @@ function closeDrawer() {
       <NuxtLink
         v-if="isLoggedIn"
         to="/account/addresses"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
         @click="closeDrawer"
       >
         Daftar Alamat
@@ -134,7 +134,7 @@ function closeDrawer() {
       <NuxtLink
         v-if="isLoggedIn"
         to="/orders"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
         @click="closeDrawer"
       >
         Pesanan Saya
@@ -142,28 +142,28 @@ function closeDrawer() {
       <NuxtLink
         v-if="isLoggedIn"
         to="/account/vouchers"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
         @click="closeDrawer"
       >
         Voucher Saya
       </NuxtLink>
       <NuxtLink
         to="/help"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
         @click="closeDrawer"
       >
         Pusat Bantuan
       </NuxtLink>
       <NuxtLink
         to="/tracking"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
         @click="closeDrawer"
       >
         Lacak Pesanan
       </NuxtLink>
       <NuxtLink
         to="/contact"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
         @click="closeDrawer"
       >
         Hubungi Kami
@@ -171,7 +171,7 @@ function closeDrawer() {
       <NuxtLink
         v-if="isAdmin"
         to="/admin/products"
-        class="py-2 text-brand-ink no-underline border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
         @click="closeDrawer"
       >
         Kelola Produk (Admin)
@@ -179,7 +179,7 @@ function closeDrawer() {
       <button
         v-if="isLoggedIn"
         type="button"
-        class="py-2 text-left text-red-600 font-semibold cursor-pointer border-b border-brand-hairsoft"
+        class="min-h-[44px] py-2.5 flex items-center text-left text-brand-danger-text font-semibold cursor-pointer border-b border-brand-hairsoft"
         @click="emit('logout')"
       >
         Keluar
@@ -187,7 +187,7 @@ function closeDrawer() {
       <NuxtLink
         v-else
         to="/auth/login"
-        class="py-2 text-brand-accent no-underline font-semibold"
+        class="min-h-[44px] py-2.5 flex items-center text-brand-accent no-underline font-semibold"
         @click="closeDrawer"
       >
         Masuk ke Akun

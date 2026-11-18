@@ -76,6 +76,12 @@ const SHA512_HEX_REGEX = /\b[a-fA-F0-9]{128}\b/g
 const SHA256_HEX_REGEX = /\b[a-fA-F0-9]{64}\b/g
 const SUPABASE_KEY_REGEX = /sbp_[a-zA-Z0-9_-]+/g
 
+function getErrorCode(err: unknown): string | number | undefined {
+  if (!err || typeof err !== 'object' || !('code' in err)) return undefined
+  const code = (err as { code?: unknown }).code
+  return typeof code === 'string' || typeof code === 'number' ? code : undefined
+}
+
 /**
  * Recursively redacts sensitive keys and values from logging objects.
  */
@@ -101,7 +107,7 @@ export function sanitizeLogData(data: unknown, depth = 0): unknown {
     return {
       name: data.name,
       message: sanitizeLogData(data.message, depth + 1),
-      code: (data as any).code,
+      code: getErrorCode(data),
       stack: isProd ? undefined : data.stack,
     }
   }
@@ -178,7 +184,7 @@ export const logger = {
         errorObj = {
           name: err.name,
           message: err.message,
-          code: (err as any).code,
+          code: getErrorCode(err),
           stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,
         }
       } else if (err && typeof err === 'object') {

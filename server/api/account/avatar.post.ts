@@ -96,7 +96,7 @@ export default defineEventHandler(async (event) => {
 
   // 6. Selaraskan user_metadata di auth Supabase
   try {
-    await (serviceClient as any).auth.admin.updateUserById(targetUserId, {
+    await serviceClient.auth.admin.updateUserById(targetUserId, {
       user_metadata: { avatar_url: newAvatarUrl },
     })
   } catch {

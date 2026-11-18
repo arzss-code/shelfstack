@@ -35,7 +35,7 @@ function recordDeliveryLog(record: EmailDeliveryRecord): void {
   }
 }
 
-function resolveEmailConfig(options?: DispatchEmailOptions) {
+export function resolveEmailConfig(options?: DispatchEmailOptions) {
   let envProvider = ''
   let envKey = ''
   let envFrom = ''
@@ -87,7 +87,7 @@ function resolveEmailConfig(options?: DispatchEmailOptions) {
   return { provider, apiKey, fromEmail, appUrl, supportEmail }
 }
 
-async function sendViaResend(
+export async function sendViaResend(
   to: string,
   from: string,
   subject: string,

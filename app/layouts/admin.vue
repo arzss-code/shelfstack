@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import AppLogo from '~/components/AppLogo.vue'
+import AdminSidebarNav, { type AdminNavLink } from '~/components/admin/AdminSidebarNav.vue'
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useAdminSupportChat } from '~/composables/useAdminSupportChat'
 
@@ -14,13 +15,14 @@ const unreadSupportCount = computed(() => {
   return threads.value?.reduce((acc, t) => acc + (t.unread_by_admin_count || 0), 0) ?? 0
 })
 
-const navLinks = [
+const navLinks: AdminNavLink[] = [
   { to: '/admin', label: 'Dashboard', icon: 'pi-chart-bar', exact: true },
   { to: '/admin/orders', label: 'Kelola Pesanan', icon: 'pi-shopping-bag', exact: false },
   { to: '/admin/users', label: 'Pelanggan & CRM', icon: 'pi-users', exact: false },
   { to: '/admin/returns', label: 'Komplain & Retur', icon: 'pi-replay', exact: false },
   { to: '/admin/support', label: 'Bantuan & Live Chat', icon: 'pi-comments', exact: false },
   { to: '/admin/products', label: 'Kelola Produk', icon: 'pi-th-large', exact: false },
+  { to: '/admin/promotions', label: 'Promo & Flash Sale', icon: 'pi-bolt', exact: false },
   { to: '/admin/coupons', label: 'Kelola Voucher', icon: 'pi-ticket', exact: false },
   { to: '/admin/activities', label: 'Activity Log', icon: 'pi-history', exact: false },
 ]
@@ -65,27 +67,11 @@ onMounted(() => {
         </div>
       </NuxtLink>
 
-      <nav class="flex flex-col gap-1.5" aria-label="Navigasi Menu Admin Desktop">
-        <NuxtLink
-          v-for="item in navLinks"
-          :key="item.to"
-          :to="item.to"
-          class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center justify-between text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
-          :exact-active-class="item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
-          :active-class="!item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
-        >
-          <div class="flex items-center gap-2.5">
-            <i :class="['pi text-xs', item.icon]" />
-            <span>{{ item.label }}</span>
-          </div>
-          <span
-            v-if="item.to === '/admin/support' && unreadSupportCount > 0"
-            class="unread-support-badge rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white leading-none shadow-sm"
-          >
-            {{ unreadSupportCount > 99 ? '99+' : unreadSupportCount }}
-          </span>
-        </NuxtLink>
-      </nav>
+      <AdminSidebarNav
+        :links="navLinks"
+        :unread-support-count="unreadSupportCount"
+        nav-label="Navigasi Menu Admin Desktop"
+      />
 
       <div class="mt-auto pt-4 border-t border-brand-hairsoft flex flex-col gap-2">
         <NuxtLink
@@ -143,7 +129,7 @@ onMounted(() => {
           </NuxtLink>
           <button
             type="button"
-            class="w-8 h-8 rounded-full border border-brand-hair flex items-center justify-center text-brand-ink hover:bg-brand-canvas"
+            class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border border-brand-hair flex items-center justify-center text-brand-ink hover:bg-brand-canvas"
             aria-label="Tutup navigasi"
             @click="isMobileMenuOpen = false"
           >
@@ -151,28 +137,12 @@ onMounted(() => {
           </button>
         </div>
 
-        <nav class="flex flex-col gap-1.5" aria-label="Navigasi Menu Admin Mobile">
-          <NuxtLink
-            v-for="item in navLinks"
-            :key="item.to"
-            :to="item.to"
-            class="rounded-full px-4 py-2.5 text-xs font-semibold no-underline transition-all flex items-center justify-between text-brand-muted hover:text-brand-ink hover:bg-brand-canvas"
-            :exact-active-class="item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
-            :active-class="!item.exact ? '!bg-brand-ink !text-brand-onink shadow-whisper' : ''"
-            @click="isMobileMenuOpen = false"
-          >
-            <div class="flex items-center gap-2.5">
-              <i :class="['pi text-xs', item.icon]" />
-              <span>{{ item.label }}</span>
-            </div>
-            <span
-              v-if="item.to === '/admin/support' && unreadSupportCount > 0"
-              class="unread-support-badge rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white leading-none shadow-sm"
-            >
-              {{ unreadSupportCount > 99 ? '99+' : unreadSupportCount }}
-            </span>
-          </NuxtLink>
-        </nav>
+        <AdminSidebarNav
+          :links="navLinks"
+          :unread-support-count="unreadSupportCount"
+          nav-label="Navigasi Menu Admin Mobile"
+          @navigate="isMobileMenuOpen = false"
+        />
 
         <div class="mt-auto pt-4 border-t border-brand-hairsoft flex flex-col gap-2">
           <NuxtLink
@@ -205,7 +175,7 @@ onMounted(() => {
           <!-- Mobile Hamburger Toggle -->
           <button
             type="button"
-            class="relative flex h-9 w-9 items-center justify-center rounded-lg border border-brand-hair text-brand-ink hover:bg-brand-canvas-soft md:hidden"
+            class="relative flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-brand-hair text-brand-ink hover:bg-brand-canvas-soft md:hidden"
             aria-label="Buka menu navigasi admin"
             @click="isMobileMenuOpen = true"
           >

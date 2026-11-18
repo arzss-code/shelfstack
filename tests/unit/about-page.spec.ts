@@ -53,8 +53,8 @@ describe('About Page (app/pages/about.vue)', () => {
     })
 
     const text = wrapper.text()
-    expect(text).toContain('34+')
-    expect(text).toContain('Produk Terkurasi')
+    expect(text).toContain('5 Kategori')
+    expect(text).toContain('Koleksi Terkurasi')
     expect(text).toContain('100%')
     expect(text).toContain('Lulus Uji Standar')
     expect(text).toContain('2 Tahun')

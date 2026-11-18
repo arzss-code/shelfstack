@@ -83,14 +83,31 @@ export async function getActiveFlashSaleCampaign(
 
   // 1. Ambil dari tabel fisik public.flash_deals terlebih dahulu (Authoritative DB Deals)
   try {
-    const { data: dbDeals } = await client
+    let queryRes = await client
       .from('flash_deals')
       .select(
         'id, product_id, promo_price_cents, discount_percentage, quota, claimed, starts_at, ends_at, is_active, products(id, name, slug, price, price_cents, stock, image_url)',
       )
       .eq('is_active', true)
+      .is('deleted_at', null)
       .lte('starts_at', nowIso)
       .gte('ends_at', nowIso)
+
+    if (
+      queryRes.error &&
+      (queryRes.error.code === '42703' || queryRes.error.message?.includes('deleted_at'))
+    ) {
+      queryRes = await client
+        .from('flash_deals')
+        .select(
+          'id, product_id, promo_price_cents, discount_percentage, quota, claimed, starts_at, ends_at, is_active, products(id, name, slug, price, price_cents, stock, image_url)',
+        )
+        .eq('is_active', true)
+        .lte('starts_at', nowIso)
+        .gte('ends_at', nowIso)
+    }
+
+    const dbDeals = queryRes.data
 
     if (dbDeals && dbDeals.length > 0) {
       const items: FlashDealItem[] = dbDeals.map((deal) => {
@@ -120,12 +137,18 @@ export async function getActiveFlashSaleCampaign(
         }
       })
 
+      const campaignEndsAt =
+        items
+          .map((item) => item.ends_at)
+          .filter(Boolean)
+          .sort()[0] || endsAt
+
       const campaignDate = startsAt.slice(0, 10)
       return {
         id: `flash-sale-${campaignDate}`,
         title: 'Flash Sale Hari Ini',
         tagline: 'Koleksi kurasi eksklusif dengan harga promo terbatas. Stok diperbarui otomatis.',
-        ends_at: endsAt,
+        ends_at: campaignEndsAt,
         is_active: isActive && items.length > 0,
         items,
       }

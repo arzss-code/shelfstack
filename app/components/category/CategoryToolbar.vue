@@ -42,7 +42,7 @@ const emit = defineEmits<{
         size="sm"
         :variant="inStockOnly ? 'primary' : 'outline'"
         icon="pi-check"
-        class="h-8 text-xs font-semibold rounded-full px-3"
+        class="min-h-[44px] text-xs font-semibold rounded-full px-3.5"
         @click="emit('update:inStockOnly', !inStockOnly)"
       >
         <span>Stok Tersedia</span>
@@ -69,7 +69,7 @@ const emit = defineEmits<{
           <button
             type="button"
             :class="[
-              'w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+              'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
               viewMode === 'grid'
                 ? 'bg-brand-canvas text-brand-ink shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:text-brand-ink',
@@ -85,7 +85,7 @@ const emit = defineEmits<{
           <button
             type="button"
             :class="[
-              'w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+              'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
               viewMode === 'list'
                 ? 'bg-brand-canvas text-brand-ink shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:text-brand-ink',

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import PointsPage from './points.vue'
-
 definePageMeta({ middleware: 'auth' })
 
-useSeoMeta({
-  title: 'Buku Kas Koin Loyalitas - ShelfStack',
-  description:
-    'Pantau saldo koin loyalitas ShelfStack, ledger mutasi transaksi cashback, dan tukar voucher diskon belanja eksklusif.',
-})
+const route = useRoute()
+await navigateTo(
+  { path: '/account/points', query: route.query },
+  { redirectCode: 301, replace: true },
+)
 </script>
 
 <template>
-  <PointsPage />
+  <div class="py-12 text-center text-xs text-brand-muted">
+    Mengalihkan ke halaman Koin &amp; Rewards...
+  </div>
 </template>

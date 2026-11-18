@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   // Set response caching for product variants
   setHeader(event, 'Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
 
-  const { data, error } = await (client as any)
+  const { data, error } = await client
     .from('product_variants')
     .select('*')
     .eq('product_id', productId)

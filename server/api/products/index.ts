@@ -157,11 +157,12 @@ export default defineEventHandler(async (event) => {
       return errorResponse(event, 'Validation error', parsed.error.flatten().fieldErrors, 400)
     }
 
-    const { data, error } = await client
-      .from('products')
-      .insert([parsed.data as any])
-      .select()
-      .single()
+    const insertPayload: Database['public']['Tables']['products']['Insert'] = {
+      ...parsed.data,
+      specs: parsed.data.specs as Database['public']['Tables']['products']['Row']['specs'],
+    }
+
+    const { data, error } = await client.from('products').insert([insertPayload]).select().single()
 
     if (error) {
       return errorResponse(event, 'Failed to create product', error, 500)

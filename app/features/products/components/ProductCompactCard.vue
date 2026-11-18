@@ -121,7 +121,7 @@ const {
           v-if="formattedRating"
           class="flex items-center gap-1 text-[11px] text-brand-muted tabular-nums"
         >
-          <i class="pi pi-star-fill text-[10px] text-amber-500" aria-hidden="true" />
+          <i class="pi pi-star-fill text-[10px] text-brand-warning" aria-hidden="true" />
           <span class="font-bold text-brand-ink">{{ formattedRating }}</span>
           <span v-if="product.review_count">({{ product.review_count }})</span>
           <span v-else-if="product.sold_count">· {{ product.sold_count }} terjual</span>
@@ -161,7 +161,7 @@ const {
           size="sm"
           icon="pi-shopping-bag"
           :loading="justAdded"
-          class="text-xs h-8 px-2.5 sm:px-3 whitespace-nowrap"
+          class="text-xs min-h-[44px] px-3 sm:px-3.5 whitespace-nowrap"
           :aria-label="`Tambah ${product.name} ke keranjang`"
           @click.stop="handleQuickAdd"
         >
@@ -172,7 +172,7 @@ const {
           variant="secondary"
           size="sm"
           disabled
-          class="text-xs h-8 px-2.5 sm:px-3 opacity-60 whitespace-nowrap"
+          class="text-xs min-h-[44px] px-3 sm:px-3.5 opacity-60 whitespace-nowrap"
         >
           Habis
         </UiButton>

@@ -31,7 +31,7 @@ export async function requireUser(event: H3Event): Promise<{
   }
 
   // Normalisasikan user.id agar kode downstream yang memanggil user.id tidak bernilai undefined
-  ;(user as any).id = userId
+  ;(user as unknown as { id?: string }).id = userId
 
   const client = await serverSupabaseClient<Database>(event)
   const { data: dbProfile, error } = await client

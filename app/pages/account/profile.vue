@@ -7,6 +7,7 @@ import ProfileAvatarCard from '~/components/account/ProfileAvatarCard.vue'
 import ProfileMetricsBanner from '~/components/account/ProfileMetricsBanner.vue'
 import ProfileSecurityCard from '~/components/account/ProfileSecurityCard.vue'
 import ProfileEmailCard from '~/components/account/ProfileEmailCard.vue'
+import ProfileThemeCard from '~/components/account/ProfileThemeCard.vue'
 import UiInput from '~/components/ui/UiInput.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import UiAlert from '~/components/ui/UiAlert.vue'
@@ -191,13 +192,13 @@ const handleUpdatePassword = async (newPass: string, confirmPass: string) => {
             />
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-brand-muted pt-1">
-              <div class="p-3 rounded-field bg-white border border-brand-hair">
+              <div class="p-3 rounded-field bg-brand-canvas border border-brand-hair">
                 <span class="text-[11px] text-brand-muted block font-medium">Tipe Akun</span>
                 <span class="font-bold text-brand-ink uppercase">{{
                   profile?.role || 'Customer'
                 }}</span>
               </div>
-              <div class="p-3 rounded-field bg-white border border-brand-hair">
+              <div class="p-3 rounded-field bg-brand-canvas border border-brand-hair">
                 <span class="text-[11px] text-brand-muted block font-medium"
                   >Tanggal Bergabung</span
                 >
@@ -246,6 +247,9 @@ const handleUpdatePassword = async (newPass: string, confirmPass: string) => {
           :success="passwordSuccess"
           @save="handleUpdatePassword"
         />
+
+        <!-- Section 4: Preferensi Tampilan (Mode Terang / Gelap) -->
+        <ProfileThemeCard />
       </div>
     </div>
   </div>

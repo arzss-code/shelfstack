@@ -39,7 +39,7 @@ export function useAuth() {
   if (nuxtApp) {
     try {
       supabase = useSupabaseClient<Database>()
-      user = useSupabaseUser() as any
+      user = useSupabaseUser() as unknown as Ref<User | null>
       profile = useState<UserProfile | null>('auth-profile', () => null)
     } catch {
       // Abaikan jika Supabase composables belum siap

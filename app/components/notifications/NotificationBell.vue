@@ -56,7 +56,7 @@ const {
       <button
         v-else
         type="button"
-        class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 cursor-pointer"
+        class="relative w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 cursor-pointer"
         aria-label="Lihat Notifikasi"
         :aria-expanded="isOpen"
         @click="toggleDropdown"
@@ -64,7 +64,7 @@ const {
         <i class="pi pi-bell text-base sm:text-lg text-brand-ink" />
         <span
           v-if="unreadCount > 0"
-          class="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-rose-600 text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-white tabular-nums shadow-xs leading-none"
+          class="absolute top-1 right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-brand-danger text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none"
         >
           {{ unreadCount > 99 ? '99+' : unreadCount }}
         </span>

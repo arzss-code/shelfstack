@@ -5,6 +5,7 @@ import { formatRupiah } from '~/utils/format'
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import OrderPaymentCountdownCard from './OrderPaymentCountdownCard.vue'
+import type { PaidRefundRequestState } from '~/composables/usePaidOrderRefundRequest'
 
 defineProps<{
   order: Order
@@ -19,12 +20,14 @@ defineProps<{
   formatShippingServiceName: (service?: string | null) => string
   returnEligibility?: { isEligible: boolean; remainingDays?: number; reason?: string } | null
   returnTicket?: unknown
+  paidRefundRequest?: PaidRefundRequestState | null
 }>()
 
 const emit = defineEmits<{
   pay: []
   checkStatus: []
   openCancelModal: []
+  openPaidRefundModal: []
   reorder: []
   openReturnModal: []
   openInvoiceModal: []
@@ -42,7 +45,7 @@ const onPaymentExpired = () => {
 
 <template>
   <aside
-    class="lg:col-span-4 w-full bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-24"
+    class="lg:col-span-4 w-full bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-5 sticky top-24"
   >
     <h2
       class="font-display text-base font-bold text-brand-ink m-0 pb-3 border-b border-brand-hairsoft"
@@ -90,13 +93,13 @@ const onPaymentExpired = () => {
           (order.coins_discount_cents && order.coins_discount_cents > 0) ||
           (order.coins_used && order.coins_used > 0)
         "
-        class="flex items-center justify-between font-medium text-amber-700 dark:text-amber-400"
+        class="flex items-center justify-between font-medium text-brand-warning-text"
       >
         <span class="flex items-center gap-1.5 truncate">
           <span>Potongan Koin</span>
           <span
             v-if="order.coins_used"
-            class="rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 font-mono text-[10px] text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+            class="rounded border border-brand-warning-edge bg-brand-warning-tint px-1.5 py-0.5 tabular-nums text-[10px] text-brand-warning-text"
           >
             {{ new Intl.NumberFormat('id-ID').format(order.coins_used) }} Koin
           </span>
@@ -171,7 +174,7 @@ const onPaymentExpired = () => {
       <UiButton
         variant="outline"
         size="sm"
-        class="w-full justify-center !text-red-600 hover:!text-red-700 hover:!border-red-300"
+        class="w-full justify-center !text-brand-danger-text hover:!border-brand-danger-edge hover:!bg-brand-danger-tint"
         icon="pi-times-circle"
         :disabled="isPaying || isCancelling || isManualChecking"
         @click="$emit('openCancelModal')"
@@ -181,6 +184,26 @@ const onPaymentExpired = () => {
       <p class="text-[11px] text-brand-muted text-center m-0">
         Pembayaran diproses secara instan dan aman melalui jaringan Midtrans.
       </p>
+    </div>
+
+    <!-- Paid & Unshipped: Customer Pre-Shipment Refund Request -->
+    <div v-else-if="order.status === 'paid' && !order.tracking_number" class="space-y-2 pt-2">
+      <div
+        v-if="paidRefundRequest?.status === 'pending'"
+        class="rounded-card border border-brand-warning-edge bg-brand-warning-tint px-3.5 py-2.5 text-xs font-medium text-brand-warning-text"
+      >
+        Pengajuan Pembatalan &amp; Refund Sedang Ditinjau Admin
+      </div>
+      <UiButton
+        v-else
+        variant="outline"
+        size="sm"
+        class="w-full justify-center text-xs !text-brand-danger-text !border-brand-danger-edge hover:!bg-brand-danger-tint"
+        icon="pi-times-circle"
+        @click="$emit('openPaidRefundModal')"
+      >
+        Ajukan Pembatalan &amp; Refund
+      </UiButton>
     </div>
 
     <!-- Action Button if shipped: Konfirmasi Pesanan Diterima -->

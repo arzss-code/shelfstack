@@ -29,7 +29,6 @@ const {
   stockModel,
   categoryIdModel,
   categorySelectOptions,
-  linkModel,
   descriptionModel,
   imageHint,
   onFileReject,
@@ -66,7 +65,7 @@ const {
         label="Nama Produk"
         type="text"
         autocomplete="off"
-        placeholder="Contoh: Kemeja Linen Vintage"
+        placeholder="Contoh: Keyboard Mekanikal Aluminium 75%"
         :error="errors.name"
       />
 
@@ -108,16 +107,6 @@ const {
 
       <!-- Deskripsi -->
       <UiTextarea id="description" v-model="descriptionModel" label="Deskripsi" :rows="3" />
-
-      <!-- Tautan Referensi -->
-      <UiInput
-        id="link"
-        v-model="linkModel"
-        label="Tautan Referensi (Opsional)"
-        type="text"
-        placeholder="https://..."
-        :error="errors.link"
-      />
 
       <!-- Upload Gambar -->
       <UiFileField

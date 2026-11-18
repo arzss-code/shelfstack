@@ -18,6 +18,7 @@ const emit = defineEmits<{
   delete: [id: number]
   restore: [id: number]
   viewStockMovements: [product: Product]
+  manageVariants: [product: Product]
   resetFilters: []
 }>()
 </script>
@@ -124,6 +125,7 @@ const emit = defineEmits<{
         @delete="emit('delete', $event)"
         @restore="emit('restore', $event)"
         @view-stock-movements="emit('viewStockMovements', $event)"
+        @manage-variants="emit('manageVariants', $event)"
       />
     </div>
   </div>

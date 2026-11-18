@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import AdminSupportInboxList from '~/components/admin/support/AdminSupportInboxList.vue'
 import AdminSupportChatPane from '~/components/admin/support/AdminSupportChatPane.vue'
+import AdminContactInboxPanel from '~/components/admin/support/AdminContactInboxPanel.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import UiAlert from '~/components/ui/UiAlert.vue'
 import { useAdminSupportChat } from '~/composables/useAdminSupportChat'
@@ -19,6 +20,12 @@ useSeoMeta({
 
 const route = useRoute()
 const router = useRouter()
+
+const activeChannel = ref(route.query.channel === 'contact' ? 'contact_inbox' : 'live_chat')
+const channelTabs = [
+  { value: 'live_chat', label: 'Live Chat Pelanggan' },
+  { value: 'contact_inbox', label: 'Pesan Kontak (/contact)' },
+]
 
 const {
   threads,
@@ -123,13 +130,22 @@ onMounted(async () => {
     </div>
 
     <!-- Error Banner -->
-    <UiAlert v-if="error" tone="danger" class="text-xs">
+    <UiAlert v-if="error && activeChannel === 'live_chat'" tone="danger" class="text-xs">
       {{ error }}
     </UiAlert>
 
+    <UiTabs
+      v-model="activeChannel"
+      :items="channelTabs"
+      aria-label="Kanal layanan bantuan pelanggan"
+    />
+
+    <AdminContactInboxPanel v-if="activeChannel === 'contact_inbox'" />
+
     <!-- Workspace Dual-Pane Container -->
     <div
-      class="h-[calc(100vh-14rem)] min-h-[580px] flex rounded-card border border-brand-hair bg-white shadow-whisper overflow-hidden"
+      v-else
+      class="h-[calc(100vh-14rem)] min-h-[580px] flex rounded-card border border-brand-hair bg-brand-canvas shadow-whisper overflow-hidden"
     >
       <!-- Left Pane: Thread Inbox List -->
       <aside

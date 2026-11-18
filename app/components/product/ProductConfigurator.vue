@@ -206,7 +206,7 @@ const {
             type="button"
             aria-label="Kurangi jumlah"
             :disabled="quantity <= 1 || isOutOfStock"
-            class="w-8 h-8 rounded-full bg-brand-canvas text-brand-ink flex items-center justify-center hover:bg-brand-canvas-soft transition-colors cursor-pointer border-0 disabled:opacity-40"
+            class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-brand-canvas text-brand-ink flex items-center justify-center hover:bg-brand-canvas-soft transition-colors cursor-pointer border-0 disabled:opacity-40"
             @click="decrementQty"
           >
             <i class="pi pi-minus text-xs" />
@@ -228,7 +228,7 @@ const {
             type="button"
             aria-label="Tambah jumlah"
             :disabled="quantity >= maxQuantity || isOutOfStock"
-            class="w-8 h-8 rounded-full bg-brand-canvas text-brand-ink flex items-center justify-center hover:bg-brand-canvas-soft transition-colors cursor-pointer border-0 disabled:opacity-40"
+            class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-brand-canvas text-brand-ink flex items-center justify-center hover:bg-brand-canvas-soft transition-colors cursor-pointer border-0 disabled:opacity-40"
             @click="incrementQty"
           >
             <i class="pi pi-plus text-xs" />
@@ -244,7 +244,7 @@ const {
           @click="handleAddToBag"
         >
           <span v-if="isOutOfStock">Stok Habis</span>
-          <span v-else> Tambah ke Bag · {{ formatRupiah(effectivePrice * quantity) }} </span>
+          <span v-else> Tambah ke Keranjang · {{ formatRupiah(effectivePrice * quantity) }} </span>
         </UiButton>
 
         <!-- Wishlist Action Button -->

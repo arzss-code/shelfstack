@@ -115,21 +115,25 @@ export default defineEventHandler(async (event) => {
       )
     }
 
+    interface RefundWebhookRpcPayload {
+      no_op?: boolean
+      result?: string
+      message?: string
+    }
+    const refundRpcResult = (refundResult ?? null) as RefundWebhookRpcPayload | null
+
     if (
-      (refundResult as any)?.no_op &&
-      ((refundResult as any)?.result === 'REFUND_IDENTITY_MISMATCH' ||
-        (refundResult as any)?.result === 'REFUND_AMOUNT_MISMATCH')
+      refundRpcResult?.no_op &&
+      (refundRpcResult?.result === 'REFUND_IDENTITY_MISMATCH' ||
+        refundRpcResult?.result === 'REFUND_AMOUNT_MISMATCH')
     ) {
-      logger.warn(
-        `[Midtrans Webhook] Refund event ignored due to ${(refundResult as any).result}`,
-        {
-          requestId: event.context?.requestId,
-          orderId: baseOrderId,
-          result: (refundResult as any).result,
-        },
-      )
+      logger.warn(`[Midtrans Webhook] Refund event ignored due to ${refundRpcResult.result}`, {
+        requestId: event.context?.requestId,
+        orderId: baseOrderId,
+        result: refundRpcResult.result,
+      })
       return successResponse(
-        `Notifikasi refund diabaikan: ${(refundResult as any).message || (refundResult as any).result}`,
+        `Notifikasi refund diabaikan: ${refundRpcResult.message || refundRpcResult.result}`,
         refundResult,
       )
     }

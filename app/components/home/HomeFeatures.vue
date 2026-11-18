@@ -21,13 +21,13 @@
         </div>
         <h3 class="font-display m-0 text-lg font-bold text-brand-ink">Kurasi Kualitas Terpilih</h3>
         <p class="font-body m-0 text-xs sm:text-sm leading-relaxed text-brand-muted">
-          Setiap produk melalui uji fungsi dan daya tahan sebelum masuk katalog. Kami hanya menjual
-          barang yang kami bangga gunakan sendiri.
+          Setiap perangkat diuji beban, ergonomi meja kerja, dan keaslian komponen sebelum masuk ke
+          inventaris resmi ShelfStack.
         </p>
       </div>
 
       <div
-        class="bg-white border border-brand-hairsoft rounded-card p-6 flex flex-col gap-3 shadow-whisper transition-all hover:border-brand-accent/40"
+        class="bg-brand-canvas border border-brand-hairsoft rounded-card p-6 flex flex-col gap-3 shadow-whisper transition-all hover:border-brand-accent/40"
       >
         <div
           class="w-10 h-10 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center text-brand-ink"
@@ -38,13 +38,13 @@
           Transaksi Aman &amp; Terlindungi
         </h3>
         <p class="font-body m-0 text-xs sm:text-sm leading-relaxed text-brand-muted">
-          Sistem pembayaran terenkripsi dan jaminan uang kembali jika pesanan tidak sampai atau
-          tidak sesuai deskripsi.
+          Pembayaran VA, QRIS, dan kartu terverifikasi webhook Midtrans dengan penguncian stok
+          atomik selama proses checkout.
         </p>
       </div>
 
       <div
-        class="bg-white border border-brand-hairsoft rounded-card p-6 flex flex-col gap-3 shadow-whisper transition-all hover:border-brand-accent/40"
+        class="bg-brand-canvas border border-brand-hairsoft rounded-card p-6 flex flex-col gap-3 shadow-whisper transition-all hover:border-brand-accent/40"
       >
         <div
           class="w-10 h-10 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center text-brand-ink"
@@ -55,8 +55,8 @@
           Pengiriman Cepat &amp; Lacak Realtime
         </h3>
         <p class="font-body m-0 text-xs sm:text-sm leading-relaxed text-brand-muted">
-          Pesanan diproses langsung dari gudang logistik dan nomor resi dapat dipantau setiap saat
-          hingga tiba di depan pintu Anda.
+          Pengemasan berlapis dikirim dari hub sentral Semarang lengkap dengan nomor resi dan
+          linimasa pengiriman terpantau.
         </p>
       </div>
     </div>

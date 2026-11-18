@@ -14,6 +14,9 @@ export function useAdminProducts() {
   const editingProduct = ref<Product | null>(null)
   const isStockModalVisible = ref(false)
   const stockAuditProduct = ref<Product | null>(null)
+  const isVariantModalVisible = ref(false)
+  const variantProduct = ref<Product | null>(null)
+  const isCategoryModalVisible = ref(false)
   const searchQuery = ref('')
   const activeTab = ref('0')
   const sortOption = ref('name-asc')
@@ -28,6 +31,15 @@ export function useAdminProducts() {
   const openStockMovements = (product: Product) => {
     stockAuditProduct.value = product
     isStockModalVisible.value = true
+  }
+
+  const openVariantsModal = (product: Product) => {
+    variantProduct.value = product
+    isVariantModalVisible.value = true
+  }
+
+  const openCategoryManagerModal = () => {
+    isCategoryModalVisible.value = true
   }
 
   const criticalStockProducts = computed(() =>
@@ -198,6 +210,9 @@ export function useAdminProducts() {
     editingProduct,
     isStockModalVisible,
     stockAuditProduct,
+    isVariantModalVisible,
+    variantProduct,
+    isCategoryModalVisible,
     searchQuery,
     activeTab,
     sortOption,
@@ -205,6 +220,8 @@ export function useAdminProducts() {
     tabItems,
     filteredProducts,
     openStockMovements,
+    openVariantsModal,
+    openCategoryManagerModal,
     openAddForm,
     openEditForm,
     handleSave,

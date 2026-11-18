@@ -66,7 +66,12 @@ interface CatalogApiResponse {
 }
 
 // Fetch katalog di server (SSR-first + reactive updates saat filter berganti)
-const { data: catalogResponse, pending } = await useAsyncData<CatalogApiResponse>(
+const {
+  data: catalogResponse,
+  pending,
+  error: catalogError,
+  refresh: refreshCatalog,
+} = await useAsyncData<CatalogApiResponse>(
   'katalog-products',
   () => $fetch<CatalogApiResponse>('/api/products', { params: queryParams.value }),
   {
@@ -189,9 +194,21 @@ onMounted(async () => {
         @reset="resetAllFilters"
       />
 
-      <section class="lg:col-span-9 space-y-6">
+      <section class="lg:col-span-9 min-w-0 space-y-6">
+        <UiAlert
+          v-if="catalogError"
+          tone="danger"
+          title="Gagal memuat katalog produk"
+          class="text-xs"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <span>Terjadi gangguan saat mengambil daftar produk. Silakan coba kembali.</span>
+            <UiButton size="sm" variant="outline" @click="refreshCatalog()">Coba Lagi</UiButton>
+          </div>
+        </UiAlert>
+
         <ProductList
-          v-if="viewMode === 'grid'"
+          v-else-if="viewMode === 'grid'"
           :products="products"
           :loading="pending"
           :is-searching="activeFiltersCount > 0"

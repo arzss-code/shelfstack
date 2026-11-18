@@ -15,17 +15,38 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event).catch(() => ({}))
-  const reason = (body?.reason as string) || 'Permintaan refund oleh Administrator'
-
-  // 2. Idempotency Key Handling
-  const headerKey = getHeader(event, 'idempotency-key')
-  const idempotencyKey =
-    headerKey?.trim() ||
-    (typeof body?.idempotency_key === 'string' && body.idempotency_key.trim()) ||
-    crypto.randomUUID()
+  let reason = (body?.reason as string) || 'Permintaan refund oleh Administrator'
 
   // Task 07.4: Jalur admin terisolasi menggunakan service role setelah otorisasi requireAdmin lulus
   const client = serverSupabaseServiceRole<Database>(event)
+
+  // 2. Idempotency Key Handling (adopsi permintaan refund pelanggan jika ada)
+  const headerKey = getHeader(event, 'idempotency-key')
+  const explicitKey =
+    headerKey?.trim() ||
+    (typeof body?.idempotency_key === 'string' && body.idempotency_key.trim()) ||
+    ''
+
+  let idempotencyKey = explicitKey
+  if (!idempotencyKey) {
+    const { data: pendingCustomerReq } = await client
+      .from('refunds')
+      .select('id, idempotency_key, reason')
+      .eq('order_id', orderId)
+      .eq('status', 'pending')
+      .like('idempotency_key', 'cust-refund-req-%')
+      .is('gateway_refund_id', null)
+      .maybeSingle()
+
+    if (pendingCustomerReq?.idempotency_key) {
+      idempotencyKey = pendingCustomerReq.idempotency_key
+      if (!body?.reason && pendingCustomerReq.reason) {
+        reason = pendingCustomerReq.reason
+      }
+    } else {
+      idempotencyKey = crypto.randomUUID()
+    }
+  }
 
   // 3. Inisiasi Refund Attempt secara atomik di PostgreSQL (mengunci order dengan FOR UPDATE)
   const { data: attemptData, error: attemptError } = await client.rpc('create_refund_attempt', {

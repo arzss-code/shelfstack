@@ -77,16 +77,16 @@ onBeforeUnmount(() => {
     class="relative flex-1 max-w-2xl mx-2 sm:mx-6 hidden md:block"
   >
     <form
-      class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full px-2 border border-brand-hair focus-within:border-brand-ink focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-ink/20 transition-colors shadow-whisper"
+      class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full px-1.5 border border-brand-hair focus-within:border-brand-ink focus-within:bg-brand-canvas focus-within:ring-2 focus-within:ring-brand-ink/20 transition-colors shadow-whisper"
       @submit.prevent="handleSubmit"
     >
       <!-- Single Category Dropdown Button -->
-      <div ref="categoryDropdownRef" class="relative shrink-0">
+      <div ref="categoryDropdownRef" class="relative shrink-0 flex items-center">
         <button
           type="button"
           :aria-expanded="isCategoryDropdownOpen"
           aria-haspopup="listbox"
-          class="whitespace-nowrap flex items-center gap-1.5 text-xs text-brand-ink font-semibold px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors cursor-pointer"
+          class="relative whitespace-nowrap flex items-center gap-1.5 text-xs text-brand-ink font-semibold h-9 px-3 rounded-full hover:bg-brand-hairsoft transition-colors cursor-pointer before:content-[''] before:absolute before:-inset-y-1 before:inset-x-0"
           @click="isCategoryDropdownOpen = !isCategoryDropdownOpen"
         >
           <span>{{ selectedCategory }}</span>
@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
       <UiTooltip text="Cari produk" position="bottom">
         <button
           type="submit"
-          class="w-8 h-8 rounded-full bg-brand-ink text-white flex items-center justify-center shrink-0 hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
+          class="relative w-8 h-8 rounded-full bg-brand-ink text-brand-onink flex items-center justify-center shrink-0 hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper before:content-[''] before:absolute before:-inset-1.5"
           aria-label="Cari produk"
         >
           <i class="pi pi-search text-xs" aria-hidden="true" />
