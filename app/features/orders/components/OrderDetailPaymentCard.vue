@@ -5,6 +5,7 @@ import { formatRupiah } from '~/utils/format'
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import OrderPaymentCountdownCard from './OrderPaymentCountdownCard.vue'
+import type { PaidRefundRequestState } from '~/composables/usePaidOrderRefundRequest'
 
 defineProps<{
   order: Order
@@ -19,12 +20,14 @@ defineProps<{
   formatShippingServiceName: (service?: string | null) => string
   returnEligibility?: { isEligible: boolean; remainingDays?: number; reason?: string } | null
   returnTicket?: unknown
+  paidRefundRequest?: PaidRefundRequestState | null
 }>()
 
 const emit = defineEmits<{
   pay: []
   checkStatus: []
   openCancelModal: []
+  openPaidRefundModal: []
   reorder: []
   openReturnModal: []
   openInvoiceModal: []
@@ -181,6 +184,26 @@ const onPaymentExpired = () => {
       <p class="text-[11px] text-brand-muted text-center m-0">
         Pembayaran diproses secara instan dan aman melalui jaringan Midtrans.
       </p>
+    </div>
+
+    <!-- Paid & Unshipped: Customer Pre-Shipment Refund Request -->
+    <div v-else-if="order.status === 'paid' && !order.tracking_number" class="space-y-2 pt-2">
+      <div
+        v-if="paidRefundRequest?.status === 'pending'"
+        class="rounded-card border border-brand-warning-edge bg-brand-warning-tint px-3.5 py-2.5 text-xs font-medium text-brand-warning-text"
+      >
+        Pengajuan Pembatalan &amp; Refund Sedang Ditinjau Admin
+      </div>
+      <UiButton
+        v-else
+        variant="outline"
+        size="sm"
+        class="w-full justify-center text-xs !text-brand-danger-text !border-brand-danger-edge hover:!bg-brand-danger-tint"
+        icon="pi-times-circle"
+        @click="$emit('openPaidRefundModal')"
+      >
+        Ajukan Pembatalan &amp; Refund
+      </UiButton>
     </div>
 
     <!-- Action Button if shipped: Konfirmasi Pesanan Diterima -->

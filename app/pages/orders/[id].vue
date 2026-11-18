@@ -7,10 +7,13 @@ import ReviewFormModal from '~/components/product/ReviewFormModal.vue'
 import OrderReturnModal from '~/components/orders/OrderReturnModal.vue'
 import OrderReturnStatusCard from '~/components/orders/OrderReturnStatusCard.vue'
 import OrderDetailProgressStepper from '~/features/orders/components/OrderDetailProgressStepper.vue'
+import OrderDetailHeaderBanner from '~/features/orders/components/OrderDetailHeaderBanner.vue'
 import OrderDetailItemsCard from '~/features/orders/components/OrderDetailItemsCard.vue'
 import OrderDetailDeliveryCard from '~/features/orders/components/OrderDetailDeliveryCard.vue'
 import OrderDetailPaymentCard from '~/features/orders/components/OrderDetailPaymentCard.vue'
+import OrderPaidRefundModal from '~/components/orders/OrderPaidRefundModal.vue'
 import { useReturnRequest } from '~/composables/useReturnRequest'
+import { usePaidOrderRefundRequest } from '~/composables/usePaidOrderRefundRequest'
 import { useOrderDetail } from '~/composables/useOrderDetail'
 import { useUiConfirm } from '~/composables/useUiConfirm'
 
@@ -48,6 +51,13 @@ const {
 
 const confirm = useUiConfirm()
 const { ticket: returnTicket, eligibility: returnEligibility, fetchReturnData } = useReturnRequest()
+const {
+  refundRequest: paidRefundRequest,
+  isSubmittingRefund,
+  isModalOpen: isPaidRefundModalOpen,
+  fetchRefundRequest,
+  submitRefundRequest,
+} = usePaidOrderRefundRequest()
 
 const isCancelModalOpen = ref(false)
 const isInvoiceModalOpen = ref(false)
@@ -86,8 +96,15 @@ const onConfirmCancel = async (reason: string) => {
   if (success) isCancelModalOpen.value = false
 }
 
+const onConfirmPaidRefund = async (reason: string) => {
+  await submitRefundRequest(orderId, reason)
+}
+
 onMounted(() => {
-  if (orderId) fetchReturnData(orderId)
+  if (orderId) {
+    fetchReturnData(orderId)
+    fetchRefundRequest(orderId)
+  }
 })
 
 useSeoMeta({
@@ -137,66 +154,13 @@ useSeoMeta({
     </div>
 
     <div v-else-if="order" class="space-y-6">
-      <div
-        class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-      >
-        <div>
-          <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
-            <h1 class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0">
-              Pesanan #{{ order.id.slice(0, 8).toUpperCase() }}
-            </h1>
-            <UiBadge
-              :variant="getStatusBadge(order.status).variant"
-              :label="getStatusBadge(order.status).label"
-              class="shrink-0"
-            />
-          </div>
-          <p class="font-body text-xs text-brand-muted m-0 mt-1">
-            Dibuat pada {{ formatDate(order.created_at) }}
-            <span v-if="order.paid_at"> · Dibayar pada {{ formatDate(order.paid_at) }}</span>
-          </p>
-        </div>
-
-        <div v-if="order.tracking_number" class="flex flex-wrap items-center gap-2 sm:justify-end">
-          <div
-            class="inline-flex items-center gap-2 bg-blue-50/70 border border-blue-200/80 rounded-field px-3 py-1.5 text-xs"
-          >
-            <span
-              class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white shrink-0"
-            >
-              <i class="pi pi-truck text-[10px]" />
-            </span>
-            <span class="font-bold text-brand-ink uppercase text-[11px]">{{
-              order.courier_name || 'Kurir'
-            }}</span>
-            <span class="text-brand-faint">·</span>
-            <span class="font-semibold text-brand-ink text-[11px]">{{
-              order.tracking_number
-            }}</span>
-            <button
-              type="button"
-              class="text-[11px] text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 ml-1 transition-colors"
-              :title="copiedHeaderResi ? 'Tersalin!' : 'Salin Resi'"
-              @click="copyHeaderResi(order.tracking_number)"
-            >
-              <i
-                :class="
-                  copiedHeaderResi ? 'pi pi-check text-emerald-600 text-xs' : 'pi pi-copy text-xs'
-                "
-              />
-              <span class="text-[10px]">{{ copiedHeaderResi ? 'Tersalin' : 'Salin' }}</span>
-            </button>
-          </div>
-          <UiButton
-            :to="`/tracking?q=${encodeURIComponent(order.tracking_number)}`"
-            variant="outline"
-            size="sm"
-            icon="pi-compass"
-          >
-            Lacak Publik
-          </UiButton>
-        </div>
-      </div>
+      <OrderDetailHeaderBanner
+        :order="order"
+        :copied-header-resi="copiedHeaderResi"
+        :status-badge="getStatusBadge(order.status)"
+        :format-date="formatDate"
+        @copy-resi="copyHeaderResi"
+      />
 
       <OrderReturnStatusCard
         v-if="returnTicket"
@@ -250,9 +214,11 @@ useSeoMeta({
           :format-shipping-service-name="formatShippingServiceName"
           :return-eligibility="returnEligibility"
           :return-ticket="returnTicket"
+          :paid-refund-request="paidRefundRequest"
           @pay="handlePayNow"
           @check-status="handleCheckPaymentStatus(false)"
           @open-cancel-modal="isCancelModalOpen = true"
+          @open-paid-refund-modal="isPaidRefundModalOpen = true"
           @reorder="handleReorder"
           @confirm-delivery="handleConfirmDeliveryClick"
           @payment-expired="handlePaymentExpired"
@@ -266,6 +232,11 @@ useSeoMeta({
       v-model:visible="isCancelModalOpen"
       :loading="isCancelling"
       @confirm="onConfirmCancel"
+    />
+    <OrderPaidRefundModal
+      v-model:visible="isPaidRefundModalOpen"
+      :loading="isSubmittingRefund"
+      @confirm="onConfirmPaidRefund"
     />
     <OrderInvoiceModal v-if="order" v-model:visible="isInvoiceModalOpen" :order="order" />
     <OrderReturnModal

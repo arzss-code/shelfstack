@@ -147,6 +147,56 @@ export type Database = {
           },
         ]
       }
+      product_variants: {
+        Row: {
+          attributes: Json
+          created_at: string
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          name: string
+          price_cents: number | null
+          product_id: number
+          sku: string
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          attributes?: Json
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          price_cents?: number | null
+          product_id: number
+          sku: string
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          attributes?: Json
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_cents?: number | null
+          product_id?: number
+          sku?: string
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'product_variants_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -569,6 +619,7 @@ export type Database = {
           price_cents: number
           product_id: number
           qty: number
+          variant_id: string | null
         }
         Insert: {
           id?: string
@@ -576,6 +627,7 @@ export type Database = {
           price_cents: number
           product_id: number
           qty: number
+          variant_id?: string | null
         }
         Update: {
           id?: string
@@ -583,6 +635,7 @@ export type Database = {
           price_cents?: number
           product_id?: number
           qty?: number
+          variant_id?: string | null
         }
         Relationships: [
           {

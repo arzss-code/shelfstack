@@ -21,6 +21,7 @@ const emit = defineEmits<{
   delete: [id: number]
   restore: [id: number]
   viewStockMovements: [product: Product]
+  manageVariants: [product: Product]
 }>()
 
 const {
@@ -194,6 +195,16 @@ const {
             </button>
           </template>
           <template v-else>
+            <UiTooltip text="Kelola Varian" position="top">
+              <button
+                type="button"
+                class="w-7 h-7 rounded-full bg-brand-field hover:bg-brand-accent hover:text-white text-brand-muted hover:border-brand-accent border border-brand-hairsoft transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Kelola Varian Produk"
+                @click.stop="emit('manageVariants', product)"
+              >
+                <i class="pi pi-sitemap text-[10px]" />
+              </button>
+            </UiTooltip>
             <UiTooltip text="Riwayat Mutasi Stok" position="top">
               <button
                 type="button"

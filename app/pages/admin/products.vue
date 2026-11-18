@@ -2,6 +2,8 @@
 import ProductList from '~/features/products/components/ProductList.vue'
 import ProductForm from '~/features/products/components/ProductForm.vue'
 import StockMovementsModal from '~/features/products/components/StockMovementsModal.vue'
+import AdminProductVariantsModal from '~/components/admin/products/AdminProductVariantsModal.vue'
+import AdminCategoryManagerModal from '~/components/admin/products/AdminCategoryManagerModal.vue'
 
 useSeoMeta({
   title: 'Kelola Produk',
@@ -18,6 +20,9 @@ const {
   editingProduct,
   isStockModalVisible,
   stockAuditProduct,
+  isVariantModalVisible,
+  variantProduct,
+  isCategoryModalVisible,
   searchQuery,
   activeTab,
   sortOption,
@@ -25,6 +30,8 @@ const {
   tabItems,
   filteredProducts,
   openStockMovements,
+  openVariantsModal,
+  openCategoryManagerModal,
   openAddForm,
   openEditForm,
   handleSave,
@@ -77,6 +84,9 @@ const handleProductRestocked = (newStock: number) => {
           />
         </div>
 
+        <UiButton variant="secondary" icon="pi-tags" @click="openCategoryManagerModal">
+          Kelola Kategori
+        </UiButton>
         <UiButton variant="primary" icon="pi-plus" @click="openAddForm">Tambah Produk</UiButton>
       </div>
     </div>
@@ -92,6 +102,7 @@ const handleProductRestocked = (newStock: number) => {
         @edit="openEditForm"
         @delete="handleDelete"
         @view-stock-movements="openStockMovements"
+        @manage-variants="openVariantsModal"
       />
 
       <!-- Load More Button -->
@@ -116,6 +127,7 @@ const handleProductRestocked = (newStock: number) => {
         @edit="openEditForm"
         @delete="handleDelete"
         @view-stock-movements="openStockMovements"
+        @manage-variants="openVariantsModal"
       />
     </div>
 
@@ -159,6 +171,21 @@ const handleProductRestocked = (newStock: number) => {
       :product="stockAuditProduct"
       @close="isStockModalVisible = false"
       @restocked="handleProductRestocked"
+    />
+
+    <!-- Container for Variant Matrix Modal -->
+    <AdminProductVariantsModal
+      :show="isVariantModalVisible"
+      :product="variantProduct"
+      @close="isVariantModalVisible = false"
+      @updated="productStore.fetchProducts()"
+    />
+
+    <!-- Container for Category CRUD Modal -->
+    <AdminCategoryManagerModal
+      :show="isCategoryModalVisible"
+      @close="isCategoryModalVisible = false"
+      @updated="productStore.fetchProducts()"
     />
   </div>
 </template>
