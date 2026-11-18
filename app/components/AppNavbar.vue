@@ -10,7 +10,6 @@ import NavbarSearchBar from '~/components/navbar/NavbarSearchBar.vue'
 import NavbarCartButton from '~/components/navbar/NavbarCartButton.vue'
 import NavbarUserMenu from '~/components/navbar/NavbarUserMenu.vue'
 import NavbarMobileDrawer from '~/components/navbar/NavbarMobileDrawer.vue'
-import UiThemeToggle from '~/components/ui/UiThemeToggle.vue'
 import AppLogo from './AppLogo.vue'
 
 const { user, profile, isAdmin, isLoggedIn, fetchProfile, signOut } = useAuth()
@@ -122,7 +121,7 @@ const handleLogout = async () => {
     <!-- LAYER 2: Main E-Commerce Header Bar -->
     <div class="w-full bg-brand-canvas border-b border-brand-hair">
       <div
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between gap-4 sm:gap-6"
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[68px] py-2.5 flex items-center justify-between gap-4 sm:gap-6"
       >
         <!-- Brand Logo -->
         <NuxtLink
@@ -143,9 +142,7 @@ const handleLogout = async () => {
         />
 
         <!-- Right Commerce Actions -->
-        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
-          <UiThemeToggle />
-
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <!-- Notification Bell -->
           <template v-if="isLoggedIn && user">
             <NotificationBell variant="light" />
@@ -165,7 +162,7 @@ const handleLogout = async () => {
               <i class="pi pi-heart text-base sm:text-lg text-brand-ink" />
               <span
                 v-if="wishlistStore.totalItems > 0"
-                class="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-brand-danger text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none"
+                class="absolute top-1 right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-brand-danger text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none"
                 aria-hidden="true"
               >
                 {{ wishlistStore.totalItems > 99 ? '99+' : wishlistStore.totalItems }}

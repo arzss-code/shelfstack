@@ -42,11 +42,11 @@ onBeforeUnmount(() => {
     <template v-if="isLoggedIn && hasUser">
       <button
         type="button"
-        class="flex items-center gap-1.5 min-h-[44px] px-1.5 sm:pl-1.5 sm:pr-2.5 py-1 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair active:scale-95"
+        class="flex items-center gap-1.5 h-11 min-h-[44px] pl-1.5 pr-2.5 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair active:scale-95"
         @click="isUserMenuOpen = !isUserMenuOpen"
       >
         <span
-          class="w-7 h-7 rounded-full overflow-hidden border border-brand-hair bg-brand-ink text-brand-onink text-xs font-bold flex items-center justify-center shrink-0"
+          class="w-8 h-8 rounded-full overflow-hidden border border-brand-hair bg-brand-ink text-brand-onink text-xs font-bold flex items-center justify-center shrink-0"
         >
           <img
             v-if="avatarUrl"

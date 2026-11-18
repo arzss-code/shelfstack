@@ -7,6 +7,7 @@ import ProfileAvatarCard from '~/components/account/ProfileAvatarCard.vue'
 import ProfileMetricsBanner from '~/components/account/ProfileMetricsBanner.vue'
 import ProfileSecurityCard from '~/components/account/ProfileSecurityCard.vue'
 import ProfileEmailCard from '~/components/account/ProfileEmailCard.vue'
+import ProfileThemeCard from '~/components/account/ProfileThemeCard.vue'
 import UiInput from '~/components/ui/UiInput.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import UiAlert from '~/components/ui/UiAlert.vue'
@@ -246,6 +247,9 @@ const handleUpdatePassword = async (newPass: string, confirmPass: string) => {
           :success="passwordSuccess"
           @save="handleUpdatePassword"
         />
+
+        <!-- Section 4: Preferensi Tampilan (Mode Terang / Gelap) -->
+        <ProfileThemeCard />
       </div>
     </div>
   </div>

@@ -22,7 +22,7 @@ const emit = defineEmits<{
       <i class="pi pi-shopping-bag text-base sm:text-lg text-brand-ink" />
       <span
         v-if="totalItems > 0"
-        class="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 min-w-4 h-4 sm:min-w-[17px] sm:h-[17px] px-1 rounded-full bg-brand-ink text-brand-onink text-[9px] sm:text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none"
+        class="absolute top-1 right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-brand-ink text-brand-onink text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none"
         aria-hidden="true"
       >
         {{ totalItems > 99 ? '99+' : totalItems }}

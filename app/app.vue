@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { useThemeMode } from '~/composables/useThemeMode'
+
+const { initTheme } = useThemeMode()
+
+onMounted(() => {
+  initTheme()
+})
+
 useHead({
   titleTemplate: (titleChunk) => {
     return titleChunk ? `${titleChunk} | ShelfStack` : 'ShelfStack'

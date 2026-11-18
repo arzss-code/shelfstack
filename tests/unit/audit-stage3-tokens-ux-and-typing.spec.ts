@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
-import UiThemeToggle from '~/components/ui/UiThemeToggle.vue'
+import ProfileThemeCard from '~/components/account/ProfileThemeCard.vue'
 
 function collectTsVueFiles(dir: string): string[] {
   const results: string[] = []
@@ -23,21 +23,34 @@ describe('Stage 3 Remediations: Tokens, Theme Toggle, UX 5-States, & Strict Typi
     localStorage.removeItem('shelfstack-theme')
   })
 
-  it('toggles .dark class on documentElement and persists preference via UiThemeToggle', async () => {
-    const wrapper = mount(UiThemeToggle)
-    const btn = wrapper.get('[data-testid="theme-toggle-button"]')
+  it('toggles .dark class on documentElement from Settings ProfileThemeCard and keeps theme toggle out of navbars', async () => {
+    const wrapper = mount(ProfileThemeCard)
+    const darkBtn = wrapper.get('[data-testid="settings-theme-dark"]')
+    const lightBtn = wrapper.get('[data-testid="settings-theme-light"]')
 
     expect(document.documentElement.classList.contains('dark')).toBe(false)
-    expect(btn.attributes('aria-label')).toContain('gelap')
+    expect(lightBtn.attributes('aria-pressed')).toBe('true')
+    expect(darkBtn.attributes('aria-pressed')).toBe('false')
 
-    await btn.trigger('click')
+    await darkBtn.trigger('click')
     expect(document.documentElement.classList.contains('dark')).toBe(true)
     expect(localStorage.getItem('shelfstack-theme')).toBe('dark')
-    expect(btn.attributes('aria-label')).toContain('terang')
+    expect(darkBtn.attributes('aria-pressed')).toBe('true')
 
-    await btn.trigger('click')
+    await lightBtn.trigger('click')
     expect(document.documentElement.classList.contains('dark')).toBe(false)
     expect(localStorage.getItem('shelfstack-theme')).toBe('light')
+    expect(lightBtn.attributes('aria-pressed')).toBe('true')
+
+    const navbarSrc = readFileSync(resolve(process.cwd(), 'app/components/AppNavbar.vue'), 'utf8')
+    const drawerSrc = readFileSync(
+      resolve(process.cwd(), 'app/components/navbar/NavbarMobileDrawer.vue'),
+      'utf8',
+    )
+    const adminLayoutSrc = readFileSync(resolve(process.cwd(), 'app/layouts/admin.vue'), 'utf8')
+    expect(navbarSrc).not.toContain('UiThemeToggle')
+    expect(drawerSrc).not.toContain('UiThemeToggle')
+    expect(adminLayoutSrc).not.toContain('UiThemeToggle')
   })
 
   it('enforces error state with retry CTA and min-w-0 320px guard on /katalog and /c/[slug]', () => {

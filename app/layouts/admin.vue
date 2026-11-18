@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import AppLogo from '~/components/AppLogo.vue'
 import AdminSidebarNav, { type AdminNavLink } from '~/components/admin/AdminSidebarNav.vue'
-import UiThemeToggle from '~/components/ui/UiThemeToggle.vue'
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useAdminSupportChat } from '~/composables/useAdminSupportChat'
 
@@ -197,9 +196,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="flex items-center gap-2 sm:gap-3">
-          <UiThemeToggle />
-
+        <div class="flex items-center gap-3">
           <NuxtLink
             to="/"
             class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-brand-hair text-xs font-medium text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft no-underline transition-colors"

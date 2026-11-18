@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import UiThemeToggle from '~/components/ui/UiThemeToggle.vue'
-
 defineProps<{
   open: boolean
   searchQuery: string
@@ -30,7 +28,7 @@ function closeDrawer() {
     <!-- Mobile Search Form -->
     <search>
       <form
-        class="flex items-center gap-2 bg-brand-field rounded-full pl-3.5 pr-1 py-1 border border-brand-hair"
+        class="flex items-center gap-2 bg-brand-field rounded-full pl-3.5 pr-1.5 py-1 border border-brand-hair"
         @submit.prevent="emit('search')"
       >
         <input
@@ -49,7 +47,7 @@ function closeDrawer() {
         <button
           type="submit"
           aria-label="Cari produk"
-          class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-brand-ink text-brand-onink flex items-center justify-center shrink-0"
+          class="relative w-8 h-8 rounded-full bg-brand-ink text-brand-onink flex items-center justify-center shrink-0 before:content-[''] before:absolute before:-inset-1.5"
         >
           <i class="pi pi-search text-xs" aria-hidden="true" />
         </button>
@@ -58,10 +56,6 @@ function closeDrawer() {
 
     <!-- Mobile Links -->
     <nav class="flex flex-col gap-1 text-xs font-semibold" aria-label="Navigasi Mobile">
-      <div class="flex items-center justify-between py-1 border-b border-brand-hairsoft">
-        <span class="text-brand-ink">Tampilan Tema</span>
-        <UiThemeToggle />
-      </div>
       <NuxtLink
         to="/"
         class="min-h-[44px] py-2.5 flex items-center text-brand-ink no-underline border-b border-brand-hairsoft"
