@@ -140,3 +140,29 @@ export function calculateReviewStats(ratings: number[]): ReviewStats {
     distribution,
   }
 }
+
+export const adminReviewStatusSchema = z.enum(['all', 'active', 'hidden'])
+export type AdminReviewStatus = z.infer<typeof adminReviewStatusSchema>
+
+export const adminReviewQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  rating: z.coerce.number().int().min(1).max(5).optional(),
+  status: adminReviewStatusSchema.default('all'),
+  q: z.string().optional().default(''),
+})
+
+export type AdminReviewQuery = z.infer<typeof adminReviewQuerySchema>
+
+export const adminReviewUpdateSchema = z.object({
+  is_hidden: z.boolean(),
+})
+
+export type AdminReviewUpdate = z.infer<typeof adminReviewUpdateSchema>
+
+export interface AdminReviewItem extends ProductReviewItem {
+  deleted_at: string | null
+  product_name: string
+  product_image_url: string | null
+  reviewer_email: string | null
+}
