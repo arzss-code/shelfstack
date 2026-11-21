@@ -1,6 +1,6 @@
 # Audit Lanjutan ShelfStack (v1.1.0-beta.29): Fitur Setengah Jadi, Celah Produk, UI/UX, & Copywriting
 
-> **Status Remediasi (`v1.1.0-beta.30`, 2026-11-18):** Seluruh item Tahap 1, Tahap 2, dan Tahap 3 pada rencana di bawah ini telah diimplementasikan pada branch `feat/audit-next-phase` dan terverifikasi via `pnpm lint` (EXIT 0), `pnpm typecheck` (EXIT 0), `pnpm --filter @shelfstack/order-service test` (25/25 lolos), `pnpm exec vitest run` (141/141 file, 1.391/1.391 test lolos), dan `pnpm build` (EXIT 0). Catatan deployment: migrasi baru `supabase/migrations/20261203000001_audit_stage1_contact_restock_and_rma.sql` perlu didorong via `pnpm dlx supabase db push` ke database target saat rilis (kandidat fase berikutnya yang belum dikerjakan pada batch ini: ongkir dinamis per kota tujuan serta persistent email outbox/retry queue).
+> **Status Remediasi (`v1.1.0-beta.31`, 2026-11-21):** Seluruh item peningkatan platform Fase 1 sampai 5 telah tuntas diimplementasikan: Hardening Dark Mode (77 komponen), perapihan beranda (`HomeReviews.vue`), moderasi ulasan pelanggan (`/admin/reviews`), persistent email outbox queue (`20261204000001_email_outbox_queue.sql`), dan ongkir dinamis zonasi Semarang/Jawa/Luar Jawa (`shared/schemas/shipping.ts`). Terverifikasi via `pnpm lint` (EXIT 0), `pnpm typecheck` (EXIT 0), `pnpm exec vitest run` (144 file, 1.428 test lolos 100%), dan `pnpm build` (EXIT 0).
 
 - **Tanggal Audit:** 2026-11-18
 - **Baseline:** `v1.1.0-beta.29` (pasca-remediasi audit awal pada PR `#103` dan PR `#104`)
