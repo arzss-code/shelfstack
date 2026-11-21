@@ -1,6 +1,6 @@
 <template>
   <article
-    class="relative bg-white border border-brand-hair hover:border-amber-300 rounded-2xl shadow-whisper overflow-hidden transition-all duration-200 flex"
+    class="relative bg-brand-canvas border border-brand-hair hover:border-amber-300 rounded-2xl shadow-whisper overflow-hidden transition-all duration-200 flex"
   >
     <!-- Left Badge Stub -->
     <div

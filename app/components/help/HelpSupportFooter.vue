@@ -11,7 +11,7 @@ const handleOpenLiveChat = () => {
 
 <template>
   <footer
-    class="mt-12 sm:mt-16 bg-white border border-brand-hair rounded-card p-6 sm:p-8 text-center shadow-whisper"
+    class="mt-12 sm:mt-16 bg-brand-canvas border border-brand-hair rounded-card p-6 sm:p-8 text-center shadow-whisper"
   >
     <div
       class="w-12 h-12 rounded-full bg-brand-canvas-soft text-brand-ink flex items-center justify-center mx-auto mb-3"

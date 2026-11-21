@@ -123,7 +123,7 @@ useSeoMeta({
     <!-- Loading State -->
     <div
       v-if="loading"
-      class="w-full max-w-[420px] p-12 bg-white rounded-card border border-brand-hair text-center"
+      class="w-full max-w-[420px] p-12 bg-brand-canvas rounded-card border border-brand-hair text-center"
     >
       <i class="pi pi-spin pi-spinner text-2xl text-brand-accent mb-3 block" />
       <p class="text-xs text-brand-muted m-0">Memuat label pengiriman...</p>

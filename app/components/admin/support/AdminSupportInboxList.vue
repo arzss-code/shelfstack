@@ -122,7 +122,9 @@ const onSearchInput = (e: Event) => {
 </script>
 
 <template>
-  <div class="admin-support-inbox-list flex h-full flex-col border-r border-brand-hair bg-white">
+  <div
+    class="admin-support-inbox-list flex h-full flex-col border-r border-brand-hair bg-brand-canvas"
+  >
     <!-- Search Bar with Icon -->
     <div class="border-b border-brand-hair p-3">
       <div class="relative">
@@ -133,7 +135,7 @@ const onSearchInput = (e: Event) => {
           type="text"
           :value="effectiveSearchQuery"
           placeholder="Cari nama atau email..."
-          class="search-input w-full rounded-field border border-brand-hair bg-brand-canvas-soft pl-8 pr-3 py-1.5 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-white focus:outline-none transition-colors"
+          class="search-input w-full rounded-field border border-brand-hair bg-brand-canvas-soft pl-8 pr-3 py-1.5 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors"
           @input="onSearchInput"
         />
       </div>
@@ -143,7 +145,7 @@ const onSearchInput = (e: Event) => {
     <div class="filter-section relative border-b border-brand-hair bg-brand-canvas-soft/30 p-2.5">
       <button
         type="button"
-        class="filter-dropdown-trigger flex w-full items-center justify-between rounded-field border border-brand-hair bg-white px-3 py-1.5 text-xs text-brand-ink shadow-xs transition-colors hover:border-brand-ink focus:outline-none cursor-pointer"
+        class="filter-dropdown-trigger flex w-full items-center justify-between rounded-field border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs text-brand-ink shadow-xs transition-colors hover:border-brand-ink focus:outline-none cursor-pointer"
         aria-label="Filter status percakapan"
         @click="isDropdownOpen = !isDropdownOpen"
       >
@@ -166,7 +168,7 @@ const onSearchInput = (e: Event) => {
       <!-- Dropdown Popover Menu with Test Contracts Preserved -->
       <div
         v-show="isDropdownOpen"
-        class="status-tabs filter-menu absolute left-2.5 right-2.5 top-[calc(100%+4px)] z-30 rounded-card border border-brand-hair bg-white p-1.5 shadow-floating space-y-0.5"
+        class="status-tabs filter-menu absolute left-2.5 right-2.5 top-[calc(100%+4px)] z-30 rounded-card border border-brand-hair bg-brand-canvas p-1.5 shadow-floating space-y-0.5"
       >
         <button
           v-for="tab in tabs"

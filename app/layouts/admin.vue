@@ -22,6 +22,7 @@ const navLinks: AdminNavLink[] = [
   { to: '/admin/returns', label: 'Komplain & Retur', icon: 'pi-replay', exact: false },
   { to: '/admin/support', label: 'Bantuan & Live Chat', icon: 'pi-comments', exact: false },
   { to: '/admin/products', label: 'Kelola Produk', icon: 'pi-th-large', exact: false },
+  { to: '/admin/reviews', label: 'Ulasan Produk', icon: 'pi-star', exact: false },
   { to: '/admin/promotions', label: 'Promo & Flash Sale', icon: 'pi-bolt', exact: false },
   { to: '/admin/coupons', label: 'Kelola Voucher', icon: 'pi-ticket', exact: false },
   { to: '/admin/activities', label: 'Activity Log', icon: 'pi-history', exact: false },

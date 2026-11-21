@@ -14,7 +14,7 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="bg-white border border-brand-hair rounded-card p-5 sm:p-6 mb-6 shadow-whisper">
+  <div class="bg-brand-canvas border border-brand-hair rounded-card p-5 sm:p-6 mb-6 shadow-whisper">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
         <div class="flex items-center gap-2.5">
@@ -52,7 +52,7 @@ defineEmits<{
           :class="
             desktopPermission === 'granted'
               ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-              : 'bg-white hover:bg-brand-canvas-soft text-brand-muted border-brand-hair'
+              : 'bg-brand-canvas hover:bg-brand-canvas-soft text-brand-muted border-brand-hair'
           "
           :title="
             desktopPermission === 'granted'
@@ -107,7 +107,9 @@ defineEmits<{
         <span
           v-if="unreadCount > 0"
           class="px-1.5 py-0.2 rounded-full text-[10px] font-bold"
-          :class="activeTab === 'unread' ? 'bg-white text-brand-ink' : 'bg-rose-500 text-white'"
+          :class="
+            activeTab === 'unread' ? 'bg-brand-canvas text-brand-ink' : 'bg-rose-500 text-white'
+          "
         >
           {{ unreadCount }}
         </span>

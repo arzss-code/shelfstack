@@ -66,8 +66,8 @@ const handleToggle = (e: Event) => {
       class="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer shadow-sm active:scale-90 transition-colors duration-150 select-none"
       :class="[
         isSaved
-          ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-950/80 dark:text-rose-400'
-          : 'bg-white text-brand-muted hover:text-rose-600 hover:bg-white dark:bg-brand-canvas dark:text-brand-muted dark:hover:text-rose-400',
+          ? 'bg-brand-danger-tint text-brand-danger hover:opacity-90'
+          : 'bg-brand-canvas text-brand-muted hover:text-brand-danger hover:bg-brand-canvas-soft',
       ]"
       @click="handleToggle"
     >

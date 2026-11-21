@@ -44,7 +44,7 @@ const setFilter = (filter: AddressFilterType) => {
         :value="searchQuery"
         type="text"
         placeholder="Cari penerima atau kota..."
-        class="w-full pl-8 pr-3 py-1.5 text-xs rounded-full border border-brand-hair bg-white text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink transition-colors"
+        class="w-full pl-8 pr-3 py-1.5 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink transition-colors"
         @input="onSearchInput"
       />
     </div>

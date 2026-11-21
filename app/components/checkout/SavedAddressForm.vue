@@ -128,7 +128,7 @@ const handleSubmit = () => {
       <!-- Selected State Card -->
       <div
         v-if="form.city"
-        class="p-3 rounded-xl border border-brand-hair bg-white flex items-center justify-between gap-3 transition-colors"
+        class="p-3 rounded-xl border border-brand-hair bg-brand-canvas flex items-center justify-between gap-3 transition-colors"
       >
         <div class="flex items-center gap-2.5 min-w-0">
           <div
@@ -161,7 +161,7 @@ const handleSubmit = () => {
         v-else
         type="button"
         data-testid="saved-address-location-picker-btn"
-        class="w-full flex items-center justify-between p-3 rounded-xl border border-dashed border-brand-hair hover:border-brand-ink bg-white hover:bg-brand-canvas-soft/30 transition-all text-left group cursor-pointer"
+        class="w-full flex items-center justify-between p-3 rounded-xl border border-dashed border-brand-hair hover:border-brand-ink bg-brand-canvas hover:bg-brand-canvas-soft/30 transition-all text-left group cursor-pointer"
         @click="isLocationModalOpen = true"
       >
         <div

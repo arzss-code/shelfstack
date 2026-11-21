@@ -44,8 +44,8 @@ const toggle = () => {
     :class="[
       isAvailable
         ? modelValue
-          ? 'border-amber-400 bg-amber-50/70 dark:border-amber-600/70 dark:bg-amber-950/30 ring-1 ring-amber-400/30 shadow-whisper'
-          : 'border-amber-200 bg-amber-50/30 dark:border-amber-900/40 dark:bg-amber-950/20 hover:border-amber-300'
+          ? 'border-brand-warning-edge bg-brand-warning-tint ring-1 ring-brand-warning/30 shadow-whisper'
+          : 'border-brand-hair bg-brand-canvas-soft hover:border-brand-warning-edge'
         : 'border-brand-hair bg-brand-canvas-soft/40 opacity-70',
     ]"
   >
@@ -56,8 +56,8 @@ const toggle = () => {
         :class="[
           isAvailable
             ? modelValue
-              ? 'bg-amber-500 text-white shadow-amber-500/20 ring-2 ring-amber-400/20 dark:bg-amber-500 dark:text-zinc-950'
-              : 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200 border border-amber-200 dark:border-amber-800/80'
+              ? 'bg-brand-warning text-brand-onink shadow-sm'
+              : 'bg-brand-warning-tint text-brand-warning-text border border-brand-warning-edge'
             : 'bg-brand-canvas-soft text-brand-muted border border-brand-hair',
         ]"
       >
@@ -71,15 +71,12 @@ const toggle = () => {
           </h3>
           <span
             v-if="isAvailable"
-            class="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-100/80 px-2 py-0.5 text-[10.5px] font-semibold text-amber-900 dark:border-amber-800/80 dark:bg-amber-900/50 dark:text-amber-200"
+            class="inline-flex items-center gap-1 rounded-full border border-brand-warning-edge bg-brand-warning-tint px-2 py-0.5 text-caption font-semibold text-brand-warning-text"
           >
-            <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-brand-warning" />
             Tersedia {{ formattedBalance }}
           </span>
-          <span
-            v-if="isAvailable"
-            class="text-[10px] font-medium text-amber-800/80 dark:text-amber-300/70"
-          >
+          <span v-if="isAvailable" class="text-caption font-medium text-brand-muted">
             (1 Koin = Rp 1)
           </span>
         </div>
@@ -87,18 +84,15 @@ const toggle = () => {
         <!-- Description / Feedback text -->
         <p
           v-if="isAvailable && modelValue"
-          class="m-0 mt-1 text-xs font-medium text-amber-900 dark:text-amber-200 flex items-center gap-1"
+          class="m-0 mt-1 text-xs font-medium text-brand-warning-text flex items-center gap-1"
         >
-          <i class="pi pi-check-circle text-amber-600 dark:text-amber-400 text-xs shrink-0" />
+          <i class="pi pi-check-circle text-brand-warning text-xs shrink-0" />
           <span
             >Hemat {{ formattedSavings }} ({{ formattedMaxUsable }}) berhasil diterapkan ke
             pesanan.</span
           >
         </p>
-        <p
-          v-else-if="isAvailable"
-          class="m-0 mt-1 text-xs text-amber-800/90 dark:text-amber-300/80"
-        >
+        <p v-else-if="isAvailable" class="m-0 mt-1 text-xs text-brand-muted">
           Pakai {{ formattedMaxUsable }} untuk hemat {{ formattedSavings }} (Maks. 50% subtotal).
         </p>
         <p v-else class="m-0 mt-1 text-xs text-brand-muted">
@@ -119,12 +113,8 @@ const toggle = () => {
       :aria-checked="modelValue && isAvailable"
       :aria-label="'Tukarkan ShelfStack Koin'"
       :disabled="disabled || !isAvailable"
-      class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-      :class="[
-        modelValue && isAvailable
-          ? 'bg-amber-500 dark:bg-amber-500'
-          : 'bg-zinc-300 dark:bg-zinc-700',
-      ]"
+      class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-warning focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      :class="[modelValue && isAvailable ? 'bg-brand-warning' : 'bg-brand-hair']"
       @click="toggle"
       @keydown.space.prevent="toggle"
       @keydown.enter.prevent="toggle"

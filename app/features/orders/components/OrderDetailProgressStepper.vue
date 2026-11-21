@@ -11,7 +11,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper">
+  <div class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper">
     <div class="flex items-center justify-between pb-4 mb-6 border-b border-brand-hairsoft">
       <div class="flex items-center gap-2">
         <i class="pi pi-compass text-brand-accent text-sm" />
@@ -67,7 +67,7 @@ defineProps<{
                     ? 'bg-amber-500 text-white shadow-sm ring-4 ring-amber-100'
                     : step.isActive
                       ? 'bg-brand-accent text-white shadow-sm ring-4 ring-brand-accent/20'
-                      : 'bg-white border-2 border-brand-hair text-brand-muted',
+                      : 'bg-brand-canvas border-2 border-brand-hair text-brand-muted',
               ]"
             >
               <i v-if="step.isCompleted" class="pi pi-check text-xs" />

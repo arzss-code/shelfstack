@@ -149,7 +149,7 @@ onMounted(async () => {
     >
       <!-- Left Pane: Thread Inbox List -->
       <aside
-        class="w-full md:w-80 lg:w-96 shrink-0 border-r border-brand-hair flex flex-col h-full bg-white"
+        class="w-full md:w-80 lg:w-96 shrink-0 border-r border-brand-hair flex flex-col h-full bg-brand-canvas"
         :class="activeThreadId ? 'hidden md:flex' : 'flex'"
       >
         <AdminSupportInboxList
@@ -165,7 +165,7 @@ onMounted(async () => {
 
       <!-- Right Pane: Active Chat Pane or Empty State -->
       <section
-        class="flex-1 min-w-0 flex flex-col h-full bg-white"
+        class="flex-1 min-w-0 flex flex-col h-full bg-brand-canvas"
         :class="activeThreadId ? 'flex' : 'hidden md:flex'"
       >
         <!-- Mobile Navigation Header: Back to Inbox -->

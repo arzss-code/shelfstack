@@ -2,6 +2,25 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.31] - 2026-11-21
+
+### Penuntasan Peningkatan Platform: Hardening Visual Dark Mode, Moderasi Ulasan, Persistent Outbox, dan Ongkir Dinamis Berbasis Wilayah
+
+- **Fase 1: Hardening Visual Dark Mode & Pembersihan Token Semantik**:
+  - Menggantikan seluruh kelas `bg-white` dengan token semantik `bg-brand-canvas` di 77 komponen `.vue` storefront, checkout, dan admin agar tampilan tema gelap konsisten tanpa celah kontras silau.
+  - Mengonversi pemakaian warna Tailwind mentah pada status pill, notifikasi, wishlist, dan kupon menjadi token semantik (`brand-warning-tint`, `brand-accent-tint`, `brand-danger-tint`, `brand-success-tint`).
+- **Fase 2: Perapihan Beranda & Eliminasi Redundansi Jaminan**:
+  - Merapikan kartu komitmen jaminan pada `HomeReviews.vue` menjadi layout horizontal kompak dengan hierarki visual terkalibrasi (`text-caption`, `bg-brand-canvas`) sehingga ulasan kepuasan pembeli nyata menjadi sorotan utama.
+- **Fase 3: Panel Admin Moderasi Ulasan Pelanggan (`/admin/reviews`)**:
+  - Menambahkan kontrak skema moderasi ulasan (`shared/schemas/review.ts`), endpoint terpaginasi `GET /api/admin/reviews` dengan filter status/rating dan perhitungan metrik kepuasan toko, serta `PATCH /api/admin/reviews/[id]` untuk soft-delete ulasan bermasalah.
+  - Membangun antarmuka admin modular (`AdminReviewsTable.vue`, `AdminReviewsFilterBar.vue`, `AdminReviewsMetricCards.vue`, `useAdminReviews.ts`, dan halaman `/admin/reviews`) dengan tautan navigasi resmi di `AdminSidebarNav.vue`.
+- **Fase 4: Persistent Email Outbox & Resilient Retry Queue**:
+  - Menambahkan migrasi PostgreSQL `20261204000001_email_outbox_queue.sql` (`public.email_outbox`) dengan RLS admin/service role untuk audit trail transaksi email.
+  - Membangun antrean outbox transaksional (`server/utils/email-outbox.ts`) serta endpoint admin `GET /api/admin/emails/outbox` dan `POST /api/admin/emails/retry` untuk monitoring dan pemulihan pengiriman notifikasi email yang sempat gagal.
+- **Fase 5: Kalkulasi Ongkos Kirim Dinamis Berbasis Wilayah Tujuan**:
+  - Mendefinisikan matriks zonasi logistik dari gudang sentral Semarang ke Jawa Tengah (Zona 1: Rp12k/Rp20k/Rp30k/Rp20k), Pulau Jawa Lainnya (Zona 2: Rp16k/Rp28k/Rp45k/Rp25k), dan Luar Jawa (Zona 3: Rp32k/Rp50k/Rp38k dengan penonaktifan otomatis layanan Instan).
+  - Mengintegrasikan kalkulasi dinamis pada `server/api/shipping/calculate.post.ts`, selektor checkout `ShippingMethodSelector.vue` (`destination-city`), komposable pesanan `useCheckoutOrder.ts`, dan estimator PDP `ProductShippingEstimator.vue` dengan tetap mempertahankan ambang batas Bebas Ongkir universal (belanja >= Rp500.000).
+
 ## [v1.1.0-beta.30] - 2026-11-18
 
 ### Penuntasan Audit Lanjutan (`docs/AUDIT-NEXT-PHASE.md`): Integritas Storefront, Modul Admin Lengkap, & Unifikasi Design System

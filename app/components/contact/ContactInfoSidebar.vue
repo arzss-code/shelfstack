@@ -15,7 +15,7 @@ const handleOpenLiveChat = () => {
 <template>
   <div class="space-y-6">
     <!-- Saluran Resmi Card -->
-    <UiCard :padded="true" class="space-y-6 border-brand-hair bg-white">
+    <UiCard :padded="true" class="space-y-6 border-brand-hair bg-brand-canvas">
       <div class="border-b border-brand-hair pb-4">
         <h2 class="font-display text-lg font-bold text-brand-ink">
           Saluran Resmi &amp; Informasi Layanan
@@ -138,7 +138,7 @@ const handleOpenLiveChat = () => {
     </UiCard>
 
     <!-- Security & Privacy Note -->
-    <div class="rounded-card border border-brand-hair bg-white p-4">
+    <div class="rounded-card border border-brand-hair bg-brand-canvas p-4">
       <div class="flex items-center gap-2">
         <i class="pi pi-shield text-xs text-brand-success" />
         <p class="text-xs font-medium text-brand-ink">Privasi &amp; Keamanan Terjamin</p>

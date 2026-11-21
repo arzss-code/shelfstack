@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { formatRupiah } from '~/utils/format'
-import { shippingRateTiers, type ShippingRateTier } from '~~/shared/schemas/shipping'
+import {
+  shippingRateTiers,
+  getZoneShippingRateTiers,
+  type ShippingRateTier,
+} from '~~/shared/schemas/shipping'
 import type { UiSelectOption } from '~/components/ui/UiSelect.vue'
 
 const props = defineProps<{
@@ -25,7 +29,8 @@ const cityOptions: UiSelectOption[] = [
 const subtotalCents = computed(() => Math.round(props.productPrice * 100))
 
 const calculatedTiers = computed(() => {
-  return shippingRateTiers.map((tier: ShippingRateTier) => {
+  const currentTiers = getZoneShippingRateTiers(selectedCity.value)
+  return currentTiers.map((tier: ShippingRateTier) => {
     const isFree = Boolean(
       tier.freeThresholdCents && subtotalCents.value >= tier.freeThresholdCents,
     )

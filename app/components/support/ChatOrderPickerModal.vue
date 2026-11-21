@@ -71,7 +71,7 @@ const getOrderNumber = (ord: OrderPickerItem): string => {
     @click="emit('close')"
   >
     <div
-      class="w-full max-w-md rounded-card border border-brand-hair bg-white p-4 shadow-floating"
+      class="w-full max-w-md rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-floating"
       @click.stop
     >
       <div class="flex items-center justify-between pb-3 border-b border-brand-hair">

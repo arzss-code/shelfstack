@@ -133,7 +133,7 @@ watch(
       <!-- Usages Table -->
       <div
         v-else
-        class="max-h-[380px] overflow-x-auto overflow-y-auto rounded-xl border border-brand-hair bg-white"
+        class="max-h-[380px] overflow-x-auto overflow-y-auto rounded-xl border border-brand-hair bg-brand-canvas"
       >
         <table class="w-full text-left text-xs" role="table">
           <thead

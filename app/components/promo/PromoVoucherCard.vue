@@ -24,7 +24,7 @@ const formatDiscountBadge = (coupon: PromoCoupon) => {
 
 <template>
   <article
-    class="relative bg-white border border-brand-hair hover:border-brand-ink/40 rounded-2xl shadow-whisper overflow-hidden flex transition-all duration-200"
+    class="relative bg-brand-canvas border border-brand-hair hover:border-brand-ink/40 rounded-2xl shadow-whisper overflow-hidden flex transition-all duration-200"
   >
     <!-- Left Stub: Discount value -->
     <div

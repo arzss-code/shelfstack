@@ -130,7 +130,7 @@ const formatTime = (isoString?: string): string => {
 </script>
 
 <template>
-  <div class="admin-support-chat-pane flex h-full flex-col bg-white">
+  <div class="admin-support-chat-pane flex h-full flex-col bg-brand-canvas">
     <!-- Empty State -->
     <div
       v-if="!effectiveThread"
@@ -153,7 +153,7 @@ const formatTime = (isoString?: string): string => {
           <!-- System Note (Clean Informational Card instead of Oval Badge) -->
           <div
             v-if="msg.sender_type === 'system'"
-            class="message-bubble system-bubble mx-auto my-2 max-w-[85%] rounded-xl border border-brand-hair bg-white p-3.5 text-center text-xs text-brand-muted leading-relaxed shadow-whisper"
+            class="message-bubble system-bubble mx-auto my-2 max-w-[85%] rounded-xl border border-brand-hair bg-brand-canvas p-3.5 text-center text-xs text-brand-muted leading-relaxed shadow-whisper"
           >
             {{ msg.message_text }}
           </div>
@@ -161,7 +161,7 @@ const formatTime = (isoString?: string): string => {
           <!-- Customer Message (Dynamic fit left) -->
           <div
             v-else-if="msg.sender_type === 'customer'"
-            class="message-bubble customer-bubble mr-auto w-fit max-w-[80%] rounded-2xl rounded-bl-xs border border-brand-hair bg-white px-3.5 py-2.5 text-brand-ink shadow-whisper space-y-1.5"
+            class="message-bubble customer-bubble mr-auto w-fit max-w-[80%] rounded-2xl rounded-bl-xs border border-brand-hair bg-brand-canvas px-3.5 py-2.5 text-brand-ink shadow-whisper space-y-1.5"
           >
             <p class="text-xs m-0 leading-relaxed whitespace-pre-wrap break-words">
               {{ msg.message_text }}

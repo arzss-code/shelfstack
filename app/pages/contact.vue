@@ -168,7 +168,7 @@ const handleSubmit = async () => {
 
       <!-- Right Column: Formulir Kontak Interaktif -->
       <div class="lg:col-span-7">
-        <UiCard :padded="true" class="border-brand-hair bg-white">
+        <UiCard :padded="true" class="border-brand-hair bg-brand-canvas">
           <div class="mb-6 border-b border-brand-hair pb-4">
             <h2 class="font-display text-lg font-bold text-brand-ink">Kirimkan Pesan</h2>
             <p class="mt-1 text-xs text-brand-muted">

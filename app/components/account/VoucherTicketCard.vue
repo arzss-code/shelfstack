@@ -57,7 +57,7 @@ const handleClaim = () => {
 
 <template>
   <div
-    class="relative flex flex-col sm:flex-row bg-white border border-brand-hair rounded-card overflow-hidden shadow-whisper transition-all duration-150 hover:shadow-floating"
+    class="relative flex flex-col sm:flex-row bg-brand-canvas border border-brand-hair rounded-card overflow-hidden shadow-whisper transition-all duration-150 hover:shadow-floating"
     :class="{ 'opacity-65 grayscale-25': mode === 'history' }"
   >
     <!-- Left Ticket Cutout Notch (Decorative for desktop) -->
@@ -71,7 +71,7 @@ const handleClaim = () => {
     >
       <div class="flex items-center sm:flex-col gap-2">
         <div
-          class="w-10 h-10 rounded-field flex items-center justify-center text-brand-ink bg-white border border-brand-hair shadow-whisper shrink-0"
+          class="w-10 h-10 rounded-field flex items-center justify-center text-brand-ink bg-brand-canvas border border-brand-hair shadow-whisper shrink-0"
         >
           <i :class="isPercentage ? 'pi pi-percentage text-base' : 'pi pi-tag text-base'" />
         </div>
@@ -91,7 +91,7 @@ const handleClaim = () => {
 
       <!-- Mobile code tag -->
       <span
-        class="sm:hidden font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-white border border-brand-hair text-brand-ink"
+        class="sm:hidden font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-brand-canvas border border-brand-hair text-brand-ink"
       >
         {{ voucher.code }}
       </span>
@@ -106,7 +106,7 @@ const handleClaim = () => {
           </h3>
           <button
             type="button"
-            class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-brand-canvas-soft border border-brand-hair text-brand-ink hover:bg-white text-[11px] font-mono font-bold transition-colors cursor-pointer"
+            class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-brand-canvas-soft border border-brand-hair text-brand-ink hover:bg-brand-canvas text-[11px] font-mono font-bold transition-colors cursor-pointer"
             title="Klik untuk menyalin kode voucher"
             @click="handleCopyCode"
           >

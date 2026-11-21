@@ -39,7 +39,7 @@ const {
       <button
         v-if="variant === 'dark'"
         type="button"
-        class="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors active:scale-95 cursor-pointer"
+        class="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-brand-canvas/10 transition-colors active:scale-95 cursor-pointer"
         aria-label="Lihat Notifikasi"
         :aria-expanded="isOpen"
         @click="toggleDropdown"
@@ -158,7 +158,11 @@ const {
             <span
               v-if="unreadCount > 0"
               class="w-1.5 h-1.5 rounded-full"
-              :class="activeTab === 'unread' ? 'bg-white' : 'bg-blue-600'"
+              :class="
+                activeTab === 'unread'
+                  ? 'bg-brand-canvas text-brand-ink'
+                  : 'bg-brand-accent text-white'
+              "
             />
           </button>
         </div>

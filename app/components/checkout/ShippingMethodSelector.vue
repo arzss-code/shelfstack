@@ -15,10 +15,14 @@ const props = withDefaults(
     selectedCourier?: string | null
     subtotalCents: number
     disabled?: boolean
+    destinationCity?: string | null
+    destinationProvince?: string | null
   }>(),
   {
     selectedCourier: null,
     disabled: false,
+    destinationCity: null,
+    destinationProvince: null,
   },
 )
 
@@ -30,27 +34,52 @@ const emit = defineEmits<{
 const serviceKeys: ShippingService[] = ['reguler', 'express', 'instant', 'cargo']
 
 const servicesWithPricing = computed(() => {
+  const destination =
+    props.destinationCity || props.destinationProvince
+      ? { city: props.destinationCity, province: props.destinationProvince }
+      : null
+
   return serviceKeys.map((key) => {
     const opt = shippingRateOptions[key]
-    const calc = calculateShippingFee(key, props.subtotalCents)
+    const calc = calculateShippingFee(key, props.subtotalCents, destination)
     const dynamicEta = calculateDeliveryEta(key)
+    const isAvailable = calc.isAvailable !== false
     return {
       key,
       name: key === 'express' ? 'Kilat / Next Day' : opt.name,
-      description: opt.description,
-      eta: opt.eta,
+      description: isAvailable
+        ? opt.description
+        : 'Layanan tidak tersedia untuk wilayah tujuan ini',
+      eta: calc.etd || opt.eta,
       dynamicEta,
       feeCents: calc.feeCents,
       isFree: calc.isFree,
-      formattedPrice: calc.isFree ? 'Gratis' : formatRupiah(calc.feeCents / 100),
+      isAvailable,
+      formattedPrice: !isAvailable
+        ? 'Tidak Tersedia'
+        : calc.isFree
+          ? 'Gratis'
+          : formatRupiah(calc.feeCents / 100),
     }
   })
 })
 
 const selectService = (service: ShippingService) => {
   if (props.disabled) return
+  const item = servicesWithPricing.value.find((s) => s.key === service)
+  if (item && !item.isAvailable) return
   emit('update:modelValue', service)
 }
+
+watch(
+  () => servicesWithPricing.value,
+  (pricing) => {
+    const current = pricing.find((p) => p.key === props.modelValue)
+    if (current && !current.isAvailable) {
+      emit('update:modelValue', 'reguler')
+    }
+  },
+)
 
 const selectCourier = (courierCode: string | null) => {
   if (props.disabled) return
@@ -96,7 +125,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
     <div
       role="radiogroup"
       aria-label="Pilihan Layanan Pengiriman"
-      class="rounded-xl border border-brand-hair bg-white divide-y divide-brand-hairsoft overflow-hidden shadow-xs"
+      class="rounded-xl border border-brand-hair bg-brand-canvas divide-y divide-brand-hairsoft overflow-hidden shadow-xs"
     >
       <div
         v-for="(svc, index) in servicesWithPricing"
@@ -107,9 +136,11 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
         :data-testid="`shipping-option-${svc.key}`"
         class="relative flex items-center justify-between p-4 cursor-pointer select-none transition-colors duration-150 group text-left focus:outline-none focus:ring-2 focus:ring-brand-ink/20"
         :class="[
-          modelValue === svc.key
-            ? 'bg-brand-canvas-soft/50'
-            : 'bg-white hover:bg-brand-canvas-soft/30',
+          !svc.isAvailable
+            ? 'opacity-40 cursor-not-allowed bg-brand-canvas-soft/20'
+            : modelValue === svc.key
+              ? 'bg-brand-canvas-soft/50'
+              : 'bg-brand-canvas hover:bg-brand-canvas-soft/30',
         ]"
         @click="selectService(svc.key)"
         @keydown="handleKeydown($event, index)"
@@ -127,8 +158,8 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
             class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-all duration-150"
             :class="[
               modelValue === svc.key
-                ? 'border-2 border-brand-ink bg-white'
-                : 'border border-brand-hair bg-white group-hover:border-brand-ink/50',
+                ? 'border-2 border-brand-ink bg-brand-canvas'
+                : 'border border-brand-hair bg-brand-canvas group-hover:border-brand-ink/50',
             ]"
           >
             <div v-if="modelValue === svc.key" class="w-2 h-2 rounded-full bg-brand-ink" />
@@ -144,7 +175,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
                 class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
                 :class="[
                   modelValue === svc.key
-                    ? 'bg-white border border-brand-hair text-brand-ink font-semibold'
+                    ? 'bg-brand-canvas border border-brand-hair text-brand-ink font-semibold'
                     : 'bg-brand-canvas-soft text-brand-muted',
                 ]"
               >
@@ -166,7 +197,10 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
 
         <!-- Price or Free Shipping Badge -->
         <div class="shrink-0 text-right">
-          <template v-if="svc.isFree">
+          <template v-if="!svc.isAvailable">
+            <span class="text-xs font-semibold text-brand-muted">Tidak Tersedia</span>
+          </template>
+          <template v-else-if="svc.isFree">
             <UiBadge label="Bebas Ongkir" variant="success" class="text-xs font-semibold" />
           </template>
           <template v-else>
@@ -193,7 +227,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
           :class="[
             selectedCourier === null || selectedCourier === ''
               ? 'border-brand-ink bg-brand-ink text-white font-medium shadow-2xs'
-              : 'border-brand-hair hover:border-brand-ink/40 text-brand-muted bg-white',
+              : 'border-brand-hair hover:border-brand-ink/40 text-brand-muted bg-brand-canvas',
           ]"
           :disabled="disabled"
           @click="selectCourier(null)"
@@ -213,7 +247,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
           :class="[
             selectedCourier === c.code
               ? 'border-brand-ink bg-brand-ink text-white font-medium shadow-2xs'
-              : 'border-brand-hair hover:border-brand-ink/40 text-brand-muted bg-white',
+              : 'border-brand-hair hover:border-brand-ink/40 text-brand-muted bg-brand-canvas',
           ]"
           :disabled="disabled"
           @click="selectCourier(c.code)"

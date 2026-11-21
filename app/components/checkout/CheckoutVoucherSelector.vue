@@ -181,19 +181,19 @@ const couponExtraInfo = computed(() => {
     <!-- State 2: Auto-Discount Best Recommendation (When not applied yet, but best discount available) -->
     <div
       v-else-if="bestEligibleCoupon && bestSavingsCents > 0"
-      class="rounded-xl border border-amber-300 dark:border-amber-800/60 bg-amber-50/70 dark:bg-amber-950/25 p-3 transition-all"
+      class="rounded-xl border border-brand-warning-edge bg-brand-warning-tint p-3 transition-all"
     >
       <div class="flex items-center justify-between gap-2.5">
         <div class="flex items-center gap-2.5 min-w-0">
           <div
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white shadow-whisper"
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-warning text-brand-onink shadow-whisper"
           >
             <i class="pi pi-bolt text-xs" />
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 flex-wrap">
               <span
-                class="rounded bg-amber-100 px-1.5 py-0.2 text-[9.5px] font-bold text-amber-800 dark:bg-amber-900/50 dark:text-amber-200 border border-amber-200 dark:border-amber-700"
+                class="rounded bg-brand-warning-tint px-1.5 py-0.5 text-micro font-bold text-brand-warning-text border border-brand-warning-edge"
               >
                 Diskon Terbaik
               </span>
@@ -201,9 +201,7 @@ const couponExtraInfo = computed(() => {
                 {{ bestEligibleCoupon.code }}
               </span>
             </div>
-            <p
-              class="m-0 mt-0.5 truncate text-[11px] font-medium text-amber-900 dark:text-amber-200"
-            >
+            <p class="m-0 mt-0.5 truncate text-micro font-medium text-brand-warning-text">
               Hemat {{ formattedBestSavings }} untuk pesanan ini
             </p>
           </div>

@@ -61,7 +61,7 @@ const labelInfo = computed(() => {
         <div class="flex items-center gap-1.5 flex-wrap">
           <span
             v-if="labelInfo.hasCategory"
-            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold bg-white text-brand-ink border border-brand-hair uppercase tracking-wide"
+            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold bg-brand-canvas text-brand-ink border border-brand-hair uppercase tracking-wide"
           >
             <i :class="[labelInfo.icon, 'text-[10px] text-brand-muted']" aria-hidden="true" />
             <span>{{ labelInfo.label }}</span>

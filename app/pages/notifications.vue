@@ -93,7 +93,9 @@ const handleNavigate = async (item: NotificationItem) => {
         />
 
         <!-- Notification List -->
-        <div class="bg-white border border-brand-hair rounded-card overflow-hidden shadow-whisper">
+        <div
+          class="bg-brand-canvas border border-brand-hair rounded-card overflow-hidden shadow-whisper"
+        >
           <!-- Loading -->
           <div v-if="isLoading" class="p-12 text-center text-xs text-brand-muted">
             <i class="pi pi-spin pi-spinner text-2xl text-brand-muted mb-2 block" />
@@ -153,7 +155,7 @@ const handleNavigate = async (item: NotificationItem) => {
           >
             <button
               type="button"
-              class="px-5 py-2 text-xs font-semibold text-brand-ink bg-white border border-brand-hair hover:bg-brand-canvas-soft rounded-full transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+              class="px-5 py-2 text-xs font-semibold text-brand-ink bg-brand-canvas border border-brand-hair hover:bg-brand-canvas-soft rounded-full transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
               :disabled="isLoadingMore"
               @click="notificationStore.loadMore"
             >

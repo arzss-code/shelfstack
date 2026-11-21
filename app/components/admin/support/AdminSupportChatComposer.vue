@@ -82,7 +82,7 @@ defineExpose({
 
 <template>
   <div
-    class="admin-support-chat-composer relative border-t border-brand-hair bg-white p-3 shrink-0"
+    class="admin-support-chat-composer relative border-t border-brand-hair bg-brand-canvas p-3 shrink-0"
   >
     <!-- Canned Response Picker Popover -->
     <div v-if="isCannedOpen" class="absolute bottom-24 left-3 z-30">
@@ -133,7 +133,7 @@ defineExpose({
         rows="2"
         maxlength="1000"
         placeholder="Ketik balasan untuk pelanggan..."
-        class="composer-textarea composer-input w-full resize-none rounded-field border border-brand-hair bg-brand-canvas-soft px-3 py-2 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-white focus:outline-none transition-colors leading-relaxed"
+        class="composer-textarea composer-input w-full resize-none rounded-field border border-brand-hair bg-brand-canvas-soft px-3 py-2 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors leading-relaxed"
         @keydown.enter.exact.prevent="handleSend"
       />
 
@@ -145,7 +145,7 @@ defineExpose({
           <UiTooltip text="Gunakan Template Balasan Cepat" position="top" align="start">
             <button
               type="button"
-              class="btn-canned inline-flex h-8 items-center gap-1.5 rounded-field border border-brand-hair bg-brand-canvas-soft px-2.5 text-xs font-medium text-brand-ink hover:bg-white hover:border-brand-ink transition-colors"
+              class="btn-canned inline-flex h-8 items-center gap-1.5 rounded-field border border-brand-hair bg-brand-canvas-soft px-2.5 text-xs font-medium text-brand-ink hover:bg-brand-canvas hover:border-brand-ink transition-colors"
               @click="toggleCannedMenu"
             >
               <i class="pi pi-bolt text-xs text-brand-accent" />

@@ -9,7 +9,6 @@ import {
   useCheckoutSummaryDisplay,
   createCheckoutPlacedSnapshot,
   type PlacedOrderSnapshot,
-  type ServerOrderSummary,
 } from '~/composables/useCheckoutSummaryDisplay'
 import type { UserAddress } from '~~/shared/schemas/address'
 import { type ShippingService, calculateShippingFee } from '~~/shared/schemas/shipping'
@@ -87,13 +86,10 @@ export function useCheckoutOrder() {
   const createdOrderId = ref<string | null>(null)
   const generalError = ref('')
   const checkoutIdempotencyKey = ref<string>('')
-
   const selectedShippingService = ref<ShippingService>('reguler')
   const selectedCourierCode = ref<string | null>(null)
   const selectedSavedAddressId = ref<string | null>(null)
   const saveAddressForNextOrder = ref(false)
-
-  // Manajemen pemakaian koin loyalitas di checkout
   const useCoins = ref(false)
 
   const maxUsableCoins = computed(() => {
@@ -104,10 +100,21 @@ export function useCheckoutOrder() {
   const coinsDiscountCents = computed(() => calculateCoinsDiscountCents(actualCoinsUsed.value))
 
   const shippingFeeCalculation = computed(() => {
-    return calculateShippingFee(selectedShippingService.value, cartStore.totalPriceCents)
+    return calculateShippingFee(selectedShippingService.value, cartStore.totalPriceCents, {
+      city: address.value.city,
+    })
   })
   const shippingFeeCents = computed(() => shippingFeeCalculation.value.feeCents)
   const isFreeShipping = computed(() => shippingFeeCalculation.value.isFree)
+
+  watch(
+    () => shippingFeeCalculation.value.isAvailable,
+    (available) => {
+      if (available === false) {
+        selectedShippingService.value = 'reguler'
+      }
+    },
+  )
 
   const placedOrderSnapshot = ref<PlacedOrderSnapshot | null>(null)
 

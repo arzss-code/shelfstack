@@ -179,7 +179,7 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
           'relative p-4 rounded-card border-2 transition-all duration-150 text-left cursor-pointer flex flex-col justify-between gap-3',
           selectedId === addr.id
             ? 'border-brand-ink bg-brand-canvas-soft/40 shadow-whisper'
-            : 'border-brand-hair bg-white hover:border-brand-ink/30 hover:shadow-whisper',
+            : 'border-brand-hair bg-brand-canvas hover:border-brand-ink/30 hover:shadow-whisper',
         ]"
         @click="handleSelect(addr)"
       >

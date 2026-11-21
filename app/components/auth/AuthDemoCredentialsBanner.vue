@@ -47,8 +47,8 @@ function selectRole(role: 'customer' | 'admin') {
         class="group relative flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/50 min-h-[44px]"
         :class="[
           selectedRole === 'customer'
-            ? 'border-brand-ink bg-white shadow-whisper text-brand-ink'
-            : 'border-brand-hairsoft bg-white/70 hover:bg-white hover:border-brand-hair text-brand-muted',
+            ? 'border-brand-ink bg-brand-canvas shadow-whisper text-brand-ink'
+            : 'border-brand-hairsoft bg-white/70 hover:bg-brand-canvas hover:border-brand-hair text-brand-muted',
         ]"
         aria-label="Gunakan akun demo pelanggan: demo-customer@shelfstack.local"
         @click="selectRole('customer')"
@@ -89,8 +89,8 @@ function selectRole(role: 'customer' | 'admin') {
         class="group relative flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/50 min-h-[44px]"
         :class="[
           selectedRole === 'admin'
-            ? 'border-brand-ink bg-white shadow-whisper text-brand-ink'
-            : 'border-brand-hairsoft bg-white/70 hover:bg-white hover:border-brand-hair text-brand-muted',
+            ? 'border-brand-ink bg-brand-canvas shadow-whisper text-brand-ink'
+            : 'border-brand-hairsoft bg-white/70 hover:bg-brand-canvas hover:border-brand-hair text-brand-muted',
         ]"
         aria-label="Gunakan akun demo admin: demo-admin@shelfstack.local"
         @click="selectRole('admin')"

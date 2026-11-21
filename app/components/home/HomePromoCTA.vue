@@ -46,7 +46,7 @@ const { isLoggedIn, isAdmin } = useAuth()
       <div class="flex flex-wrap items-center gap-3 shrink-0">
         <NuxtLink
           to="/promos"
-          class="rounded-full bg-white/15 hover:bg-white/25 text-white border border-white/20 px-6 py-3.5 text-sm font-semibold no-underline transition-colors shadow-whisper inline-flex items-center justify-center gap-2 min-h-[44px]"
+          class="rounded-full bg-white/15 hover:bg-brand-canvas/25 text-white border border-white/20 px-6 py-3.5 text-sm font-semibold no-underline transition-colors shadow-whisper inline-flex items-center justify-center gap-2 min-h-[44px]"
         >
           <i class="pi pi-percentage text-xs" aria-hidden="true" />
           <span>Lihat Voucher</span>

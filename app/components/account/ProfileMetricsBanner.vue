@@ -12,7 +12,7 @@ defineProps<{
   <div
     class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-brand-canvas border border-brand-hair rounded-card p-4 sm:p-5 shadow-whisper"
   >
-    <div class="p-3 rounded-field bg-white border border-brand-hair">
+    <div class="p-3 rounded-field bg-brand-canvas border border-brand-hair">
       <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block">
         Status Akun
       </span>
@@ -24,7 +24,7 @@ defineProps<{
 
     <NuxtLink
       to="/orders"
-      class="p-3 rounded-field bg-white border border-brand-hair no-underline block hover:border-brand-ink/40 transition-colors active:scale-95"
+      class="p-3 rounded-field bg-brand-canvas border border-brand-hair no-underline block hover:border-brand-ink/40 transition-colors active:scale-95"
     >
       <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block">
         Total Pesanan
@@ -39,7 +39,7 @@ defineProps<{
 
     <NuxtLink
       to="/orders"
-      class="p-3 rounded-field bg-white border border-brand-hair no-underline block hover:border-brand-ink/40 transition-colors active:scale-95"
+      class="p-3 rounded-field bg-brand-canvas border border-brand-hair no-underline block hover:border-brand-ink/40 transition-colors active:scale-95"
     >
       <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block">
         Pesanan Aktif
@@ -54,7 +54,7 @@ defineProps<{
 
     <NuxtLink
       to="/account/addresses"
-      class="p-3 rounded-field bg-white border border-brand-hair no-underline block hover:border-brand-ink/40 transition-colors active:scale-95"
+      class="p-3 rounded-field bg-brand-canvas border border-brand-hair no-underline block hover:border-brand-ink/40 transition-colors active:scale-95"
     >
       <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block">
         Daftar Alamat

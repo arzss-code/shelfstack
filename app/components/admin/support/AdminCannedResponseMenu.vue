@@ -65,7 +65,7 @@ const onSelectResponse = (text: string) => {
 
 <template>
   <div
-    class="canned-response-menu w-80 rounded-card border border-brand-hair bg-white p-3 shadow-floating text-brand-ink z-40"
+    class="canned-response-menu w-80 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-floating text-brand-ink z-40"
   >
     <div class="flex items-center justify-between pb-2 mb-2 border-b border-brand-hair">
       <div class="flex items-center gap-1.5">
@@ -86,7 +86,7 @@ const onSelectResponse = (text: string) => {
         v-model="searchQuery"
         type="text"
         placeholder="Cari template balasan..."
-        class="w-full rounded-field border border-brand-hair bg-brand-canvas-soft pl-7 pr-2 py-1 text-[11px] text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-white focus:outline-none transition-colors"
+        class="w-full rounded-field border border-brand-hair bg-brand-canvas-soft pl-7 pr-2 py-1 text-[11px] text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors"
       />
     </div>
 

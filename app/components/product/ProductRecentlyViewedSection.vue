@@ -103,7 +103,7 @@ const items = computed(() => {
         <button
           type="button"
           aria-label="Hapus dari daftar dilihat"
-          class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-white/80 hover:bg-white text-brand-muted hover:text-brand-danger shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer border-0"
+          class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-white/80 hover:bg-brand-canvas text-brand-muted hover:text-brand-danger shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer border-0"
           @click.stop.prevent="removeItem(item.id)"
         >
           <i class="pi pi-times text-[9px]" aria-hidden="true" />

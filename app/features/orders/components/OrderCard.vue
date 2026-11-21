@@ -70,7 +70,7 @@ const handleCardClick = () => {
 
 <template>
   <article
-    class="bg-white border border-brand-hair rounded-card p-5 sm:p-6 shadow-whisper hover:border-brand-ink/25 transition-all cursor-pointer space-y-4"
+    class="bg-brand-canvas border border-brand-hair rounded-card p-5 sm:p-6 shadow-whisper hover:border-brand-ink/25 transition-all cursor-pointer space-y-4"
     @click="handleCardClick"
   >
     <!-- Top Metadata Header -->

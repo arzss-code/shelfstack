@@ -31,18 +31,18 @@ const getTypeIcon = (type: NotificationType): string => {
 const getTypeStyles = (type: NotificationType): string => {
   switch (type) {
     case 'order_created':
-      return 'bg-blue-100/70 text-blue-700'
+      return 'bg-brand-accent-tint text-brand-accent'
     case 'payment_success':
-      return 'bg-emerald-100/70 text-emerald-700'
+      return 'bg-brand-success-tint text-brand-success-text'
     case 'order_shipped':
-      return 'bg-amber-100/70 text-amber-700'
+      return 'bg-brand-warning-tint text-brand-warning-text'
     case 'order_completed':
-      return 'bg-purple-100/70 text-purple-700'
+      return 'bg-brand-success-tint text-brand-success-text'
     case 'order_cancelled':
-      return 'bg-rose-100/70 text-rose-700'
+      return 'bg-brand-danger-tint text-brand-danger-text'
     case 'system':
     default:
-      return 'bg-zinc-100 text-zinc-700'
+      return 'bg-brand-canvas-soft text-brand-muted'
   }
 }
 
@@ -65,7 +65,7 @@ const formatDateTime = (isoString: string): string => {
 <template>
   <div
     class="p-4 sm:p-5 hover:bg-brand-canvas-soft/60 transition-colors flex items-start gap-4"
-    :class="{ 'bg-blue-50/20': !item.is_read }"
+    :class="{ 'bg-brand-accent-tint/40': !item.is_read }"
   >
     <!-- Type Icon -->
     <div

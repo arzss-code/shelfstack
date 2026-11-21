@@ -45,7 +45,7 @@ const statusBadgeClass = computed(() => {
 
 <template>
   <div
-    class="chat-order-snippet rounded-card border border-brand-hair bg-white p-3 shadow-whisper text-brand-ink"
+    class="chat-order-snippet rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper text-brand-ink"
   >
     <div class="flex items-center justify-between gap-2">
       <span class="order-number font-semibold text-xs text-brand-ink truncate">

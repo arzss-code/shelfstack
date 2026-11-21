@@ -71,7 +71,7 @@ const {
 
     <!-- Filter & Search Bar -->
     <div
-      class="relative z-20 flex flex-col items-stretch justify-between gap-3 rounded-2xl border border-brand-hair bg-white p-3 shadow-whisper sm:flex-row sm:items-center"
+      class="relative z-20 flex flex-col items-stretch justify-between gap-3 rounded-2xl border border-brand-hair bg-brand-canvas p-3 shadow-whisper sm:flex-row sm:items-center"
     >
       <div class="w-full sm:w-72">
         <UiInput

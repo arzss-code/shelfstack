@@ -12,7 +12,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div
-        class="bg-white border border-brand-hairsoft rounded-card p-6 flex flex-col gap-3 shadow-whisper transition-all hover:border-brand-accent/40"
+        class="bg-brand-canvas border border-brand-hairsoft rounded-card p-6 flex flex-col gap-3 shadow-whisper transition-all hover:border-brand-accent/40"
       >
         <div
           class="w-10 h-10 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center text-brand-ink"

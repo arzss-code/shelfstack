@@ -54,7 +54,7 @@ const handleClaim = () => {
           <h3 class="font-bold text-sm text-brand-ink truncate">{{ coupon.name }}</h3>
           <div class="flex items-center gap-2 mt-1">
             <span
-              class="font-mono text-[10px] font-bold bg-white text-brand-ink px-2 py-0.5 rounded border border-brand-hair"
+              class="font-mono text-[10px] font-bold bg-brand-canvas text-brand-ink px-2 py-0.5 rounded border border-brand-hair"
             >
               {{ coupon.code }}
             </span>

@@ -111,7 +111,7 @@ function handleApplyCustom() {
             step="10000"
             placeholder="Min"
             aria-label="Harga minimum"
-            class="w-full pl-8 pr-2 py-1.5 bg-brand-canvas-soft border border-brand-hair rounded-field text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-white focus:outline-none transition-colors tabular"
+            class="w-full pl-8 pr-2 py-1.5 bg-brand-canvas-soft border border-brand-hair rounded-field text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors tabular"
             @keydown.enter.prevent="handleApplyCustom"
           />
         </div>
@@ -129,7 +129,7 @@ function handleApplyCustom() {
             step="10000"
             placeholder="Maks"
             aria-label="Harga maksimum"
-            class="w-full pl-8 pr-2 py-1.5 bg-brand-canvas-soft border border-brand-hair rounded-field text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-white focus:outline-none transition-colors tabular"
+            class="w-full pl-8 pr-2 py-1.5 bg-brand-canvas-soft border border-brand-hair rounded-field text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors tabular"
             @keydown.enter.prevent="handleApplyCustom"
           />
         </div>
