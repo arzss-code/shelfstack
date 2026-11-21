@@ -228,38 +228,38 @@ const featuredReviews = computed<FeaturedReview[]>(() => reviews.value)
         Empat Komitmen Layanan Resmi
       </h3>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div
           v-for="item in commitments"
           :key="item.title"
-          class="bg-brand-canvas-soft border border-brand-hair rounded-card p-6 flex flex-col justify-between gap-4 shadow-whisper transition-all hover:border-brand-accent/40"
+          class="bg-brand-canvas border border-brand-hair rounded-card p-4 sm:p-5 flex flex-col justify-between gap-3 shadow-whisper transition-all hover:border-brand-accent/40"
           data-testid="trust-commitment-card"
         >
           <div>
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-2.5">
               <div
-                class="w-10 h-10 rounded-full bg-brand-accent/10 text-brand-accent flex items-center justify-center"
+                class="w-9 h-9 rounded-full bg-brand-accent/10 text-brand-accent flex items-center justify-center shrink-0"
               >
-                <i :class="[item.icon, 'text-lg']" aria-hidden="true" />
+                <i :class="[item.icon, 'text-sm']" aria-hidden="true" />
               </div>
               <span
-                class="bg-brand-canvas border border-brand-hair px-2.5 py-0.5 rounded-full text-[10px] font-semibold text-brand-muted"
+                class="bg-brand-canvas-soft border border-brand-hair px-2 py-0.5 rounded-full text-[10px] font-semibold text-brand-muted"
               >
                 {{ item.tag }}
               </span>
             </div>
 
-            <h4 class="font-display text-base font-bold text-brand-ink m-0 mb-2">
+            <h4 class="font-display text-sm font-bold text-brand-ink m-0 mb-1">
               {{ item.title }}
             </h4>
 
-            <p class="font-body text-xs sm:text-sm text-brand-muted leading-relaxed m-0">
+            <p class="font-body text-xs text-brand-muted leading-relaxed m-0">
               {{ item.description }}
             </p>
           </div>
 
           <div
-            class="pt-3 border-t border-brand-hairsoft flex items-center justify-between text-[11px] text-brand-muted"
+            class="pt-2.5 border-t border-brand-hairsoft flex items-center justify-between text-caption text-brand-muted"
           >
             <span class="font-medium">{{ item.metric }}</span>
             <i class="pi pi-check text-brand-accent text-xs" aria-hidden="true" />
