@@ -29,7 +29,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <aside class="hidden lg:flex lg:col-span-3 flex-col gap-6 sticky top-40 select-none">
+  <aside class="hidden lg:flex lg:col-span-3 flex-col gap-6 select-none">
     <UiCard :padded="true">
       <!-- Filter Header -->
       <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft mb-5">
@@ -59,7 +59,7 @@ const emit = defineEmits<{
             :class="[
               'text-left px-3 py-2 rounded-field text-xs font-medium transition-all cursor-pointer border-0 flex items-center justify-between',
               selectedCategory === cat.id
-                ? 'bg-brand-ink text-white font-semibold shadow-whisper'
+                ? 'bg-brand-ink text-brand-onink font-semibold shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:bg-brand-canvas-soft hover:text-brand-ink',
             ]"
             @click="emit('update:selectedCategory', cat.id)"
@@ -128,7 +128,7 @@ const emit = defineEmits<{
             :class="[
               'text-left px-3 py-2 rounded-field text-xs font-medium transition-all cursor-pointer border-0 flex items-center justify-between',
               selectedRating === r.id
-                ? 'bg-brand-ink text-white font-semibold shadow-whisper'
+                ? 'bg-brand-ink text-brand-onink font-semibold shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:bg-brand-canvas-soft hover:text-brand-ink',
             ]"
             @click="emit('update:selectedRating', r.id)"

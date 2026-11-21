@@ -86,7 +86,7 @@ function handleApplyCustom() {
         class="px-2 py-1.5 rounded-field text-xs font-medium border text-center transition-colors cursor-pointer truncate"
         :class="
           selectedChip === chip.id
-            ? 'bg-brand-ink text-white border-brand-ink font-semibold shadow-whisper'
+            ? 'bg-brand-ink text-brand-onink border-brand-ink font-semibold shadow-whisper'
             : 'bg-brand-canvas-soft border-brand-hair text-brand-muted hover:text-brand-ink hover:border-brand-ink'
         "
         @click="handleSelectChip(chip)"
@@ -142,7 +142,7 @@ function handleApplyCustom() {
       <div class="flex items-center gap-2 pt-0.5">
         <button
           type="button"
-          class="flex-1 py-1.5 px-3 rounded-field bg-brand-ink text-white text-xs font-semibold hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
+          class="flex-1 py-1.5 px-3 rounded-field bg-brand-ink text-brand-onink text-xs font-semibold hover:bg-brand-inkhover transition-colors cursor-pointer shadow-whisper"
           @click="handleApplyCustom"
         >
           Terapkan

@@ -134,7 +134,7 @@ export function useUiSelect(
         : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/10'
 
     return [
-      'inline-flex items-center justify-between gap-2 border bg-white text-brand-ink transition-all',
+      'inline-flex items-center justify-between gap-2 border bg-brand-canvas text-brand-ink transition-all',
       'cursor-pointer select-none text-left outline-none font-medium',
       'disabled:cursor-not-allowed disabled:bg-brand-field disabled:text-brand-muted disabled:border-brand-hairsoft',
       props.block ? 'w-full' : 'min-w-[120px]',

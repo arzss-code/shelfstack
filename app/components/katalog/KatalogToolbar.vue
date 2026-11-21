@@ -30,7 +30,7 @@ const emit = defineEmits<{
 
 <template>
   <section
-    class="sticky top-20 z-30 bg-brand-canvas/95 backdrop-blur-md py-3 px-4 rounded-card border border-brand-hair shadow-whisper flex flex-wrap items-center justify-between gap-3"
+    class="bg-brand-canvas py-3 px-4 rounded-card border border-brand-hair shadow-whisper flex flex-wrap items-center justify-between gap-3"
   >
     <!-- Search Input Field with UiInput Primitive -->
     <div class="relative w-full sm:w-80">
