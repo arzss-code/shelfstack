@@ -17,7 +17,7 @@ const formattedDate = computed(() => {
 </script>
 
 <template>
-  <UiCard :padded="true" class="bg-white border-brand-hair shadow-whisper">
+  <UiCard :padded="true" class="bg-brand-canvas border-brand-hair shadow-whisper">
     <div class="space-y-3">
       <!-- Header: Masked Reviewer Name & Date (Strictly No Gaudy Verified Badges) -->
       <div class="flex items-center justify-between gap-4">

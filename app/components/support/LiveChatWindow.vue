@@ -137,7 +137,7 @@ const formatTime = (isoString?: string): string => {
 
 <template>
   <div
-    class="live-chat-window fixed bottom-0 right-4 sm:right-6 z-50 flex h-[600px] max-h-[calc(100vh-1rem)] w-[400px] max-w-[calc(100vw-1rem)] flex-col rounded-t-2xl border-t border-x border-brand-hair bg-white shadow-floating"
+    class="live-chat-window fixed bottom-0 right-4 sm:right-6 z-50 flex h-[600px] max-h-[calc(100vh-1rem)] w-[400px] max-w-[calc(100vw-1rem)] flex-col rounded-t-2xl border-t border-x border-brand-hair bg-brand-canvas shadow-floating"
     role="dialog"
     aria-modal="true"
     aria-label="Jendela Live Chat Bantuan ShelfStack"
@@ -200,7 +200,7 @@ const formatTime = (isoString?: string): string => {
           <!-- System Note (Clean Informational Card) -->
           <div
             v-if="msg.sender_type === 'system'"
-            class="system-bubble mx-auto my-1 max-w-[90%] rounded-card border border-brand-hair bg-white p-3 text-center text-xs text-brand-muted leading-relaxed shadow-whisper"
+            class="system-bubble mx-auto my-1 max-w-[90%] rounded-card border border-brand-hair bg-brand-canvas p-3 text-center text-xs text-brand-muted leading-relaxed shadow-whisper"
           >
             {{ msg.message_text }}
           </div>
@@ -230,7 +230,7 @@ const formatTime = (isoString?: string): string => {
           <!-- Admin Message (Dynamic fit left) -->
           <div
             v-else
-            class="admin-bubble mr-auto w-fit max-w-[80%] rounded-2xl rounded-bl-xs border border-brand-hair bg-white px-3 py-2 text-brand-ink shadow-whisper space-y-1.5"
+            class="admin-bubble mr-auto w-fit max-w-[80%] rounded-2xl rounded-bl-xs border border-brand-hair bg-brand-canvas px-3 py-2 text-brand-ink shadow-whisper space-y-1.5"
           >
             <p class="m-0 text-xs leading-relaxed whitespace-pre-wrap break-words">
               {{ msg.message_text }}

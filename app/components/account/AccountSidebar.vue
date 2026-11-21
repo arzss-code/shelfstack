@@ -193,7 +193,9 @@ const handleLogout = () => {
                 v-if="item.badge !== undefined && item.badge > 0"
                 class="rounded-full px-1.5 py-0.5 font-bold text-[10px] tabular-nums"
                 :class="[
-                  isItemActive(item.to) ? 'bg-white text-brand-ink' : 'bg-brand-ink text-white',
+                  isItemActive(item.to)
+                    ? 'bg-brand-canvas text-brand-ink'
+                    : 'bg-brand-ink text-white',
                 ]"
               >
                 {{ item.badge }}

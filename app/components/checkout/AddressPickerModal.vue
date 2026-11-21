@@ -167,7 +167,7 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
             v-model="searchQuery"
             type="search"
             placeholder="Cari penerima, jalan, atau kota..."
-            class="w-full pl-8 pr-3 py-2 text-xs rounded-full border border-brand-hair bg-white text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/15 transition-all"
+            class="w-full pl-8 pr-3 py-2 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/15 transition-all"
           />
         </div>
 
@@ -198,7 +198,7 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
           :class="[
             activeFilter === opt.id
               ? 'border-brand-ink bg-brand-ink text-white shadow-2xs'
-              : 'border-brand-hair hover:border-brand-ink/30 text-brand-muted bg-white hover:text-brand-ink',
+              : 'border-brand-hair hover:border-brand-ink/30 text-brand-muted bg-brand-canvas hover:text-brand-ink',
           ]"
           @click="activeFilter = opt.id"
         >

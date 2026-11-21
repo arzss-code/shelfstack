@@ -72,7 +72,7 @@ const copyResi = async (resi?: string | null) => {
         </span>
         <span class="text-brand-faint">·</span>
         <span
-          class="font-mono text-brand-ink font-semibold text-[11px] bg-white px-2 py-0.5 rounded border border-blue-200/60"
+          class="font-mono text-brand-ink font-semibold text-[11px] bg-brand-canvas px-2 py-0.5 rounded border border-brand-hair"
         >
           {{ order.tracking_number }}
         </span>

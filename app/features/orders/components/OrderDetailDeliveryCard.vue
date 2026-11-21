@@ -18,7 +18,7 @@ defineEmits<{
 <template>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Address Card -->
-    <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-3">
+    <div class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-3">
       <div class="flex items-center gap-2 pb-3 border-b border-brand-hairsoft">
         <i class="pi pi-map-marker text-brand-accent text-base" />
         <h2 class="font-display text-base font-bold text-brand-ink m-0">Tujuan Pengiriman</h2>
@@ -38,7 +38,7 @@ defineEmits<{
     </div>
 
     <!-- Shipping Logistics Card -->
-    <div class="bg-white border border-brand-hair rounded-card p-6 shadow-whisper space-y-3">
+    <div class="bg-brand-canvas border border-brand-hair rounded-card p-6 shadow-whisper space-y-3">
       <div class="flex items-center justify-between pb-3 border-b border-brand-hairsoft">
         <div class="flex items-center gap-2">
           <i class="pi pi-truck text-brand-accent text-base" />

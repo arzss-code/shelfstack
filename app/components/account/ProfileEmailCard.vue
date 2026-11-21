@@ -41,7 +41,7 @@ const handleUpdate = () => {
 
     <div class="space-y-4 max-w-lg">
       <div
-        class="p-3.5 rounded-field bg-white border border-brand-hair flex items-center justify-between"
+        class="p-3.5 rounded-field bg-brand-canvas border border-brand-hair flex items-center justify-between"
       >
         <div>
           <span class="text-[11px] text-brand-muted block font-medium"

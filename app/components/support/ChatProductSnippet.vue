@@ -22,7 +22,7 @@ const formattedPrice = computed(() => {
 
 <template>
   <div
-    class="chat-product-snippet rounded-card border border-brand-hair bg-white p-2.5 shadow-whisper text-brand-ink flex items-center gap-2.5 max-w-sm"
+    class="chat-product-snippet rounded-card border border-brand-hair bg-brand-canvas p-2.5 shadow-whisper text-brand-ink flex items-center gap-2.5 max-w-sm"
   >
     <div
       class="h-12 w-12 shrink-0 rounded border border-brand-hair bg-brand-canvas-soft overflow-hidden flex items-center justify-center"

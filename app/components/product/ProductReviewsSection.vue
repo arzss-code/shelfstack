@@ -78,7 +78,7 @@ const {
 
     <!-- Loading Skeleton View -->
     <div v-if="isLoading" class="space-y-4">
-      <UiCard v-for="i in 3" :key="i" :padded="true" class="bg-white border-brand-hair">
+      <UiCard v-for="i in 3" :key="i" :padded="true" class="bg-brand-canvas border-brand-hair">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2.5">

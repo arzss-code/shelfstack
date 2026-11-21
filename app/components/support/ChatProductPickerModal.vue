@@ -75,7 +75,7 @@ const formatRupiah = (cents: number): string => {
     @click="emit('close')"
   >
     <div
-      class="w-full max-w-md rounded-card border border-brand-hair bg-white p-4 shadow-floating"
+      class="w-full max-w-md rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-floating"
       @click.stop
     >
       <div class="flex items-center justify-between pb-3 border-b border-brand-hair">
@@ -100,7 +100,7 @@ const formatRupiah = (cents: number): string => {
           v-model="searchQuery"
           type="text"
           placeholder="Cari nama produk..."
-          class="w-full rounded-field border border-brand-hair bg-brand-canvas-soft pl-8 pr-3 py-1.5 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-white focus:outline-none transition-colors"
+          class="w-full rounded-field border border-brand-hair bg-brand-canvas-soft pl-8 pr-3 py-1.5 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors"
           @input="searchProducts(searchQuery)"
         />
       </div>

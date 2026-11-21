@@ -243,7 +243,7 @@ const featuredReviews = computed<FeaturedReview[]>(() => reviews.value)
                 <i :class="[item.icon, 'text-lg']" aria-hidden="true" />
               </div>
               <span
-                class="bg-white border border-brand-hair px-2.5 py-0.5 rounded-full text-[10px] font-semibold text-brand-muted"
+                class="bg-brand-canvas border border-brand-hair px-2.5 py-0.5 rounded-full text-[10px] font-semibold text-brand-muted"
               >
                 {{ item.tag }}
               </span>

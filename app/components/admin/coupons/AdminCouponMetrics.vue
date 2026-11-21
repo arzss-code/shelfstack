@@ -15,7 +15,7 @@ defineProps<{
 <template>
   <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
     <!-- Total Master Voucher -->
-    <div class="space-y-1 rounded-2xl border border-brand-hair bg-white p-4 shadow-whisper">
+    <div class="space-y-1 rounded-2xl border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
       <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">
         Total Voucher
       </p>
@@ -26,7 +26,7 @@ defineProps<{
     </div>
 
     <!-- Voucher Aktif -->
-    <div class="space-y-1 rounded-2xl border border-brand-hair bg-white p-4 shadow-whisper">
+    <div class="space-y-1 rounded-2xl border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
       <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">
         Voucher Aktif
       </p>
@@ -37,7 +37,7 @@ defineProps<{
     </div>
 
     <!-- Total Penggunaan -->
-    <div class="space-y-1 rounded-2xl border border-brand-hair bg-white p-4 shadow-whisper">
+    <div class="space-y-1 rounded-2xl border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
       <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">
         Total Penggunaan
       </p>
@@ -48,7 +48,7 @@ defineProps<{
     </div>
 
     <!-- Total Penghematan Diskon -->
-    <div class="space-y-1 rounded-2xl border border-brand-hair bg-white p-4 shadow-whisper">
+    <div class="space-y-1 rounded-2xl border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
       <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">
         Total Diskon Diberikan
       </p>

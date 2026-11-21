@@ -18,7 +18,7 @@ const emit = defineEmits<{
   >
     <button
       type="button"
-      class="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 text-xs"
+      class="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white hover:bg-brand-canvas/30 text-xs"
       aria-label="Tutup pratinjau"
       @click="emit('close')"
     >

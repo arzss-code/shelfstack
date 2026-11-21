@@ -133,7 +133,7 @@ const handleClaimCoupon = async (couponId: string) => {
                 class="px-2.5 py-1 rounded-full border transition-colors cursor-pointer"
                 :class="
                   categoryFilter === 'all'
-                    ? 'bg-white border-brand-ink text-brand-ink font-bold shadow-whisper'
+                    ? 'bg-brand-canvas border-brand-ink text-brand-ink font-bold shadow-whisper'
                     : 'border-brand-hair text-brand-muted hover:text-brand-ink'
                 "
                 @click="categoryFilter = 'all'"
@@ -145,7 +145,7 @@ const handleClaimCoupon = async (couponId: string) => {
                 class="px-2.5 py-1 rounded-full border transition-colors cursor-pointer"
                 :class="
                   categoryFilter === 'percentage'
-                    ? 'bg-white border-brand-ink text-brand-ink font-bold shadow-whisper'
+                    ? 'bg-brand-canvas border-brand-ink text-brand-ink font-bold shadow-whisper'
                     : 'border-brand-hair text-brand-muted hover:text-brand-ink'
                 "
                 @click="categoryFilter = 'percentage'"
@@ -157,7 +157,7 @@ const handleClaimCoupon = async (couponId: string) => {
                 class="px-2.5 py-1 rounded-full border transition-colors cursor-pointer"
                 :class="
                   categoryFilter === 'fixed'
-                    ? 'bg-white border-brand-ink text-brand-ink font-bold shadow-whisper'
+                    ? 'bg-brand-canvas border-brand-ink text-brand-ink font-bold shadow-whisper'
                     : 'border-brand-hair text-brand-muted hover:text-brand-ink'
                 "
                 @click="categoryFilter = 'fixed'"

@@ -60,7 +60,7 @@ const paymentChannels = ['QRIS', 'GoPay', 'ShopeePay', 'BCA VA', 'Mandiri VA', '
           <span
             v-for="channel in paymentChannels"
             :key="channel"
-            class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-white border border-brand-hair text-brand-ink"
+            class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-brand-canvas border border-brand-hair text-brand-ink"
           >
             {{ channel }}
           </span>

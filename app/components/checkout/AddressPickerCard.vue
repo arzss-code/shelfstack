@@ -55,7 +55,7 @@ const labelInfo = computed(() => {
       'group relative p-4 sm:p-4.5 rounded-card border-2 transition-all duration-150 text-left cursor-pointer flex flex-col justify-between gap-3 outline-none focus-visible:ring-2 focus-visible:ring-brand-ink/20',
       isSelected
         ? 'border-brand-ink bg-brand-canvas-soft/30'
-        : 'border-brand-hair bg-white hover:border-brand-ink/40 hover:bg-brand-canvas-soft/10',
+        : 'border-brand-hair bg-brand-canvas hover:border-brand-ink/40 hover:bg-brand-canvas-soft/10',
     ]"
     @click="emit('select', address)"
     @keydown.enter.prevent="emit('select', address)"
@@ -70,7 +70,7 @@ const labelInfo = computed(() => {
           :class="[
             isSelected
               ? 'border-brand-ink bg-brand-ink'
-              : 'border-brand-hair bg-white group-hover:border-brand-ink/50',
+              : 'border-brand-hair bg-brand-canvas group-hover:border-brand-ink/50',
           ]"
         >
           <div

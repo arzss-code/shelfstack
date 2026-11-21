@@ -42,7 +42,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="overflow-hidden rounded-2xl border border-brand-hair bg-white shadow-whisper">
+  <div class="overflow-hidden rounded-2xl border border-brand-hair bg-brand-canvas shadow-whisper">
     <!-- Loading State -->
     <div v-if="loading" class="space-y-3 p-10 text-center">
       <i class="pi pi-spinner animate-spin text-2xl text-brand-muted" aria-hidden="true" />

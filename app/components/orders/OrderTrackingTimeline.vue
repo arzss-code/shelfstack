@@ -1,12 +1,12 @@
 <template>
-  <div class="bg-white border border-brand-hair rounded-card p-5 sm:p-6 shadow-whisper">
+  <div class="bg-brand-canvas border border-brand-hair rounded-card p-5 sm:p-6 shadow-whisper">
     <!-- Header: Courier & Tracking Number -->
     <div
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-brand-hairsoft"
     >
       <div class="flex items-center gap-3">
         <div
-          class="w-10 h-10 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center shrink-0"
+          class="w-10 h-10 rounded-full bg-brand-accent-tint text-brand-accent flex items-center justify-center shrink-0"
         >
           <i class="pi pi-truck text-lg" />
         </div>
@@ -17,7 +17,7 @@
             </span>
             <span
               v-if="status"
-              class="px-2 py-0.5 text-[10px] font-bold rounded-full uppercase"
+              class="px-2 py-0.5 text-caption font-bold rounded-full uppercase"
               :class="getStatusBadgeClass(status)"
             >
               {{ getStatusLabel(status) }}
@@ -28,10 +28,10 @@
             <button
               v-if="trackingNumber"
               type="button"
-              class="text-[11px] text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
+              class="text-caption text-brand-accent hover:text-brand-accent-hover font-medium inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
               @click="copyTrackingNumber"
             >
-              <i :class="copied ? 'pi pi-check text-emerald-600' : 'pi pi-copy text-xs'" />
+              <i :class="copied ? 'pi pi-check text-brand-success' : 'pi pi-copy text-xs'" />
               <span>{{ copied ? 'Tersalin' : 'Salin Resi' }}</span>
             </button>
           </div>
@@ -62,10 +62,10 @@
         <div v-for="(cp, idx) in checkpoints" :key="cp.id || idx" class="relative group">
           <!-- Node Icon / Dot -->
           <div
-            class="absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full flex items-center justify-center ring-4 ring-white"
+            class="absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full flex items-center justify-center ring-4 ring-brand-canvas"
             :class="
               idx === 0
-                ? 'bg-blue-600 text-white shadow-xs'
+                ? 'bg-brand-accent text-white shadow-xs'
                 : 'bg-brand-canvas-soft text-brand-muted border border-brand-hair'
             "
           >
@@ -83,7 +83,7 @@
             class="rounded-lg p-3 transition-colors"
             :class="
               idx === 0
-                ? 'bg-blue-50/40 border border-blue-100/80'
+                ? 'bg-brand-accent-tint border border-brand-accent-edge'
                 : 'hover:bg-brand-canvas-soft/40'
             "
           >
@@ -165,14 +165,14 @@ const getStatusBadgeClass = (status: string): string => {
   switch (status) {
     case 'completed':
     case 'delivered':
-      return 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+      return 'bg-brand-success-tint text-brand-success-text border border-brand-success-edge'
     case 'shipped':
     case 'in_transit':
-      return 'bg-blue-50 text-blue-700 border border-blue-200'
+      return 'bg-brand-accent-tint text-brand-accent-text border border-brand-accent-edge'
     case 'cancelled':
-      return 'bg-rose-50 text-rose-700 border border-rose-200'
+      return 'bg-brand-danger-tint text-brand-danger-text border border-brand-danger-edge'
     default:
-      return 'bg-zinc-100 text-zinc-700'
+      return 'bg-brand-canvas-soft text-brand-muted border border-brand-hair'
   }
 }
 

@@ -30,30 +30,30 @@ const getInitials = (name?: string): string => {
 const statusBadgeClass = (status: string): string => {
   switch (status) {
     case 'open':
-      return 'bg-sky-50 text-sky-700 border-sky-200'
+      return 'bg-brand-accent-tint text-brand-accent-text border-brand-accent-edge'
     case 'waiting_admin':
-      return 'bg-amber-50 text-amber-700 border-amber-200'
+      return 'bg-brand-warning-tint text-brand-warning-text border-brand-warning-edge'
     case 'waiting_customer':
-      return 'bg-blue-50 text-blue-700 border-blue-200'
+      return 'bg-brand-canvas-soft text-brand-muted border-brand-hair'
     case 'resolved':
-      return 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      return 'bg-brand-success-tint text-brand-success-text border-brand-success-edge'
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200'
+      return 'bg-brand-canvas-soft text-brand-muted border-brand-hair'
   }
 }
 
 const statusDotClass = (status: string): string => {
   switch (status) {
     case 'open':
-      return 'bg-sky-500'
+      return 'bg-brand-accent'
     case 'waiting_admin':
-      return 'bg-amber-500 animate-pulse'
+      return 'bg-brand-warning animate-pulse'
     case 'waiting_customer':
-      return 'bg-blue-500'
+      return 'bg-brand-muted'
     case 'resolved':
-      return 'bg-emerald-500'
+      return 'bg-brand-success'
     default:
-      return 'bg-gray-400'
+      return 'bg-brand-faint'
   }
 }
 
@@ -80,7 +80,7 @@ const onStatusChange = (e: Event) => {
 
 <template>
   <div
-    class="pane-header flex items-center justify-between border-b border-brand-hair bg-white px-4 py-3 shrink-0 shadow-xs"
+    class="pane-header flex items-center justify-between border-b border-brand-hair bg-brand-canvas px-4 py-3 shrink-0 shadow-xs"
   >
     <div class="flex items-center gap-3">
       <div
@@ -120,7 +120,7 @@ const onStatusChange = (e: Event) => {
       <div class="relative">
         <select
           :value="thread.status"
-          class="status-select appearance-none rounded-field border border-brand-hair bg-brand-canvas-soft pl-2.5 pr-7 py-1 text-xs font-medium text-brand-ink focus:border-brand-ink focus:bg-white focus:outline-none transition-colors cursor-pointer"
+          class="status-select appearance-none rounded-field border border-brand-hair bg-brand-canvas-soft pl-2.5 pr-7 py-1 text-xs font-medium text-brand-ink focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors cursor-pointer"
           aria-label="Ubah status percakapan"
           @change="onStatusChange"
         >
@@ -137,7 +137,7 @@ const onStatusChange = (e: Event) => {
       <!-- 1-Click Resolve Button -->
       <button
         type="button"
-        class="btn-resolve inline-flex items-center gap-1.5 rounded-field bg-emerald-600 hover:bg-emerald-700 px-3 py-1 text-xs text-white font-medium shadow-xs transition-colors active:scale-95"
+        class="btn-resolve inline-flex items-center gap-1.5 rounded-field bg-brand-success hover:opacity-90 px-3 py-1 text-xs text-white font-medium shadow-xs transition-colors active:scale-95"
         @click="emit('updateStatus', 'resolved')"
       >
         <i class="pi pi-check text-[10px]" />

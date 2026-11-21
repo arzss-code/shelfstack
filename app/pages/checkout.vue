@@ -73,7 +73,7 @@ const {
 
       <div class="flex items-center gap-1.5 text-[11px]">
         <span
-          class="inline-flex items-center gap-1.5 rounded-full border border-brand-hair bg-white px-2.5 py-0.5 font-semibold text-brand-ink shadow-2xs"
+          class="inline-flex items-center gap-1.5 rounded-full border border-brand-hair bg-brand-canvas px-2.5 py-0.5 font-semibold text-brand-ink shadow-2xs"
         >
           <i class="pi pi-check-circle text-xs text-brand-success" /> Checkout Aman
         </span>

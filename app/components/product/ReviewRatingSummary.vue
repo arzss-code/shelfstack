@@ -35,7 +35,7 @@ const handleStarClick = (star: number) => {
 </script>
 
 <template>
-  <UiCard :padded="true" class="bg-white border-brand-hair shadow-whisper">
+  <UiCard :padded="true" class="bg-brand-canvas border-brand-hair shadow-whisper">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
       <!-- Left: Large Average Score Bento -->
       <div

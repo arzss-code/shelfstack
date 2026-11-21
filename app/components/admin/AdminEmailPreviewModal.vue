@@ -255,7 +255,7 @@ const handleCopyHtml = async () => {
               <div
                 v-if="viewMode === 'rendered'"
                 :class="[
-                  'transition-all duration-200 bg-white shadow-card rounded-lg overflow-hidden border border-slate-200',
+                  'transition-all duration-200 bg-brand-canvas shadow-card rounded-lg overflow-hidden border border-slate-200',
                   viewport === 'desktop' ? 'w-full max-w-[620px]' : 'w-[375px] max-w-full',
                 ]"
               >

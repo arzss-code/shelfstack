@@ -17,7 +17,7 @@ defineProps<{
     <div class="flex items-center gap-4">
       <!-- eslint-disable vue/no-v-html -->
       <div
-        class="p-1 border border-brand-hair rounded bg-white shadow-whisper"
+        class="p-1 border border-brand-hair rounded bg-brand-canvas shadow-whisper"
         v-html="verificationQrSvg"
       />
       <!-- eslint-enable vue/no-v-html -->

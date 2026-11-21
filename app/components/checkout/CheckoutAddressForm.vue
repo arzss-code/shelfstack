@@ -206,7 +206,7 @@ const toggleSave = (e: Event) => {
           v-else
           type="button"
           data-testid="open-location-picker-btn"
-          class="w-full flex items-center justify-between p-3.5 rounded-xl border border-dashed border-brand-hair hover:border-brand-ink bg-white hover:bg-brand-canvas-soft/30 transition-all text-left group cursor-pointer"
+          class="w-full flex items-center justify-between p-3.5 rounded-xl border border-dashed border-brand-hair hover:border-brand-ink bg-brand-canvas hover:bg-brand-canvas-soft/30 transition-all text-left group cursor-pointer"
           @click="isLocationModalOpen = true"
         >
           <div

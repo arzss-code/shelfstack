@@ -63,7 +63,7 @@ function handleCourierSelect(value: string | number | null) {
           <input
             :value="trackingNumberInput"
             type="text"
-            class="flex-1 px-3 py-2 text-xs font-mono bg-white border border-brand-hair rounded-lg text-brand-ink focus:outline-none focus:border-brand-ink"
+            class="flex-1 px-3 py-2 text-xs font-mono bg-brand-canvas border border-brand-hair rounded-lg text-brand-ink focus:outline-none focus:border-brand-ink"
             placeholder="Contoh: SS-JNE-123456"
             @input="emit('update:trackingNumberInput', ($event.target as HTMLInputElement).value)"
           />

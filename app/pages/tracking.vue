@@ -12,7 +12,7 @@
 
       <!-- Search Hero Card -->
       <div
-        class="bg-white border border-brand-hair rounded-card p-6 sm:p-8 mb-6 shadow-whisper text-center"
+        class="bg-brand-canvas border border-brand-hair rounded-card p-6 sm:p-8 mb-6 shadow-whisper text-center"
       >
         <div
           class="w-12 h-12 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center mx-auto mb-3"
@@ -39,7 +39,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              class="w-full pl-10 pr-4 py-2.5 bg-brand-field rounded-full border border-brand-hair text-xs sm:text-sm text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink focus:bg-white transition-all shadow-inner"
+              class="w-full pl-10 pr-4 py-2.5 bg-brand-field rounded-full border border-brand-hair text-xs sm:text-sm text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink focus:bg-brand-canvas transition-all shadow-inner"
               placeholder="Contoh: SS-JNE-123456 atau ID Pesanan..."
             />
           </div>
@@ -58,7 +58,7 @@
       <div v-if="trackingData" class="space-y-6 animate-fadeIn">
         <!-- Masked Recipient Privacy Card -->
         <div
-          class="bg-white border border-brand-hair rounded-card p-4 sm:p-5 shadow-whisper flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+          class="bg-brand-canvas border border-brand-hair rounded-card p-4 sm:p-5 shadow-whisper flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
         >
           <div class="flex items-center gap-3">
             <div
@@ -105,7 +105,7 @@
       <!-- Not Found Error State -->
       <div
         v-else-if="errorMessage"
-        class="bg-white border border-rose-200 rounded-card p-8 text-center shadow-whisper animate-fadeIn"
+        class="bg-brand-canvas border border-brand-danger-edge rounded-card p-8 text-center shadow-whisper animate-fadeIn"
       >
         <div
           class="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-3"

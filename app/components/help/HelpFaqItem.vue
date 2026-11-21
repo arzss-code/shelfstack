@@ -32,7 +32,7 @@ const getBadgeVariant = (
 
 <template>
   <article
-    class="bg-white border border-brand-hair rounded-card overflow-hidden transition-colors shadow-whisper"
+    class="bg-brand-canvas border border-brand-hair rounded-card overflow-hidden transition-colors shadow-whisper"
     :class="{ 'border-brand-ink/40': isOpen }"
     data-testid="faq-item"
     :data-category="item.category"

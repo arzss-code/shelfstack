@@ -185,7 +185,7 @@ const {
           tabindex="-1"
           :aria-activedescendant="activeIndex >= 0 ? `${selectId}-opt-${activeIndex}` : undefined"
           :class="[
-            'absolute z-50 mt-1.5 max-h-60 overflow-y-auto bg-white border border-brand-hair rounded-card p-1 shadow-floating outline-none',
+            'absolute z-50 mt-1.5 max-h-60 overflow-y-auto bg-brand-canvas border border-brand-hair rounded-card p-1 shadow-floating outline-none',
             align === 'right' ? 'right-0' : 'left-0',
             block ? 'w-full' : 'min-w-full w-max max-w-xs sm:max-w-sm',
           ]"

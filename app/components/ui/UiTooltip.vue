@@ -64,7 +64,7 @@ const cardClasses = computed(() => {
   const base = 'shadow-floating border whitespace-nowrap transition-all duration-200 select-none'
   const theme =
     props.variant === 'light'
-      ? 'bg-white text-brand-ink border-brand-hair'
+      ? 'bg-brand-canvas text-brand-ink border-brand-hair'
       : 'bg-brand-ink text-white border-white/10'
 
   return `${base} ${theme}`

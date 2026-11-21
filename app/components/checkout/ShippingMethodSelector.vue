@@ -96,7 +96,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
     <div
       role="radiogroup"
       aria-label="Pilihan Layanan Pengiriman"
-      class="rounded-xl border border-brand-hair bg-white divide-y divide-brand-hairsoft overflow-hidden shadow-xs"
+      class="rounded-xl border border-brand-hair bg-brand-canvas divide-y divide-brand-hairsoft overflow-hidden shadow-xs"
     >
       <div
         v-for="(svc, index) in servicesWithPricing"
@@ -109,7 +109,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
         :class="[
           modelValue === svc.key
             ? 'bg-brand-canvas-soft/50'
-            : 'bg-white hover:bg-brand-canvas-soft/30',
+            : 'bg-brand-canvas hover:bg-brand-canvas-soft/30',
         ]"
         @click="selectService(svc.key)"
         @keydown="handleKeydown($event, index)"
@@ -127,8 +127,8 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
             class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-all duration-150"
             :class="[
               modelValue === svc.key
-                ? 'border-2 border-brand-ink bg-white'
-                : 'border border-brand-hair bg-white group-hover:border-brand-ink/50',
+                ? 'border-2 border-brand-ink bg-brand-canvas'
+                : 'border border-brand-hair bg-brand-canvas group-hover:border-brand-ink/50',
             ]"
           >
             <div v-if="modelValue === svc.key" class="w-2 h-2 rounded-full bg-brand-ink" />
@@ -144,7 +144,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
                 class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
                 :class="[
                   modelValue === svc.key
-                    ? 'bg-white border border-brand-hair text-brand-ink font-semibold'
+                    ? 'bg-brand-canvas border border-brand-hair text-brand-ink font-semibold'
                     : 'bg-brand-canvas-soft text-brand-muted',
                 ]"
               >
@@ -193,7 +193,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
           :class="[
             selectedCourier === null || selectedCourier === ''
               ? 'border-brand-ink bg-brand-ink text-white font-medium shadow-2xs'
-              : 'border-brand-hair hover:border-brand-ink/40 text-brand-muted bg-white',
+              : 'border-brand-hair hover:border-brand-ink/40 text-brand-muted bg-brand-canvas',
           ]"
           :disabled="disabled"
           @click="selectCourier(null)"
@@ -213,7 +213,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
           :class="[
             selectedCourier === c.code
               ? 'border-brand-ink bg-brand-ink text-white font-medium shadow-2xs'
-              : 'border-brand-hair hover:border-brand-ink/40 text-brand-muted bg-white',
+              : 'border-brand-hair hover:border-brand-ink/40 text-brand-muted bg-brand-canvas',
           ]"
           :disabled="disabled"
           @click="selectCourier(c.code)"

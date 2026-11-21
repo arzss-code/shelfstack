@@ -38,7 +38,7 @@ const onSelect = (emoji: string) => {
 
 <template>
   <div
-    class="chat-emoji-picker w-64 rounded-card border border-brand-hair bg-white p-2.5 shadow-floating z-40"
+    class="chat-emoji-picker w-64 rounded-card border border-brand-hair bg-brand-canvas p-2.5 shadow-floating z-40"
     role="dialog"
     aria-label="Pilih Emotikon"
   >
