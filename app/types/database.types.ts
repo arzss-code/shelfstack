@@ -284,6 +284,51 @@ export type Database = {
         }
         Relationships: []
       }
+      email_outbox: {
+        Row: {
+          attempts: number
+          created_at: string
+          deleted_at: string | null
+          id: string
+          last_error: string | null
+          payload: Json
+          recipient: string
+          sent_at: string | null
+          status: 'pending' | 'processing' | 'sent' | 'failed'
+          subject: string
+          template: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          last_error?: string | null
+          payload?: Json
+          recipient: string
+          sent_at?: string | null
+          status?: 'pending' | 'processing' | 'sent' | 'failed'
+          subject: string
+          template: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          last_error?: string | null
+          payload?: Json
+          recipient?: string
+          sent_at?: string | null
+          status?: 'pending' | 'processing' | 'sent' | 'failed'
+          subject?: string
+          template?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
