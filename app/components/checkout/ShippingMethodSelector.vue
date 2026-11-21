@@ -15,10 +15,14 @@ const props = withDefaults(
     selectedCourier?: string | null
     subtotalCents: number
     disabled?: boolean
+    destinationCity?: string | null
+    destinationProvince?: string | null
   }>(),
   {
     selectedCourier: null,
     disabled: false,
+    destinationCity: null,
+    destinationProvince: null,
   },
 )
 
@@ -30,27 +34,52 @@ const emit = defineEmits<{
 const serviceKeys: ShippingService[] = ['reguler', 'express', 'instant', 'cargo']
 
 const servicesWithPricing = computed(() => {
+  const destination =
+    props.destinationCity || props.destinationProvince
+      ? { city: props.destinationCity, province: props.destinationProvince }
+      : null
+
   return serviceKeys.map((key) => {
     const opt = shippingRateOptions[key]
-    const calc = calculateShippingFee(key, props.subtotalCents)
+    const calc = calculateShippingFee(key, props.subtotalCents, destination)
     const dynamicEta = calculateDeliveryEta(key)
+    const isAvailable = calc.isAvailable !== false
     return {
       key,
       name: key === 'express' ? 'Kilat / Next Day' : opt.name,
-      description: opt.description,
-      eta: opt.eta,
+      description: isAvailable
+        ? opt.description
+        : 'Layanan tidak tersedia untuk wilayah tujuan ini',
+      eta: calc.etd || opt.eta,
       dynamicEta,
       feeCents: calc.feeCents,
       isFree: calc.isFree,
-      formattedPrice: calc.isFree ? 'Gratis' : formatRupiah(calc.feeCents / 100),
+      isAvailable,
+      formattedPrice: !isAvailable
+        ? 'Tidak Tersedia'
+        : calc.isFree
+          ? 'Gratis'
+          : formatRupiah(calc.feeCents / 100),
     }
   })
 })
 
 const selectService = (service: ShippingService) => {
   if (props.disabled) return
+  const item = servicesWithPricing.value.find((s) => s.key === service)
+  if (item && !item.isAvailable) return
   emit('update:modelValue', service)
 }
+
+watch(
+  () => servicesWithPricing.value,
+  (pricing) => {
+    const current = pricing.find((p) => p.key === props.modelValue)
+    if (current && !current.isAvailable) {
+      emit('update:modelValue', 'reguler')
+    }
+  },
+)
 
 const selectCourier = (courierCode: string | null) => {
   if (props.disabled) return
@@ -107,9 +136,11 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
         :data-testid="`shipping-option-${svc.key}`"
         class="relative flex items-center justify-between p-4 cursor-pointer select-none transition-colors duration-150 group text-left focus:outline-none focus:ring-2 focus:ring-brand-ink/20"
         :class="[
-          modelValue === svc.key
-            ? 'bg-brand-canvas-soft/50'
-            : 'bg-brand-canvas hover:bg-brand-canvas-soft/30',
+          !svc.isAvailable
+            ? 'opacity-40 cursor-not-allowed bg-brand-canvas-soft/20'
+            : modelValue === svc.key
+              ? 'bg-brand-canvas-soft/50'
+              : 'bg-brand-canvas hover:bg-brand-canvas-soft/30',
         ]"
         @click="selectService(svc.key)"
         @keydown="handleKeydown($event, index)"
@@ -166,7 +197,10 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
 
         <!-- Price or Free Shipping Badge -->
         <div class="shrink-0 text-right">
-          <template v-if="svc.isFree">
+          <template v-if="!svc.isAvailable">
+            <span class="text-xs font-semibold text-brand-muted">Tidak Tersedia</span>
+          </template>
+          <template v-else-if="svc.isFree">
             <UiBadge label="Bebas Ongkir" variant="success" class="text-xs font-semibold" />
           </template>
           <template v-else>

@@ -164,42 +164,272 @@ export const shippingRateOptions: Record<ShippingService, ShippingRateOption> = 
   },
 }
 
+export type ShippingZone = 'central_java' | 'java_other' | 'outer_java'
+
+export interface ShippingDestinationInput {
+  province?: string | null
+  city?: string | null
+}
+
+export interface ShippingCalculationFeeResult {
+  feeCents: number
+  isFree: boolean
+  service: ShippingService
+  zone?: ShippingZone
+  isAvailable?: boolean
+  etd?: string
+}
+
+export const CENTRAL_JAVA_CITIES = [
+  'semarang',
+  'surakarta',
+  'solo',
+  'salatiga',
+  'magelang',
+  'pekalongan',
+  'tegal',
+  'kudus',
+  'banyumas',
+  'purwokerto',
+  'cilacap',
+  'klaten',
+  'jepara',
+  'pati',
+  'boyolali',
+  'sragen',
+  'sukoharjo',
+  'karanganyar',
+  'wonogiri',
+  'rembang',
+  'blora',
+  'grobogan',
+  'demak',
+  'temanggung',
+  'kendal',
+  'batang',
+  'pemalang',
+  'brebes',
+  'kebumen',
+  'purworejo',
+  'banjarnegara',
+  'purbalingga',
+  'wonosobo',
+]
+
+export const JAVA_OTHER_PROVINCES = [
+  'dki jakarta',
+  'jakarta',
+  'jawa barat',
+  'west java',
+  'jawa timur',
+  'east java',
+  'banten',
+  'di yogyakarta',
+  'yogyakarta',
+  'daerah istimewa yogyakarta',
+]
+
+export const ZONE_SHIPPING_RATES: Record<
+  ShippingZone,
+  Record<ShippingService, { feeCents: number; available: boolean; etd: string }>
+> = {
+  central_java: {
+    reguler: { feeCents: 1200000, available: true, etd: '1-2 Hari Kerja' },
+    express: { feeCents: 2000000, available: true, etd: '1 Hari Kerja' },
+    instant: { feeCents: 3000000, available: true, etd: 'Tiba Hari Ini' },
+    cargo: { feeCents: 2000000, available: true, etd: '2-3 Hari Kerja' },
+  },
+  java_other: {
+    reguler: { feeCents: 1600000, available: true, etd: '2-3 Hari Kerja' },
+    express: { feeCents: 2800000, available: true, etd: '1-2 Hari Kerja' },
+    instant: { feeCents: 4500000, available: true, etd: 'Tiba Hari Ini' },
+    cargo: { feeCents: 2500000, available: true, etd: '3-5 Hari Kerja' },
+  },
+  outer_java: {
+    reguler: { feeCents: 3200000, available: true, etd: '3-5 Hari Kerja' },
+    express: { feeCents: 5000000, available: true, etd: '2-3 Hari Kerja' },
+    instant: { feeCents: 0, available: false, etd: 'Tidak Tersedia' },
+    cargo: { feeCents: 3800000, available: true, etd: '5-9 Hari Kerja' },
+  },
+}
+
+export function resolveShippingZone(
+  destination?: ShippingDestinationInput | string | null,
+): ShippingZone | null {
+  if (!destination) return null
+
+  const text = (
+    typeof destination === 'string'
+      ? destination
+      : `${destination.province || ''} ${destination.city || ''}`
+  )
+    .trim()
+    .toLowerCase()
+
+  if (!text) return null
+
+  // 1. Cek Semarang dan Jawa Tengah (Warehouse Hub)
+  if (
+    text.includes('jawa tengah') ||
+    text.includes('central java') ||
+    CENTRAL_JAVA_CITIES.some((c) => text.includes(c))
+  ) {
+    return 'central_java'
+  }
+
+  // 2. Cek Pulau Jawa Lainnya
+  if (
+    JAVA_OTHER_PROVINCES.some((p) => text.includes(p)) ||
+    text.includes('bandung') ||
+    text.includes('surabaya') ||
+    text.includes('bekasi') ||
+    text.includes('tangerang') ||
+    text.includes('bogor') ||
+    text.includes('depok') ||
+    text.includes('malang') ||
+    text.includes('serang') ||
+    text.includes('cirebon')
+  ) {
+    return 'java_other'
+  }
+
+  // 3. Wilayah Luar Jawa
+  return 'outer_java'
+}
+
+export function getZoneShippingRateTiers(
+  destination?: ShippingDestinationInput | string | null,
+): ShippingRateTier[] {
+  const zone = resolveShippingZone(destination)
+  if (!zone) return shippingRateTiers
+
+  const rates = ZONE_SHIPPING_RATES[zone]
+  return [
+    {
+      id: 'reguler',
+      name: 'Reguler',
+      etd: rates.reguler.etd,
+      baseFeeCents: rates.reguler.feeCents,
+      freeThresholdCents: FREE_SHIPPING_THRESHOLD_CENTS,
+      description: 'Pengiriman standar terpercaya berbasis zonasi',
+    },
+    {
+      id: 'express',
+      name: 'Next Day / Kilat',
+      etd: rates.express.etd,
+      baseFeeCents: rates.express.feeCents,
+      freeThresholdCents: null,
+      description: 'Layanan prioritas cepat tiba keesokan hari',
+    },
+    {
+      id: 'instant',
+      name: 'Instan / Sameday',
+      etd: rates.instant.etd,
+      baseFeeCents: rates.instant.feeCents,
+      freeThresholdCents: null,
+      description: rates.instant.available
+        ? 'Pengiriman langsung tiba di hari yang sama'
+        : 'Layanan instan tidak tersedia untuk wilayah tujuan ini',
+    },
+    {
+      id: 'cargo',
+      name: 'Kargo Ekonomis',
+      etd: rates.cargo.etd,
+      baseFeeCents: rates.cargo.feeCents,
+      freeThresholdCents: null,
+      description: 'Pengiriman hemat untuk pesanan berbobot besar',
+    },
+  ]
+}
+
 export function calculateShippingFee(
   service?: string | null,
   subtotalCents?: number,
-): { feeCents: number; isFree: boolean; service: ShippingService } {
+  destination?: ShippingDestinationInput | string | null,
+): ShippingCalculationFeeResult {
   const normalized = (service || '').trim().toLowerCase()
   const subtotal = Math.max(0, subtotalCents ?? 0)
+  const zone = resolveShippingZone(destination)
 
-  if (normalized === 'express') {
+  // Default fallback tanpa tujuan spesifik (menjaga kompatibilitas penuh dengan tarif standar)
+  if (!zone) {
+    if (normalized === 'express') {
+      return {
+        service: 'express',
+        feeCents: 3000000,
+        isFree: false,
+        isAvailable: true,
+        etd: '1 Hari Kerja',
+      }
+    }
+
+    if (normalized === 'instant') {
+      return {
+        service: 'instant',
+        feeCents: 4500000,
+        isFree: false,
+        isAvailable: true,
+        etd: 'Tiba Hari Ini',
+      }
+    }
+
+    if (normalized === 'cargo') {
+      return {
+        service: 'cargo',
+        feeCents: 2500000,
+        isFree: false,
+        isAvailable: true,
+        etd: '4-7 Hari Kerja',
+      }
+    }
+
+    const isFree = subtotal >= FREE_SHIPPING_THRESHOLD_CENTS
     return {
-      service: 'express',
-      feeCents: 3000000,
-      isFree: false,
+      service: 'reguler',
+      feeCents: isFree ? 0 : 1500000,
+      isFree,
+      isAvailable: true,
+      etd: '2-3 Hari Kerja',
     }
   }
 
-  if (normalized === 'instant') {
+  // Kalkulasi berbasis zonasi geografis
+  const validService: ShippingService =
+    normalized === 'express' || normalized === 'instant' || normalized === 'cargo'
+      ? normalized
+      : 'reguler'
+
+  const rateInfo = ZONE_SHIPPING_RATES[zone][validService]
+
+  if (!rateInfo.available) {
     return {
-      service: 'instant',
-      feeCents: 4500000,
+      service: validService,
+      feeCents: 0,
       isFree: false,
+      zone,
+      isAvailable: false,
+      etd: rateInfo.etd,
     }
   }
 
-  if (normalized === 'cargo') {
+  if (validService === 'reguler') {
+    const isFree = subtotal >= FREE_SHIPPING_THRESHOLD_CENTS
     return {
-      service: 'cargo',
-      feeCents: 2500000,
-      isFree: false,
+      service: 'reguler',
+      feeCents: isFree ? 0 : rateInfo.feeCents,
+      isFree,
+      zone,
+      isAvailable: true,
+      etd: rateInfo.etd,
     }
   }
 
-  // Reguler default
-  const isFree = subtotal >= 50000000
   return {
-    service: 'reguler',
-    feeCents: isFree ? 0 : 1500000,
-    isFree,
+    service: validService,
+    feeCents: rateInfo.feeCents,
+    isFree: false,
+    zone,
+    isAvailable: true,
+    etd: rateInfo.etd,
   }
 }

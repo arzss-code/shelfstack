@@ -187,6 +187,7 @@ const {
           v-model="selectedShippingService"
           v-model:selected-courier="selectedCourierCode"
           :subtotal-cents="cartStore.totalPriceCents"
+          :destination-city="address.city"
           :disabled="isSubmitting || isOrderPlaced"
         />
 
