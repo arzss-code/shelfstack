@@ -46,6 +46,7 @@ export async function getProductReviews(
   client: SupabaseClient<Database>,
   productId: number,
   query: ReviewQuery,
+  serviceClient?: SupabaseClient<Database>,
 ): Promise<{
   reviews: ProductReviewItem[]
   stats: ReviewStats
@@ -107,7 +108,8 @@ export async function getProductReviews(
   const nameMap = new Map<string, string>()
 
   if (userIds.length > 0) {
-    const { data: profiles } = await client
+    const profileClient = serviceClient || client
+    const { data: profiles } = await profileClient
       .from('profiles')
       .select('user_id, full_name')
       .in('user_id', userIds)

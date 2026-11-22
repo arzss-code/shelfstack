@@ -41,7 +41,21 @@ export default defineEventHandler(async (event) => {
       errorResponse(event, 'Product not found', error, 404)
     }
 
-    return successResponse('Product retrieved successfully', data)
+    // Ambil daftar varian aktif untuk produk ini
+    const { data: variantsData } = await client
+      .from('product_variants')
+      .select('*')
+      .eq('product_id', data.id)
+      .eq('is_active', true)
+      .is('deleted_at', null)
+      .order('sku', { ascending: true })
+
+    const productWithVariants = {
+      ...data,
+      variants: variantsData || [],
+    }
+
+    return successResponse('Product retrieved successfully', productWithVariants)
   }
 
   if (method === 'PUT') {

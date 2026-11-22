@@ -21,7 +21,33 @@ export function useProductConfigurator(
     promoPrice?: () => number | null | undefined
   },
 ) {
-  const variants = computed(() => getProductVariants(getProduct()))
+  const variants = computed(() => {
+    const p = getProduct()
+    const fallback = getProductVariants(p)
+    if (!p.variants || p.variants.length === 0) {
+      return fallback
+    }
+
+    const colorMap = new Map<string, { name: string; class: string }>()
+    for (const v of p.variants) {
+      if (!v.is_active || v.deleted_at) continue
+      const colorName = (v.attributes as Record<string, string>)?.color || v.name
+      if (colorName && !colorMap.has(colorName)) {
+        colorMap.set(colorName, {
+          name: colorName,
+          class: (v.attributes as Record<string, string>)?.colorClass || 'bg-brand-ink',
+        })
+      }
+    }
+
+    const colors = Array.from(colorMap.values())
+    return {
+      colorTitle: fallback.colorTitle || 'Pilihan Warna',
+      colors: colors.length > 0 ? colors : fallback.colors,
+      optionTitle: fallback.optionTitle || 'Pilihan Opsi',
+      options: fallback.options,
+    }
+  })
 
   const quantity = ref(1)
   const selectedColor = ref('')
@@ -44,10 +70,11 @@ export function useProductConfigurator(
     if (!p.variants || p.variants.length === 0) return null
     const match = p.variants.find((v) => {
       if (!v.is_active || v.deleted_at) return false
-      const colorAttr = v.attributes.color || v.name
+      const colorAttr = (v.attributes as Record<string, string>)?.color || v.name
       return (
         colorAttr.toLowerCase() === selectedColor.value.toLowerCase() ||
-        v.name.toLowerCase().includes(selectedColor.value.toLowerCase())
+        v.name.toLowerCase().includes(selectedColor.value.toLowerCase()) ||
+        selectedColor.value.toLowerCase().includes(colorAttr.toLowerCase())
       )
     })
     return match || p.variants[0] || null

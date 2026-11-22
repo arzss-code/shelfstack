@@ -4,6 +4,7 @@ export interface ProductReview {
   order_id: string
   user_id?: string
   user_name?: string
+  reviewer_name?: string
   user_email?: string
   rating: number
   review_text: string

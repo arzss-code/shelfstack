@@ -22,6 +22,7 @@ const toast = useUiToast()
 const recentlyViewed = useRecentlyViewed()
 
 const product = ref<Product | null>(null)
+const selectedVariantImage = ref<string | null>(null)
 const loading = ref(true)
 
 const { getDealForProduct, formattedTimer, isCampaignActive } = useFlashSale()
@@ -115,6 +116,7 @@ watch(
     if (val) {
       product.value = val
       loading.value = false
+      selectedVariantImage.value = null
     }
   },
   { immediate: true },
@@ -226,7 +228,7 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
     <div v-else-if="product" class="space-y-12">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         <div class="lg:col-span-7">
-          <ProductGallery :product="product" />
+          <ProductGallery :product="product" :active-image-override="selectedVariantImage" />
         </div>
         <div class="lg:col-span-5 space-y-6">
           <ProductFlashSaleBanner
@@ -237,6 +239,7 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
           <ProductConfigurator
             :product="product"
             :flash-price="activeFlashDeal ? activeFlashDeal.promo_price_cents / 100 : null"
+            @change-variant-image="selectedVariantImage = $event"
             @add-to-bag="onAddToBag"
             @buy-now="onBuyNow"
           />

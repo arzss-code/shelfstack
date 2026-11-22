@@ -2,6 +2,7 @@ import { defineEventHandler } from 'h3'
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { successResponse, errorResponse } from '../../utils/response'
+import { CURATED_VARIANTS, DEMO_REVIEWERS, CURATED_REVIEWS } from '../../utils/seed-catalog-data'
 
 interface SeedProductItem {
   categorySlug: 'tech' | 'furniture' | 'home' | 'lifestyle' | 'stationery'
@@ -523,10 +524,159 @@ export default defineEventHandler(async (event) => {
     insertedCount++
   }
 
-  return successResponse('Seeding produk kurasi berhasil', {
+  // 4. Seed varian produk dinamis (product_variants)
+  let seededVariantsCount = 0
+  for (const v of CURATED_VARIANTS) {
+    const { data: prod } = await client
+      .from('products')
+      .select('id')
+      .eq('name', v.productName)
+      .is('deleted_at', null)
+      .maybeSingle()
+
+    if (!prod) continue
+
+    const { error: varErr } = await client.from('product_variants').upsert(
+      {
+        product_id: prod.id,
+        sku: v.sku,
+        name: v.name,
+        attributes: v.attributes,
+        price_cents: v.price_cents,
+        stock: v.stock,
+        is_active: true,
+        deleted_at: null,
+      },
+      { onConflict: 'sku' },
+    )
+
+    if (!varErr) {
+      seededVariantsCount++
+    }
+  }
+
+  // 5. Pastikan akun demo reviewer terdaftar di auth.users & profiles
+  const validReviewerIds = new Set<string>()
+  for (const rev of DEMO_REVIEWERS) {
+    try {
+      await client.auth.admin.createUser({
+        email: rev.email,
+        password: 'Password123!',
+        email_confirm: true,
+        user_metadata: { full_name: rev.fullName },
+      })
+    } catch {
+      // Abaikan jika sudah ada
+    }
+
+    const { data: userProfile } = await client
+      .from('profiles')
+      .upsert(
+        {
+          user_id: rev.id,
+          full_name: rev.fullName,
+          role: 'customer',
+        },
+        { onConflict: 'user_id' },
+      )
+      .select('user_id')
+      .maybeSingle()
+
+    if (userProfile?.user_id) {
+      validReviewerIds.add(userProfile.user_id)
+    }
+  }
+
+  // 6. Seed ulasan terverifikasi dan pesanan selesai (product_reviews)
+  let seededReviewsCount = 0
+  const fallbackUserId = '00000000-0000-0000-0000-000000000001'
+
+  for (const r of CURATED_REVIEWS) {
+    const { data: prod } = await client
+      .from('products')
+      .select('id, price, price_cents')
+      .eq('name', r.productName)
+      .is('deleted_at', null)
+      .maybeSingle()
+
+    if (!prod) continue
+
+    const reviewer = DEMO_REVIEWERS[r.reviewerIndex] || DEMO_REVIEWERS[0]
+    const effectiveUserId =
+      reviewer && validReviewerIds.has(reviewer.id) ? reviewer.id : fallbackUserId
+    const reviewerName = reviewer ? reviewer.fullName : 'Pelanggan Terverifikasi'
+    const itemPriceCents = prod.price_cents || prod.price * 100
+
+    // Cari pesanan selesai yang sudah ada untuk user dan produk ini
+    let targetOrderId: string | null = null
+    const { data: existingItems } = await client
+      .from('order_items')
+      .select('order_id, orders!inner(id, user_id, status)')
+      .eq('product_id', prod.id)
+      .eq('orders.user_id', effectiveUserId)
+      .eq('orders.status', 'completed')
+      .limit(1)
+
+    if (existingItems && existingItems.length > 0 && existingItems[0]?.order_id) {
+      targetOrderId = existingItems[0].order_id
+    } else {
+      // Buat draft pesanan selesai terverifikasi untuk menaungi ulasan
+      const { data: newOrder, error: orderErr } = await client
+        .from('orders')
+        .insert({
+          user_id: effectiveUserId,
+          total_cents: itemPriceCents,
+          subtotal_cents: itemPriceCents,
+          status: 'completed',
+          address: {
+            name: reviewerName,
+            city: 'Jakarta Selatan',
+            street: 'Kawasan Bisnis Sudirman No. 28',
+          },
+          payment_type: 'bank_transfer',
+          shipping_service: 'reguler',
+          paid_at: new Date(Date.now() - 86400000 * 4).toISOString(),
+          delivered_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+        })
+        .select('id')
+        .single()
+
+      if (!orderErr && newOrder) {
+        targetOrderId = newOrder.id
+        await client.from('order_items').insert({
+          order_id: newOrder.id,
+          product_id: prod.id,
+          qty: 1,
+          price_cents: itemPriceCents,
+        })
+      }
+    }
+
+    if (targetOrderId) {
+      const { error: revErr } = await client.from('product_reviews').upsert(
+        {
+          product_id: prod.id,
+          user_id: effectiveUserId,
+          order_id: targetOrderId,
+          rating: r.rating,
+          review_text: r.reviewText,
+          deleted_at: null,
+        },
+        { onConflict: 'product_id,user_id,order_id' },
+      )
+
+      if (!revErr) {
+        seededReviewsCount++
+      }
+    }
+  }
+
+  return successResponse('Seeding produk kurasi, varian, dan ulasan berhasil', {
     insertedCount,
     skippedCount,
     deletedDummyCount,
+    seededVariantsCount,
+    seededReviewsCount,
     deleteErrors,
     totalCuratedList: CURATED_PRODUCTS.length,
   })

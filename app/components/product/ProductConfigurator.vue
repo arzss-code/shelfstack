@@ -20,6 +20,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   addToBag: [payload: ProductSelectionPayload]
   buyNow: [payload: ProductSelectionPayload]
+  changeVariantImage: [imageUrl: string]
 }>()
 
 const {
@@ -50,6 +51,17 @@ const {
   {
     promoPrice: () => props.flashPrice,
   },
+)
+
+watch(
+  selectedVariant,
+  (variant) => {
+    const imageUrl = (variant?.attributes as Record<string, string>)?.image_url
+    if (imageUrl) {
+      emit('changeVariantImage', imageUrl)
+    }
+  },
+  { immediate: true },
 )
 </script>
 

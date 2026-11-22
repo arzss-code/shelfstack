@@ -1,8 +1,7 @@
-import { serverSupabaseClient } from '#supabase/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { reviewQuerySchema } from '../../../../../shared/schemas/review'
-import { errorResponse, successResponse } from '../../../../utils/response'
-import { getProductReviews, resolveProductId } from '../../../../utils/review'
 
 export default defineEventHandler(async (event) => {
   const rawId = getRouterParam(event, 'id')
@@ -11,6 +10,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const client = await serverSupabaseClient<Database>(event)
+  let serviceClient: SupabaseClient<Database> | undefined
+  try {
+    serviceClient = serverSupabaseServiceRole<Database>(event)
+  } catch (_err) {
+    serviceClient = undefined
+  }
+
   const productId = await resolveProductId(client, rawId)
   if (!productId) {
     return errorResponse(event, 'Produk tidak ditemukan.', null, 404)
@@ -28,7 +34,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const data = await getProductReviews(client, productId, queryParse.data)
+    const data = await getProductReviews(client, productId, queryParse.data, serviceClient)
     return successResponse('Daftar ulasan berhasil dimuat.', data.reviews, {
       stats: data.stats,
       pagination: data.pagination,
