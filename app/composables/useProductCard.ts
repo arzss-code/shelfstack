@@ -1,5 +1,5 @@
 import type { Product } from '~/types/product'
-import { useCategories } from '~/composables/useCategories'
+import { useCategories, CANONICAL_CATEGORIES } from '~/composables/useCategories'
 import { useCartStore } from '~/features/cart/stores/cart'
 
 export function useProductCard(getProduct: () => Product) {
@@ -38,7 +38,15 @@ export function useProductCard(getProduct: () => Product) {
   const categoryName = computed(() => {
     const product = getProduct()
     if (!product.category_id) return null
-    const cat = dynamicCategories.value.find((c) => c.id === product.category_id)
+    const allCategories = dynamicCategories.value.length
+      ? dynamicCategories.value
+      : CANONICAL_CATEGORIES
+    const cat = allCategories.find(
+      (c) =>
+        c.id === product.category_id ||
+        c.slug === product.category_id ||
+        c.name.toLowerCase() === product.category_id?.toLowerCase(),
+    )
     return cat ? cat.name : null
   })
 

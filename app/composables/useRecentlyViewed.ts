@@ -8,11 +8,13 @@ export interface RecentlyViewedItem {
   imageUrl?: string | null
   category?: string | null
   stock: number
+  rating?: number | null
+  soldCount?: number | null
   viewedAt?: number
 }
 
 const STORAGE_KEY = 'shelfstack_recently_viewed'
-const MAX_RECENTLY_VIEWED = 8
+const MAX_RECENTLY_VIEWED = 12
 
 export function useRecentlyViewed() {
   const recentlyViewed = ref<RecentlyViewedItem[]>([])

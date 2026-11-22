@@ -131,6 +131,7 @@ onMounted(() => {
       imageUrl: product.value.image_url,
       category: product.value.category_id || undefined,
       stock: product.value.stock,
+      rating: product.value.rating || 5.0,
     })
 
     if (/^\d+$/.test(param.value) && product.value.slug) {
