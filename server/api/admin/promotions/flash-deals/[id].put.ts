@@ -40,27 +40,37 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Waktu berakhir harus setelah waktu mulai', null, 422)
   }
 
-  const payload: Database['public']['Tables']['flash_deals']['Update'] = {
-    updated_at: new Date().toISOString(),
-  }
-  if (parsed.data.product_id !== undefined) payload.product_id = parsed.data.product_id
+  const basePayload: Database['public']['Tables']['flash_deals']['Update'] = {}
+  if (parsed.data.product_id !== undefined) basePayload.product_id = parsed.data.product_id
   if (parsed.data.promo_price_cents !== undefined)
-    payload.promo_price_cents = parsed.data.promo_price_cents
+    basePayload.promo_price_cents = parsed.data.promo_price_cents
   if (parsed.data.discount_percentage !== undefined)
-    payload.discount_percentage = parsed.data.discount_percentage
-  if (parsed.data.quota !== undefined) payload.quota = parsed.data.quota
-  if (parsed.data.starts_at !== undefined) payload.starts_at = parsed.data.starts_at
-  if (parsed.data.ends_at !== undefined) payload.ends_at = parsed.data.ends_at
-  if (parsed.data.is_active !== undefined) payload.is_active = parsed.data.is_active
+    basePayload.discount_percentage = parsed.data.discount_percentage
+  if (parsed.data.quota !== undefined) basePayload.quota = parsed.data.quota
+  if (parsed.data.starts_at !== undefined) basePayload.starts_at = parsed.data.starts_at
+  if (parsed.data.ends_at !== undefined) basePayload.ends_at = parsed.data.ends_at
+  if (parsed.data.is_active !== undefined) basePayload.is_active = parsed.data.is_active
 
-  const { data: updated, error: updateErr } = await client
+  const selectCols =
+    'id, product_id, promo_price_cents, discount_percentage, quota, claimed, starts_at, ends_at, is_active, created_at, products(id, name, slug, price, price_cents, stock, image_url)'
+
+  let { data: updated, error: updateErr } = await client
     .from('flash_deals')
-    .update(payload)
+    .update({ ...basePayload, updated_at: new Date().toISOString() })
     .eq('id', idCheck.data)
-    .select(
-      'id, product_id, promo_price_cents, discount_percentage, quota, claimed, starts_at, ends_at, is_active, created_at, updated_at, products(id, name, slug, price, price_cents, stock, image_url)',
-    )
+    .select(selectCols)
     .single()
+
+  if (updateErr && (updateErr.code === '42703' || updateErr.message?.includes('updated_at'))) {
+    const fallbackRes = await client
+      .from('flash_deals')
+      .update(basePayload)
+      .eq('id', idCheck.data)
+      .select(selectCols)
+      .single()
+    updated = fallbackRes.data
+    updateErr = fallbackRes.error
+  }
 
   if (updateErr) {
     return errorResponse(event, 'Gagal memperbarui kampanye flash sale', updateErr.message, 500)

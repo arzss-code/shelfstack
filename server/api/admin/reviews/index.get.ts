@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   let dbQuery = client
     .from('product_reviews')
     .select(
-      'id, product_id, user_id, order_id, order_item_id, rating, review_text, created_at, updated_at, deleted_at, products(id, name, image_url), profiles(id, full_name, email)',
+      'id, product_id, user_id, order_id, order_item_id, rating, review_text, created_at, updated_at, deleted_at, products(id, name, image_url)',
       { count: 'exact' },
     )
     .order('created_at', { ascending: false })
@@ -81,25 +81,56 @@ export default defineEventHandler(async (event) => {
     updated_at: string
     deleted_at: string | null
     products: { id: number; name: string; image_url: string | null } | null
-    profiles: { id: string; full_name: string | null; email: string | null } | null
   }
 
-  const items: AdminReviewItem[] = ((data as unknown as RawReviewRow[]) || []).map((row) => ({
-    id: row.id,
-    product_id: row.product_id,
-    user_id: row.user_id,
-    order_id: row.order_id,
-    order_item_id: row.order_item_id,
-    rating: row.rating,
-    review_text: row.review_text,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
-    deleted_at: row.deleted_at,
-    product_name: row.products?.name || `Produk #${row.product_id}`,
-    product_image_url: row.products?.image_url || null,
-    reviewer_email: row.profiles?.email || null,
-    reviewer_name: formatReviewerName(row.profiles?.full_name, row.profiles?.email),
-  }))
+  const rawRows = (data as unknown as RawReviewRow[]) || []
+  const userIds = Array.from(new Set(rawRows.map((r) => r.user_id)))
+  const profileMap = new Map<string, { full_name: string | null; email: string | null }>()
+
+  if (userIds.length > 0) {
+    const [{ data: profiles }, authRes] = await Promise.all([
+      client.from('profiles').select('user_id, full_name').in('user_id', userIds),
+      client.auth.admin
+        .listUsers({ page: 1, perPage: 1000 })
+        .catch(() => ({ data: { users: [] } })),
+    ])
+
+    const emailMap = new Map<string, string>()
+    authRes?.data?.users?.forEach((u) => {
+      if (u.id && u.email) {
+        emailMap.set(u.id, u.email)
+      }
+    })
+
+    profiles?.forEach((p) => {
+      if (p.user_id) {
+        profileMap.set(p.user_id, {
+          full_name: p.full_name,
+          email: emailMap.get(p.user_id) || null,
+        })
+      }
+    })
+  }
+
+  const items: AdminReviewItem[] = rawRows.map((row) => {
+    const userMeta = profileMap.get(row.user_id)
+    return {
+      id: row.id,
+      product_id: row.product_id,
+      user_id: row.user_id,
+      order_id: row.order_id,
+      order_item_id: row.order_item_id,
+      rating: row.rating,
+      review_text: row.review_text,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+      deleted_at: row.deleted_at,
+      product_name: row.products?.name || `Produk #${row.product_id}`,
+      product_image_url: row.products?.image_url || null,
+      reviewer_email: userMeta?.email || null,
+      reviewer_name: formatReviewerName(userMeta?.full_name, userMeta?.email),
+    }
+  })
 
   const totalCount = count ?? (data?.length || 0)
   const totalPages = Math.ceil(totalCount / limit) || 1
