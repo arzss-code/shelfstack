@@ -3,22 +3,37 @@ import type { Product } from '~/types/product'
 import { detectProductCategorySlug } from '~/utils/product-specs'
 import ProductSpecsTable from './ProductSpecsTable.vue'
 
-const props = defineProps<{
-  product: Product
-}>()
+const props = withDefaults(
+  defineProps<{
+    product: Product
+    activeImageOverride?: string | null
+  }>(),
+  {
+    activeImageOverride: null,
+  },
+)
 
 const categorySlug = computed(() => detectProductCategorySlug(props.product))
 
-const activeImage = ref(props.product.image_url || '')
+const activeImage = ref(props.activeImageOverride || props.product.image_url || '')
 const imageFailed = ref(false)
 const mainImgEl = ref<HTMLImageElement | null>(null)
 
 watch(
   () => props.product.image_url,
   (newUrl) => {
-    if (newUrl) activeImage.value = newUrl
+    if (newUrl && !props.activeImageOverride) activeImage.value = newUrl
   },
   { immediate: true },
+)
+
+watch(
+  () => props.activeImageOverride,
+  (newOverride) => {
+    if (newOverride) {
+      activeImage.value = newOverride
+    }
+  },
 )
 
 watch(activeImage, () => {
@@ -35,6 +50,14 @@ const galleryImages = computed(() => {
   const list: string[] = []
   if (props.product.image_url) {
     list.push(props.product.image_url)
+  }
+  if (props.product.variants && Array.isArray(props.product.variants)) {
+    for (const v of props.product.variants) {
+      const vUrl = (v.attributes as Record<string, string>)?.image_url
+      if (vUrl && !list.includes(vUrl)) {
+        list.push(vUrl)
+      }
+    }
   }
   if (props.product.gallery_urls && Array.isArray(props.product.gallery_urls)) {
     for (const url of props.product.gallery_urls) {

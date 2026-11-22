@@ -34,10 +34,11 @@ export function useProductReviews(getProductId: () => number | string) {
     try {
       const res = await $fetch<{
         success?: boolean
-        data?: { summary?: ProductReviewsSummary }
+        data?: unknown
+        stats?: ProductReviewsSummary
         summary?: ProductReviewsSummary
       }>(`/api/products/${getProductId()}/reviews?limit=1`)
-      const rawSummary = res?.data?.summary || res?.summary
+      const rawSummary = res?.stats || res?.summary
       if (rawSummary) {
         summary.value = {
           average_rating: Number(rawSummary.average_rating) || 0,
@@ -64,15 +65,28 @@ export function useProductReviews(getProductId: () => number | string) {
         sort: selectedSort.value,
       }
       if (selectedStar.value) {
+        params.rating = selectedStar.value
         params.star = selectedStar.value
       }
 
-      const res = await $fetch<
-        ProductReviewsResponse | { success: boolean; data: ProductReviewsResponse }
-      >(`/api/products/${getProductId()}/reviews`, { params })
+      const res = await $fetch<{
+        status?: string
+        data?: ProductReview[] | { reviews?: ProductReview[] }
+        reviews?: ProductReview[]
+        stats?: ProductReviewsSummary
+        summary?: ProductReviewsSummary
+        pagination?: {
+          page: number
+          limit: number
+          total_items?: number
+          total?: number
+          total_pages: number
+        }
+      }>(`/api/products/${getProductId()}/reviews`, { params })
 
-      const payload = 'data' in res && res.data ? res.data : (res as ProductReviewsResponse)
-      const fetchedReviews = payload.reviews || []
+      const fetchedReviews: ProductReview[] = Array.isArray(res?.data)
+        ? res.data
+        : (res?.data as { reviews?: ProductReview[] })?.reviews || res?.reviews || []
 
       if (isAppend) {
         reviews.value = [...reviews.value, ...fetchedReviews]
@@ -80,15 +94,17 @@ export function useProductReviews(getProductId: () => number | string) {
         reviews.value = fetchedReviews
       }
 
-      if (payload.summary && !selectedStar.value) {
+      const rawSummary = res?.stats || res?.summary
+      if (rawSummary && !selectedStar.value) {
         summary.value = {
-          average_rating: Number(payload.summary.average_rating) || 0,
-          total_reviews: Number(payload.summary.total_reviews) || 0,
-          distribution: payload.summary.distribution || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+          average_rating: Number(rawSummary.average_rating) || 0,
+          total_reviews: Number(rawSummary.total_reviews) || 0,
+          distribution: rawSummary.distribution || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
         }
       }
 
-      const totalInFilter = payload.pagination?.total ?? fetchedReviews.length
+      const totalInFilter =
+        res?.pagination?.total_items ?? res?.pagination?.total ?? fetchedReviews.length
       hasMore.value = reviews.value.length < totalInFilter
     } catch {
       if (!isAppend) {

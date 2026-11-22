@@ -410,6 +410,47 @@ where not exists (
   where p.name = v.name and p.deleted_at is null
 );
 
+-- 2.c Seed Varian Produk Dinamis (Product Variants)
+insert into public.product_variants (product_id, sku, name, attributes, price_cents, stock)
+select
+  p.id,
+  v.sku,
+  v.name,
+  v.attributes::jsonb,
+  v.price_cents,
+  v.stock
+from (values
+  ('Keyboard Mekanikal Nirkabel 75%', 'SS-KBD-75-BLK', 'Matte Obsidian', '{"color": "Matte Obsidian", "colorClass": "bg-[#18181b]", "image_url": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80"}', 145000000, 16),
+  ('Keyboard Mekanikal Nirkabel 75%', 'SS-KBD-75-WHT', 'Chalk White', '{"color": "Chalk White", "colorClass": "bg-[#f4f4f5]", "image_url": "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80"}', 145000000, 10),
+  ('Keyboard Mekanikal Nirkabel 75%', 'SS-KBD-75-NVY', 'Midnight Navy', '{"color": "Midnight Navy", "colorClass": "bg-[#1e293b]", "image_url": "https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=800&q=80"}', 149000000, 6),
+  ('Headphone Studio ANC', 'SS-HD-ANC-BLK', 'Midnight Black', '{"color": "Midnight Black", "colorClass": "bg-[#141414]", "image_url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"}', 268000000, 15),
+  ('Headphone Studio ANC', 'SS-HD-ANC-SLV', 'Silver Titanium', '{"color": "Silver Titanium", "colorClass": "bg-[#d4d4d8]", "image_url": "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80"}', 278000000, 10),
+  ('Tetikus Ergonomis Nirkabel Precision', 'SS-MOU-PRC-GRY', 'Space Gray', '{"color": "Space Gray", "colorClass": "bg-[#3f3f46]", "image_url": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80"}', 89000000, 16),
+  ('Tetikus Ergonomis Nirkabel Precision', 'SS-MOU-PRC-WHT', 'Off White', '{"color": "Off White", "colorClass": "bg-[#f5f5f4]", "image_url": "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80"}', 89000000, 12),
+  ('Meja Kerja Modular Solid Oak', 'SS-DSK-OAK-NAT', 'Natural Oak', '{"color": "Natural Oak", "colorClass": "bg-[#d97706]", "image_url": "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=800&q=80"}', 325000000, 5),
+  ('Meja Kerja Modular Solid Oak', 'SS-DSK-OAK-WLN', 'Deep Walnut', '{"color": "Deep Walnut", "colorClass": "bg-[#451a03]", "image_url": "https://images.unsplash.com/photo-1593062096033-9a26b09da705?auto=format&fit=crop&w=800&q=80"}', 345000000, 3),
+  ('Kursi Ergonomis Mesh Pro', 'SS-CHR-MSH-BLK', 'All Black', '{"color": "All Black", "colorClass": "bg-[#18181b]", "image_url": "https://images.unsplash.com/photo-1580481077195-731da03fed7e?auto=format&fit=crop&w=800&q=80"}', 289000000, 8),
+  ('Kursi Ergonomis Mesh Pro', 'SS-CHR-MSH-GRY', 'Slate Gray', '{"color": "Slate Gray", "colorClass": "bg-[#9ca3af]", "image_url": "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=800&q=80"}', 299000000, 6),
+  ('Lampu Meja Task Aluminium', 'SS-LMP-ALM-BLK', 'Matte Black', '{"color": "Matte Black", "colorClass": "bg-[#18181b]", "image_url": "https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?auto=format&fit=crop&w=800&q=80"}', 85000000, 10),
+  ('Lampu Meja Task Aluminium', 'SS-LMP-ALM-WHT', 'Pure White', '{"color": "Pure White", "colorClass": "bg-[#f8fafc]", "image_url": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80"}', 85000000, 8),
+  ('Dripper Kopi Keramik Pour-Over V60', 'SS-DRP-V60-WHT', 'Chalk White', '{"color": "Chalk White", "colorClass": "bg-[#f8fafc]", "image_url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80"}', 28500000, 20),
+  ('Dripper Kopi Keramik Pour-Over V60', 'SS-DRP-V60-BLK', 'Matte Black', '{"color": "Matte Black", "colorClass": "bg-[#1c1917]", "image_url": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80"}', 28500000, 15),
+  ('Gelas Kaca Borosilikat Double-Wall 350ml', 'SS-GLS-BWL-350', 'Clear Borosilicate', '{"color": "Clear Glass", "colorClass": "bg-[#e2e8f0]", "image_url": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=800&q=80"}', 12500000, 40),
+  ('Gelas Kaca Borosilikat Double-Wall 350ml', 'SS-GLS-BWL-AMB', 'Warm Amber', '{"color": "Warm Amber", "colorClass": "bg-[#d97706]", "image_url": "https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80"}', 13500000, 20),
+  ('Dompet Kartu Kulit Nabati Slim', 'SS-WLT-VGT-BRN', 'Cognac Tan', '{"color": "Cognac Tan", "colorClass": "bg-[#92400e]", "image_url": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80"}', 29500000, 18),
+  ('Dompet Kartu Kulit Nabati Slim', 'SS-WLT-VGT-BLK', 'Tactical Black', '{"color": "Tactical Black", "colorClass": "bg-[#18181b]", "image_url": "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=800&q=80"}', 29500000, 12),
+  ('Jam Tangan Lapangan Otomatis Field Watch', 'SS-WTC-FLD-OLV', 'Olive Drab', '{"color": "Olive Drab", "colorClass": "bg-[#3f4e38]", "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80"}', 185000000, 6),
+  ('Jam Tangan Lapangan Otomatis Field Watch', 'SS-WTC-FLD-BLK', 'Stealth Black', '{"color": "Stealth Black", "colorClass": "bg-[#18181b]", "image_url": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80"}', 185000000, 4),
+  ('Jurnal Grid Hardcover Kertas 120gsm', 'SS-JRN-GRD-GRN', 'Forest Green', '{"color": "Forest Green", "colorClass": "bg-[#14532d]", "image_url": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80"}', 17500000, 30),
+  ('Jurnal Grid Hardcover Kertas 120gsm', 'SS-JRN-GRD-BLK', 'Stonewashed Black', '{"color": "Stonewashed Black", "colorClass": "bg-[#18181b]", "image_url": "https://images.unsplash.com/photo-1531346878377-a5be20888e57?auto=format&fit=crop&w=800&q=80"}', 17500000, 25)
+) as v(prod_name, sku, name, attributes, price_cents, stock)
+join public.products p on p.name = v.prod_name and p.deleted_at is null
+on conflict (sku) do update set
+  name = excluded.name,
+  attributes = excluded.attributes,
+  price_cents = excluded.price_cents,
+  stock = excluded.stock;
+
 -- 3. Seed Akun Demo Deterministik untuk Pengujian & Evaluasi Portofolio
 -- PERINGATAN: Akun demo ini HANYA untuk lingkungan pengujian/portofolio lokal & staging.
 -- Password default: Password123!
@@ -812,6 +853,69 @@ values
     1,
     112000000
   ),
+  (
+    'f0000000-0000-0000-0000-000000000010'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Keyboard Mekanikal Nirkabel 75%' and deleted_at is null order by id asc limit 1),
+    1,
+    145000000
+  ),
+  (
+    'f0000000-0000-0000-0000-000000000011'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Tetikus Ergonomis Nirkabel Precision' and deleted_at is null order by id asc limit 1),
+    1,
+    89000000
+  ),
+  (
+    'f0000000-0000-0000-0000-000000000012'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Meja Kerja Modular Solid Oak' and deleted_at is null order by id asc limit 1),
+    1,
+    325000000
+  ),
+  (
+    'f0000000-0000-0000-0000-000000000013'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Kursi Ergonomis Mesh Pro' and deleted_at is null order by id asc limit 1),
+    1,
+    289000000
+  ),
+  (
+    'f0000000-0000-0000-0000-000000000014'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Dripper Kopi Keramik Pour-Over V60' and deleted_at is null order by id asc limit 1),
+    1,
+    28500000
+  ),
+  (
+    'f0000000-0000-0000-0000-000000000015'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Gelas Kaca Borosilikat Double-Wall 350ml' and deleted_at is null order by id asc limit 1),
+    1,
+    12500000
+  ),
+  (
+    'f0000000-0000-0000-0000-000000000016'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Dompet Kartu Kulit Nabati Slim' and deleted_at is null order by id asc limit 1),
+    1,
+    29500000
+  ),
+  (
+    'f0000000-0000-0000-0000-000000000017'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Jam Tangan Lapangan Otomatis Field Watch' and deleted_at is null order by id asc limit 1),
+    1,
+    185000000
+  ),
+  (
+    'f0000000-0000-0000-0000-000000000018'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    (select id from public.products where name = 'Jurnal Grid Hardcover Kertas 120gsm' and deleted_at is null order by id asc limit 1),
+    1,
+    17500000
+  ),
   -- Item Order 2 (Lampu Meja Task Aluminium)
   (
     'f0000000-0000-0000-0000-000000000003'::uuid,
@@ -958,6 +1062,87 @@ insert into public.product_reviews (
     5,
     'Material nilon Cordura sangat tebal, tahan percikan air hujan deras, dan kompartemen laptop 16 inci empuk aman untuk mobilitas harian.',
     now() - interval '1 day'
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000010'::uuid,
+    (select id from public.products where name = 'Keyboard Mekanikal Nirkabel 75%' and deleted_at is null order by id asc limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Sasis aluminiumnya sangat kokoh dan berat saat ditaruh di meja. Gasket mount-nya bikin suara ketikan empuk dan thock tanpa getaran kopong. Koneksi Bluetooth ke MacBook dan PC mulus berganti.',
+    now() - interval '2 days'
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000011'::uuid,
+    (select id from public.products where name = 'Tetikus Ergonomis Nirkabel Precision' and deleted_at is null order by id asc limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Sudut ergonomisnya pas di tangan kanan, ketegangan pergelangan tangan berkurang drastis setelah pemakaian seminggu penuh. Roda scroll logam elektromagnetik sangat presisi untuk navigasi spreadsheet panjang.',
+    now() - interval '2 days'
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000012'::uuid,
+    (select id from public.products where name = 'Meja Kerja Modular Solid Oak' and deleted_at is null order by id asc limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Finishing kayu solid oak-nya sangat halus dengan serat alami yang terlihat mewah. Rangka baja sangat stabil tanpa goyangan sama sekali walau menopang dua monitor dan PC berat. Manajemen kabel di kolong meja rapi.',
+    now() - interval '3 days'
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000013'::uuid,
+    (select id from public.products where name = 'Kursi Ergonomis Mesh Pro' and deleted_at is null order by id asc limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Jaring mesh-nya sejuk tidak panas di ruangan ber-AC sedang. Penopang lumbar 3D bisa diatur pas di lekukan tulang belakang bawah, duduk 8 jam kerja tetap nyaman.',
+    now() - interval '3 days'
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000014'::uuid,
+    (select id from public.products where name = 'Dripper Kopi Keramik Pour-Over V60' and deleted_at is null order by id asc limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Keramik tebal menjaga suhu seduhan air tetap stabil selama proses pour-over. Alur spiralnya mengalirkan air dengan kecepatan yang konsisten. Hasil seduhan bersih dan aroma kopi terekstraksi maksimal.',
+    now() - interval '4 days'
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000015'::uuid,
+    (select id from public.products where name = 'Gelas Kaca Borosilikat Double-Wall 350ml' and deleted_at is null order by id asc limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Kaca dinding ganda benar-benar menahan panas dengan sempurna, dipegang tidak panas dan saat diisi es batu tidak ada embun kondensasi di meja kerja.',
+    now() - interval '4 days'
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000016'::uuid,
+    (select id from public.products where name = 'Dompet Kartu Kulit Nabati Slim' and deleted_at is null order by id asc limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Kulit nabatinya beraroma alami dan jahitannya rapi sekali. Muat 6 kartu utama dan beberapa lembar uang darurat tanpa membuat kantong celana menggembung.',
+    now() - interval '4 days'
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000017'::uuid,
+    (select id from public.products where name = 'Jam Tangan Lapangan Otomatis Field Watch' and deleted_at is null order by id asc limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Kaca kristal safirnya benar-benar tahan gores dan jarum superluminova terbaca jelas di kondisi gelap. Akurasi movement otomatisnya sangat baik untuk pemakaian harian.',
+    now() - interval '5 days'
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000018'::uuid,
+    (select id from public.products where name = 'Jurnal Grid Hardcover Kertas 120gsm' and deleted_at is null order by id asc limit 1),
+    '00000000-0000-0000-0000-000000000001'::uuid,
+    'e0000000-0000-0000-0000-000000000001'::uuid,
+    5,
+    'Kertas 120gsm sangat tebal, saya tes dengan pena fountain pen tinta basah sama sekali tidak tembus (no bleed-through). Jilid sampul kainnya estetik dan rapi.',
+    now() - interval '5 days'
   )
 on conflict (product_id, user_id, order_id) do nothing;
 

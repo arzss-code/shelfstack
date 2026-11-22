@@ -8,6 +8,9 @@ const props = defineProps<{
 }>()
 
 const maskedName = computed(() => {
+  if (props.review.reviewer_name) {
+    return props.review.reviewer_name
+  }
   return formatReviewerName(props.review.user_name || props.review.user_email)
 })
 
