@@ -5,7 +5,7 @@ import { requireAdmin } from '../../../../utils/auth'
 import { errorResponse, successResponse } from '../../../../utils/response'
 
 const FLASH_DEAL_SELECT =
-  'id, product_id, promo_price_cents, discount_percentage, quota, claimed, starts_at, ends_at, is_active, created_at, updated_at, products(id, name, slug, price, price_cents, stock, image_url)'
+  'id, product_id, promo_price_cents, discount_percentage, quota, claimed, starts_at, ends_at, is_active, created_at, products(id, name, slug, price, price_cents, stock, image_url)'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
