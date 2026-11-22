@@ -46,11 +46,11 @@ const emit = defineEmits<{
         v-if="searchQuery"
         text="Hapus pencarian"
         position="top"
-        class="absolute right-2.5 top-1/2 -translate-y-1/2"
+        class="absolute right-2 top-1/2 -translate-y-1/2"
       >
         <button
           type="button"
-          class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-[10px] text-brand-ink hover:text-brand-accent transition-colors cursor-pointer border-0"
+          class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft transition-colors cursor-pointer border-0"
           aria-label="Hapus pencarian"
           @click="emit('clearSearch')"
         >
@@ -59,14 +59,14 @@ const emit = defineEmits<{
       </UiTooltip>
     </div>
 
-    <!-- Controls Right: Mobile Filter Button, Sort Dropdown & Mode Switchers -->
+    <!-- Controls Right: Mobile Filter Button, Sort Dropdown & Mode Switcher -->
     <div class="flex items-center gap-2.5 ml-auto w-full sm:w-auto justify-between sm:justify-end">
       <!-- Mobile Filter Button (lg:hidden) using UiButton -->
       <UiButton
         type="button"
         variant="secondary"
         size="sm"
-        class="lg:hidden rounded-full font-semibold text-xs min-h-[44px]"
+        class="lg:hidden rounded-full font-semibold text-xs h-9"
         icon="pi-filter"
         @click="emit('openMobileFilter')"
       >
@@ -90,16 +90,17 @@ const emit = defineEmits<{
         @update:model-value="emit('update:selectedSort', String($event))"
       />
 
-      <!-- View Mode & Density Controls (Desktop only) -->
+      <!-- View Mode Switcher (Desktop only): Compact 2-way Grid vs List -->
       <div
-        class="hidden sm:flex items-center bg-brand-field p-1 rounded-full border border-brand-hairsoft gap-1"
+        class="hidden sm:inline-flex items-center h-9 bg-brand-field p-1 rounded-full border border-brand-hairsoft gap-1"
+        role="group"
+        aria-label="Mode Tampilan Katalog"
       >
-        <!-- View Mode: Grid vs List -->
         <UiTooltip text="Tampilan Grid" position="top">
           <button
             type="button"
             :class="[
-              'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+              'w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
               viewMode === 'grid'
                 ? 'bg-brand-canvas text-brand-ink shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:text-brand-ink',
@@ -111,57 +112,21 @@ const emit = defineEmits<{
           </button>
         </UiTooltip>
 
-        <UiTooltip text="Tampilan List" position="top">
+        <UiTooltip text="Tampilan Daftar" position="top">
           <button
             type="button"
             :class="[
-              'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+              'w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
               viewMode === 'list'
                 ? 'bg-brand-canvas text-brand-ink shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:text-brand-ink',
             ]"
-            aria-label="Tampilan List"
+            aria-label="Tampilan Daftar"
             @click="emit('update:viewMode', 'list')"
           >
             <i class="pi pi-bars text-xs" aria-hidden="true" />
           </button>
         </UiTooltip>
-
-        <!-- Divider if in grid mode to show 4 vs 3 cols -->
-        <span v-if="viewMode === 'grid'" class="w-[1px] h-4 bg-brand-hair mx-0.5" />
-
-        <template v-if="viewMode === 'grid'">
-          <UiTooltip text="Tampilan 4 Kolom" position="top">
-            <button
-              type="button"
-              :class="[
-                'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
-                gridDensity === 'compact'
-                  ? 'bg-brand-canvas text-brand-ink shadow-whisper font-bold'
-                  : 'text-brand-muted bg-transparent hover:text-brand-ink',
-              ]"
-              aria-label="Tampilan 4 Kolom"
-              @click="emit('update:gridDensity', 'compact')"
-            >
-              <span class="text-[10px]">4</span>
-            </button>
-          </UiTooltip>
-          <UiTooltip text="Tampilan 3 Kolom" position="top">
-            <button
-              type="button"
-              :class="[
-                'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
-                gridDensity === 'spacious'
-                  ? 'bg-brand-canvas text-brand-ink shadow-whisper font-bold'
-                  : 'text-brand-muted bg-transparent hover:text-brand-ink',
-              ]"
-              aria-label="Tampilan 3 Kolom"
-              @click="emit('update:gridDensity', 'spacious')"
-            >
-              <span class="text-[10px]">3</span>
-            </button>
-          </UiTooltip>
-        </template>
       </div>
     </div>
   </section>

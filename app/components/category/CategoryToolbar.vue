@@ -61,7 +61,7 @@ const emit = defineEmits<{
 
       <!-- View Mode Switcher: Grid vs Compact List -->
       <div
-        class="inline-flex items-center bg-brand-field p-0.5 rounded-full border border-brand-hairsoft"
+        class="inline-flex items-center h-9 bg-brand-field p-1 rounded-full border border-brand-hairsoft gap-1"
         role="group"
         aria-label="Mode Tampilan Produk"
       >
@@ -69,7 +69,7 @@ const emit = defineEmits<{
           <button
             type="button"
             :class="[
-              'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+              'w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
               viewMode === 'grid'
                 ? 'bg-brand-canvas text-brand-ink shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:text-brand-ink',
@@ -77,7 +77,7 @@ const emit = defineEmits<{
             aria-label="Tampilan Grid"
             @click="emit('update:viewMode', 'grid')"
           >
-            <i class="pi pi-th-large" aria-hidden="true" />
+            <i class="pi pi-th-large text-xs" aria-hidden="true" />
           </button>
         </UiTooltip>
 
@@ -85,7 +85,7 @@ const emit = defineEmits<{
           <button
             type="button"
             :class="[
-              'w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
+              'w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer border-0',
               viewMode === 'list'
                 ? 'bg-brand-canvas text-brand-ink shadow-whisper'
                 : 'text-brand-muted bg-transparent hover:text-brand-ink',
@@ -93,7 +93,7 @@ const emit = defineEmits<{
             aria-label="Tampilan List"
             @click="emit('update:viewMode', 'list')"
           >
-            <i class="pi pi-bars" aria-hidden="true" />
+            <i class="pi pi-bars text-xs" aria-hidden="true" />
           </button>
         </UiTooltip>
       </div>

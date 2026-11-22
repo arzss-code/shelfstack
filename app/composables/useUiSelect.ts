@@ -121,8 +121,8 @@ export function useUiSelect(
     const geometry =
       props.size === 'sm'
         ? isPill.value
-          ? 'h-10 rounded-full py-2 px-3.5 text-xs'
-          : 'h-8 rounded-full py-1 px-3 text-xs'
+          ? 'h-9 rounded-full py-1.5 px-3.5 text-xs'
+          : 'h-9 rounded-field py-1.5 px-3 text-xs'
         : isPill.value
           ? 'h-11 rounded-full py-2.5 px-4 text-sm'
           : 'h-11 rounded-field py-2.5 px-3.5 text-sm'
