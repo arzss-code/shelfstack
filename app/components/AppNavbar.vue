@@ -46,9 +46,26 @@ const handleSearch = () => {
   isMobileMenuOpen.value = false
 }
 
+let isTicking = false
+
 const handleScroll = () => {
   if (typeof window === 'undefined') return
-  isScrolled.value = window.scrollY > 30
+  if (!isTicking) {
+    window.requestAnimationFrame(() => {
+      const currentY = window.scrollY
+      // Hysteresis deadband:
+      // Melipat saat scroll ke bawah melewati 80px
+      // Membuka kembali HANYA saat kembali ke dekat puncak layar (<= 15px)
+      // Jarak 65px mencegah osilasi loop getar (tinggi ribbon ~36px)
+      if (currentY > 80 && !isScrolled.value) {
+        isScrolled.value = true
+      } else if (currentY <= 15 && isScrolled.value) {
+        isScrolled.value = false
+      }
+      isTicking = false
+    })
+    isTicking = true
+  }
 }
 
 onMounted(() => {
