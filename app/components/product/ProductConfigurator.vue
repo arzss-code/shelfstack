@@ -81,7 +81,7 @@ watch(
       </div>
 
       <h1
-        class="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-brand-ink leading-tight m-0 mb-3"
+        class="font-display text-2xl sm:text-3xl font-bold text-brand-ink tracking-tight leading-snug m-0 mb-2.5"
       >
         {{ product.name }}
       </h1>
@@ -135,16 +135,7 @@ watch(
         >
           Hemat {{ Math.round(((product.price - effectivePrice) / product.price) * 100) }}%
         </span>
-        <span
-          v-if="selectedVariant && selectedVariant.name"
-          class="text-xs font-semibold text-brand-muted"
-        >
-          ({{ selectedVariant.name }})
-        </span>
       </div>
-      <p class="font-body text-xs text-brand-muted m-0">
-        Pajak dan jaminan kurasi sudah termasuk. Pengiriman diproses langsung dari warehouse resmi.
-      </p>
     </UiCard>
 
     <!-- Configurator 1: Colorways -->

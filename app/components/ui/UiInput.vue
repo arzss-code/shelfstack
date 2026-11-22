@@ -85,7 +85,7 @@ const controlClass = computed(() => {
     : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink'
   const padding = props.leftIcon
     ? props.size === 'sm'
-      ? 'pl-9'
+      ? 'pl-[34px]'
       : 'pl-10'
     : props.size === 'sm'
       ? 'pl-3.5'

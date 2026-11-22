@@ -163,7 +163,7 @@ const resetFilters = () => {
 </script>
 
 <template>
-  <div class="promos-page pb-16 space-y-6 max-w-5xl mx-auto">
+  <div class="promos-page pb-16 space-y-6 w-full">
     <!-- Breadcrumb -->
     <nav class="flex items-center gap-2 text-xs text-brand-muted pt-2" aria-label="Breadcrumb">
       <NuxtLink to="/" class="hover:text-brand-ink transition-colors no-underline"
@@ -182,11 +182,11 @@ const resetFilters = () => {
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div
-        v-for="n in 4"
+        v-for="n in 6"
         :key="n"
-        class="p-4 rounded-2xl border border-brand-hair bg-brand-canvas flex gap-4"
+        class="p-4 rounded-card border border-brand-hair bg-brand-canvas flex gap-4"
       >
         <UiSkeleton width="w-28" height="h-32" />
         <div class="flex-1 space-y-2 py-2">
@@ -208,14 +208,14 @@ const resetFilters = () => {
     </div>
 
     <!-- Voucher Cards Grid -->
-    <main v-else class="space-y-4">
+    <section v-else class="space-y-4" aria-label="Daftar Voucher">
       <!-- Free Shipping Banner -->
       <PromoFreeShippingCard v-if="selectedTab === 'all' || selectedTab === 'shipping'" />
 
       <!-- Regular Voucher Grid -->
       <div
         v-if="selectedTab !== 'shipping'"
-        class="grid grid-cols-1 md:grid-cols-2 items-start gap-4"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start gap-4"
       >
         <PromoVoucherCard
           v-for="coupon in filteredCoupons"
@@ -238,7 +238,7 @@ const resetFilters = () => {
         action-label="Reset Filter"
         @action="resetFilters"
       />
-    </main>
+    </section>
 
     <!-- Terms & Conditions Modal -->
     <PromoTermsModal

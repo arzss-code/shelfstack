@@ -8,6 +8,8 @@ export interface RecentlyViewedItem {
   imageUrl?: string | null
   category?: string | null
   stock: number
+  rating?: number | null
+  soldCount?: number | null
   viewedAt?: number
 }
 

@@ -39,7 +39,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6 max-w-7xl mx-auto" data-testid="admin-reviews-page">
+  <div class="space-y-6" data-testid="admin-reviews-page">
     <!-- Top Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>

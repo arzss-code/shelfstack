@@ -103,7 +103,10 @@ const handleNativeShare = async () => {
 
     <div class="flex items-center gap-2">
       <!-- WhatsApp Direct Share Button -->
-      <UiTooltip text="Bagikan ke WhatsApp" position="top">
+      <UiTooltip
+        text="Bagikan rincian dan tautan resmi produk ini langsung ke WhatsApp"
+        position="top"
+      >
         <button
           type="button"
           aria-label="Bagikan produk ke WhatsApp"
@@ -116,7 +119,7 @@ const handleNativeShare = async () => {
       </UiTooltip>
 
       <!-- Copy URL to Clipboard Button -->
-      <UiTooltip text="Salin tautan produk" position="top">
+      <UiTooltip text="Salin tautan produk resmi ke papan klip" position="top">
         <button
           type="button"
           aria-label="Salin tautan produk"
@@ -129,14 +132,24 @@ const handleNativeShare = async () => {
       </UiTooltip>
 
       <!-- Native Web Share API Button (Mobile/Supported Browser) -->
-      <UiButton
-        v-if="canNativeShare"
-        variant="ghost"
-        size="sm"
-        aria-label="Buka dialog bagikan peramban"
-        icon="pi-external-link"
-        @click="handleNativeShare"
-      />
+      <ClientOnly>
+        <UiTooltip
+          v-if="canNativeShare"
+          text="Bagikan lewat aplikasi lain di perangkat Anda"
+          position="top"
+        >
+          <UiButton
+            variant="secondary"
+            size="sm"
+            class="h-8 rounded-full font-semibold text-xs border border-brand-hair text-brand-ink hover:bg-brand-canvas-soft"
+            aria-label="Buka dialog bagikan peramban"
+            icon="pi-share-alt"
+            @click="handleNativeShare"
+          >
+            <span>Lainnya</span>
+          </UiButton>
+        </UiTooltip>
+      </ClientOnly>
     </div>
   </div>
 </template>

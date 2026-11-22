@@ -20,8 +20,8 @@ export interface UseRelatedProductsReturn {
 }
 
 /**
- * Composable untuk memuat dan mengurasi 4 produk terkait berdasarkan kategori produk aktif.
- * Jika kategori produk aktif memiliki kurang dari 4 varian lain, sistem akan melengkapi
+ * Composable untuk memuat dan mengurasi 6 produk terkait berdasarkan kategori produk aktif.
+ * Jika kategori produk aktif memiliki kurang dari 6 varian lain, sistem akan melengkapi
  * rekomendasi dengan produk terpopuler/terkurasi lainnya dari katalog.
  */
 export function useRelatedProducts(
@@ -79,7 +79,7 @@ export function useRelatedProducts(
         const categoryRes = await $fetch<{ status: string; data: Product[] }>('/api/products', {
           params: {
             category: queryCategory,
-            limit: 6,
+            limit: 10,
             page: 1,
             sort: 'popular',
           },
@@ -94,11 +94,11 @@ export function useRelatedProducts(
         }
       }
 
-      // 2. Jika kurang dari 4, lengkapi dengan produk terpopuler di luar kategori
-      if (candidates.length < 4) {
+      // 2. Jika kurang dari 6, lengkapi dengan produk terpopuler di luar kategori
+      if (candidates.length < 6) {
         const generalRes = await $fetch<{ status: string; data: Product[] }>('/api/products', {
           params: {
-            limit: 8,
+            limit: 12,
             page: 1,
             sort: 'popular',
           },
@@ -109,14 +109,14 @@ export function useRelatedProducts(
             if (item.id !== targetId && !candidates.some((c) => c.id === item.id)) {
               candidates.push(item)
             }
-            if (candidates.length >= 4) {
+            if (candidates.length >= 6) {
               break
             }
           }
         }
       }
 
-      const finalSelection = candidates.slice(0, 4)
+      const finalSelection = candidates.slice(0, 6)
       relatedProducts.value = finalSelection
 
       if (finalSelection.length === 0) {

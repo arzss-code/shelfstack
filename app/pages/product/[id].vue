@@ -8,7 +8,6 @@ import ProductConfigurator from '~/components/product/ProductConfigurator.vue'
 import ProductReviewsSection from '~/components/product/ProductReviewsSection.vue'
 import ProductRelatedSection from '~/components/product/ProductRelatedSection.vue'
 import ProductRecentlyViewedSection from '~/components/product/ProductRecentlyViewedSection.vue'
-import ProductSocialShare from '~/components/product/ProductSocialShare.vue'
 import ProductFlashSaleBanner from '~/components/promotions/ProductFlashSaleBanner.vue'
 import ProductShippingEstimator from '~/components/product/ProductShippingEstimator.vue'
 import { useRecentlyViewed } from '~/composables/useRecentlyViewed'
@@ -132,6 +131,7 @@ onMounted(() => {
       imageUrl: product.value.image_url,
       category: product.value.category_id || undefined,
       stock: product.value.stock,
+      rating: product.value.rating || 5.0,
     })
 
     if (/^\d+$/.test(param.value) && product.value.slug) {
@@ -191,31 +191,46 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
 
 <template>
   <div class="space-y-8 pb-16 pt-2">
-    <!-- Breadcrumbs -->
+    <!-- Breadcrumbs with Responsive Container Ellipsis -->
     <nav
       aria-label="Breadcrumbs"
-      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 border-b border-brand-hairsoft overflow-x-auto"
+      class="flex items-center text-xs font-medium text-brand-muted pb-2 border-b border-brand-hairsoft min-w-0"
     >
-      <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
-        ShelfStack
-      </NuxtLink>
-      <span class="text-brand-faint">/</span>
-      <NuxtLink
-        to="/katalog"
-        class="hover:text-brand-ink no-underline text-brand-muted transition-colors"
-      >
-        Katalog
-      </NuxtLink>
-      <span class="text-brand-faint">/</span>
-      <span v-if="product" class="text-brand-ink font-semibold truncate max-w-56">
-        {{ product.name }}
-      </span>
+      <ol class="flex items-center gap-2 m-0 p-0 list-none min-w-0 flex-1">
+        <li class="shrink-0 flex items-center gap-2">
+          <NuxtLink
+            to="/"
+            class="hover:text-brand-ink no-underline text-brand-muted transition-colors"
+          >
+            ShelfStack
+          </NuxtLink>
+          <span class="text-brand-faint" aria-hidden="true">/</span>
+        </li>
+        <li class="shrink-0 flex items-center gap-2">
+          <NuxtLink
+            to="/katalog"
+            class="hover:text-brand-ink no-underline text-brand-muted transition-colors"
+          >
+            Katalog
+          </NuxtLink>
+          <span class="text-brand-faint" aria-hidden="true">/</span>
+        </li>
+        <li v-if="product" class="min-w-0 flex-1 truncate">
+          <span
+            class="text-brand-ink font-semibold truncate block"
+            :title="product.name"
+            aria-current="page"
+          >
+            {{ product.name }}
+          </span>
+        </li>
+      </ol>
     </nav>
 
     <!-- Loading Skeleton View -->
-    <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 animate-pulse">
-      <div class="lg:col-span-7 aspect-[4/3] bg-brand-field rounded-card" />
-      <div class="lg:col-span-5 space-y-4">
+    <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 animate-pulse">
+      <div class="lg:col-span-5 aspect-square w-full bg-brand-field rounded-card" />
+      <div class="lg:col-span-7 space-y-4">
         <div class="h-4 w-32 bg-brand-field rounded-full" />
         <div class="h-8 w-3/4 bg-brand-field rounded-full" />
         <div class="h-6 w-1/3 bg-brand-field rounded-full" />
@@ -226,11 +241,11 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
 
     <!-- Product Detail Hub -->
     <div v-else-if="product" class="space-y-12">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        <div class="lg:col-span-7">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        <div class="lg:col-span-5">
           <ProductGallery :product="product" :active-image-override="selectedVariantImage" />
         </div>
-        <div class="lg:col-span-5 space-y-6">
+        <div class="lg:col-span-7 space-y-6 lg:sticky lg:top-24">
           <ProductFlashSaleBanner
             v-if="activeFlashDeal"
             :deal="activeFlashDeal"
@@ -244,7 +259,6 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
             @buy-now="onBuyNow"
           />
           <ProductShippingEstimator :product-price="product.price" />
-          <ProductSocialShare :product="product" />
         </div>
       </div>
 

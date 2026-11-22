@@ -2,6 +2,7 @@
 import type { Product } from '~/types/product'
 import { detectProductCategorySlug } from '~/utils/product-specs'
 import ProductSpecsTable from './ProductSpecsTable.vue'
+import ProductSocialShare from './ProductSocialShare.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -87,10 +88,10 @@ const warrantyBadge = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <!-- Main Media Container -->
+  <div class="flex flex-col gap-4 w-full">
+    <!-- Main Media Container (Full Width of Column) -->
     <div
-      class="relative w-full aspect-square rounded-card bg-brand-canvas-soft border border-brand-hair overflow-hidden flex items-center justify-center p-2 sm:p-4 shadow-whisper group"
+      class="relative w-full aspect-square rounded-card bg-brand-canvas-soft border border-brand-hair overflow-hidden shadow-whisper group"
     >
       <img
         v-if="activeImage && !imageFailed"
@@ -101,10 +102,10 @@ const warrantyBadge = computed(() => {
         height="800"
         fetchpriority="high"
         decoding="async"
-        class="w-full h-full object-contain transition-all duration-300 group-hover:scale-[1.03]"
+        class="w-full h-full object-cover transition-all duration-300 group-hover:scale-[1.03]"
         @error="imageFailed = true"
       />
-      <div v-else class="flex flex-col items-center justify-center text-brand-faint">
+      <div v-else class="flex flex-col items-center justify-center w-full h-full text-brand-faint">
         <i class="pi pi-image text-5xl mb-2" aria-hidden="true" />
         <span class="text-xs font-medium">Gambar Produk Belum Tersedia</span>
       </div>
@@ -117,21 +118,21 @@ const warrantyBadge = computed(() => {
       </div>
     </div>
 
-    <!-- Multi-Angle Thumbnail Switcher (Stitch Prototype Spec) -->
+    <!-- Multi-Angle Thumbnail Switcher (Left Aligned & Non-Clipping) -->
     <div
       v-if="galleryImages.length > 1"
-      class="flex items-center gap-2.5 overflow-x-auto py-1"
+      class="flex items-center justify-start gap-2.5 overflow-x-auto py-1.5 px-1 w-full"
       aria-label="Sudut Foto Produk"
     >
       <button
         v-for="(img, idx) in galleryImages"
         :key="idx"
         type="button"
-        class="w-16 h-16 aspect-square rounded-field border p-1 bg-brand-canvas-soft shrink-0 transition-all cursor-pointer overflow-hidden focus:outline-none flex items-center justify-center"
+        class="w-12 h-12 sm:w-14 sm:h-14 aspect-square rounded-field border bg-brand-canvas-soft shrink-0 transition-all cursor-pointer overflow-hidden focus:outline-none flex items-center justify-center"
         :class="[
           activeImage === img
-            ? 'border-brand-ink ring-2 ring-brand-ink/20 shadow-whisper scale-105'
-            : 'border-brand-hair hover:border-brand-muted opacity-70 hover:opacity-100',
+            ? 'border-2 border-brand-ink ring-2 ring-brand-ink/20 shadow-whisper'
+            : 'border border-brand-hair hover:border-brand-muted opacity-70 hover:opacity-100',
         ]"
         :aria-label="`Pilih sudut gambar ${idx + 1}`"
         @click="activeImage = img"
@@ -139,42 +140,47 @@ const warrantyBadge = computed(() => {
         <img
           :src="img"
           :alt="`${product.name} thumbnail ${idx + 1}`"
-          width="64"
-          height="64"
+          width="56"
+          height="56"
           loading="lazy"
           decoding="async"
-          class="w-full h-full object-cover rounded-[inherit]"
+          class="w-full h-full object-cover"
         />
       </button>
     </div>
 
     <!-- Micro-Showcase Spec Grid (3 Triad Boxes) -->
-    <div class="grid grid-cols-3 gap-3 pt-2">
+    <div class="grid grid-cols-3 gap-2 sm:gap-3 pt-1 w-full">
       <div
-        class="bg-brand-canvas-soft border border-brand-hairsoft p-3.5 rounded-field flex flex-col items-center justify-center text-center shadow-whisper"
+        class="bg-brand-canvas-soft border border-brand-hairsoft p-2.5 sm:p-3 rounded-field flex flex-col items-center justify-center text-center shadow-whisper"
       >
-        <i class="pi pi-shield text-brand-ink text-lg mb-1" />
-        <span class="font-display font-bold text-sm text-brand-ink">{{ warrantyBadge.value }}</span>
-        <span class="text-[11px] text-brand-muted">{{ warrantyBadge.label }}</span>
+        <i class="pi pi-shield text-brand-ink text-base mb-1" />
+        <span class="font-display font-bold text-xs sm:text-sm text-brand-ink">{{
+          warrantyBadge.value
+        }}</span>
+        <span class="text-[10px] sm:text-[11px] text-brand-muted">{{ warrantyBadge.label }}</span>
       </div>
       <div
-        class="bg-brand-canvas-soft border border-brand-hairsoft p-3.5 rounded-field flex flex-col items-center justify-center text-center shadow-whisper"
+        class="bg-brand-canvas-soft border border-brand-hairsoft p-2.5 sm:p-3 rounded-field flex flex-col items-center justify-center text-center shadow-whisper"
       >
-        <i class="pi pi-check-circle text-brand-accent text-lg mb-1" />
-        <span class="font-display font-bold text-sm text-brand-ink">100% Asli</span>
-        <span class="text-[11px] text-brand-muted">Terverifikasi</span>
+        <i class="pi pi-check-circle text-brand-accent text-base mb-1" />
+        <span class="font-display font-bold text-xs sm:text-sm text-brand-ink">100% Asli</span>
+        <span class="text-[10px] sm:text-[11px] text-brand-muted">Terverifikasi</span>
       </div>
       <div
-        class="bg-brand-canvas-soft border border-brand-hairsoft p-3.5 rounded-field flex flex-col items-center justify-center text-center shadow-whisper"
+        class="bg-brand-canvas-soft border border-brand-hairsoft p-2.5 sm:p-3 rounded-field flex flex-col items-center justify-center text-center shadow-whisper"
       >
-        <i class="pi pi-box text-brand-ink text-lg mb-1" />
-        <span class="font-display font-bold text-sm text-brand-ink">Kemasan Aman</span>
-        <span class="text-[11px] text-brand-muted">Proteksi Ekstra</span>
+        <i class="pi pi-box text-brand-ink text-base mb-1" />
+        <span class="font-display font-bold text-xs sm:text-sm text-brand-ink">Kemasan Aman</span>
+        <span class="text-[10px] sm:text-[11px] text-brand-muted">Proteksi Ekstra</span>
       </div>
     </div>
 
+    <!-- Social Share Actions -->
+    <ProductSocialShare :product="product" class="w-full" />
+
     <!-- Description & Information -->
-    <UiCard :padded="true" class="mt-2 space-y-4">
+    <UiCard :padded="true" class="w-full mt-2 space-y-4">
       <h2 class="font-display text-lg font-bold text-brand-ink m-0">
         Deskripsi &amp; Informasi Produk
       </h2>
@@ -198,6 +204,6 @@ const warrantyBadge = computed(() => {
     </UiCard>
 
     <!-- Dynamic Specification Table (FR-3.2) -->
-    <ProductSpecsTable :product="product" class="mt-2" />
+    <ProductSpecsTable :product="product" class="w-full mt-2" />
   </div>
 </template>

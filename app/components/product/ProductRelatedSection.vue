@@ -49,15 +49,15 @@ const { relatedProducts, isLoading, isError, categoryName, viewAllUrl, fetchRela
       </NuxtLink>
     </div>
 
-    <!-- 1. Loading State: 4 Skeleton Cards -->
+    <!-- 1. Loading State: 6 Skeleton Cards -->
     <div
       v-if="isLoading"
-      class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 animate-pulse"
+      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 animate-pulse"
       aria-busy="true"
       aria-label="Memuat rekomendasi produk terkait"
     >
       <div
-        v-for="i in 4"
+        v-for="i in 6"
         :key="i"
         class="flex flex-col bg-brand-canvas border border-brand-hair rounded-card overflow-hidden"
       >
@@ -83,10 +83,10 @@ const { relatedProducts, isLoading, isError, categoryName, viewAllUrl, fetchRela
       </UiButton>
     </div>
 
-    <!-- 3. Success State: 4 Related Product Cards -->
+    <!-- 3. Success State: 6 Related Product Cards -->
     <div
       v-else-if="relatedProducts.length > 0"
-      class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
+      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4"
     >
       <ProductCard
         v-for="item in relatedProducts"

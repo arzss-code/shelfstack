@@ -8,65 +8,36 @@ import { useRelatedProducts } from '../../app/composables/useRelatedProducts'
 import ProductRelatedSection from '../../app/components/product/ProductRelatedSection.vue'
 import type { Product } from '../../app/types/product'
 
-const mockProductA: Product = {
-  id: 1,
-  name: 'Mechanical Keyboard Master',
-  slug: 'mechanical-keyboard-master',
-  price: 1500000,
-  stock: 12,
-  category_id: '28082f15-1fd6-425e-9f6e-ed197c591c39', // tech
-  image_url: 'https://example.com/keyboard.jpg',
-}
+const createMockProduct = (
+  id: number,
+  name: string,
+  category_id = '28082f15-1fd6-425e-9f6e-ed197c591c39',
+): Product => ({
+  id,
+  name,
+  slug: name.toLowerCase().replace(/\s+/g, '-'),
+  price: 1000000,
+  stock: 10,
+  category_id,
+  image_url: `https://example.com/${id}.jpg`,
+})
 
-const mockProductB: Product = {
-  id: 2,
-  name: 'Studio Monitor Headphone',
-  slug: 'studio-monitor-headphone',
-  price: 2400000,
-  stock: 8,
-  category_id: '28082f15-1fd6-425e-9f6e-ed197c591c39', // tech
-  image_url: 'https://example.com/headphone.jpg',
-}
-
-const mockProductC: Product = {
-  id: 3,
-  name: 'Desk Pad Wool Felt',
-  slug: 'desk-pad-wool-felt',
-  price: 450000,
-  stock: 20,
-  category_id: '28082f15-1fd6-425e-9f6e-ed197c591c39', // tech
-  image_url: 'https://example.com/deskpad.jpg',
-}
-
-const mockProductD: Product = {
-  id: 4,
-  name: 'Wireless Charger Dock',
-  slug: 'wireless-charger-dock',
-  price: 650000,
-  stock: 5,
-  category_id: '28082f15-1fd6-425e-9f6e-ed197c591c39', // tech
-  image_url: 'https://example.com/charger.jpg',
-}
-
-const mockProductE: Product = {
-  id: 5,
-  name: 'Precision Titanium Pen',
-  slug: 'precision-titanium-pen',
-  price: 950000,
-  stock: 15,
-  category_id: '8d426592-2d81-4d0a-85a3-edae2803b8ad', // stationery
-  image_url: 'https://example.com/pen.jpg',
-}
-
-const mockProductF: Product = {
-  id: 6,
-  name: 'Ergonomic Desk Chair',
-  slug: 'ergonomic-desk-chair',
-  price: 3200000,
-  stock: 4,
-  category_id: '0c6b1f1d-64ca-4c94-8666-91a97f8e4095', // furniture
-  image_url: 'https://example.com/chair.jpg',
-}
+const mockProductA = createMockProduct(1, 'Mechanical Keyboard Master')
+const mockProductB = createMockProduct(2, 'Studio Monitor Headphone')
+const mockProductC = createMockProduct(3, 'Desk Pad Wool Felt')
+const mockProductD = createMockProduct(4, 'Wireless Charger Dock')
+const mockProductE = createMockProduct(
+  5,
+  'Precision Titanium Pen',
+  '8d426592-2d81-4d0a-85a3-edae2803b8ad',
+)
+const mockProductF = createMockProduct(
+  6,
+  'Ergonomic Desk Chair',
+  '0c6b1f1d-64ca-4c94-8666-91a97f8e4095',
+)
+const mockProductG = createMockProduct(7, 'Aluminum Laptop Stand')
+const mockProductH = createMockProduct(8, 'Monitor Light Bar')
 
 const { mockFetch } = vi.hoisted(() => {
   const fMock: any = vi.fn()
@@ -125,50 +96,48 @@ describe('Product Related Recommendations (Backlog C-03)', () => {
     it('filters out the current product from recommendations', async () => {
       mockFetch.mockResolvedValueOnce({
         status: 'success',
-        data: [mockProductA, mockProductB, mockProductC, mockProductD, mockProductF],
+        data: [
+          mockProductA,
+          mockProductB,
+          mockProductC,
+          mockProductD,
+          mockProductF,
+          mockProductG,
+          mockProductH,
+        ],
       })
 
       const { relatedProducts, fetchRelated } = useRelatedProducts(mockProductA)
       await fetchRelated()
 
-      expect(relatedProducts.value).toHaveLength(4)
+      expect(relatedProducts.value).toHaveLength(6)
       expect(relatedProducts.value.some((p) => p.id === mockProductA.id)).toBe(false)
-      expect(relatedProducts.value.map((p) => p.id)).toEqual([2, 3, 4, 6])
+      expect(relatedProducts.value.map((p) => p.id)).toEqual([2, 3, 4, 6, 7, 8])
     })
 
-    it('supplements with general popular products when category has fewer than 4 candidates', async () => {
-      // 1. Kategori hanya punya mockProductA (target) dan mockProductB (1 kandidat)
+    it('supplements with general popular products when category has fewer than 6 candidates', async () => {
       mockFetch.mockResolvedValueOnce({
         status: 'success',
         data: [mockProductA, mockProductB],
       })
-
-      // 2. Query umum mengembalikan mockProductC, mockProductD, mockProductE
       mockFetch.mockResolvedValueOnce({
         status: 'success',
-        data: [mockProductB, mockProductC, mockProductD, mockProductE],
+        data: [mockProductB, mockProductC, mockProductD, mockProductE, mockProductF, mockProductG],
       })
 
       const { relatedProducts, fetchRelated, status } = useRelatedProducts(mockProductA)
       await fetchRelated()
 
       expect(status.value).toBe('success')
-      expect(relatedProducts.value).toHaveLength(4)
-      // Dipastikan tidak ada duplikat dan target tidak disertakan
+      expect(relatedProducts.value).toHaveLength(6)
       const ids = relatedProducts.value.map((p) => p.id)
-      expect(new Set(ids).size).toBe(4)
+      expect(new Set(ids).size).toBe(6)
       expect(ids).not.toContain(mockProductA.id)
     })
 
     it('sets status to empty when no candidates are found', async () => {
-      mockFetch.mockResolvedValueOnce({
-        status: 'success',
-        data: [mockProductA],
-      })
-      mockFetch.mockResolvedValueOnce({
-        status: 'success',
-        data: [mockProductA],
-      })
+      mockFetch.mockResolvedValueOnce({ status: 'success', data: [mockProductA] })
+      mockFetch.mockResolvedValueOnce({ status: 'success', data: [mockProductA] })
 
       const { relatedProducts, fetchRelated, status, isEmpty } = useRelatedProducts(mockProductA)
       await fetchRelated()
@@ -192,7 +161,6 @@ describe('Product Related Recommendations (Backlog C-03)', () => {
 
   describe('ProductRelatedSection.vue component', () => {
     it('renders loading skeleton when fetching', async () => {
-      // Pending promise yang tidak langsung resolve
       mockFetch.mockImplementation(() => new Promise(() => {}))
 
       const wrapper = mount(ProductRelatedSection, {
@@ -205,10 +173,10 @@ describe('Product Related Recommendations (Backlog C-03)', () => {
       expect(wrapper.findAll('.animate-pulse').length).toBeGreaterThan(0)
     })
 
-    it('renders 4 ProductCard items on success', async () => {
+    it('renders 6 ProductCard items on success', async () => {
       mockFetch.mockResolvedValueOnce({
         status: 'success',
-        data: [mockProductB, mockProductC, mockProductD, mockProductE],
+        data: [mockProductB, mockProductC, mockProductD, mockProductE, mockProductF, mockProductG],
       })
 
       const wrapper = mount(ProductRelatedSection, {
@@ -219,7 +187,7 @@ describe('Product Related Recommendations (Backlog C-03)', () => {
       await flushPromises()
 
       const cards = wrapper.findAll('.product-card-stub')
-      expect(cards).toHaveLength(4)
+      expect(cards).toHaveLength(6)
       expect(wrapper.text()).toContain('Koleksi Terkait')
       expect(wrapper.text()).toContain('Tech & Gadget')
     })
@@ -238,15 +206,14 @@ describe('Product Related Recommendations (Backlog C-03)', () => {
       const retryBtn = wrapper.find('.ui-button-stub')
       expect(retryBtn.exists()).toBe(true)
 
-      // Coba lagi dengan respon sukses
       mockFetch.mockResolvedValueOnce({
         status: 'success',
-        data: [mockProductB, mockProductC, mockProductD, mockProductE],
+        data: [mockProductB, mockProductC, mockProductD, mockProductE, mockProductF, mockProductG],
       })
       await retryBtn.trigger('click')
       await flushPromises()
 
-      expect(wrapper.findAll('.product-card-stub')).toHaveLength(4)
+      expect(wrapper.findAll('.product-card-stub')).toHaveLength(6)
     })
   })
 
