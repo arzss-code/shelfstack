@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Pekerjaan aktif:** Penuntasan seluruh 5 fase Platform Enhancements (`v1.1.0-beta.31`): Hardening visual dark mode (77 komponen `bg-brand-canvas`), perapihan beranda dan eliminasi redundansi jaminan (`HomeReviews.vue`), panel admin moderasi ulasan pelanggan (`/admin/reviews`), persistent email outbox queue (`20261204000001_email_outbox_queue.sql`, `server/utils/email-outbox.ts`, endpoints retry admin), serta kalkulasi ongkir dinamis berbasis wilayah tujuan Semarang/Jawa/Luar Jawa (`shared/schemas/shipping.ts`, `ShippingMethodSelector.vue`, `useCheckoutOrder.ts`, `ProductShippingEstimator.vue`).
+- **Pekerjaan aktif:** Penuntasan seluruh 5 fase Platform Enhancements (`v1.1.0-beta.31`), perapihan galeri produk detail kompak pas viewport (`ProductGallery.vue`), breadcrumbs responsif bebas overflow dini (`app/pages/product/[id].vue`), padding input pencarian katalog (`UiInput.vue`), tombol bagikan sosial dengan tooltip jelas (`ProductSocialShare.vue`), serta standarisasi fotografi produk studio multi-sudut seragam (`field-watch-angle.jpg`).
 - **Versi rilis aktif:** `v1.1.0-beta.31` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
-- **Quality Gate Terkini (2026-11-21):** `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `order-service test` 2 file / 25 test lolos 100% · `vitest run` 144 file / 1.428 test lolos 100% · `pnpm build` EXIT 0 · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
+- **Quality Gate Terkini (2026-11-22):** `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `vitest run` 144 file / 1.431 test lolos 100% · `pnpm build` EXIT 0 · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
