@@ -135,16 +135,7 @@ watch(
         >
           Hemat {{ Math.round(((product.price - effectivePrice) / product.price) * 100) }}%
         </span>
-        <span
-          v-if="selectedVariant && selectedVariant.name"
-          class="text-xs font-semibold text-brand-muted"
-        >
-          ({{ selectedVariant.name }})
-        </span>
       </div>
-      <p class="font-body text-xs text-brand-muted m-0">
-        Pajak dan jaminan kurasi sudah termasuk. Pengiriman diproses langsung dari warehouse resmi.
-      </p>
     </UiCard>
 
     <!-- Configurator 1: Colorways -->
