@@ -2,11 +2,17 @@
 import { useInstantSearch } from '~/composables/useInstantSearch'
 import SearchAutocompletePopover from '~/components/search/SearchAutocompletePopover.vue'
 
-const props = defineProps<{
-  searchQuery: string
-  selectedCategory: string
-  dropdownCategories: string[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    searchQuery: string
+    selectedCategory?: string
+    dropdownCategories?: string[]
+  }>(),
+  {
+    selectedCategory: 'Semua Kategori',
+    dropdownCategories: () => [],
+  },
+)
 
 const emit = defineEmits<{
   'update:searchQuery': [value: string]
@@ -14,18 +20,11 @@ const emit = defineEmits<{
   selectCategory: [category: string]
 }>()
 
-const isCategoryDropdownOpen = ref(false)
-const categoryDropdownRef = ref<HTMLElement | null>(null)
 const searchBarContainerRef = ref<HTMLElement | null>(null)
 
 // Composable instant search dengan sinkronisasi query
 const queryRef = toRef(props, 'searchQuery')
 const instantSearch = useInstantSearch(queryRef)
-
-function handleSelectCategory(cat: string) {
-  isCategoryDropdownOpen.value = false
-  emit('selectCategory', cat)
-}
 
 function handleInput(e: Event) {
   const val = (e.target as HTMLInputElement).value
@@ -44,14 +43,6 @@ function handleSubmit() {
 function handleClickOutside(event: MouseEvent) {
   const target = event.target as Node | null
   if (!target) return
-
-  if (
-    isCategoryDropdownOpen.value &&
-    categoryDropdownRef.value &&
-    !categoryDropdownRef.value.contains(target)
-  ) {
-    isCategoryDropdownOpen.value = false
-  }
 
   if (
     instantSearch.isOpen.value &&
@@ -77,66 +68,9 @@ onBeforeUnmount(() => {
     class="relative flex-1 max-w-2xl mx-2 sm:mx-6 hidden md:block"
   >
     <form
-      class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full px-1.5 border border-brand-hair focus-within:border-brand-ink focus-within:bg-brand-canvas focus-within:ring-2 focus-within:ring-brand-ink/20 transition-colors shadow-whisper"
+      class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full pl-4 pr-1.5 border border-brand-hair focus-within:border-brand-ink focus-within:bg-brand-canvas focus-within:ring-2 focus-within:ring-brand-ink/20 transition-colors shadow-whisper"
       @submit.prevent="handleSubmit"
     >
-      <!-- Single Category Dropdown Button -->
-      <div ref="categoryDropdownRef" class="relative shrink-0 flex items-center">
-        <button
-          type="button"
-          :aria-expanded="isCategoryDropdownOpen"
-          aria-haspopup="listbox"
-          class="relative whitespace-nowrap flex items-center gap-1.5 text-xs text-brand-ink font-semibold h-9 px-3 rounded-full hover:bg-brand-hairsoft transition-colors cursor-pointer before:content-[''] before:absolute before:-inset-y-1 before:inset-x-0"
-          @click="isCategoryDropdownOpen = !isCategoryDropdownOpen"
-        >
-          <span>{{ selectedCategory }}</span>
-          <svg
-            class="w-3 h-3 text-brand-muted shrink-0 transition-transform duration-200 origin-center"
-            :class="{ 'rotate-180': isCategoryDropdownOpen }"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </button>
-
-        <!-- Category Dropdown List -->
-        <Transition
-          enter-active-class="transition duration-150 ease-out"
-          enter-from-class="transform scale-95 opacity-0 -translate-y-1"
-          enter-to-class="transform scale-100 opacity-100 translate-y-0"
-          leave-active-class="transition duration-100 ease-in"
-          leave-from-class="transform scale-100 opacity-100 translate-y-0"
-          leave-to-class="transform scale-95 opacity-0 -translate-y-1"
-        >
-          <div
-            v-if="isCategoryDropdownOpen"
-            class="absolute left-0 top-full mt-2 w-56 max-h-64 overflow-y-auto bg-brand-canvas border border-brand-hair rounded-card shadow-floating p-1.5 z-50"
-          >
-            <button
-              v-for="cat in dropdownCategories"
-              :key="cat"
-              type="button"
-              class="w-full text-left px-3 py-2 text-xs font-medium text-brand-ink hover:bg-brand-canvas-soft rounded-field transition-colors flex items-center justify-between cursor-pointer border-0"
-              @click="handleSelectCategory(cat)"
-            >
-              <span>{{ cat }}</span>
-              <i
-                v-if="selectedCategory === cat"
-                class="pi pi-check text-[10px] text-brand-accent font-bold"
-              />
-            </button>
-          </div>
-        </Transition>
-      </div>
-
-      <span class="w-px h-5 bg-brand-hair mx-1 shrink-0" aria-hidden="true" />
-
       <input
         :value="searchQuery"
         type="search"

@@ -16,21 +16,13 @@ const { user, profile, isAdmin, isLoggedIn, fetchProfile, signOut } = useAuth()
 const cartStore = useCartStore()
 const wishlistStore = useWishlistStore()
 const notificationStore = useNotificationStore()
-const {
-  categories: dynamicCategories,
-  categoryMap: dynamicCategoryMap,
-  fetchCategories,
-} = useCategories()
+const { categories: dynamicCategories, fetchCategories } = useCategories()
 const router = useRouter()
 
 const isMobileMenuOpen = ref(false)
 const searchQuery = ref('')
-const selectedCategory = ref('Semua Kategori')
+const isScrolled = ref(false)
 
-const dropdownCategories = computed(() => [
-  'Semua Kategori',
-  ...dynamicCategories.value.map((c) => c.name),
-])
 const subNavCategories = computed(() => [
   { name: 'Semua Produk', path: '/katalog' },
   ...dynamicCategories.value.map((c) => ({ name: c.name, path: `/katalog?category=${c.slug}` })),
@@ -54,19 +46,23 @@ const handleSearch = () => {
   isMobileMenuOpen.value = false
 }
 
-const selectCategory = (cat: string) => {
-  selectedCategory.value = cat
-  const catSlug = dynamicCategoryMap.value[cat]
-  router.push(catSlug ? { path: '/katalog', query: { category: catSlug } } : '/katalog')
+const handleScroll = () => {
+  if (typeof window === 'undefined') return
+  isScrolled.value = window.scrollY > 30
 }
 
 onMounted(() => {
   fetchProfile().catch(() => {})
   fetchCategories().catch(() => {})
+  handleScroll()
+  window.addEventListener('scroll', handleScroll, { passive: true })
 })
 
 onBeforeUnmount(() => {
   notificationStore.cleanupRealtimeListener()
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('scroll', handleScroll)
+  }
 })
 
 watch(
@@ -133,13 +129,7 @@ const handleLogout = async () => {
         </NuxtLink>
 
         <!-- Center Search Bar -->
-        <NavbarSearchBar
-          v-model:search-query="searchQuery"
-          :selected-category="selectedCategory"
-          :dropdown-categories="dropdownCategories"
-          @search="handleSearch"
-          @select-category="selectCategory"
-        />
+        <NavbarSearchBar v-model:search-query="searchQuery" @search="handleSearch" />
 
         <!-- Right Commerce Actions -->
         <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -152,17 +142,19 @@ const handleLogout = async () => {
           <UiTooltip text="Wishlist" position="bottom" align="center">
             <NuxtLink
               to="/wishlist"
-              class="relative w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 no-underline cursor-pointer"
+              class="group relative w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-brand-ink transition-transform no-underline cursor-pointer"
               :aria-label="
                 wishlistStore.totalItems > 0
                   ? `Wishlist (${wishlistStore.totalItems} item)`
                   : 'Wishlist'
               "
             >
-              <i class="pi pi-heart text-base sm:text-lg text-brand-ink" />
+              <i
+                class="pi pi-heart text-base sm:text-lg text-brand-ink group-hover:scale-125 group-active:scale-95 transition-transform duration-200 ease-out origin-center"
+              />
               <span
                 v-if="wishlistStore.totalItems > 0"
-                class="absolute top-1 right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-brand-danger text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none"
+                class="absolute top-1 right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-brand-danger text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none group-hover:scale-110 transition-transform duration-200"
                 aria-hidden="true"
               >
                 {{ wishlistStore.totalItems > 99 ? '99+' : wishlistStore.totalItems }}
@@ -192,7 +184,7 @@ const handleLogout = async () => {
           <!-- Mobile Hamburger Trigger -->
           <button
             type="button"
-            class="md:hidden w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center hover:bg-brand-canvas-soft text-brand-ink transition-colors cursor-pointer active:scale-95"
+            class="md:hidden w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-brand-ink transition-colors cursor-pointer active:scale-95"
             aria-label="Buka menu navigasi"
             :aria-expanded="isMobileMenuOpen"
             @click="isMobileMenuOpen = !isMobileMenuOpen"
@@ -207,9 +199,14 @@ const handleLogout = async () => {
       </div>
     </div>
 
-    <!-- LAYER 3: Sub-Navigation Category Ribbon Bar -->
+    <!-- LAYER 3: Sub-Navigation Category Ribbon Bar (Melipat Saat Scroll) -->
     <div
-      class="w-full bg-brand-canvas-soft border-b border-brand-hairsoft py-2 overflow-x-auto [scrollbar-width:none]"
+      class="w-full bg-brand-canvas-soft border-brand-hairsoft transition-all duration-300 ease-in-out [scrollbar-width:none] overflow-hidden"
+      :class="[
+        isScrolled
+          ? 'max-h-0 opacity-0 py-0 border-b-0 -translate-y-2 pointer-events-none'
+          : 'max-h-14 opacity-100 py-2 border-b translate-y-0 overflow-x-auto',
+      ]"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         <nav

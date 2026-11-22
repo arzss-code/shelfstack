@@ -39,15 +39,17 @@ const {
       <button
         v-if="variant === 'dark'"
         type="button"
-        class="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-brand-canvas/10 transition-colors active:scale-95 cursor-pointer"
+        class="group relative w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-white/80 hover:text-white transition-colors cursor-pointer"
         aria-label="Lihat Notifikasi"
         :aria-expanded="isOpen"
         @click="toggleDropdown"
       >
-        <i class="pi pi-bell text-xs sm:text-sm text-white" />
+        <i
+          class="pi pi-bell text-xs sm:text-sm text-white group-hover:scale-125 group-active:scale-95 transition-transform duration-200 ease-out origin-center"
+        />
         <span
           v-if="unreadCount > 0"
-          class="absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-1 ring-brand-ink tabular-nums shadow-xs leading-none"
+          class="absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-1 ring-brand-ink tabular-nums shadow-xs leading-none group-hover:scale-110 transition-transform duration-200"
         >
           {{ unreadCount > 99 ? '99+' : unreadCount }}
         </span>
@@ -56,15 +58,17 @@ const {
       <button
         v-else
         type="button"
-        class="relative w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-brand-ink hover:bg-brand-canvas-soft transition-colors active:scale-95 cursor-pointer"
+        class="group relative w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-brand-ink transition-transform cursor-pointer"
         aria-label="Lihat Notifikasi"
         :aria-expanded="isOpen"
         @click="toggleDropdown"
       >
-        <i class="pi pi-bell text-base sm:text-lg text-brand-ink" />
+        <i
+          class="pi pi-bell text-base sm:text-lg text-brand-ink group-hover:scale-125 group-active:scale-95 transition-transform duration-200 ease-out origin-center"
+        />
         <span
           v-if="unreadCount > 0"
-          class="absolute top-1 right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-brand-danger text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none"
+          class="absolute top-1 right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-brand-danger text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none group-hover:scale-110 transition-transform duration-200"
         >
           {{ unreadCount > 99 ? '99+' : unreadCount }}
         </span>

@@ -1,7 +1,18 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useId, watch } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useAttrs,
+  useId,
+  useSlots,
+  watch,
+} from 'vue'
 
 const attrs = useAttrs()
+const slots = useSlots()
 const isPositioned = computed(() => {
   return (
     typeof attrs.class === 'string' && /(?:^|\s)(absolute|fixed|sticky)(?:\s|$)/.test(attrs.class)
@@ -125,7 +136,7 @@ function updatePosition() {
 }
 
 function handleMouseEnter() {
-  if (props.disabled || (!props.text && !attrs.content)) return
+  if (props.disabled || (!props.text && !slots.content)) return
   updatePosition()
   isVisible.value = true
 }
