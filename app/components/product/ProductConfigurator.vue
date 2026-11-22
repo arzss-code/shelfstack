@@ -81,7 +81,7 @@ watch(
       </div>
 
       <h1
-        class="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-brand-ink leading-tight m-0 mb-3"
+        class="font-display text-2xl sm:text-3xl font-bold text-brand-ink tracking-tight leading-snug m-0 mb-2.5"
       >
         {{ product.name }}
       </h1>

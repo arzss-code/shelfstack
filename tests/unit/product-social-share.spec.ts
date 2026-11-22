@@ -26,6 +26,9 @@ describe('ProductSocialShare.vue', () => {
   }
 
   const globalStubs = {
+    ClientOnly: {
+      template: '<div><slot /></div>',
+    },
     UiTooltip: {
       template: '<div><slot /></div>',
       props: ['text', 'position'],

@@ -293,7 +293,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     gallery_urls: [
       '/images/products/field-watch-black.jpg',
       '/images/products/field-watch-olive.jpg',
-      '/images/products/field-watch-black-angle.jpg',
+      '/images/products/field-watch-angle.jpg',
     ],
     weight_grams: 160,
     specs: {
