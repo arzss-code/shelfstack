@@ -40,7 +40,7 @@ const {
 
 <template>
   <article
-    class="product-card group relative isolate flex flex-col bg-brand-canvas rounded-card border border-brand-hair hover:border-brand-muted/40 shadow-whisper hover:shadow-floating transition-shadow duration-200 cursor-pointer overflow-hidden"
+    class="product-card group relative isolate flex flex-col bg-brand-canvas rounded-card border border-brand-hair hover:border-brand-muted/40 shadow-whisper hover:shadow-floating transition-shadow duration-200 cursor-pointer"
     @click="navigateToDetail"
   >
     <!-- Stretched Semantic Link for Accessibility, Hover URL & SEO -->
