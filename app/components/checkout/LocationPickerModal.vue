@@ -100,7 +100,7 @@ const {
               class="flex-1 py-1.5 px-2 rounded-full text-center text-xs font-semibold transition-all cursor-pointer border-0"
               :class="[
                 activeTab === t.key
-                  ? 'bg-brand-ink text-white shadow-whisper'
+                  ? 'bg-brand-ink text-brand-onink shadow-whisper'
                   : 'text-brand-muted hover:text-brand-ink hover:bg-brand-canvas',
                 isTabDisabled(t.key) ? 'opacity-35 pointer-events-none' : '',
               ]"

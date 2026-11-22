@@ -140,7 +140,7 @@ const couponExtraInfo = computed(() => {
     >
       <div class="flex items-center gap-2.5 min-w-0">
         <div
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-accent-tint text-brand-accent group-hover:bg-brand-ink group-hover:text-white transition-colors"
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-accent-tint text-brand-accent group-hover:bg-brand-ink group-hover:text-brand-onink transition-colors"
         >
           <i class="pi pi-ticket text-xs" />
         </div>

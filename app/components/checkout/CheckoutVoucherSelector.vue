@@ -210,7 +210,7 @@ const couponExtraInfo = computed(() => {
         <div class="flex items-center gap-1.5 shrink-0">
           <button
             type="button"
-            class="rounded-lg bg-brand-ink px-2.5 py-1 text-xs font-bold text-white hover:bg-brand-ink/90 transition-colors shadow-whisper cursor-pointer border-0 disabled:cursor-not-allowed disabled:opacity-50"
+            class="rounded-lg bg-brand-ink px-2.5 py-1 text-xs font-bold text-brand-onink hover:bg-brand-ink/90 transition-colors shadow-whisper cursor-pointer border-0 disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="props.disabled"
             @click="handleApplyBest"
           >
@@ -242,7 +242,7 @@ const couponExtraInfo = computed(() => {
     >
       <div class="flex items-center gap-2.5 min-w-0">
         <div
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-accent-tint text-brand-accent group-hover:bg-brand-ink group-hover:text-white transition-colors"
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-accent-tint text-brand-accent group-hover:bg-brand-ink group-hover:text-brand-onink transition-colors"
         >
           <i class="pi pi-ticket text-xs" />
         </div>

@@ -103,7 +103,7 @@ const isTabActive = (tabPath: string) => {
       <div class="flex min-w-0 items-center gap-3.5 sm:gap-4">
         <div class="relative shrink-0">
           <div
-            class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-ink font-display font-bold text-lg text-white shadow-whisper sm:h-14 sm:w-14 sm:text-xl"
+            class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-ink font-display font-bold text-lg text-brand-onink shadow-whisper sm:h-14 sm:w-14 sm:text-xl"
           >
             {{ initial }}
           </div>
@@ -164,7 +164,7 @@ const isTabActive = (tabPath: string) => {
         <span>{{ tab.label }}</span>
         <span
           v-if="tab.badge !== undefined && tab.badge > 0"
-          class="ml-1 rounded-full bg-brand-ink px-1.5 py-0.5 font-bold text-[10px] text-white tabular-nums leading-none"
+          class="ml-1 rounded-full bg-brand-ink px-1.5 py-0.5 font-bold text-[10px] text-brand-onink tabular-nums leading-none"
         >
           {{ tab.badge }}
         </span>

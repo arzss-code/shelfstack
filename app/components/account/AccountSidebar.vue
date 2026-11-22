@@ -134,7 +134,7 @@ const handleLogout = () => {
             />
             <div
               v-else
-              class="flex h-full w-full items-center justify-center bg-brand-ink font-display font-bold text-base text-white"
+              class="flex h-full w-full items-center justify-center bg-brand-ink font-display font-bold text-base text-brand-onink"
             >
               {{ initial }}
             </div>
@@ -175,7 +175,7 @@ const handleLogout = () => {
               class="flex items-center justify-between rounded-field px-3 py-2 font-medium text-xs no-underline transition-all"
               :class="[
                 isItemActive(item.to)
-                  ? 'bg-brand-ink font-semibold text-white shadow-xs'
+                  ? 'bg-brand-ink font-semibold text-brand-onink shadow-xs'
                   : 'text-brand-ink hover:bg-brand-canvas-soft',
               ]"
             >
@@ -184,7 +184,7 @@ const handleLogout = () => {
                   :class="[
                     item.icon,
                     'text-xs',
-                    isItemActive(item.to) ? 'text-white' : 'text-brand-muted',
+                    isItemActive(item.to) ? 'text-brand-onink' : 'text-brand-muted',
                   ]"
                 />
                 <span>{{ item.label }}</span>
@@ -195,7 +195,7 @@ const handleLogout = () => {
                 :class="[
                   isItemActive(item.to)
                     ? 'bg-brand-canvas text-brand-ink'
-                    : 'bg-brand-ink text-white',
+                    : 'bg-brand-ink text-brand-onink',
                 ]"
               >
                 {{ item.badge }}
@@ -235,7 +235,7 @@ const handleLogout = () => {
             />
             <div
               v-else
-              class="flex h-full w-full items-center justify-center bg-brand-ink font-display font-bold text-sm text-white"
+              class="flex h-full w-full items-center justify-center bg-brand-ink font-display font-bold text-sm text-brand-onink"
             >
               {{ initial }}
             </div>
@@ -272,7 +272,7 @@ const handleLogout = () => {
           <span>{{ tab.label }}</span>
           <span
             v-if="tab.badge !== undefined && tab.badge > 0"
-            class="ml-0.5 rounded-full bg-brand-ink px-1.5 py-0.2 font-bold text-[9px] text-white tabular-nums leading-none"
+            class="ml-0.5 rounded-full bg-brand-ink px-1.5 py-0.2 font-bold text-[9px] text-brand-onink tabular-nums leading-none"
           >
             {{ tab.badge }}
           </span>

@@ -76,7 +76,7 @@ watch(
           :class="[
             'flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer border-0',
             activeTab === 'wallet'
-              ? 'bg-brand-ink text-white shadow-whisper'
+              ? 'bg-brand-ink text-brand-onink shadow-whisper'
               : 'text-brand-muted hover:text-brand-ink bg-transparent hover:bg-brand-canvas-soft',
           ]"
           @click="activeTab = 'wallet'"
@@ -88,7 +88,7 @@ watch(
             :class="[
               'rounded-full px-1.5 py-0.2 text-[9.5px]',
               activeTab === 'wallet'
-                ? 'bg-white/20 text-white'
+                ? 'bg-brand-onink/20 text-brand-onink'
                 : 'bg-brand-hairsoft text-brand-ink',
             ]"
           >
@@ -101,7 +101,7 @@ watch(
           :class="[
             'flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer border-0',
             activeTab === 'public'
-              ? 'bg-brand-ink text-white shadow-whisper'
+              ? 'bg-brand-ink text-brand-onink shadow-whisper'
               : 'text-brand-muted hover:text-brand-ink bg-transparent hover:bg-brand-canvas-soft',
           ]"
           @click="activeTab = 'public'"
@@ -113,7 +113,7 @@ watch(
             :class="[
               'rounded-full px-1.5 py-0.2 text-[9.5px]',
               activeTab === 'public'
-                ? 'bg-white/20 text-white'
+                ? 'bg-brand-onink/20 text-brand-onink'
                 : 'bg-brand-hairsoft text-brand-ink',
             ]"
           >

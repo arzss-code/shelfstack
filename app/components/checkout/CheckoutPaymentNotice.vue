@@ -20,7 +20,7 @@ const paymentChannels = ['QRIS', 'GoPay', 'ShopeePay', 'BCA VA', 'Mandiri VA', '
     <div class="p-4 bg-brand-canvas-soft/60 rounded-xl border border-brand-hairsoft space-y-3">
       <div class="flex items-start gap-3">
         <div
-          class="w-8 h-8 rounded-lg bg-brand-ink text-white flex items-center justify-center shrink-0 mt-0.5"
+          class="w-8 h-8 rounded-lg bg-brand-ink text-brand-onink flex items-center justify-center shrink-0 mt-0.5"
         >
           <i class="pi pi-shield text-sm" />
         </div>

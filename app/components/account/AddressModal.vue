@@ -163,7 +163,7 @@ const handleSubmit = () => {
             class="px-3 py-2 rounded-field text-xs font-medium border flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95"
             :class="[
               selectedLabel === item.id
-                ? 'bg-brand-ink text-white border-brand-ink shadow-xs font-semibold'
+                ? 'bg-brand-ink text-brand-onink border-brand-ink shadow-xs font-semibold'
                 : 'bg-brand-canvas text-brand-ink border-brand-hair hover:bg-brand-canvas-soft',
             ]"
             @click="selectedLabel = item.id"

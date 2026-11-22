@@ -91,7 +91,7 @@ const handleClaimCoupon = async (couponId: string) => {
                 class="px-3 py-1.5 rounded-field text-xs font-bold transition-all cursor-pointer border-0"
                 :class="
                   activeTab === 'claimed'
-                    ? 'bg-brand-ink text-white shadow-whisper'
+                    ? 'bg-brand-ink text-brand-onink shadow-whisper'
                     : 'text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft'
                 "
                 @click="activeTab = 'claimed'"
@@ -104,7 +104,7 @@ const handleClaimCoupon = async (couponId: string) => {
                 class="px-3 py-1.5 rounded-field text-xs font-bold transition-all cursor-pointer border-0"
                 :class="
                   activeTab === 'discoverable'
-                    ? 'bg-brand-ink text-white shadow-whisper'
+                    ? 'bg-brand-ink text-brand-onink shadow-whisper'
                     : 'text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft'
                 "
                 @click="activeTab = 'discoverable'"
@@ -117,7 +117,7 @@ const handleClaimCoupon = async (couponId: string) => {
                 class="px-3 py-1.5 rounded-field text-xs font-bold transition-all cursor-pointer border-0"
                 :class="
                   activeTab === 'history'
-                    ? 'bg-brand-ink text-white shadow-whisper'
+                    ? 'bg-brand-ink text-brand-onink shadow-whisper'
                     : 'text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft'
                 "
                 @click="activeTab = 'history'"

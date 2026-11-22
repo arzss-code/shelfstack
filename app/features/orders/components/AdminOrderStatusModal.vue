@@ -69,7 +69,7 @@ function handleCourierSelect(value: string | number | null) {
           />
           <button
             type="button"
-            class="px-3 py-2 text-xs font-semibold bg-brand-ink hover:bg-brand-inkhover text-white rounded-lg transition-colors cursor-pointer shrink-0 border-0"
+            class="px-3 py-2 text-xs font-semibold bg-brand-ink hover:bg-brand-inkhover text-brand-onink rounded-lg transition-colors cursor-pointer shrink-0 border-0"
             @click="emit('autoGenerateTracking')"
           >
             Resi Otomatis

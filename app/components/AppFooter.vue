@@ -6,11 +6,11 @@ const { isLoggedIn, isAdmin } = useAuth()
 
 <template>
   <footer
-    class="w-full bg-brand-ink text-white rounded-t-card mt-16 border-t border-brand-hairsoft overflow-hidden"
+    class="w-full bg-brand-strip text-white rounded-t-card mt-16 border-t border-white/10 overflow-hidden"
   >
     <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12 md:py-16">
       <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-brand-ink-soft"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-white/10"
       >
         <!-- Brand Info Column -->
         <div class="lg:col-span-4 flex flex-col items-start gap-4">
@@ -23,7 +23,7 @@ const { isLoggedIn, isAdmin } = useAuth()
           </p>
 
           <div
-            class="mt-2 inline-flex items-center gap-2 bg-brand-ink-soft px-3.5 py-1.5 rounded-full text-xs font-medium text-white/90"
+            class="mt-2 inline-flex items-center gap-2 bg-white/10 px-3.5 py-1.5 rounded-full text-xs font-medium text-white/90"
           >
             <span class="w-1.5 h-1.5 rounded-full bg-brand-success" />
             <span>Layanan Pelanggan Aktif · 100% Produk Terverifikasi</span>

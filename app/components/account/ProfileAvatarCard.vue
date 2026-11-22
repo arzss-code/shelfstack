@@ -99,7 +99,7 @@ const handleDeleteAvatar = () => {
           />
           <div
             v-else
-            class="w-full h-full bg-brand-ink text-white font-display text-3xl font-bold flex items-center justify-center select-none"
+            class="w-full h-full bg-brand-ink text-brand-onink font-display text-3xl font-bold flex items-center justify-center select-none"
           >
             {{ initial }}
           </div>

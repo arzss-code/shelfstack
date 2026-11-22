@@ -45,7 +45,7 @@
           </div>
           <button
             type="submit"
-            class="px-5 py-2.5 rounded-full bg-brand-ink hover:bg-brand-inkhover text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer inline-flex items-center gap-2 shrink-0 shadow-whisper"
+            class="px-5 py-2.5 rounded-full bg-brand-ink hover:bg-brand-inkhover text-brand-onink text-xs sm:text-sm font-semibold transition-colors cursor-pointer inline-flex items-center gap-2 shrink-0 shadow-whisper"
             :disabled="isLoading"
           >
             <i v-if="isLoading" class="pi pi-spin pi-spinner text-xs" />

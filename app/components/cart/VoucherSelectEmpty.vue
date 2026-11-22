@@ -30,7 +30,7 @@ const emit = defineEmits<{
         </p>
         <button
           type="button"
-          class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-brand-ink px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-ink/90 transition-colors cursor-pointer border-0"
+          class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-brand-ink px-3 py-1.5 text-xs font-semibold text-brand-onink hover:bg-brand-ink/90 transition-colors cursor-pointer border-0"
           @click="emit('switchTab', 'public')"
         >
           <span>Lihat Promo Tersedia</span>
@@ -45,7 +45,7 @@ const emit = defineEmits<{
         </p>
         <button
           type="button"
-          class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-brand-ink px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-ink/90 transition-colors cursor-pointer border-0"
+          class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-brand-ink px-3 py-1.5 text-xs font-semibold text-brand-onink hover:bg-brand-ink/90 transition-colors cursor-pointer border-0"
           @click="emit('switchTab', 'public')"
         >
           <span>Jelajahi Promo Tersedia</span>
