@@ -20,9 +20,13 @@ on conflict (slug) do update set
   image_url = excluded.image_url,
   display_order = excluded.display_order;
 
--- 2.a Pembersihan Duplikasi Produk dari Eksekusi Seeder Sebelumnya
--- Menonaktifkan (soft delete) produk duplikat yang memiliki nama sama (pertahankan id terkecil yang aktif).
+-- 2.a Pembersihan Duplikasi & Data Dummy Produk dari Eksekusi Seeder Sebelumnya
+-- Menonaktifkan (soft delete) produk duplikat atau dummy yang memiliki nama sama atau ID demo lama.
 -- Soft delete menjaga keutuhan foreign key pada riwayat order_items lama.
+update public.products
+set deleted_at = now()
+where id in (8, 10, 11, 12) or name in ('Tambah baru', 'test edit lagi', 'tambah edit', 'Produk baru lagi');
+
 with duplicates as (
   select id,
          row_number() over (partition by name order by id asc) as rn
@@ -37,51 +41,370 @@ where id in (
 
 -- 2.b Seed Produk Kurasi ShelfStack
 -- Idempoten: Hanya insert jika produk aktif dengan nama yang sama belum ada di database
-insert into public.products (name, price, stock, description, image_url, category_id)
+insert into public.products (name, price, stock, description, image_url, category_id, weight_grams, specs, rating, review_count, sold_count, is_featured)
 select
-  v.name, v.price, v.stock, v.description, v.image_url, v.category_id
+  v.name, v.price, v.stock, v.description, v.image_url, v.category_id, v.weight_grams, v.specs, v.rating, v.review_count, v.sold_count, v.is_featured
 from (values
+  -- 1. Tech & Gadget
   (
     'Headphone Studio ANC',
     2680000,
     25,
     'Headphone nirkabel resolusi tinggi dengan peredam bising aktif hibrida, driver 40mm berdiafragma berilium, dan bantalan telinga busa memori.',
     'https://lh3.googleusercontent.com/aida-public/AB6AXuDwVY6_XJIJ--I5tlVeVHvg6ErT_oBXt2avwd8dlAuTVukdzmLAppAhyNQAGXm3rQFEX1mHUEJ1GZ0wxvknebBIyNihYqTnXUswGHZuBSXpTUJrW6irkYFSwJUdz3lXaf3SIaU32wSKZaVrV6lC7Krf-diQ9YtZ80tMZPN0gDm7158w3dT3TGRm9DJY3Zr0K4RKBXS_5cVnFyD0hA50xpvdjViEWoa2fQmCh6xzjHcub1jp-D9HREja',
-    (select id from public.categories where slug = 'tech')
+    (select id from public.categories where slug = 'tech'),
+    500,
+    '{"driver": "40mm Beryllium", "anc": "Hybrid ANC -40dB", "battery": "38 Hours"}'::jsonb,
+    5.00,
+    1,
+    0,
+    false
   ),
+  (
+    'Keyboard Mekanikal Nirkabel 75%',
+    1450000,
+    32,
+    'Keyboard mekanikal nirkabel 75% dengan sasis aluminium CNC anodized, hot-swappable switches, keycap PBT dye-sublimated, dan peredam suara gasket ganda.',
+    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'tech'),
+    850,
+    '{"konektivitas": "Bluetooth 5.2 / 2.4GHz / Type-C", "layout": "75% Compact (82 Keys)", "baterai": "4000mAh"}'::jsonb,
+    4.95,
+    24,
+    58,
+    true
+  ),
+  (
+    'Tetikus Ergonomis Nirkabel Precision',
+    890000,
+    28,
+    'Mouse ergonomis presisi dengan sensor optik 26.000 DPI, roda putar logam elektromagnetik, dan daya tahan baterai hingga 70 hari.',
+    'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'tech'),
+    140,
+    '{"sensor": "Darkfield 26K DPI", "baterai": "500mAh", "konektivitas": "USB / Bluetooth LE"}'::jsonb,
+    4.88,
+    19,
+    42,
+    false
+  ),
+  (
+    'Pengisi Daya GaN 100W Multi-Port',
+    499000,
+    50,
+    'Adaptor daya cepat GaN III 100W dengan 3 port USB-C dan 1 port USB-A, mendukung pengisian daya laptop dan smartphone secara simultan.',
+    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'tech'),
+    220,
+    '{"daya_maksimal": "100W Power Delivery 3.0", "port": "3x USB-C + 1x USB-A"}'::jsonb,
+    4.92,
+    36,
+    85,
+    false
+  ),
+  (
+    'Stand Laptop Ergonomis Aluminium',
+    320000,
+    4,
+    'Dudukan laptop berbahan aluminium aeronautika dengan sirkulasi udara optimal dan kemiringan ergonomis untuk mengurangi ketegangan leher.',
+    'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'tech'),
+    650,
+    '{"material": "Anodized Aircraft Aluminum", "kompatibilitas": "Laptop 11-17 inci"}'::jsonb,
+    4.85,
+    15,
+    34,
+    false
+  ),
+
+  -- 2. Furnitur & Ruang Kerja
   (
     'Lampu Meja Task Aluminium',
     850000,
     18,
     'Lampu meja fleksibel berbahan aluminium anodized dengan kontrol sentuh peredupan halus dan temperatur cahaya alami.',
     'https://lh3.googleusercontent.com/aida-public/AB6AXuBhuBSFbEmAvUs-dIR2YRW-AgUpd_FXgqc62yOMrFXAqiJxphILJy3g73g9zMSiczWs5C_QAJAN1CjOVg_pzST382d0uUBGS5pFhsCPOFK1nOrZaHe-97eQ5JqcvSwsi3UzEkT3yFNe2vkYGKvByoxn2fF4xlojiv56WR8B1rwrUZFxLT-WZVzHWHvp1T17Fqfe44ym_WRhnIIM_2T_g3dkxEIvLv9oyO86-o48wqWDKZfPrK2obggw',
-    (select id from public.categories where slug = 'furniture')
+    (select id from public.categories where slug = 'furniture'),
+    1200,
+    '{"material": "Anodized Aluminum", "temperature": "2700K - 6500K", "cct": "Stepless Dimming"}'::jsonb,
+    4.90,
+    14,
+    26,
+    false
   ),
   (
-    'Tas Komuter EDC Ballistic',
-    1120000,
-    12,
-    'Tas komuter harian berkapasitas 20L dengan material nilon Cordura 1000D anti air, ritsleting YKK AquaGuard, dan kompartemen laptop 16 inci empuk.',
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuCaW1aKJlLR-zy1At4XWYvwZTHyVzcedxmF5czH_xXSLAw5u-HsTZgUrlfag8Lcz8Wy41SeSwYS-HeeyVsHZK3HIKWSVxEmb50sDQgwEwzPqy8Tk7DfzdvdVw4uC3VyiWSo8w_SV806yxW6xxj4tygQ5PGNzL4_0kdeany5eVB7SlX4r2_9T2mzzvz4Eqy6YNr5Hqd0-C230EfZJntIcrv_ptSdiTpKbYG9ESr-91MiSkickFdwXSq7',
-    (select id from public.categories where slug = 'lifestyle')
+    'Meja Kerja Modular Solid Oak',
+    3250000,
+    8,
+    'Meja kerja minimalis permukaan kayu solid oak berperekat ramah lingkungan, rangka baja kokoh berlapis powder coating, dan tray manajemen kabel.',
+    'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'furniture'),
+    24000,
+    '{"dimensi": "140cm x 70cm x 75cm", "material_top": "Solid White Oak Wood", "kapasitas": "120 kg"}'::jsonb,
+    5.00,
+    11,
+    18,
+    true
   ),
+  (
+    'Kursi Ergonomis Mesh Pro',
+    2890000,
+    14,
+    'Kursi kerja ergonomis dengan sandaran punggung jaring elastis, penopang lumbar adaptif 3D, dan mekanisme sinkronisasi multi-posisi.',
+    'https://images.unsplash.com/photo-1580481077195-731da03fed7e?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'furniture'),
+    18500,
+    '{"sandaran": "Korean Breathable Mesh", "lumbar": "Dynamic 3D Adaptive", "gaslift": "Class-4"}'::jsonb,
+    4.90,
+    28,
+    45,
+    false
+  ),
+  (
+    'Tatakan Monitor Kayu Walnut',
+    680000,
+    22,
+    'Stand monitor ganda berbahan kayu walnut alami dengan rak bawah aluminium untuk menyimpan keyboard dan perlengkapan meja kerja.',
+    'https://images.unsplash.com/photo-1593062096033-9a26b09da705?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'furniture'),
+    2800,
+    '{"dimensi": "105cm x 23cm x 11cm", "material": "American Solid Walnut Wood"}'::jsonb,
+    4.88,
+    20,
+    39,
+    false
+  ),
+  (
+    'Desk Mat Kulit Vegan Minimalis',
+    210000,
+    3,
+    'Alas meja kerja kulit vegan premium tahan tumpahan air, permukaan halus untuk pergerakan mouse presisi, dan lapisan dasar suede anti-slip.',
+    'https://images.unsplash.com/photo-1616440347437-b1c73416efc2?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'furniture'),
+    480,
+    '{"dimensi": "80cm x 40cm", "material": "PU Vegan Leather + Cork Backing"}'::jsonb,
+    4.82,
+    14,
+    51,
+    false
+  ),
+
+  -- 3. Rumah & Dapur
   (
     'Ketel Leher Angsa Matte Black',
     780000,
     15,
     'Ketel seduh pour-over presisi dengan cerat leher angsa, termometer terintegrasi, dan pegangan kayu walnut ergonomis.',
     'https://lh3.googleusercontent.com/aida-public/AB6AXuD9s-kQe4Pj_sE28_vB6v6-tA775o0T8tQnF9-4_kL_o21s3eA7xG9bT9hG8r_3v_m231_2o_pL4r5-w2k7qE9n_vL3k2x0_vB6',
-    (select id from public.categories where slug = 'home')
+    (select id from public.categories where slug = 'home'),
+    800,
+    '{"kapasitas": "1000 ml", "material": "Stainless Steel 304", "finishing": "Matte Powder Coating"}'::jsonb,
+    4.90,
+    19,
+    33,
+    false
   ),
+  (
+    'Dripper Kopi Keramik Pour-Over V60',
+    285000,
+    35,
+    'Alat seduh kopi keramik manual dengan alur spiral internal untuk laju aliran air seimbang dan ekstraksi aroma kopi yang kaya.',
+    'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'home'),
+    420,
+    '{"material": "Arita Ceramic Porcelain", "kapasitas": "1-4 Cups", "perawatan": "Dishwasher Safe"}'::jsonb,
+    4.94,
+    31,
+    72,
+    false
+  ),
+  (
+    'Penggiling Kopi Manual Stainless Steel',
+    460000,
+    20,
+    'Penggiling biji kopi tangan dengan mata pisau kerucut stainless 420 presisi dan poros ganda untuk keseragaman gilingan espresso hingga pour-over.',
+    'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'home'),
+    580,
+    '{"mata_burr": "CNC 420 Stainless Steel", "kapasitas": "30g Beans"}'::jsonb,
+    4.90,
+    22,
+    48,
+    false
+  ),
+  (
+    'Gelas Kaca Borosilikat Double-Wall 350ml',
+    125000,
+    60,
+    'Cangkir kopi kaca dinding ganda tahan panas borosilikat, menjaga suhu minuman hangat atau dingin tanpa kondensasi pada dinding luar.',
+    'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'home'),
+    210,
+    '{"kapasitas": "350 ml", "material": "Borosilicate Glass (-20°C to 150°C)"}'::jsonb,
+    4.86,
+    42,
+    110,
+    false
+  ),
+  (
+    'Wadah Biji Kopi Kedap Udara Vakum',
+    240000,
+    45,
+    'Toples penyimpanan kopi dengan katup pelepas gas CO2 satu arah dan segel silikon rapat untuk menjaga kesegaran roasted beans.',
+    'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'home'),
+    390,
+    '{"kapasitas": "500 gram (1.2L)", "material": "Stainless Steel 304"}'::jsonb,
+    4.88,
+    18,
+    36,
+    false
+  ),
+
+  -- 4. Pakaian & Aksesoris
+  (
+    'Tas Komuter EDC Ballistic',
+    1120000,
+    12,
+    'Tas komuter harian berkapasitas 20L dengan material nilon Cordura 1000D anti air, ritsleting YKK AquaGuard, dan kompartemen laptop 16 inci empuk.',
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuCaW1aKJlLR-zy1At4XWYvwZTHyVzcedxmF5czH_xXSLAw5u-HsTZgUrlfag8Lcz8Wy41SeSwYS-HeeyVsHZK3HIKWSVxEmb50sDQgwEwzPqy8Tk7DfzdvdVw4uC3VyiWSo8w_SV806yxW6xxj4tygQ5PGNzL4_0kdeany5eVB7SlX4r2_9T2mzzvz4Eqy6YNr5Hqd0-C230EfZJntIcrv_ptSdiTpKbYG9ESr-91MiSkickFdwXSq7',
+    (select id from public.categories where slug = 'lifestyle'),
+    850,
+    '{"material": "Cordura 1000D Nylon", "kapasitas": "20 Liter", "ritsleting": "YKK AquaGuard"}'::jsonb,
+    4.90,
+    21,
+    35,
+    false
+  ),
+  (
+    'Dompet Kartu Kulit Nabati Slim',
+    295000,
+    30,
+    'Dompet kartu saku tipis berbahan kulit sapi nabati dengan lapisan pemblokir RFID, 6 slot kartu, dan kompartemen uang tunai lipat.',
+    'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'lifestyle'),
+    85,
+    '{"material": "Vegetable Tanned Leather", "fitur": "RFID Blocking Protection"}'::jsonb,
+    4.91,
+    27,
+    64,
+    false
+  ),
+  (
+    'Jam Tangan Lapangan Otomatis Field Watch',
+    1850000,
+    10,
+    'Jam tangan bergaya militer dengan kaca kristal safir anti gores, mesin otomatis 24 permata, jarum berpendar superluminova, dan strap kanvas tahan air.',
+    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'lifestyle'),
+    160,
+    '{"diameter": "38 mm", "kaca": "Sapphire Crystal AR", "water_resistance": "100m / 10 ATM"}'::jsonb,
+    4.96,
+    16,
+    29,
+    true
+  ),
+  (
+    'Kaus Katun Organik Heavyweight 240gsm',
+    195000,
+    50,
+    'Kaus oblong kasual berbahan 100% serat katun organik pilihan dengan gramasi padat 240gsm, berpotongan santai dan tahan susut.',
+    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'lifestyle'),
+    280,
+    '{"gramasi": "240 GSM Heavyweight Cotton", "sertifikasi": "GOTS Organic"}'::jsonb,
+    4.84,
+    38,
+    95,
+    false
+  ),
+  (
+    'Topi Baseball Katun Washed Unstructured',
+    165000,
+    40,
+    'Topi 6-panel klasik berbahan katun twill washed yang lembut dengan gesper pengatur kuningan antik di bagian belakang.',
+    'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'lifestyle'),
+    95,
+    '{"material": "100% Washed Cotton Twill", "penutup": "Antique Brass Slider"}'::jsonb,
+    4.80,
+    21,
+    47,
+    false
+  ),
+
+  -- 5. Alat Tulis & Kerajinan
   (
     'Pena Gel Presisi Titanium',
     340000,
     40,
     'Pena berbahan bodi titanium padat dengan mekanisme bolt-action tahan banting dan isi ulang standar internasional Schmidt EasyFlow.',
     'https://lh3.googleusercontent.com/aida-public/AB6AXuCtGtrTCVBPJytnec8yoiKZ2iY9yzFgcAGMVbDl8vffvV6ZEoNZFfgeDAQvYGDQ9PHSAAxfVK2j8hKUAZ8b8VxmoAnLrSjVNR8ihTPjQ6pP4gUAImGZd2tG7Lzf12mjzZ9daMM6X8wl7uLjiCTNo0sgJqsJX1aqeuE6NGKVIOcdjxjMbFEaL7kqquFVa0SMIXQWDpPCysw4-xUBBBhXrgB7_alEgVQ5G1N_PIViWD7Wd3vqGT2JE6cr',
-    (select id from public.categories where slug = 'stationery')
+    (select id from public.categories where slug = 'stationery'),
+    65,
+    '{"material": "Grade 5 Titanium", "mekanisme": "Bolt-Action", "refill": "Schmidt EasyFlow 9000"}'::jsonb,
+    4.95,
+    28,
+    62,
+    false
+  ),
+  (
+    'Jurnal Grid Hardcover Kertas 120gsm',
+    175000,
+    55,
+    'Buku catatan bersampul kain linen hardcover dengan 192 halaman kertas dot grid 120gsm bebas asam yang ramah terhadap tinta pena basah.',
+    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'stationery'),
+    410,
+    '{"ukuran": "A5 (148 x 210 mm)", "kertas": "120 GSM Acid-Free", "halaman": "192 Pages Dot Grid"}'::jsonb,
+    4.93,
+    35,
+    88,
+    false
+  ),
+  (
+    'Penggaris Segitiga Arsitek Aluminium',
+    135000,
+    70,
+    'Penggaris skala drafting arsitektural paduan aluminium padat dengan grafir angka laser tahan luntur dan kode warna pada setiap sisinya.',
+    'https://images.unsplash.com/photo-1589365278144-c9e705f843ba?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'stationery'),
+    130,
+    '{"panjang": "30 cm", "material": "Solid Anodized Aluminum Alloy"}'::jsonb,
+    4.89,
+    19,
+    53,
+    false
+  ),
+  (
+    'Tempat Pensil Kulit Gulung Handcrafted',
+    240000,
+    25,
+    'Gulungan tempat alat tulis berbahan kulit asli samak nabati dengan 5 slot elastis untuk pena favorit dan tali pengikat kulit melingkar.',
+    'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'stationery'),
+    145,
+    '{"material": "Crazy Horse Genuine Leather", "kapasitas": "5-6 Pens"}'::jsonb,
+    4.87,
+    17,
+    39,
+    false
+  ),
+  (
+    'Klip Kertas Kuningan Solid Vintage (Set 10)',
+    85000,
+    90,
+    'Set 10 klip penjepit berkas dari kuningan murni tanpa lapisan cat yang akan menua membentuk patina anggun seiring waktu pemakaian.',
+    'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+    (select id from public.categories where slug = 'stationery'),
+    90,
+    '{"material": "Solid Brass", "isi": "10 Pcs Klip", "finishing": "Brushed Patina"}'::jsonb,
+    4.85,
+    29,
+    76,
+    false
   )
-) as v(name, price, stock, description, image_url, category_id)
+) as v(name, price, stock, description, image_url, category_id, weight_grams, specs, rating, review_count, sold_count, is_featured)
 where not exists (
   select 1 from public.products p
   where p.name = v.name and p.deleted_at is null
