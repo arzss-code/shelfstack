@@ -62,8 +62,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Matte Obsidian',
       colorClass: 'bg-[#18181b]',
-      image_url:
-        'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/keyboard-75-black.jpg',
     },
     price_cents: 145000000,
     stock: 16,
@@ -75,8 +74,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Chalk White',
       colorClass: 'bg-[#f4f4f5]',
-      image_url:
-        'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/keyboard-75-white.jpg',
     },
     price_cents: 145000000,
     stock: 10,
@@ -88,8 +86,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Midnight Navy',
       colorClass: 'bg-[#1e293b]',
-      image_url:
-        'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/keyboard-75-navy.jpg',
     },
     price_cents: 149000000,
     stock: 6,
@@ -101,8 +98,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Midnight Black',
       colorClass: 'bg-[#141414]',
-      image_url:
-        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/headphone-anc-black.jpg',
     },
     price_cents: 268000000,
     stock: 15,
@@ -114,8 +110,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Silver Titanium',
       colorClass: 'bg-[#d4d4d8]',
-      image_url:
-        'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/headphone-anc-silver.jpg',
     },
     price_cents: 278000000,
     stock: 10,
@@ -127,8 +122,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Space Gray',
       colorClass: 'bg-[#3f3f46]',
-      image_url:
-        'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/mouse-ergonomic-gray.jpg',
     },
     price_cents: 89000000,
     stock: 16,
@@ -140,8 +134,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Off White',
       colorClass: 'bg-[#f5f5f4]',
-      image_url:
-        'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/mouse-ergonomic-white.jpg',
     },
     price_cents: 89000000,
     stock: 12,
@@ -153,8 +146,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Stealth Black',
       colorClass: 'bg-[#18181b]',
-      image_url:
-        'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/charger-gan-black.jpg',
     },
     price_cents: 49900000,
     stock: 28,
@@ -166,8 +158,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Arctic White',
       colorClass: 'bg-[#fafafa]',
-      image_url:
-        'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/charger-gan-white.jpg',
     },
     price_cents: 49900000,
     stock: 22,
@@ -179,8 +170,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Space Silver',
       colorClass: 'bg-[#e2e8f0]',
-      image_url:
-        'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/laptop-stand-silver.jpg',
     },
     price_cents: 32000000,
     stock: 2,
@@ -192,8 +182,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Space Gray',
       colorClass: 'bg-[#475569]',
-      image_url:
-        'https://images.unsplash.com/photo-1616440347437-b1c73416efc2?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/desk-mat-black.jpg',
     },
     price_cents: 32000000,
     stock: 2,
@@ -207,8 +196,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Natural Oak',
       colorClass: 'bg-[#d97706]',
-      image_url:
-        'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/desk-oak-natural.jpg',
     },
     price_cents: 325000000,
     stock: 5,
@@ -220,8 +208,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Deep Walnut',
       colorClass: 'bg-[#451a03]',
-      image_url:
-        'https://images.unsplash.com/photo-1593062096033-9a26b09da705?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/desk-oak-walnut.jpg',
     },
     price_cents: 345000000,
     stock: 3,
@@ -233,8 +220,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'All Black',
       colorClass: 'bg-[#18181b]',
-      image_url:
-        'https://images.unsplash.com/photo-1580481077195-731da03fed7e?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/chair-mesh-black.jpg',
     },
     price_cents: 289000000,
     stock: 8,
@@ -246,8 +232,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Slate Gray',
       colorClass: 'bg-[#9ca3af]',
-      image_url:
-        'https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/chair-mesh-gray.jpg',
     },
     price_cents: 299000000,
     stock: 6,
@@ -259,8 +244,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Matte Black',
       colorClass: 'bg-[#18181b]',
-      image_url:
-        'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/lamp-task-black.jpg',
     },
     price_cents: 85000000,
     stock: 10,
@@ -272,8 +256,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Pure White',
       colorClass: 'bg-[#f8fafc]',
-      image_url:
-        'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/lamp-task-white.jpg',
     },
     price_cents: 85000000,
     stock: 8,
@@ -285,8 +268,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'American Walnut',
       colorClass: 'bg-[#451a03]',
-      image_url:
-        'https://images.unsplash.com/photo-1593062096033-9a26b09da705?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/desk-oak-walnut.jpg',
     },
     price_cents: 68000000,
     stock: 12,
@@ -298,8 +280,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'White Oak',
       colorClass: 'bg-[#d97706]',
-      image_url:
-        'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/desk-oak-natural.jpg',
     },
     price_cents: 68000000,
     stock: 10,
@@ -311,8 +292,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Carbon Black',
       colorClass: 'bg-[#18181b]',
-      image_url:
-        'https://images.unsplash.com/photo-1616440347437-b1c73416efc2?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/desk-mat-black.jpg',
     },
     price_cents: 21000000,
     stock: 2,
@@ -324,8 +304,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Cognac Brown',
       colorClass: 'bg-[#78350f]',
-      image_url:
-        'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/wallet-leather-tan.jpg',
     },
     price_cents: 21000000,
     stock: 1,
@@ -339,8 +318,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Chalk White',
       colorClass: 'bg-[#f8fafc]',
-      image_url:
-        'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/dripper-v60-white.jpg',
     },
     price_cents: 28500000,
     stock: 20,
@@ -352,8 +330,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Matte Black',
       colorClass: 'bg-[#1c1917]',
-      image_url:
-        'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/dripper-v60-black.jpg',
     },
     price_cents: 28500000,
     stock: 15,
@@ -365,8 +342,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Clear Glass',
       colorClass: 'bg-[#e2e8f0]',
-      image_url:
-        'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/glass-borosilicate-clear.jpg',
     },
     price_cents: 12500000,
     stock: 40,
@@ -378,8 +354,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Warm Amber',
       colorClass: 'bg-[#d97706]',
-      image_url:
-        'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/coffee-grinder-silver.jpg',
     },
     price_cents: 13500000,
     stock: 20,
@@ -391,8 +366,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Brushed Silver',
       colorClass: 'bg-[#cbd5e1]',
-      image_url:
-        'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/coffee-grinder-silver.jpg',
     },
     price_cents: 46000000,
     stock: 12,
@@ -404,8 +378,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Matte Obsidian',
       colorClass: 'bg-[#1c1917]',
-      image_url:
-        'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/coffee-canister-black.jpg',
     },
     price_cents: 46000000,
     stock: 8,
@@ -417,8 +390,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Matte Black',
       colorClass: 'bg-[#1c1917]',
-      image_url:
-        'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/coffee-canister-black.jpg',
     },
     price_cents: 24000000,
     stock: 25,
@@ -430,8 +402,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Stainless Steel',
       colorClass: 'bg-[#cbd5e1]',
-      image_url:
-        'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/glass-borosilicate-clear.jpg',
     },
     price_cents: 24000000,
     stock: 20,
@@ -445,8 +416,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Cognac Tan',
       colorClass: 'bg-[#92400e]',
-      image_url:
-        'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/wallet-leather-tan.jpg',
     },
     price_cents: 29500000,
     stock: 18,
@@ -458,8 +428,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Tactical Black',
       colorClass: 'bg-[#18181b]',
-      image_url:
-        'https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/wallet-leather-black.jpg',
     },
     price_cents: 29500000,
     stock: 12,
@@ -471,8 +440,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Olive Drab',
       colorClass: 'bg-[#3f4e38]',
-      image_url:
-        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/field-watch-olive.jpg',
     },
     price_cents: 185000000,
     stock: 6,
@@ -484,8 +452,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Stealth Black',
       colorClass: 'bg-[#18181b]',
-      image_url:
-        'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/field-watch-black.jpg',
     },
     price_cents: 185000000,
     stock: 4,
@@ -497,8 +464,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Tactical Black',
       colorClass: 'bg-[#09090b]',
-      image_url:
-        'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/backpack-edc-black.jpg',
     },
     price_cents: 112000000,
     stock: 8,
@@ -510,8 +476,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Olive Green',
       colorClass: 'bg-[#3f4e38]',
-      image_url:
-        'https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/backpack-edc-green.jpg',
     },
     price_cents: 112000000,
     stock: 4,
@@ -523,8 +488,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Off White',
       colorClass: 'bg-[#f4f4f5]',
-      image_url:
-        'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/tshirt-heavyweight-white.jpg',
     },
     price_cents: 19500000,
     stock: 28,
@@ -536,8 +500,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Deep Black',
       colorClass: 'bg-[#18181b]',
-      image_url:
-        'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/tshirt-heavyweight-black.jpg',
     },
     price_cents: 19500000,
     stock: 22,
@@ -551,8 +514,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Forest Green',
       colorClass: 'bg-[#14532d]',
-      image_url:
-        'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/journal-grid-green.jpg',
     },
     price_cents: 17500000,
     stock: 30,
@@ -564,8 +526,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Stonewashed Black',
       colorClass: 'bg-[#18181b]',
-      image_url:
-        'https://images.unsplash.com/photo-1531346878377-a5be20888e57?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/journal-grid-black.jpg',
     },
     price_cents: 17500000,
     stock: 25,
@@ -577,8 +538,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Raw Titanium',
       colorClass: 'bg-[#71717a]',
-      image_url:
-        'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/pen-titanium-raw.jpg',
     },
     price_cents: 34000000,
     stock: 25,
@@ -590,8 +550,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'DLC Matte Black',
       colorClass: 'bg-[#18181b]',
-      image_url:
-        'https://images.unsplash.com/photo-1585336261026-7f417f64243a?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/pen-titanium-black.jpg',
     },
     price_cents: 36000000,
     stock: 20,
@@ -603,8 +562,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Crazy Horse Brown',
       colorClass: 'bg-[#78350f]',
-      image_url:
-        'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/pen-titanium-raw.jpg',
     },
     price_cents: 24000000,
     stock: 15,
@@ -616,8 +574,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Natural Tan',
       colorClass: 'bg-[#b45309]',
-      image_url:
-        'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80',
+      image_url: '/images/products/wallet-leather-tan.jpg',
     },
     price_cents: 24000000,
     stock: 10,
