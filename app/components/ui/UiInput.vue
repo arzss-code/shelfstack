@@ -81,7 +81,7 @@ const effectiveInputMode = computed<'email' | 'tel' | 'url' | 'search' | 'decima
 const controlClass = computed(() => {
   const geometry =
     props.size === 'sm'
-      ? 'h-8 rounded-full pl-8 pr-3 text-xs'
+      ? 'h-9 rounded-full pl-8.5 pr-3 text-xs'
       : 'h-11 rounded-field pl-3.5 pr-3.5 text-sm'
   const border = props.error
     ? 'border-rose-300 focus:border-rose-500'

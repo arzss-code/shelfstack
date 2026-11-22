@@ -32,7 +32,7 @@ const {
 
 <template>
   <article
-    class="product-compact-card group relative flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-card border border-brand-hair bg-brand-canvas hover:border-brand-muted/40 shadow-whisper hover:shadow-floating transition-all duration-200 cursor-pointer overflow-hidden max-w-full"
+    class="product-compact-card group relative flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-card border border-brand-hair bg-brand-canvas hover:border-brand-muted/40 shadow-whisper hover:shadow-floating transition-all duration-200 cursor-pointer max-w-full"
     data-testid="product-compact-card"
     @click="navigateToDetail"
   >
