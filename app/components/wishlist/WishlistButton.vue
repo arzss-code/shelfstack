@@ -109,12 +109,16 @@ const handleToggle = (e: Event) => {
     v-else
     :text="isSaved ? 'Hapus dari Wishlist' : 'Simpan ke Wishlist'"
     position="bottom"
+    class="shrink-0"
   >
     <button
       type="button"
       :aria-label="isSaved ? 'Hapus dari Wishlist' : 'Simpan ke Wishlist'"
-      class="w-10 h-10 rounded-full border transition-all duration-200 flex items-center justify-center cursor-pointer shadow-xs active:scale-95"
+      class="rounded-full border transition-all duration-200 flex items-center justify-center cursor-pointer shadow-xs active:scale-95 shrink-0"
       :class="[
+        size === 'lg'
+          ? 'w-12 h-12 min-w-[48px] min-h-[48px]'
+          : 'w-10 h-10 min-w-[40px] min-h-[40px]',
         isSaved
           ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
           : 'bg-brand-canvas border-brand-ink/15 text-brand-muted hover:text-rose-600 hover:bg-brand-canvas-soft hover:border-brand-ink/30',
@@ -122,8 +126,9 @@ const handleToggle = (e: Event) => {
       @click="handleToggle"
     >
       <i
-        class="text-base transition-colors duration-200"
+        class="transition-colors duration-200"
         :class="[
+          size === 'lg' ? 'text-lg' : 'text-base',
           isSaved ? 'pi pi-heart-fill text-brand-danger' : 'pi pi-heart',
           isPopping ? 'animate-heart-pop' : '',
         ]"

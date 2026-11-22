@@ -210,15 +210,15 @@ watch(
     <!-- Quantity Stepper & Actions -->
     <div class="space-y-3 pt-2">
       <div class="flex items-center gap-3">
-        <!-- Stepper Pill -->
+        <!-- Stepper Pill (48px Ergonomic Height) -->
         <div
-          class="flex items-center bg-brand-field border border-brand-hair rounded-full p-1 shrink-0"
+          class="h-12 flex items-center bg-brand-field border border-brand-hair rounded-full px-1.5 shrink-0 shadow-xs"
         >
           <button
             type="button"
             aria-label="Kurangi jumlah"
             :disabled="quantity <= 1 || isOutOfStock"
-            class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-brand-canvas text-brand-ink flex items-center justify-center hover:bg-brand-canvas-soft transition-colors cursor-pointer border-0 disabled:opacity-40"
+            class="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-brand-canvas text-brand-ink flex items-center justify-center hover:bg-brand-canvas-soft active:scale-95 transition-all cursor-pointer border-0 disabled:opacity-40 shadow-xs"
             @click="decrementQty"
           >
             <i class="pi pi-minus text-xs" />
@@ -230,7 +230,7 @@ watch(
             pattern="[0-9]*"
             aria-label="Jumlah unit pesanan"
             :disabled="isOutOfStock"
-            class="w-12 text-center font-display font-bold text-sm text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-brand-canvas focus:ring-1 focus:ring-brand-accent/40 rounded-sm transition-all py-1 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            class="w-10 text-center font-display font-bold text-sm text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-brand-canvas focus:ring-1 focus:ring-brand-accent/40 rounded-sm transition-all py-1 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             @focus="($event.target as HTMLInputElement).select()"
             @input="handleQuantityInput"
             @blur="handleQuantityBlur"
@@ -240,17 +240,17 @@ watch(
             type="button"
             aria-label="Tambah jumlah"
             :disabled="quantity >= maxQuantity || isOutOfStock"
-            class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-brand-canvas text-brand-ink flex items-center justify-center hover:bg-brand-canvas-soft transition-colors cursor-pointer border-0 disabled:opacity-40"
+            class="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-brand-canvas text-brand-ink flex items-center justify-center hover:bg-brand-canvas-soft active:scale-95 transition-all cursor-pointer border-0 disabled:opacity-40 shadow-xs"
             @click="incrementQty"
           >
             <i class="pi pi-plus text-xs" />
           </button>
         </div>
 
-        <!-- Add to Bag Button using UiButton -->
+        <!-- Add to Bag Button using UiButton (48px Ergonomic Height) -->
         <UiButton
           variant="primary"
-          class="flex-1"
+          class="flex-1 h-12 text-sm font-semibold rounded-full"
           :disabled="isOutOfStock"
           icon="pi-shopping-bag"
           @click="handleAddToBag"
@@ -259,8 +259,8 @@ watch(
           <span v-else> Tambah ke Keranjang · {{ formatRupiah(effectivePrice * quantity) }} </span>
         </UiButton>
 
-        <!-- Wishlist Action Button -->
-        <WishlistButton :product="product" variant="inline" class="shrink-0" />
+        <!-- Wishlist Action Button (48px Ergonomic Height) -->
+        <WishlistButton :product="product" variant="inline" size="lg" />
       </div>
 
       <!-- Instant 1-Click Buy Action using UiButton -->
