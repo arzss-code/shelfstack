@@ -130,7 +130,7 @@ const resetSearch = () => {
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto space-y-6 pb-16">
+  <div class="space-y-6 pb-16">
     <!-- Breadcrumb -->
     <nav class="flex items-center gap-2 text-xs text-brand-muted mb-6" aria-label="Breadcrumb">
       <NuxtLink to="/" class="hover:text-brand-ink transition-colors no-underline">
