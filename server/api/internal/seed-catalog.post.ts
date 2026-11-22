@@ -11,6 +11,7 @@ interface SeedProductItem {
   stock: number
   description: string
   image_url: string
+  gallery_urls?: string[]
   weight_grams: number
   specs: Record<string, unknown>
   rating: number
@@ -28,8 +29,12 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 32,
     description:
       'Keyboard mekanikal nirkabel 75% dengan sasis aluminium CNC anodized, hot-swappable switches, keycap PBT dye-sublimated, dan peredam suara gasket ganda.',
-    image_url:
-      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/keyboard-75-black.jpg',
+    gallery_urls: [
+      '/images/products/keyboard-75-black.jpg',
+      '/images/products/keyboard-75-white.jpg',
+      '/images/products/keyboard-75-angle.jpg',
+    ],
     weight_grams: 850,
     specs: {
       konektivitas: 'Bluetooth 5.2 / 2.4GHz / Type-C',
@@ -49,8 +54,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 28,
     description:
       'Mouse ergonomis presisi dengan sensor optik 26.000 DPI, roda putar logam elektromagnetik, dan daya tahan baterai hingga 70 hari.',
-    image_url:
-      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/mouse-ergonomic-gray.jpg',
     weight_grams: 140,
     specs: {
       sensor: 'Darkfield High Precision 26K DPI',
@@ -69,8 +73,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 50,
     description:
       'Adaptor daya cepat GaN III 100W dengan 3 port USB-C dan 1 port USB-A, mendukung pengisian daya laptop dan smartphone secara simultan.',
-    image_url:
-      'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/charger-gan-black.jpg',
     weight_grams: 220,
     specs: {
       daya_maksimal: '100W Power Delivery 3.0',
@@ -89,8 +92,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 4,
     description:
       'Dudukan laptop berbahan aluminium aeronautika dengan sirkulasi udara optimal dan kemiringan ergonomis untuk mengurangi ketegangan leher.',
-    image_url:
-      'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/laptop-stand-silver.jpg',
     weight_grams: 650,
     specs: {
       material: 'Anodized Aircraft Aluminum',
@@ -111,8 +113,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 8,
     description:
       'Meja kerja minimalis permukaan kayu solid oak berperekat ramah lingkungan, rangka baja kokoh berlapis powder coating, dan tray manajemen kabel.',
-    image_url:
-      'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/desk-oak-natural.jpg',
     weight_grams: 24000,
     specs: {
       dimensi: '140cm x 70cm x 75cm',
@@ -132,8 +133,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 14,
     description:
       'Kursi kerja ergonomis dengan sandaran punggung jaring elastis, penopang lumbar adaptif 3D, dan mekanisme sinkronisasi multi-posisi.',
-    image_url:
-      'https://images.unsplash.com/photo-1580481077195-731da03fed7e?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/chair-mesh-black.jpg',
     weight_grams: 18500,
     specs: {
       sandaran: 'Korean Breathable Mesh',
@@ -152,8 +152,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 22,
     description:
       'Stand monitor ganda berbahan kayu walnut alami dengan rak bawah aluminium untuk menyimpan keyboard dan perlengkapan meja kerja.',
-    image_url:
-      'https://images.unsplash.com/photo-1593062096033-9a26b09da705?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/desk-oak-walnut.jpg',
     weight_grams: 2800,
     specs: {
       dimensi: '105cm x 23cm x 11cm',
@@ -172,8 +171,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 3,
     description:
       'Alas meja kerja kulit vegan premium tahan tumpahan air, permukaan halus untuk pergerakan mouse presisi, dan lapisan dasar suede anti-slip.',
-    image_url:
-      'https://images.unsplash.com/photo-1616440347437-b1c73416efc2?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/desk-mat-black.jpg',
     weight_grams: 480,
     specs: {
       dimensi: '80cm x 40cm',
@@ -194,8 +192,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 35,
     description:
       'Alat seduh kopi keramik manual dengan alur spiral internal untuk laju aliran air seimbang dan ekstraksi aroma kopi yang kaya.',
-    image_url:
-      'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/dripper-v60-white.jpg',
     weight_grams: 420,
     specs: {
       material: 'Arita Ceramic Porcelain',
@@ -214,8 +211,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 20,
     description:
       'Penggiling biji kopi tangan dengan mata pisau kerucut stainless 420 presisi dan poros ganda untuk keseragaman gilingan espresso hingga pour-over.',
-    image_url:
-      'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/coffee-grinder-silver.jpg',
     weight_grams: 580,
     specs: {
       mata_burr: 'CNC 420 Stainless Steel Conical',
@@ -234,8 +230,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 60,
     description:
       'Cangkir kopi kaca dinding ganda tahan panas borosilikat, menjaga suhu minuman hangat atau dingin tanpa kondensasi pada dinding luar.',
-    image_url:
-      'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/glass-borosilicate-clear.jpg',
     weight_grams: 210,
     specs: {
       kapasitas: '350 ml',
@@ -254,8 +249,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 45,
     description:
       'Toples penyimpanan kopi dengan katup pelepas gas CO2 satu arah dan segel silikon rapat untuk menjaga kesegaran roasted beans.',
-    image_url:
-      'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/coffee-canister-black.jpg',
     weight_grams: 390,
     specs: {
       kapasitas: '500 gram (1.2 Liter)',
@@ -276,8 +270,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 30,
     description:
       'Dompet kartu saku tipis berbahan kulit sapi nabati dengan lapisan pemblokir RFID, 6 slot kartu, dan kompartemen uang tunai lipat.',
-    image_url:
-      'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/wallet-leather-tan.jpg',
     weight_grams: 85,
     specs: {
       material: 'Full-grain Vegetable Tanned Leather',
@@ -296,8 +289,12 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 10,
     description:
       'Jam tangan bergaya militer dengan kaca kristal safir anti gores, mesin otomatis 24 permata, jarum berpendar superluminova, dan strap kanvas tahan air.',
-    image_url:
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/field-watch-black.jpg',
+    gallery_urls: [
+      '/images/products/field-watch-black.jpg',
+      '/images/products/field-watch-olive.jpg',
+      '/images/products/field-watch-black-angle.jpg',
+    ],
     weight_grams: 160,
     specs: {
       diameter: '38 mm',
@@ -317,8 +314,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 50,
     description:
       'Kaus oblong kasual berbahan 100% serat katun organik pilihan dengan gramasi padat 240gsm, berpotongan santai dan tahan susut.',
-    image_url:
-      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/tshirt-heavyweight-white.jpg',
     weight_grams: 280,
     specs: {
       gramasi: '240 GSM Heavyweight Cotton',
@@ -337,8 +333,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 40,
     description:
       'Topi 6-panel klasik berbahan katun twill washed yang lembut dengan gesper pengatur kuningan antik di bagian belakang.',
-    image_url:
-      'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/cap-baseball-black.jpg',
     weight_grams: 95,
     specs: {
       material: '100% Washed Cotton Twill',
@@ -359,8 +354,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 55,
     description:
       'Buku catatan bersampul kain linen hardcover dengan 192 halaman kertas dot grid 120gsm bebas asam yang ramah terhadap tinta pena basah.',
-    image_url:
-      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/journal-grid-green.jpg',
     weight_grams: 410,
     specs: {
       ukuran: 'A5 (148 x 210 mm)',
@@ -380,8 +374,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 70,
     description:
       'Penggaris skala drafting arsitektural paduan aluminium padat dengan grafir angka laser tahan luntur dan kode warna pada setiap sisinya.',
-    image_url:
-      'https://images.unsplash.com/photo-1589365278144-c9e705f843ba?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/ruler-architect-black.jpg',
     weight_grams: 130,
     specs: {
       panjang: '30 cm',
@@ -400,8 +393,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 25,
     description:
       'Gulungan tempat alat tulis berbahan kulit asli samak nabati dengan 5 slot elastis untuk pena favorit dan tali pengikat kulit melingkar.',
-    image_url:
-      'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/pen-titanium-raw.jpg',
     weight_grams: 145,
     specs: {
       material: 'Crazy Horse Genuine Leather',
@@ -420,8 +412,7 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 90,
     description:
       'Set 10 klip penjepit berkas dari kuningan murni tanpa lapisan cat yang akan menua membentuk patina anggun seiring waktu pemakaian.',
-    image_url:
-      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/clips-brass-vintage.jpg',
     weight_grams: 90,
     specs: {
       material: 'Solid Brass (Kuningan Murni)',
@@ -497,6 +488,19 @@ export default defineEventHandler(async (event) => {
       .maybeSingle()
 
     if (existing) {
+      await client
+        .from('products')
+        .update({
+          image_url: item.image_url,
+          gallery_urls: item.gallery_urls || [item.image_url],
+          specs: item.specs as Database['public']['Tables']['products']['Row']['specs'],
+          description: item.description,
+          price: item.price,
+          stock: item.stock,
+          rating: item.rating,
+          review_count: item.review_count,
+        })
+        .eq('id', existing.id)
       skippedCount++
       continue
     }
@@ -510,7 +514,7 @@ export default defineEventHandler(async (event) => {
       category_id: categoryId,
       weight_grams: item.weight_grams,
       specs: item.specs as Database['public']['Tables']['products']['Row']['specs'],
-      gallery_urls: [item.image_url],
+      gallery_urls: item.gallery_urls || [item.image_url],
       rating: item.rating,
       review_count: item.review_count,
       sold_count: item.sold_count,

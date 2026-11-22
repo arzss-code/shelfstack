@@ -89,6 +89,72 @@ export const CATEGORY_VARIANTS_MAP: Record<string, ProductVariants> = {
   },
 }
 
+export const SPECIFIC_ITEM_VARIANTS: Record<string, ProductVariants> = {
+  watch: {
+    colorTitle: 'Pilihan Warna Lapangan',
+    colors: [
+      { name: 'Stealth Black', class: 'bg-[#18181b]' },
+      { name: 'Olive Drab', class: 'bg-[#3f4e38]' },
+    ],
+    optionTitle: 'Diameter Case & Dial',
+    options: [
+      { name: '38mm Dial Klasik', note: 'Proporsional & Ringan' },
+      { name: '40mm Dial Lapangan', note: 'Tangguh & Visibilitas Tinggi' },
+    ],
+  },
+  wallet: {
+    colorTitle: 'Pilihan Warna Kulit',
+    colors: [
+      { name: 'Cognac Tan', class: 'bg-[#92400e]' },
+      { name: 'Tactical Black', class: 'bg-[#18181b]' },
+    ],
+    optionTitle: 'Kapasitas Kompartemen',
+    options: [
+      { name: '6 Slot Kartu Slim', note: 'Ultra tipis profil 6mm' },
+      { name: '8 Slot + Cash Pocket', note: 'Kapasitas harian serbaguna' },
+    ],
+  },
+  apparel: {
+    colorTitle: 'Pilihan Warna',
+    colors: [
+      { name: 'Deep Black', class: 'bg-[#18181b]' },
+      { name: 'Off White', class: 'bg-[#f4f4f5]' },
+      { name: 'Olive Drab', class: 'bg-[#3f4e38]' },
+    ],
+    optionTitle: 'Pilihan Ukuran',
+    options: [
+      { name: 'M (Lebar 53cm)', note: 'Standar Reguler Fit' },
+      { name: 'L (Lebar 56cm)', note: 'Relaxed Fit' },
+      { name: 'XL (Lebar 59cm)', note: 'Oversized Streetwear' },
+    ],
+  },
+  cap: {
+    colorTitle: 'Pilihan Warna',
+    colors: [
+      { name: 'Washed Charcoal', class: 'bg-[#27272a]' },
+      { name: 'Khaki Sand', class: 'bg-[#d4b996]' },
+    ],
+    optionTitle: 'Sistem Pengencang',
+    options: [
+      { name: 'Strap Logam Kuningan', note: 'Adjustable lingkar 54-60cm' },
+      { name: 'Strap Kulit Asli', note: 'Finishing kulit nabati' },
+    ],
+  },
+  keyboard: {
+    colorTitle: 'Pilihan Warna Sasis',
+    colors: [
+      { name: 'Matte Obsidian', class: 'bg-[#18181b]' },
+      { name: 'Chalk White', class: 'bg-[#f4f4f5]' },
+      { name: 'Midnight Navy', class: 'bg-[#1e293b]' },
+    ],
+    optionTitle: 'Pilihan Switch Mekanikal',
+    options: [
+      { name: 'Linear Red (Pre-Lubed)', note: 'Halus & senyap untuk mengetik cepat' },
+      { name: 'Tactile Brown (Pre-Lubed)', note: 'Feedback ketukan mantap berumpan' },
+    ],
+  },
+}
+
 export const CATEGORY_SPECS_MAP: Record<string, ProductSpecItem[]> = {
   tech: [
     { label: 'Driver Audio', value: '40mm Diafragma Berilium Presisi', icon: 'pi pi-volume-up' },

@@ -79,6 +79,31 @@ describe('Product Specs & Variant Resolver', () => {
       expect(variants.optionTitle).toBe('Material Utama')
       expect(variants.options.some((o) => o.name.includes('Stainless'))).toBe(true)
     })
+
+    it('returns watch-specific variants for watch product', () => {
+      const watchProduct = {
+        id: 14,
+        name: 'Jam Tangan Lapangan Otomatis Field Watch',
+        slug: 'jam-tangan-lapangan-otomatis-field-watch',
+        category_id: 'f11887b3-ff92-4d6f-a119-a972efd79144',
+      } as Product
+      const variants = getProductVariants(watchProduct)
+      expect(variants.optionTitle).toBe('Diameter Case & Dial')
+      expect(variants.options.some((o) => o.name.includes('38mm'))).toBe(true)
+      expect(variants.options.some((o) => o.name.includes('40mm'))).toBe(true)
+    })
+
+    it('returns wallet-specific variants for wallet product', () => {
+      const walletProduct = {
+        id: 13,
+        name: 'Dompet Kartu Kulit Nabati Slim',
+        slug: 'dompet-kartu-kulit-nabati-slim',
+        category_id: 'f11887b3-ff92-4d6f-a119-a972efd79144',
+      } as Product
+      const variants = getProductVariants(walletProduct)
+      expect(variants.optionTitle).toBe('Kapasitas Kompartemen')
+      expect(variants.options.some((o) => o.name.includes('6 Slot'))).toBe(true)
+    })
   })
 
   describe('getProductSpecs', () => {
@@ -95,6 +120,27 @@ describe('Product Specs & Variant Resolver', () => {
       const labels = specs.map((s) => s.label)
       expect(labels).toContain('Kapasitas Volume')
       expect(labels).toContain('Kompartemen Laptop')
+    })
+
+    it('returns exclusive watch specs for watch and omits bag specs', () => {
+      const watchProduct = {
+        id: 14,
+        name: 'Jam Tangan Lapangan Otomatis Field Watch',
+        slug: 'jam-tangan-lapangan-otomatis-field-watch',
+        category_id: 'f11887b3-ff92-4d6f-a119-a972efd79144',
+        specs: {
+          diameter: '38 mm',
+          kaca: 'Sapphire Crystal dengan AR Coating',
+          mesin: 'Automatic Movement NH35 24-Jewels',
+          water_resistance: '100 Meter / 10 ATM',
+        },
+      } as Product
+      const specs = getProductSpecs(watchProduct)
+      const labels = specs.map((s) => s.label)
+      expect(labels).toContain('Diameter Case')
+      expect(labels).toContain('Kaca Kristal')
+      expect(labels).not.toContain('Kapasitas Volume')
+      expect(labels).not.toContain('Kompartemen Laptop')
     })
 
     it('merges custom product.specs from database if available', () => {
