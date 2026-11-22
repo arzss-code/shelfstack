@@ -8,7 +8,6 @@ import ProductConfigurator from '~/components/product/ProductConfigurator.vue'
 import ProductReviewsSection from '~/components/product/ProductReviewsSection.vue'
 import ProductRelatedSection from '~/components/product/ProductRelatedSection.vue'
 import ProductRecentlyViewedSection from '~/components/product/ProductRecentlyViewedSection.vue'
-import ProductSocialShare from '~/components/product/ProductSocialShare.vue'
 import ProductFlashSaleBanner from '~/components/promotions/ProductFlashSaleBanner.vue'
 import ProductShippingEstimator from '~/components/product/ProductShippingEstimator.vue'
 import { useRecentlyViewed } from '~/composables/useRecentlyViewed'
@@ -229,10 +228,8 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
 
     <!-- Loading Skeleton View -->
     <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 animate-pulse">
-      <div
-        class="lg:col-span-6 aspect-square max-w-[460px] mx-auto w-full bg-brand-field rounded-card"
-      />
-      <div class="lg:col-span-6 space-y-4">
+      <div class="lg:col-span-5 aspect-square w-full bg-brand-field rounded-card" />
+      <div class="lg:col-span-7 space-y-4">
         <div class="h-4 w-32 bg-brand-field rounded-full" />
         <div class="h-8 w-3/4 bg-brand-field rounded-full" />
         <div class="h-6 w-1/3 bg-brand-field rounded-full" />
@@ -244,10 +241,10 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
     <!-- Product Detail Hub -->
     <div v-else-if="product" class="space-y-12">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-        <div class="lg:col-span-6 lg:sticky lg:top-24">
+        <div class="lg:col-span-5">
           <ProductGallery :product="product" :active-image-override="selectedVariantImage" />
         </div>
-        <div class="lg:col-span-6 space-y-6">
+        <div class="lg:col-span-7 space-y-6 lg:sticky lg:top-24">
           <ProductFlashSaleBanner
             v-if="activeFlashDeal"
             :deal="activeFlashDeal"
@@ -261,7 +258,6 @@ const onBuyNow = (payload: ProductSelectionPayload) => {
             @buy-now="onBuyNow"
           />
           <ProductShippingEstimator :product-price="product.price" />
-          <ProductSocialShare :product="product" />
         </div>
       </div>
 

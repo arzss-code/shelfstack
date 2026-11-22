@@ -2,6 +2,7 @@
 import type { Product } from '~/types/product'
 import { detectProductCategorySlug } from '~/utils/product-specs'
 import ProductSpecsTable from './ProductSpecsTable.vue'
+import ProductSocialShare from './ProductSocialShare.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -87,10 +88,10 @@ const warrantyBadge = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <!-- Main Media Container (Compact Viewport Fitted) -->
+  <div class="flex flex-col gap-4 w-full">
+    <!-- Main Media Container (Full Width of Column) -->
     <div
-      class="relative w-full max-w-[440px] sm:max-w-[460px] mx-auto aspect-square rounded-card bg-brand-canvas-soft border border-brand-hair overflow-hidden shadow-whisper group"
+      class="relative w-full aspect-square rounded-card bg-brand-canvas-soft border border-brand-hair overflow-hidden shadow-whisper group"
     >
       <img
         v-if="activeImage && !imageFailed"
@@ -117,10 +118,10 @@ const warrantyBadge = computed(() => {
       </div>
     </div>
 
-    <!-- Multi-Angle Thumbnail Switcher (Compact & Ergonomic) -->
+    <!-- Multi-Angle Thumbnail Switcher (Left Aligned & Non-Clipping) -->
     <div
       v-if="galleryImages.length > 1"
-      class="flex items-center justify-center sm:justify-start gap-2 overflow-x-auto py-1 max-w-[460px] mx-auto w-full"
+      class="flex items-center justify-start gap-2.5 overflow-x-auto py-1.5 px-1 w-full"
       aria-label="Sudut Foto Produk"
     >
       <button
@@ -130,8 +131,8 @@ const warrantyBadge = computed(() => {
         class="w-12 h-12 sm:w-14 sm:h-14 aspect-square rounded-field border bg-brand-canvas-soft shrink-0 transition-all cursor-pointer overflow-hidden focus:outline-none flex items-center justify-center"
         :class="[
           activeImage === img
-            ? 'border-brand-ink ring-2 ring-brand-ink/20 shadow-whisper scale-105'
-            : 'border-brand-hair hover:border-brand-muted opacity-70 hover:opacity-100',
+            ? 'border-2 border-brand-ink ring-2 ring-brand-ink/20 shadow-whisper'
+            : 'border border-brand-hair hover:border-brand-muted opacity-70 hover:opacity-100',
         ]"
         :aria-label="`Pilih sudut gambar ${idx + 1}`"
         @click="activeImage = img"
@@ -149,7 +150,7 @@ const warrantyBadge = computed(() => {
     </div>
 
     <!-- Micro-Showcase Spec Grid (3 Triad Boxes) -->
-    <div class="grid grid-cols-3 gap-2 sm:gap-3 pt-1 max-w-[460px] mx-auto w-full">
+    <div class="grid grid-cols-3 gap-2 sm:gap-3 pt-1 w-full">
       <div
         class="bg-brand-canvas-soft border border-brand-hairsoft p-2.5 sm:p-3 rounded-field flex flex-col items-center justify-center text-center shadow-whisper"
       >
@@ -175,8 +176,11 @@ const warrantyBadge = computed(() => {
       </div>
     </div>
 
+    <!-- Social Share Actions -->
+    <ProductSocialShare :product="product" class="w-full" />
+
     <!-- Description & Information -->
-    <UiCard :padded="true" class="mt-2 space-y-4">
+    <UiCard :padded="true" class="w-full mt-2 space-y-4">
       <h2 class="font-display text-lg font-bold text-brand-ink m-0">
         Deskripsi &amp; Informasi Produk
       </h2>
@@ -200,6 +204,6 @@ const warrantyBadge = computed(() => {
     </UiCard>
 
     <!-- Dynamic Specification Table (FR-3.2) -->
-    <ProductSpecsTable :product="product" class="mt-2" />
+    <ProductSpecsTable :product="product" class="w-full mt-2" />
   </div>
 </template>
