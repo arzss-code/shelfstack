@@ -10,7 +10,7 @@ defineEmits<{
 
 <template>
   <header
-    class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-900 text-white p-6 sm:p-8 shadow-floating"
+    class="relative overflow-hidden rounded-card bg-brand-obsidian text-white p-6 sm:p-8 shadow-floating"
   >
     <!-- Background Ambient Mesh Gradients -->
     <div

@@ -24,12 +24,16 @@ const formatDiscountBadge = (coupon: PromoCoupon) => {
 
 <template>
   <article
-    class="relative bg-brand-canvas border border-brand-hair hover:border-brand-ink/40 rounded-2xl shadow-whisper overflow-hidden flex transition-all duration-200"
+    class="relative bg-brand-canvas border border-brand-hair hover:border-brand-ink/40 rounded-card shadow-whisper overflow-hidden flex transition-all duration-200"
   >
     <!-- Left Stub: Discount value -->
     <div
-      class="w-24 sm:w-28 shrink-0 p-3 sm:p-3.5 flex flex-col justify-between items-center text-center"
-      :class="coupon.discount_type === 'percentage' ? 'bg-blue-50/70' : 'bg-emerald-50/70'"
+      class="w-24 sm:w-28 shrink-0 p-3 sm:p-3.5 flex flex-col justify-between items-center text-center border-r border-brand-hairsoft"
+      :class="
+        coupon.discount_type === 'percentage'
+          ? 'bg-blue-500/10 dark:bg-blue-500/15'
+          : 'bg-emerald-500/10 dark:bg-emerald-500/15'
+      "
     >
       <UiBadge
         :label="coupon.discount_type === 'percentage' ? 'Diskon' : 'Potongan'"
@@ -39,7 +43,11 @@ const formatDiscountBadge = (coupon: PromoCoupon) => {
       <div class="my-auto py-1">
         <p
           class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none whitespace-nowrap"
-          :class="coupon.discount_type === 'percentage' ? 'text-brand-accent' : 'text-emerald-700'"
+          :class="
+            coupon.discount_type === 'percentage'
+              ? 'text-brand-accent dark:text-blue-400'
+              : 'text-emerald-700 dark:text-emerald-400'
+          "
         >
           {{ formatDiscountBadge(coupon) }}
         </p>

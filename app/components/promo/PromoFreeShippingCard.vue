@@ -1,22 +1,26 @@
 <template>
   <article
-    class="relative bg-brand-canvas border border-brand-hair hover:border-amber-300 rounded-2xl shadow-whisper overflow-hidden transition-all duration-200 flex"
+    class="relative bg-brand-canvas border border-brand-hair hover:border-amber-400/50 rounded-card shadow-whisper overflow-hidden transition-all duration-200 flex"
   >
     <!-- Left Badge Stub -->
     <div
-      class="w-24 sm:w-28 shrink-0 bg-amber-50/80 p-3 sm:p-3.5 flex flex-col justify-between items-center text-center"
+      class="w-24 sm:w-28 shrink-0 bg-amber-500/10 dark:bg-amber-500/15 p-3 sm:p-3.5 flex flex-col justify-between items-center text-center border-r border-brand-hairsoft"
     >
       <UiBadge label="Ekspedisi" variant="warning" />
       <div class="my-auto py-1">
         <p
-          class="text-xl sm:text-2xl font-extrabold text-amber-800 tracking-tight leading-none whitespace-nowrap"
+          class="text-xl sm:text-2xl font-extrabold text-amber-800 dark:text-amber-300 tracking-tight leading-none whitespace-nowrap"
         >
           BEBAS
         </p>
-        <p class="text-[10px] font-semibold text-amber-700 leading-tight mt-0.5">Ongkir</p>
+        <p
+          class="text-[10px] font-semibold text-amber-700 dark:text-amber-400 leading-tight mt-0.5"
+        >
+          Ongkir
+        </p>
       </div>
       <p
-        class="text-[10px] font-medium text-brand-muted pt-1.5 border-t border-amber-200/50 w-full truncate"
+        class="text-[10px] font-medium text-brand-muted pt-1.5 border-t border-amber-500/20 w-full truncate"
       >
         Min. Rp 500rb
       </p>

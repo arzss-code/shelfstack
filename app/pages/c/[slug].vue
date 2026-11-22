@@ -162,7 +162,7 @@ function onExploreCatalog() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 space-y-6">
+  <div class="space-y-6 pb-16">
     <!-- Breadcrumb Navigasi -->
     <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-xs text-brand-muted">
       <NuxtLink to="/" class="hover:text-brand-ink transition-colors no-underline">
