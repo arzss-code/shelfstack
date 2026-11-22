@@ -132,7 +132,7 @@ const handleSubmit = () => {
       >
         <div class="flex items-center gap-2.5 min-w-0">
           <div
-            class="w-8 h-8 rounded-lg bg-brand-ink text-white flex items-center justify-center shrink-0"
+            class="w-8 h-8 rounded-lg bg-brand-ink text-brand-onink flex items-center justify-center shrink-0"
           >
             <i class="pi pi-map-marker text-xs" />
           </div>

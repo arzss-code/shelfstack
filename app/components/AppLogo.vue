@@ -61,7 +61,7 @@ const sizeClasses = computed(() => {
         width="14"
         height="3"
         rx="1.5"
-        :fill="variant === 'inverse' ? '#141414' : '#ffffff'"
+        :fill="variant === 'inverse' ? '#141414' : 'var(--brand-onink, #ffffff)'"
       />
       <!-- Shelf tier 2 (mid) -->
       <rect
@@ -70,7 +70,7 @@ const sizeClasses = computed(() => {
         width="14"
         height="3"
         rx="1.5"
-        :fill="variant === 'inverse' ? '#141414' : '#ffffff'"
+        :fill="variant === 'inverse' ? '#141414' : 'var(--brand-onink, #ffffff)'"
       />
       <!-- Shelf tier 3 (bottom accent slot) -->
       <rect x="7" y="18" width="9" height="3" rx="1.5" fill="var(--brand-accent, #0066ff)" />

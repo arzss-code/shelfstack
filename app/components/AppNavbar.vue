@@ -95,7 +95,7 @@ const handleLogout = async () => {
 <template>
   <header class="w-full bg-brand-canvas sticky top-0 z-50 shadow-nav select-none">
     <!-- LAYER 1: Top Announcement Bar (Inverted Ink Strip) -->
-    <div class="bg-brand-ink text-white py-1.5 border-b border-white/10 hidden sm:block">
+    <div class="bg-brand-strip text-white py-1.5 border-b border-white/10 hidden sm:block">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between text-xs">
         <div class="flex items-center gap-2.5">
           <p class="tracking-wide m-0 text-[11px] sm:text-xs flex items-center gap-2.5">

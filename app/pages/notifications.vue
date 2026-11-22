@@ -130,7 +130,7 @@ const handleNavigate = async (item: NotificationItem) => {
             </div>
             <NuxtLink
               to="/katalog"
-              class="mt-2 px-4 py-2 rounded-full bg-brand-ink text-white text-xs font-semibold hover:bg-brand-inkhover transition-colors no-underline inline-flex items-center gap-1.5"
+              class="mt-2 px-4 py-2 rounded-full bg-brand-ink text-brand-onink text-xs font-semibold hover:bg-brand-inkhover transition-colors no-underline inline-flex items-center gap-1.5"
             >
               <span>Mulai Belanja</span>
               <i class="pi pi-arrow-right text-[10px]" />

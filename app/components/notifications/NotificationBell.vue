@@ -137,7 +137,7 @@ const {
             class="px-2.5 py-1 text-xs rounded-full font-medium transition-colors cursor-pointer border-0"
             :class="
               activeTab === 'all'
-                ? 'bg-brand-ink text-white'
+                ? 'bg-brand-ink text-brand-onink'
                 : 'bg-transparent text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft'
             "
             @click="activeTab = 'all'"
@@ -149,7 +149,7 @@ const {
             class="px-2.5 py-1 text-xs rounded-full font-medium transition-colors cursor-pointer border-0 flex items-center gap-1"
             :class="
               activeTab === 'unread'
-                ? 'bg-brand-ink text-white'
+                ? 'bg-brand-ink text-brand-onink'
                 : 'bg-transparent text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft'
             "
             @click="activeTab = 'unread'"

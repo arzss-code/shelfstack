@@ -85,7 +85,7 @@ defineEmits<{
         class="px-3 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer border-0 whitespace-nowrap"
         :class="
           activeTab === 'all'
-            ? 'bg-brand-ink text-white'
+            ? 'bg-brand-ink text-brand-onink'
             : 'bg-brand-canvas-soft text-brand-muted hover:text-brand-ink'
         "
         @click="$emit('update:activeTab', 'all')"
@@ -98,7 +98,7 @@ defineEmits<{
         class="px-3 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer border-0 whitespace-nowrap flex items-center gap-1.5"
         :class="
           activeTab === 'unread'
-            ? 'bg-brand-ink text-white'
+            ? 'bg-brand-ink text-brand-onink'
             : 'bg-brand-canvas-soft text-brand-muted hover:text-brand-ink'
         "
         @click="$emit('update:activeTab', 'unread')"
@@ -120,7 +120,7 @@ defineEmits<{
         class="px-3 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer border-0 whitespace-nowrap"
         :class="
           activeTab === 'orders'
-            ? 'bg-brand-ink text-white'
+            ? 'bg-brand-ink text-brand-onink'
             : 'bg-brand-canvas-soft text-brand-muted hover:text-brand-ink'
         "
         @click="$emit('update:activeTab', 'orders')"
@@ -133,7 +133,7 @@ defineEmits<{
         class="px-3 py-1.5 text-xs font-semibold rounded-full transition-colors cursor-pointer border-0 whitespace-nowrap"
         :class="
           activeTab === 'system'
-            ? 'bg-brand-ink text-white'
+            ? 'bg-brand-ink text-brand-onink'
             : 'bg-brand-canvas-soft text-brand-muted hover:text-brand-ink'
         "
         @click="$emit('update:activeTab', 'system')"

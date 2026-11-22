@@ -152,7 +152,7 @@ const navigateToSupport = () => {
             <!-- Profile Identity -->
             <div class="flex items-center gap-3 pb-2">
               <div
-                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-ink text-white font-bold text-base shadow-sm"
+                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-ink text-brand-onink font-bold text-base shadow-sm"
               >
                 <span>{{
                   (customerDetail?.fullName || fallbackCustomer?.fullName || 'U')

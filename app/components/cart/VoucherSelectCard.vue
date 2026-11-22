@@ -99,7 +99,7 @@ const handleClick = () => {
       :class="[
         'w-20 sm:w-24 p-2 sm:p-2.5 flex flex-col items-center justify-center text-center shrink-0 border-r border-dashed transition-colors',
         selected
-          ? 'bg-brand-ink text-white border-brand-ink'
+          ? 'bg-brand-ink text-brand-onink border-brand-ink'
           : 'bg-brand-canvas-soft text-brand-ink border-brand-hair group-hover:bg-brand-field',
       ]"
     >
@@ -109,7 +109,7 @@ const handleClick = () => {
       <span
         :class="[
           'text-[9px] uppercase font-bold tracking-wider mt-1 px-1.5 py-0.5 rounded',
-          selected ? 'bg-white/20 text-white' : 'bg-brand-hair text-brand-muted',
+          selected ? 'bg-brand-onink/20 text-brand-onink' : 'bg-brand-hair text-brand-muted',
         ]"
       >
         {{ coupon.discount_type === 'percentage' ? 'Diskon' : 'Potongan' }}
@@ -144,7 +144,7 @@ const handleClick = () => {
           <button
             v-if="mode === 'public' && !selected"
             type="button"
-            class="rounded-lg bg-brand-ink px-2.5 py-1 text-[11px] font-bold text-white hover:bg-brand-ink/90 transition-colors shadow-whisper shrink-0 cursor-pointer border-0"
+            class="rounded-lg bg-brand-ink px-2.5 py-1 text-[11px] font-bold text-brand-onink hover:bg-brand-ink/90 transition-colors shadow-whisper shrink-0 cursor-pointer border-0"
             :disabled="isClaiming"
             @click.stop="emit('claimAndApply', coupon)"
           >
@@ -156,7 +156,7 @@ const handleClick = () => {
             :class="[
               'flex h-4 w-4 items-center justify-center rounded-full border transition-all',
               selected
-                ? 'border-brand-ink bg-brand-ink text-white'
+                ? 'border-brand-ink bg-brand-ink text-brand-onink'
                 : 'border-brand-hair bg-brand-canvas group-hover:border-brand-ink',
             ]"
           >

@@ -57,7 +57,7 @@ const getBadgeVariant = (
       </div>
       <span
         class="w-7 h-7 rounded-full bg-brand-canvas-soft text-brand-muted flex items-center justify-center shrink-0 transition-transform duration-200"
-        :class="{ 'rotate-180 bg-brand-ink text-white': isOpen }"
+        :class="{ 'rotate-180 bg-brand-ink text-brand-onink': isOpen }"
         aria-hidden="true"
       >
         <i class="pi pi-chevron-down text-xs" />

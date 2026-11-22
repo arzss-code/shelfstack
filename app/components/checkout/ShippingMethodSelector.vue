@@ -226,7 +226,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
           class="px-3 py-1.5 text-xs rounded-full border transition-all cursor-pointer flex items-center gap-1.5"
           :class="[
             selectedCourier === null || selectedCourier === ''
-              ? 'border-brand-ink bg-brand-ink text-white font-medium shadow-2xs'
+              ? 'border-brand-ink bg-brand-ink text-brand-onink font-medium shadow-2xs'
               : 'border-brand-hair hover:border-brand-ink/40 text-brand-muted bg-brand-canvas',
           ]"
           :disabled="disabled"
@@ -246,7 +246,7 @@ const handleKeydown = (event: KeyboardEvent, currentIndex: number) => {
           class="px-3 py-1.5 text-xs rounded-full border transition-all cursor-pointer flex items-center gap-1.5"
           :class="[
             selectedCourier === c.code
-              ? 'border-brand-ink bg-brand-ink text-white font-medium shadow-2xs'
+              ? 'border-brand-ink bg-brand-ink text-brand-onink font-medium shadow-2xs'
               : 'border-brand-hair hover:border-brand-ink/40 text-brand-muted bg-brand-canvas',
           ]"
           :disabled="disabled"

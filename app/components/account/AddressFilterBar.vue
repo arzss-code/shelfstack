@@ -58,7 +58,7 @@ const setFilter = (filter: AddressFilterType) => {
         class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap active:scale-95"
         :class="[
           activeFilter === opt.id
-            ? 'bg-brand-ink text-white border-brand-ink shadow-xs'
+            ? 'bg-brand-ink text-brand-onink border-brand-ink shadow-xs'
             : 'bg-brand-canvas text-brand-muted border-brand-hair hover:text-brand-ink hover:border-brand-ink/40',
         ]"
         @click="setFilter(opt.id)"

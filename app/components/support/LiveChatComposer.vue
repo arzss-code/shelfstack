@@ -266,7 +266,7 @@ const handleFileChange = async (event: Event) => {
           </span>
           <button
             type="button"
-            class="btn-send inline-flex items-center gap-1.5 rounded-full bg-brand-ink px-4 py-1.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-brand-inkhover active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="btn-send inline-flex items-center gap-1.5 rounded-full bg-brand-ink px-4 py-1.5 text-xs font-semibold text-brand-onink shadow-xs transition-all hover:bg-brand-inkhover active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="
               (!inputText.trim() && !selectedOrder && !selectedProduct) ||
               inputText.length > 1000 ||

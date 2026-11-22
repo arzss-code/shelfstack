@@ -79,20 +79,25 @@ const effectiveInputMode = computed<'email' | 'tel' | 'url' | 'search' | 'decima
 )
 
 const controlClass = computed(() => {
-  const geometry =
-    props.size === 'sm'
-      ? 'h-9 rounded-full pl-8.5 pr-3 text-xs'
-      : 'h-11 rounded-field pl-3.5 pr-3.5 text-sm'
+  const geometry = props.size === 'sm' ? 'h-9 rounded-full text-xs' : 'h-11 rounded-field text-sm'
   const border = props.error
     ? 'border-rose-300 focus:border-rose-500'
     : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink'
-  const padding = props.leftIcon ? '' : props.size === 'sm' ? 'pl-3' : 'pl-3.5'
+  const padding = props.leftIcon
+    ? props.size === 'sm'
+      ? 'pl-9'
+      : 'pl-10'
+    : props.size === 'sm'
+      ? 'pl-3.5'
+      : 'pl-4'
   const trailing =
     props.rightIcon || (props.showPasswordToggle && props.type === 'password')
       ? props.size === 'sm'
         ? 'pr-10'
         : 'pr-11'
-      : ''
+      : props.size === 'sm'
+        ? 'pr-3.5'
+        : 'pr-4'
 
   return [
     'w-full border bg-brand-canvas text-brand-ink transition-colors',

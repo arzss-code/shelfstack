@@ -197,7 +197,7 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
           class="px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap active:scale-95"
           :class="[
             activeFilter === opt.id
-              ? 'border-brand-ink bg-brand-ink text-white shadow-2xs'
+              ? 'border-brand-ink bg-brand-ink text-brand-onink shadow-2xs'
               : 'border-brand-hair hover:border-brand-ink/30 text-brand-muted bg-brand-canvas hover:text-brand-ink',
           ]"
           @click="activeFilter = opt.id"

@@ -185,7 +185,7 @@ const {
             <img :src="url" alt="Foto Bukti" class="h-full w-full object-cover" />
             <button
               type="button"
-              class="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand-ink/80 text-white hover:bg-brand-danger transition-colors cursor-pointer"
+              class="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand-ink/80 text-brand-onink hover:bg-brand-danger transition-colors cursor-pointer"
               aria-label="Hapus foto bukti"
               @click="removeProofImage(idx)"
             >

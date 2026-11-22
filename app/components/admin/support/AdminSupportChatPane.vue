@@ -183,7 +183,7 @@ const formatTime = (isoString?: string): string => {
           <!-- Admin Message (Dynamic fit right) -->
           <div
             v-else
-            class="message-bubble admin-bubble ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-xs bg-brand-ink text-white px-3.5 py-2.5 shadow-whisper space-y-1.5"
+            class="message-bubble admin-bubble ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-xs bg-brand-ink text-brand-onink px-3.5 py-2.5 shadow-whisper space-y-1.5"
           >
             <p class="text-xs m-0 leading-relaxed whitespace-pre-wrap break-words">
               {{ msg.message_text }}
@@ -197,7 +197,7 @@ const formatTime = (isoString?: string): string => {
             />
             <ChatOrderSnippet v-if="msg.attached_order" :order="msg.attached_order" />
             <ChatProductSnippet v-if="msg.attached_product" :product="msg.attached_product" />
-            <div class="flex items-center justify-end text-[10px] text-white/70 tabular-nums">
+            <div class="flex items-center justify-end text-[10px] text-brand-onink/70 tabular-nums">
               <span>{{ formatTime(msg.created_at) }}</span>
             </div>
           </div>

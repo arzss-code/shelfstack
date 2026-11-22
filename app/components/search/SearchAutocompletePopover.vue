@@ -199,7 +199,7 @@ const isQueryEmpty = computed(() => props.query.trim().length < 2)
               class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full border transition-colors cursor-pointer"
               :class="
                 activeIndex === getCategoryIndex(idx)
-                  ? 'bg-brand-ink text-white border-brand-ink shadow-whisper'
+                  ? 'bg-brand-ink text-brand-onink border-brand-ink shadow-whisper'
                   : 'bg-brand-canvas-soft text-brand-ink border-brand-hair hover:border-brand-ink'
               "
               @click="emit('selectCategory', cat)"

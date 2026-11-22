@@ -63,7 +63,7 @@ const retryConnection = () => {
 
       <button
         type="button"
-        class="shrink-0 rounded-full bg-brand-ink text-white px-3.5 py-1 text-xs font-bold hover:bg-brand-ink/90 transition-colors inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0"
+        class="shrink-0 rounded-full bg-brand-ink text-brand-onink px-3.5 py-1 text-xs font-bold hover:bg-brand-ink/90 transition-colors inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0"
         @click="retryConnection"
       >
         <i class="pi pi-refresh text-[10px]" aria-hidden="true" />

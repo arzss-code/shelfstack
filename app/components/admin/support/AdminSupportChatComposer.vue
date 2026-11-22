@@ -116,7 +116,7 @@ defineExpose({
         />
         <button
           type="button"
-          class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-ink text-[8px] text-white hover:bg-red-600 transition-colors"
+          class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-ink text-[8px] text-brand-onink hover:bg-red-600 transition-colors"
           @click="selectedImage = null"
         >
           <i class="pi pi-times" />
@@ -197,7 +197,7 @@ defineExpose({
           >
           <button
             type="button"
-            class="btn-admin-send btn-send inline-flex items-center gap-1.5 rounded-full bg-brand-ink px-4 py-1.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-brand-inkhover active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="btn-admin-send btn-send inline-flex items-center gap-1.5 rounded-full bg-brand-ink px-4 py-1.5 text-xs font-semibold text-brand-onink shadow-xs transition-all hover:bg-brand-inkhover active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="!replyText.trim() || isSending"
             @click="handleSend"
           >

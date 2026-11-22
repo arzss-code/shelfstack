@@ -178,7 +178,7 @@ const {
           </div>
           <span
             data-testid="deal-badge"
-            class="absolute top-2 left-2 rounded-full bg-brand-ink px-2.5 py-0.5 text-[10px] font-bold text-white shadow-sm"
+            class="absolute top-2 left-2 rounded-full bg-brand-ink px-2.5 py-0.5 text-[10px] font-bold text-brand-onink shadow-sm"
           >
             {{ getProductBadge(product) }}
           </span>

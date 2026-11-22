@@ -199,7 +199,7 @@ const handleSaveModal = async (payload: CreateAddressInput) => {
                 </h2>
                 <span
                   v-if="addresses.length > 0"
-                  class="px-2 py-0.5 rounded-full text-xs font-bold bg-brand-ink text-white tabular-nums"
+                  class="px-2 py-0.5 rounded-full text-xs font-bold bg-brand-ink text-brand-onink tabular-nums"
                 >
                   {{ addresses.length }}
                 </span>

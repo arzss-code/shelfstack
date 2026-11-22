@@ -33,7 +33,7 @@ withDefaults(
     >
       <!-- Left Column: Aesthetic Visual Showcase & Brand Insignia -->
       <div
-        class="relative col-span-12 md:col-span-5 bg-brand-ink text-white p-6 sm:p-8 flex flex-col justify-between overflow-hidden border-b md:border-b-0 md:border-r border-brand-hair min-h-[220px] md:min-h-[500px]"
+        class="relative col-span-12 md:col-span-5 bg-brand-strip text-white p-6 sm:p-8 flex flex-col justify-between overflow-hidden border-b md:border-b-0 md:border-r border-brand-hair min-h-[220px] md:min-h-[500px]"
       >
         <!-- Background Aesthetic Photo with Scrim -->
         <img
