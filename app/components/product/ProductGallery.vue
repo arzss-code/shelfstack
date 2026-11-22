@@ -90,7 +90,7 @@ const warrantyBadge = computed(() => {
   <div class="flex flex-col gap-4">
     <!-- Main Media Container -->
     <div
-      class="relative w-full aspect-[4/3] rounded-card bg-brand-field border border-brand-hair overflow-hidden flex items-center justify-center p-6 shadow-whisper group"
+      class="relative w-full aspect-square rounded-card bg-brand-canvas-soft border border-brand-hair overflow-hidden flex items-center justify-center p-2 sm:p-4 shadow-whisper group"
     >
       <img
         v-if="activeImage && !imageFailed"
@@ -98,10 +98,10 @@ const warrantyBadge = computed(() => {
         :src="activeImage"
         :alt="product.name"
         width="800"
-        height="600"
+        height="800"
         fetchpriority="high"
         decoding="async"
-        class="w-full h-full object-contain mix-blend-multiply transition-all duration-300 group-hover:scale-105"
+        class="w-full h-full object-contain transition-all duration-300 group-hover:scale-[1.03]"
         @error="imageFailed = true"
       />
       <div v-else class="flex flex-col items-center justify-center text-brand-faint">
@@ -127,7 +127,7 @@ const warrantyBadge = computed(() => {
         v-for="(img, idx) in galleryImages"
         :key="idx"
         type="button"
-        class="w-16 h-16 rounded-field border p-1 bg-brand-field shrink-0 transition-all cursor-pointer overflow-hidden focus:outline-none"
+        class="w-16 h-16 aspect-square rounded-field border p-1 bg-brand-canvas-soft shrink-0 transition-all cursor-pointer overflow-hidden focus:outline-none flex items-center justify-center"
         :class="[
           activeImage === img
             ? 'border-brand-ink ring-2 ring-brand-ink/20 shadow-whisper scale-105'
@@ -143,7 +143,7 @@ const warrantyBadge = computed(() => {
           height="64"
           loading="lazy"
           decoding="async"
-          class="w-full h-full object-contain mix-blend-multiply"
+          class="w-full h-full object-cover rounded-[inherit]"
         />
       </button>
     </div>

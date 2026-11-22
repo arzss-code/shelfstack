@@ -37,7 +37,12 @@ const shareMessage = computed(() => {
 })
 
 const canNativeShare = computed(() => {
-  return import.meta.client && typeof navigator.share === 'function'
+  const isClient = typeof window !== 'undefined' || import.meta.client
+  const nav =
+    typeof navigator !== 'undefined'
+      ? navigator
+      : (globalThis as unknown as { navigator?: Navigator }).navigator
+  return Boolean(isClient && nav && typeof nav.share === 'function')
 })
 
 const handleShareWhatsApp = () => {
