@@ -226,35 +226,16 @@ onMounted(async () => {
         />
 
         <!-- Paginasi Server-side (Tier-1 E-Commerce Standard) -->
-        <div
+        <UiPagination
           v-if="totalPages > 1"
-          class="flex items-center justify-between border-t border-brand-hairsoft pt-6"
-        >
-          <p class="text-xs text-brand-muted m-0">
-            Halaman <span class="font-semibold text-brand-ink">{{ currentPage }}</span> dari
-            <span class="font-semibold text-brand-ink">{{ totalPages }}</span>
-          </p>
-          <div class="flex items-center gap-1.5">
-            <UiButton
-              variant="secondary"
-              size="sm"
-              icon="pi-chevron-left"
-              :disabled="currentPage <= 1 || pending"
-              @click="changePage(currentPage - 1, totalPages)"
-            >
-              Sebelumnya
-            </UiButton>
-            <UiButton
-              variant="secondary"
-              size="sm"
-              icon="pi-chevron-right"
-              :disabled="currentPage >= totalPages || pending"
-              @click="changePage(currentPage + 1, totalPages)"
-            >
-              Selanjutnya
-            </UiButton>
-          </div>
-        </div>
+          v-model="currentPage"
+          :total-pages="totalPages"
+          :total-count="totalProducts"
+          :page-size="itemsPerPage"
+          :loading="pending"
+          item-name="produk"
+          @change="(p) => changePage(p, totalPages)"
+        />
       </section>
     </div>
 
