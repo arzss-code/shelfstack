@@ -24,6 +24,30 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
   // Tech & Gadget
   {
     categorySlug: 'tech',
+    name: 'Headphone Studio ANC',
+    price: 2680000,
+    stock: 25,
+    description:
+      'Headphone nirkabel resolusi tinggi dengan peredam bising aktif hibrida, driver 40mm berdiafragma berilium, dan bantalan telinga busa memori.',
+    image_url: '/images/products/headphone-anc-black.jpg',
+    gallery_urls: [
+      '/images/products/headphone-anc-black.jpg',
+      '/images/products/headphone-anc-silver.jpg',
+    ],
+    weight_grams: 500,
+    specs: {
+      driver: '40mm Beryllium Diaphragm',
+      anc: 'Hybrid ANC -40dB Noise Cancellation',
+      baterai: '38 Jam Pemutaran Audio',
+      konektivitas: 'Bluetooth 5.3 & Jack 3.5mm OFC',
+    },
+    rating: 5.0,
+    review_count: 14,
+    sold_count: 32,
+    is_featured: false,
+  },
+  {
+    categorySlug: 'tech',
     name: 'Keyboard Mekanikal Nirkabel 75%',
     price: 1450000,
     stock: 32,
@@ -108,6 +132,27 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
   // Furnitur & Ruang Kerja
   {
     categorySlug: 'furniture',
+    name: 'Lampu Meja Task Aluminium',
+    price: 850000,
+    stock: 18,
+    description:
+      'Lampu meja fleksibel berbahan aluminium anodized dengan kontrol sentuh peredupan halus dan temperatur cahaya alami.',
+    image_url: '/images/products/lamp-task-black.jpg',
+    gallery_urls: ['/images/products/lamp-task-black.jpg', '/images/products/lamp-task-white.jpg'],
+    weight_grams: 1200,
+    specs: {
+      material: 'Anodized 6063 Aluminum Alloy',
+      temperature: '2700K - 6500K Stepless CCT',
+      daya: '12W High-CRI LED (Ra > 95)',
+      kontrol: 'Touch Sensor Dimming',
+    },
+    rating: 4.9,
+    review_count: 14,
+    sold_count: 26,
+    is_featured: false,
+  },
+  {
+    categorySlug: 'furniture',
     name: 'Meja Kerja Modular Solid Oak',
     price: 3250000,
     stock: 8,
@@ -152,7 +197,11 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 22,
     description:
       'Stand monitor ganda berbahan kayu walnut alami dengan rak bawah aluminium untuk menyimpan keyboard dan perlengkapan meja kerja.',
-    image_url: '/images/products/desk-oak-walnut.jpg',
+    image_url: '/images/products/monitor-stand-walnut.jpg',
+    gallery_urls: [
+      '/images/products/monitor-stand-walnut.jpg',
+      '/images/products/monitor-stand-oak.jpg',
+    ],
     weight_grams: 2800,
     specs: {
       dimensi: '105cm x 23cm x 11cm',
@@ -185,6 +234,27 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
   },
 
   // Rumah & Dapur
+  {
+    categorySlug: 'home',
+    name: 'Ketel Leher Angsa Matte Black',
+    price: 780000,
+    stock: 15,
+    description:
+      'Ketel seduh pour-over presisi dengan cerat leher angsa, termometer terintegrasi, dan pegangan kayu walnut ergonomis.',
+    image_url: '/images/products/kettle-gooseneck-black.jpg',
+    gallery_urls: ['/images/products/kettle-gooseneck-black.jpg'],
+    weight_grams: 800,
+    specs: {
+      kapasitas: '1000 ml',
+      material: 'Stainless Steel 304 Food Grade',
+      finishing: 'Matte Powder Coating',
+      fitur: 'Integrated Thermometer & Ergonomic Handle',
+    },
+    rating: 4.9,
+    review_count: 19,
+    sold_count: 33,
+    is_featured: false,
+  },
   {
     categorySlug: 'home',
     name: 'Dripper Kopi Keramik Pour-Over V60',
@@ -263,6 +333,30 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
   },
 
   // Pakaian & Aksesoris
+  {
+    categorySlug: 'lifestyle',
+    name: 'Tas Komuter EDC Ballistic',
+    price: 1120000,
+    stock: 12,
+    description:
+      'Tas komuter harian berkapasitas 20L dengan material nilon Cordura 1000D anti air, ritsleting YKK AquaGuard, dan kompartemen laptop 16 inci empuk.',
+    image_url: '/images/products/backpack-edc-black.jpg',
+    gallery_urls: [
+      '/images/products/backpack-edc-black.jpg',
+      '/images/products/backpack-edc-green.jpg',
+    ],
+    weight_grams: 850,
+    specs: {
+      material: 'Cordura 1000D Waterproof Nylon',
+      kapasitas: '20 Liter Daily Commute',
+      ritsleting: 'YKK AquaGuard Weatherproof',
+      kompartemen: 'Laptop 16 inch Suspended Padded',
+    },
+    rating: 4.9,
+    review_count: 21,
+    sold_count: 35,
+    is_featured: false,
+  },
   {
     categorySlug: 'lifestyle',
     name: 'Dompet Kartu Kulit Nabati Slim',
@@ -349,6 +443,30 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
   // Alat Tulis & Kerajinan
   {
     categorySlug: 'stationery',
+    name: 'Pena Gel Presisi Titanium',
+    price: 340000,
+    stock: 40,
+    description:
+      'Pena berbahan bodi titanium padat dengan mekanisme bolt-action tahan banting dan isi ulang standar internasional Schmidt EasyFlow.',
+    image_url: '/images/products/pen-titanium-black.jpg',
+    gallery_urls: [
+      '/images/products/pen-titanium-black.jpg',
+      '/images/products/pen-titanium-raw.jpg',
+    ],
+    weight_grams: 65,
+    specs: {
+      material: 'Grade 5 Solid Titanium Alloy',
+      mekanisme: 'Precision Bolt-Action',
+      refill: 'Schmidt EasyFlow 9000 Standard',
+      panjang: '135 mm / Diameter 10 mm',
+    },
+    rating: 4.95,
+    review_count: 28,
+    sold_count: 62,
+    is_featured: false,
+  },
+  {
+    categorySlug: 'stationery',
     name: 'Jurnal Grid Hardcover Kertas 120gsm',
     price: 175000,
     stock: 55,
@@ -393,7 +511,11 @@ const CURATED_PRODUCTS: SeedProductItem[] = [
     stock: 25,
     description:
       'Gulungan tempat alat tulis berbahan kulit asli samak nabati dengan 5 slot elastis untuk pena favorit dan tali pengikat kulit melingkar.',
-    image_url: '/images/products/pen-titanium-raw.jpg',
+    image_url: '/images/products/pencil-roll-brown.jpg',
+    gallery_urls: [
+      '/images/products/pencil-roll-brown.jpg',
+      '/images/products/pencil-roll-tan.jpg',
+    ],
     weight_grams: 145,
     specs: {
       material: 'Crazy Horse Genuine Leather',

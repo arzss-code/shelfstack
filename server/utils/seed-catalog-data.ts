@@ -182,7 +182,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Space Gray',
       colorClass: 'bg-[#475569]',
-      image_url: '/images/products/desk-mat-black.jpg',
+      image_url: '/images/products/laptop-stand-gray.jpg',
     },
     price_cents: 32000000,
     stock: 2,
@@ -268,7 +268,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'American Walnut',
       colorClass: 'bg-[#451a03]',
-      image_url: '/images/products/desk-oak-walnut.jpg',
+      image_url: '/images/products/monitor-stand-walnut.jpg',
     },
     price_cents: 68000000,
     stock: 12,
@@ -280,7 +280,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'White Oak',
       colorClass: 'bg-[#d97706]',
-      image_url: '/images/products/desk-oak-natural.jpg',
+      image_url: '/images/products/monitor-stand-oak.jpg',
     },
     price_cents: 68000000,
     stock: 10,
@@ -304,7 +304,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Cognac Brown',
       colorClass: 'bg-[#78350f]',
-      image_url: '/images/products/wallet-leather-tan.jpg',
+      image_url: '/images/products/desk-mat-brown.jpg',
     },
     price_cents: 21000000,
     stock: 1,
@@ -336,6 +336,18 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     stock: 15,
   },
   {
+    productName: 'Ketel Leher Angsa Matte Black',
+    sku: 'SS-KTL-GSN-BLK',
+    name: 'Matte Black',
+    attributes: {
+      color: 'Matte Black',
+      colorClass: 'bg-[#1c1917]',
+      image_url: '/images/products/kettle-gooseneck-black.jpg',
+    },
+    price_cents: 78000000,
+    stock: 15,
+  },
+  {
     productName: 'Gelas Kaca Borosilikat Double-Wall 350ml',
     sku: 'SS-GLS-BWL-350',
     name: 'Clear Borosilicate',
@@ -354,7 +366,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Warm Amber',
       colorClass: 'bg-[#d97706]',
-      image_url: '/images/products/coffee-grinder-silver.jpg',
+      image_url: '/images/products/glass-borosilicate-amber.jpg',
     },
     price_cents: 13500000,
     stock: 20,
@@ -378,7 +390,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Matte Obsidian',
       colorClass: 'bg-[#1c1917]',
-      image_url: '/images/products/coffee-canister-black.jpg',
+      image_url: '/images/products/coffee-grinder-black.jpg',
     },
     price_cents: 46000000,
     stock: 8,
@@ -402,7 +414,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Stainless Steel',
       colorClass: 'bg-[#cbd5e1]',
-      image_url: '/images/products/glass-borosilicate-clear.jpg',
+      image_url: '/images/products/coffee-canister-silver.jpg',
     },
     price_cents: 24000000,
     stock: 20,
@@ -505,6 +517,30 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     price_cents: 19500000,
     stock: 22,
   },
+  {
+    productName: 'Topi Baseball Katun Washed Unstructured',
+    sku: 'SS-CAP-BSB-BLK',
+    name: 'Washed Black',
+    attributes: {
+      color: 'Washed Black',
+      colorClass: 'bg-[#18181b]',
+      image_url: '/images/products/cap-baseball-black.jpg',
+    },
+    price_cents: 16500000,
+    stock: 24,
+  },
+  {
+    productName: 'Topi Baseball Katun Washed Unstructured',
+    sku: 'SS-CAP-BSB-KHK',
+    name: 'Vintage Khaki',
+    attributes: {
+      color: 'Vintage Khaki',
+      colorClass: 'bg-[#d4b996]',
+      image_url: '/images/products/cap-baseball-khaki.jpg',
+    },
+    price_cents: 16500000,
+    stock: 16,
+  },
 
   // 5. Alat Tulis & Kerajinan
   {
@@ -562,7 +598,7 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Crazy Horse Brown',
       colorClass: 'bg-[#78350f]',
-      image_url: '/images/products/pen-titanium-raw.jpg',
+      image_url: '/images/products/pencil-roll-brown.jpg',
     },
     price_cents: 24000000,
     stock: 15,
@@ -574,10 +610,34 @@ export const CURATED_VARIANTS: SeedVariantItem[] = [
     attributes: {
       color: 'Natural Tan',
       colorClass: 'bg-[#b45309]',
-      image_url: '/images/products/wallet-leather-tan.jpg',
+      image_url: '/images/products/pencil-roll-tan.jpg',
     },
     price_cents: 24000000,
     stock: 10,
+  },
+  {
+    productName: 'Penggaris Segitiga Arsitek Aluminium',
+    sku: 'SS-RLR-ARC-BLK',
+    name: 'Matte Black Anodized',
+    attributes: {
+      color: 'Matte Black Anodized',
+      colorClass: 'bg-[#18181b]',
+      image_url: '/images/products/ruler-architect-black.jpg',
+    },
+    price_cents: 13500000,
+    stock: 70,
+  },
+  {
+    productName: 'Klip Kertas Kuningan Solid Vintage (Set 10)',
+    sku: 'SS-CLP-BRS-VNT',
+    name: 'Brushed Brass',
+    attributes: {
+      color: 'Brushed Brass',
+      colorClass: 'bg-[#ca8a04]',
+      image_url: '/images/products/clips-brass-vintage.jpg',
+    },
+    price_cents: 8500000,
+    stock: 90,
   },
 ]
 

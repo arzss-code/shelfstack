@@ -4,11 +4,12 @@ const STORAGE_KEY = 'shelfstack_recent_searches'
 const MAX_RECENT_ITEMS = 6
 
 export const POPULAR_SEARCH_TAGS = Object.freeze([
-  'Mechanical Keyboard',
-  'Monitor Stand',
+  'Keyboard Mekanikal',
+  'Kursi Ergonomis',
+  'Tatakan Monitor',
   'Desk Mat',
-  'USB-C Hub',
-  'Ergonomic Chair',
+  'Headphone Studio',
+  'Dripper Kopi',
 ] as const)
 
 export function useRecentSearches() {
