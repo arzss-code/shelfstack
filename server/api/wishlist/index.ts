@@ -28,7 +28,13 @@ export default defineEventHandler(async (event) => {
           price_cents,
           image_url,
           stock,
-          category_id
+          category_id,
+          rating,
+          review_count,
+          sold_count,
+          categories (
+            name
+          )
         )
       `,
       )

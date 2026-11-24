@@ -114,6 +114,10 @@ const ASSETS_MAP = [
     url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80',
   },
   {
+    filename: 'kettle-gooseneck-black.jpg',
+    url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80',
+  },
+  {
     filename: 'coffee-grinder-silver.jpg',
     url: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80',
   },
@@ -199,7 +203,7 @@ const ASSETS_MAP = [
   },
   {
     filename: 'pencil-roll-brown.jpg',
-    url: 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=800&q=80',
+    url: 'https://images.unsplash.com/photo-1569683795645-b62e50fbf103?auto=format&fit=crop&w=800&q=80',
   },
   {
     filename: 'pencil-roll-tan.jpg',

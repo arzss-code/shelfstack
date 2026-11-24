@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
         .from('products')
         .select('id, name, slug, price, image_url, stock, categories(id, name, slug)')
         .is('deleted_at', null)
-        .ilike('name', `%${sanitizedKeyword}%`)
+        .or(`name.ilike.%${sanitizedKeyword}%,description.ilike.%${sanitizedKeyword}%`)
         .order('is_featured', { ascending: false })
         .order('rating', { ascending: false })
         .limit(5),
