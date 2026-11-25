@@ -6,7 +6,8 @@ import VoucherTicketCard from '~/components/account/VoucherTicketCard.vue'
 import VoucherClaimInput from '~/components/account/VoucherClaimInput.vue'
 import UiEmptyState from '~/components/ui/UiEmptyState.vue'
 import UiAlert from '~/components/ui/UiAlert.vue'
-import UiButton from '~/components/ui/UiButton.vue'
+import UiSkeleton from '~/components/ui/UiSkeleton.vue'
+import UiTabs, { type UiTabItem } from '~/components/ui/UiTabs.vue'
 import type { UserVoucherItem } from '~~/shared/schemas/user-voucher'
 
 definePageMeta({ middleware: 'auth' })
@@ -29,13 +30,34 @@ const {
   claimVoucherByCode,
 } = useUserVouchers()
 
-const activeTab = ref<'claimed' | 'discoverable' | 'history'>('claimed')
-const categoryFilter = ref<'all' | 'percentage' | 'fixed'>('all')
+type VoucherTab = 'claimed' | 'discoverable' | 'history'
+type VoucherCategoryFilter = 'all' | 'percentage' | 'fixed'
+
+const activeTab = ref<VoucherTab>('claimed')
+const categoryFilter = ref<VoucherCategoryFilter>('all')
 const claimingId = ref<string | null>(null)
 
 onMounted(async () => {
   await fetchVouchers()
 })
+
+const tabItems = computed<UiTabItem[]>(() => [
+  { value: 'claimed', label: 'Voucher Saya', count: activeCount.value },
+  { value: 'discoverable', label: 'Temukan Promo', count: discoverableVouchers.value.length },
+  { value: 'history', label: 'Riwayat', count: historyVouchers.value.length },
+])
+
+const filterOptions: Array<{ id: VoucherCategoryFilter; label: string }> = [
+  { id: 'all', label: 'Semua' },
+  { id: 'percentage', label: 'Persentase' },
+  { id: 'fixed', label: 'Potongan Tetap' },
+]
+
+const onTabChange = (val: string) => {
+  if (val === 'claimed' || val === 'discoverable' || val === 'history') {
+    activeTab.value = val
+  }
+}
 
 const currentVouchers = computed<UserVoucherItem[]>(() => {
   if (activeTab.value === 'claimed') return claimedVouchers.value
@@ -56,185 +78,171 @@ const handleClaimCoupon = async (couponId: string) => {
 </script>
 
 <template>
-  <div class="space-y-6 pb-16">
-    <!-- Breadcrumbs -->
+  <div class="space-y-4 pb-16">
+    <!-- Desktop Breadcrumbs -->
     <nav
       aria-label="Breadcrumbs"
-      class="flex items-center gap-2 text-xs font-medium text-brand-muted pb-2 overflow-x-auto"
+      class="hidden sm:flex items-center gap-2 text-xs font-medium text-brand-muted overflow-x-auto"
     >
-      <NuxtLink to="/" class="hover:text-brand-ink no-underline text-brand-muted transition-colors">
+      <NuxtLink
+        to="/"
+        class="hover:text-brand-ink no-underline text-brand-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded-sm"
+      >
         ShelfStack
       </NuxtLink>
-      <span class="text-brand-faint">/</span>
+      <span class="text-brand-faint" aria-hidden="true">/</span>
       <span class="text-brand-ink font-semibold">Voucher Saya</span>
     </nav>
 
-    <!-- 2-Column Responsive Layout (Sidebar on xl, Horizontal Tabs on < xl) -->
-    <div class="flex flex-col xl:flex-row gap-6 items-start">
+    <!-- 2-Column Responsive Layout -->
+    <div class="flex flex-col xl:flex-row gap-4 xl:gap-6 items-start">
       <AccountSidebar />
 
-      <!-- Right Main Content Panel -->
-      <div class="flex-1 min-w-0 w-full space-y-6">
-        <!-- Banner Klaim Kode Promo Manual -->
+      <div class="flex-1 min-w-0 w-full space-y-3.5">
+        <!-- Compact Header -->
+        <header class="pb-3.5 border-b border-brand-hair">
+          <div class="flex items-center gap-2">
+            <h1
+              class="font-display text-lg sm:text-2xl font-bold text-brand-ink tracking-[-0.02em] m-0 [text-wrap:balance]"
+            >
+              Voucher Saya
+            </h1>
+            <span
+              v-if="activeCount > 0"
+              class="px-2 py-0.5 rounded-full bg-brand-canvas-soft border border-brand-hair text-brand-ink text-[11px] font-semibold tabular-nums"
+            >
+              {{ activeCount }} aktif
+            </span>
+          </div>
+          <p class="text-xs text-brand-muted m-0 mt-1 [text-wrap:pretty]">
+            Klaim kode promo dan kelola kupon diskon siap pakai saat checkout.
+          </p>
+        </header>
+
+        <!-- Manual Promo Claim Bar -->
         <VoucherClaimInput :loading="isClaiming" @submit="claimVoucherByCode" />
 
-        <!-- Tab Navigasi Dompet Voucher -->
-        <div
-          class="bg-brand-canvas border border-brand-hair rounded-card p-4 sm:p-5 shadow-whisper"
-        >
+        <!-- Single-Row Scrollable Tabs + Type Filter Chips -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+          <UiTabs
+            :model-value="activeTab"
+            :items="tabItems"
+            full-width
+            class="lg:w-auto"
+            aria-label="Navigasi dompet voucher"
+            @update:model-value="onTabChange"
+          />
+
           <div
-            class="flex items-center justify-between gap-3 border-b border-brand-hairsoft pb-3 flex-wrap"
+            class="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0"
+            role="group"
+            aria-label="Filter jenis diskon voucher"
           >
-            <div class="flex items-center gap-1.5 sm:gap-2">
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-field text-xs font-bold transition-all cursor-pointer border-0"
-                :class="
-                  activeTab === 'claimed'
-                    ? 'bg-brand-ink text-brand-onink shadow-whisper'
-                    : 'text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft'
-                "
-                @click="activeTab = 'claimed'"
-              >
-                Voucher Saya ({{ activeCount }})
-              </button>
-
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-field text-xs font-bold transition-all cursor-pointer border-0"
-                :class="
-                  activeTab === 'discoverable'
-                    ? 'bg-brand-ink text-brand-onink shadow-whisper'
-                    : 'text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft'
-                "
-                @click="activeTab = 'discoverable'"
-              >
-                Temukan Promo ({{ discoverableVouchers.length }})
-              </button>
-
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-field text-xs font-bold transition-all cursor-pointer border-0"
-                :class="
-                  activeTab === 'history'
-                    ? 'bg-brand-ink text-brand-onink shadow-whisper'
-                    : 'text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft'
-                "
-                @click="activeTab = 'history'"
-              >
-                Riwayat ({{ historyVouchers.length }})
-              </button>
-            </div>
-
-            <!-- Filter Chips Kategori -->
-            <div class="flex items-center gap-1 text-[11px]">
-              <button
-                type="button"
-                class="px-2.5 py-1 rounded-full border transition-colors cursor-pointer"
-                :class="
-                  categoryFilter === 'all'
-                    ? 'bg-brand-canvas border-brand-ink text-brand-ink font-bold shadow-whisper'
-                    : 'border-brand-hair text-brand-muted hover:text-brand-ink'
-                "
-                @click="categoryFilter = 'all'"
-              >
-                Semua
-              </button>
-              <button
-                type="button"
-                class="px-2.5 py-1 rounded-full border transition-colors cursor-pointer"
-                :class="
-                  categoryFilter === 'percentage'
-                    ? 'bg-brand-canvas border-brand-ink text-brand-ink font-bold shadow-whisper'
-                    : 'border-brand-hair text-brand-muted hover:text-brand-ink'
-                "
-                @click="categoryFilter = 'percentage'"
-              >
-                Persentase
-              </button>
-              <button
-                type="button"
-                class="px-2.5 py-1 rounded-full border transition-colors cursor-pointer"
-                :class="
-                  categoryFilter === 'fixed'
-                    ? 'bg-brand-canvas border-brand-ink text-brand-ink font-bold shadow-whisper'
-                    : 'border-brand-hair text-brand-muted hover:text-brand-ink'
-                "
-                @click="categoryFilter = 'fixed'"
-              >
-                Potongan Tetap
-              </button>
-            </div>
-          </div>
-
-          <!-- Alert Error State -->
-          <UiAlert v-if="error" variant="danger" class="mt-4">
-            {{ error }}
-          </UiAlert>
-
-          <!-- Loading State: Skeleton Cards -->
-          <div v-if="isLoading" class="space-y-3.5 mt-4">
-            <div
-              v-for="i in 3"
-              :key="i"
-              class="h-28 bg-brand-canvas-soft rounded-card animate-pulse border border-brand-hairsoft"
-            />
-          </div>
-
-          <!-- Empty State -->
-          <div v-else-if="filteredVouchers.length === 0" class="py-8">
-            <UiEmptyState
-              v-if="activeTab === 'claimed'"
-              icon="pi pi-ticket"
-              title="Belum Ada Voucher Tersimpan"
-              description="Klaim voucher promo yang tersedia di tab Temukan Promo untuk mendapatkan potongan belanja."
+            <button
+              v-for="opt in filterOptions"
+              :key="opt.id"
+              type="button"
+              :aria-pressed="categoryFilter === opt.id"
+              class="voucher-chip px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+              :class="
+                categoryFilter === opt.id
+                  ? 'bg-brand-ink text-brand-onink border-brand-ink'
+                  : 'bg-brand-canvas border-brand-hair text-brand-muted hover:text-brand-ink hover:border-brand-ink/40'
+              "
+              @click="categoryFilter = opt.id"
             >
-              <template #action>
-                <UiButton
-                  variant="primary"
-                  size="sm"
-                  class="mt-2"
-                  @click="activeTab = 'discoverable'"
-                >
-                  Lihat Promo Tersedia
-                </UiButton>
-              </template>
-            </UiEmptyState>
-
-            <UiEmptyState
-              v-else-if="activeTab === 'discoverable'"
-              icon="pi pi-check-circle"
-              title="Semua Promo Telah Diklaim"
-              description="Anda telah mengklaim seluruh kupon promo publik yang tersedia saat ini."
-            >
-              <template #action>
-                <UiButton variant="secondary" size="sm" class="mt-2" @click="activeTab = 'claimed'">
-                  Buka Voucher Saya
-                </UiButton>
-              </template>
-            </UiEmptyState>
-
-            <UiEmptyState
-              v-else
-              icon="pi pi-history"
-              title="Tidak Ada Riwayat Voucher"
-              description="Voucher yang telah Anda gunakan pada pesanan atau kedaluwarsa akan tercatat di sini."
-            />
+              {{ opt.label }}
+            </button>
           </div>
+        </div>
 
-          <!-- List Voucher Cards -->
-          <div v-else class="space-y-3.5 mt-4">
-            <VoucherTicketCard
-              v-for="v in filteredVouchers"
-              :key="v.id"
-              :voucher="v"
-              :mode="activeTab"
-              :loading="claimingId === v.coupon_id"
-              @claim="handleClaimCoupon"
-            />
+        <!-- Error State -->
+        <UiAlert v-if="error" variant="danger">
+          {{ error }}
+        </UiAlert>
+
+        <!-- Loading Skeleton -->
+        <div v-if="isLoading" role="status" aria-busy="true" class="space-y-3">
+          <span class="sr-only">Memuat daftar voucher…</span>
+          <div
+            v-for="i in 3"
+            :key="i"
+            class="p-4 rounded-card border border-brand-hair bg-brand-canvas flex items-center justify-between gap-4"
+          >
+            <div class="flex-1 min-w-0 space-y-2">
+              <UiSkeleton width="w-28" height="h-4" />
+              <UiSkeleton width="w-3/4" height="h-3.5" />
+            </div>
+            <UiSkeleton width="w-24" height="h-8" shape="pill" class="shrink-0" />
           </div>
+        </div>
+
+        <!-- Empty States (wired to real UiEmptyState action-label & @action) -->
+        <UiEmptyState
+          v-else-if="filteredVouchers.length === 0 && categoryFilter !== 'all'"
+          icon="pi-filter"
+          title="Tidak Ada Voucher untuk Jenis Ini"
+          description="Tidak ditemukan voucher sesuai filter jenis potongan yang dipilih."
+          action-label="Tampilkan Semua"
+          @action="categoryFilter = 'all'"
+        />
+
+        <UiEmptyState
+          v-else-if="filteredVouchers.length === 0 && activeTab === 'claimed'"
+          icon="pi-ticket"
+          title="Belum Ada Voucher Tersimpan"
+          description="Klaim voucher promo yang tersedia di tab Temukan Promo untuk mendapatkan potongan belanja."
+          action-label="Lihat Promo Tersedia"
+          @action="activeTab = 'discoverable'"
+        />
+
+        <UiEmptyState
+          v-else-if="filteredVouchers.length === 0 && activeTab === 'discoverable'"
+          icon="pi-check-circle"
+          title="Semua Promo Telah Diklaim"
+          description="Anda telah mengklaim seluruh kupon promo publik yang tersedia saat ini."
+          action-label="Buka Voucher Saya"
+          @action="activeTab = 'claimed'"
+        />
+
+        <UiEmptyState
+          v-else-if="filteredVouchers.length === 0"
+          icon="pi-history"
+          title="Tidak Ada Riwayat Voucher"
+          description="Voucher yang telah Anda gunakan pada pesanan atau kedaluwarsa akan tercatat di sini."
+        />
+
+        <!-- List Voucher Cards -->
+        <div v-else class="space-y-3">
+          <VoucherTicketCard
+            v-for="v in filteredVouchers"
+            :key="v.id"
+            :voucher="v"
+            :mode="activeTab"
+            :loading="claimingId === v.coupon_id"
+            @claim="handleClaimCoupon"
+          />
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.voucher-chip {
+  touch-action: manipulation;
+}
+
+@media (pointer: coarse) {
+  .voucher-chip {
+    min-block-size: 36px;
+    position: relative;
+  }
+
+  .voucher-chip::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+  }
+}
+</style>
