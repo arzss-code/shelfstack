@@ -2,6 +2,23 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.32] - 2026-11-25
+
+### Redisain Wishlist, Polish UX Mobile Storefront & Akun, Aset Studio Katalog, dan Sinkronisasi Migrasi Supabase
+
+- **Redisain Halaman Wishlist & Pengayaan Metadata (PR #117)**:
+  - Merombak `app/pages/wishlist.vue` bersama `WishlistItemRow.vue`, `WishlistFilterBar.vue`, dan `wishlist-helper.ts` dengan tata letak kompak, filter kategori/stok, serta ringkasan kategori, rating, ulasan, dan jumlah terjual dari `GET /api/wishlist` dan `POST /api/wishlist/sync`.
+  - Memperbaiki sinkronisasi seeder katalog (`seed-catalog.post.ts`, `seed-catalog-data.ts`, `supabase/seed.sql`), riwayat pencarian (`useRecentSearches.ts`), dan pencarian instan (`search-instant.get.ts`).
+- **Polish UX Mobile & Aksesibilitas Halaman Keranjang, Pesanan, Voucher, dan Alamat**:
+  - **Keranjang (`app/pages/cart.vue`, `app/components/cart/CartItemRow.vue`)**: Memisahkan baris item ke komponen modular (<= 300 baris), menambahkan konfirmasi `useUiConfirm()` saat mengosongkan keranjang, mengubah thumbnail menjadi `<NuxtLink>`, mengganti warna mentah dengan token semantik `brand-warning-*`/`brand-danger-*`, serta menerapkan layout container-query dengan area sentuh 44px.
+  - **Pesanan (`app/pages/orders/index.vue`)**: Menambahkan `<h1>Pesanan Saya</h1>` dengan badge jumlah, menyembunyikan breadcrumb redundan di mobile, serta menggunakan `<UiAlert variant="danger">`, `<UiEmptyState>`, dan `<UiSkeleton>` dengan atribut `role="status"` dan `aria-busy="true"`.
+  - **Voucher (`app/pages/account/vouchers.vue`)**: Memperbaiki tombol aksi dan kelas ikon ganda pada `UiEmptyState`, menambahkan `<h1>Voucher Saya</h1>`, menggunakan `<UiTabs>` satu baris scrollable, serta menambahkan `aria-pressed` dan area sentuh 44px pada chip filter diskon.
+  - **Daftar Alamat (`app/pages/account/addresses.vue`, `app/components/account/AddressFilterBar.vue`)**: Menyelaraskan heading `<h1>Daftar Alamat</h1>`, memperbaiki kelas ikon ganda, menghapus wrapper kartu bersarang, menambahkan label `sr-only`, `type="search"`, tombol hapus cepat, `aria-pressed`, `focus-visible:ring-2`, dan target sentuh 44px.
+- **Standarisasi Fotografi Studio Produk Katalog (Batch 1 Tech & Kursi Ergonomis)**:
+  - Memperbarui 12 aset fotografi studio berlatar netral `#ECEDEF` dengan geometri dan sudut konsisten antarvarian warna (`headphone-anc-*`, `mouse-ergonomic-*`, `charger-gan-*`, `laptop-stand-*`, `keyboard-75-angle.jpg`, `chair-mesh-*`, dan base `desk-oak-natural.jpg`).
+- **Verifikasi Sinkronisasi Migrasi Supabase Remote**:
+  - Memverifikasi melalui `pnpm dlx supabase migration list --linked` bahwa seluruh 49 migrasi lokal, termasuk `20261202000001`, `20261203000001`, dan `20261204000001`, telah diterapkan dan sinkron penuh pada proyek Supabase remote `mbcyttxkfppcdvwitrif`.
+
 ## [v1.1.0-beta.31] - 2026-11-21
 
 ### Penuntasan Peningkatan Platform: Hardening Visual Dark Mode, Moderasi Ulasan, Persistent Outbox, dan Ongkir Dinamis Berbasis Wilayah

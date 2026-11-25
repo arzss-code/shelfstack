@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Pekerjaan aktif:** Penuntasan seluruh 5 fase Platform Enhancements (`v1.1.0-beta.31`), perapihan galeri produk detail kompak pas viewport (`ProductGallery.vue`), breadcrumbs responsif bebas overflow dini (`app/pages/product/[id].vue`), padding input pencarian katalog (`UiInput.vue`), tombol bagikan sosial dengan tooltip jelas (`ProductSocialShare.vue`), serta standarisasi fotografi produk studio multi-sudut seragam (`field-watch-angle.jpg`).
-- **Versi rilis aktif:** `v1.1.0-beta.31` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
-- **Quality Gate Terkini (2026-11-22):** `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `vitest run` 144 file / 1.431 test lolos 100% · `pnpm build` EXIT 0 · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
+- **Pekerjaan aktif:** Rilis `v1.1.0-beta.32` (redisain `/wishlist` + pengayaan metadata PR #117, polish UX mobile & aksesibilitas `/cart`, `/orders`, `/account/vouchers`, dan `/account/addresses`, regenerasi 12 aset fotografi studio produk katalog Batch 1 Tech dan kursi ergonomis berlatar `#ECEDEF` dengan sisa 32 aset varian terjadwal otomatis, serta verifikasi sinkronisasi seluruh 49 migrasi Supabase remote).
+- **Versi rilis aktif:** `v1.1.0-beta.32` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
+- **Quality Gate Terkini (2026-11-25):** `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `vitest run` 146 file / 1.442 test lolos 100% · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -47,9 +47,9 @@
 
 **Known gaps terdokumentasi:**
 
-- Runtime test PostgreSQL multi-koneksi untuk migrasi `20261202000001` dan `20261203000001` belum dieksekusi lokal karena daemon Docker offline; pada instance Supabase target wajib dijalankan `pnpm dlx supabase db push` sebelum mengaktifkan fitur tabel baru (`contact_messages`, kolom `deleted_at` kategori/flash deals, RPC `admin_restock_product`). Endpoint publik memiliki fallback defensif bila kolom `deleted_at` belum ada.
+- Sinkronisasi skema remote selesai diverifikasi (2026-11-25): `pnpm dlx supabase migration list --linked` mengonfirmasi seluruh 49 migrasi lokal, termasuk `20261202000001`, `20261203000001`, dan `20261204000001` (`public.email_outbox`, `contact_messages`, `deleted_at` kategori/flash deals, RPC `admin_restock_product`), sudah diterapkan dan sinkron penuh pada proyek Supabase `mbcyttxkfppcdvwitrif`. Runtime test PostgreSQL multi-koneksi lokal tetap belum dieksekusi karena daemon Docker lokal offline.
 - Cleanup avatar best-effort tetap tidak memakai antrean retry terpisah bila Storage API gagal sementara setelah update profil sukses.
-- Migrasi tabel `public.email_outbox` (`20261204000001_email_outbox_queue.sql`) perlu diterapkan via `pnpm dlx supabase db push` saat deployment instance Supabase aktif. Dispatcher outbox memiliki fallback otomatis ke in-memory bila tabel belum dimigrasikan.
+- Regenerasi foto studio varian produk katalog masih menyisakan 32 gambar (dimulai dari `desk-oak-walnut.jpg`) yang dijadwalkan lanjut otomatis pada branch `feat/catalog-variant-images` mengikuti jendela kuota generator gambar.
 
 ## 🚀 Riwayat Kemajuan per Fase
 
