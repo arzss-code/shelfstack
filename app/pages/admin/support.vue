@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminSupportInboxList from '~/components/admin/support/AdminSupportInboxList.vue'
 import AdminSupportChatPane from '~/components/admin/support/AdminSupportChatPane.vue'
 import AdminContactInboxPanel from '~/components/admin/support/AdminContactInboxPanel.vue'
@@ -103,25 +104,21 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="space-y-4 text-brand-ink">
-    <!-- Header -->
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h1 class="text-xl font-bold tracking-tight text-brand-ink flex items-center gap-2">
-          <span>Bantuan & Live Chat</span>
-          <span
-            v-if="totalUnreadCount > 0"
-            class="inline-flex items-center rounded-full border border-brand-danger-edge bg-brand-danger-tint px-2 py-0.5 text-xs font-semibold text-brand-danger-text"
-          >
-            {{ totalUnreadCount }} belum dibalas
-          </span>
-        </h1>
-        <p class="text-xs text-brand-muted">
-          Pusat layanan percakapan langsung dan resolusi kendala pelanggan secara real-time.
-        </p>
-      </div>
+  <div class="space-y-5 text-brand-ink">
+    <AdminPageHeader
+      title="Bantuan & Live Chat"
+      subtitle="Balas percakapan pelanggan dan kelola pesan masuk dari formulir kontak."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Bantuan & Live Chat' }]"
+    >
+      <template v-if="totalUnreadCount > 0" #title-badge>
+        <span
+          class="inline-flex items-center rounded-full border border-brand-danger-edge bg-brand-danger-tint px-2 py-0.5 text-xs font-semibold text-brand-danger-text"
+        >
+          {{ totalUnreadCount }} belum dibalas
+        </span>
+      </template>
 
-      <div class="flex items-center gap-2">
+      <template #actions>
         <UiButton
           size="sm"
           variant="outline"
@@ -129,10 +126,10 @@ onMounted(async () => {
           :loading="isLoadingThreads"
           @click="refreshData"
         >
-          <span class="sr-only sm:not-sr-only">Segarkan</span>
+          <span class="sr-only sm:not-sr-only">Segarkan Data</span>
         </UiButton>
-      </div>
-    </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- Error Banner -->
     <UiAlert v-if="error && activeChannel === 'live_chat'" tone="danger" class="text-xs">

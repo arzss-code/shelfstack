@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminFlashDealModal, {
   type FlashDealAdminRow,
 } from '~/components/admin/promotions/AdminFlashDealModal.vue'
@@ -117,25 +118,27 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1
-          class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0 mb-1"
+  <div class="space-y-5">
+    <AdminPageHeader
+      title="Promo & Flash Sale"
+      subtitle="Atur jadwal flash sale, kuota klaim, dan harga promo produk."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Promo & Flash Sale' }]"
+    >
+      <template #actions>
+        <UiButton
+          variant="outline"
+          size="sm"
+          icon="pi-refresh"
+          :loading="loading"
+          @click="loadData"
         >
-          Promo &amp; Flash Sale
-        </h1>
-        <p class="text-xs sm:text-sm text-brand-muted m-0">
-          Kelola jadwal kampanye Flash Deals aktif, kuota klaim, dan potongan harga resmi.
-        </p>
-      </div>
-      <div class="flex items-center gap-2">
-        <UiButton variant="outline" icon="pi-refresh" :loading="loading" @click="loadData">
-          Segarkan
+          Segarkan Data
         </UiButton>
-        <UiButton variant="primary" icon="pi-plus" @click="openCreate">Buat Flash Sale</UiButton>
-      </div>
-    </div>
+        <UiButton variant="primary" size="sm" icon="pi-plus" @click="openCreate">
+          Buat Flash Sale
+        </UiButton>
+      </template>
+    </AdminPageHeader>
 
     <UiAlert v-if="errorMsg" tone="danger" class="text-xs">
       <div class="flex items-center justify-between gap-3">

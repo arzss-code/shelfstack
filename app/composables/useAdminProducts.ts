@@ -20,6 +20,25 @@ export function useAdminProducts() {
   const searchQuery = ref('')
   const activeTab = ref('0')
   const sortOption = ref('name-asc')
+  const viewMode = ref<'grid' | 'table'>('grid')
+
+  const PRODUCT_VIEW_STORAGE_KEY = 'shelfstack-admin-products-view'
+
+  const setViewMode = (mode: 'grid' | 'table') => {
+    viewMode.value = mode
+    if (import.meta.client) {
+      try {
+        localStorage.setItem(PRODUCT_VIEW_STORAGE_KEY, mode)
+      } catch {
+        // Abaikan jika storage diblokir browser
+      }
+    }
+  }
+
+  const resetProductFilters = () => {
+    searchQuery.value = ''
+    sortOption.value = 'name-asc'
+  }
 
   const sortOptionsList = [
     { value: 'name-asc', label: 'Nama A-Z' },
@@ -85,6 +104,16 @@ export function useAdminProducts() {
   })
 
   onMounted(async () => {
+    if (import.meta.client) {
+      try {
+        const saved = localStorage.getItem(PRODUCT_VIEW_STORAGE_KEY)
+        if (saved === 'grid' || saved === 'table') {
+          viewMode.value = saved
+        }
+      } catch {
+        // Abaikan jika storage tidak tersedia
+      }
+    }
     try {
       await productStore.fetchProducts()
     } catch (error: unknown) {
@@ -216,9 +245,12 @@ export function useAdminProducts() {
     searchQuery,
     activeTab,
     sortOption,
+    viewMode,
     sortOptionsList,
     tabItems,
     filteredProducts,
+    setViewMode,
+    resetProductFilters,
     openStockMovements,
     openVariantsModal,
     openCategoryManagerModal,

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminCouponMetrics from '~/components/admin/coupons/AdminCouponMetrics.vue'
 import AdminCouponTable from '~/components/admin/coupons/AdminCouponTable.vue'
 import AdminCouponModal from '~/components/admin/coupons/AdminCouponModal.vue'
@@ -42,36 +43,25 @@ const {
 </script>
 
 <template>
-  <div class="admin-coupons-page space-y-6">
-    <!-- Header Section -->
-    <div
-      class="flex flex-col justify-between gap-4 border-b border-brand-hair pb-4 sm:flex-row sm:items-center"
+  <div class="admin-coupons-page space-y-5">
+    <AdminPageHeader
+      title="Kelola Voucher Promo"
+      subtitle="Atur kode kupon diskon, voucher penukaran koin, dan batas pemakaian."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Kelola Voucher' }]"
     >
-      <div>
-        <div class="mb-1 flex items-center gap-2 text-xs text-brand-muted">
-          <NuxtLink to="/admin" class="no-underline hover:text-brand-ink"> Dashboard </NuxtLink>
-          <span class="text-brand-faint">/</span>
-          <span class="font-semibold text-brand-ink">Kelola Voucher</span>
-        </div>
-        <h1 class="font-display text-2xl font-bold tracking-tight text-brand-ink sm:text-3xl">
-          Kelola Voucher Promo
-        </h1>
-        <p class="mt-0.5 text-xs text-brand-muted sm:text-sm">
-          Atur kode promo belanja, voucher penukaran koin loyalitas, dan pantau riwayat audit kuota.
-        </p>
-      </div>
-
-      <UiButton variant="primary" size="sm" icon="pi-plus" @click="openCreateModal">
-        Buat Voucher Baru
-      </UiButton>
-    </div>
+      <template #actions>
+        <UiButton variant="primary" size="sm" icon="pi-plus" @click="openCreateModal">
+          Buat Voucher Baru
+        </UiButton>
+      </template>
+    </AdminPageHeader>
 
     <!-- Executive Metrics Bento Grid -->
     <AdminCouponMetrics :metrics="metrics" />
 
     <!-- Filter & Search Bar -->
     <div
-      class="relative z-20 flex flex-col items-stretch justify-between gap-3 rounded-2xl border border-brand-hair bg-brand-canvas p-3 shadow-whisper sm:flex-row sm:items-center"
+      class="relative z-20 flex flex-col items-stretch justify-between gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper sm:flex-row sm:items-center"
     >
       <div class="w-full sm:w-72">
         <UiInput

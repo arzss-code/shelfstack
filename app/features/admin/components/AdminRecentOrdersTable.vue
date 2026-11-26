@@ -94,12 +94,12 @@ const formatDate = (dateStr: string) => {
           <tr
             class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
           >
-            <th class="py-3 px-4 font-semibold">ID Pesanan</th>
-            <th class="py-3 px-4 font-semibold">Pelanggan</th>
-            <th class="py-3 px-4 font-semibold">Tanggal</th>
-            <th class="py-3 px-4 font-semibold">Status</th>
-            <th class="py-3 px-4 font-semibold text-right">Total</th>
-            <th class="py-3 px-4 font-semibold text-center">Aksi</th>
+            <th scope="col" class="py-2.5 px-3.5 font-semibold">ID Pesanan</th>
+            <th scope="col" class="py-2.5 px-3.5 font-semibold">Pelanggan</th>
+            <th scope="col" class="py-2.5 px-3.5 font-semibold">Tanggal</th>
+            <th scope="col" class="py-2.5 px-3.5 font-semibold">Status</th>
+            <th scope="col" class="py-2.5 px-3.5 font-semibold text-right">Total</th>
+            <th scope="col" class="py-2.5 px-3.5 font-semibold text-center">Aksi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft">

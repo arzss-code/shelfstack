@@ -8,13 +8,13 @@ export class AdminOrdersPage extends BasePage {
   readonly searchInput: Locator
   readonly tableRows: Locator
 
-  readonly exportCsvButton: Locator
+  readonly exportMenuButton: Locator
 
   constructor(page: Page) {
     super(page)
     this.heading = page.getByRole('heading', { name: 'Kelola Pesanan' })
     this.refreshButton = page.getByRole('button', { name: 'Perbarui' })
-    this.exportCsvButton = page.getByRole('button', { name: 'Ekspor CSV' })
+    this.exportMenuButton = page.getByRole('button', { name: /ekspor data/i })
     this.searchInput = page.getByPlaceholder('Cari ID / Nama...')
     this.tableRows = page.locator('table tbody tr')
   }

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
+import AdminReturnMetrics from '~/components/admin/returns/AdminReturnMetrics.vue'
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import UiInput from '~/components/ui/UiInput.vue'
@@ -107,28 +109,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6 pb-12 text-brand-ink">
-    <!-- Header -->
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <div>
-        <h1 class="text-xl font-bold tracking-tight text-brand-ink">
-          Kelola Komplain & Retur Produk
-        </h1>
-        <p class="mt-0.5 text-xs text-brand-muted">
-          Pusat otorisasi pengembalian barang (*RMA*) dan penyelesaian garansi pelanggan.
-        </p>
-      </div>
-
-      <UiButton
-        size="sm"
-        variant="outline"
-        icon="pi-refresh"
-        :loading="isLoading"
-        @click="fetchReturns"
-      >
-        Segarkan Data
-      </UiButton>
-    </div>
+  <div class="space-y-5 text-brand-ink">
+    <AdminPageHeader
+      title="Kelola Komplain & Retur Produk"
+      subtitle="Tinjau pengajuan retur, status pengiriman kembali, dan penyelesaian garansi."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Komplain & Retur' }]"
+    >
+      <template #actions>
+        <UiButton
+          size="sm"
+          variant="outline"
+          icon="pi-refresh"
+          :loading="isLoading"
+          @click="fetchReturns"
+        >
+          Segarkan Data
+        </UiButton>
+      </template>
+    </AdminPageHeader>
 
     <!-- Error Alert -->
     <UiAlert v-if="errorMessage" tone="danger">
@@ -136,53 +134,23 @@ onMounted(() => {
     </UiAlert>
 
     <!-- Stat Cards KPI -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      <div class="rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
-        <span class="text-[11px] font-medium text-brand-muted">Menunggu Review</span>
-        <div class="mt-1 flex items-baseline justify-between">
-          <span class="text-2xl font-bold text-brand-warning-text">{{ metrics.requested }}</span>
-          <span class="text-[11px] text-brand-muted">tiket</span>
-        </div>
-      </div>
-
-      <div class="rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
-        <span class="text-[11px] font-medium text-brand-muted">Disetujui (Menunggu Kiriman)</span>
-        <div class="mt-1 flex items-baseline justify-between">
-          <span class="text-2xl font-bold text-brand-accent-text">{{ metrics.approved }}</span>
-          <span class="text-[11px] text-brand-muted">paket</span>
-        </div>
-      </div>
-
-      <div class="rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
-        <span class="text-[11px] font-medium text-brand-muted">Barang Tiba di Gudang</span>
-        <div class="mt-1 flex items-baseline justify-between">
-          <span class="text-2xl font-bold text-brand-ink">{{ metrics.item_received }}</span>
-          <span class="text-[11px] text-brand-muted">inspeksi</span>
-        </div>
-      </div>
-
-      <div class="rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
-        <span class="text-[11px] font-medium text-brand-muted">Selesai Dituntaskan</span>
-        <div class="mt-1 flex items-baseline justify-between">
-          <span class="text-2xl font-bold text-brand-success-text">{{ metrics.completed }}</span>
-          <span class="text-[11px] text-brand-muted">klaim</span>
-        </div>
-      </div>
-    </div>
+    <AdminReturnMetrics :metrics="metrics" />
 
     <!-- Filter Bar & Search -->
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+    <div
+      class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper"
+    >
       <!-- Status Tabs -->
       <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
         <button
           v-for="tab in statusFilterTabs"
           :key="tab.id"
           type="button"
-          class="rounded-full px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all cursor-pointer min-h-[36px]"
+          class="rounded-full px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all cursor-pointer min-h-[34px] border-0"
           :class="
             activeStatusFilter === tab.id
               ? 'bg-brand-ink text-brand-onink shadow-whisper'
-              : 'text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink'
+              : 'bg-transparent text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink'
           "
           @click="activeStatusFilter = tab.id"
         >
@@ -192,7 +160,16 @@ onMounted(() => {
 
       <!-- Search Input -->
       <div class="w-full sm:w-64">
-        <UiInput v-model="searchQuery" placeholder="Cari order / nama pemohon..." clearable />
+        <label for="admin-returns-search" class="sr-only">Cari order atau pemohon</label>
+        <UiInput
+          id="admin-returns-search"
+          v-model="searchQuery"
+          size="sm"
+          type="search"
+          left-icon="pi-search"
+          placeholder="Cari order / nama pemohon..."
+          clearable
+        />
       </div>
     </div>
 
@@ -200,31 +177,36 @@ onMounted(() => {
     <div
       class="overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper"
     >
-      <div class="overflow-x-auto">
+      <div
+        tabindex="0"
+        role="region"
+        aria-label="Tabel pengajuan komplain dan retur"
+        class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+      >
         <table class="w-full text-left text-xs border-collapse">
           <thead>
             <tr
-              class="border-b border-brand-hair bg-brand-canvas-soft text-[11px] font-bold text-brand-muted uppercase tracking-wider"
+              class="border-b border-brand-hair bg-brand-canvas-soft text-[11px] font-semibold text-brand-muted uppercase tracking-wider"
             >
-              <th class="py-3 px-4">Pesanan & Pemohon</th>
-              <th class="py-3 px-4">Alasan Kendala</th>
-              <th class="py-3 px-4">Opsi Solusi</th>
-              <th class="py-3 px-4">Status Tiket</th>
-              <th class="py-3 px-4">Tanggal Pengajuan</th>
-              <th class="py-3 px-4 text-right">Tindakan</th>
+              <th scope="col" class="py-2.5 px-3.5">Pesanan &amp; Pemohon</th>
+              <th scope="col" class="py-2.5 px-3.5">Alasan Kendala</th>
+              <th scope="col" class="py-2.5 px-3.5">Opsi Solusi</th>
+              <th scope="col" class="py-2.5 px-3.5">Status Tiket</th>
+              <th scope="col" class="py-2.5 px-3.5">Tanggal Pengajuan</th>
+              <th scope="col" class="py-2.5 px-3.5 text-right">Tindakan</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-brand-hairsoft">
             <tr v-if="isLoading">
               <td colspan="6" class="py-12 text-center text-brand-muted">
-                <i class="pi pi-spinner pi-spin text-lg" />
+                <i class="pi pi-spinner pi-spin text-lg" aria-hidden="true" />
                 <p class="mt-2 text-xs">Memuat daftar pengajuan retur...</p>
               </td>
             </tr>
 
             <tr v-else-if="returnsList.length === 0">
               <td colspan="6" class="py-12 text-center text-brand-muted">
-                <i class="pi pi-inbox text-2xl" />
+                <i class="pi pi-inbox text-2xl" aria-hidden="true" />
                 <p class="mt-2 font-medium text-xs">Tidak ada pengajuan retur yang cocok.</p>
               </td>
             </tr>
@@ -235,16 +217,16 @@ onMounted(() => {
               :key="item.id"
               class="hover:bg-brand-canvas-soft/60 transition-colors"
             >
-              <td class="py-3.5 px-4">
+              <td class="py-2.5 px-3.5">
                 <span class="block font-bold text-brand-ink">{{ item.order_number }}</span>
                 <span class="block text-[11px] text-brand-muted">{{ item.customer_name }}</span>
               </td>
-              <td class="py-3.5 px-4">
+              <td class="py-2.5 px-3.5">
                 <span class="font-medium text-brand-ink">
                   {{ RETURN_REASON_LABELS[item.reason_type] }}
                 </span>
               </td>
-              <td class="py-3.5 px-4">
+              <td class="py-2.5 px-3.5">
                 <span
                   class="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[11px] font-semibold"
                   :class="
@@ -256,20 +238,21 @@ onMounted(() => {
                   <i
                     :class="item.solution_type === 'refund' ? 'pi-wallet' : 'pi-replay'"
                     class="pi text-[10px]"
+                    aria-hidden="true"
                   />
                   <span>{{ item.solution_type === 'refund' ? 'Refund' : 'Tukar Unit' }}</span>
                 </span>
               </td>
-              <td class="py-3.5 px-4">
+              <td class="py-2.5 px-3.5">
                 <UiBadge
                   :label="RETURN_STATUS_MAP[item.status].label"
                   :variant="RETURN_STATUS_MAP[item.status].tone"
                 />
               </td>
-              <td class="py-3.5 px-4 text-brand-muted whitespace-nowrap">
+              <td class="py-2.5 px-3.5 text-brand-muted whitespace-nowrap">
                 {{ formatDate(item.created_at) }}
               </td>
-              <td class="py-3.5 px-4 text-right">
+              <td class="py-2.5 px-3.5 text-right">
                 <UiButton size="xs" variant="outline" @click="openDetailModal(item)">
                   Tinjau
                 </UiButton>

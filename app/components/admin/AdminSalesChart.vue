@@ -113,7 +113,7 @@ const shouldShowLabel = (idx: number, total: number) => {
 </script>
 
 <template>
-  <div class="rounded-card border border-brand-hair bg-brand-canvas p-6 shadow-whisper space-y-6">
+  <div class="rounded-card border border-brand-hair bg-brand-canvas p-5 shadow-whisper space-y-4">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <h2 class="font-display text-base font-bold text-brand-ink m-0 flex items-center gap-2">
@@ -185,7 +185,7 @@ const shouldShowLabel = (idx: number, total: number) => {
           }"
         >
           <p class="font-bold text-brand-ink m-0">{{ activeHoverData.pt.label }}</p>
-          <p class="font-display text-brand-accent font-bold m-0 mt-0.5 tabular">
+          <p class="font-display text-brand-accent-text font-bold m-0 mt-0.5 tabular">
             {{ formatRupiah(activeHoverData.pt.revenue) }}
           </p>
           <p class="text-[11px] text-brand-muted m-0">

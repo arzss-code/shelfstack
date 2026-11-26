@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminExpiryQueueCard from '~/features/orders/components/AdminExpiryQueueCard.vue'
+import AdminOrderExportMenu from '~/features/orders/components/AdminOrderExportMenu.vue'
 import AdminOrderTable from '~/features/orders/components/AdminOrderTable.vue'
 
 definePageMeta({
@@ -26,45 +28,35 @@ const {
   totalOrders,
   errorMessage,
   exporting,
+  exportingFormat,
   statusTabs,
   totalPages,
   fetchOrders,
   onStatusChange,
   onSearch,
   onSortChange,
-  handleExportCsv,
+  handleExport,
   prevPage,
   nextPage,
 } = useAdminOrdersList()
 </script>
 
 <template>
-  <div class="space-y-6 pb-16">
-    <!-- Header -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
-          Kelola Pesanan
-        </h1>
-        <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1">
-          Pantau seluruh pesanan, verifikasi pembayaran, dan jalankan pembaruan logistik secara
-          langsung.
-        </p>
-      </div>
+  <div class="space-y-5">
+    <AdminPageHeader
+      title="Kelola Pesanan"
+      subtitle="Pantau pesanan masuk, verifikasi pembayaran, dan perbarui status pengiriman."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Kelola Pesanan' }]"
+    >
+      <template #actions>
+        <AdminOrderExportMenu
+          :exporting="exporting"
+          :active-format="exportingFormat"
+          @export="handleExport"
+        />
 
-      <div class="flex items-center gap-2">
         <UiButton
           variant="outline"
-          size="sm"
-          icon="pi-download"
-          :loading="exporting"
-          @click="handleExportCsv"
-        >
-          Ekspor CSV
-        </UiButton>
-
-        <UiButton
-          variant="secondary"
           size="sm"
           icon="pi-refresh"
           :loading="loading"
@@ -72,14 +64,16 @@ const {
         >
           Perbarui
         </UiButton>
-      </div>
-    </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- BullMQ Order Expiry & DLQ Telemetry -->
     <AdminExpiryQueueCard />
 
     <!-- Filter & Search Controls -->
-    <div class="flex flex-col gap-3 rounded-2xl border border-brand-hair bg-brand-canvas-soft p-4">
+    <div
+      class="flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3.5 shadow-whisper"
+    >
       <!-- Status Tabs -->
       <UiTabs
         :model-value="activeStatus"

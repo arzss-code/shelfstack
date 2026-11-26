@@ -31,6 +31,7 @@ export function useAdminOrdersList() {
   const totalOrders = ref(0)
   const errorMessage = ref('')
   const exporting = ref(false)
+  const exportingFormat = ref<'csv' | 'xlsx' | null>(null)
   let orderChannel: RealtimeChannel | null = null
 
   const statusTabs = [
@@ -86,22 +87,32 @@ export function useAdminOrdersList() {
     fetchOrders()
   }
 
-  const handleExportCsv = async () => {
+  const handleExport = async (format: 'csv' | 'xlsx' = 'csv') => {
     exporting.value = true
+    exportingFormat.value = format
     try {
-      const params: Record<string, string> = {}
+      const params: Record<string, string> = { format }
       if (activeStatus.value) params.status = activeStatus.value
       if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
       if (fromDate.value) params.from = fromDate.value
       if (toDate.value) params.to = toDate.value
       if (sortParam.value) params.sort = sortParam.value
 
-      const res = await $fetch<string>('/api/admin/orders/export', { params, responseType: 'text' })
-      const blob = new Blob([res], { type: 'text/csv;charset=utf-8;' })
+      const dateStamp = new Date().toISOString().slice(0, 10)
+      const mimeType =
+        format === 'xlsx'
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          : 'text/csv;charset=utf-8;'
+      const buf = await $fetch<ArrayBuffer>('/api/admin/orders/export', {
+        params,
+        responseType: 'arrayBuffer',
+      })
+      const blob = new Blob([buf], { type: mimeType })
+
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', `laporan-pesanan-${new Date().toISOString().slice(0, 10)}.csv`)
+      link.setAttribute('download', `laporan-pesanan-${dateStamp}.${format}`)
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -109,19 +120,28 @@ export function useAdminOrdersList() {
 
       toast.show({
         title: 'Ekspor Berhasil',
-        message: 'Laporan CSV pesanan berhasil diunduh.',
+        message:
+          format === 'xlsx'
+            ? 'Laporan Excel (.xlsx) pesanan berhasil diunduh.'
+            : 'Laporan CSV pesanan berhasil diunduh.',
         tone: 'success',
       })
     } catch {
       toast.show({
         title: 'Gagal Ekspor',
-        message: 'Gagal mengunduh laporan CSV pesanan.',
+        message:
+          format === 'xlsx'
+            ? 'Gagal mengunduh laporan Excel pesanan.'
+            : 'Gagal mengunduh laporan CSV pesanan.',
         tone: 'error',
       })
     } finally {
       exporting.value = false
+      exportingFormat.value = null
     }
   }
+
+  const handleExportCsv = () => handleExport('csv')
 
   const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize) || 1)
 
@@ -223,12 +243,14 @@ export function useAdminOrdersList() {
     totalOrders,
     errorMessage,
     exporting,
+    exportingFormat,
     statusTabs,
     totalPages,
     fetchOrders,
     onStatusChange,
     onSearch,
     onSortChange,
+    handleExport,
     handleExportCsv,
     prevPage,
     nextPage,

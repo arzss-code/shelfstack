@@ -4,8 +4,17 @@ Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
 ## [v1.1.0-beta.36] - 2026-11-26
 
-### Remediasi Audit UI/UX, Dark Mode, dan WCAG 2.1 AA Back-Office Admin (11/11 Rute)
+### Standardisasi Desain Admin, View Tabel Produk, Ekspor Excel/CSV Pesanan, & Audit WCAG 2.1 AA (11/11 Rute)
 
+- **Penyeragaman Konsistensi Desain Admin (11/11 Rute + Detail Pesanan)**:
+  - Memperkenalkan komponen `AdminPageHeader.vue` (hierarki breadcrumb seragam, ukuran heading `text-xl sm:text-2xl`, subjudul padat bebas jargon, batas bawah konsisten, dan tombol header seragam `UiButton size="sm"`).
+  - Menyeragamkan ritme spasi halaman (`space-y-5` di dalam `<main>`), radius permukaan (`rounded-card`), kepadatan kartu metrik (`p-4`, ikon `h-8 w-8 rounded-lg`) di `AdminStatCard.vue`, `AdminUserMetrics.vue`, `AdminReviewsMetricCards.vue`, `AdminCouponMetrics.vue`, `AdminReturnMetrics.vue`, dan `categories.vue`, serta header/sel tabel kompak (`py-2.5 px-3.5`) di seluruh tabel admin.
+  - Merapikan tautan eksternal `target="_blank"` di tabel ulasan & kategori dengan `rel="noopener noreferrer"`.
+- **Mode Tampilan Tabel pada Kelola Produk (`products.vue`, `AdminProductTable.vue`, `useAdminProducts.ts`)**:
+  - Menambahkan kontrol toggle `Grid` / `Tabel` (`aria-pressed`, tersimpan otomatis di `localStorage`) pada toolbar filter `/admin/products` untuk memindai produk, SKU/slug, kategori, harga, stok, jumlah terjual, rating, serta seluruh aksi manajemen (Varian, Mutasi Stok, Ubah, Hapus/Restore) secara padat dan informatif.
+- **Tombol Gabung Ekspor Excel (.xlsx) & CSV di Kelola Pesanan (`AdminOrderExportMenu.vue`, `/api/admin/orders/export`, `server/utils/xlsx.ts`)**:
+  - Menambahkan generator workbook OpenXML `.xlsx` native zero-dependency (`server/utils/xlsx.ts`) yang menghasilkan berkas Excel valid dengan header terformat dan tipe numerik IDR, mendukung query `?format=xlsx|csv` pada `server/api/admin/orders/export.get.ts`.
+  - Menggabungkan aksi unduhan menjadi satu dropdown menu aksesibel `Ekspor Data` (`AdminOrderExportMenu.vue`) dengan pilihan `Unduh Excel (.xlsx)` dan `Unduh CSV (.csv)`, navigasi keyboard panah/Escape, serta fokus kembali ke pemicu.
 - **Perbaikan Layout & Kontras Kritis (P0)**:
   - Memindahkan bar tombol aksi manajemen produk di `ProductCard.vue` ke baris footer terpisah dan mengizinkan wrapping rapi pada baris harga + stok agar tidak terjadi overflow horizontal di desktop maupun mobile (`375px`) serta angka harga tidak terpotong elipsis.
   - Menata ulang header kartu KPI di `AdminStatCard.vue` (ikon sejajar baris judul atas) agar nominal `Revenue Bulan Ini` mendapat lebar penuh dan tidak bertabrakan dengan ikon dompet.

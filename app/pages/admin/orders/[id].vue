@@ -53,7 +53,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="space-y-6 pb-20">
+  <div class="space-y-5">
     <!-- Breadcrumb -->
     <div class="flex items-center gap-2 text-xs text-brand-muted">
       <NuxtLink
@@ -69,9 +69,9 @@ useSeoMeta({
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="space-y-4 py-8">
+    <div v-if="loading" class="space-y-4 py-6">
       <div class="h-10 w-64 animate-pulse rounded bg-brand-hairsoft" />
-      <div class="h-48 w-full animate-pulse rounded-2xl bg-brand-hairsoft" />
+      <div class="h-48 w-full animate-pulse rounded-card bg-brand-hairsoft" />
     </div>
 
     <!-- Error State -->
@@ -88,10 +88,10 @@ useSeoMeta({
     </UiAlert>
 
     <!-- Content State -->
-    <div v-else-if="order" class="space-y-6">
+    <div v-else-if="order" class="space-y-5">
       <!-- Header Banner with Status & Actions -->
       <div
-        class="flex flex-col gap-4 rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper sm:flex-row sm:items-center sm:justify-between"
+        class="flex flex-col gap-4 rounded-card border border-brand-hair bg-brand-canvas-soft p-5 shadow-whisper sm:flex-row sm:items-center sm:justify-between"
       >
         <div class="space-y-1.5 min-w-0">
           <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
@@ -167,7 +167,7 @@ useSeoMeta({
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 items-start">
         <!-- Order Items List (2 cols) -->
         <div
-          class="lg:col-span-2 rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper space-y-4"
+          class="lg:col-span-2 rounded-card border border-brand-hair bg-brand-canvas-soft p-5 shadow-whisper space-y-4"
         >
           <h2 class="font-display text-base font-bold text-brand-ink m-0">Daftar Produk</h2>
 

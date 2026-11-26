@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import { useActivities } from '~/features/activities/composables/useActivities'
 import type { ActivityLog } from '~/features/activities/composables/useActivities'
 import {
@@ -89,17 +90,28 @@ const rowClass = (data: ActivityLog) =>
 </script>
 
 <template>
-  <div>
-    <div class="mb-8 flex items-center justify-between">
-      <div>
-        <h1 class="m-0 mb-1 text-3xl font-bold tracking-tight text-brand-ink">Activity Log</h1>
-        <p class="m-0 text-brand-muted">Riwayat lengkap aktivitas dan perubahan sistem.</p>
-      </div>
-    </div>
+  <div class="space-y-5">
+    <AdminPageHeader
+      title="Activity Log"
+      subtitle="Riwayat perubahan katalog, pesanan, dan aktivitas sistem."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Activity Log' }]"
+    >
+      <template #actions>
+        <UiButton
+          variant="outline"
+          size="sm"
+          icon="pi-refresh"
+          :loading="loading"
+          @click="fetchActivities"
+        >
+          Segarkan Data
+        </UiButton>
+      </template>
+    </AdminPageHeader>
 
     <!-- Filter Bar -->
     <div
-      class="mb-4 flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-4 md:flex-row md:items-center md:justify-between"
+      class="flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3.5 shadow-whisper md:flex-row md:items-center md:justify-between"
     >
       <UiTabs v-model="selectedAction" :items="actionTabs" aria-label="Filter jenis aksi" />
 
@@ -139,7 +151,7 @@ const rowClass = (data: ActivityLog) =>
     <!-- Tabel aktivitas: shimmer saat memuat, data setelahnya -->
     <div
       v-else
-      class="overflow-hidden rounded-2xl border border-brand-hair bg-brand-canvas-soft shadow-whisper"
+      class="overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper"
     >
       <!-- Skeleton Loading (Shimmer) -->
       <div v-if="loading" class="space-y-3 p-4" aria-busy="true">
@@ -156,41 +168,51 @@ const rowClass = (data: ActivityLog) =>
       </div>
 
       <!-- Data Table -->
-      <div v-else class="overflow-x-auto">
+      <div
+        v-else
+        tabindex="0"
+        role="region"
+        aria-label="Tabel activity log sistem"
+        class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+      >
         <table class="w-full text-left text-xs border-collapse">
           <thead>
             <tr
-              class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
+              class="border-b border-brand-hair bg-brand-canvas-soft text-brand-muted uppercase tracking-wider text-[11px]"
             >
-              <th class="py-3 px-4 font-semibold whitespace-nowrap w-[180px]">Waktu</th>
-              <th class="py-3 px-4 font-semibold">Aksi</th>
-              <th class="py-3 px-4 font-semibold min-w-[250px]">Deskripsi</th>
-              <th class="py-3 px-4 font-semibold whitespace-nowrap">IP Address</th>
-              <th class="py-3 px-4 font-semibold whitespace-nowrap">Browser / OS</th>
-              <th class="py-3 px-4 font-semibold text-center w-[100px]">Detail</th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold whitespace-nowrap w-[180px]">
+                Waktu
+              </th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold">Aksi</th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold min-w-[250px]">Deskripsi</th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold whitespace-nowrap">IP Address</th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold whitespace-nowrap">
+                Browser / OS
+              </th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold text-center w-[100px]">Detail</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-brand-hairsoft">
             <tr
               v-for="row in filteredActivities"
               :key="row.id"
-              class="hover:bg-brand-canvas transition-colors"
+              class="hover:bg-brand-canvas-soft/50 transition-colors"
               :class="rowClass(row)"
             >
-              <td class="py-3.5 px-4 font-medium text-brand-ink whitespace-nowrap">
+              <td class="py-2.5 px-3.5 font-medium text-brand-ink whitespace-nowrap">
                 {{ formatDate(row.created_at) }}
               </td>
-              <td class="py-3.5 px-4">
+              <td class="py-2.5 px-3.5">
                 <UiBadge :label="row.action" :variant="getActionVariant(row.action)" />
               </td>
-              <td class="py-3.5 px-4 text-brand-ink">{{ row.description }}</td>
-              <td class="py-3.5 px-4 text-brand-muted whitespace-nowrap">
+              <td class="py-2.5 px-3.5 text-brand-ink">{{ row.description }}</td>
+              <td class="py-2.5 px-3.5 text-brand-muted whitespace-nowrap">
                 {{ row.ip_address || '-' }}
               </td>
-              <td class="py-3.5 px-4 text-brand-muted whitespace-nowrap">
+              <td class="py-2.5 px-3.5 text-brand-muted whitespace-nowrap">
                 {{ row.browser || '-' }} • {{ row.platform || '-' }}
               </td>
-              <td class="py-3.5 px-4 text-center whitespace-nowrap">
+              <td class="py-2.5 px-3.5 text-center whitespace-nowrap">
                 <UiTooltip v-if="row.old_data || row.new_data" text="Lihat Detail" position="top">
                   <UiIconButton icon="pi-search" label="Lihat Detail" @click="viewDetails(row)" />
                 </UiTooltip>

@@ -85,12 +85,10 @@ const formatDate = (dateStr: string) => {
 </script>
 
 <template>
-  <div
-    class="overflow-hidden rounded-2xl border border-brand-hair bg-brand-canvas-soft shadow-whisper"
-  >
+  <div class="overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper">
     <!-- Skeleton Loading -->
-    <div v-if="loading" class="space-y-3 p-6" aria-busy="true">
-      <UiSkeleton v-for="i in 5" :key="i" height="h-14" />
+    <div v-if="loading" class="space-y-3 p-4" aria-busy="true">
+      <UiSkeleton v-for="i in 5" :key="i" height="h-12" />
     </div>
 
     <!-- Empty State -->
@@ -113,9 +111,9 @@ const formatDate = (dateStr: string) => {
       <table class="w-full border-collapse text-left text-xs">
         <thead>
           <tr
-            class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
+            class="border-b border-brand-hair bg-brand-canvas-soft text-brand-muted uppercase tracking-wider text-[11px]"
           >
-            <th scope="col" class="px-4 py-3" :aria-sort="getAriaSort('id')">
+            <th scope="col" class="px-3.5 py-2.5" :aria-sort="getAriaSort('id')">
               <UiSortHeader
                 sort-key="id"
                 label="ID pesanan"
@@ -126,7 +124,7 @@ const formatDate = (dateStr: string) => {
                 ID Pesanan
               </UiSortHeader>
             </th>
-            <th scope="col" class="px-4 py-3" :aria-sort="getAriaSort('name')">
+            <th scope="col" class="px-3.5 py-2.5" :aria-sort="getAriaSort('name')">
               <UiSortHeader
                 sort-key="name"
                 label="pelanggan"
@@ -137,7 +135,7 @@ const formatDate = (dateStr: string) => {
                 Pelanggan
               </UiSortHeader>
             </th>
-            <th scope="col" class="px-4 py-3" :aria-sort="getAriaSort('created_at')">
+            <th scope="col" class="px-3.5 py-2.5" :aria-sort="getAriaSort('created_at')">
               <UiSortHeader
                 sort-key="created_at"
                 label="tanggal"
@@ -148,9 +146,9 @@ const formatDate = (dateStr: string) => {
                 Tanggal
               </UiSortHeader>
             </th>
-            <th scope="col" class="px-4 py-3 text-center font-semibold">Item</th>
-            <th scope="col" class="px-4 py-3 font-semibold">Status</th>
-            <th scope="col" class="px-4 py-3 text-right" :aria-sort="getAriaSort('total')">
+            <th scope="col" class="px-3.5 py-2.5 text-center font-semibold">Item</th>
+            <th scope="col" class="px-3.5 py-2.5 font-semibold">Status</th>
+            <th scope="col" class="px-3.5 py-2.5 text-right" :aria-sort="getAriaSort('total')">
               <UiSortHeader
                 sort-key="total"
                 label="total"
@@ -161,19 +159,19 @@ const formatDate = (dateStr: string) => {
                 Total
               </UiSortHeader>
             </th>
-            <th scope="col" class="px-4 py-3 text-center font-semibold">Aksi</th>
+            <th scope="col" class="px-3.5 py-2.5 text-center font-semibold">Aksi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft">
           <tr
             v-for="order in orders"
             :key="order.id"
-            class="transition-colors hover:bg-brand-canvas"
+            class="transition-colors hover:bg-brand-canvas-soft/60"
           >
-            <td class="px-4 py-3.5 font-mono font-medium text-brand-ink">
+            <td class="px-3.5 py-2.5 font-mono font-medium text-brand-ink">
               #{{ order.id.slice(0, 8) }}
             </td>
-            <td class="px-4 py-3.5 text-brand-ink">
+            <td class="px-3.5 py-2.5 text-brand-ink">
               <div class="max-w-[180px] truncate font-medium">
                 {{ order.address?.name || 'Pelanggan' }}
               </div>
@@ -181,21 +179,21 @@ const formatDate = (dateStr: string) => {
                 {{ order.address?.city || '-' }}
               </div>
             </td>
-            <td class="whitespace-nowrap px-4 py-3.5 text-brand-muted">
+            <td class="whitespace-nowrap px-3.5 py-2.5 text-brand-muted">
               {{ formatDate(order.created_at) }}
             </td>
-            <td class="px-4 py-3.5 text-center text-brand-muted">
+            <td class="px-3.5 py-2.5 text-center text-brand-muted">
               {{ order.order_items?.length || 0 }} item
             </td>
-            <td class="px-4 py-3.5">
+            <td class="px-3.5 py-2.5">
               <UiBadge v-bind="getStatusBadge(order.status)" />
             </td>
             <td
-              class="tabular whitespace-nowrap px-4 py-3.5 text-right font-semibold text-brand-ink"
+              class="tabular whitespace-nowrap px-3.5 py-2.5 text-right font-semibold text-brand-ink"
             >
               {{ formatRupiah(order.total_cents / 100) }}
             </td>
-            <td class="whitespace-nowrap px-4 py-3.5 text-center">
+            <td class="whitespace-nowrap px-3.5 py-2.5 text-center">
               <UiButton
                 variant="outline"
                 size="xs"
@@ -214,7 +212,7 @@ const formatDate = (dateStr: string) => {
     <!-- Pagination Footer -->
     <div
       v-if="orders.length > 0"
-      class="flex items-center justify-between border-t border-brand-hair px-4 py-3 text-xs text-brand-muted"
+      class="flex flex-wrap items-center justify-between gap-2 border-t border-brand-hair bg-brand-canvas-soft/60 px-4 py-2.5 text-xs text-brand-muted"
     >
       <span>
         Menampilkan {{ (page - 1) * pageSize + 1 }} -

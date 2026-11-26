@@ -1,10 +1,12 @@
 import { describe, it, expect } from 'vitest'
+import { inflateRawSync } from 'node:zlib'
 import {
   escapeCsvCell,
   generateOrdersCsv,
   parseExportDateRange,
   type OrderCsvRow,
 } from '~/utils/csv'
+import { generateOrdersXlsx } from '~~/server/utils/xlsx'
 
 describe('CSV Order Export Utility', () => {
   it('escapes cells containing commas, quotes, and special characters', () => {
@@ -106,5 +108,58 @@ describe('Rentang Tanggal Ekspor (parseExportDateRange)', () => {
     if (!res.ok) {
       expect(res.error).toContain('tidak boleh setelah tanggal akhir')
     }
+  })
+})
+
+describe('XLSX Order Export Utility (generateOrdersXlsx)', () => {
+  function extractZipEntryText(zipBuffer: Buffer, targetName: string): string {
+    const nameBytes = Buffer.from(targetName, 'utf8')
+    let offset = 0
+    while (offset + 30 < zipBuffer.length && zipBuffer.readUInt32LE(offset) === 0x04034b50) {
+      const compMethod = zipBuffer.readUInt16LE(offset + 8)
+      const compSize = zipBuffer.readUInt32LE(offset + 18)
+      const nameLen = zipBuffer.readUInt16LE(offset + 26)
+      const extraLen = zipBuffer.readUInt16LE(offset + 28)
+      const entryName = zipBuffer.subarray(offset + 30, offset + 30 + nameLen)
+      const dataStart = offset + 30 + nameLen + extraLen
+      const payload = zipBuffer.subarray(dataStart, dataStart + compSize)
+      if (entryName.equals(nameBytes)) {
+        return compMethod === 8
+          ? inflateRawSync(payload).toString('utf8')
+          : payload.toString('utf8')
+      }
+      offset = dataStart + compSize
+    }
+    throw new Error(`Zip entry not found: ${targetName}`)
+  }
+
+  it('generates valid PKZIP OOXML workbook containing headers and escaped order rows', () => {
+    const rows: OrderCsvRow[] = [
+      {
+        id: 'ord-xlsx-1',
+        created_at: '2026-11-26T10:00:00Z',
+        customer_name: 'Siti & Co <Jakarta>',
+        city: 'Bandung',
+        phone: '081200001111',
+        status: 'completed',
+        item_count: 3,
+        total_idr: 450000,
+      },
+    ]
+
+    const buf = generateOrdersXlsx(rows)
+    // Valid ZIP signature PK\x03\x04
+    expect(buf.readUInt32LE(0)).toBe(0x04034b50)
+
+    const workbookXml = extractZipEntryText(buf, 'xl/workbook.xml')
+    expect(workbookXml).toContain('Laporan Pesanan')
+
+    const sheetXml = extractZipEntryText(buf, 'xl/worksheets/sheet1.xml')
+    expect(sheetXml).toContain('ID Pesanan')
+    expect(sheetXml).toContain('Total (IDR)')
+    expect(sheetXml).toContain('ord-xlsx-1')
+    expect(sheetXml).toContain('Siti &amp; Co &lt;Jakarta&gt;')
+    expect(sheetXml).toContain('<v>450000</v>')
+    expect(sheetXml).toContain('<v>3</v>')
   })
 })

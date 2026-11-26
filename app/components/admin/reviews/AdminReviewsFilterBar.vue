@@ -48,7 +48,7 @@ const ratingOptions = [
 
 <template>
   <div
-    class="p-4 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper flex flex-col md:flex-row md:items-center justify-between gap-4"
+    class="p-3.5 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper flex flex-col md:flex-row md:items-center justify-between gap-3"
     data-testid="admin-reviews-filter-bar"
   >
     <!-- Status Tabs -->

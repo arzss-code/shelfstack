@@ -49,13 +49,13 @@ const formatDate = (isoStr: string): string => {
           class="bg-brand-canvas-soft border-b border-brand-hair text-brand-muted uppercase tracking-wider text-[11px] font-semibold"
         >
           <tr>
-            <th class="py-3 px-4 min-w-[200px]">Produk</th>
-            <th class="py-3 px-4 min-w-[150px]">Pelanggan</th>
-            <th class="py-3 px-4 min-w-[120px]">Rating</th>
-            <th class="py-3 px-4 min-w-[260px]">Isi Ulasan</th>
-            <th class="py-3 px-4 min-w-[110px]">Tanggal</th>
-            <th class="py-3 px-4 min-w-[120px]">Status</th>
-            <th class="py-3 px-4 text-right min-w-[120px]">Aksi Moderasi</th>
+            <th scope="col" class="py-2.5 px-3.5 min-w-[200px]">Produk</th>
+            <th scope="col" class="py-2.5 px-3.5 min-w-[150px]">Pelanggan</th>
+            <th scope="col" class="py-2.5 px-3.5 min-w-[120px]">Rating</th>
+            <th scope="col" class="py-2.5 px-3.5 min-w-[260px]">Isi Ulasan</th>
+            <th scope="col" class="py-2.5 px-3.5 min-w-[110px]">Tanggal</th>
+            <th scope="col" class="py-2.5 px-3.5 min-w-[120px]">Status</th>
+            <th scope="col" class="py-2.5 px-3.5 text-right min-w-[120px]">Aksi Moderasi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
@@ -119,6 +119,7 @@ const formatDate = (isoStr: string): string => {
                   <NuxtLink
                     :to="`/product/${review.product_id}`"
                     target="_blank"
+                    rel="noopener noreferrer"
                     class="text-[11px] text-brand-accent-text hover:underline inline-flex items-center gap-0.5 mt-0.5"
                   >
                     <span>Lihat di Toko</span>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAdminUsers } from '~/composables/useAdminUsers'
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminUserMetrics from '~/components/admin/users/AdminUserMetrics.vue'
 import UiInput from '~/components/ui/UiInput.vue'
 import UiSelect from '~/components/ui/UiSelect.vue'
@@ -56,44 +57,36 @@ const formatDate = (dateStr?: string | null) => {
 </script>
 
 <template>
-  <div class="admin-users-page space-y-6">
-    <!-- Header Section -->
-    <div
-      class="flex flex-col justify-between gap-4 border-b border-brand-hair pb-4 sm:flex-row sm:items-center"
+  <div class="admin-users-page space-y-5">
+    <AdminPageHeader
+      title="Pelanggan & Customer Lifetime Value"
+      subtitle="Daftar pelanggan terdaftar, total pesanan, dan akumulasi nilai belanja."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Pelanggan & CRM' }]"
     >
-      <div>
-        <div class="mb-1 flex items-center gap-2 text-xs text-brand-muted">
-          <NuxtLink to="/admin" class="no-underline hover:text-brand-ink">Dashboard</NuxtLink>
-          <span class="text-brand-faint">/</span>
-          <span class="font-semibold text-brand-ink">CRM Pelanggan</span>
-        </div>
-        <h1 class="font-display text-2xl font-bold tracking-tight text-brand-ink sm:text-3xl">
-          Pelanggan &amp; Customer Lifetime Value
-        </h1>
-        <p class="mt-0.5 text-xs text-brand-muted sm:text-sm">
-          Pantau akumulasi belanja pembeli (LTV), total frekuensi pesanan, dan profil pelanggan
-          aktif.
-        </p>
-      </div>
-
-      <UiButton
-        variant="outline"
-        size="sm"
-        icon="pi-refresh"
-        :loading="loading"
-        @click="fetchCustomers"
-      >
-        Segarkan Data
-      </UiButton>
-    </div>
+      <template #actions>
+        <UiButton
+          variant="outline"
+          size="sm"
+          icon="pi-refresh"
+          :loading="loading"
+          @click="fetchCustomers"
+        >
+          Segarkan Data
+        </UiButton>
+      </template>
+    </AdminPageHeader>
 
     <!-- Executive Metrics Grid -->
     <AdminUserMetrics :metrics="metrics" />
 
     <!-- Toolbar Filters -->
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      class="flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper sm:flex-row sm:items-center sm:justify-between"
+    >
       <div class="w-full sm:max-w-xs">
+        <label for="admin-users-search" class="sr-only">Cari nama atau email pelanggan</label>
         <UiInput
+          id="admin-users-search"
           v-model="searchQuery"
           size="sm"
           type="search"
@@ -109,8 +102,8 @@ const formatDate = (dateStr?: string | null) => {
     <!-- Customers Table Card -->
     <UiCard :padded="false" class="overflow-hidden">
       <!-- Error state -->
-      <div v-if="error" class="p-6 text-center text-xs text-brand-danger">
-        <i class="pi pi-exclamation-circle text-lg mb-1 block" />
+      <div v-if="error" class="p-6 text-center text-xs text-brand-danger-text">
+        <i class="pi pi-exclamation-circle text-lg mb-1 block" aria-hidden="true" />
         <p class="m-0 font-medium">{{ error }}</p>
         <UiButton size="xs" variant="outline" class="mt-2" @click="fetchCustomers"
           >Coba Lagi</UiButton
@@ -118,7 +111,7 @@ const formatDate = (dateStr?: string | null) => {
       </div>
 
       <!-- Loading skeleton state -->
-      <div v-else-if="loading && !hasCustomers" class="p-6 space-y-4">
+      <div v-else-if="loading && !hasCustomers" class="p-4 space-y-3" aria-busy="true">
         <div v-for="i in 5" :key="i" class="h-12 w-full animate-pulse rounded-lg bg-brand-field" />
       </div>
 
@@ -131,18 +124,26 @@ const formatDate = (dateStr?: string | null) => {
       />
 
       <!-- Table View -->
-      <div v-else class="overflow-x-auto">
+      <div
+        v-else
+        tabindex="0"
+        role="region"
+        aria-label="Tabel data pelanggan dan LTV"
+        class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+      >
         <table class="w-full text-left text-xs border-collapse">
           <thead>
             <tr
-              class="border-b border-brand-hairsoft bg-brand-canvas-soft/60 text-brand-muted uppercase tracking-wider text-[11px]"
+              class="border-b border-brand-hair bg-brand-canvas-soft text-brand-muted uppercase tracking-wider text-[11px]"
             >
-              <th class="py-3 px-4 font-semibold">Pelanggan</th>
-              <th class="py-3 px-4 font-semibold">Terdaftar</th>
-              <th class="py-3 px-4 font-semibold text-center">Total Pesanan</th>
-              <th class="py-3 px-4 font-semibold text-right">Nilai Belanja (LTV)</th>
-              <th class="py-3 px-4 font-semibold">Pesanan Terakhir</th>
-              <th class="py-3 px-4 font-semibold text-center">Aksi</th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold">Pelanggan</th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold">Terdaftar</th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold text-center">Total Pesanan</th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold text-right">
+                Nilai Belanja (LTV)
+              </th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold">Pesanan Terakhir</th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold text-center">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
@@ -151,7 +152,7 @@ const formatDate = (dateStr?: string | null) => {
               :key="c.userId"
               class="hover:bg-brand-canvas-soft/40 transition-colors"
             >
-              <td class="py-3 px-4">
+              <td class="py-2.5 px-3.5">
                 <div class="flex items-center gap-3">
                   <div
                     class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-field text-brand-ink font-bold text-xs border border-brand-hair"
@@ -170,30 +171,30 @@ const formatDate = (dateStr?: string | null) => {
                   </div>
                 </div>
               </td>
-              <td class="py-3 px-4 text-brand-muted whitespace-nowrap">
+              <td class="py-2.5 px-3.5 text-brand-muted whitespace-nowrap">
                 {{ formatDate(c.createdAt) }}
               </td>
-              <td class="py-3 px-4 text-center">
+              <td class="py-2.5 px-3.5 text-center">
                 <UiBadge :label="`${c.totalOrders} order`" variant="default" />
               </td>
-              <td class="py-3 px-4 text-right">
+              <td class="py-2.5 px-3.5 text-right">
                 <span class="font-display font-bold text-sm text-brand-ink tabular">{{
                   c.formattedLtv
                 }}</span>
                 <span
                   v-if="c.completedOrders > 0"
-                  class="block text-[10.5px] text-brand-success font-medium"
+                  class="block text-[10.5px] text-brand-success-text font-medium"
                 >
                   {{ c.completedOrders }} lunas
                 </span>
               </td>
-              <td class="py-3 px-4 text-brand-muted whitespace-nowrap">
+              <td class="py-2.5 px-3.5 text-brand-muted whitespace-nowrap">
                 {{ formatDate(c.lastOrderAt) }}
               </td>
-              <td class="py-3 px-4 text-center">
-                <UiButton size="xs" variant="ghost" icon="pi-eye" @click="openCustomerDetail(c)"
-                  >Rincian</UiButton
-                >
+              <td class="py-2.5 px-3.5 text-center">
+                <UiButton size="xs" variant="outline" icon="pi-eye" @click="openCustomerDetail(c)">
+                  Rincian
+                </UiButton>
               </td>
             </tr>
           </tbody>
@@ -203,7 +204,7 @@ const formatDate = (dateStr?: string | null) => {
       <!-- Pagination Footer -->
       <div
         v-if="totalPages > 1"
-        class="flex items-center justify-between border-t border-brand-hairsoft px-4 py-3 text-xs text-brand-muted"
+        class="flex flex-wrap items-center justify-between gap-2 border-t border-brand-hair bg-brand-canvas-soft/60 px-4 py-2.5 text-xs text-brand-muted"
       >
         <span
           >Menampilkan halaman {{ currentPage }} dari {{ totalPages }} (Total

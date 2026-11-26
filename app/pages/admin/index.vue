@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminStatCard from '~/features/admin/components/AdminStatCard.vue'
 import AdminSalesChart from '~/components/admin/AdminSalesChart.vue'
 import AdminOperationalSignals from '~/features/admin/components/AdminOperationalSignals.vue'
@@ -82,22 +83,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="space-y-8 pb-16">
-    <!-- Header Page -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
-          Dashboard Eksekutif
-        </h1>
-        <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1">
-          Pantau omzet bulanan, volume order tertunda, dan kesehatan stok inventaris secara
-          realtime.
-        </p>
-      </div>
-
-      <div class="flex items-center gap-3">
+  <div class="space-y-5">
+    <AdminPageHeader
+      title="Dashboard Eksekutif"
+      subtitle="Ringkasan omzet bulanan, pesanan tertunda, dan stok menipis."
+    >
+      <template #actions>
         <UiButton
-          variant="secondary"
+          variant="outline"
           size="sm"
           icon="pi-refresh"
           :loading="refreshing"
@@ -108,8 +101,8 @@ onUnmounted(() => {
         <UiButton variant="primary" size="sm" icon="pi-shopping-bag" to="/admin/orders">
           Kelola Pesanan
         </UiButton>
-      </div>
-    </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- Error Alert -->
     <UiAlert v-if="errorMessage" tone="danger">

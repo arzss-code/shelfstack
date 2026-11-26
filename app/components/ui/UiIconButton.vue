@@ -24,7 +24,7 @@ const variantClass = computed(() => {
     case 'primary':
       return 'border-brand-hair bg-brand-canvas text-brand-ink hover:border-brand-ink hover:bg-brand-canvas-soft'
     case 'danger':
-      return 'border-transparent bg-transparent text-brand-muted hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600'
+      return 'border-transparent bg-transparent text-brand-muted hover:border-brand-danger-edge hover:bg-brand-danger-tint hover:text-brand-danger-text'
     case 'neutral':
     default:
       return 'border-brand-hair bg-brand-canvas text-brand-muted hover:border-brand-ink hover:text-brand-ink'
