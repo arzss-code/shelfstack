@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Pekerjaan aktif:** Rilis `v1.1.0-beta.34` (self-hosting `DM Sans` via `@nuxt/fonts` dengan 0 request Google Fonts eksternal, penghapusan `date-fns` ke `Intl.DateTimeFormat` native, penambahan suite WCAG 2.1 AA otomatis `@axe-core/playwright` di `tests/e2e/a11y.spec.ts` + perbaikan 4 pelanggaran a11y nyata, serta kepatuhan `color-scheme`, scrollbar fallback, listener OS theme, dan `touch-action`). Sisa 20 gambar studio varian katalog terjadwal otomatis di branch `feat/catalog-variant-images`.
-- **Versi rilis aktif:** `v1.1.0-beta.34` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
-- **Quality Gate Terkini (2026-11-26):** `pnpm audit --audit-level=low` 0 kerentanan · `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `vitest run` 146 file / 1.442 test lolos 100% · `pnpm build` EXIT 0 (30 MB / 10,9 MB gzip) · Playwright E2E + Axe-Core 33 passed (1 skipped bawaan `shots.spec.ts`) · Live Chrome DevTools 0 console/CSP error & 0 external font links · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
+- **Pekerjaan aktif:** Rilis `v1.1.0-beta.35` (penambahan gate `pnpm audit --audit-level=high` di CI, perluasan audit WCAG 2.1 AA `@axe-core/playwright` ke 7 rute kritis termasuk PDP `/product/[id]`, `/orders`, dan `/account/vouchers` beserta perbaikan 5 temuan a11y nyata, sinkronisasi `README.md`, dan pembersihan 47 branch remote + 43 branch lokal yang sudah ter-merge). Sisa 20 gambar studio varian katalog terjadwal otomatis di branch `feat/catalog-variant-images` sebelum freeze `v1.1.0`.
+- **Versi rilis aktif:** `v1.1.0-beta.35` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
+- **Quality Gate Terkini (2026-11-26):** `pnpm audit --audit-level=high` 0 kerentanan · `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `vitest run` 146 file / 1.442 test lolos 100% · `pnpm build` EXIT 0 · Playwright E2E + Axe-Core 35 passed (7/7 rute WCAG 2.1 AA lolos, 1 skipped bawaan `shots.spec.ts`) · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)

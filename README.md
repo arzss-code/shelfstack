@@ -2,10 +2,10 @@
 
 [![CI/CD Pipeline](https://github.com/arzss-code/shelfstack/actions/workflows/ci.yml/badge.svg)](https://github.com/arzss-code/shelfstack/actions/workflows/ci.yml)
 [![Nuxt 4](https://img.shields.io/badge/Nuxt-4.x-00DC82?logo=nuxt.js&logoColor=white)](https://nuxt.com)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20%2B%20RLS-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
 [![Fastify & BullMQ](https://img.shields.io/badge/Worker-Fastify%20%2B%20Redis%207%20%2B%20BullMQ-black?logo=fastify&logoColor=white)](https://bullmq.io)
-[![Vitest](<https://img.shields.io/badge/Vitest-100%25%20Passing%20(1377%20tests)-6E9F18?logo=vitest&logoColor=white>)](https://vitest.dev)
+[![Vitest](<https://img.shields.io/badge/Vitest-100%25%20Passing%20(1442%20tests)-6E9F18?logo=vitest&logoColor=white>)](https://vitest.dev)
 
 Aplikasi e-commerce berbasis **Nuxt 4**, **Nitro**, **Supabase (PostgreSQL, Auth, Storage, Realtime)**, **Midtrans Sandbox**, dan worker mikroservis **Fastify + Redis 7 + BullMQ** (`@shelfstack/order-service`).
 
@@ -48,7 +48,7 @@ flowchart LR
    - **Strict Typing 100%**: 0 penggunaan tipe `: any` di seluruh kode aplikasi dan server.
 5. **Kinerja Web & SSR SEO**:
    - Pengambilan data detail produk (`/product/[id]`) menggunakan `useAsyncData` top-level untuk memastikan tag Open Graph dan Schema.org JSON-LD ter-render utuh pada initial server-rendered HTML.
-   - Pemuatan aset tipografi mandiri via `preconnect` tanpa rantai `@import` CSS pemblokir render.
+   - Pemuatan aset tipografi `DM Sans` secara self-hosted melalui `@nuxt/fonts` beserta `@font-face` fallback ber-metrik selaras tanpa request font eksternal pemblokir render.
    - Penandaan `fetchpriority="high"` pada citra utama untuk optimalisasi Largest Contentful Paint (LCP).
 6. **Pengujian Beban Terautentikasi (Grafana k6)**:
    Suite pengujian konkurensi (`pnpm test:load`) dengan injeksi cookie sesi `@supabase/ssr` otomatis memverifikasi ketahanan sistem di bawah permintaan paralel (termasuk skenario katalog, webhook deduplication, health probe, dan penanganan stok kosong tanpa error HTTP 500 pada pengujian terukur di `docs/engineering/load-testing.md`).
@@ -151,12 +151,13 @@ Seluruh kode diverifikasi secara otomatis melalui rangkaian pengujian lokal dan 
 
 | Perintah                                            | Ruang Lingkup                                               | Standar Kelulusan                       |
 | :-------------------------------------------------- | :---------------------------------------------------------- | :-------------------------------------- |
+| `pnpm audit --audit-level=high`                     | Audit kerentanan keamanan dependensi workspace              | 0 kerentanan critical/high              |
 | `pnpm lint`                                         | Analisis statis ESLint (root app + server)                  | 0 error, 0 warning                      |
 | `pnpm typecheck`                                    | Pemeriksaan tipe penuh TypeScript via `nuxi typecheck`      | EXIT 0 (0 compilation error)            |
 | `pnpm --filter @shelfstack/order-service typecheck` | Pemeriksaan tipe mikroservis Fastify                        | EXIT 0                                  |
-| `pnpm exec vitest run`                              | Unit & integration tests Nuxt, domain model, dan server API | 138 test files / 1.377 tests lolos 100% |
+| `pnpm exec vitest run`                              | Unit & integration tests Nuxt, domain model, dan server API | 146 test files / 1.442 tests lolos 100% |
 | `pnpm --filter @shelfstack/order-service test`      | Unit tests Fastify, BullMQ delayed queue, dan DLQ replay    | 2 test files / 25 tests lolos 100%      |
-| `pnpm test:e2e`                                     | Pengujian fungsional browser Playwright Chromium            | Skenario checkout dan pelacakan lolos   |
+| `pnpm test:e2e`                                     | Pengujian E2E Playwright Chromium + audit WCAG 2.1 AA (Axe) | Skenario checkout, akun, & a11y lolos   |
 | `pnpm test:load`                                    | Pengujian beban konkurensi Grafana k6                       | Skenario terukur bebas error HTTP 500   |
 | `pnpm build`                                        | Verifikasi kompilasi bundel produksi Nuxt + Nitro           | Build sukses tanpa warning degradasi    |
 
