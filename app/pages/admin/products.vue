@@ -67,13 +67,18 @@ const handleProductRestocked = (newStock: number) => {
 
     <!-- Toolbar Tabs, Filter, & View Mode -->
     <div
-      class="flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3.5 shadow-whisper"
+      class="flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper"
     >
-      <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <UiTabs v-model="activeTab" :items="tabItems" aria-label="Tampilan katalog produk" />
+      <div class="flex flex-col gap-2.5 xl:flex-row xl:items-center xl:justify-between">
+        <UiTabs
+          v-model="activeTab"
+          :items="tabItems"
+          aria-label="Tampilan katalog produk"
+          class="self-start max-w-full xl:shrink-0"
+        />
 
         <div class="flex flex-wrap items-center gap-2">
-          <div class="w-full sm:w-56">
+          <div class="w-full sm:w-48">
             <label for="admin-products-search" class="sr-only">Cari produk</label>
             <UiInput
               id="admin-products-search"
@@ -86,7 +91,7 @@ const handleProductRestocked = (newStock: number) => {
             />
           </div>
 
-          <div class="w-full sm:w-44">
+          <div class="w-full sm:w-40">
             <label for="product-sort" class="sr-only">Urutkan tampilan saat ini</label>
             <UiSelect
               id="product-sort"
@@ -157,6 +162,7 @@ const handleProductRestocked = (newStock: number) => {
         :products="filteredProducts"
         :loading="productStore.loading"
         :is-searching="searchQuery.trim().length > 0"
+        density="admin"
         @edit="openEditForm"
         @delete="handleDelete"
         @view-stock-movements="openStockMovements"
@@ -166,7 +172,9 @@ const handleProductRestocked = (newStock: number) => {
 
       <!-- Load More Button -->
       <div
-        v-if="activeTab === '0' && productStore.hasMore && !searchQuery.trim()"
+        v-if="
+          viewMode === 'grid' && activeTab === '0' && productStore.hasMore && !searchQuery.trim()
+        "
         class="flex justify-center pt-2"
       >
         <UiButton
@@ -197,6 +205,7 @@ const handleProductRestocked = (newStock: number) => {
         :products="filteredProducts"
         :loading="productStore.loading"
         :is-searching="searchQuery.trim().length > 0"
+        density="admin"
         is-trash
         @restore="handleRestore"
         @reset-filters="resetProductFilters"
@@ -204,7 +213,7 @@ const handleProductRestocked = (newStock: number) => {
 
       <!-- Load More Button (Trash) -->
       <div
-        v-if="productStore.hasMoreDeleted && !searchQuery.trim()"
+        v-if="viewMode === 'grid' && productStore.hasMoreDeleted && !searchQuery.trim()"
         class="flex justify-center pt-2"
       >
         <UiButton

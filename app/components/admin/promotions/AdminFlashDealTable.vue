@@ -164,9 +164,9 @@ const {
     <UiPagination
       v-if="deals.length > 0"
       v-model="page"
+      v-model:page-size="pageSize"
       :total-pages="totalPages"
       :total-count="totalCount"
-      :page-size="pageSize"
       :loading="Boolean(loading)"
       item-name="kampanye"
       compact

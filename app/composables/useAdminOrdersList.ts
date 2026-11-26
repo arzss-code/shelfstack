@@ -16,7 +16,7 @@ export function useAdminOrdersList() {
   const fromDate = ref('')
   const toDate = ref('')
   const page = ref(1)
-  const pageSize = 15
+  const pageSize = ref(15)
   const sortKey = ref<string | null>(null)
   const sortDirection = ref<'desc' | 'asc' | null>(null)
 
@@ -46,8 +46,8 @@ export function useAdminOrdersList() {
   const fetchOrders = async () => {
     loading.value = true
     errorMessage.value = ''
-    const from = (page.value - 1) * pageSize
-    const to = from + pageSize - 1
+    const from = (page.value - 1) * pageSize.value
+    const to = from + pageSize.value - 1
     try {
       const params: Record<string, string | number> = { from, to }
       if (activeStatus.value) params.status = activeStatus.value
@@ -159,7 +159,7 @@ export function useAdminOrdersList() {
 
   const handleExportCsv = () => handleExport('csv')
 
-  const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize) || 1)
+  const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize.value) || 1)
 
   const prevPage = () => {
     if (page.value > 1) {
@@ -178,6 +178,13 @@ export function useAdminOrdersList() {
   const setPage = (next: number) => {
     if (next < 1 || next > totalPages.value || next === page.value) return
     page.value = next
+    fetchOrders()
+  }
+
+  const setPageSize = (nextSize: number) => {
+    if (!Number.isFinite(nextSize) || nextSize < 1 || nextSize === pageSize.value) return
+    pageSize.value = nextSize
+    page.value = 1
     fetchOrders()
   }
 
@@ -278,5 +285,6 @@ export function useAdminOrdersList() {
     prevPage,
     nextPage,
     setPage,
+    setPageSize,
   }
 }

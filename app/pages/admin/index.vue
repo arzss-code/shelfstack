@@ -116,6 +116,7 @@ onUnmounted(() => {
         subtitle="Dari pesanan lunas dan selesai"
         icon="pi-wallet"
         color="success"
+        to="/admin/orders?status=completed"
         :loading="loading"
       />
 
@@ -135,7 +136,7 @@ onUnmounted(() => {
         subtitle="Produk dengan stok di bawah 5 unit"
         icon="pi-exclamation-triangle"
         color="danger"
-        to="/admin/products"
+        to="/admin/products?tab=critical"
         :loading="loading"
       />
 
@@ -145,6 +146,7 @@ onUnmounted(() => {
         subtitle="Akun pembeli aktif"
         icon="pi-users"
         color="info"
+        to="/admin/users"
         :loading="loading"
       />
     </div>

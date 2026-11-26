@@ -16,8 +16,9 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'toggleStatus', review: AdminReviewItem): void
-  (e: 'pageChange', page: number): void
+  toggleStatus: [review: AdminReviewItem]
+  pageChange: [page: number]
+  pageSizeChange: [size: number]
 }>()
 
 const reviewColumns = [
@@ -262,6 +263,7 @@ const formatDate = (isoStr: string): string => {
       item-name="ulasan"
       compact
       @change="emit('pageChange', $event)"
+      @page-size-change="emit('pageSizeChange', $event)"
     />
   </div>
 </template>

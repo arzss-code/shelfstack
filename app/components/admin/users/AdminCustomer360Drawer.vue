@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { Customer360Detail, AdminCustomerSummary } from '~~/shared/types/admin-crm'
 
 const props = defineProps<{
@@ -16,6 +16,11 @@ const router = useRouter()
 const loading = ref(false)
 const errorMessage = ref<string | null>(null)
 const customerDetail = ref<Customer360Detail | null>(null)
+const avatarLoadError = ref(false)
+
+const resolvedAvatarUrl = computed(
+  () => customerDetail.value?.avatarUrl || props.fallbackCustomer?.avatarUrl || null,
+)
 
 const fetchCustomer360 = async (id: string) => {
   loading.value = true
@@ -35,6 +40,7 @@ const fetchCustomer360 = async (id: string) => {
 watch(
   () => [props.visible, props.userId],
   ([isVisible, currentId]) => {
+    avatarLoadError.value = false
     if (isVisible && currentId && typeof currentId === 'string') {
       void fetchCustomer360(currentId)
     }
@@ -152,9 +158,17 @@ const navigateToSupport = () => {
             <!-- Profile Identity -->
             <div class="flex items-center gap-3 pb-2">
               <div
-                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-ink text-brand-onink font-bold text-base shadow-sm"
+                class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-brand-hair bg-brand-ink text-brand-onink font-bold text-base shadow-sm"
               >
-                <span>{{
+                <img
+                  v-if="resolvedAvatarUrl && !avatarLoadError"
+                  :src="resolvedAvatarUrl"
+                  :alt="customerDetail?.fullName || fallbackCustomer?.fullName || 'Pelanggan'"
+                  referrerpolicy="no-referrer"
+                  class="h-full w-full object-cover"
+                  @error="avatarLoadError = true"
+                />
+                <span v-else>{{
                   (customerDetail?.fullName || fallbackCustomer?.fullName || 'U')
                     .charAt(0)
                     .toUpperCase()

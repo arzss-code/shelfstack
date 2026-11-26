@@ -24,6 +24,7 @@ const {
   totalPages,
   totalCustomersCount,
   pageSize,
+  setPageSize,
   sortOptions,
   hasCustomers,
   fetchCustomers,
@@ -194,6 +195,7 @@ const formatDate = (dateStr?: string | null) => {
                       v-if="c.avatarUrl"
                       :src="c.avatarUrl"
                       :alt="c.fullName"
+                      referrerpolicy="no-referrer"
                       class="h-full w-full rounded-full object-cover"
                     />
                     <span v-else>{{ c.fullName.charAt(0).toUpperCase() }}</span>
@@ -244,6 +246,7 @@ const formatDate = (dateStr?: string | null) => {
         :loading="loading"
         item-name="pelanggan"
         compact
+        @page-size-change="setPageSize"
       />
     </UiCard>
 

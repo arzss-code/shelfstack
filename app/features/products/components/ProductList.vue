@@ -1,17 +1,28 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Product } from '~/types/product'
 import ProductCard from './ProductCard.vue'
 
-defineProps<{
+const props = defineProps<{
   products: Product[]
   loading: boolean
   isSearching?: boolean
   isTrash?: boolean
   /** Mode etalase publik: sembunyikan tombol edit/hapus, kartu klik ke detail. */
   hideActions?: boolean
-  /** Kepadatan grid: compact (4 kolom) atau spacious (3 kolom) */
-  density?: 'compact' | 'spacious'
+  /** Kepadatan grid: compact (4 kolom), spacious (3 kolom), atau admin (1/2/3/4 kolom adaptif). */
+  density?: 'compact' | 'spacious' | 'admin'
 }>()
+
+const gridClass = computed(() => {
+  if (props.density === 'admin') {
+    return 'grid gap-3 sm:gap-4 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'
+  }
+  if (props.density === 'spacious') {
+    return 'grid gap-3 sm:gap-4 md:gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'
+  }
+  return 'grid gap-3 sm:gap-4 md:gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+})
 
 const emit = defineEmits<{
   edit: [product: Product]
@@ -26,15 +37,7 @@ const emit = defineEmits<{
 <template>
   <div>
     <!-- Loading State: Modernist Skeletal Grid -->
-    <div
-      v-if="loading"
-      :class="[
-        'grid gap-3 sm:gap-4 md:gap-6',
-        density === 'spacious'
-          ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'
-          : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
-      ]"
-    >
+    <div v-if="loading" :class="gridClass">
       <div
         v-for="i in 8"
         :key="i"
@@ -106,15 +109,7 @@ const emit = defineEmits<{
     </div>
 
     <!-- Product Grid: Modernist Product Cards -->
-    <div
-      v-else
-      :class="[
-        'grid gap-3 sm:gap-4 md:gap-6',
-        density === 'spacious'
-          ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'
-          : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
-      ]"
-    >
+    <div v-else :class="gridClass">
       <ProductCard
         v-for="product in products"
         :key="product.id"

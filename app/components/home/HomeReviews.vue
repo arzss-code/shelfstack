@@ -163,6 +163,7 @@ const featuredReviews = computed<FeaturedReview[]>(() => reviews.value)
 
               <!-- Rating Stars -->
               <div
+                role="img"
                 class="flex items-center gap-1 text-brand-warning shrink-0"
                 :aria-label="`Rating ${review.rating} dari 5 bintang`"
               >

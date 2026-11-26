@@ -167,9 +167,9 @@ const {
     <UiPagination
       v-if="!pending && categories.length > 0"
       v-model="page"
+      v-model:page-size="pageSize"
       :total-pages="totalPages"
       :total-count="totalCount"
-      :page-size="pageSize"
       :loading="pending"
       item-name="kategori"
       compact

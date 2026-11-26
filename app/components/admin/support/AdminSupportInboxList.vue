@@ -136,7 +136,6 @@ const onSearchInput = (e: Event) => {
   <div
     class="admin-support-inbox-list flex h-full flex-col border-r border-brand-hair bg-brand-canvas"
   >
-    <!-- Toolbar Pencarian & Filter Status -->
     <div class="border-b border-brand-hair bg-brand-canvas p-2.5 space-y-2 shrink-0">
       <div class="relative">
         <i
@@ -187,7 +186,6 @@ const onSearchInput = (e: Event) => {
           />
         </button>
 
-        <!-- Dropdown Popover Menu with Test Contracts Preserved -->
         <div
           v-show="isDropdownOpen"
           role="listbox"
@@ -221,7 +219,6 @@ const onSearchInput = (e: Event) => {
       </div>
     </div>
 
-    <!-- Thread Cards List -->
     <div class="thread-items flex-1 overflow-y-auto divide-y divide-brand-hair/60">
       <div
         v-if="effectiveThreads.length === 0"
@@ -244,17 +241,26 @@ const onSearchInput = (e: Event) => {
         @click="onSelectThread(thread.id)"
       >
         <div class="flex flex-1 items-center gap-2.5 min-w-0 mr-2">
-          <!-- Avatar -->
-          <div
-            class="customer-avatar flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-xs font-semibold text-brand-ink overflow-hidden shadow-xs"
-          >
-            <img
-              v-if="thread.customer_avatar_url"
-              :src="thread.customer_avatar_url"
-              :alt="thread.customer_name"
-              class="h-full w-full object-cover"
-            />
-            <span v-else>{{ getInitials(thread.customer_name) }}</span>
+          <!-- Avatar & Unread Badge -->
+          <div class="relative shrink-0">
+            <div
+              class="customer-avatar flex h-9 w-9 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-xs font-semibold text-brand-ink overflow-hidden shadow-xs"
+            >
+              <img
+                v-if="thread.customer_avatar_url"
+                :src="thread.customer_avatar_url"
+                :alt="thread.customer_name"
+                referrerpolicy="no-referrer"
+                class="h-full w-full object-cover"
+              />
+              <span v-else>{{ getInitials(thread.customer_name) }}</span>
+            </div>
+            <span
+              v-if="thread.unread_by_admin_count > 0"
+              class="unread-admin-badge unread-badge absolute -top-1 -right-1 z-10 flex h-4 min-w-[16px] items-center justify-center rounded-full border border-brand-canvas bg-brand-danger px-1 text-[10px] font-bold text-white shadow-xs tabular-nums"
+            >
+              {{ thread.unread_by_admin_count }}
+            </span>
           </div>
 
           <!-- Customer details & last snippet -->
@@ -273,8 +279,8 @@ const onSearchInput = (e: Event) => {
           </div>
         </div>
 
-        <!-- Status pill & unread badge -->
-        <div class="flex shrink-0 flex-col items-end gap-1.5">
+        <!-- Status pill -->
+        <div class="flex shrink-0 flex-col items-end">
           <span
             class="status-pill inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
             :class="statusPillClass(thread.status)"
@@ -283,12 +289,6 @@ const onSearchInput = (e: Event) => {
           >
             <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(thread.status)" />
             <span>{{ formatStatusLabel(thread.status) }}</span>
-          </span>
-          <span
-            v-if="thread.unread_by_admin_count > 0"
-            class="unread-admin-badge unread-badge flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand-danger px-1 text-[10px] font-bold text-white shadow-xs"
-          >
-            {{ thread.unread_by_admin_count }}
           </span>
         </div>
       </div>

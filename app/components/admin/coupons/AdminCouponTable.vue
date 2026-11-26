@@ -252,9 +252,9 @@ const {
     <UiPagination
       v-if="!loading && coupons.length > 0"
       v-model="page"
+      v-model:page-size="pageSize"
       :total-pages="totalPages"
       :total-count="totalCount"
-      :page-size="pageSize"
       :loading="loading"
       item-name="voucher"
       compact

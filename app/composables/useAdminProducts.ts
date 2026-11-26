@@ -6,6 +6,7 @@ import { useUiToast } from '~/composables/useUiToast'
 import { useUiConfirm } from '~/composables/useUiConfirm'
 
 export function useAdminProducts() {
+  const route = useRoute()
   const productStore = useProductStore()
   const toast = useUiToast()
   const confirm = useUiConfirm()
@@ -18,11 +19,28 @@ export function useAdminProducts() {
   const variantProduct = ref<Product | null>(null)
   const isCategoryModalVisible = ref(false)
   const searchQuery = ref('')
-  const activeTab = ref('0')
+  const activeTab = ref(
+    route.query.tab === 'critical' ? '2' : route.query.tab === 'trash' ? '1' : '0',
+  )
   const sortOption = ref('name-asc')
   const viewMode = ref<'grid' | 'table'>('grid')
 
   const PRODUCT_VIEW_STORAGE_KEY = 'shelfstack-admin-products-view'
+
+  const ensureFullTableDataset = async () => {
+    if (viewMode.value !== 'table') return
+    try {
+      if (activeTab.value === '1') {
+        if (productStore.hasMoreDeleted || productStore.deletedProducts.length === 0) {
+          await productStore.fetchAllDeletedProducts()
+        }
+      } else if (productStore.hasMore || productStore.products.length === 0) {
+        await productStore.fetchAllProducts()
+      }
+    } catch {
+      // Tetap gunakan data tercached jika reload penuh gagal
+    }
+  }
 
   const setViewMode = (mode: 'grid' | 'table') => {
     viewMode.value = mode
@@ -32,6 +50,9 @@ export function useAdminProducts() {
       } catch {
         // Abaikan jika storage diblokir browser
       }
+    }
+    if (mode === 'table') {
+      void ensureFullTableDataset()
     }
   }
 
@@ -90,15 +111,21 @@ export function useAdminProducts() {
   })
 
   watch(activeTab, async (newVal) => {
-    if (newVal === '1' && productStore.deletedProducts.length === 0) {
-      try {
-        await productStore.fetchDeletedProducts()
-      } catch {
-        toast.show({
-          title: 'Error',
-          message: 'Gagal memuat keranjang sampah',
-          tone: 'error',
-        })
+    if (newVal === '1') {
+      if (viewMode.value === 'table' && productStore.hasMoreDeleted) {
+        await ensureFullTableDataset()
+        return
+      }
+      if (productStore.deletedProducts.length === 0) {
+        try {
+          await productStore.fetchDeletedProducts()
+        } catch {
+          toast.show({
+            title: 'Error',
+            message: 'Gagal memuat keranjang sampah',
+            tone: 'error',
+          })
+        }
       }
     }
   })
@@ -115,7 +142,11 @@ export function useAdminProducts() {
       }
     }
     try {
-      await productStore.fetchProducts()
+      if (viewMode.value === 'table') {
+        await productStore.fetchAllProducts()
+      } else {
+        await productStore.fetchProducts()
+      }
     } catch (error: unknown) {
       toast.show({
         title: 'Gagal Memuat Data',

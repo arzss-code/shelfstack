@@ -45,6 +45,7 @@ const formattedAverageRating = computed(() => {
         <p class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tabular">
           {{ metrics.total }}
         </p>
+        <p class="text-[11px] text-brand-muted m-0 mt-1">Ulasan terverifikasi pembeli</p>
       </div>
     </div>
 

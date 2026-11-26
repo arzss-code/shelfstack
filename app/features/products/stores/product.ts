@@ -47,6 +47,19 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  const fetchAllProducts = async () => {
+    loading.value = true
+    try {
+      const all = await productRepository.getProducts(supabase, 0, 499)
+      products.value = all
+      hasMore.value = false
+    } catch (e: unknown) {
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   const fetchDeletedProducts = async (isLoadMore = false) => {
     loading.value = true
     try {
@@ -72,6 +85,19 @@ export const useProductStore = defineStore('product', () => {
       } else {
         deletedProducts.value = newDeleted
       }
+    } catch (e: unknown) {
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const fetchAllDeletedProducts = async () => {
+    loading.value = true
+    try {
+      const all = await productRepository.getDeletedProducts(supabase, 0, 499)
+      deletedProducts.value = all
+      hasMoreDeleted.value = false
     } catch (e: unknown) {
       throw e
     } finally {
@@ -241,7 +267,9 @@ export const useProductStore = defineStore('product', () => {
     hasMore,
     hasMoreDeleted,
     fetchProducts,
+    fetchAllProducts,
     fetchDeletedProducts,
+    fetchAllDeletedProducts,
     fetchProductById,
     addProduct,
     updateProduct,

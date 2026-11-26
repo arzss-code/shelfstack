@@ -47,6 +47,7 @@ const emit = defineEmits<{
   prevPage: []
   nextPage: []
   pageChange: [page: number]
+  pageSizeChange: [size: number]
   sortChange: [payload: { key: string | null; direction: 'desc' | 'asc' | null }]
 }>()
 
@@ -250,6 +251,7 @@ const formatDate = (dateStr: string) => {
       item-name="pesanan"
       compact
       @change="onOrderPageChange"
+      @page-size-change="emit('pageSizeChange', $event)"
     />
   </div>
 </template>

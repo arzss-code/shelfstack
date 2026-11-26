@@ -29,6 +29,7 @@ const {
   fetchReviews,
   toggleReviewStatus,
   setPage,
+  setPageSize,
   setRating,
   setStatus,
   setSearch,
@@ -80,6 +81,7 @@ onMounted(() => {
       :pagination="pagination"
       @toggle-status="toggleReviewStatus"
       @page-change="setPage"
+      @page-size-change="setPageSize"
     />
   </div>
 </template>

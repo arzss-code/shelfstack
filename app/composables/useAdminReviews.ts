@@ -138,6 +138,13 @@ export function useAdminReviews() {
     fetchReviews()
   }
 
+  const setPageSize = (nextLimit: number) => {
+    const safeLimit = Math.min(50, Math.max(1, nextLimit))
+    pagination.value.limit = safeLimit
+    pagination.value.page = 1
+    fetchReviews()
+  }
+
   const setRating = (r?: number) => {
     ratingFilter.value = r
     pagination.value.page = 1
@@ -169,6 +176,7 @@ export function useAdminReviews() {
     fetchReviews,
     toggleReviewStatus,
     setPage,
+    setPageSize,
     setRating,
     setStatus,
     setSearch,

@@ -1,24 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import UiSelect from './UiSelect.vue'
 
 const props = withDefaults(
   defineProps<{
-    /** Halaman aktif saat ini (1-based index) */
     modelValue?: number
-    /** Total jumlah halaman */
     totalPages: number
-    /** Total item keseluruhan untuk ringkasan data */
     totalCount?: number
-    /** Jumlah item per halaman */
     pageSize?: number
-    /** Status loading asynchronous */
     loading?: boolean
-    /** Label nama entitas dalam ringkasan (default: 'produk') */
     itemName?: string
-    /** Jumlah nomor halaman tetangga kiri/kanan yang tampil */
     siblingCount?: number
-    /** Mode ringkas untuk footer tabel admin */
     compact?: boolean
+    showPageSize?: boolean
+    pageSizeOptions?: number[]
   }>(),
   {
     modelValue: 1,
@@ -28,12 +23,16 @@ const props = withDefaults(
     itemName: 'produk',
     siblingCount: 1,
     compact: false,
+    showPageSize: undefined,
+    pageSizeOptions: undefined,
   },
 )
 
 const emit = defineEmits<{
   'update:modelValue': [page: number]
   change: [page: number]
+  'update:pageSize': [size: number]
+  pageSizeChange: [size: number]
 }>()
 
 const currentPage = computed(() => {
@@ -43,6 +42,15 @@ const currentPage = computed(() => {
 
 const isFirstPage = computed(() => currentPage.value <= 1)
 const isLastPage = computed(() => currentPage.value >= props.totalPages)
+const isPageSizeVisible = computed(
+  () => (props.showPageSize ?? props.compact) && (props.totalCount ?? 0) > 0,
+)
+
+const resolvedPageSizeOptions = computed(() => {
+  const base = props.pageSizeOptions ?? (props.pageSize === 15 ? [10, 15, 25, 50] : [12, 25, 50])
+  const merged = Array.from(new Set([...base, props.pageSize])).sort((a, b) => a - b)
+  return merged.map((size) => ({ value: String(size), label: String(size) }))
+})
 
 type PageItem =
   | { type: 'page'; page: number; isCurrent: boolean; key: string }
@@ -51,7 +59,6 @@ type PageItem =
 const paginationItems = computed<PageItem[]>(() => {
   const total = props.totalPages
   const current = currentPage.value
-
   if (total <= 7) {
     return Array.from({ length: total }, (_, i) => ({
       type: 'page',
@@ -62,51 +69,30 @@ const paginationItems = computed<PageItem[]>(() => {
   }
 
   const items: PageItem[] = []
-  const leftSiblingIndex = Math.max(current - props.siblingCount, 1)
-  const rightSiblingIndex = Math.min(current + props.siblingCount, total)
+  const leftSibling = Math.max(current - props.siblingCount, 1)
+  const rightSibling = Math.min(current + props.siblingCount, total)
+  const showLeftEllipsis = leftSibling > 2
+  const showRightEllipsis = rightSibling < total - 1
 
-  const showLeftEllipsis = leftSiblingIndex > 2
-  const showRightEllipsis = rightSiblingIndex < total - 1
+  items.push({ type: 'page', page: 1, isCurrent: current === 1, key: 'page-1' })
 
-  // Always show first page
-  items.push({
-    type: 'page',
-    page: 1,
-    isCurrent: current === 1,
-    key: 'page-1',
-  })
-
-  // Left ellipsis or page 2
   if (showLeftEllipsis) {
     items.push({ type: 'ellipsis', key: 'ellipsis-left' })
-  } else if (leftSiblingIndex === 2) {
-    items.push({
-      type: 'page',
-      page: 2,
-      isCurrent: current === 2,
-      key: 'page-2',
-    })
+  } else if (leftSibling === 2) {
+    items.push({ type: 'page', page: 2, isCurrent: current === 2, key: 'page-2' })
   }
 
-  // Middle pages
-  const middleStart = showLeftEllipsis ? leftSiblingIndex : 2
-  const middleEnd = showRightEllipsis ? rightSiblingIndex : total - 1
-
-  for (let i = middleStart; i <= middleEnd; i++) {
+  const startMid = showLeftEllipsis ? leftSibling : 2
+  const endMid = showRightEllipsis ? rightSibling : total - 1
+  for (let i = startMid; i <= endMid; i++) {
     if (i !== 1 && i !== total) {
-      items.push({
-        type: 'page',
-        page: i,
-        isCurrent: current === i,
-        key: `page-${i}`,
-      })
+      items.push({ type: 'page', page: i, isCurrent: current === i, key: `page-${i}` })
     }
   }
 
-  // Right ellipsis or penultimate page
   if (showRightEllipsis) {
     items.push({ type: 'ellipsis', key: 'ellipsis-right' })
-  } else if (rightSiblingIndex === total - 1 && total > 2) {
+  } else if (rightSibling === total - 1 && total > 2) {
     items.push({
       type: 'page',
       page: total - 1,
@@ -115,16 +101,9 @@ const paginationItems = computed<PageItem[]>(() => {
     })
   }
 
-  // Always show last page
   if (total > 1) {
-    items.push({
-      type: 'page',
-      page: total,
-      isCurrent: current === total,
-      key: `page-${total}`,
-    })
+    items.push({ type: 'page', page: total, isCurrent: current === total, key: `page-${total}` })
   }
-
   return items
 })
 
@@ -142,6 +121,13 @@ const goToPage = (page: number) => {
   emit('update:modelValue', page)
   emit('change', page)
 }
+
+const onPageSizeSelect = (rawValue: string) => {
+  const next = Number(rawValue)
+  if (!Number.isFinite(next) || next < 1 || next === props.pageSize) return
+  emit('update:pageSize', next)
+  emit('pageSizeChange', next)
+}
 </script>
 
 <template>
@@ -156,26 +142,37 @@ const goToPage = (page: number) => {
     "
     data-testid="ui-pagination"
   >
-    <!-- Ringkasan Data (Left on desktop, bottom on mobile) -->
     <div
-      class="text-xs text-brand-muted m-0 order-2 sm:order-1 text-center sm:text-left select-none"
+      class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 text-xs text-brand-muted m-0 order-2 sm:order-1 select-none"
     >
-      <template v-if="totalCount != null && totalCount > 0">
-        Menampilkan <span class="font-semibold text-brand-ink">{{ itemRangeText }}</span> dari
-        <span class="font-semibold text-brand-ink">{{ totalCount }}</span> {{ itemName }}
-      </template>
-      <template v-else>
-        Halaman <span class="font-semibold text-brand-ink">{{ currentPage }}</span> dari
-        <span class="font-semibold text-brand-ink">{{ totalPages }}</span>
-      </template>
+      <span>
+        <template v-if="totalCount != null && totalCount > 0">
+          Menampilkan <span class="font-semibold text-brand-ink">{{ itemRangeText }}</span> dari
+          <span class="font-semibold text-brand-ink">{{ totalCount }}</span> {{ itemName }}
+        </template>
+        <template v-else>
+          Halaman <span class="font-semibold text-brand-ink">{{ currentPage }}</span> dari
+          <span class="font-semibold text-brand-ink">{{ totalPages }}</span>
+        </template>
+      </span>
+
+      <div v-if="isPageSizeVisible" class="inline-flex items-center gap-1.5">
+        <span class="text-[11px] text-brand-muted">Tampilkan</span>
+        <UiSelect
+          :model-value="String(pageSize)"
+          :options="resolvedPageSizeOptions"
+          size="xs"
+          aria-label="Jumlah data per halaman"
+          data-testid="pagination-page-size"
+          @change="onPageSizeSelect"
+        />
+      </div>
     </div>
 
-    <!-- Kontrol Navigasi Halaman -->
     <div
       class="flex items-center gap-1 sm:gap-1.5 order-1 sm:order-2 flex-wrap justify-center"
       data-testid="pagination-controls"
     >
-      <!-- Tombol Sebelumnya -->
       <button
         type="button"
         :class="
@@ -195,10 +192,8 @@ const goToPage = (page: number) => {
         <span class="hidden sm:inline">Sebelumnya</span>
       </button>
 
-      <!-- Nomor-Nomor Halaman & Ellipsis -->
       <div class="flex items-center gap-1 sm:gap-1.5">
         <template v-for="item in paginationItems" :key="item.key">
-          <!-- Separator Ellipsis -->
           <span
             v-if="item.type === 'ellipsis'"
             :class="
@@ -212,7 +207,6 @@ const goToPage = (page: number) => {
             ...
           </span>
 
-          <!-- Tombol Nomor Halaman -->
           <button
             v-else
             type="button"
@@ -236,7 +230,6 @@ const goToPage = (page: number) => {
         </template>
       </div>
 
-      <!-- Tombol Selanjutnya -->
       <button
         type="button"
         :class="

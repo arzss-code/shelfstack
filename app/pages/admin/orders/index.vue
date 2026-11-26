@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
+import UiDateRangePicker from '~/components/ui/UiDateRangePicker.vue'
 import AdminOrderExportMenu from '~/features/orders/components/AdminOrderExportMenu.vue'
 import AdminOrderTable from '~/features/orders/components/AdminOrderTable.vue'
 
@@ -39,6 +40,7 @@ const {
   prevPage,
   nextPage,
   setPage,
+  setPageSize,
 } = useAdminOrdersList()
 </script>
 
@@ -69,83 +71,43 @@ const {
 
     <!-- Filter & Search Controls -->
     <div
-      class="flex flex-col gap-2.5 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper"
+      class="rounded-card border border-brand-hair bg-brand-canvas p-2.5 sm:p-3 shadow-whisper"
+      data-testid="admin-orders-filter-bar"
     >
-      <!-- Status Tabs + Total Count -->
-      <div class="flex flex-wrap items-center justify-between gap-2">
+      <form
+        class="flex flex-col gap-2.5 xl:flex-row xl:items-center xl:justify-between"
+        @submit.prevent="onSearch"
+      >
         <UiTabs
           :model-value="activeStatus"
           :items="statusTabs"
           aria-label="Filter status pesanan"
-          class="self-start"
+          class="self-start max-w-full"
           @update:model-value="onStatusChange"
         />
 
-        <span v-if="!loading" class="text-[11px] font-medium text-brand-muted tabular">
-          Total: <strong class="text-brand-ink">{{ totalOrders }}</strong> pesanan
-        </span>
-      </div>
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 min-w-0">
+          <label for="admin-orders-search" class="sr-only">Cari ID atau nama pelanggan</label>
+          <div class="w-full min-w-[180px] sm:flex-1 xl:w-52 xl:flex-none">
+            <UiInput
+              id="admin-orders-search"
+              v-model="searchQuery"
+              type="search"
+              size="sm"
+              left-icon="pi-search"
+              placeholder="Cari ID / Nama..."
+            />
+          </div>
 
-      <!-- Search & Filter Form -->
-      <form class="flex flex-wrap items-center gap-2" @submit.prevent="onSearch">
-        <label for="admin-orders-search" class="sr-only">Cari ID atau nama pelanggan</label>
-        <div class="w-full min-w-[200px] sm:flex-1">
-          <UiInput
-            id="admin-orders-search"
-            v-model="searchQuery"
-            type="search"
-            size="sm"
-            left-icon="pi-search"
-            placeholder="Cari ID / Nama..."
+          <UiDateRangePicker
+            v-model:from="fromDate"
+            v-model:to="toDate"
+            class="flex-1 sm:flex-none"
+            @change="onSearch"
           />
-        </div>
 
-        <div
-          class="flex h-9 w-full shrink-0 items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3.5 transition-colors hover:border-brand-faint focus-within:border-brand-ink focus-within:ring-1 focus-within:ring-inset focus-within:ring-brand-ink sm:w-auto"
-        >
-          <label
-            for="admin-orders-from"
-            class="shrink-0 text-[11px] font-semibold text-brand-muted"
-          >
-            Dari
-          </label>
-          <input
-            id="admin-orders-from"
-            v-model="fromDate"
-            type="date"
-            aria-label="Tanggal mulai pesanan"
-            title="Pilih tanggal awal periode pesanan"
-            class="min-w-0 flex-1 bg-transparent text-xs text-brand-ink focus:outline-none focus-visible:outline-none"
-          />
+          <UiButton variant="secondary" size="sm" type="submit" class="shrink-0">Cari</UiButton>
         </div>
-
-        <div
-          class="flex h-9 w-full shrink-0 items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3.5 transition-colors hover:border-brand-faint focus-within:border-brand-ink focus-within:ring-1 focus-within:ring-inset focus-within:ring-brand-ink sm:w-auto"
-        >
-          <label for="admin-orders-to" class="shrink-0 text-[11px] font-semibold text-brand-muted">
-            Sampai
-          </label>
-          <input
-            id="admin-orders-to"
-            v-model="toDate"
-            type="date"
-            aria-label="Tanggal akhir pesanan"
-            title="Pilih tanggal akhir periode pesanan"
-            class="min-w-0 flex-1 bg-transparent text-xs text-brand-ink focus:outline-none focus-visible:outline-none"
-          />
-        </div>
-
-        <UiButton variant="secondary" size="sm" type="submit" class="shrink-0">Cari</UiButton>
-        <UiButton
-          v-if="fromDate || toDate"
-          variant="ghost"
-          size="sm"
-          type="button"
-          class="shrink-0"
-          @click="resetDateFilters"
-        >
-          Reset Tanggal
-        </UiButton>
       </form>
     </div>
 
@@ -167,6 +129,7 @@ const {
       @prev-page="prevPage"
       @next-page="nextPage"
       @page-change="setPage"
+      @page-size-change="setPageSize"
       @sort-change="onSortChange"
     />
   </div>
