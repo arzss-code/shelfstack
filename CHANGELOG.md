@@ -2,6 +2,19 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.35] - 2026-11-26
+
+### Hardening Pra-Rilis: Gate Audit Keamanan CI, Perluasan Audit WCAG 2.1 AA PDP & Akun, serta Sinkronisasi Dokumentasi
+
+- **CI Security Gate (`.github/workflows/ci.yml`)**:
+  - Menambahkan tahap `pnpm audit --audit-level=high` pada job `code-quality` agar kerentanan `high`/`critical` terblokir otomatis sebelum merge.
+- **Perluasan Audit Aksesibilitas WCAG 2.1 AA (`tests/e2e/a11y.spec.ts`) & Perbaikan 5 Temuan Nyata**:
+  - Memperluas suite `@axe-core/playwright` dari 4 rute publik menjadi 7 rute kritis dengan menambahkan halaman detail produk (`/product/[id]`) serta rute terautentikasi `/orders` dan `/account/vouchers`.
+  - Memperbaiki 5 pelanggaran WCAG 2.1 AA nyata yang terdeteksi: menghapus `aria-controls` tanpa target panel pada `UiTabs.vue` (mendukung prop opsional `panelIdPrefix`), menaikkan kontras teks opsi terpilih di `ProductConfigurator.vue` dari 2,87:1 (`text-brand-muted`) menjadi `text-brand-onink/80`, menambahkan `role="img"` / `role="status"` pada kontainer ber-`aria-label` di `ReviewRatingSummary.vue`, `ReviewCard.vue`, dan `ProductRelatedSection.vue`, serta menyelaraskan label tombol filter bintang dan badge wishlist `AppNavbar.vue`.
+- **Sinkronisasi Dokumentasi (`README.md`) & Kebersihan Branch**:
+  - Menyelaraskan badge TypeScript (`6.x`), jumlah unit test (`146 file / 1.442 test`), catatan self-hosted `@nuxt/fonts`, serta matriks pengujian (`pnpm audit`, Playwright + Axe-Core) di `README.md`.
+  - Membersihkan 47 branch remote dan 43 branch lokal yang sudah ter-merge.
+
 ## [v1.1.0-beta.34] - 2026-11-26
 
 ### Optimasi Font Self-Hosted (`@nuxt/fonts`), Audit Aksesibilitas WCAG 2.1 AA Otomatis (`@axe-core/playwright`), dan Pembersihan Dependency

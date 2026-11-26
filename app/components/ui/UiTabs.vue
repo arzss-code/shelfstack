@@ -18,8 +18,10 @@ const props = withDefaults(
     ariaLabel?: string
     /** Membentang penuh 100% lebar kontainer secara proporsional. */
     fullWidth?: boolean
+    /** Prefiks ID panel terkait bila tab mengontrol tabpanel eksplisit di DOM. */
+    panelIdPrefix?: string
   }>(),
-  { ariaLabel: '', fullWidth: false },
+  { ariaLabel: '', fullWidth: false, panelIdPrefix: '' },
 )
 
 const emit = defineEmits<{
@@ -79,7 +81,7 @@ const onKeydown = (event: KeyboardEvent) => {
       type="button"
       role="tab"
       :aria-selected="item.value === modelValue"
-      :aria-controls="`${tablistId}-panel-${item.value}`"
+      :aria-controls="panelIdPrefix ? `${panelIdPrefix}-${item.value}` : undefined"
       :tabindex="index === activeIndex ? 0 : -1"
       class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap select-none cursor-pointer border-0"
       :class="[

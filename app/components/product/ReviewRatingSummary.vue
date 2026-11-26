@@ -54,6 +54,7 @@ const handleStarClick = (star: number) => {
         </div>
 
         <div
+          role="img"
           class="mt-2 flex items-center gap-1"
           :aria-label="`Rata-rata ${formattedAverage} dari 5 bintang`"
         >
@@ -87,13 +88,14 @@ const handleStarClick = (star: number) => {
               ? 'bg-brand-canvas-soft ring-1 ring-brand-ink'
               : 'hover:bg-brand-canvas-soft',
           ]"
-          :aria-label="`Filter ulasan ${item.star} bintang, ${item.count} ulasan`"
+          :aria-pressed="selectedStar === item.star"
           @click="handleStarClick(item.star)"
         >
           <!-- Star label -->
           <div class="flex items-center gap-1 w-14 shrink-0 font-medium text-brand-ink">
+            <span class="sr-only">Filter ulasan bintang</span>
             <span>{{ item.star }}</span>
-            <i class="pi pi-star-fill text-amber-400 text-[11px]" />
+            <i class="pi pi-star-fill text-amber-400 text-[11px]" aria-hidden="true" />
           </div>
 
           <!-- Distribution Bar Track -->

@@ -52,6 +52,7 @@ const { relatedProducts, isLoading, isError, categoryName, viewAllUrl, fetchRela
     <!-- 1. Loading State: 6 Skeleton Cards -->
     <div
       v-if="isLoading"
+      role="status"
       class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 animate-pulse"
       aria-busy="true"
       aria-label="Memuat rekomendasi produk terkait"
