@@ -134,7 +134,7 @@ const handleLogout = async () => {
     <!-- LAYER 2: Main E-Commerce Header Bar -->
     <div class="w-full bg-brand-canvas border-b border-brand-hair">
       <div
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[68px] py-2.5 flex items-center justify-between gap-4 sm:gap-6"
+        class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-[68px] py-2.5 flex items-center justify-between gap-2 sm:gap-6"
       >
         <!-- Brand Logo -->
         <NuxtLink
@@ -149,35 +149,37 @@ const handleLogout = async () => {
         <NavbarSearchBar v-model:search-query="searchQuery" @search="handleSearch" />
 
         <!-- Right Commerce Actions -->
-        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <!-- Notification Bell -->
-          <template v-if="isLoggedIn && user">
+        <div class="flex items-center gap-0.5 sm:gap-2 shrink-0">
+          <!-- Notification Bell (available in mobile drawer below sm to keep 320px-375px navbar zero-overflow) -->
+          <div v-if="isLoggedIn && user" class="hidden sm:block">
             <NotificationBell variant="light" />
-          </template>
+          </div>
 
           <!-- Wishlist Icon Button -->
-          <UiTooltip text="Wishlist" position="bottom" align="center">
-            <NuxtLink
-              to="/wishlist"
-              class="group relative w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-brand-ink transition-transform no-underline cursor-pointer"
-              :aria-label="
-                wishlistStore.totalItems > 0
-                  ? `Wishlist (${wishlistStore.totalItems} item)`
-                  : 'Wishlist'
-              "
-            >
-              <i
-                class="pi pi-heart text-base sm:text-lg text-brand-ink group-hover:scale-125 group-active:scale-95 transition-transform duration-200 ease-out origin-center"
-              />
-              <span
-                v-if="wishlistStore.totalItems > 0"
-                class="absolute top-1 right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-brand-danger text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none group-hover:scale-110 transition-transform duration-200"
-                aria-hidden="true"
+          <div class="hidden min-[360px]:block">
+            <UiTooltip text="Wishlist" position="bottom" align="center">
+              <NuxtLink
+                to="/wishlist"
+                class="group relative w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-brand-ink transition-transform no-underline cursor-pointer"
+                :aria-label="
+                  wishlistStore.totalItems > 0
+                    ? `Wishlist (${wishlistStore.totalItems} item)`
+                    : 'Wishlist'
+                "
               >
-                {{ wishlistStore.totalItems > 99 ? '99+' : wishlistStore.totalItems }}
-              </span>
-            </NuxtLink>
-          </UiTooltip>
+                <i
+                  class="pi pi-heart text-base sm:text-lg text-brand-ink group-hover:scale-125 group-active:scale-95 transition-transform duration-200 ease-out origin-center"
+                />
+                <span
+                  v-if="wishlistStore.totalItems > 0"
+                  class="absolute top-1 right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-brand-danger text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-brand-canvas tabular-nums shadow-xs leading-none group-hover:scale-110 transition-transform duration-200"
+                  aria-hidden="true"
+                >
+                  {{ wishlistStore.totalItems > 99 ? '99+' : wishlistStore.totalItems }}
+                </span>
+              </NuxtLink>
+            </UiTooltip>
+          </div>
 
           <!-- Cart Icon Button -->
           <NavbarCartButton

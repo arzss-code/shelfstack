@@ -15,9 +15,7 @@ import {
   parseWishlistStockQuery,
 } from '~/features/wishlist/utils/wishlist-helper'
 
-useHead({
-  title: 'Wishlist - ShelfStack',
-})
+useHead({ title: 'Wishlist - ShelfStack' })
 
 const wishlistStore = useWishlistStore()
 const cartStore = useCartStore()
@@ -75,45 +73,37 @@ const resetFilters = () => {
   sortBy.value = 'newest'
 }
 
+const notify = (
+  severity: 'success' | 'info' | 'warn',
+  summary: string,
+  detail: string,
+  life = 2500,
+) => toast.add({ severity, summary, detail, life })
+
 const handleMoveToCart = (productId: number, productName: string) => {
   if (!wishlistStore.moveToCart(productId)) return
   cartStore.isDrawerOpen = true
-  toast.add({
-    severity: 'success',
-    summary: 'Masuk Keranjang',
-    detail: `${productName} dipindahkan ke keranjang belanja.`,
-    life: 2500,
-  })
+  notify('success', 'Masuk Keranjang', `${productName} dipindahkan ke keranjang belanja.`)
 }
 
 const handleRemove = (productId: number, productName: string) => {
   wishlistStore.removeItem(productId)
-  toast.add({
-    severity: 'info',
-    summary: 'Wishlist',
-    detail: `${productName} dihapus dari wishlist.`,
-    life: 2000,
-  })
+  notify('info', 'Wishlist', `${productName} dihapus dari wishlist.`, 2000)
 }
 
 const handleMoveAll = () => {
   const count = wishlistStore.moveAllToCart()
   if (count > 0) {
     cartStore.isDrawerOpen = true
-    toast.add({
-      severity: 'success',
-      summary: 'Semua Produk Dipindahkan',
-      detail: `${count} produk siap beli telah masuk ke keranjang belanja.`,
-      life: 3000,
-    })
+    notify(
+      'success',
+      'Semua Produk Dipindahkan',
+      `${count} produk siap beli telah masuk ke keranjang belanja.`,
+      3000,
+    )
     return
   }
-  toast.add({
-    severity: 'warn',
-    summary: 'Tidak Dapat Memindahkan',
-    detail: 'Semua produk di wishlist saat ini kehabisan stok.',
-    life: 2500,
-  })
+  notify('warn', 'Tidak Dapat Memindahkan', 'Semua produk di wishlist saat ini kehabisan stok.')
 }
 
 const handleClear = () => {
@@ -126,12 +116,7 @@ const handleClear = () => {
     accept: () => {
       wishlistStore.clearWishlist()
       resetFilters()
-      toast.add({
-        severity: 'info',
-        summary: 'Wishlist Dikosongkan',
-        detail: 'Seluruh produk tersimpan telah dihapus.',
-        life: 2000,
-      })
+      notify('info', 'Wishlist Dikosongkan', 'Seluruh produk tersimpan telah dihapus.', 2000)
     },
   })
 }
