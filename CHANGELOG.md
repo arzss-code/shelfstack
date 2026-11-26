@@ -16,6 +16,7 @@ Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
   - Menaikkan kontras teks aksen & teks sekunder di Dark Mode dengan mengganti `text-brand-accent` -> `text-brand-accent-text` (`AdminOperationalSignals.vue`, `AdminRecentOrdersTable.vue`, `AdminReviewsTable.vue`, `AdminCouponMetrics.vue`, `returns.vue`) serta menyesuaikan `--brand-faint` Dark Mode di `app/assets/css/main.css` (`#636363` -> `#8a8d94`).
   - Memperluas `tests/e2e/a11y.spec.ts` dengan skenario audit WCAG 2.1 AA (Light + Dark) dan zero horizontal overflow pada 7 rute back-office admin (`/admin`, `/admin/orders`, `/admin/products`, `/admin/reviews`, `/admin/support`, `/admin/users`, `/admin/activities`).
 - **Konsistensi Token Dark Mode & Ketahanan Sidebar (P2)**:
+  - Menghapus badge indikator dekoratif `Live Realtime` dan `Live` pada header `app/pages/admin/orders/index.vue` serta `app/pages/admin/activities.vue` (termasuk asersi `liveIndicator` di `tests/e2e/pages/AdminOrdersPage.ts`).
   - Mengganti warna mentah Tailwind (`bg-amber-50`, `bg-red-100`, `bg-sky-50`, `bg-emerald-50`, `bg-blue-50`, `bg-red-500`) dengan token semantik `brand-*` di `AdminUserMetrics.vue`, `app/pages/admin/support.vue`, `app/utils/support-status.ts`, `app/layouts/admin.vue`, `AdminSidebarNav.vue`, `app/pages/admin/categories.vue`, `app/pages/admin/returns.vue`, dan `AdminCouponTable.vue`.
   - Menambahkan `min-h-0 flex-1 overflow-y-auto` pada wrapper navigasi sidebar desktop & drawer mobile di `app/layouts/admin.vue` agar tautan bawah tetap aman diakses di layar berdimensi pendek.
 

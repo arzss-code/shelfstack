@@ -92,22 +92,7 @@ const rowClass = (data: ActivityLog) =>
   <div>
     <div class="mb-8 flex items-center justify-between">
       <div>
-        <h1
-          class="m-0 mb-1 flex items-center gap-3 text-3xl font-bold tracking-tight text-brand-ink"
-        >
-          Activity Log
-          <span
-            class="inline-flex items-center gap-1.5 rounded-full bg-brand-success-tint px-2 py-1 text-xs font-medium text-brand-success-text ring-1 ring-inset ring-brand-success-edge"
-          >
-            <span class="relative flex h-2 w-2">
-              <span
-                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-success opacity-75"
-              />
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-success" />
-            </span>
-            Live
-          </span>
-        </h1>
+        <h1 class="m-0 mb-1 text-3xl font-bold tracking-tight text-brand-ink">Activity Log</h1>
         <p class="m-0 text-brand-muted">Riwayat lengkap aktivitas dan perubahan sistem.</p>
       </div>
     </div>

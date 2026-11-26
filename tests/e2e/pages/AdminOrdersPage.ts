@@ -4,7 +4,6 @@ import { BasePage } from './BasePage'
 
 export class AdminOrdersPage extends BasePage {
   readonly heading: Locator
-  readonly liveIndicator: Locator
   readonly refreshButton: Locator
   readonly searchInput: Locator
   readonly tableRows: Locator
@@ -14,7 +13,6 @@ export class AdminOrdersPage extends BasePage {
   constructor(page: Page) {
     super(page)
     this.heading = page.getByRole('heading', { name: 'Kelola Pesanan' })
-    this.liveIndicator = page.getByText('Live Realtime')
     this.refreshButton = page.getByRole('button', { name: 'Perbarui' })
     this.exportCsvButton = page.getByRole('button', { name: 'Ekspor CSV' })
     this.searchInput = page.getByPlaceholder('Cari ID / Nama...')
@@ -27,7 +25,6 @@ export class AdminOrdersPage extends BasePage {
 
   async assertPageLoaded(): Promise<void> {
     await expect(this.heading).toBeVisible({ timeout: 15000 })
-    await expect(this.liveIndicator).toBeVisible()
     await expect(this.searchInput).toBeVisible()
   }
 

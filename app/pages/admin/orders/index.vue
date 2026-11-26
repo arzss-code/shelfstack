@@ -43,17 +43,9 @@ const {
     <!-- Header -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <div class="flex items-center gap-3">
-          <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
-            Kelola Pesanan
-          </h1>
-          <span
-            class="inline-flex items-center gap-1.5 rounded-full border border-brand-success-edge bg-brand-success-tint px-2.5 py-0.5 text-[11px] font-medium text-brand-success-text"
-          >
-            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-success" />
-            Live Realtime
-          </span>
-        </div>
+        <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
+          Kelola Pesanan
+        </h1>
         <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1">
           Pantau seluruh pesanan, verifikasi pembayaran, dan jalankan pembaruan logistik secara
           langsung.
