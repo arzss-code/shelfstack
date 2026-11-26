@@ -2,6 +2,20 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.34] - 2026-11-26
+
+### Optimasi Font Self-Hosted (`@nuxt/fonts`), Audit Aksesibilitas WCAG 2.1 AA Otomatis (`@axe-core/playwright`), dan Pembersihan Dependency
+
+- **Optimasi Font & Penghapusan Dependency Redundan**:
+  - Memasang `@nuxt/fonts` (`^1.2.1`) di `nuxt.config.ts` untuk self-hosting `DM Sans` (400-700) beserta `@font-face` fallback ber-metrik selaras, menghapus seluruh `<link>` render-blocking Google Fonts eksternal, serta memangkas ukuran total build produksi dari `31,7 MB` menjadi `30 MB`.
+  - Menghapus `date-fns` dari `package.json` dan menggantikannya dengan helper native `formatDateTime` (`Intl.DateTimeFormat('id-ID')`) di `app/utils/format.ts` untuk `app/pages/admin/activities.vue` dan `ActivityDetailDialog.vue`.
+- **Standar Web Modern Zero-Dependency (`main.css`, `nuxt.config.ts`, `useThemeMode.ts`)**:
+  - Menambahkan `<meta name="color-scheme" content="light dark">` di `nuxt.config.ts`, menyetel `color-scheme: light` di `:root` dan `color-scheme: dark` di `.dark`, membungkus `::-webkit-scrollbar` di dalam `@supports not (scrollbar-color: auto)` dengan reset `scrollbar-width: auto`, serta menambahkan `touch-action: manipulation` dan `scroll-margin-top: 6rem`.
+  - Menambahkan listener `matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ...)` pada `useThemeMode.ts` saat pengguna belum menetapkan preferensi manual.
+- **Suite Audit WCAG 2.1 AA Otomatis & Remediasi 4 Temuan Aksesibilitas**:
+  - Memasang `@axe-core/playwright` (`^4.14.1`) dan menambahkan `tests/e2e/a11y.spec.ts` untuk mengaudit `/`, `/katalog`, `/cart`, dan `/auth/login` terhadap standar `wcag2a`, `wcag2aa`, `wcag21a`, dan `wcag21aa`.
+  - Memperbaiki 4 pelanggaran nyata yang terdeteksi Axe-Core: kontras `text-white/40` -> `text-white/70` (`IDR (Rp)`) di `AppNavbar.vue`, menambahkan `aria-label` pada switch stok di `KatalogSidebar.vue` dan `KatalogMobileFilter.vue`, serta menyelaraskan `aria-label` dengan teks tampak pada `HomeHero.vue` dan `AuthDemoCredentialsBanner.vue`.
+
 ## [v1.1.0-beta.33] - 2026-11-26
 
 ### Remediasi 15 Kerentanan Dependensi, Kepatuhan Batas 300 Baris Penuh, dan Perbaikan QA Mobile Navbar

@@ -9,6 +9,9 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - '@e2e-dev/web@0.13.0'
   - e2e@0.18.0
+  - '@nuxt/fonts@1.2.1'
+  - fontaine@1.1.0
+  - fontless@1.4.0
 
 overrides:
   '@simple-git/argv-parser': '>=2.0.1'
