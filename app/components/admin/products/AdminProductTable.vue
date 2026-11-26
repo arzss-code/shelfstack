@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue'
 import type { Product } from '~/types/product'
 import { useCategories, CANONICAL_CATEGORIES } from '~/composables/useCategories'
 import { useClientTableSort } from '~/composables/useClientTableSort'
+import AdminProductRowActions from './AdminProductRowActions.vue'
 import { formatRupiah } from '~/utils/format'
 
 const props = withDefaults(
@@ -265,53 +266,15 @@ const {
               <span v-else class="text-brand-faint">-</span>
             </td>
             <td class="px-2.5 py-2 text-right whitespace-nowrap">
-              <div class="inline-flex items-center justify-end gap-0.5">
-                <template v-if="isTrash">
-                  <UiButton
-                    size="xs"
-                    variant="outline"
-                    icon="pi-replay"
-                    @click="emit('restore', product.id)"
-                  >
-                    Restore
-                  </UiButton>
-                </template>
-                <template v-else>
-                  <UiTooltip text="Kelola Varian" position="top">
-                    <UiIconButton
-                      icon="pi-sitemap"
-                      label="Kelola Varian Produk"
-                      size="sm"
-                      @click="emit('manageVariants', product)"
-                    />
-                  </UiTooltip>
-                  <UiTooltip text="Riwayat Mutasi Stok" position="top">
-                    <UiIconButton
-                      icon="pi-history"
-                      label="Riwayat Mutasi Stok"
-                      size="sm"
-                      @click="emit('viewStockMovements', product)"
-                    />
-                  </UiTooltip>
-                  <UiTooltip text="Ubah Produk" position="top">
-                    <UiIconButton
-                      icon="pi-pencil"
-                      label="Ubah Produk"
-                      size="sm"
-                      @click="emit('edit', product)"
-                    />
-                  </UiTooltip>
-                  <UiTooltip text="Hapus Produk" position="top" align="end">
-                    <UiIconButton
-                      icon="pi-trash"
-                      label="Hapus Produk"
-                      variant="danger"
-                      size="sm"
-                      @click="emit('delete', product.id)"
-                    />
-                  </UiTooltip>
-                </template>
-              </div>
+              <AdminProductRowActions
+                :product="product"
+                :is-trash="isTrash"
+                @edit="emit('edit', $event)"
+                @delete="emit('delete', $event)"
+                @restore="emit('restore', $event)"
+                @view-stock-movements="emit('viewStockMovements', $event)"
+                @manage-variants="emit('manageVariants', $event)"
+              />
             </td>
           </tr>
         </tbody>

@@ -68,6 +68,14 @@ const resetFilters = () => {
   selectedAction.value = NO_FILTER.action
 }
 
+const activityColumns = [
+  { key: 'created_at', label: 'Waktu', thClass: 'whitespace-nowrap w-[180px]' },
+  { key: 'action', label: 'Aksi', thClass: '' },
+  { key: 'description', label: 'Deskripsi', thClass: 'min-w-[250px]' },
+  { key: 'ip_address', label: 'IP Address', thClass: 'whitespace-nowrap' },
+  { key: 'browser', label: 'Browser / OS', thClass: 'whitespace-nowrap' },
+] as const
+
 const {
   sortKey,
   sortDirection,
@@ -218,74 +226,21 @@ const rowClass = (data: ActivityLog) =>
                 class="border-b border-brand-hair bg-brand-canvas-soft text-brand-muted uppercase tracking-wider text-[11px]"
               >
                 <th
+                  v-for="col in activityColumns"
+                  :key="col.key"
                   scope="col"
-                  class="py-2.5 px-3.5 whitespace-nowrap w-[180px]"
-                  :aria-sort="getAriaSort('created_at')"
+                  class="py-2.5 px-3.5"
+                  :class="col.thClass"
+                  :aria-sort="getAriaSort(col.key)"
                 >
                   <UiSortHeader
-                    sort-key="created_at"
-                    label="Waktu"
+                    :sort-key="col.key"
+                    :label="col.label"
                     :active-key="sortKey"
                     :direction="sortDirection"
                     @sort="onSortChange"
                   >
-                    Waktu
-                  </UiSortHeader>
-                </th>
-                <th scope="col" class="py-2.5 px-3.5" :aria-sort="getAriaSort('action')">
-                  <UiSortHeader
-                    sort-key="action"
-                    label="Aksi"
-                    :active-key="sortKey"
-                    :direction="sortDirection"
-                    @sort="onSortChange"
-                  >
-                    Aksi
-                  </UiSortHeader>
-                </th>
-                <th
-                  scope="col"
-                  class="py-2.5 px-3.5 min-w-[250px]"
-                  :aria-sort="getAriaSort('description')"
-                >
-                  <UiSortHeader
-                    sort-key="description"
-                    label="Deskripsi"
-                    :active-key="sortKey"
-                    :direction="sortDirection"
-                    @sort="onSortChange"
-                  >
-                    Deskripsi
-                  </UiSortHeader>
-                </th>
-                <th
-                  scope="col"
-                  class="py-2.5 px-3.5 whitespace-nowrap"
-                  :aria-sort="getAriaSort('ip_address')"
-                >
-                  <UiSortHeader
-                    sort-key="ip_address"
-                    label="IP Address"
-                    :active-key="sortKey"
-                    :direction="sortDirection"
-                    @sort="onSortChange"
-                  >
-                    IP Address
-                  </UiSortHeader>
-                </th>
-                <th
-                  scope="col"
-                  class="py-2.5 px-3.5 whitespace-nowrap"
-                  :aria-sort="getAriaSort('browser')"
-                >
-                  <UiSortHeader
-                    sort-key="browser"
-                    label="Browser / OS"
-                    :active-key="sortKey"
-                    :direction="sortDirection"
-                    @sort="onSortChange"
-                  >
-                    Browser / OS
+                    {{ col.label }}
                   </UiSortHeader>
                 </th>
                 <th scope="col" class="py-2.5 px-3.5 font-semibold text-center w-[100px]">

@@ -4,12 +4,6 @@ import { useAdminUsers } from '~/composables/useAdminUsers'
 import { useClientTableSort } from '~/composables/useClientTableSort'
 import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminUserMetrics from '~/components/admin/users/AdminUserMetrics.vue'
-import UiInput from '~/components/ui/UiInput.vue'
-import UiSelect from '~/components/ui/UiSelect.vue'
-import UiButton from '~/components/ui/UiButton.vue'
-import UiCard from '~/components/ui/UiCard.vue'
-import UiEmptyState from '~/components/ui/UiEmptyState.vue'
-import UiBadge from '~/components/ui/UiBadge.vue'
 import AdminCustomer360Drawer from '~/components/admin/users/AdminCustomer360Drawer.vue'
 import type { AdminCustomerSummary } from '~~/shared/types/admin-crm'
 
@@ -38,35 +32,11 @@ const selectedCustomer = ref<AdminCustomerSummary | null>(null)
 const isDetailDrawerOpen = ref(false)
 
 const userColumns = [
-  { key: 'name', label: 'Pelanggan', ariaLabel: 'pelanggan', thClass: '', align: 'left' as const },
-  {
-    key: 'createdAt',
-    label: 'Terdaftar',
-    ariaLabel: 'tanggal daftar',
-    thClass: '',
-    align: 'left' as const,
-  },
-  {
-    key: 'totalOrders',
-    label: 'Pesanan',
-    ariaLabel: 'total pesanan',
-    thClass: 'text-center',
-    align: 'center' as const,
-  },
-  {
-    key: 'ltv',
-    label: 'Total Belanja',
-    ariaLabel: 'nilai belanja',
-    thClass: 'text-right',
-    align: 'right' as const,
-  },
-  {
-    key: 'lastOrderAt',
-    label: 'Pesanan Terakhir',
-    ariaLabel: 'pesanan terakhir',
-    thClass: '',
-    align: 'left' as const,
-  },
+  { key: 'name', label: 'Pelanggan', thClass: '', align: 'left' as const },
+  { key: 'createdAt', label: 'Terdaftar', thClass: '', align: 'left' as const },
+  { key: 'totalOrders', label: 'Pesanan', thClass: 'text-center', align: 'center' as const },
+  { key: 'ltv', label: 'Total Belanja', thClass: 'text-right', align: 'right' as const },
+  { key: 'lastOrderAt', label: 'Pesanan Terakhir', thClass: '', align: 'left' as const },
 ]
 
 const {
