@@ -8,8 +8,7 @@ import {
   filterActivities,
   isFiltering,
 } from '~/features/activities/utils/activity-filter'
-import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { formatDateTime } from '~/utils/format'
 import ActivityDetailDialog from '~/features/activities/components/ActivityDetailDialog.vue'
 
 useSeoMeta({
@@ -60,10 +59,7 @@ onMounted(() => {
 })
 
 /** Waktu bisa null bila kolom kosong, tampilkan placeholder ringkas. */
-const formatDate = (dateStr: string | null) => {
-  if (!dateStr) return '-'
-  return format(new Date(dateStr), 'dd MMM yyyy, HH:mm', { locale: id })
-}
+const formatDate = (dateStr: string | null) => formatDateTime(dateStr)
 
 const getActionVariant = (
   action: string,

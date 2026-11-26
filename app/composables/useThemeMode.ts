@@ -3,10 +3,20 @@ import { computed, ref, type Ref } from 'vue'
 export type ThemeMode = 'light' | 'dark'
 
 const THEME_STORAGE_KEY = 'shelfstack-theme'
+let isSystemListenerBound = false
 
 function applyThemeClass(mode: ThemeMode) {
   if (!import.meta.client || typeof document === 'undefined') return
   document.documentElement.classList.toggle('dark', mode === 'dark')
+}
+
+function readSavedTheme(): ThemeMode | null {
+  try {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY)
+    return saved === 'dark' || saved === 'light' ? saved : null
+  } catch {
+    return null
+  }
 }
 
 export function useThemeMode() {
@@ -37,22 +47,25 @@ export function useThemeMode() {
 
   function initTheme() {
     if (!import.meta.client) return
-    let initial: ThemeMode = 'light'
-    try {
-      const saved = localStorage.getItem(THEME_STORAGE_KEY)
-      if (saved === 'dark' || saved === 'light') {
-        initial = saved
-      } else if (
-        typeof window !== 'undefined' &&
-        window.matchMedia?.('(prefers-color-scheme: dark)').matches
-      ) {
-        initial = 'dark'
-      }
-    } catch {
-      initial = 'light'
-    }
+    const saved = readSavedTheme()
+    const mediaQuery =
+      typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-color-scheme: dark)')
+        : null
+
+    const initial: ThemeMode = saved ?? (mediaQuery?.matches ? 'dark' : 'light')
     theme.value = initial
     applyThemeClass(initial)
+
+    if (mediaQuery && !isSystemListenerBound && typeof mediaQuery.addEventListener === 'function') {
+      isSystemListenerBound = true
+      mediaQuery.addEventListener('change', (event) => {
+        if (readSavedTheme()) return
+        const next: ThemeMode = event.matches ? 'dark' : 'light'
+        theme.value = next
+        applyThemeClass(next)
+      })
+    }
   }
 
   return {
