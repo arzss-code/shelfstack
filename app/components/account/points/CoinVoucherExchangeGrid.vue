@@ -135,7 +135,7 @@ const handleExchange = async (couponId: string) => {
             v-else
             type="button"
             :disabled="isExchanging"
-            class="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-brand-warning px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-warning focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer border-0"
+            class="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-brand-warning-text px-4 py-2 text-xs font-bold text-white dark:bg-brand-warning dark:text-brand-onink shadow-sm transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-warning focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer border-0"
             @click="handleExchange(item.id)"
           >
             <i

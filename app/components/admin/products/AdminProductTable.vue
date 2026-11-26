@@ -3,6 +3,8 @@ import { computed, onMounted } from 'vue'
 import type { Product } from '~/types/product'
 import { useCategories, CANONICAL_CATEGORIES } from '~/composables/useCategories'
 import { useClientTableSort } from '~/composables/useClientTableSort'
+import { useClientPagination } from '~/composables/useClientPagination'
+import UiPagination from '~/components/ui/UiPagination.vue'
 import AdminProductRowActions from './AdminProductRowActions.vue'
 import { formatRupiah } from '~/utils/format'
 
@@ -117,16 +119,22 @@ const {
   stock: (p) => p.stock,
   rating: (p) => p.rating ?? 0,
 })
+
+const {
+  page,
+  pageSize,
+  totalCount,
+  totalPages,
+  paginatedItems: paginatedProducts,
+} = useClientPagination(sortedProducts, 12)
 </script>
 
 <template>
   <div class="overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper">
-    <!-- Loading State -->
     <div v-if="loading" class="space-y-3 p-4" aria-busy="true">
       <UiSkeleton v-for="i in 6" :key="i" height="h-12" />
     </div>
 
-    <!-- Empty State -->
     <div v-else-if="products.length === 0" class="p-6">
       <UiEmptyState
         :icon="isSearching ? 'pi-search' : isTrash ? 'pi-trash' : 'pi-box'"
@@ -149,7 +157,6 @@ const {
       />
     </div>
 
-    <!-- Compact Table View -->
     <div
       v-else
       tabindex="0"
@@ -187,12 +194,11 @@ const {
 
         <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
           <tr
-            v-for="product in sortedProducts"
+            v-for="product in paginatedProducts"
             :key="product.id"
             class="transition-colors hover:bg-brand-canvas-soft/60"
             data-testid="admin-product-table-row"
           >
-            <!-- Produk -->
             <td class="px-2.5 py-2">
               <div class="flex items-center gap-2.5 min-w-0">
                 <div
@@ -280,5 +286,15 @@ const {
         </tbody>
       </table>
     </div>
+    <UiPagination
+      v-if="!loading && products.length > 0"
+      v-model="page"
+      :total-pages="totalPages"
+      :total-count="totalCount"
+      :page-size="pageSize"
+      :loading="loading"
+      item-name="produk"
+      compact
+    />
   </div>
 </template>

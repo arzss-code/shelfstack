@@ -42,10 +42,11 @@ describe('Audit Remediation: Accessibility, Keyboard & Contrast Verification Sui
     expect(grid.classes()).toContain('sm:grid-cols-2')
   })
 
-  it('main.css: token warna brand-warning memiliki rasio kontras WCAG AA (>= 4.5:1) terhadap latar putih', () => {
+  it('main.css: token warna brand-warning-text memiliki rasio kontras WCAG AA (>= 4.5:1) sementara brand-warning cerah untuk ikon bintang', () => {
     const cssPath = resolve(process.cwd(), 'app/assets/css/main.css')
     const cssContent = readFileSync(cssPath, 'utf-8')
-    expect(cssContent).toContain('--brand-warning: #8a5a00;')
+    expect(cssContent).toContain('--brand-warning: #f59e0b;')
+    expect(cssContent).toContain('--brand-warning-text: #92400e;')
     expect(cssContent).not.toContain('--brand-warning: #e28e00;')
   })
 })

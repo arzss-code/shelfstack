@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { AdminReviewStatus } from '~~/shared/schemas/review'
 import type { AdminReviewMetrics } from '~/composables/useAdminReviews'
+import UiTabs, { type UiTabItem } from '~/components/ui/UiTabs.vue'
+import UiSelect, { type UiSelectOption } from '~/components/ui/UiSelect.vue'
+import UiInput from '~/components/ui/UiInput.vue'
 
 const props = defineProps<{
   metrics: AdminReviewMetrics
@@ -26,93 +29,68 @@ watch(localSearch, (val) => {
   }, 300)
 })
 
-const statusOptions: {
-  value: AdminReviewStatus
-  label: string
-  count: (m: AdminReviewMetrics) => number
-}[] = [
-  { value: 'all', label: 'Semua', count: (m) => m.total },
-  { value: 'active', label: 'Aktif di Etalase', count: (m) => m.active },
-  { value: 'hidden', label: 'Disembunyikan', count: (m) => m.hidden },
+const statusTabs = computed<UiTabItem[]>(() => [
+  { value: 'all', label: 'Semua', count: props.metrics.total },
+  { value: 'active', label: 'Aktif di Etalase', count: props.metrics.active },
+  { value: 'hidden', label: 'Disembunyikan', count: props.metrics.hidden },
+])
+
+const ratingSelectOptions: UiSelectOption[] = [
+  { value: 'all', label: 'Semua Bintang' },
+  { value: '5', label: '5 Bintang' },
+  { value: '4', label: '4 Bintang' },
+  { value: '3', label: '3 Bintang' },
+  { value: '2', label: '2 Bintang' },
+  { value: '1', label: '1 Bintang' },
 ]
 
-const ratingOptions = [
-  { value: undefined, label: 'Semua Bintang' },
-  { value: 5, label: '5 Bintang' },
-  { value: 4, label: '4 Bintang' },
-  { value: 3, label: '3 Bintang' },
-  { value: 2, label: '2 Bintang' },
-  { value: 1, label: '1 Bintang' },
-]
+const ratingModel = computed(() => (props.activeRating ? String(props.activeRating) : 'all'))
+
+function onStatusChange(value: string) {
+  emit('update:status', value as AdminReviewStatus)
+}
+
+function onRatingChange(value: string) {
+  emit('update:rating', value && value !== 'all' ? Number(value) : undefined)
+}
 </script>
 
 <template>
   <div
-    class="p-3.5 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper flex flex-col md:flex-row md:items-center justify-between gap-3"
+    class="rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between"
     data-testid="admin-reviews-filter-bar"
   >
-    <!-- Status Tabs -->
-    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-      <button
-        v-for="opt in statusOptions"
-        :key="opt.value"
-        type="button"
-        class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 border cursor-pointer select-none"
-        :class="[
-          activeStatus === opt.value
-            ? 'bg-brand-ink text-brand-onink border-brand-ink shadow-whisper'
-            : 'bg-brand-canvas-soft text-brand-muted border-brand-hair hover:text-brand-ink hover:bg-brand-canvas',
-        ]"
-        @click="emit('update:status', opt.value)"
-      >
-        <span>{{ opt.label }}</span>
-        <span
-          class="px-1.5 py-0.2 rounded-full text-[10px] font-bold tabular"
-          :class="
-            activeStatus === opt.value
-              ? 'bg-brand-onink/15 text-brand-onink'
-              : 'bg-brand-hair text-brand-muted'
-          "
-        >
-          {{ opt.count(metrics) }}
-        </span>
-      </button>
-    </div>
+    <UiTabs
+      :model-value="activeStatus"
+      :items="statusTabs"
+      aria-label="Filter status moderasi ulasan"
+      class="self-start"
+      @update:model-value="onStatusChange"
+    />
 
-    <!-- Rating & Search Controls -->
-    <div class="flex flex-wrap items-center gap-2.5">
-      <!-- Rating Filter Pills -->
-      <div class="flex items-center gap-1">
-        <button
-          v-for="r in ratingOptions"
-          :key="String(r.value)"
-          type="button"
-          class="px-2.5 py-1.5 rounded-lg text-caption font-semibold transition-colors border cursor-pointer select-none"
-          :class="[
-            activeRating === r.value
-              ? 'bg-brand-warning-tint text-brand-warning-text border-brand-warning-edge font-bold'
-              : 'bg-brand-canvas-soft text-brand-muted border-brand-hair hover:text-brand-ink',
-          ]"
-          @click="emit('update:rating', r.value)"
-        >
-          <span v-if="r.value" class="flex items-center gap-1">
-            <span>{{ r.value }}</span>
-            <i class="pi pi-star-fill text-[9px] text-brand-warning" />
-          </span>
-          <span v-else>{{ r.label }}</span>
-        </button>
+    <div class="flex w-full flex-wrap items-center gap-2 sm:flex-nowrap lg:w-auto">
+      <div class="w-full sm:w-40">
+        <label for="admin-reviews-rating-filter" class="sr-only">Filter rating bintang</label>
+        <UiSelect
+          id="admin-reviews-rating-filter"
+          :model-value="ratingModel"
+          :options="ratingSelectOptions"
+          size="sm"
+          block
+          aria-label="Filter rating bintang"
+          @change="onRatingChange"
+        />
       </div>
 
-      <!-- Search Input -->
-      <div class="relative min-w-[200px] flex-1 sm:flex-initial">
-        <i
-          class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-faint pointer-events-none"
-        />
-        <input
+      <div class="w-full sm:w-60">
+        <label for="admin-reviews-search" class="sr-only">Cari teks ulasan</label>
+        <UiInput
+          id="admin-reviews-search"
           v-model="localSearch"
-          type="text"
+          type="search"
+          size="sm"
+          left-icon="pi-search"
           placeholder="Cari teks ulasan..."
-          class="w-full h-9 pl-8 pr-3 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint hover:border-brand-faint focus:border-brand-ink focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-ink transition-colors"
         />
       </div>
     </div>

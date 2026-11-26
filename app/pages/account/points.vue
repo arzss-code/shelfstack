@@ -118,7 +118,7 @@ const handleRefresh = async () => {
                 class="min-h-[44px] cursor-pointer rounded-field border-0 px-3.5 py-1.5 text-xs font-bold transition-all focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
                 :class="
                   activeTab === 'exchange'
-                    ? 'bg-brand-warning text-white shadow-whisper'
+                    ? 'bg-brand-warning-text text-white dark:bg-brand-warning dark:text-brand-onink shadow-whisper'
                     : 'text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink'
                 "
                 @click="activeTab = 'exchange'"

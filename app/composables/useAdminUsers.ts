@@ -96,6 +96,7 @@ export function useAdminUsers() {
     currentPage,
     totalPages,
     totalCustomersCount,
+    pageSize: itemsPerPage,
     sortOptions,
     hasCustomers,
     fetchCustomers,

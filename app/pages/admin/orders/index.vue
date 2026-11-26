@@ -38,6 +38,7 @@ const {
   handleExport,
   prevPage,
   nextPage,
+  setPage,
 } = useAdminOrdersList()
 </script>
 
@@ -68,20 +69,27 @@ const {
 
     <!-- Filter & Search Controls -->
     <div
-      class="flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3.5 shadow-whisper"
+      class="flex flex-col gap-2.5 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper"
     >
-      <!-- Status Tabs -->
-      <UiTabs
-        :model-value="activeStatus"
-        :items="statusTabs"
-        aria-label="Filter status pesanan"
-        @update:model-value="onStatusChange"
-      />
+      <!-- Status Tabs + Total Count -->
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <UiTabs
+          :model-value="activeStatus"
+          :items="statusTabs"
+          aria-label="Filter status pesanan"
+          class="self-start"
+          @update:model-value="onStatusChange"
+        />
+
+        <span v-if="!loading" class="text-[11px] font-medium text-brand-muted tabular">
+          Total: <strong class="text-brand-ink">{{ totalOrders }}</strong> pesanan
+        </span>
+      </div>
 
       <!-- Search & Filter Form -->
       <form class="flex flex-wrap items-center gap-2" @submit.prevent="onSearch">
         <label for="admin-orders-search" class="sr-only">Cari ID atau nama pelanggan</label>
-        <div class="w-full sm:w-56">
+        <div class="w-full min-w-[200px] sm:flex-1">
           <UiInput
             id="admin-orders-search"
             v-model="searchQuery"
@@ -93,7 +101,7 @@ const {
         </div>
 
         <div
-          class="flex h-9 w-full items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3.5 transition-colors hover:border-brand-faint focus-within:border-brand-ink focus-within:ring-1 focus-within:ring-inset focus-within:ring-brand-ink sm:w-auto"
+          class="flex h-9 w-full shrink-0 items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3.5 transition-colors hover:border-brand-faint focus-within:border-brand-ink focus-within:ring-1 focus-within:ring-inset focus-within:ring-brand-ink sm:w-auto"
         >
           <label
             for="admin-orders-from"
@@ -112,7 +120,7 @@ const {
         </div>
 
         <div
-          class="flex h-9 w-full items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3.5 transition-colors hover:border-brand-faint focus-within:border-brand-ink focus-within:ring-1 focus-within:ring-inset focus-within:ring-brand-ink sm:w-auto"
+          class="flex h-9 w-full shrink-0 items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3.5 transition-colors hover:border-brand-faint focus-within:border-brand-ink focus-within:ring-1 focus-within:ring-inset focus-within:ring-brand-ink sm:w-auto"
         >
           <label for="admin-orders-to" class="shrink-0 text-[11px] font-semibold text-brand-muted">
             Sampai
@@ -127,12 +135,13 @@ const {
           />
         </div>
 
-        <UiButton variant="secondary" size="sm" type="submit">Cari</UiButton>
+        <UiButton variant="secondary" size="sm" type="submit" class="shrink-0">Cari</UiButton>
         <UiButton
           v-if="fromDate || toDate"
           variant="ghost"
           size="sm"
           type="button"
+          class="shrink-0"
           @click="resetDateFilters"
         >
           Reset Tanggal
@@ -157,6 +166,7 @@ const {
       :sort-direction="sortDirection"
       @prev-page="prevPage"
       @next-page="nextPage"
+      @page-change="setPage"
       @sort-change="onSortChange"
     />
   </div>

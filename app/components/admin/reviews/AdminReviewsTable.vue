@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { AdminReviewItem } from '~~/shared/schemas/review'
 import { useClientTableSort } from '~/composables/useClientTableSort'
+import UiPagination from '~/components/ui/UiPagination.vue'
 
 const props = defineProps<{
   reviews: AdminReviewItem[]
@@ -251,32 +252,16 @@ const formatDate = (isoStr: string): string => {
     </div>
 
     <!-- Pagination Footer -->
-    <div
-      v-if="pagination.totalPages > 1"
-      class="p-4 border-t border-brand-hair bg-brand-canvas-soft flex items-center justify-between text-caption text-brand-muted"
-    >
-      <span>
-        Menampilkan halaman {{ pagination.page }} dari {{ pagination.totalPages }} (Total
-        {{ pagination.totalCount }} ulasan)
-      </span>
-      <div class="flex items-center gap-1.5">
-        <button
-          type="button"
-          :disabled="pagination.page <= 1 || loading"
-          class="px-3 py-1 rounded-full border border-brand-hair bg-brand-canvas text-brand-ink text-xs font-semibold hover:bg-brand-canvas-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-          @click="emit('pageChange', pagination.page - 1)"
-        >
-          Sebelumnya
-        </button>
-        <button
-          type="button"
-          :disabled="pagination.page >= pagination.totalPages || loading"
-          class="px-3 py-1 rounded-full border border-brand-hair bg-brand-canvas text-brand-ink text-xs font-semibold hover:bg-brand-canvas-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-          @click="emit('pageChange', pagination.page + 1)"
-        >
-          Selanjutnya
-        </button>
-      </div>
-    </div>
+    <UiPagination
+      v-if="reviews.length > 0"
+      :model-value="pagination.page"
+      :total-pages="pagination.totalPages"
+      :total-count="pagination.totalCount"
+      :page-size="pagination.limit"
+      :loading="loading"
+      item-name="ulasan"
+      compact
+      @change="emit('pageChange', $event)"
+    />
   </div>
 </template>

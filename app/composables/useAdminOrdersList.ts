@@ -175,6 +175,12 @@ export function useAdminOrdersList() {
     }
   }
 
+  const setPage = (next: number) => {
+    if (next < 1 || next > totalPages.value || next === page.value) return
+    page.value = next
+    fetchOrders()
+  }
+
   const setupRealtime = () => {
     if (!import.meta.client) return
 
@@ -271,5 +277,6 @@ export function useAdminOrdersList() {
     handleExportCsv,
     prevPage,
     nextPage,
+    setPage,
   }
 }

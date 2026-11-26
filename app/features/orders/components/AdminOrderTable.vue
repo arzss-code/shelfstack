@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { OrderStatus } from '~/types/order'
+import UiPagination from '~/components/ui/UiPagination.vue'
 import { formatRupiah } from '~/utils/format'
 
 export interface AdminOrderRow {
@@ -45,8 +46,15 @@ const props = withDefaults(
 const emit = defineEmits<{
   prevPage: []
   nextPage: []
+  pageChange: [page: number]
   sortChange: [payload: { key: string | null; direction: 'desc' | 'asc' | null }]
 }>()
+
+const onOrderPageChange = (nextPage: number) => {
+  if (nextPage === props.page - 1) emit('prevPage')
+  else if (nextPage === props.page + 1) emit('nextPage')
+  emit('pageChange', nextPage)
+}
 
 const getAriaSort = (key: string): 'ascending' | 'descending' | 'none' => {
   if (props.sortKey !== key || !props.sortDirection) return 'none'
@@ -232,29 +240,16 @@ const formatDate = (dateStr: string) => {
     </div>
 
     <!-- Pagination Footer -->
-    <div
+    <UiPagination
       v-if="orders.length > 0"
-      class="flex flex-wrap items-center justify-between gap-2 border-t border-brand-hair bg-brand-canvas-soft/60 px-4 py-2.5 text-xs text-brand-muted"
-    >
-      <span>
-        Menampilkan {{ (page - 1) * pageSize + 1 }} -
-        {{ Math.min(page * pageSize, totalOrders) }} dari {{ totalOrders }} pesanan
-      </span>
-
-      <div class="flex items-center gap-2">
-        <UiButton variant="outline" size="xs" :disabled="page <= 1" @click="emit('prevPage')">
-          Sebelumnya
-        </UiButton>
-        <span>Halaman {{ page }} / {{ totalPages }}</span>
-        <UiButton
-          variant="outline"
-          size="xs"
-          :disabled="page >= totalPages"
-          @click="emit('nextPage')"
-        >
-          Berikutnya
-        </UiButton>
-      </div>
-    </div>
+      :model-value="page"
+      :total-pages="totalPages"
+      :total-count="totalOrders"
+      :page-size="pageSize"
+      :loading="loading"
+      item-name="pesanan"
+      compact
+      @change="onOrderPageChange"
+    />
   </div>
 </template>

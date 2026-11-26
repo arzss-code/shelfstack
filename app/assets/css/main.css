@@ -35,7 +35,7 @@
   --brand-cobaltdeep: #0052cc;
   --brand-strip: #141414;
   --brand-success: #00875a;
-  --brand-warning: #8a5a00;
+  --brand-warning: #f59e0b;
   --brand-danger: #e41e3f;
   --brand-obsidian: #12131a;
 
@@ -43,8 +43,8 @@
      Tiap status punya tiga lapis, yaitu warna teks, latar, dan garis tepi. */
   --brand-success-tint: #e6f4ee;
   --brand-success-edge: #c2e3d5;
-  --brand-warning-tint: #fdf2e0;
-  --brand-warning-edge: #f2ddb5;
+  --brand-warning-tint: #fff6e5;
+  --brand-warning-edge: #fcd38a;
   --brand-danger-tint: #fdecef;
   --brand-danger-edge: #f6ccd5;
   --brand-accent-tint: #e9f1ff;
@@ -53,7 +53,7 @@
 
   /* Teks status di atas tint, langkah lebih gelap agar kontras tetap di atas 4.5:1. */
   --brand-success-text: #006b47;
-  --brand-warning-text: #8a5a00;
+  --brand-warning-text: #92400e;
   --brand-danger-text: #b3152f;
   --brand-accent-text: #0044b3;
 
@@ -95,7 +95,7 @@
   --brand-cobaltdeep: #3385ff;
   --brand-strip: #000000;
   --brand-success: #00a86b;
-  --brand-warning: #ffb822;
+  --brand-warning: #fbbf24;
   --brand-danger: #ff5c78;
   --brand-obsidian: #12131a;
 

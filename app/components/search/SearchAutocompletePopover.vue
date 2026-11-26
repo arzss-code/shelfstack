@@ -263,7 +263,10 @@ const isQueryEmpty = computed(() => props.query.trim().length < 2)
                 <div v-if="prod.stock <= 0" class="text-[10px] text-brand-danger font-medium">
                   Habis
                 </div>
-                <div v-else-if="prod.stock < 5" class="text-[10px] text-brand-warning font-medium">
+                <div
+                  v-else-if="prod.stock < 5"
+                  class="text-[10px] text-brand-warning-text font-medium"
+                >
                   Sisa {{ prod.stock }}
                 </div>
               </div>

@@ -23,6 +23,7 @@ const {
   currentPage,
   totalPages,
   totalCustomersCount,
+  pageSize,
   sortOptions,
   hasCustomers,
   fetchCustomers,
@@ -234,33 +235,16 @@ const formatDate = (dateStr?: string | null) => {
       </div>
 
       <!-- Pagination Footer -->
-      <div
-        v-if="totalPages > 1"
-        class="flex flex-wrap items-center justify-between gap-2 border-t border-brand-hair bg-brand-canvas-soft/60 px-4 py-2.5 text-xs text-brand-muted"
-      >
-        <span
-          >Menampilkan halaman {{ currentPage }} dari {{ totalPages }} (Total
-          {{ totalCustomersCount }} pelanggan)</span
-        >
-        <div class="flex items-center gap-1.5">
-          <UiButton
-            size="xs"
-            variant="outline"
-            :disabled="currentPage <= 1 || loading"
-            @click="currentPage--"
-          >
-            Sebelumnya
-          </UiButton>
-          <UiButton
-            size="xs"
-            variant="outline"
-            :disabled="currentPage >= totalPages || loading"
-            @click="currentPage++"
-          >
-            Selanjutnya
-          </UiButton>
-        </div>
-      </div>
+      <UiPagination
+        v-if="sortedCustomers.length > 0"
+        v-model="currentPage"
+        :total-pages="totalPages"
+        :total-count="totalCustomersCount"
+        :page-size="pageSize"
+        :loading="loading"
+        item-name="pelanggan"
+        compact
+      />
     </UiCard>
 
     <!-- Customer 360 Slide-Over Drawer -->

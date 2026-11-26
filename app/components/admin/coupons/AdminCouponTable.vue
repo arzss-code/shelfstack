@@ -2,6 +2,8 @@
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiIconButton from '~/components/ui/UiIconButton.vue'
 import UiEmptyState from '~/components/ui/UiEmptyState.vue'
+import UiPagination from '~/components/ui/UiPagination.vue'
+import { useClientPagination } from '~/composables/useClientPagination'
 import { useClientTableSort } from '~/composables/useClientTableSort'
 
 export interface AdminCoupon {
@@ -66,6 +68,14 @@ const {
   usage: (c) => c.usage_count,
   status: (c) => (c.is_expired ? 'Kedaluwarsa' : c.is_active ? 'Aktif' : 'Nonaktif'),
 })
+
+const {
+  page,
+  pageSize,
+  totalCount,
+  totalPages,
+  paginatedItems: paginatedCoupons,
+} = useClientPagination(sortedCoupons, 12)
 </script>
 
 <template>
@@ -122,7 +132,7 @@ const {
         </thead>
         <tbody class="divide-y divide-brand-hairsoft">
           <tr
-            v-for="coupon in sortedCoupons"
+            v-for="coupon in paginatedCoupons"
             :key="coupon.id"
             class="transition-colors hover:bg-brand-canvas-soft/50"
           >
@@ -239,5 +249,15 @@ const {
         </tbody>
       </table>
     </div>
+    <UiPagination
+      v-if="!loading && coupons.length > 0"
+      v-model="page"
+      :total-pages="totalPages"
+      :total-count="totalCount"
+      :page-size="pageSize"
+      :loading="loading"
+      item-name="voucher"
+      compact
+    />
   </div>
 </template>

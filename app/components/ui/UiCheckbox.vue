@@ -31,12 +31,10 @@ function onChange(event: Event) {
 <template>
   <label
     :for="checkboxId"
-    class="inline-flex items-start gap-2.5 select-none"
+    class="inline-flex items-center gap-2.5 select-none"
     :class="disabled ? 'cursor-not-allowed opacity-55' : 'cursor-pointer'"
   >
-    <span
-      class="relative mt-0.5 inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center"
-    >
+    <span class="relative inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center">
       <input
         :id="checkboxId"
         type="checkbox"
@@ -66,7 +64,7 @@ function onChange(event: Event) {
         </svg>
       </span>
     </span>
-    <span v-if="label || $slots.default" class="text-xs font-medium leading-snug text-brand-ink">
+    <span v-if="label || $slots.default" class="text-xs font-medium leading-[18px] text-brand-ink">
       <slot>{{ label }}</slot>
     </span>
   </label>

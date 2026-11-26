@@ -17,6 +17,8 @@ const props = withDefaults(
     itemName?: string
     /** Jumlah nomor halaman tetangga kiri/kanan yang tampil */
     siblingCount?: number
+    /** Mode ringkas untuk footer tabel admin */
+    compact?: boolean
   }>(),
   {
     modelValue: 1,
@@ -25,6 +27,7 @@ const props = withDefaults(
     loading: false,
     itemName: 'produk',
     siblingCount: 1,
+    compact: false,
   },
 )
 
@@ -146,7 +149,11 @@ const goToPage = (page: number) => {
     role="navigation"
     aria-label="Paginasi Halaman"
     :aria-busy="loading"
-    class="ui-pagination flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-brand-hairsoft pt-6"
+    :class="
+      compact
+        ? 'ui-pagination flex flex-col sm:flex-row items-center justify-between gap-2.5 border-t border-brand-hair bg-brand-canvas-soft/60 px-4 py-2.5'
+        : 'ui-pagination flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-brand-hairsoft pt-6'
+    "
     data-testid="ui-pagination"
   >
     <!-- Ringkasan Data (Left on desktop, bottom on mobile) -->
@@ -171,7 +178,11 @@ const goToPage = (page: number) => {
       <!-- Tombol Sebelumnya -->
       <button
         type="button"
-        class="inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
+        :class="
+          compact
+            ? 'inline-flex h-7 items-center gap-1 px-2.5 rounded-full text-[11px] font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0'
+            : 'inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0'
+        "
         :disabled="isFirstPage || loading"
         aria-label="Halaman Sebelumnya"
         data-testid="pagination-prev"
@@ -190,7 +201,11 @@ const goToPage = (page: number) => {
           <!-- Separator Ellipsis -->
           <span
             v-if="item.type === 'ellipsis'"
-            class="w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-xs text-brand-muted select-none"
+            :class="
+              compact
+                ? 'w-6 h-7 flex items-center justify-center text-[11px] text-brand-muted select-none'
+                : 'w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-xs text-brand-muted select-none'
+            "
             aria-hidden="true"
             data-testid="pagination-ellipsis"
           >
@@ -201,8 +216,11 @@ const goToPage = (page: number) => {
           <button
             v-else
             type="button"
-            class="w-8 h-8 sm:w-9 sm:h-9 rounded-full text-xs sm:text-sm font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
+            class="rounded-full font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
             :class="[
+              compact
+                ? 'min-w-[28px] h-7 px-1 text-[11px]'
+                : 'w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm',
               item.page === currentPage
                 ? 'bg-brand-ink text-brand-onink shadow-whisper'
                 : 'bg-transparent text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft border border-transparent hover:border-brand-hair',
@@ -221,7 +239,11 @@ const goToPage = (page: number) => {
       <!-- Tombol Selanjutnya -->
       <button
         type="button"
-        class="inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
+        :class="
+          compact
+            ? 'inline-flex h-7 items-center gap-1 px-2.5 rounded-full text-[11px] font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0'
+            : 'inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0'
+        "
         :disabled="isLastPage || loading"
         aria-label="Halaman Selanjutnya"
         data-testid="pagination-next"

@@ -123,15 +123,21 @@ describe('AdminOrderTable Component', () => {
 
     const buttons = wrapper.findAll('button')
     const prevBtn = buttons.find((b) => b.text().includes('Sebelumnya'))
-    const nextBtn = buttons.find((b) => b.text().includes('Berikutnya'))
+    const nextBtn = buttons.find((b) => b.text().includes('Selanjutnya'))
+    const page3Btn = wrapper.find('[data-testid="pagination-page-3"]')
 
     expect(prevBtn).toBeDefined()
     expect(nextBtn).toBeDefined()
+    expect(page3Btn.exists()).toBe(true)
 
     await prevBtn?.trigger('click')
     expect(wrapper.emitted('prevPage')).toBeTruthy()
+    expect(wrapper.emitted('pageChange')?.[0]).toEqual([1])
 
     await nextBtn?.trigger('click')
     expect(wrapper.emitted('nextPage')).toBeTruthy()
+
+    await page3Btn.trigger('click')
+    expect(wrapper.emitted('pageChange')?.at(-1)).toEqual([3])
   })
 })

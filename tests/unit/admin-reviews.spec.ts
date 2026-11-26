@@ -142,6 +142,17 @@ describe('Admin Reviews Suite (Moderasi Ulasan Produk)', () => {
       await activeBtn?.trigger('click')
 
       expect(wrapper.emitted('update:status')?.[0]).toEqual(['active'])
+
+      const ratingTrigger = wrapper.find('button[aria-haspopup="listbox"]')
+      expect(ratingTrigger.text()).toContain('Semua Bintang')
+
+      const ratingSelect = wrapper.find('select#admin-reviews-rating-filter')
+      expect(ratingSelect.exists()).toBe(true)
+      await ratingSelect.setValue('5')
+      expect(wrapper.emitted('update:rating')?.[0]).toEqual([5])
+
+      await ratingSelect.setValue('all')
+      expect(wrapper.emitted('update:rating')?.[1]).toEqual([undefined])
     })
   })
 
