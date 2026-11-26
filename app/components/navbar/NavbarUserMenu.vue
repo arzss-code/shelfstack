@@ -42,7 +42,7 @@ onBeforeUnmount(() => {
     <template v-if="isLoggedIn && hasUser">
       <button
         type="button"
-        class="flex items-center gap-1.5 h-11 min-h-[44px] pl-1.5 pr-2.5 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair active:scale-95"
+        class="flex items-center justify-center sm:justify-start gap-1.5 w-11 sm:w-auto h-11 min-w-[44px] min-h-[44px] sm:pl-1.5 sm:pr-2.5 rounded-full hover:bg-brand-canvas-soft transition-colors cursor-pointer border border-brand-hair active:scale-95"
         @click="isUserMenuOpen = !isUserMenuOpen"
       >
         <span
