@@ -89,7 +89,6 @@ const catalogMetricValue = computed(() => {
         <div class="grid grid-cols-12 gap-3 h-80 sm:h-96">
           <NuxtLink
             to="/c/tech"
-            aria-label="Jelajahi kategori Tech dan Gadget"
             class="col-span-7 bg-brand-canvas-soft rounded-card overflow-hidden relative group border border-brand-hair shadow-whisper h-full block no-underline"
           >
             <img
@@ -117,7 +116,6 @@ const catalogMetricValue = computed(() => {
           <div class="col-span-5 flex flex-col gap-3 h-full">
             <NuxtLink
               to="/c/home"
-              aria-label="Jelajahi kategori Rumah dan Dapur"
               class="flex-1 min-h-0 bg-brand-canvas-soft rounded-card overflow-hidden relative group border border-brand-hair shadow-whisper block no-underline"
             >
               <img
@@ -143,7 +141,6 @@ const catalogMetricValue = computed(() => {
 
             <NuxtLink
               to="/c/lifestyle"
-              aria-label="Jelajahi kategori Pakaian dan Aksesoris"
               class="flex-1 min-h-0 bg-brand-canvas-soft rounded-card overflow-hidden relative group border border-brand-hair shadow-whisper block no-underline"
             >
               <img

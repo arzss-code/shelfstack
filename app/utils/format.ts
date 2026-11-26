@@ -33,3 +33,17 @@ export const formatReviewDate = (dateStr?: string | null): string => {
     year: 'numeric',
   }).format(date)
 }
+
+export const formatDateTime = (dateStr?: string | null): string => {
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return '-'
+  return new Intl.DateTimeFormat('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date)
+}

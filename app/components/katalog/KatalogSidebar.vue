@@ -79,6 +79,7 @@ const emit = defineEmits<{
         <button
           type="button"
           role="switch"
+          aria-label="Hanya tampilkan produk tersedia"
           :aria-checked="inStockOnly"
           class="w-10 h-6 rounded-full transition-colors relative cursor-pointer border-0 p-0.5"
           :class="inStockOnly ? 'bg-brand-ink' : 'bg-brand-hair'"

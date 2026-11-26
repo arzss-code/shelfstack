@@ -16,6 +16,7 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'ShelfStack: Curated Archival Department Store' },
         { name: 'theme-color', content: '#141414' },
+        { name: 'color-scheme', content: 'light dark' },
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { property: 'og:site_name', content: 'ShelfStack' },
@@ -24,12 +25,6 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'manifest', href: '/site.webmanifest' },
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap',
-        },
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg?v=2' },
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png?v=2' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png?v=2' },
@@ -44,9 +39,14 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss',
     '@nuxt/eslint',
+    '@nuxt/fonts',
     '@nuxt/image',
     'nuxt-security',
   ],
+
+  fonts: {
+    families: [{ name: 'DM Sans', provider: 'google', weights: [400, 500, 600, 700] }],
+  },
 
   supabase: {
     redirect: false,

@@ -1,6 +1,6 @@
 {
   "name": "shelfstack",
-  "version": "1.1.0-beta.33",
+  "version": "1.1.0-beta.34",
   "type": "module",
   "private": true,
   "scripts": {
@@ -21,11 +21,11 @@
     "db:seed:remote": "node scripts/seed.mjs --remote"
   },
   "dependencies": {
+    "@nuxt/fonts": "^1.2.1",
     "@nuxt/image": "^2.1.0",
     "@nuxtjs/supabase": "^2.0.9",
     "@pinia/nuxt": "^1.0.1",
     "@supabase/supabase-js": "^2.112.2",
-    "date-fns": "^4.4.0",
     "nuxt": "~4.6.4",
     "nuxt-security": "^2.6.0",
     "pinia": "^4.0.2",
@@ -39,6 +39,7 @@
     "@ai-sdk/google": "^4.0.0",
     "@ai-sdk/openai": "^4.0.0",
     "@ai-sdk/openai-compatible": "^3.0.0",
+    "@axe-core/playwright": "^4.14.1",
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@e2e-dev/web": "^0.13.0",

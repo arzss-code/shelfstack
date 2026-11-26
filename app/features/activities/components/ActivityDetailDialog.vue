@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { formatDateTime } from '~/utils/format'
 import type { ActivityLog } from '~/features/activities/composables/useActivities'
 import type { Json } from '~/types/database.types'
 
@@ -11,10 +10,7 @@ const props = defineProps<{
 
 const visible = defineModel<boolean>('visible', { default: false })
 
-const formatDate = (dateStr: string | null) => {
-  if (!dateStr) return '-'
-  return format(new Date(dateStr), 'dd MMM yyyy, HH:mm', { locale: id })
-}
+const formatDate = (dateStr: string | null) => formatDateTime(dateStr)
 
 const formatValue = (val: Json | undefined) => {
   if (val === null || val === undefined || val === '') return '-'
