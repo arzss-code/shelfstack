@@ -50,7 +50,7 @@ function selectRole(role: 'customer' | 'admin') {
             ? 'border-brand-ink bg-brand-canvas shadow-whisper text-brand-ink'
             : 'border-brand-hairsoft bg-white/70 hover:bg-brand-canvas hover:border-brand-hair text-brand-muted',
         ]"
-        aria-label="Gunakan akun demo pelanggan: demo-customer@shelfstack.local"
+        aria-label="Pelanggan Etalase & Checkout demo-customer@shelfstack.local"
         @click="selectRole('customer')"
       >
         <div class="min-w-0 pr-1">
@@ -92,7 +92,7 @@ function selectRole(role: 'customer' | 'admin') {
             ? 'border-brand-ink bg-brand-canvas shadow-whisper text-brand-ink'
             : 'border-brand-hairsoft bg-white/70 hover:bg-brand-canvas hover:border-brand-hair text-brand-muted',
         ]"
-        aria-label="Gunakan akun demo admin: demo-admin@shelfstack.local"
+        aria-label="Admin Ops Pesanan, Stok & CS demo-admin@shelfstack.local"
         @click="selectRole('admin')"
       >
         <div class="min-w-0 pr-1">
