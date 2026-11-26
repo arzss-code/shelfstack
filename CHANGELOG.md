@@ -2,6 +2,22 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.33] - 2026-11-26
+
+### Remediasi 15 Kerentanan Dependensi, Kepatuhan Batas 300 Baris Penuh, dan Perbaikan QA Mobile Navbar
+
+- **Remediasi Keamanan Dependensi (`pnpm audit`: 15 -> 0 kerentanan)**:
+  - Memperbarui `nuxt` dari `^4.5.2` ke `~4.6.4` pada `package.json` untuk menutup 11 advisory moderat/rendah pada `nuxt`, `@nuxt/nitro-server`, `@nuxt/vite-builder`, dan `@nuxt/schema` sambil menjaga kompatibilitas penuh seluruh 1.442 unit test `happy-dom`.
+  - Menambahkan override aman pada `pnpm-workspace.yaml` (`postcss-selector-parser@6` `^6.1.6`, `postcss-selector-parser@7` `^7.2.1`, `glob@>=9` `>=14.0.2`, `minimatch@>=7` `>=11.0.1`, dan `eslint-plugin-import-x` `>=4.18.1`) sehingga `pnpm audit --audit-level=low` melaporkan 0 kerentanan.
+- **Modularisasi 4 Berkas di Atas Batas 300 Baris (0 Berkas Authored > 300 Baris)**:
+  - Merampingkan `app/pages/wishlist.vue` dari 302 baris menjadi 287 baris melalui helper notifikasi ringkas.
+  - Memecah `shared/schemas/shipping.ts` (435 baris) menjadi `shared/schemas/shipping-rates.ts` dan `shared/utils/shipping-zones.ts` dengan re-export penuh tanpa circular import.
+  - Memisahkan data katalog statis dari `server/api/internal/seed-catalog.post.ts` (809 baris) dan `server/utils/seed-catalog-data.ts` (811 baris) ke modul data `server/data/catalog-seed/` (`types.ts`, `products-*.ts`, `variants-*.ts`, `reviews.ts`).
+- **Perbaikan Temuan Live QA Mobile & Konfigurasi E2E**:
+  - Memperbaiki overflow horizontal 25px pada `AppNavbar.vue` dan `NavbarUserMenu.vue` ketika pengguna terautentikasi di viewport `320px-375px` sehingga tombol hamburger dan seluruh aksi header tampil utuh (`overflowX: false`).
+  - Mengganti meta tag usang `apple-mobile-web-app-capable` menjadi `mobile-web-app-capable` di `nuxt.config.ts` untuk membersihkan peringatan konsol browser.
+  - Mendukung `PLAYWRIGHT_BASE_URL` pada `playwright.config.ts` serta memverifikasi penuh 29/29 skenario E2E Playwright aktif lolos terhadap production build.
+
 ## [v1.1.0-beta.32] - 2026-11-25
 
 ### Redisain Wishlist, Polish UX Mobile Storefront & Akun, Aset Studio Katalog, dan Sinkronisasi Migrasi Supabase

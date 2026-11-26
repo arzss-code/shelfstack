@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Pekerjaan aktif:** Rilis `v1.1.0-beta.32` (redisain `/wishlist` + pengayaan metadata PR #117, polish UX mobile & aksesibilitas `/cart`, `/orders`, `/account/vouchers`, dan `/account/addresses`, regenerasi 12 aset fotografi studio produk katalog Batch 1 Tech dan kursi ergonomis berlatar `#ECEDEF` dengan sisa 32 aset varian terjadwal otomatis, serta verifikasi sinkronisasi seluruh 49 migrasi Supabase remote).
-- **Versi rilis aktif:** `v1.1.0-beta.32` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
-- **Quality Gate Terkini (2026-11-25):** `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `vitest run` 146 file / 1.442 test lolos 100% · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
+- **Pekerjaan aktif:** Rilis `v1.1.0-beta.33` (remediasi 15 kerentanan `pnpm audit` ke 0 via `nuxt ~4.6.4` dan override aman, modularisasi 4 berkas > 300 baris menjadi 0 pelanggaran di seluruh `app/`, `server/`, `shared/`, perbaikan overflow mobile `320px-375px` di `AppNavbar.vue`, serta verifikasi penuh `pnpm build`, Chrome DevTools Live QA, dan Playwright E2E). Sisa 20 gambar studio varian katalog terjadwal otomatis di branch `feat/catalog-variant-images`.
+- **Versi rilis aktif:** `v1.1.0-beta.33` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
+- **Quality Gate Terkini (2026-11-26):** `pnpm audit --audit-level=low` 0 kerentanan · `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `vitest run` 146 file / 1.442 test + `order-service` 2 file / 25 test lolos 100% · `pnpm build` EXIT 0 · Playwright E2E 29 passed (1 skipped bawaan `shots.spec.ts`) · Live QA Chrome DevTools (`320px`/`375px`/`1280px`) 0 console error & 0 overflow · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -49,7 +49,7 @@
 
 - Sinkronisasi skema remote selesai diverifikasi (2026-11-25): `pnpm dlx supabase migration list --linked` mengonfirmasi seluruh 49 migrasi lokal, termasuk `20261202000001`, `20261203000001`, dan `20261204000001` (`public.email_outbox`, `contact_messages`, `deleted_at` kategori/flash deals, RPC `admin_restock_product`), sudah diterapkan dan sinkron penuh pada proyek Supabase `mbcyttxkfppcdvwitrif`. Runtime test PostgreSQL multi-koneksi lokal tetap belum dieksekusi karena daemon Docker lokal offline.
 - Cleanup avatar best-effort tetap tidak memakai antrean retry terpisah bila Storage API gagal sementara setelah update profil sukses.
-- Regenerasi foto studio varian produk katalog masih menyisakan 32 gambar (dimulai dari `desk-oak-walnut.jpg`) yang dijadwalkan lanjut otomatis pada branch `feat/catalog-variant-images` mengikuti jendela kuota generator gambar.
+- Regenerasi foto studio varian produk katalog masih menyisakan 20 gambar (dimulai dari `coffee-grinder-silver.jpg`) yang dijadwalkan lanjut otomatis pada branch `feat/catalog-variant-images` mengikuti jendela kuota generator gambar.
 
 ## 🚀 Riwayat Kemajuan per Fase
 
