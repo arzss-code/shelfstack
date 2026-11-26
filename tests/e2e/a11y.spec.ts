@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { waitForHydration } from './helpers'
+import { LoginPage } from './pages/LoginPage'
 
 const PUBLIC_A11Y_ROUTES = [
   { name: 'Beranda', path: '/' },
@@ -9,6 +10,28 @@ const PUBLIC_A11Y_ROUTES = [
   { name: 'Halaman Login', path: '/auth/login' },
 ]
 
+async function expectNoBlockingA11yViolations(page: Page, contextLabel: string): Promise<void> {
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze()
+
+  const blockingViolations = results.violations.filter(
+    (v) => v.impact === 'critical' || v.impact === 'serious',
+  )
+
+  const summary = blockingViolations
+    .map(
+      (v) =>
+        `[${contextLabel}][${v.impact}] ${v.id}: ${v.help} (${v.nodes.length} nodes: ${v.nodes
+          .slice(0, 2)
+          .map((n) => n.target.join(' '))
+          .join(', ')})`,
+    )
+    .join('\n')
+
+  expect(blockingViolations, summary).toEqual([])
+}
+
 test.describe('Automated WCAG 2.1 AA Accessibility Audit [SHF-E2E-A11Y]', () => {
   for (const route of PUBLIC_A11Y_ROUTES) {
     test(`${route.name} (${route.path}) bebas pelanggaran aksesibilitas critical/serious`, async ({
@@ -16,26 +39,40 @@ test.describe('Automated WCAG 2.1 AA Accessibility Audit [SHF-E2E-A11Y]', () => 
     }) => {
       await page.goto(route.path)
       await waitForHydration(page)
-
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .analyze()
-
-      const blockingViolations = results.violations.filter(
-        (v) => v.impact === 'critical' || v.impact === 'serious',
-      )
-
-      const summary = blockingViolations
-        .map(
-          (v) =>
-            `[${v.impact}] ${v.id}: ${v.help} (${v.nodes.length} nodes: ${v.nodes
-              .slice(0, 2)
-              .map((n) => n.target.join(' '))
-              .join(', ')})`,
-        )
-        .join('\n')
-
-      expect(blockingViolations, summary).toEqual([])
+      await expectNoBlockingA11yViolations(page, route.path)
     })
   }
+
+  test('Detail Produk (/product/[id]) bebas pelanggaran aksesibilitas critical/serious', async ({
+    page,
+  }) => {
+    await page.goto('/katalog')
+    await waitForHydration(page)
+
+    const firstProduct = page.locator('a[href^="/product/"]').first()
+    await expect(firstProduct).toBeVisible({ timeout: 15000 })
+    const href = await firstProduct.getAttribute('href')
+    expect(href).toMatch(/^\/product\//)
+
+    await page.goto(href || '/katalog')
+    await waitForHydration(page)
+    await expect(page.locator('h1').first()).toBeVisible({ timeout: 15000 })
+    await expectNoBlockingA11yViolations(page, href || '/product/[id]')
+  })
+
+  test('Halaman akun terautentikasi (/orders & /account/vouchers) bebas pelanggaran critical/serious', async ({
+    page,
+  }) => {
+    const loginPage = new LoginPage(page)
+    await loginPage.goto()
+    await waitForHydration(page)
+    await loginPage.loginAsCustomer()
+
+    for (const path of ['/orders', '/account/vouchers']) {
+      await page.goto(path)
+      await waitForHydration(page)
+      await expect(page.locator('h1').first()).toBeVisible({ timeout: 15000 })
+      await expectNoBlockingA11yViolations(page, path)
+    }
+  })
 })

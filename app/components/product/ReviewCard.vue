@@ -45,7 +45,11 @@ const formattedDate = computed(() => {
       </div>
 
       <!-- Rating Stars -->
-      <div class="flex items-center gap-1" :aria-label="`Rating ${review.rating} dari 5 bintang`">
+      <div
+        role="img"
+        class="flex items-center gap-1"
+        :aria-label="`Rating ${review.rating} dari 5 bintang`"
+      >
         <i
           v-for="star in 5"
           :key="star"

@@ -189,7 +189,7 @@ watch(
           <span class="text-xs font-bold">{{ opt.name }}</span>
           <span
             v-if="opt.note"
-            :class="selectedMaterial === opt.name ? 'text-brand-muted' : 'text-brand-faint'"
+            :class="selectedMaterial === opt.name ? 'text-brand-onink/80' : 'text-brand-faint'"
             class="text-[10px]"
           >
             {{ opt.note }}
