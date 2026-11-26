@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   formatStatusLabel,
   statusDotClass,
@@ -60,6 +60,17 @@ try {
 }
 
 const isDropdownOpen = ref(false)
+const dropdownRef = ref<HTMLElement | null>(null)
+
+const closeOnOutsideClick = (event: MouseEvent) => {
+  if (!isDropdownOpen.value) return
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+    isDropdownOpen.value = false
+  }
+}
+
+onMounted(() => document.addEventListener('click', closeOnOutsideClick))
+onBeforeUnmount(() => document.removeEventListener('click', closeOnOutsideClick))
 
 const tabs = [
   { key: 'all', label: 'Semua' },
@@ -125,74 +136,88 @@ const onSearchInput = (e: Event) => {
   <div
     class="admin-support-inbox-list flex h-full flex-col border-r border-brand-hair bg-brand-canvas"
   >
-    <!-- Search Bar with Icon -->
-    <div class="border-b border-brand-hair p-3">
+    <!-- Toolbar Pencarian & Filter Status -->
+    <div class="border-b border-brand-hair bg-brand-canvas p-2.5 space-y-2 shrink-0">
       <div class="relative">
         <i
-          class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-muted pointer-events-none"
+          class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-brand-muted pointer-events-none"
+          aria-hidden="true"
         />
         <input
           type="text"
           :value="effectiveSearchQuery"
           placeholder="Cari nama atau email..."
-          class="search-input w-full rounded-field border border-brand-hair bg-brand-canvas-soft pl-8 pr-3 py-1.5 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors"
+          aria-label="Cari percakapan pelanggan"
+          class="search-input h-8 w-full rounded-full border border-brand-hair bg-brand-canvas pl-8 pr-3 text-xs text-brand-ink placeholder:text-brand-faint hover:border-brand-faint focus:border-brand-ink focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-ink transition-colors"
           @input="onSearchInput"
         />
       </div>
-    </div>
 
-    <!-- Status Filter Dropdown Section (Replaces cramped text tabs) -->
-    <div class="filter-section relative border-b border-brand-hair bg-brand-canvas-soft/30 p-2.5">
-      <button
-        type="button"
-        class="filter-dropdown-trigger flex w-full items-center justify-between rounded-field border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs text-brand-ink shadow-xs transition-colors hover:border-brand-ink focus:outline-none cursor-pointer"
-        :aria-expanded="isDropdownOpen"
-        aria-haspopup="true"
-        @click="isDropdownOpen = !isDropdownOpen"
-      >
-        <div class="flex items-center gap-2 min-w-0">
-          <span class="text-brand-muted text-[11px] font-medium shrink-0">Filter:</span>
-          <span
-            class="h-2 w-2 shrink-0 rounded-full"
-            :class="statusDotClass(effectiveFilterStatus)"
-          />
-          <span class="truncate font-semibold text-brand-ink">
-            {{ activeTabLabel }}
-          </span>
-        </div>
-        <i
-          class="pi pi-chevron-down text-[10px] text-brand-muted transition-transform duration-200"
-          :class="isDropdownOpen ? 'rotate-180' : ''"
-        />
-      </button>
-
-      <!-- Dropdown Popover Menu with Test Contracts Preserved -->
       <div
-        v-show="isDropdownOpen"
-        class="status-tabs filter-menu absolute left-2.5 right-2.5 top-[calc(100%+4px)] z-30 rounded-card border border-brand-hair bg-brand-canvas p-1.5 shadow-floating space-y-0.5"
+        ref="dropdownRef"
+        class="filter-section relative"
+        @keydown.escape="isDropdownOpen = false"
       >
         <button
-          v-for="tab in tabs"
-          :key="tab.key"
           type="button"
-          :data-status="tab.key"
-          class="tab-btn filter-tab flex w-full items-center justify-between rounded-field px-2.5 py-2 text-xs transition-colors text-left cursor-pointer"
+          class="filter-dropdown-trigger flex h-8 w-full items-center justify-between rounded-field border bg-brand-canvas px-2.5 text-xs text-brand-ink transition-colors cursor-pointer outline-none"
           :class="
-            effectiveFilterStatus === tab.key
-              ? 'active-tab bg-brand-canvas-soft font-semibold text-brand-ink'
-              : 'text-brand-ink hover:bg-brand-canvas-soft/70'
+            isDropdownOpen
+              ? 'border-brand-ink ring-1 ring-inset ring-brand-ink'
+              : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink focus:ring-1 focus:ring-inset focus:ring-brand-ink'
           "
-          @click="onSelectTab(tab.key)"
+          :aria-expanded="isDropdownOpen"
+          aria-haspopup="listbox"
+          @click="isDropdownOpen = !isDropdownOpen"
         >
           <div class="flex items-center gap-2 min-w-0">
-            <span class="h-2 w-2 shrink-0 rounded-full" :class="statusDotClass(tab.key)" />
-            <span class="truncate">{{ tab.label }}</span>
+            <span class="text-brand-muted text-[11px] font-medium shrink-0">Filter:</span>
+            <span
+              class="h-2 w-2 shrink-0 rounded-full"
+              :class="statusDotClass(effectiveFilterStatus)"
+            />
+            <span class="truncate font-semibold text-brand-ink">
+              {{ activeTabLabel }}
+            </span>
           </div>
           <i
-            v-if="effectiveFilterStatus === tab.key"
-            class="pi pi-check text-[10px] text-brand-ink shrink-0"
+            class="pi pi-chevron-down text-[10px] text-brand-muted transition-transform duration-200 shrink-0"
+            :class="isDropdownOpen ? 'rotate-180' : ''"
+            aria-hidden="true"
           />
         </button>
+
+        <!-- Dropdown Popover Menu with Test Contracts Preserved -->
+        <div
+          v-show="isDropdownOpen"
+          role="listbox"
+          aria-label="Filter status percakapan"
+          class="status-tabs filter-menu absolute left-0 right-0 top-[calc(100%+4px)] z-30 rounded-card border border-brand-hair bg-brand-canvas p-1 shadow-floating space-y-0.5"
+        >
+          <button
+            v-for="tab in tabs"
+            :key="tab.key"
+            type="button"
+            :data-status="tab.key"
+            class="tab-btn filter-tab flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-xs transition-colors text-left cursor-pointer border-0"
+            :class="
+              effectiveFilterStatus === tab.key
+                ? 'active-tab bg-brand-canvas-soft font-semibold text-brand-ink'
+                : 'text-brand-ink hover:bg-brand-canvas-soft/70'
+            "
+            @click="onSelectTab(tab.key)"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="h-2 w-2 shrink-0 rounded-full" :class="statusDotClass(tab.key)" />
+              <span class="truncate">{{ tab.label }}</span>
+            </div>
+            <i
+              v-if="effectiveFilterStatus === tab.key"
+              class="pi pi-check text-[10px] text-brand-ink shrink-0 font-bold"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
       </div>
     </div>
 
@@ -210,10 +235,10 @@ const onSearchInput = (e: Event) => {
         v-for="thread in effectiveThreads"
         :key="thread.id"
         :data-id="thread.id"
-        class="thread-card thread-item flex cursor-pointer items-center justify-between p-3.5 transition-colors hover:bg-brand-canvas-soft/80"
+        class="thread-card thread-item flex cursor-pointer items-center justify-between p-3 transition-colors hover:bg-brand-canvas-soft/80"
         :class="[
           effectiveActiveThreadId === thread.id
-            ? 'active-thread is-active bg-brand-accent-tint/60 ring-1 ring-inset ring-brand-accent-edge'
+            ? 'active-thread is-active bg-brand-canvas-soft border-l-2 border-l-brand-ink'
             : '',
         ]"
         @click="onSelectThread(thread.id)"

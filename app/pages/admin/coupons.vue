@@ -47,7 +47,6 @@ const {
     <AdminPageHeader
       title="Voucher Diskon"
       subtitle="Atur kode diskon checkout, voucher koin, dan kuota pemakaian."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Voucher' }]"
     >
       <template #actions>
         <UiButton

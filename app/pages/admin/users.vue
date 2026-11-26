@@ -82,7 +82,6 @@ const formatDate = (dateStr?: string | null) => {
     <AdminPageHeader
       title="Data Pelanggan"
       subtitle="Riwayat transaksi dan total belanja per pelanggan."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Pelanggan' }]"
     >
       <template #actions>
         <UiButton

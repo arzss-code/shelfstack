@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import AppLogo from '~/components/AppLogo.vue'
 import AdminSidebarNav, { type AdminNavLink } from '~/components/admin/AdminSidebarNav.vue'
+import AdminTopBreadcrumb from '~/components/admin/AdminTopBreadcrumb.vue'
 import { useAuth } from '~/features/auth/composables/useAuth'
 import { useAdminSupportChat } from '~/composables/useAdminSupportChat'
 
@@ -197,11 +198,7 @@ onMounted(() => {
               <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-danger" />
             </span>
           </button>
-          <div class="flex items-center gap-2">
-            <span class="font-display text-sm font-bold text-brand-ink">ShelfStack</span>
-            <span class="text-xs text-brand-muted hidden sm:inline">/</span>
-            <span class="text-xs font-medium text-brand-muted hidden sm:inline">Panel Admin</span>
-          </div>
+          <AdminTopBreadcrumb :nav-links="navLinks" />
         </div>
 
         <div class="flex items-center gap-3">

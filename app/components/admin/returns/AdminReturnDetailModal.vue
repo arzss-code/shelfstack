@@ -5,6 +5,7 @@ import UiBadge from '~/components/ui/UiBadge.vue'
 import UiInput from '~/components/ui/UiInput.vue'
 import UiTextarea from '~/components/ui/UiTextarea.vue'
 import UiAlert from '~/components/ui/UiAlert.vue'
+import UiCheckbox from '~/components/ui/UiCheckbox.vue'
 import type { ReturnRequestItem } from '~~/shared/schemas/return-request'
 import { RETURN_REASON_LABELS, RETURN_SOLUTION_LABELS } from '~~/server/utils/return-request'
 import { useAdminReturnReview } from '~/composables/useAdminReturnReview'
@@ -180,16 +181,12 @@ const {
             </div>
           </div>
 
-          <label class="flex items-center gap-2 cursor-pointer pt-1">
-            <input
+          <div class="pt-1">
+            <UiCheckbox
               v-model="restockInventory"
-              type="checkbox"
-              class="rounded border-brand-hair text-brand-ink"
+              label="Kembalikan stok produk ke inventaris (Restock Item)"
             />
-            <span class="text-xs font-semibold text-brand-ink"
-              >Kembalikan stok produk ke inventaris (Restock Item)</span
-            >
-          </label>
+          </div>
         </div>
       </div>
     </div>

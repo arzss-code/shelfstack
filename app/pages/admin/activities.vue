@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminOperationalSignals from '~/features/admin/components/AdminOperationalSignals.vue'
+import AdminExpiryQueueCard from '~/features/orders/components/AdminExpiryQueueCard.vue'
 import { useClientTableSort } from '~/composables/useClientTableSort'
 import { useActivities } from '~/features/activities/composables/useActivities'
 import type { ActivityLog } from '~/features/activities/composables/useActivities'
@@ -130,7 +131,6 @@ const rowClass = (data: ActivityLog) =>
     <AdminPageHeader
       title="Aktivitas & Status Sistem"
       subtitle="Riwayat perubahan data admin dan kondisi layanan toko."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Aktivitas & Sistem' }]"
     >
       <template v-if="activeSection === 'logs'" #actions>
         <UiButton
@@ -151,7 +151,10 @@ const rowClass = (data: ActivityLog) =>
       aria-label="Bagian aktivitas dan status sistem"
     />
 
-    <AdminOperationalSignals v-if="activeSection === 'system'" />
+    <div v-if="activeSection === 'system'" class="space-y-5">
+      <AdminOperationalSignals />
+      <AdminExpiryQueueCard />
+    </div>
 
     <template v-else>
       <!-- Filter Bar -->

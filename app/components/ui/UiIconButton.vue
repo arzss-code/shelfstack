@@ -41,8 +41,8 @@ const boxClass = computed(() => (props.size === 'sm' ? 'h-7 w-7 text-[11px]' : '
     :title="label"
     :disabled="disabled || loading"
     :class="[
-      'inline-flex shrink-0 items-center justify-center rounded-full border transition-colors',
-      '',
+      'inline-flex shrink-0 items-center justify-center rounded-full border transition-colors cursor-pointer',
+      'focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0',
       'disabled:pointer-events-none disabled:opacity-50',
       variantClass,
       boxClass,

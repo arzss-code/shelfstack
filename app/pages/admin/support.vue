@@ -104,12 +104,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-3 text-brand-ink md:flex-1 md:min-h-0 md:overflow-hidden">
+  <div class="flex flex-col gap-2.5 text-brand-ink md:flex-1 md:min-h-0 md:overflow-hidden">
     <AdminPageHeader
       title="Bantuan &amp; Live Chat"
       subtitle="Balas percakapan pelanggan dan kelola pesan formulir kontak."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Bantuan & Chat' }]"
-      class="!pb-3"
+      class="!pb-2.5 shrink-0"
     >
       <template v-if="totalUnreadCount > 0" #title-badge>
         <span

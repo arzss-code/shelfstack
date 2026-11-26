@@ -54,20 +54,6 @@ useSeoMeta({
 
 <template>
   <div class="space-y-5">
-    <!-- Breadcrumb -->
-    <div class="flex items-center gap-2 text-xs text-brand-muted">
-      <NuxtLink
-        to="/admin/orders"
-        class="no-underline text-brand-muted hover:text-brand-ink font-medium transition-colors"
-      >
-        Kelola Pesanan
-      </NuxtLink>
-      <span>/</span>
-      <span class="font-semibold text-brand-ink tabular"
-        >#{{ orderId.slice(0, 8).toUpperCase() }}</span
-      >
-    </div>
-
     <!-- Loading State -->
     <div v-if="loading" class="space-y-4 py-6">
       <div class="h-10 w-64 animate-pulse rounded bg-brand-hairsoft" />

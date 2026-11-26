@@ -171,7 +171,7 @@ const goToPage = (page: number) => {
       <!-- Tombol Sebelumnya -->
       <button
         type="button"
-        class="inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:outline-none"
+        class="inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
         :disabled="isFirstPage || loading"
         aria-label="Halaman Sebelumnya"
         data-testid="pagination-prev"
@@ -201,7 +201,7 @@ const goToPage = (page: number) => {
           <button
             v-else
             type="button"
-            class="w-8 h-8 sm:w-9 sm:h-9 rounded-full text-xs sm:text-sm font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:outline-none"
+            class="w-8 h-8 sm:w-9 sm:h-9 rounded-full text-xs sm:text-sm font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
             :class="[
               item.page === currentPage
                 ? 'bg-brand-ink text-brand-onink shadow-whisper'
@@ -221,7 +221,7 @@ const goToPage = (page: number) => {
       <!-- Tombol Selanjutnya -->
       <button
         type="button"
-        class="inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:outline-none"
+        class="inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
         :disabled="isLastPage || loading"
         aria-label="Halaman Selanjutnya"
         data-testid="pagination-next"

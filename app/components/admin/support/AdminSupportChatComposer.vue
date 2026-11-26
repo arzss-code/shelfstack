@@ -82,7 +82,7 @@ defineExpose({
 
 <template>
   <div
-    class="admin-support-chat-composer relative border-t border-brand-hair bg-brand-canvas p-3 shrink-0"
+    class="admin-support-chat-composer relative border-t border-brand-hair bg-brand-canvas p-2.5 shrink-0"
   >
     <!-- Canned Response Picker Popover -->
     <div v-if="isCannedOpen" class="absolute bottom-24 left-3 z-30">
@@ -133,7 +133,7 @@ defineExpose({
         rows="2"
         maxlength="1000"
         placeholder="Ketik balasan untuk pelanggan..."
-        class="composer-textarea composer-input w-full resize-none rounded-field border border-brand-hair bg-brand-canvas-soft px-3 py-2 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors leading-relaxed"
+        class="composer-textarea composer-input w-full resize-none rounded-field border border-brand-hair bg-brand-canvas-soft px-3 py-2 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-brand-canvas focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-ink transition-colors leading-relaxed"
         @keydown.enter.exact.prevent="handleSend"
       />
 
@@ -145,10 +145,10 @@ defineExpose({
           <UiTooltip text="Gunakan Template Balasan Cepat" position="top" align="start">
             <button
               type="button"
-              class="btn-canned inline-flex h-8 items-center gap-1.5 rounded-field border border-brand-hair bg-brand-canvas-soft px-2.5 text-xs font-medium text-brand-ink hover:bg-brand-canvas hover:border-brand-ink transition-colors"
+              class="btn-canned inline-flex h-8 items-center gap-1.5 rounded-field border border-brand-hair bg-brand-canvas-soft px-2.5 text-xs font-medium text-brand-ink hover:bg-brand-canvas hover:border-brand-ink transition-colors cursor-pointer"
               @click="toggleCannedMenu"
             >
-              <i class="pi pi-bolt text-xs text-brand-accent" />
+              <i class="pi pi-bolt text-xs text-brand-ink" />
               <span>Pesan Cepat</span>
             </button>
           </UiTooltip>
@@ -157,7 +157,7 @@ defineExpose({
           <UiTooltip text="Pilih Emotikon" position="top">
             <button
               type="button"
-              class="btn-emoji flex h-8 w-8 items-center justify-center rounded-field border border-brand-hair text-brand-muted hover:text-brand-ink hover:border-brand-ink transition-colors"
+              class="btn-emoji flex h-8 w-8 items-center justify-center rounded-field border border-brand-hair text-brand-muted hover:text-brand-ink hover:border-brand-ink transition-colors cursor-pointer"
               aria-label="Tambah emotikon"
               @click="toggleEmojiPicker"
             >
@@ -169,7 +169,7 @@ defineExpose({
           <UiTooltip text="Lampirkan Gambar" position="top">
             <button
               type="button"
-              class="btn-attach-image flex h-8 w-8 items-center justify-center rounded-field border border-brand-hair text-brand-muted hover:text-brand-ink hover:border-brand-ink transition-colors"
+              class="btn-attach-image flex h-8 w-8 items-center justify-center rounded-field border border-brand-hair text-brand-muted hover:text-brand-ink hover:border-brand-ink transition-colors cursor-pointer"
               aria-label="Lampirkan gambar"
               @click="imageFileInput?.click()"
             >
@@ -181,7 +181,7 @@ defineExpose({
           <UiTooltip text="Rekomendasikan Produk Katalog" position="top">
             <button
               type="button"
-              class="btn-attach-product flex h-8 w-8 items-center justify-center rounded-field border border-brand-hair text-brand-muted hover:text-brand-ink hover:border-brand-ink transition-colors"
+              class="btn-attach-product flex h-8 w-8 items-center justify-center rounded-field border border-brand-hair text-brand-muted hover:text-brand-ink hover:border-brand-ink transition-colors cursor-pointer"
               aria-label="Rekomendasikan produk"
               @click="emit('openProductPicker')"
             >
@@ -197,7 +197,7 @@ defineExpose({
           >
           <button
             type="button"
-            class="btn-admin-send btn-send inline-flex items-center gap-1.5 rounded-full bg-brand-ink px-4 py-1.5 text-xs font-semibold text-brand-onink shadow-xs transition-all hover:bg-brand-inkhover active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="btn-admin-send btn-send inline-flex h-8 items-center gap-1.5 rounded-full bg-brand-ink px-4 text-xs font-semibold text-brand-onink transition-all hover:bg-brand-inkhover active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0"
             :disabled="!replyText.trim() || isSending"
             @click="handleSend"
           >

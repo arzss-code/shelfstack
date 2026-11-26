@@ -117,7 +117,7 @@ const freeShippingDeficit = computed(() => {
 
       <!-- Shipping Rates Matrix -->
       <div
-        class="divide-y divide-brand-hairsoft rounded-xl border border-brand-hair bg-brand-canvas"
+        class="overflow-hidden divide-y divide-brand-hairsoft rounded-xl border border-brand-hair bg-brand-canvas"
       >
         <div
           v-for="tier in calculatedTiers"

@@ -5,6 +5,7 @@ import UiInput from '~/components/ui/UiInput.vue'
 import UiSelect from '~/components/ui/UiSelect.vue'
 import UiTextarea from '~/components/ui/UiTextarea.vue'
 import UiAlert from '~/components/ui/UiAlert.vue'
+import UiCheckbox from '~/components/ui/UiCheckbox.vue'
 import type { AdminCoupon } from './AdminCouponTable.vue'
 import { useAdminCouponForm } from '~/composables/useAdminCouponForm'
 
@@ -165,20 +166,11 @@ const {
 
         <!-- Integrasi Loyalty Coins Hub -->
         <div class="space-y-3 rounded-xl border border-brand-hair bg-brand-canvas-soft/60 p-3.5">
-          <div class="flex items-center gap-2">
-            <input
-              id="is_loyalty_checkbox"
-              v-model="form.is_loyalty_voucher"
-              type="checkbox"
-              class="h-4 w-4 cursor-pointer rounded text-brand-ink focus:ring-brand-ink"
-            />
-            <label
-              for="is_loyalty_checkbox"
-              class="cursor-pointer text-xs font-semibold text-brand-ink"
-            >
-              Tersedia untuk Penukaran Koin Loyalitas
-            </label>
-          </div>
+          <UiCheckbox
+            id="is_loyalty_checkbox"
+            v-model="form.is_loyalty_voucher"
+            label="Tersedia untuk Penukaran Koin Loyalitas"
+          />
 
           <div v-if="form.is_loyalty_voucher" class="pt-1">
             <UiInput
@@ -214,19 +206,12 @@ const {
         </div>
 
         <!-- Checkbox Aktif -->
-        <div class="flex items-center gap-2 pt-1">
-          <input
+        <div class="pt-1">
+          <UiCheckbox
             id="is_active_checkbox"
             v-model="form.is_active"
-            type="checkbox"
-            class="h-4 w-4 cursor-pointer rounded text-brand-ink focus:ring-brand-ink"
+            label="Aktifkan voucher ini langsung setelah disimpan"
           />
-          <label
-            for="is_active_checkbox"
-            class="cursor-pointer text-xs font-semibold text-brand-ink"
-          >
-            Aktifkan voucher ini langsung setelah disimpan
-          </label>
         </div>
       </form>
     </div>

@@ -41,7 +41,7 @@ const getBadgeVariant = (
     <button
       :id="`faq-btn-${item.id}`"
       type="button"
-      class="w-full text-left px-5 py-4 sm:px-6 sm:py-5 flex items-center justify-between gap-4 cursor-pointer bg-transparent border-0 focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:outline-none transition-colors select-none"
+      class="w-full text-left px-5 py-4 sm:px-6 sm:py-5 flex items-center justify-between gap-4 cursor-pointer bg-transparent border-0 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink focus-visible:outline-none transition-colors select-none"
       :aria-expanded="isOpen"
       :aria-controls="`faq-panel-${item.id}`"
       data-testid="faq-toggle-button"

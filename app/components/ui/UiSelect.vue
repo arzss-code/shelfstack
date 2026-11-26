@@ -24,14 +24,16 @@ const props = withDefaults(
     error?: string
     /** Sarana bantu di bawah kontrol, tampil hanya bila tidak ada error. */
     hint?: string
-    /** `sm` untuk strip filter/toolbar, `md` untuk field formulir. */
-    size?: 'sm' | 'md'
+    /** `xs` untuk kontrol header padat, `sm` untuk strip filter/toolbar, `md` untuk field formulir. */
+    size?: 'xs' | 'sm' | 'md'
     block?: boolean
     /** Memaksa bentuk stadium pill (rounded-full). Default true jika size sm. */
     pill?: boolean
     /** Posisi popover: left atau right. */
     align?: 'left' | 'right'
     title?: string
+    /** Kelas tambahan untuk elemen native select tersembunyi (kontrak aksesibilitas/test). */
+    selectClass?: string
   }>(),
   {
     id: undefined,
@@ -47,6 +49,7 @@ const props = withDefaults(
     pill: undefined,
     align: 'left',
     title: undefined,
+    selectClass: '',
   },
 )
 
@@ -104,8 +107,11 @@ const {
         aria-hidden="true"
         :value="modelValue ?? ''"
         :disabled="disabled"
-        class="sr-only pointer-events-none"
-        @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+        :class="['sr-only pointer-events-none', selectClass]"
+        @change="
+          (emit('update:modelValue', ($event.target as HTMLSelectElement).value),
+          emit('change', ($event.target as HTMLSelectElement).value))
+        "
       >
         <option v-if="placeholder" value="" disabled :selected="!modelValue">
           {{ placeholder }}
@@ -224,7 +230,7 @@ const {
             </div>
             <i
               v-if="String(opt.value) === String(modelValue)"
-              class="pi pi-check text-[11px] text-brand-accent shrink-0 font-bold"
+              class="pi pi-check text-[11px] text-brand-ink shrink-0 font-bold"
               aria-hidden="true"
             />
           </button>

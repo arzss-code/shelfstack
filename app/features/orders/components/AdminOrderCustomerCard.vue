@@ -16,18 +16,18 @@ const isCustomer360Open = ref(false)
   <div class="space-y-6">
     <!-- Delivery Address -->
     <div
-      class="rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper space-y-3"
+      class="rounded-card border border-brand-hair bg-brand-canvas-soft p-5 shadow-whisper space-y-3"
     >
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between gap-2">
         <h2 class="font-display text-base font-bold text-brand-ink m-0">Informasi Pengiriman</h2>
         <UiButton
           v-if="order.user_id"
           size="xs"
           variant="outline"
+          icon="pi-user"
           @click="isCustomer360Open = true"
         >
-          <i class="pi pi-user text-[10px] mr-1" />
-          Profil 360°
+          Detail Pelanggan
         </UiButton>
       </div>
       <div class="text-xs text-brand-ink space-y-1.5 pt-1">
@@ -46,7 +46,7 @@ const isCustomer360Open = ref(false)
 
     <!-- Payment Info -->
     <div
-      class="rounded-2xl border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper space-y-3"
+      class="rounded-card border border-brand-hair bg-brand-canvas-soft p-5 shadow-whisper space-y-3"
     >
       <h2 class="font-display text-base font-bold text-brand-ink m-0">Detail Pembayaran</h2>
       <div class="text-xs text-brand-muted space-y-2 pt-1">

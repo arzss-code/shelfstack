@@ -140,14 +140,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-3 md:flex-1 md:min-h-0 md:overflow-hidden">
-    <div class="flex flex-wrap items-center justify-between gap-2.5 shrink-0">
+  <div class="flex flex-col gap-2.5 md:flex-1 md:min-h-0">
+    <div class="flex flex-wrap items-center justify-between gap-2.5 pt-0.5 shrink-0">
       <div class="flex flex-wrap items-center gap-1.5">
         <button
           v-for="opt in statusFilterOptions"
           :key="opt.value"
           type="button"
-          class="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors cursor-pointer min-h-[34px]"
+          class="inline-flex h-8 items-center px-3.5 rounded-full text-xs font-semibold border transition-colors cursor-pointer"
           :class="
             statusFilter === opt.value
               ? 'bg-brand-ink text-brand-onink border-brand-ink'
@@ -203,10 +203,10 @@ onMounted(() => {
           v-for="item in items"
           :key="item.id"
           type="button"
-          class="w-full text-left p-4 transition-colors cursor-pointer border-0"
+          class="w-full text-left p-3.5 transition-colors cursor-pointer border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
           :class="
             selectedItem?.id === item.id
-              ? 'bg-brand-accent-tint/50 ring-1 ring-inset ring-brand-accent-edge'
+              ? 'bg-brand-canvas-soft border-l-2 border-l-brand-ink'
               : 'bg-brand-canvas hover:bg-brand-canvas-soft'
           "
           @click="selectContact(item)"

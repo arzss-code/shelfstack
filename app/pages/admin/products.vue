@@ -54,11 +54,7 @@ const handleProductRestocked = (newStock: number) => {
 
 <template>
   <div class="space-y-5">
-    <AdminPageHeader
-      title="Kelola Produk"
-      subtitle="Daftar produk, varian, harga, dan stok."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Produk' }]"
-    >
+    <AdminPageHeader title="Kelola Produk" subtitle="Daftar produk, varian, harga, dan stok.">
       <template #actions>
         <UiButton variant="outline" size="sm" icon="pi-tags" @click="openCategoryManagerModal">
           Kategori

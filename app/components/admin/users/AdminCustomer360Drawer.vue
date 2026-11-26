@@ -26,7 +26,7 @@ const fetchCustomer360 = async (id: string) => {
       customerDetail.value = res.data
     }
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : 'Gagal memuat profil Customer 360'
+    errorMessage.value = err instanceof Error ? err.message : 'Gagal memuat detail pelanggan'
   } finally {
     loading.value = false
   }
@@ -106,11 +106,11 @@ const navigateToSupport = () => {
             >
               <i class="pi pi-user text-xs" />
             </span>
-            <h2 class="font-display text-base font-bold text-brand-ink m-0">Customer 360° View</h2>
+            <h2 class="font-display text-base font-bold text-brand-ink m-0">Detail Pelanggan</h2>
           </div>
           <UiIconButton
             icon="pi-times"
-            label="Tutup Profil 360"
+            label="Tutup Detail Pelanggan"
             variant="neutral"
             size="sm"
             @click="handleClose"
@@ -229,7 +229,7 @@ const navigateToSupport = () => {
 
               <div
                 v-if="customerDetail && customerDetail.recentOrders.length > 0"
-                class="divide-y divide-brand-hairsoft rounded-xl border border-brand-hair bg-brand-canvas-soft"
+                class="overflow-hidden divide-y divide-brand-hairsoft rounded-card border border-brand-hair bg-brand-canvas-soft"
               >
                 <div
                   v-for="order in customerDetail.recentOrders"

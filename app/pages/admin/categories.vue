@@ -110,7 +110,6 @@ onMounted(() => {
     <AdminPageHeader
       title="Kategori Produk"
       subtitle="Atur urutan tampilan, deskripsi, dan pengelompokan produk."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Kategori' }]"
     >
       <template #actions>
         <UiButton

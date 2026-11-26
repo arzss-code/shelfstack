@@ -86,7 +86,7 @@ const handleClaimCoupon = async (couponId: string) => {
     >
       <NuxtLink
         to="/"
-        class="hover:text-brand-ink no-underline text-brand-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded-sm"
+        class="hover:text-brand-ink no-underline text-brand-muted transition-colors focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 rounded-sm"
       >
         ShelfStack
       </NuxtLink>
@@ -143,7 +143,7 @@ const handleClaimCoupon = async (couponId: string) => {
               :key="opt.id"
               type="button"
               :aria-pressed="categoryFilter === opt.id"
-              class="voucher-chip px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+              class="voucher-chip px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap transition-colors duration-150 cursor-pointer focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
               :class="
                 categoryFilter === opt.id
                   ? 'bg-brand-ink text-brand-onink border-brand-ink'

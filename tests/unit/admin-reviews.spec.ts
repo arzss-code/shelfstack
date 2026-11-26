@@ -99,17 +99,25 @@ describe('Admin Reviews Suite (Moderasi Ulasan Produk)', () => {
 
       expect(wrapper.text()).toContain('Total Ulasan')
       expect(wrapper.text()).toContain('25')
-      expect(wrapper.text()).toContain('22 aktif, 3 disembunyikan')
+      expect(wrapper.text()).not.toContain('disembunyikan')
 
       expect(wrapper.text()).toContain('Rata-rata Rating')
       expect(wrapper.text()).toContain('4.85 / 5.0')
       expect(wrapper.text()).toContain('% puas')
-      expect(wrapper.text()).toContain('18x')
+      expect(wrapper.text()).not.toContain('18x')
       expect(wrapper.text()).toContain('Bintang 5 Sempurna')
       expect(wrapper.text()).toContain('18')
 
       expect(wrapper.text()).toContain('Perlu Perhatian (Bintang ≤ 3)')
       expect(wrapper.text()).toContain('2')
+
+      const integerWrapper = mount(AdminReviewsMetricCards, {
+        props: {
+          metrics: { ...mockMetrics, averageRating: 5 },
+          loading: false,
+        },
+      })
+      expect(integerWrapper.text()).toContain('5.0 / 5.0')
     })
   })
 

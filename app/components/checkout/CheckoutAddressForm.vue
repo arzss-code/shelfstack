@@ -6,6 +6,7 @@ import { formatAdministrativeAddress } from '~~/shared/data/locations/indonesia-
 import LocationPickerModal from '~/components/checkout/LocationPickerModal.vue'
 import AddressPickerModal from '~/components/checkout/AddressPickerModal.vue'
 import CheckoutSelectedAddressCard from '~/components/checkout/CheckoutSelectedAddressCard.vue'
+import UiCheckbox from '~/components/ui/UiCheckbox.vue'
 
 interface AddressModel {
   name: string
@@ -67,9 +68,8 @@ const handleSelectSavedAddress = (saved: UserAddress) => {
   emit('select-saved', saved)
 }
 
-const toggleSave = (e: Event) => {
-  const target = e.target as HTMLInputElement
-  emit('update:saveAddressForNextOrder', target.checked)
+const toggleSave = (checked: boolean) => {
+  emit('update:saveAddressForNextOrder', checked)
 }
 </script>
 
@@ -226,20 +226,13 @@ const toggleSave = (e: Event) => {
       </div>
 
       <!-- Option Checkbox: Simpan alamat -->
-      <div v-if="isLoggedIn" class="flex items-center gap-2 pt-2 border-t border-brand-hairsoft">
-        <input
+      <div v-if="isLoggedIn" class="pt-2 border-t border-brand-hairsoft">
+        <UiCheckbox
           id="save_address_checkbox"
-          :checked="saveAddressForNextOrder"
-          type="checkbox"
-          class="rounded border-brand-hair text-brand-ink focus:ring-brand-ink w-4 h-4 cursor-pointer"
-          @change="toggleSave"
+          :model-value="saveAddressForNextOrder"
+          label="Simpan alamat ini ke buku alamat saya"
+          @update:model-value="toggleSave"
         />
-        <label
-          for="save_address_checkbox"
-          class="text-xs text-brand-ink font-medium cursor-pointer select-none"
-        >
-          Simpan alamat ini ke buku alamat saya
-        </label>
       </div>
     </div>
 

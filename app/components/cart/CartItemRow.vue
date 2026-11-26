@@ -39,7 +39,7 @@ const handleManualQuantityBlur = (event: Event) => {
     >
       <NuxtLink
         :to="`/product/${item.slug || item.productId}`"
-        class="cart-media block rounded-media bg-brand-canvas-soft border border-brand-hairsoft overflow-hidden shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+        class="cart-media block rounded-media bg-brand-canvas-soft border border-brand-hairsoft overflow-hidden shrink-0 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
       >
         <img
           v-if="item.imageUrl"
@@ -66,7 +66,7 @@ const handleManualQuantityBlur = (event: Event) => {
         >
           <NuxtLink
             :to="`/product/${item.slug || item.productId}`"
-            class="text-brand-ink hover:text-brand-accent transition-colors no-underline line-clamp-2 sm:line-clamp-1 break-words focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded-sm"
+            class="text-brand-ink hover:text-brand-accent transition-colors no-underline line-clamp-2 sm:line-clamp-1 break-words focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 rounded-sm"
           >
             {{ item.name }}
           </NuxtLink>
@@ -98,7 +98,7 @@ const handleManualQuantityBlur = (event: Event) => {
         >
           <button
             type="button"
-            class="cart-step-btn relative w-6 h-6 flex items-center justify-center text-brand-ink hover:bg-brand-field rounded-full transition-colors cursor-pointer text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+            class="cart-step-btn relative w-6 h-6 flex items-center justify-center text-brand-ink hover:bg-brand-field rounded-full transition-colors cursor-pointer text-xs focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
             :aria-label="`Kurangi kuantitas ${item.name}`"
             @click="emit('updateQty', item, item.quantity - 1)"
           >
@@ -111,7 +111,7 @@ const handleManualQuantityBlur = (event: Event) => {
             pattern="[0-9]*"
             autocomplete="off"
             :aria-label="`Kuantitas ${item.name}`"
-            class="w-9 text-center text-xs font-semibold text-brand-ink bg-transparent border-0 tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded-full p-0 select-all"
+            class="w-9 text-center text-xs font-semibold text-brand-ink bg-transparent border-0 tabular-nums focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 rounded-full p-0 select-all"
             @focus="($event.target as HTMLInputElement).select()"
             @input="handleManualQuantityInput"
             @blur="handleManualQuantityBlur"
@@ -119,7 +119,7 @@ const handleManualQuantityBlur = (event: Event) => {
           />
           <button
             type="button"
-            class="cart-step-btn relative w-6 h-6 flex items-center justify-center text-brand-ink hover:bg-brand-field rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+            class="cart-step-btn relative w-6 h-6 flex items-center justify-center text-brand-ink hover:bg-brand-field rounded-full transition-colors cursor-pointer text-xs disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
             :disabled="item.stock <= 0 || item.quantity >= item.stock"
             :aria-label="`Tambah kuantitas ${item.name}`"
             @click="emit('updateQty', item, item.quantity + 1)"
@@ -140,7 +140,7 @@ const handleManualQuantityBlur = (event: Event) => {
           type="button"
           :aria-label="`Hapus ${item.name} dari keranjang`"
           :title="`Hapus ${item.name} dari keranjang`"
-          class="cart-remove-btn relative inline-flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full border border-transparent text-brand-muted transition-colors duration-150 hover:border-brand-danger-edge hover:bg-brand-danger-tint hover:text-brand-danger-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent cursor-pointer"
+          class="cart-remove-btn relative inline-flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full border border-transparent text-brand-muted transition-colors duration-150 hover:border-brand-danger-edge hover:bg-brand-danger-tint hover:text-brand-danger-text focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 cursor-pointer"
           @click="emit('remove', item)"
         >
           <i class="pi pi-trash text-xs" aria-hidden="true" />

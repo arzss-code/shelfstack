@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
-import AdminExpiryQueueCard from '~/features/orders/components/AdminExpiryQueueCard.vue'
 import AdminOrderExportMenu from '~/features/orders/components/AdminOrderExportMenu.vue'
 import AdminOrderTable from '~/features/orders/components/AdminOrderTable.vue'
 
@@ -47,7 +46,6 @@ const {
     <AdminPageHeader
       title="Kelola Pesanan"
       subtitle="Daftar pesanan masuk, verifikasi pembayaran, dan status pengiriman."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Pesanan' }]"
     >
       <template #actions>
         <AdminOrderExportMenu
@@ -67,9 +65,6 @@ const {
         </UiButton>
       </template>
     </AdminPageHeader>
-
-    <!-- BullMQ Order Expiry & DLQ Telemetry -->
-    <AdminExpiryQueueCard />
 
     <!-- Filter & Search Controls -->
     <div
@@ -98,7 +93,7 @@ const {
         </div>
 
         <div
-          class="flex w-full items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3 py-1 sm:w-auto"
+          class="flex h-9 w-full items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3.5 transition-colors hover:border-brand-faint focus-within:border-brand-ink focus-within:ring-1 focus-within:ring-inset focus-within:ring-brand-ink sm:w-auto"
         >
           <label
             for="admin-orders-from"
@@ -112,12 +107,12 @@ const {
             type="date"
             aria-label="Tanggal mulai pesanan"
             title="Pilih tanggal awal periode pesanan"
-            class="min-w-0 flex-1 bg-transparent py-0.5 text-xs text-brand-ink focus:outline-none"
+            class="min-w-0 flex-1 bg-transparent text-xs text-brand-ink focus:outline-none focus-visible:outline-none"
           />
         </div>
 
         <div
-          class="flex w-full items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3 py-1 sm:w-auto"
+          class="flex h-9 w-full items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3.5 transition-colors hover:border-brand-faint focus-within:border-brand-ink focus-within:ring-1 focus-within:ring-inset focus-within:ring-brand-ink sm:w-auto"
         >
           <label for="admin-orders-to" class="shrink-0 text-[11px] font-semibold text-brand-muted">
             Sampai
@@ -128,7 +123,7 @@ const {
             type="date"
             aria-label="Tanggal akhir pesanan"
             title="Pilih tanggal akhir periode pesanan"
-            class="min-w-0 flex-1 bg-transparent py-0.5 text-xs text-brand-ink focus:outline-none"
+            class="min-w-0 flex-1 bg-transparent text-xs text-brand-ink focus:outline-none focus-visible:outline-none"
           />
         </div>
 

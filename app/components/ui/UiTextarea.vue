@@ -35,8 +35,8 @@ const helpId = `${fieldId.value}-help`
 
 const borderClass = computed(() =>
   props.error
-    ? 'border-rose-300 focus:border-rose-500'
-    : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink',
+    ? 'border-rose-300 focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-rose-500'
+    : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-ink',
 )
 </script>
 

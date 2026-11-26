@@ -53,8 +53,8 @@ const colorStyles = computed(() => {
   <component
     :is="to ? 'NuxtLink' : 'div'"
     :to="to || undefined"
-    class="relative overflow-hidden rounded-card border border-brand-hair bg-brand-canvas p-4 transition-all duration-200 no-underline shadow-whisper"
-    :class="to ? 'hover:border-brand-ink cursor-pointer' : ''"
+    class="relative overflow-hidden rounded-card border border-brand-hair bg-brand-canvas p-4 no-underline shadow-whisper"
+    :class="to ? 'transition-colors duration-150 hover:border-brand-ink cursor-pointer group' : ''"
   >
     <div class="space-y-2 min-w-0">
       <div class="flex items-center justify-between gap-2">
@@ -78,9 +78,19 @@ const colorStyles = computed(() => {
         {{ value }}
       </h3>
 
-      <p v-if="subtitle" class="text-[11px] leading-relaxed text-brand-muted m-0">
-        {{ subtitle }}
-      </p>
+      <div v-if="subtitle || to" class="flex items-center justify-between gap-2">
+        <p v-if="subtitle" class="text-[11px] leading-relaxed text-brand-muted m-0">
+          {{ subtitle }}
+        </p>
+        <span
+          v-if="to"
+          class="inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold text-brand-ink opacity-70 transition-opacity group-hover:opacity-100"
+          aria-hidden="true"
+        >
+          <span>Lihat</span>
+          <i class="pi pi-arrow-right text-[9px]" />
+        </span>
+      </div>
     </div>
   </component>
 </template>

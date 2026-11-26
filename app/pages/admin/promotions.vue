@@ -147,7 +147,6 @@ const {
     <AdminPageHeader
       title="Promo & Flash Sale"
       subtitle="Jadwal promo berbatas waktu dan kuota klaim produk."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Flash Sale' }]"
     >
       <template #actions>
         <UiButton

@@ -30,12 +30,11 @@ const globalStubs = {
 }
 
 describe('Admin UI Consistency Components', () => {
-  it('renders AdminPageHeader with breadcrumbs, title, subtitle, and slots', () => {
+  it('renders AdminPageHeader with title, subtitle, and slots', () => {
     const wrapper = mount(AdminPageHeader, {
       props: {
         title: 'Kelola Produk',
         subtitle: 'Ringkasan manajemen katalog.',
-        breadcrumbs: [{ label: 'Dashboard', to: '/admin' }, { label: 'Kelola Produk' }],
       },
       slots: {
         actions: '<button type="button">Tambah Produk</button>',
@@ -44,7 +43,6 @@ describe('Admin UI Consistency Components', () => {
     })
 
     expect(wrapper.find('h1').text()).toBe('Kelola Produk')
-    expect(wrapper.text()).toContain('Dashboard')
     expect(wrapper.text()).toContain('Ringkasan manajemen katalog.')
     expect(wrapper.text()).toContain('Tambah Produk')
   })

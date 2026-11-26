@@ -66,7 +66,7 @@ const {
               v-model="searchQuery"
               type="text"
               placeholder="Cari kecamatan, kota, provinsi, atau kode pos..."
-              class="w-full pl-9 pr-9 py-2 text-xs rounded-full border border-brand-hair bg-brand-canvas-soft/60 focus:bg-brand-canvas focus:border-brand-ink focus:ring-1 focus:ring-brand-ink outline-none text-brand-ink placeholder:text-brand-muted transition-all"
+              class="w-full pl-9 pr-9 py-2 text-xs rounded-full border border-brand-hair bg-brand-canvas-soft/60 focus:bg-brand-canvas focus:border-brand-ink focus:ring-1 focus:ring-inset focus:ring-brand-ink focus:outline-none text-brand-ink placeholder:text-brand-muted transition-all"
               data-testid="location-search-input"
             />
             <button

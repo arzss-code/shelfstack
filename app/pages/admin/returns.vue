@@ -136,7 +136,6 @@ onMounted(() => {
     <AdminPageHeader
       title="Komplain & Retur"
       subtitle="Pengajuan pengembalian barang, tukar unit, dan pengembalian dana."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Komplain & Retur' }]"
     >
       <template #actions>
         <UiButton

@@ -112,7 +112,7 @@ const ratingOptions = [
           v-model="localSearch"
           type="text"
           placeholder="Cari teks ulasan..."
-          class="w-full pl-8 pr-3 py-1.5 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink transition-colors"
+          class="w-full h-9 pl-8 pr-3 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint hover:border-brand-faint focus:border-brand-ink focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-ink transition-colors"
         />
       </div>
     </div>

@@ -44,7 +44,6 @@ onMounted(() => {
     <AdminPageHeader
       title="Ulasan Produk"
       subtitle="Pantau rating pembeli dan kelola tampilan ulasan di toko."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Ulasan' }]"
     >
       <template #actions>
         <UiButton

@@ -256,10 +256,10 @@ button:active:not(:disabled),
   color: var(--brand-onink);
 }
 
-/* Indikator fokus tunggal memakai outline agar mengikuti radius tiap kontrol */
+/* Indikator fokus hitam seragam tanpa celah kosong */
 :where(button, a, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--brand-ink);
-  outline-offset: 2px;
+  outline: 1.5px solid var(--brand-ink);
+  outline-offset: 0px;
 }
 
 input:-webkit-autofill,

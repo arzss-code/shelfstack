@@ -18,9 +18,10 @@ const satisfactionRate = computed(() => {
   return Math.round((positiveFallback / props.metrics.active) * 100)
 })
 
-const fourStarCount = computed(() => {
-  if (props.metrics.distribution) return props.metrics.distribution[4]
-  return Math.max(0, props.metrics.active - props.metrics.fiveStar - props.metrics.attention)
+const formattedAverageRating = computed(() => {
+  if (props.metrics.active <= 0) return '0.0'
+  const avg = props.metrics.averageRating
+  return Number.isInteger(avg) ? avg.toFixed(1) : String(avg)
 })
 </script>
 
@@ -44,9 +45,6 @@ const fourStarCount = computed(() => {
         <p class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tabular">
           {{ metrics.total }}
         </p>
-        <p class="text-[11px] text-brand-muted m-0 mt-0.5">
-          {{ metrics.active }} aktif, {{ metrics.hidden }} disembunyikan
-        </p>
       </div>
     </div>
 
@@ -67,8 +65,7 @@ const fourStarCount = computed(() => {
       <div>
         <div class="flex items-baseline justify-between gap-2">
           <p class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tabular-nums">
-            <template v-if="metrics.active > 0"> {{ metrics.averageRating }} / 5.0 </template>
-            <template v-else> 0.0 / 5.0 </template>
+            {{ formattedAverageRating }} / 5.0
           </p>
           <span
             v-if="metrics.active > 0"
@@ -91,10 +88,9 @@ const fourStarCount = computed(() => {
               "
             />
           </div>
-          <span v-if="metrics.active > 0" class="text-[11px] text-brand-muted tabular-nums">
-            {{ metrics.fiveStar }}x ★5 · {{ fourStarCount }}x ★4
+          <span v-if="metrics.active <= 0" class="text-[11px] text-brand-muted">
+            Belum ada ulasan
           </span>
-          <span v-else class="text-[11px] text-brand-muted">Belum ada ulasan</span>
         </div>
       </div>
     </div>

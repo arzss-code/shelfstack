@@ -68,7 +68,7 @@ onBeforeUnmount(() => {
     class="relative flex-1 max-w-2xl mx-2 sm:mx-6 hidden md:block"
   >
     <form
-      class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full pl-4 pr-1.5 border border-brand-hair focus-within:border-brand-ink focus-within:bg-brand-canvas focus-within:ring-2 focus-within:ring-brand-ink/20 transition-colors shadow-whisper"
+      class="relative flex items-center w-full h-11 bg-brand-field hover:bg-brand-canvas-soft rounded-full pl-4 pr-1.5 border border-brand-hair focus-within:border-brand-ink focus-within:bg-brand-canvas focus-within:ring-1 focus-within:ring-inset focus-within:ring-brand-ink transition-colors shadow-whisper"
       @submit.prevent="handleSubmit"
     >
       <input
