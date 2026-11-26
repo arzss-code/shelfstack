@@ -48,7 +48,7 @@ overrides:
   svgo: '>=4.1.0'
   vite: '>=8.2.4'
   zod: '^4.6.7'
-  h3: '1.15.11'
+  'h3@1': '>=1.15.11'
   'postcss-selector-parser@6': '^6.1.6'
   'postcss-selector-parser@7': '^7.2.1'
   'glob@>=9': '>=14.0.2'

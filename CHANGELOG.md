@@ -19,6 +19,9 @@ Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
   - Mengganti warna mentah Tailwind (`bg-amber-50`, `bg-red-100`, `bg-sky-50`, `bg-emerald-50`, `bg-blue-50`, `bg-red-500`) dengan token semantik `brand-*` di `AdminUserMetrics.vue`, `app/pages/admin/support.vue`, `app/utils/support-status.ts`, `app/layouts/admin.vue`, `AdminSidebarNav.vue`, `app/pages/admin/categories.vue`, `app/pages/admin/returns.vue`, dan `AdminCouponTable.vue`.
   - Menambahkan `min-h-0 flex-1 overflow-y-auto` pada wrapper navigasi sidebar desktop & drawer mobile di `app/layouts/admin.vue` agar tautan bawah tetap aman diakses di layar berdimensi pendek.
 
+- **Perbaikan Resolusi `h3` pada `nuxt dev` (`pnpm-workspace.yaml`)**:
+  - Membatasi override `h3: '1.15.11'` menjadi `'h3@1': '>=1.15.11'` agar `nitropack` tetap memakai `h3@1.15.11` (`0` kerentanan pada `pnpm audit`) sementara `devframe@1.4.0` / `@vitejs/devtools` menyelesaikan `h3@2.0.8` sehingga `pnpm dev` tidak lagi gagal dengan `SyntaxError: The requested module 'h3' does not provide an export named 'H3'`.
+
 ## [v1.1.0-beta.35] - 2026-11-26
 
 ### Hardening Pra-Rilis: Gate Audit Keamanan CI, Perluasan Audit WCAG 2.1 AA PDP & Akun, serta Sinkronisasi Dokumentasi
