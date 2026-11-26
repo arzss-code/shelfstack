@@ -147,33 +147,34 @@ const {
       </div>
 
       <!-- Price & Status Row: Side-by-side, Clean Alignment -->
-      <div class="flex items-baseline justify-between gap-2 pt-0.5 pointer-events-auto" @click.stop>
-        <!-- Price on Left -->
-        <span
-          class="font-display font-bold text-sm sm:text-[15px] text-brand-ink tabular-nums tracking-tight"
-        >
-          {{ formatRupiah(product.price) }}
-        </span>
-
-        <!-- Stock Status / Verified Sold on Right -->
-        <span
-          v-if="hideActions"
-          class="text-[11px] font-medium tabular-nums shrink-0"
-          :class="
-            product.stock === 0
-              ? 'text-brand-danger font-semibold'
-              : product.stock <= 3
-                ? 'text-brand-warning-text font-semibold'
-                : 'text-brand-muted'
-          "
-        >
-          {{ stockStatusText }}
-        </span>
-
-        <!-- Admin Actions (Management Mode) -->
-        <div v-else class="flex items-center gap-1.5">
+      <div class="space-y-2 pt-0.5 pointer-events-auto" @click.stop>
+        <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 min-w-0">
+          <!-- Price on Left -->
           <span
-            class="px-2 py-0.5 rounded-full text-[10px] font-semibold border"
+            class="font-display font-bold text-[13px] sm:text-[15px] text-brand-ink tabular-nums tracking-tight whitespace-nowrap"
+          >
+            {{ formatRupiah(product.price) }}
+          </span>
+
+          <!-- Stock Status / Verified Sold on Right (Storefront Mode) -->
+          <span
+            v-if="hideActions"
+            class="text-[11px] font-medium tabular-nums shrink-0 whitespace-nowrap"
+            :class="
+              product.stock === 0
+                ? 'text-brand-danger font-semibold'
+                : product.stock <= 3
+                  ? 'text-brand-warning-text font-semibold'
+                  : 'text-brand-muted'
+            "
+          >
+            {{ stockStatusText }}
+          </span>
+
+          <!-- Stock Pill (Admin Mode) -->
+          <span
+            v-else
+            class="px-2 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 whitespace-nowrap tabular-nums"
             :class="[
               product.stock === 0
                 ? 'bg-brand-danger-tint text-brand-danger-text border-brand-danger-edge'
@@ -184,11 +185,17 @@ const {
           >
             Stok: {{ product.stock }}
           </span>
+        </div>
 
+        <!-- Admin Actions Bar (Dedicated Footer Row to Prevent Card Overflow) -->
+        <div
+          v-if="!hideActions"
+          class="flex items-center justify-end gap-1.5 flex-wrap border-t border-brand-hairsoft pt-2"
+        >
           <template v-if="isTrash">
             <button
               type="button"
-              class="px-2 py-0.5 rounded-field text-[11px] font-medium bg-brand-field hover:bg-brand-ink hover:text-brand-onink text-brand-ink border border-brand-hairsoft transition-colors cursor-pointer"
+              class="px-2.5 py-1 rounded-field text-[11px] font-medium bg-brand-field hover:bg-brand-ink hover:text-brand-onink text-brand-ink border border-brand-hairsoft transition-colors cursor-pointer"
               @click.stop="emit('restore', product.id)"
             >
               Restore
@@ -202,7 +209,7 @@ const {
                 aria-label="Kelola Varian Produk"
                 @click.stop="emit('manageVariants', product)"
               >
-                <i class="pi pi-sitemap text-[10px]" />
+                <i class="pi pi-sitemap text-[10px]" aria-hidden="true" />
               </button>
             </UiTooltip>
             <UiTooltip text="Riwayat Mutasi Stok" position="top">
@@ -212,7 +219,7 @@ const {
                 aria-label="Riwayat Mutasi Stok"
                 @click.stop="emit('viewStockMovements', product)"
               >
-                <i class="pi pi-history text-[10px]" />
+                <i class="pi pi-history text-[10px]" aria-hidden="true" />
               </button>
             </UiTooltip>
             <UiTooltip text="Ubah Produk" position="top">
@@ -222,7 +229,7 @@ const {
                 aria-label="Ubah Produk"
                 @click.stop="emit('edit', product)"
               >
-                <i class="pi pi-pencil text-[10px]" />
+                <i class="pi pi-pencil text-[10px]" aria-hidden="true" />
               </button>
             </UiTooltip>
             <UiTooltip text="Hapus Produk" position="top" align="end">
@@ -232,7 +239,7 @@ const {
                 aria-label="Hapus Produk"
                 @click.stop="emit('delete', product.id)"
               >
-                <i class="pi pi-trash text-[10px]" />
+                <i class="pi pi-trash text-[10px]" aria-hidden="true" />
               </button>
             </UiTooltip>
           </template>

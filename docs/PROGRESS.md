@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Pekerjaan aktif:** Rilis `v1.1.0-beta.35` (penambahan gate `pnpm audit --audit-level=high` di CI, perluasan audit WCAG 2.1 AA `@axe-core/playwright` ke 7 rute kritis termasuk PDP `/product/[id]`, `/orders`, dan `/account/vouchers` beserta perbaikan 5 temuan a11y nyata, sinkronisasi `README.md`, dan pembersihan 47 branch remote + 43 branch lokal yang sudah ter-merge). Sisa 20 gambar studio varian katalog terjadwal otomatis di branch `feat/catalog-variant-images` sebelum freeze `v1.1.0`.
-- **Versi rilis aktif:** `v1.1.0-beta.35` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
-- **Quality Gate Terkini (2026-11-26):** `pnpm audit --audit-level=high` 0 kerentanan · `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `vitest run` 146 file / 1.442 test lolos 100% · `pnpm build` EXIT 0 · Playwright E2E + Axe-Core 35 passed (7/7 rute WCAG 2.1 AA lolos, 1 skipped bawaan `shots.spec.ts`) · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
+- **Pekerjaan aktif:** Rilis `v1.1.0-beta.36` (remediasi penuh hasil audit UI/UX, Dark Mode, dan WCAG 2.1 AA pada 11 rute back-office admin: perbaikan overflow kartu `ProductCard.vue` desktop & mobile, perbaikan tabrakan KPI `AdminStatCard.vue`, perbaikan kontras counter `AdminReviewsFilterBar.vue`, perpindahan `aria-sort` ke `<th>` di `AdminOrderTable.vue`, aksesibilitas filter support & tabel scrollable, token semantik Dark Mode + penyesuaian `--brand-faint` `#8a8d94`, scroll safety sidebar `admin.vue`, dan perluasan `tests/e2e/a11y.spec.ts` ke 7 rute admin Light + Dark). Sisa 20 gambar studio varian katalog terjadwal otomatis di branch `feat/catalog-variant-images` sebelum freeze `v1.1.0`.
+- **Versi rilis aktif:** `v1.1.0-beta.36` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
+- **Quality Gate Terkini (2026-11-26):** `pnpm audit --audit-level=high` 0 kerentanan · `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `vitest run` 146 file / 1.442 test lolos 100% · `pnpm build` EXIT 0 · Playwright + Axe-Core WCAG 2.1 AA lolos 100% (termasuk 11/11 rute admin Light + Dark 0 violation & 0 horizontal overflow) · 0 file authored melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)

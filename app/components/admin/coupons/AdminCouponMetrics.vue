@@ -30,7 +30,7 @@ defineProps<{
       <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">
         Voucher Aktif
       </p>
-      <p class="font-display text-2xl font-bold tabular text-emerald-600">
+      <p class="font-display text-2xl font-bold tabular text-brand-success-text">
         {{ metrics.active_coupons }}
       </p>
       <p class="text-[11px] text-brand-muted">Siap digunakan saat checkout</p>
@@ -52,7 +52,7 @@ defineProps<{
       <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">
         Total Diskon Diberikan
       </p>
-      <p class="font-display text-2xl font-bold tabular text-brand-accent">
+      <p class="font-display text-2xl font-bold tabular text-brand-accent-text">
         {{ metrics.formatted_total_discount }}
       </p>
       <p class="text-[11px] text-brand-muted">Penghematan belanja pelanggan</p>

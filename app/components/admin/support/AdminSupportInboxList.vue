@@ -146,7 +146,8 @@ const onSearchInput = (e: Event) => {
       <button
         type="button"
         class="filter-dropdown-trigger flex w-full items-center justify-between rounded-field border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs text-brand-ink shadow-xs transition-colors hover:border-brand-ink focus:outline-none cursor-pointer"
-        aria-label="Filter status percakapan"
+        :aria-expanded="isDropdownOpen"
+        aria-haspopup="true"
         @click="isDropdownOpen = !isDropdownOpen"
       >
         <div class="flex items-center gap-2 min-w-0">
@@ -260,7 +261,7 @@ const onSearchInput = (e: Event) => {
           </span>
           <span
             v-if="thread.unread_by_admin_count > 0"
-            class="unread-admin-badge unread-badge flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white shadow-xs"
+            class="unread-admin-badge unread-badge flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand-danger px-1 text-[10px] font-bold text-white shadow-xs"
           >
             {{ thread.unread_by_admin_count }}
           </span>

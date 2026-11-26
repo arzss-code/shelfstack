@@ -101,7 +101,7 @@ onMounted(() => {
             Total Kategori
           </span>
           <span
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-brand-accent/10 text-brand-accent"
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-brand-accent-tint text-brand-accent-text"
           >
             <i class="pi pi-tags text-sm" />
           </span>
@@ -118,7 +118,7 @@ onMounted(() => {
             Total Produk Terkatalog
           </span>
           <span
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-brand-success-tint text-brand-success-text"
           >
             <i class="pi pi-box text-sm" />
           </span>
@@ -135,7 +135,7 @@ onMounted(() => {
             Rata-rata Produk/Kategori
           </span>
           <span
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400"
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-brand-accent-tint text-brand-accent-text"
           >
             <i class="pi pi-chart-pie text-sm" />
           </span>
@@ -209,7 +209,7 @@ onMounted(() => {
               </td>
               <td class="py-3 px-4 text-center">
                 <span
-                  class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium text-xs bg-brand-success-tint text-brand-success-text"
                 >
                   <i class="pi pi-box text-[10px]" />
                   {{ categoryCounts[cat.id] ?? 0 }}

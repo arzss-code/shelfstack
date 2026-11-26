@@ -75,4 +75,43 @@ test.describe('Automated WCAG 2.1 AA Accessibility Audit [SHF-E2E-A11Y]', () => 
       await expectNoBlockingA11yViolations(page, path)
     }
   })
+
+  test('Halaman back-office admin (Light & Dark + zero overflow) bebas pelanggaran critical/serious', async ({
+    page,
+  }) => {
+    const loginPage = new LoginPage(page)
+    await loginPage.goto()
+    await waitForHydration(page)
+    await loginPage.loginAsAdmin()
+
+    const adminRoutes = [
+      '/admin',
+      '/admin/orders',
+      '/admin/products',
+      '/admin/reviews',
+      '/admin/support',
+      '/admin/users',
+      '/admin/activities',
+    ]
+
+    for (const path of adminRoutes) {
+      await page.goto(path)
+      await waitForHydration(page)
+      await expect(page.locator('h1').first()).toBeVisible({ timeout: 15000 })
+      await expect(page.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 15000 })
+      await page.waitForTimeout(450)
+
+      const hasHorizontalOverflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > window.innerWidth + 1,
+      )
+      expect(hasHorizontalOverflow, `${path} tidak boleh mengalami horizontal overflow`).toBe(false)
+
+      await expectNoBlockingA11yViolations(page, `${path} [light]`)
+
+      await page.evaluate(() => document.documentElement.classList.add('dark'))
+      await page.waitForTimeout(450)
+      await expectNoBlockingA11yViolations(page, `${path} [dark]`)
+      await page.evaluate(() => document.documentElement.classList.remove('dark'))
+    }
+  })
 })

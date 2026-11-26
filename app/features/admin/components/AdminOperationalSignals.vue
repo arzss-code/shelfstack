@@ -165,7 +165,9 @@ const systemToneBadge = computed(() => {
           class="flex items-center justify-between text-[11px] text-brand-muted pt-1 border-t border-brand-hairsoft"
         >
           <span>4xx: {{ metrics.requestsClientError }}</span>
-          <span :class="metrics.requestsServerError > 0 ? 'text-brand-danger font-semibold' : ''">
+          <span
+            :class="metrics.requestsServerError > 0 ? 'text-brand-danger-text font-semibold' : ''"
+          >
             5xx: {{ metrics.requestsServerError }}
           </span>
         </div>
@@ -190,7 +192,7 @@ const systemToneBadge = computed(() => {
           class="flex items-center justify-between text-[11px] text-brand-muted pt-1 border-t border-brand-hairsoft"
         >
           <span>Gagal: {{ metrics.webhookFailure }}</span>
-          <span class="text-brand-success font-medium">SHA-512 Valid</span>
+          <span class="text-brand-success-text font-medium">SHA-512 Valid</span>
         </div>
       </div>
 
@@ -234,7 +236,7 @@ const systemToneBadge = computed(() => {
           class="flex items-center justify-between text-[11px] text-brand-muted pt-1 border-t border-brand-hairsoft"
         >
           <span>Gagal: {{ metrics.reconciliationFailure }}</span>
-          <span class="text-brand-accent font-medium">Idempoten</span>
+          <span class="text-brand-accent-text font-medium">Idempoten</span>
         </div>
       </div>
     </div>

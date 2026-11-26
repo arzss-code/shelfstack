@@ -30,7 +30,7 @@ defineProps<{
       <div class="flex items-center justify-between">
         <span class="text-xs font-semibold text-brand-muted">Total Transaksi Selesai</span>
         <div
-          class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-success-tint text-brand-success border border-brand-success-edge"
+          class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-success-tint text-brand-success-text border border-brand-success-edge"
         >
           <i class="pi pi-dollar text-xs" />
         </div>
@@ -48,7 +48,7 @@ defineProps<{
       <div class="flex items-center justify-between">
         <span class="text-xs font-semibold text-brand-muted">Rata-rata Nilai Belanja (LTV)</span>
         <div
-          class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-canvas-soft text-brand-accent border border-brand-hair"
+          class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-accent-tint text-brand-accent-text border border-brand-accent-edge"
         >
           <i class="pi pi-chart-line text-xs" />
         </div>
@@ -66,7 +66,7 @@ defineProps<{
       <div class="flex items-center justify-between">
         <span class="text-xs font-semibold text-brand-muted">Pelanggan Aktif Belanja</span>
         <div
-          class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-700 border border-amber-200"
+          class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-warning-tint text-brand-warning-text border border-brand-warning-edge"
         >
           <i class="pi pi-shopping-bag text-xs" />
         </div>

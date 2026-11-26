@@ -38,7 +38,12 @@ const formatDate = (isoStr: string): string => {
     data-testid="admin-reviews-table-wrapper"
   >
     <!-- Table Header / Overflow Container -->
-    <div class="overflow-x-auto min-w-0">
+    <div
+      tabindex="0"
+      role="region"
+      aria-label="Tabel moderasi ulasan produk"
+      class="overflow-x-auto min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+    >
       <table class="w-full text-left text-xs border-collapse">
         <thead
           class="bg-brand-canvas-soft border-b border-brand-hair text-brand-muted uppercase tracking-wider text-[11px] font-semibold"
@@ -114,7 +119,7 @@ const formatDate = (isoStr: string): string => {
                   <NuxtLink
                     :to="`/product/${review.product_id}`"
                     target="_blank"
-                    class="text-[11px] text-brand-accent hover:underline inline-flex items-center gap-0.5 mt-0.5"
+                    class="text-[11px] text-brand-accent-text hover:underline inline-flex items-center gap-0.5 mt-0.5"
                   >
                     <span>Lihat di Toko</span>
                     <i class="pi pi-external-link text-[9px]" />
@@ -190,7 +195,7 @@ const formatDate = (isoStr: string): string => {
                 :class="[
                   review.deleted_at
                     ? 'bg-brand-success-tint text-brand-success-text border-brand-success-edge hover:bg-brand-success hover:text-white'
-                    : 'bg-brand-canvas-soft text-brand-danger border-brand-hair hover:bg-brand-danger hover:text-white hover:border-brand-danger',
+                    : 'bg-brand-canvas-soft text-brand-danger-text border-brand-hair hover:bg-brand-danger hover:text-white hover:border-brand-danger',
                 ]"
                 @click="emit('toggleStatus', review)"
               >

@@ -121,10 +121,7 @@ const emit = defineEmits<{
 
             <!-- Biaya Koin Loyalty -->
             <td class="px-4 py-3.5">
-              <span
-                v-if="coupon.coin_cost"
-                class="font-medium tabular text-amber-700 dark:text-amber-400"
-              >
+              <span v-if="coupon.coin_cost" class="font-medium tabular text-brand-warning-text">
                 {{ coupon.formatted_coin_cost }}
               </span>
               <span v-else class="text-brand-faint">-</span>

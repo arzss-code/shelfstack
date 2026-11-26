@@ -46,7 +46,6 @@ const trigger = () => {
   <button
     type="button"
     :aria-label="a11yLabel"
-    :aria-sort="isActive ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'"
     class="group/sort inline-flex items-center gap-1 rounded-full px-1 py-0.5 font-semibold uppercase tracking-wider text-[11px] transition-colors hover:bg-brand-field"
     :class="[
       align === 'right' ? 'flex-row-reverse' : '',

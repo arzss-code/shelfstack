@@ -2,6 +2,23 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [v1.1.0-beta.36] - 2026-11-26
+
+### Remediasi Audit UI/UX, Dark Mode, dan WCAG 2.1 AA Back-Office Admin (11/11 Rute)
+
+- **Perbaikan Layout & Kontras Kritis (P0)**:
+  - Memindahkan bar tombol aksi manajemen produk di `ProductCard.vue` ke baris footer terpisah dan mengizinkan wrapping rapi pada baris harga + stok agar tidak terjadi overflow horizontal di desktop maupun mobile (`375px`) serta angka harga tidak terpotong elipsis.
+  - Menata ulang header kartu KPI di `AdminStatCard.vue` (ikon sejajar baris judul atas) agar nominal `Revenue Bulan Ini` mendapat lebar penuh dan tidak bertabrakan dengan ikon dompet.
+  - Memperbaiki kontras counter tab aktif pada `AdminReviewsFilterBar.vue` dari `bg-white/20 text-white` (`1,01:1` di Dark Mode) menjadi `bg-brand-onink/15 text-brand-onink`.
+- **Remediasi Aksesibilitas WCAG 2.1 AA (P1) & Guard Otomatis**:
+  - Memindahkan atribut `aria-sort` dari `<button>` di `UiSortHeader.vue` ke elemen `<th scope="col">` induk di `AdminOrderTable.vue` (menutup pelanggaran `aria-allowed-attr`), serta menambahkan `tabindex="0"` + `role="region"` pada kontainer tabel scrollable di `AdminReviewsTable.vue`, `AdminOrderTable.vue`, dan `AdminRecentOrdersTable.vue` (`scrollable-region-focusable`).
+  - Menyelaraskan tombol filter di `AdminSupportInboxList.vue` (`aria-expanded`, `aria-haspopup`, menghapus override `aria-label` yang memicu `label-content-name-mismatch`).
+  - Menaikkan kontras teks aksen & teks sekunder di Dark Mode dengan mengganti `text-brand-accent` -> `text-brand-accent-text` (`AdminOperationalSignals.vue`, `AdminRecentOrdersTable.vue`, `AdminReviewsTable.vue`, `AdminCouponMetrics.vue`, `returns.vue`) serta menyesuaikan `--brand-faint` Dark Mode di `app/assets/css/main.css` (`#636363` -> `#8a8d94`).
+  - Memperluas `tests/e2e/a11y.spec.ts` dengan skenario audit WCAG 2.1 AA (Light + Dark) dan zero horizontal overflow pada 7 rute back-office admin (`/admin`, `/admin/orders`, `/admin/products`, `/admin/reviews`, `/admin/support`, `/admin/users`, `/admin/activities`).
+- **Konsistensi Token Dark Mode & Ketahanan Sidebar (P2)**:
+  - Mengganti warna mentah Tailwind (`bg-amber-50`, `bg-red-100`, `bg-sky-50`, `bg-emerald-50`, `bg-blue-50`, `bg-red-500`) dengan token semantik `brand-*` di `AdminUserMetrics.vue`, `app/pages/admin/support.vue`, `app/utils/support-status.ts`, `app/layouts/admin.vue`, `AdminSidebarNav.vue`, `app/pages/admin/categories.vue`, `app/pages/admin/returns.vue`, dan `AdminCouponTable.vue`.
+  - Menambahkan `min-h-0 flex-1 overflow-y-auto` pada wrapper navigasi sidebar desktop & drawer mobile di `app/layouts/admin.vue` agar tautan bawah tetap aman diakses di layar berdimensi pendek.
+
 ## [v1.1.0-beta.35] - 2026-11-26
 
 ### Hardening Pra-Rilis: Gate Audit Keamanan CI, Perluasan Audit WCAG 2.1 AA PDP & Akun, serta Sinkronisasi Dokumentasi

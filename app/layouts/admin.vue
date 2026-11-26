@@ -52,11 +52,11 @@ onMounted(() => {
 
     <!-- Desktop Modernist Admin Sidebar -->
     <aside
-      class="sticky top-0 hidden h-[100dvh] w-64 shrink-0 flex-col gap-2 border-r border-brand-hair bg-brand-canvas-soft p-5 md:flex z-30"
+      class="sticky top-0 hidden h-[100dvh] w-64 shrink-0 flex-col gap-2 overflow-hidden border-r border-brand-hair bg-brand-canvas-soft p-5 md:flex z-30"
     >
       <NuxtLink
         to="/"
-        class="mb-6 flex items-center gap-2.5 px-2 py-2 no-underline text-brand-ink group"
+        class="mb-4 flex shrink-0 items-center gap-2.5 px-2 py-2 no-underline text-brand-ink group"
       >
         <AppLogo variant="mark-only" size="md" />
         <div class="flex flex-col">
@@ -69,13 +69,15 @@ onMounted(() => {
         </div>
       </NuxtLink>
 
-      <AdminSidebarNav
-        :links="navLinks"
-        :unread-support-count="unreadSupportCount"
-        nav-label="Navigasi Menu Admin Desktop"
-      />
+      <div class="min-h-0 flex-1 overflow-y-auto pr-1 -mr-1">
+        <AdminSidebarNav
+          :links="navLinks"
+          :unread-support-count="unreadSupportCount"
+          nav-label="Navigasi Menu Admin Desktop"
+        />
+      </div>
 
-      <div class="mt-auto pt-4 border-t border-brand-hairsoft flex flex-col gap-2">
+      <div class="mt-auto shrink-0 pt-4 border-t border-brand-hairsoft flex flex-col gap-2">
         <NuxtLink
           to="/"
           class="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-brand-muted no-underline hover:bg-brand-canvas hover:text-brand-ink transition-colors"
@@ -120,9 +122,11 @@ onMounted(() => {
     >
       <aside
         v-if="isMobileMenuOpen"
-        class="fixed inset-y-0 left-0 w-72 bg-brand-canvas-soft border-r border-brand-hair p-5 flex flex-col z-50 md:hidden shadow-floating"
+        class="fixed inset-y-0 left-0 w-72 bg-brand-canvas-soft border-r border-brand-hair p-5 flex flex-col overflow-hidden z-50 md:hidden shadow-floating"
       >
-        <div class="flex items-center justify-between pb-4 border-b border-brand-hairsoft mb-4">
+        <div
+          class="flex shrink-0 items-center justify-between pb-4 border-b border-brand-hairsoft mb-4"
+        >
           <NuxtLink to="/" class="flex items-center gap-2.5 no-underline text-brand-ink">
             <AppLogo variant="mark-only" size="sm" />
             <span class="font-display text-sm font-bold tracking-tight text-brand-ink"
@@ -139,14 +143,16 @@ onMounted(() => {
           </button>
         </div>
 
-        <AdminSidebarNav
-          :links="navLinks"
-          :unread-support-count="unreadSupportCount"
-          nav-label="Navigasi Menu Admin Mobile"
-          @navigate="isMobileMenuOpen = false"
-        />
+        <div class="min-h-0 flex-1 overflow-y-auto pr-1 -mr-1">
+          <AdminSidebarNav
+            :links="navLinks"
+            :unread-support-count="unreadSupportCount"
+            nav-label="Navigasi Menu Admin Mobile"
+            @navigate="isMobileMenuOpen = false"
+          />
+        </div>
 
-        <div class="mt-auto pt-4 border-t border-brand-hairsoft flex flex-col gap-2">
+        <div class="mt-auto shrink-0 pt-4 border-t border-brand-hairsoft flex flex-col gap-2">
           <NuxtLink
             to="/"
             class="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-brand-muted no-underline hover:bg-brand-canvas hover:text-brand-ink transition-colors"
@@ -184,9 +190,9 @@ onMounted(() => {
             <i class="pi pi-bars text-sm" />
             <span v-if="unreadSupportCount > 0" class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
               <span
-                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-danger opacity-75"
               />
-              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-danger" />
             </span>
           </button>
           <div class="flex items-center gap-2">

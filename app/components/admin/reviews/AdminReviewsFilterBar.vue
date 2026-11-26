@@ -69,7 +69,9 @@ const ratingOptions = [
         <span
           class="px-1.5 py-0.2 rounded-full text-[10px] font-bold tabular"
           :class="
-            activeStatus === opt.value ? 'bg-white/20 text-white' : 'bg-brand-hair text-brand-muted'
+            activeStatus === opt.value
+              ? 'bg-brand-onink/15 text-brand-onink'
+              : 'bg-brand-hair text-brand-muted'
           "
         >
           {{ opt.count(metrics) }}

@@ -64,27 +64,30 @@ const colorStyles = computed(() => {
       colorStyles.bg,
     ]"
   >
-    <div class="flex items-start justify-between gap-4">
-      <div class="space-y-1.5 flex-1 min-w-0">
-        <p class="text-xs font-medium uppercase tracking-wider text-brand-muted m-0">
+    <div class="space-y-2.5 min-w-0">
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-xs font-medium uppercase tracking-wider text-brand-muted m-0 truncate">
           {{ title }}
         </p>
-
-        <div v-if="loading" class="h-8 w-28 animate-pulse rounded bg-brand-hairsoft" />
-        <h3 v-else class="text-2xl font-bold tracking-tight tabular text-brand-ink m-0">
-          {{ value }}
-        </h3>
-
-        <p v-if="subtitle" class="text-xs leading-relaxed text-brand-muted m-0">
-          {{ subtitle }}
-        </p>
+        <div
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand-hair bg-brand-canvas shadow-whisper"
+        >
+          <i :class="['pi text-base', icon, colorStyles.badge]" aria-hidden="true" />
+        </div>
       </div>
 
-      <div
-        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-brand-hair bg-brand-canvas shadow-whisper"
+      <div v-if="loading" class="h-8 w-28 animate-pulse rounded bg-brand-hairsoft" />
+      <h3
+        v-else
+        class="text-xl xl:text-2xl font-bold tracking-tight tabular text-brand-ink m-0 truncate"
+        :title="value"
       >
-        <i :class="['pi text-lg', icon, colorStyles.badge]" />
-      </div>
+        {{ value }}
+      </h3>
+
+      <p v-if="subtitle" class="text-xs leading-relaxed text-brand-muted m-0">
+        {{ subtitle }}
+      </p>
     </div>
   </component>
 </template>

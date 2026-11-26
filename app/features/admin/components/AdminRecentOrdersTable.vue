@@ -63,7 +63,7 @@ const formatDate = (dateStr: string) => {
 
       <NuxtLink
         to="/admin/orders"
-        class="text-xs font-semibold text-brand-accent no-underline hover:underline flex items-center gap-1.5"
+        class="text-xs font-semibold text-brand-accent-text no-underline hover:underline flex items-center gap-1.5"
       >
         <span>Lihat Semua Pesanan</span>
         <i class="pi pi-arrow-right text-[10px]" />
@@ -82,7 +82,13 @@ const formatDate = (dateStr: string) => {
     </div>
 
     <!-- Orders Table -->
-    <div v-else class="overflow-x-auto">
+    <div
+      v-else
+      tabindex="0"
+      role="region"
+      aria-label="Tabel transaksi terbaru"
+      class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+    >
       <table class="w-full text-left text-xs border-collapse">
         <thead>
           <tr

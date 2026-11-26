@@ -111,7 +111,7 @@ onMounted(async () => {
           <span>Bantuan & Live Chat</span>
           <span
             v-if="totalUnreadCount > 0"
-            class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700"
+            class="inline-flex items-center rounded-full border border-brand-danger-edge bg-brand-danger-tint px-2 py-0.5 text-xs font-semibold text-brand-danger-text"
           >
             {{ totalUnreadCount }} belum dibalas
           </span>
@@ -122,9 +122,14 @@ onMounted(async () => {
       </div>
 
       <div class="flex items-center gap-2">
-        <UiButton size="sm" variant="outline" :loading="isLoadingThreads" @click="refreshData">
-          <i class="pi pi-refresh text-xs" />
-          <span class="hidden sm:inline">Segarkan</span>
+        <UiButton
+          size="sm"
+          variant="outline"
+          icon="pi-refresh"
+          :loading="isLoadingThreads"
+          @click="refreshData"
+        >
+          <span class="sr-only sm:not-sr-only">Segarkan</span>
         </UiButton>
       </div>
     </div>

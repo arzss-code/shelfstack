@@ -119,9 +119,14 @@ onMounted(() => {
         </p>
       </div>
 
-      <UiButton size="sm" variant="outline" :loading="isLoading" @click="fetchReturns">
-        <i class="pi pi-refresh text-xs" />
-        <span>Segarkan Data</span>
+      <UiButton
+        size="sm"
+        variant="outline"
+        icon="pi-refresh"
+        :loading="isLoading"
+        @click="fetchReturns"
+      >
+        Segarkan Data
       </UiButton>
     </div>
 
@@ -135,7 +140,7 @@ onMounted(() => {
       <div class="rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
         <span class="text-[11px] font-medium text-brand-muted">Menunggu Review</span>
         <div class="mt-1 flex items-baseline justify-between">
-          <span class="text-2xl font-bold text-brand-warning">{{ metrics.requested }}</span>
+          <span class="text-2xl font-bold text-brand-warning-text">{{ metrics.requested }}</span>
           <span class="text-[11px] text-brand-muted">tiket</span>
         </div>
       </div>
@@ -143,7 +148,7 @@ onMounted(() => {
       <div class="rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
         <span class="text-[11px] font-medium text-brand-muted">Disetujui (Menunggu Kiriman)</span>
         <div class="mt-1 flex items-baseline justify-between">
-          <span class="text-2xl font-bold text-brand-accent">{{ metrics.approved }}</span>
+          <span class="text-2xl font-bold text-brand-accent-text">{{ metrics.approved }}</span>
           <span class="text-[11px] text-brand-muted">paket</span>
         </div>
       </div>
@@ -159,7 +164,7 @@ onMounted(() => {
       <div class="rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
         <span class="text-[11px] font-medium text-brand-muted">Selesai Dituntaskan</span>
         <div class="mt-1 flex items-baseline justify-between">
-          <span class="text-2xl font-bold text-brand-success">{{ metrics.completed }}</span>
+          <span class="text-2xl font-bold text-brand-success-text">{{ metrics.completed }}</span>
           <span class="text-[11px] text-brand-muted">klaim</span>
         </div>
       </div>
@@ -241,11 +246,11 @@ onMounted(() => {
               </td>
               <td class="py-3.5 px-4">
                 <span
-                  class="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-semibold"
+                  class="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[11px] font-semibold"
                   :class="
                     item.solution_type === 'refund'
-                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300'
-                      : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                      ? 'border-brand-accent-edge bg-brand-accent-tint text-brand-accent-text'
+                      : 'border-brand-success-edge bg-brand-success-tint text-brand-success-text'
                   "
                 >
                   <i

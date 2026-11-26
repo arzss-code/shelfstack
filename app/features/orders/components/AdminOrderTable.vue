@@ -28,7 +28,7 @@ interface StatusBadge {
   label: string
 }
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     orders: AdminOrderRow[]
     loading: boolean
@@ -47,6 +47,11 @@ const emit = defineEmits<{
   nextPage: []
   sortChange: [payload: { key: string | null; direction: 'desc' | 'asc' | null }]
 }>()
+
+const getAriaSort = (key: string): 'ascending' | 'descending' | 'none' => {
+  if (props.sortKey !== key || !props.sortDirection) return 'none'
+  return props.sortDirection === 'asc' ? 'ascending' : 'descending'
+}
 
 const getStatusBadge = (status: OrderStatus): StatusBadge => {
   switch (status) {
@@ -98,13 +103,19 @@ const formatDate = (dateStr: string) => {
     </div>
 
     <!-- Data Table -->
-    <div v-else class="overflow-x-auto">
+    <div
+      v-else
+      tabindex="0"
+      role="region"
+      aria-label="Tabel daftar pesanan"
+      class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+    >
       <table class="w-full border-collapse text-left text-xs">
         <thead>
           <tr
             class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
           >
-            <th class="px-4 py-3">
+            <th scope="col" class="px-4 py-3" :aria-sort="getAriaSort('id')">
               <UiSortHeader
                 sort-key="id"
                 label="ID pesanan"
@@ -115,7 +126,7 @@ const formatDate = (dateStr: string) => {
                 ID Pesanan
               </UiSortHeader>
             </th>
-            <th class="px-4 py-3">
+            <th scope="col" class="px-4 py-3" :aria-sort="getAriaSort('name')">
               <UiSortHeader
                 sort-key="name"
                 label="pelanggan"
@@ -126,7 +137,7 @@ const formatDate = (dateStr: string) => {
                 Pelanggan
               </UiSortHeader>
             </th>
-            <th class="px-4 py-3">
+            <th scope="col" class="px-4 py-3" :aria-sort="getAriaSort('created_at')">
               <UiSortHeader
                 sort-key="created_at"
                 label="tanggal"
@@ -137,9 +148,9 @@ const formatDate = (dateStr: string) => {
                 Tanggal
               </UiSortHeader>
             </th>
-            <th class="px-4 py-3 text-center font-semibold">Item</th>
-            <th class="px-4 py-3 font-semibold">Status</th>
-            <th class="px-4 py-3 text-right">
+            <th scope="col" class="px-4 py-3 text-center font-semibold">Item</th>
+            <th scope="col" class="px-4 py-3 font-semibold">Status</th>
+            <th scope="col" class="px-4 py-3 text-right" :aria-sort="getAriaSort('total')">
               <UiSortHeader
                 sort-key="total"
                 label="total"
@@ -150,7 +161,7 @@ const formatDate = (dateStr: string) => {
                 Total
               </UiSortHeader>
             </th>
-            <th class="px-4 py-3 text-center font-semibold">Aksi</th>
+            <th scope="col" class="px-4 py-3 text-center font-semibold">Aksi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft">
