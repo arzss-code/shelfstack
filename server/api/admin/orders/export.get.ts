@@ -24,6 +24,8 @@ export default defineEventHandler(async (event) => {
     'total_asc',
     'name_asc',
     'name_desc',
+    'status_asc',
+    'status_desc',
   ]
   const sort = sortAllowlist.includes(rawSort) ? rawSort : 'created_at_desc'
 
@@ -67,6 +69,10 @@ export default defineEventHandler(async (event) => {
         return dbQuery.order('address->>name', { ascending: true }).limit(1000)
       case 'name_desc':
         return dbQuery.order('address->>name', { ascending: false }).limit(1000)
+      case 'status_asc':
+        return dbQuery.order('status', { ascending: true }).limit(1000)
+      case 'status_desc':
+        return dbQuery.order('status', { ascending: false }).limit(1000)
       case 'created_at_desc':
       default:
         return dbQuery.order('created_at', { ascending: false }).limit(1000)

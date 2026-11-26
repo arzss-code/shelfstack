@@ -26,29 +26,24 @@ const colorStyles = computed(() => {
   switch (props.color) {
     case 'success':
       return {
-        bg: 'bg-brand-success-tint text-brand-success-text border-brand-success-edge',
-        badge: 'text-brand-success-text',
+        iconBox: 'border-brand-success-edge bg-brand-success-tint text-brand-success-text',
       }
     case 'warning':
       return {
-        bg: 'bg-brand-warning-tint text-brand-warning-text border-brand-warning-edge',
-        badge: 'text-brand-warning-text',
+        iconBox: 'border-brand-warning-edge bg-brand-warning-tint text-brand-warning-text',
       }
     case 'danger':
       return {
-        bg: 'bg-brand-danger-tint text-brand-danger-text border-brand-danger-edge',
-        badge: 'text-brand-danger-text',
+        iconBox: 'border-brand-danger-edge bg-brand-danger-tint text-brand-danger-text',
       }
     case 'info':
       return {
-        bg: 'bg-brand-accent-tint text-brand-accent-text border-brand-accent-edge',
-        badge: 'text-brand-accent-text',
+        iconBox: 'border-brand-accent-edge bg-brand-accent-tint text-brand-accent-text',
       }
     case 'neutral':
     default:
       return {
-        bg: 'bg-brand-canvas-soft text-brand-ink border-brand-hairsoft',
-        badge: 'text-brand-muted',
+        iconBox: 'border-brand-hair bg-brand-canvas-soft text-brand-ink',
       }
   }
 })
@@ -58,11 +53,8 @@ const colorStyles = computed(() => {
   <component
     :is="to ? 'NuxtLink' : 'div'"
     :to="to || undefined"
-    class="relative overflow-hidden rounded-card border p-4 transition-all duration-200 no-underline shadow-whisper"
-    :class="[
-      to ? 'hover:-translate-y-0.5 hover:shadow-floating cursor-pointer' : '',
-      colorStyles.bg,
-    ]"
+    class="relative overflow-hidden rounded-card border border-brand-hair bg-brand-canvas p-4 transition-all duration-200 no-underline shadow-whisper"
+    :class="to ? 'hover:border-brand-ink cursor-pointer' : ''"
   >
     <div class="space-y-2 min-w-0">
       <div class="flex items-center justify-between gap-2">
@@ -70,9 +62,10 @@ const colorStyles = computed(() => {
           {{ title }}
         </p>
         <div
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-brand-hair bg-brand-canvas shadow-whisper"
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border"
+          :class="colorStyles.iconBox"
         >
-          <i :class="['pi text-xs', icon, colorStyles.badge]" aria-hidden="true" />
+          <i :class="['pi text-xs', icon]" aria-hidden="true" />
         </div>
       </div>
 

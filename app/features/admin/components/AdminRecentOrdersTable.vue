@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { OrderStatus } from '~/types/order'
+import { useClientTableSort } from '~/composables/useClientTableSort'
 import { formatRupiah } from '~/utils/format'
 
 interface RecentOrder {
@@ -14,10 +15,21 @@ interface RecentOrder {
   }
 }
 
-defineProps<{
+const props = defineProps<{
   orders: RecentOrder[]
   loading?: boolean
 }>()
+
+const { sortKey, sortDirection, sortedItems, onSortChange, getAriaSort } = useClientTableSort(
+  () => props.orders,
+  {
+    id: (o) => o.id,
+    customer: (o) => o.address?.name || 'Pelanggan Toko',
+    created_at: (o) => new Date(o.created_at).getTime() || 0,
+    status: (o) => o.status,
+    total_cents: (o) => o.total_cents,
+  },
+)
 
 const getStatusBadge = (status: OrderStatus) => {
   switch (status) {
@@ -50,14 +62,12 @@ const formatDate = (dateStr: string) => {
 </script>
 
 <template>
-  <div class="rounded-card border border-brand-hair bg-brand-canvas-soft p-6 shadow-whisper">
-    <div class="mb-5 flex items-center justify-between">
+  <div class="rounded-card border border-brand-hair bg-brand-canvas p-5 shadow-whisper">
+    <div class="mb-4 flex items-center justify-between gap-3">
       <div>
-        <h2 class="font-display text-base sm:text-lg font-bold text-brand-ink m-0">
-          Transaksi Terbaru
-        </h2>
+        <h2 class="font-display text-base font-bold text-brand-ink m-0">Transaksi Terbaru</h2>
         <p class="font-body text-xs text-brand-muted m-0 mt-0.5">
-          8 transaksi pesanan paling mutakhir yang masuk ke sistem.
+          8 pesanan terakhir yang masuk ke toko.
         </p>
       </div>
 
@@ -92,26 +102,81 @@ const formatDate = (dateStr: string) => {
       <table class="w-full text-left text-xs border-collapse">
         <thead>
           <tr
-            class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
+            class="border-b border-brand-hair bg-brand-canvas-soft text-brand-muted uppercase tracking-wider text-[11px]"
           >
-            <th scope="col" class="py-2.5 px-3.5 font-semibold">ID Pesanan</th>
-            <th scope="col" class="py-2.5 px-3.5 font-semibold">Pelanggan</th>
-            <th scope="col" class="py-2.5 px-3.5 font-semibold">Tanggal</th>
-            <th scope="col" class="py-2.5 px-3.5 font-semibold">Status</th>
-            <th scope="col" class="py-2.5 px-3.5 font-semibold text-right">Total</th>
+            <th scope="col" class="py-2.5 px-3.5" :aria-sort="getAriaSort('id')">
+              <UiSortHeader
+                sort-key="id"
+                label="ID pesanan"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="onSortChange"
+              >
+                ID Pesanan
+              </UiSortHeader>
+            </th>
+            <th scope="col" class="py-2.5 px-3.5" :aria-sort="getAriaSort('customer')">
+              <UiSortHeader
+                sort-key="customer"
+                label="pelanggan"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="onSortChange"
+              >
+                Pelanggan
+              </UiSortHeader>
+            </th>
+            <th scope="col" class="py-2.5 px-3.5" :aria-sort="getAriaSort('created_at')">
+              <UiSortHeader
+                sort-key="created_at"
+                label="tanggal"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="onSortChange"
+              >
+                Tanggal
+              </UiSortHeader>
+            </th>
+            <th scope="col" class="py-2.5 px-3.5" :aria-sort="getAriaSort('status')">
+              <UiSortHeader
+                sort-key="status"
+                label="status"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="onSortChange"
+              >
+                Status
+              </UiSortHeader>
+            </th>
+            <th
+              scope="col"
+              class="py-2.5 px-3.5 text-right"
+              :aria-sort="getAriaSort('total_cents')"
+            >
+              <UiSortHeader
+                sort-key="total_cents"
+                label="total"
+                align="right"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="onSortChange"
+              >
+                Total
+              </UiSortHeader>
+            </th>
             <th scope="col" class="py-2.5 px-3.5 font-semibold text-center">Aksi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft">
           <tr
-            v-for="order in orders"
+            v-for="order in sortedItems"
             :key="order.id"
-            class="hover:bg-brand-canvas transition-colors"
+            class="hover:bg-brand-canvas-soft/60 transition-colors"
           >
-            <td class="py-3.5 px-4 font-mono font-medium tabular text-brand-ink">
+            <td class="py-2.5 px-3.5 font-mono font-medium tabular-nums text-brand-ink">
               #{{ order.id.slice(0, 8) }}
             </td>
-            <td class="py-3.5 px-4 text-brand-ink">
+            <td class="py-2.5 px-3.5 text-brand-ink">
               <div class="font-medium truncate max-w-[180px]">
                 {{ order.address?.name || 'Pelanggan Toko' }}
               </div>
@@ -119,27 +184,26 @@ const formatDate = (dateStr: string) => {
                 {{ order.address?.city || '-' }}
               </div>
             </td>
-            <td class="py-3.5 px-4 text-brand-muted whitespace-nowrap">
+            <td class="py-2.5 px-3.5 text-brand-muted whitespace-nowrap">
               {{ formatDate(order.created_at) }}
             </td>
-            <td class="py-3.5 px-4">
+            <td class="py-2.5 px-3.5">
               <UiBadge
                 :label="getStatusBadge(order.status).label"
                 :variant="getStatusBadge(order.status).variant"
               />
             </td>
             <td
-              class="py-3.5 px-4 text-right font-semibold text-brand-ink whitespace-nowrap tabular"
+              class="py-2.5 px-3.5 text-right font-semibold text-brand-ink whitespace-nowrap tabular-nums"
             >
               {{ formatRupiah(order.total_cents / 100) }}
             </td>
-            <td class="py-3.5 px-4 text-center whitespace-nowrap">
+            <td class="py-2.5 px-3.5 text-center whitespace-nowrap">
               <NuxtLink
                 :to="`/admin/orders/${order.id}`"
-                class="inline-flex items-center gap-1.5 rounded-full bg-brand-canvas px-3 py-1 text-xs font-semibold text-brand-ink no-underline border border-brand-hair hover:bg-brand-field"
+                class="inline-flex items-center gap-1 rounded-full bg-brand-canvas px-3 py-1 text-xs font-semibold text-brand-ink no-underline border border-brand-hair hover:bg-brand-field"
               >
                 <span>Detail</span>
-                <i class="pi pi-arrow-right text-[9px]" />
               </NuxtLink>
             </td>
           </tr>

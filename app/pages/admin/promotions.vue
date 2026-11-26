@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
+import { useClientTableSort } from '~/composables/useClientTableSort'
 import AdminFlashDealModal, {
   type FlashDealAdminRow,
 } from '~/components/admin/promotions/AdminFlashDealModal.vue'
@@ -43,7 +44,7 @@ function getDealStatusBadge(deal: FlashDealAdminRow): {
   const end = new Date(deal.ends_at).getTime()
   if (now < start) return { label: 'Terjadwal', variant: 'info' }
   if (now > end || deal.claimed >= deal.quota) return { label: 'Berakhir', variant: 'warning' }
-  return { label: 'Aktif Live', variant: 'success' }
+  return { label: 'Berlangsung', variant: 'success' }
 }
 
 function formatDateTime(iso: string): string {
@@ -115,14 +116,38 @@ function confirmArchive(deal: FlashDealAdminRow) {
 onMounted(() => {
   loadData()
 })
+
+const promoColumns = [
+  { key: 'product', label: 'Produk', ariaLabel: 'produk', align: 'left' as const },
+  { key: 'discount', label: 'Diskon', ariaLabel: 'persentase diskon', align: 'center' as const },
+  { key: 'promo_price', label: 'Harga Promo', ariaLabel: 'harga promo', align: 'right' as const },
+  { key: 'claimed', label: 'Kuota Klaim', ariaLabel: 'kuota klaim', align: 'center' as const },
+  { key: 'starts_at', label: 'Jadwal Promo', ariaLabel: 'jadwal promo', align: 'left' as const },
+  { key: 'status', label: 'Status', ariaLabel: 'status promo', align: 'left' as const },
+]
+
+const {
+  sortKey,
+  sortDirection,
+  sortedItems: sortedDeals,
+  onSortChange,
+  getAriaSort,
+} = useClientTableSort(deals, {
+  product: (d) => d.products?.name || `Produk #${d.product_id}`,
+  discount: (d) => d.discount_percentage,
+  promo_price: (d) => d.promo_price_cents,
+  claimed: (d) => d.claimed,
+  starts_at: (d) => new Date(d.starts_at).getTime() || 0,
+  status: (d) => getDealStatusBadge(d).label,
+})
 </script>
 
 <template>
   <div class="space-y-5">
     <AdminPageHeader
       title="Promo & Flash Sale"
-      subtitle="Atur jadwal flash sale, kuota klaim, dan harga promo produk."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Promo & Flash Sale' }]"
+      subtitle="Jadwal promo berbatas waktu dan kuota klaim produk."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Flash Sale' }]"
     >
       <template #actions>
         <UiButton
@@ -132,7 +157,7 @@ onMounted(() => {
           :loading="loading"
           @click="loadData"
         >
-          Segarkan Data
+          Muat Ulang
         </UiButton>
         <UiButton variant="primary" size="sm" icon="pi-plus" @click="openCreate">
           Buat Flash Sale
@@ -160,50 +185,95 @@ onMounted(() => {
       @action="openCreate"
     />
 
-    <div v-else class="grid grid-cols-1 gap-3">
-      <article
-        v-for="deal in deals"
-        :key="deal.id"
-        class="rounded-card border border-brand-hair bg-brand-canvas p-4 sm:p-5 shadow-whisper flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+    <div
+      v-else
+      class="overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper"
+    >
+      <div
+        tabindex="0"
+        role="region"
+        aria-label="Tabel daftar kampanye flash sale"
+        class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
       >
-        <div class="space-y-1.5 min-w-0">
-          <div class="flex flex-wrap items-center gap-2">
-            <h2 class="m-0 font-display text-sm sm:text-base font-bold text-brand-ink truncate">
-              {{ deal.products?.name || `Produk #${deal.product_id}` }}
-            </h2>
-            <UiBadge
-              :label="getDealStatusBadge(deal).label"
-              :variant="getDealStatusBadge(deal).variant"
-            />
-            <UiBadge :label="`-${deal.discount_percentage}%`" variant="danger" />
-          </div>
-
-          <div
-            class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-brand-muted tabular-nums"
-          >
-            <span>
-              Harga Promo:
-              <strong class="text-brand-ink">{{
-                formatRupiah(deal.promo_price_cents / 100)
-              }}</strong>
-            </span>
-            <span>Kuota Klaim: {{ deal.claimed }} / {{ deal.quota }}</span>
-            <span
-              >Jadwal: {{ formatDateTime(deal.starts_at) }} -
-              {{ formatDateTime(deal.ends_at) }}</span
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr
+              class="border-b border-brand-hair bg-brand-canvas-soft text-[11px] font-semibold uppercase tracking-wider text-brand-muted"
             >
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2 shrink-0">
-          <UiButton size="sm" variant="secondary" icon="pi-pencil" @click="openEdit(deal)">
-            Edit
-          </UiButton>
-          <UiButton size="sm" variant="danger" icon="pi-trash" @click="confirmArchive(deal)">
-            Hapus
-          </UiButton>
-        </div>
-      </article>
+              <th
+                v-for="col in promoColumns"
+                :key="col.key"
+                scope="col"
+                class="py-2.5 px-3.5 whitespace-nowrap"
+                :class="
+                  col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''
+                "
+                :aria-sort="getAriaSort(col.key)"
+              >
+                <UiSortHeader
+                  :sort-key="col.key"
+                  :label="col.label"
+                  :align="col.align"
+                  :active-key="sortKey"
+                  :direction="sortDirection"
+                  @sort="onSortChange"
+                >
+                  {{ col.label }}
+                </UiSortHeader>
+              </th>
+              <th scope="col" class="py-2.5 px-3.5 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
+            <tr
+              v-for="deal in sortedDeals"
+              :key="deal.id"
+              class="hover:bg-brand-canvas-soft/50 transition-colors"
+            >
+              <td class="py-2.5 px-3.5 font-semibold text-brand-ink max-w-[220px] truncate">
+                {{ deal.products?.name || `Produk #${deal.product_id}` }}
+              </td>
+              <td class="py-2.5 px-3.5 text-center whitespace-nowrap">
+                <UiBadge :label="`-${deal.discount_percentage}%`" variant="danger" />
+              </td>
+              <td
+                class="py-2.5 px-3.5 text-right font-display font-bold tabular-nums whitespace-nowrap"
+              >
+                {{ formatRupiah(deal.promo_price_cents / 100) }}
+              </td>
+              <td class="py-2.5 px-3.5 text-center text-brand-muted tabular-nums whitespace-nowrap">
+                {{ deal.claimed }} / {{ deal.quota }}
+              </td>
+              <td class="py-2.5 px-3.5 text-brand-muted tabular-nums whitespace-nowrap">
+                {{ formatDateTime(deal.starts_at) }} - {{ formatDateTime(deal.ends_at) }}
+              </td>
+              <td class="py-2.5 px-3.5 whitespace-nowrap">
+                <UiBadge
+                  :label="getDealStatusBadge(deal).label"
+                  :variant="getDealStatusBadge(deal).variant"
+                />
+              </td>
+              <td class="py-2.5 px-3.5 text-right whitespace-nowrap">
+                <div class="inline-flex items-center gap-1">
+                  <UiIconButton
+                    icon="pi-pencil"
+                    label="Ubah flash sale"
+                    size="sm"
+                    @click="openEdit(deal)"
+                  />
+                  <UiIconButton
+                    icon="pi-trash"
+                    label="Hapus flash sale"
+                    variant="danger"
+                    size="sm"
+                    @click="confirmArchive(deal)"
+                  />
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <AdminFlashDealModal

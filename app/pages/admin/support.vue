@@ -104,11 +104,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="space-y-5 text-brand-ink">
+  <div class="flex flex-col gap-3 text-brand-ink md:flex-1 md:min-h-0 md:overflow-hidden">
     <AdminPageHeader
-      title="Bantuan & Live Chat"
-      subtitle="Balas percakapan pelanggan dan kelola pesan masuk dari formulir kontak."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Bantuan & Live Chat' }]"
+      title="Bantuan &amp; Live Chat"
+      subtitle="Balas percakapan pelanggan dan kelola pesan formulir kontak."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Bantuan & Chat' }]"
+      class="!pb-3"
     >
       <template v-if="totalUnreadCount > 0" #title-badge>
         <span
@@ -126,28 +127,30 @@ onMounted(async () => {
           :loading="isLoadingThreads"
           @click="refreshData"
         >
-          <span class="sr-only sm:not-sr-only">Segarkan Data</span>
+          <span class="sr-only sm:not-sr-only">Muat Ulang</span>
         </UiButton>
       </template>
     </AdminPageHeader>
 
     <!-- Error Banner -->
-    <UiAlert v-if="error && activeChannel === 'live_chat'" tone="danger" class="text-xs">
+    <UiAlert v-if="error && activeChannel === 'live_chat'" tone="danger" class="text-xs shrink-0">
       {{ error }}
     </UiAlert>
 
-    <UiTabs
-      v-model="activeChannel"
-      :items="channelTabs"
-      aria-label="Kanal layanan bantuan pelanggan"
-    />
+    <div class="shrink-0">
+      <UiTabs
+        v-model="activeChannel"
+        :items="channelTabs"
+        aria-label="Kanal layanan bantuan pelanggan"
+      />
+    </div>
 
     <AdminContactInboxPanel v-if="activeChannel === 'contact_inbox'" />
 
-    <!-- Workspace Dual-Pane Container -->
+    <!-- Workspace Dual-Pane Container (Viewport-Fit on Desktop) -->
     <div
       v-else
-      class="h-[calc(100vh-14rem)] min-h-[580px] flex rounded-card border border-brand-hair bg-brand-canvas shadow-whisper overflow-hidden"
+      class="h-[72dvh] min-h-[440px] md:h-auto md:min-h-0 md:flex-1 flex rounded-card border border-brand-hair bg-brand-canvas shadow-whisper overflow-hidden"
     >
       <!-- Left Pane: Thread Inbox List -->
       <aside

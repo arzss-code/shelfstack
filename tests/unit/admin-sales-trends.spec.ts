@@ -118,14 +118,15 @@ describe('Admin Sales Trends & Analytics', () => {
       })
       await flushPromises()
 
-      expect(wrapper.text()).toContain('Tren Penjualan & Pendapatan')
+      expect(wrapper.text()).toContain('Grafik Penjualan')
       expect(wrapper.text()).toContain('7 Hari')
       expect(wrapper.text()).toContain('30 Hari')
       expect(wrapper.text()).toContain('Bulan Ini')
 
       expect(wrapper.text()).toContain('Total Omzet')
-      expect(wrapper.text()).toContain('17 Pesanan')
+      expect(wrapper.text()).toContain('17 pesanan')
       expect(wrapper.html()).not.toContain('font-mono')
+      expect(wrapper.html()).not.toContain('overflow-hidden')
     })
 
     it('renders pure SVG elements with grid lines and data points in brand electric blue', async () => {

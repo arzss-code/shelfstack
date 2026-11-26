@@ -42,9 +42,9 @@ onMounted(() => {
 <template>
   <div class="space-y-5" data-testid="admin-reviews-page">
     <AdminPageHeader
-      title="Moderasi Ulasan Produk"
-      subtitle="Pantau rating pelanggan terverifikasi dan atur visibilitas ulasan di etalase."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Ulasan Produk' }]"
+      title="Ulasan Produk"
+      subtitle="Pantau rating pembeli dan kelola tampilan ulasan di toko."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Ulasan' }]"
     >
       <template #actions>
         <UiButton
@@ -54,7 +54,7 @@ onMounted(() => {
           :loading="loading"
           @click="fetchReviews"
         >
-          Segarkan Data
+          Muat Ulang
         </UiButton>
       </template>
     </AdminPageHeader>

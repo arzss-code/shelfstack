@@ -33,14 +33,14 @@ function formatFailedTime(iso: string): string {
 
 <template>
   <section
-    aria-label="Telemetri Worker Kedaluwarsa Pesanan"
-    class="rounded-card border border-brand-hair bg-brand-canvas-soft p-4 sm:p-5 shadow-whisper space-y-4"
+    aria-label="Antrean Pesanan Kedaluwarsa"
+    class="rounded-card border border-brand-hair bg-brand-canvas p-4 sm:p-5 shadow-whisper space-y-4"
   >
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="space-y-1">
         <div class="flex flex-wrap items-center gap-2">
           <h2 class="font-display text-sm sm:text-base font-bold text-brand-ink m-0">
-            Antrean Kedaluwarsa Pesanan (BullMQ &amp; DLQ)
+            Antrean Pesanan Kedaluwarsa
           </h2>
 
           <UiBadge v-if="loading" label="Memeriksa Worker..." variant="default" />
@@ -49,14 +49,14 @@ function formatFailedTime(iso: string): string {
             label="Order Service Offline"
             variant="default"
           />
-          <UiBadge v-else-if="dlqCount > 0" :label="`${dlqCount} Job di DLQ`" variant="danger" />
+          <UiBadge v-else-if="dlqCount > 0" :label="`${dlqCount} Gagal (DLQ)`" variant="danger" />
           <UiBadge v-else-if="telemetry.enabled" label="Worker Aktif" variant="success" />
-          <UiBadge v-else label="BullMQ Nonaktif" variant="warning" />
+          <UiBadge v-else label="Nonaktif" variant="warning" />
         </div>
 
         <p class="font-body text-xs text-brand-muted m-0">
-          Menangani pembatalan otomatis pesanan pending setelah batas waktu bayar habis beserta
-          pemulihan stok, kuota voucher, dan koin pelanggan.
+          Pembatalan otomatis pesanan melewati batas bayar dan pemulihan stok, kuota voucher, serta
+          koin.
         </p>
       </div>
 
@@ -72,13 +72,13 @@ function formatFailedTime(iso: string): string {
         </UiButton>
 
         <UiButton
-          variant="secondary"
+          variant="outline"
           size="sm"
           icon="pi-refresh"
           :loading="refreshing"
           @click="fetchQueueTelemetry(true)"
         >
-          Segarkan Worker
+          Muat Ulang
         </UiButton>
       </div>
     </div>

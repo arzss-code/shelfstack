@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import type { Product } from '~/types/product'
 import { useCategories, CANONICAL_CATEGORIES } from '~/composables/useCategories'
+import { useClientTableSort } from '~/composables/useClientTableSort'
 import { formatRupiah } from '~/utils/format'
 
 const props = withDefaults(
@@ -63,6 +64,58 @@ const getStockBadge = (stock: number) => {
   }
   return { label: `Stok: ${stock}`, variant: 'success' as const }
 }
+
+const productColumns = [
+  {
+    key: 'name',
+    label: 'Produk',
+    ariaLabel: 'nama produk',
+    thClass: 'min-w-[190px]',
+    align: 'left' as const,
+  },
+  {
+    key: 'category',
+    label: 'Kategori',
+    ariaLabel: 'kategori',
+    thClass: 'whitespace-nowrap',
+    align: 'left' as const,
+  },
+  {
+    key: 'price',
+    label: 'Harga',
+    ariaLabel: 'harga',
+    thClass: 'text-right whitespace-nowrap',
+    align: 'right' as const,
+  },
+  {
+    key: 'stock',
+    label: 'Stok & Terjual',
+    ariaLabel: 'stok produk',
+    thClass: 'whitespace-nowrap',
+    align: 'left' as const,
+  },
+  {
+    key: 'rating',
+    label: 'Rating',
+    ariaLabel: 'rating produk',
+    thClass: 'text-center whitespace-nowrap',
+    align: 'center' as const,
+  },
+]
+
+const {
+  sortKey,
+  sortDirection,
+  sortedItems: sortedProducts,
+  onSortChange,
+  getAriaSort,
+} = useClientTableSort(() => props.products, {
+  name: (p) => p.name,
+  category: (p) => resolveCategory(p),
+  price: (p) => p.price_cents ?? p.price * 100,
+  stock: (p) => p.stock,
+  rating: (p) => p.rating ?? 0,
+})
 </script>
 
 <template>
@@ -108,18 +161,32 @@ const getStockBadge = (stock: number) => {
           <tr
             class="border-b border-brand-hair bg-brand-canvas-soft text-[11px] font-semibold uppercase tracking-wider text-brand-muted"
           >
-            <th scope="col" class="px-2.5 py-2.5 min-w-[190px]">Produk</th>
-            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap">Kategori</th>
-            <th scope="col" class="px-2.5 py-2.5 text-right whitespace-nowrap">Harga</th>
-            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap">Stok &amp; Terjual</th>
-            <th scope="col" class="px-2.5 py-2.5 text-center whitespace-nowrap">Rating</th>
+            <th
+              v-for="col in productColumns"
+              :key="col.key"
+              scope="col"
+              class="px-2.5 py-2.5"
+              :class="col.thClass"
+              :aria-sort="getAriaSort(col.key)"
+            >
+              <UiSortHeader
+                :sort-key="col.key"
+                :label="col.label"
+                :align="col.align"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="onSortChange"
+              >
+                {{ col.label }}
+              </UiSortHeader>
+            </th>
             <th scope="col" class="px-2.5 py-2.5 text-right whitespace-nowrap">Aksi</th>
           </tr>
         </thead>
 
         <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
           <tr
-            v-for="product in products"
+            v-for="product in sortedProducts"
             :key="product.id"
             class="transition-colors hover:bg-brand-canvas-soft/60"
             data-testid="admin-product-table-row"
@@ -161,7 +228,6 @@ const getStockBadge = (stock: number) => {
               </div>
             </td>
 
-            <!-- Kategori -->
             <td class="px-2.5 py-2 whitespace-nowrap">
               <span
                 class="inline-flex items-center rounded-md border border-brand-hair bg-brand-canvas-soft px-2 py-0.5 text-[11px] font-medium text-brand-ink"
@@ -169,15 +235,11 @@ const getStockBadge = (stock: number) => {
                 {{ resolveCategory(product) }}
               </span>
             </td>
-
-            <!-- Harga -->
             <td class="px-2.5 py-2 text-right whitespace-nowrap">
               <span class="font-display font-bold text-brand-ink tabular-nums">
                 {{ formatRupiah(product.price) }}
               </span>
             </td>
-
-            <!-- Stok & Terjual -->
             <td class="px-2.5 py-2 whitespace-nowrap">
               <div class="flex items-center gap-1.5">
                 <UiBadge
@@ -192,8 +254,6 @@ const getStockBadge = (stock: number) => {
                 </span>
               </div>
             </td>
-
-            <!-- Rating -->
             <td class="px-2.5 py-2 text-center whitespace-nowrap">
               <span
                 v-if="product.rating && product.rating > 0"
@@ -204,8 +264,6 @@ const getStockBadge = (stock: number) => {
               </span>
               <span v-else class="text-brand-faint">-</span>
             </td>
-
-            <!-- Aksi -->
             <td class="px-2.5 py-2 text-right whitespace-nowrap">
               <div class="inline-flex items-center justify-end gap-0.5">
                 <template v-if="isTrash">

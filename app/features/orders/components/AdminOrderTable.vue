@@ -116,7 +116,7 @@ const formatDate = (dateStr: string) => {
             <th scope="col" class="px-3.5 py-2.5" :aria-sort="getAriaSort('id')">
               <UiSortHeader
                 sort-key="id"
-                label="ID pesanan"
+                label="ID Pesanan"
                 :active-key="sortKey"
                 :direction="sortDirection"
                 @sort="(payload) => emit('sortChange', payload)"
@@ -127,7 +127,7 @@ const formatDate = (dateStr: string) => {
             <th scope="col" class="px-3.5 py-2.5" :aria-sort="getAriaSort('name')">
               <UiSortHeader
                 sort-key="name"
-                label="pelanggan"
+                label="Pelanggan"
                 :active-key="sortKey"
                 :direction="sortDirection"
                 @sort="(payload) => emit('sortChange', payload)"
@@ -138,7 +138,7 @@ const formatDate = (dateStr: string) => {
             <th scope="col" class="px-3.5 py-2.5" :aria-sort="getAriaSort('created_at')">
               <UiSortHeader
                 sort-key="created_at"
-                label="tanggal"
+                label="Tanggal"
                 :active-key="sortKey"
                 :direction="sortDirection"
                 @sort="(payload) => emit('sortChange', payload)"
@@ -146,12 +146,34 @@ const formatDate = (dateStr: string) => {
                 Tanggal
               </UiSortHeader>
             </th>
-            <th scope="col" class="px-3.5 py-2.5 text-center font-semibold">Item</th>
-            <th scope="col" class="px-3.5 py-2.5 font-semibold">Status</th>
+            <th scope="col" class="px-3.5 py-2.5 text-center" :aria-sort="getAriaSort('items')">
+              <UiSortHeader
+                sort-key="items"
+                label="Item"
+                align="center"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="(payload) => emit('sortChange', payload)"
+              >
+                Item
+              </UiSortHeader>
+            </th>
+            <th scope="col" class="px-3.5 py-2.5" :aria-sort="getAriaSort('status')">
+              <UiSortHeader
+                sort-key="status"
+                label="Status"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="(payload) => emit('sortChange', payload)"
+              >
+                Status
+              </UiSortHeader>
+            </th>
             <th scope="col" class="px-3.5 py-2.5 text-right" :aria-sort="getAriaSort('total')">
               <UiSortHeader
                 sort-key="total"
-                label="total"
+                label="Total"
+                align="right"
                 :active-key="sortKey"
                 :direction="sortDirection"
                 @sort="(payload) => emit('sortChange', payload)"

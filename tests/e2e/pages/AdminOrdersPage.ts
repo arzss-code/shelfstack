@@ -13,7 +13,7 @@ export class AdminOrdersPage extends BasePage {
   constructor(page: Page) {
     super(page)
     this.heading = page.getByRole('heading', { name: 'Kelola Pesanan' })
-    this.refreshButton = page.getByRole('button', { name: 'Perbarui' })
+    this.refreshButton = page.getByRole('button', { name: 'Muat Ulang' })
     this.exportMenuButton = page.getByRole('button', { name: /ekspor data/i })
     this.searchInput = page.getByPlaceholder('Cari ID / Nama...')
     this.tableRows = page.locator('table tbody tr')

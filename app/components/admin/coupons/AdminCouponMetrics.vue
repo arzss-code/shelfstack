@@ -29,7 +29,7 @@ defineProps<{
       <p class="m-0 font-display text-xl sm:text-2xl font-bold tabular text-brand-ink">
         {{ metrics.total_coupons }}
       </p>
-      <p class="m-0 text-[11px] text-brand-muted">Master voucher terdaftar</p>
+      <p class="m-0 text-[11px] text-brand-muted">Jumlah voucher dibuat</p>
     </div>
 
     <!-- Voucher Aktif -->
@@ -85,7 +85,7 @@ defineProps<{
       >
         {{ metrics.formatted_total_discount }}
       </p>
-      <p class="m-0 text-[11px] text-brand-muted">Penghematan belanja pelanggan</p>
+      <p class="m-0 text-[11px] text-brand-muted">Total potongan terpakai</p>
     </div>
   </div>
 </template>

@@ -140,14 +140,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-wrap items-center justify-between gap-3">
+  <div class="flex flex-col gap-3 md:flex-1 md:min-h-0 md:overflow-hidden">
+    <div class="flex flex-wrap items-center justify-between gap-2.5 shrink-0">
       <div class="flex flex-wrap items-center gap-1.5">
         <button
           v-for="opt in statusFilterOptions"
           :key="opt.value"
           type="button"
-          class="min-h-[44px] px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors cursor-pointer"
+          class="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors cursor-pointer min-h-[34px]"
           :class="
             statusFilter === opt.value
               ? 'bg-brand-ink text-brand-onink border-brand-ink'
@@ -161,7 +161,9 @@ onMounted(() => {
 
       <form class="flex items-center gap-2 w-full sm:w-auto" @submit.prevent="fetchContacts">
         <div class="w-full sm:w-64">
+          <label for="admin-contact-search" class="sr-only">Cari pesan kontak</label>
           <UiInput
+            id="admin-contact-search"
             v-model="searchQuery"
             size="sm"
             left-icon="pi-search"
@@ -172,7 +174,7 @@ onMounted(() => {
       </form>
     </div>
 
-    <UiAlert v-if="errorMsg" tone="danger" class="text-xs">
+    <UiAlert v-if="errorMsg" tone="danger" class="text-xs shrink-0">
       <div class="flex items-center justify-between gap-2">
         <span>{{ errorMsg }}</span>
         <UiButton size="sm" variant="outline" @click="fetchContacts">Coba Lagi</UiButton>
@@ -192,10 +194,10 @@ onMounted(() => {
 
     <div
       v-else
-      class="grid grid-cols-1 lg:grid-cols-12 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper overflow-hidden min-h-[460px]"
+      class="grid grid-cols-1 lg:grid-cols-12 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper overflow-hidden md:flex-1 md:min-h-0"
     >
       <div
-        class="lg:col-span-5 divide-y divide-brand-hairsoft border-b lg:border-b-0 lg:border-r border-brand-hair overflow-y-auto max-h-[540px]"
+        class="lg:col-span-5 divide-y divide-brand-hairsoft border-b lg:border-b-0 lg:border-r border-brand-hair overflow-y-auto max-h-[360px] lg:max-h-none md:h-full"
       >
         <button
           v-for="item in items"
@@ -223,7 +225,7 @@ onMounted(() => {
         </button>
       </div>
 
-      <div v-if="selectedItem" class="lg:col-span-7 p-5 space-y-4">
+      <div v-if="selectedItem" class="lg:col-span-7 p-4 space-y-3.5 overflow-y-auto md:h-full">
         <div
           class="flex flex-wrap items-start justify-between gap-2 pb-3 border-b border-brand-hairsoft"
         >

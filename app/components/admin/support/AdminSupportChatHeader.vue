@@ -47,7 +47,7 @@ const statusDotClass = (status: string): string => {
     case 'open':
       return 'bg-brand-accent'
     case 'waiting_admin':
-      return 'bg-brand-warning animate-pulse'
+      return 'bg-brand-warning'
     case 'waiting_customer':
       return 'bg-brand-muted'
     case 'resolved':

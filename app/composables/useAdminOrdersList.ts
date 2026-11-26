@@ -21,7 +21,7 @@ export function useAdminOrdersList() {
   const sortDirection = ref<'desc' | 'asc' | null>(null)
 
   const sortParam = computed(() => {
-    if (!sortKey.value || !sortDirection.value) return ''
+    if (!sortKey.value || !sortDirection.value || sortKey.value === 'items') return ''
     const col = sortKey.value === 'id' ? 'created_at' : sortKey.value
     return `${col}_${sortDirection.value}`
   })
@@ -52,6 +52,8 @@ export function useAdminOrdersList() {
       const params: Record<string, string | number> = { from, to }
       if (activeStatus.value) params.status = activeStatus.value
       if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
+      if (fromDate.value) params.date_from = fromDate.value
+      if (toDate.value) params.date_to = toDate.value
       if (sortParam.value) params.sort = sortParam.value
 
       const res = await $fetch<{
@@ -80,9 +82,23 @@ export function useAdminOrdersList() {
     fetchOrders()
   }
 
+  const resetDateFilters = () => {
+    fromDate.value = ''
+    toDate.value = ''
+    page.value = 1
+    fetchOrders()
+  }
+
   const onSortChange = (payload: { key: string | null; direction: 'desc' | 'asc' | null }) => {
-    sortKey.value = payload.key
+    sortKey.value = payload.direction ? payload.key : null
     sortDirection.value = payload.direction
+    if (sortKey.value === 'items') {
+      const factor = sortDirection.value === 'desc' ? -1 : 1
+      orders.value = [...orders.value].sort(
+        (a, b) => ((a.order_items?.length || 0) - (b.order_items?.length || 0)) * factor,
+      )
+      return
+    }
     page.value = 1
     fetchOrders()
   }
@@ -249,6 +265,7 @@ export function useAdminOrdersList() {
     fetchOrders,
     onStatusChange,
     onSearch,
+    resetDateFilters,
     onSortChange,
     handleExport,
     handleExportCsv,

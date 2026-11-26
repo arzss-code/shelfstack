@@ -103,7 +103,8 @@ describe('Admin Reviews Suite (Moderasi Ulasan Produk)', () => {
 
       expect(wrapper.text()).toContain('Rata-rata Rating')
       expect(wrapper.text()).toContain('4.85 / 5.0')
-
+      expect(wrapper.text()).toContain('% puas')
+      expect(wrapper.text()).toContain('18x')
       expect(wrapper.text()).toContain('Bintang 5 Sempurna')
       expect(wrapper.text()).toContain('18')
 

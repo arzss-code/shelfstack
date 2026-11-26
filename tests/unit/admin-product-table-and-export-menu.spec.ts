@@ -104,8 +104,14 @@ describe('Admin UI Consistency Components', () => {
       global: { stubs: globalStubs },
     })
 
-    await wrapper.get('button').trigger('click')
+    await wrapper.get('tbody button').trigger('click')
     expect(wrapper.emitted('restore')?.[0]).toEqual([99])
+
+    await rowsWrapperSortCheck()
+    async function rowsWrapperSortCheck() {
+      await wrapper.get('thead button').trigger('click')
+      expect(wrapper.get('thead th').attributes('aria-sort')).toBe('descending')
+    }
 
     const emptyWrapper = mount(AdminProductTable, {
       props: { products: [], loading: false, isSearching: true },

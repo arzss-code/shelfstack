@@ -223,7 +223,7 @@ describe('Admin Operational Signals & System Telemetry Suite', () => {
       })
       await flushPromises()
 
-      expect(wrapper.text()).toContain('Sinyal Operasional & Telemetri Sistem')
+      expect(wrapper.text()).toContain('Status Sistem')
       expect(wrapper.text()).toContain('PostgreSQL Supabase')
       expect(wrapper.text()).toContain('Order Service Worker')
       expect(wrapper.text()).toContain('Sukses HTTP API')

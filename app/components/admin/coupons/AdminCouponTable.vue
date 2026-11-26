@@ -2,6 +2,7 @@
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiIconButton from '~/components/ui/UiIconButton.vue'
 import UiEmptyState from '~/components/ui/UiEmptyState.vue'
+import { useClientTableSort } from '~/composables/useClientTableSort'
 
 export interface AdminCoupon {
   id: string
@@ -27,7 +28,7 @@ export interface AdminCoupon {
   created_at: string
 }
 
-defineProps<{
+const props = defineProps<{
   coupons: AdminCoupon[]
   loading: boolean
 }>()
@@ -39,6 +40,32 @@ const emit = defineEmits<{
   viewUsages: [coupon: AdminCoupon]
   create: []
 }>()
+
+const couponColumns = [
+  { key: 'code', label: 'Kode Voucher', ariaLabel: 'kode voucher' },
+  { key: 'name', label: 'Nama & Tipe', ariaLabel: 'nama voucher' },
+  { key: 'discount', label: 'Nilai Diskon', ariaLabel: 'nilai diskon' },
+  { key: 'min_purchase', label: 'Min. Belanja', ariaLabel: 'minimal belanja' },
+  { key: 'coin_cost', label: 'Biaya Koin', ariaLabel: 'biaya koin' },
+  { key: 'usage', label: 'Kuota Pakai', ariaLabel: 'kuota pemakaian' },
+  { key: 'status', label: 'Status', ariaLabel: 'status voucher' },
+] as const
+
+const {
+  sortKey,
+  sortDirection,
+  sortedItems: sortedCoupons,
+  onSortChange,
+  getAriaSort,
+} = useClientTableSort(() => props.coupons, {
+  code: (c) => c.code,
+  name: (c) => c.name,
+  discount: (c) => c.discount_value,
+  min_purchase: (c) => c.min_purchase_cents,
+  coin_cost: (c) => c.coin_cost ?? 0,
+  usage: (c) => c.usage_count,
+  status: (c) => (c.is_expired ? 'Kedaluwarsa' : c.is_active ? 'Aktif' : 'Nonaktif'),
+})
 </script>
 
 <template>
@@ -73,19 +100,29 @@ const emit = defineEmits<{
           class="border-b border-brand-hair bg-brand-canvas-soft text-[11px] font-semibold uppercase tracking-wider text-brand-muted"
         >
           <tr>
-            <th scope="col" class="px-3.5 py-2.5">Kode Voucher</th>
-            <th scope="col" class="px-3.5 py-2.5">Nama & Tipe</th>
-            <th scope="col" class="px-3.5 py-2.5">Nilai Diskon</th>
-            <th scope="col" class="px-3.5 py-2.5">Min. Belanja & Pagu</th>
-            <th scope="col" class="px-3.5 py-2.5">Biaya Koin</th>
-            <th scope="col" class="px-3.5 py-2.5">Kuota Pemakaian</th>
-            <th scope="col" class="px-3.5 py-2.5">Status</th>
+            <th
+              v-for="col in couponColumns"
+              :key="col.key"
+              scope="col"
+              class="px-3.5 py-2.5 whitespace-nowrap"
+              :aria-sort="getAriaSort(col.key)"
+            >
+              <UiSortHeader
+                :sort-key="col.key"
+                :label="col.label"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="onSortChange"
+              >
+                {{ col.label }}
+              </UiSortHeader>
+            </th>
             <th scope="col" class="px-3.5 py-2.5 text-right">Aksi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft">
           <tr
-            v-for="coupon in coupons"
+            v-for="coupon in sortedCoupons"
             :key="coupon.id"
             class="transition-colors hover:bg-brand-canvas-soft/50"
           >
@@ -155,7 +192,7 @@ const emit = defineEmits<{
             </td>
 
             <!-- Status Semantik -->
-            <td class="px-4 py-3.5">
+            <td class="px-3.5 py-2.5">
               <UiBadge
                 :label="coupon.is_expired ? 'Kedaluwarsa' : coupon.is_active ? 'Aktif' : 'Nonaktif'"
                 :variant="coupon.is_expired ? 'danger' : coupon.is_active ? 'success' : 'default'"
@@ -163,7 +200,7 @@ const emit = defineEmits<{
             </td>
 
             <!-- Aksi -->
-            <td class="px-4 py-3.5 text-right">
+            <td class="px-3.5 py-2.5 text-right">
               <div class="inline-flex items-center gap-1">
                 <UiIconButton
                   icon="pi-history"

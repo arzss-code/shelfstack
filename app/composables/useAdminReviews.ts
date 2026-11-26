@@ -1,5 +1,9 @@
 import { ref } from 'vue'
-import type { AdminReviewItem, AdminReviewStatus } from '../../shared/schemas/review'
+import type {
+  AdminReviewItem,
+  AdminReviewStatus,
+  ReviewDistribution,
+} from '../../shared/schemas/review'
 import { useUiToast } from './useUiToast'
 
 export interface AdminReviewMetrics {
@@ -9,6 +13,8 @@ export interface AdminReviewMetrics {
   fiveStar: number
   attention: number
   averageRating: number
+  positiveRate?: number
+  distribution?: ReviewDistribution
 }
 
 export function useAdminReviews() {

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
+import AdminCategoryMetrics from '~/components/admin/categories/AdminCategoryMetrics.vue'
 import AdminCategoryManagerModal from '~/components/admin/products/AdminCategoryManagerModal.vue'
 import { useCategories } from '~/composables/useCategories'
+import { useClientTableSort } from '~/composables/useClientTableSort'
 
 definePageMeta({
   layout: 'admin',
@@ -48,6 +50,50 @@ const totalProductsAcrossCategories = computed(() => {
   return Object.values(categoryCounts.value).reduce((acc, count) => acc + count, 0)
 })
 
+const categoryColumns = [
+  {
+    key: 'order',
+    label: 'Urutan',
+    ariaLabel: 'urutan',
+    thClass: 'text-center w-20',
+    align: 'center' as const,
+  },
+  {
+    key: 'name',
+    label: 'Nama Kategori & Slug',
+    ariaLabel: 'nama kategori',
+    thClass: '',
+    align: 'left' as const,
+  },
+  {
+    key: 'description',
+    label: 'Deskripsi',
+    ariaLabel: 'deskripsi',
+    thClass: '',
+    align: 'left' as const,
+  },
+  {
+    key: 'count',
+    label: 'Produk Aktif',
+    ariaLabel: 'produk aktif',
+    thClass: 'text-center w-32',
+    align: 'center' as const,
+  },
+]
+
+const {
+  sortKey,
+  sortDirection,
+  sortedItems: sortedCategories,
+  onSortChange,
+  getAriaSort,
+} = useClientTableSort(filteredCategories, {
+  order: (cat) => cat.display_order ?? Number.MAX_SAFE_INTEGER,
+  name: (cat) => cat.name,
+  description: (cat) => cat.description || '',
+  count: (cat) => categoryCounts.value[cat.id] ?? 0,
+})
+
 const handleCategoriesUpdated = async () => {
   await fetchCategories()
   await loadCategoryProductCounts()
@@ -62,89 +108,43 @@ onMounted(() => {
 <template>
   <div class="admin-categories-page space-y-5">
     <AdminPageHeader
-      title="Kelola Kategori Katalog"
-      subtitle="Atur urutan kategori etalase, deskripsi kurasi, dan visibilitas produk."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Kelola Kategori' }]"
+      title="Kategori Produk"
+      subtitle="Atur urutan tampilan, deskripsi, dan pengelompokan produk."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Kategori' }]"
     >
       <template #actions>
-        <a
+        <UiButton
+          variant="outline"
+          size="sm"
+          icon="pi-refresh"
+          :loading="pending || loadingCounts"
+          @click="handleCategoriesUpdated"
+        >
+          Muat Ulang
+        </UiButton>
+        <UiButton
           href="/katalog"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center justify-center gap-1.5 rounded-full border border-brand-hair bg-brand-canvas px-4 py-2 text-xs font-semibold text-brand-ink no-underline transition-all hover:border-brand-ink hover:bg-brand-canvas-soft"
+          variant="outline"
+          size="sm"
+          icon="pi-external-link"
         >
-          <i class="pi pi-external-link shrink-0 text-[11px]" aria-hidden="true" />
-          <span>Buka Etalase</span>
-        </a>
+          Buka Etalase
+        </UiButton>
         <UiButton variant="primary" size="sm" icon="pi-plus" @click="isModalOpen = true">
-          Kelola &amp; Tambah Kategori
+          Atur Kategori
         </UiButton>
       </template>
     </AdminPageHeader>
 
-    <!-- Executive Metrics Grid -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div class="rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">
-            Total Kategori
-          </span>
-          <span
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-brand-accent-edge bg-brand-accent-tint text-brand-accent-text"
-          >
-            <i class="pi pi-tags text-xs" aria-hidden="true" />
-          </span>
-        </div>
-        <div
-          class="font-display mt-2 text-xl sm:text-2xl font-bold tracking-tight tabular text-brand-ink"
-        >
-          {{ categories.length }}
-        </div>
-        <p class="mt-1 m-0 text-[11px] text-brand-muted">Kategori aktif pada storefront</p>
-      </div>
-
-      <div class="rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">
-            Total Produk Terkatalog
-          </span>
-          <span
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-brand-success-edge bg-brand-success-tint text-brand-success-text"
-          >
-            <i class="pi pi-box text-xs" aria-hidden="true" />
-          </span>
-        </div>
-        <div
-          class="font-display mt-2 text-xl sm:text-2xl font-bold tracking-tight tabular text-brand-ink"
-        >
-          {{ totalProductsAcrossCategories }}
-        </div>
-        <p class="mt-1 m-0 text-[11px] text-brand-muted">Total inventaris aktif terdistribusi</p>
-      </div>
-
-      <div class="rounded-card border border-brand-hair bg-brand-canvas p-4 shadow-whisper">
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">
-            Rata-rata Produk/Kategori
-          </span>
-          <span
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-brand-accent-edge bg-brand-accent-tint text-brand-accent-text"
-          >
-            <i class="pi pi-chart-pie text-xs" aria-hidden="true" />
-          </span>
-        </div>
-        <div
-          class="font-display mt-2 text-xl sm:text-2xl font-bold tracking-tight tabular text-brand-ink"
-        >
-          {{
-            categories.length > 0
-              ? (totalProductsAcrossCategories / categories.length).toFixed(1)
-              : '0'
-          }}
-        </div>
-        <p class="mt-1 m-0 text-[11px] text-brand-muted">Kerapatan kurasi produk</p>
-      </div>
-    </div>
+    <AdminCategoryMetrics
+      :category-count="categories.length"
+      :total-products="totalProductsAcrossCategories"
+      :average-per-category="
+        categories.length > 0 ? (totalProductsAcrossCategories / categories.length).toFixed(1) : '0'
+      "
+    />
 
     <!-- Search & Filter Controls -->
     <div
@@ -185,16 +185,31 @@ onMounted(() => {
             <tr
               class="border-b border-brand-hair bg-brand-canvas-soft text-[11px] font-semibold uppercase tracking-wider text-brand-muted"
             >
-              <th scope="col" class="py-2.5 px-3.5 text-center w-16">Urutan</th>
-              <th scope="col" class="py-2.5 px-3.5">Nama Kategori &amp; Slug</th>
-              <th scope="col" class="py-2.5 px-3.5">Deskripsi Kurasi</th>
-              <th scope="col" class="py-2.5 px-3.5 text-center w-28">Produk Aktif</th>
-              <th scope="col" class="py-2.5 px-3.5 text-right w-44">Tindakan</th>
+              <th
+                v-for="col in categoryColumns"
+                :key="col.key"
+                scope="col"
+                class="py-2.5 px-3.5"
+                :class="col.thClass"
+                :aria-sort="getAriaSort(col.key)"
+              >
+                <UiSortHeader
+                  :sort-key="col.key"
+                  :label="col.label"
+                  :align="col.align"
+                  :active-key="sortKey"
+                  :direction="sortDirection"
+                  @sort="onSortChange"
+                >
+                  {{ col.label }}
+                </UiSortHeader>
+              </th>
+              <th scope="col" class="py-2.5 px-3.5 text-right w-44">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-brand-hairsoft">
             <tr
-              v-for="cat in filteredCategories"
+              v-for="cat in sortedCategories"
               :key="cat.id"
               class="transition-colors hover:bg-brand-canvas-soft/40"
             >

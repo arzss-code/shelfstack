@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useAdminUsers } from '~/composables/useAdminUsers'
+import { useClientTableSort } from '~/composables/useClientTableSort'
 import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminUserMetrics from '~/components/admin/users/AdminUserMetrics.vue'
 import UiInput from '~/components/ui/UiInput.vue'
@@ -14,9 +15,8 @@ import type { AdminCustomerSummary } from '~~/shared/types/admin-crm'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 useSeoMeta({
-  title: 'CRM Pelanggan & LTV - ShelfStack Admin',
-  description:
-    'Kelola basis data pelanggan resmi ShelfStack, pantau Customer Lifetime Value (LTV), dan riwayat belanja.',
+  title: 'Data Pelanggan - Admin ShelfStack',
+  description: 'Daftar pelanggan, riwayat transaksi, dan total belanja di ShelfStack.',
 })
 
 const {
@@ -36,6 +36,57 @@ const {
 
 const selectedCustomer = ref<AdminCustomerSummary | null>(null)
 const isDetailDrawerOpen = ref(false)
+
+const userColumns = [
+  { key: 'name', label: 'Pelanggan', ariaLabel: 'pelanggan', thClass: '', align: 'left' as const },
+  {
+    key: 'createdAt',
+    label: 'Terdaftar',
+    ariaLabel: 'tanggal daftar',
+    thClass: '',
+    align: 'left' as const,
+  },
+  {
+    key: 'totalOrders',
+    label: 'Pesanan',
+    ariaLabel: 'total pesanan',
+    thClass: 'text-center',
+    align: 'center' as const,
+  },
+  {
+    key: 'ltv',
+    label: 'Total Belanja',
+    ariaLabel: 'nilai belanja',
+    thClass: 'text-right',
+    align: 'right' as const,
+  },
+  {
+    key: 'lastOrderAt',
+    label: 'Pesanan Terakhir',
+    ariaLabel: 'pesanan terakhir',
+    thClass: '',
+    align: 'left' as const,
+  },
+]
+
+const {
+  sortKey,
+  sortDirection,
+  sortedItems: sortedCustomers,
+  onSortChange,
+  resetSort,
+  getAriaSort,
+} = useClientTableSort(customers, {
+  name: (c) => c.fullName,
+  createdAt: (c) => (c.createdAt ? new Date(c.createdAt).getTime() : null),
+  totalOrders: (c) => c.totalOrders,
+  ltv: (c) => c.totalSpentCents,
+  lastOrderAt: (c) => (c.lastOrderAt ? new Date(c.lastOrderAt).getTime() : null),
+})
+
+watch(selectedSort, () => {
+  resetSort()
+})
 
 const openCustomerDetail = (customer: AdminCustomerSummary) => {
   selectedCustomer.value = customer
@@ -59,9 +110,9 @@ const formatDate = (dateStr?: string | null) => {
 <template>
   <div class="admin-users-page space-y-5">
     <AdminPageHeader
-      title="Pelanggan & Customer Lifetime Value"
-      subtitle="Daftar pelanggan terdaftar, total pesanan, dan akumulasi nilai belanja."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Pelanggan & CRM' }]"
+      title="Data Pelanggan"
+      subtitle="Riwayat transaksi dan total belanja per pelanggan."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Pelanggan' }]"
     >
       <template #actions>
         <UiButton
@@ -71,7 +122,7 @@ const formatDate = (dateStr?: string | null) => {
           :loading="loading"
           @click="fetchCustomers"
         >
-          Segarkan Data
+          Muat Ulang
         </UiButton>
       </template>
     </AdminPageHeader>
@@ -136,19 +187,31 @@ const formatDate = (dateStr?: string | null) => {
             <tr
               class="border-b border-brand-hair bg-brand-canvas-soft text-brand-muted uppercase tracking-wider text-[11px]"
             >
-              <th scope="col" class="py-2.5 px-3.5 font-semibold">Pelanggan</th>
-              <th scope="col" class="py-2.5 px-3.5 font-semibold">Terdaftar</th>
-              <th scope="col" class="py-2.5 px-3.5 font-semibold text-center">Total Pesanan</th>
-              <th scope="col" class="py-2.5 px-3.5 font-semibold text-right">
-                Nilai Belanja (LTV)
+              <th
+                v-for="col in userColumns"
+                :key="col.key"
+                scope="col"
+                class="py-2.5 px-3.5"
+                :class="col.thClass"
+                :aria-sort="getAriaSort(col.key)"
+              >
+                <UiSortHeader
+                  :sort-key="col.key"
+                  :label="col.label"
+                  :align="col.align"
+                  :active-key="sortKey"
+                  :direction="sortDirection"
+                  @sort="onSortChange"
+                >
+                  {{ col.label }}
+                </UiSortHeader>
               </th>
-              <th scope="col" class="py-2.5 px-3.5 font-semibold">Pesanan Terakhir</th>
               <th scope="col" class="py-2.5 px-3.5 font-semibold text-center">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
             <tr
-              v-for="c in customers"
+              v-for="c in sortedCustomers"
               :key="c.userId"
               class="hover:bg-brand-canvas-soft/40 transition-colors"
             >

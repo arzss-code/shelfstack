@@ -15,18 +15,20 @@ const unreadSupportCount = computed(() => {
   return threads.value?.reduce((acc, t) => acc + (t.unread_by_admin_count || 0), 0) ?? 0
 })
 
+const isCompactWorkspace = computed(() => route.path.startsWith('/admin/support'))
+
 const navLinks: AdminNavLink[] = [
-  { to: '/admin', label: 'Dashboard', icon: 'pi-chart-bar', exact: true },
-  { to: '/admin/orders', label: 'Kelola Pesanan', icon: 'pi-shopping-bag', exact: false },
-  { to: '/admin/users', label: 'Pelanggan & CRM', icon: 'pi-users', exact: false },
+  { to: '/admin', label: 'Ringkasan', icon: 'pi-chart-bar', exact: true },
+  { to: '/admin/orders', label: 'Pesanan', icon: 'pi-shopping-bag', exact: false },
+  { to: '/admin/users', label: 'Pelanggan', icon: 'pi-users', exact: false },
   { to: '/admin/returns', label: 'Komplain & Retur', icon: 'pi-replay', exact: false },
-  { to: '/admin/support', label: 'Bantuan & Live Chat', icon: 'pi-comments', exact: false },
-  { to: '/admin/products', label: 'Kelola Produk', icon: 'pi-th-large', exact: false },
-  { to: '/admin/categories', label: 'Kelola Kategori', icon: 'pi-tags', exact: false },
-  { to: '/admin/reviews', label: 'Ulasan Produk', icon: 'pi-star', exact: false },
-  { to: '/admin/promotions', label: 'Promo & Flash Sale', icon: 'pi-bolt', exact: false },
-  { to: '/admin/coupons', label: 'Kelola Voucher', icon: 'pi-ticket', exact: false },
-  { to: '/admin/activities', label: 'Activity Log', icon: 'pi-history', exact: false },
+  { to: '/admin/support', label: 'Bantuan & Chat', icon: 'pi-comments', exact: false },
+  { to: '/admin/products', label: 'Produk', icon: 'pi-th-large', exact: false },
+  { to: '/admin/categories', label: 'Kategori', icon: 'pi-tags', exact: false },
+  { to: '/admin/reviews', label: 'Ulasan', icon: 'pi-star', exact: false },
+  { to: '/admin/promotions', label: 'Flash Sale', icon: 'pi-bolt', exact: false },
+  { to: '/admin/coupons', label: 'Voucher', icon: 'pi-ticket', exact: false },
+  { to: '/admin/activities', label: 'Aktivitas & Sistem', icon: 'pi-history', exact: false },
 ]
 
 // Close mobile menu on route change
@@ -173,11 +175,14 @@ onMounted(() => {
       </aside>
     </Transition>
 
-    <!-- Main Admin Body with Dedicated Back-Office Header -->
-    <div class="flex min-w-0 flex-1 flex-col">
-      <!-- Dedicated Admin Header Bar (No Consumer Navbar Bleed) -->
+    <!-- Main Admin Body -->
+    <div
+      class="flex min-w-0 flex-1 flex-col"
+      :class="isCompactWorkspace ? 'md:h-[100dvh] md:overflow-hidden' : ''"
+    >
+      <!-- Dedicated Admin Header Bar -->
       <header
-        class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-brand-hair bg-brand-canvas/90 backdrop-blur-md px-4 sm:px-6 lg:px-8"
+        class="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between border-b border-brand-hair bg-brand-canvas/95 backdrop-blur-md px-4 sm:px-6 lg:px-8"
       >
         <div class="flex items-center gap-3">
           <!-- Mobile Hamburger Toggle -->
@@ -189,18 +194,13 @@ onMounted(() => {
           >
             <i class="pi pi-bars text-sm" />
             <span v-if="unreadSupportCount > 0" class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-              <span
-                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-danger opacity-75"
-              />
               <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-danger" />
             </span>
           </button>
           <div class="flex items-center gap-2">
             <span class="font-display text-sm font-bold text-brand-ink">ShelfStack</span>
             <span class="text-xs text-brand-muted hidden sm:inline">/</span>
-            <span class="text-xs font-medium text-brand-muted hidden sm:inline"
-              >Back-Office Command</span
-            >
+            <span class="text-xs font-medium text-brand-muted hidden sm:inline">Panel Admin</span>
           </div>
         </div>
 
@@ -238,7 +238,12 @@ onMounted(() => {
       <main
         id="admin-main-content"
         tabindex="-1"
-        class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 pb-12 focus:outline-none"
+        class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 focus:outline-none"
+        :class="
+          isCompactWorkspace
+            ? 'py-4 pb-6 md:py-3 md:pb-3 md:min-h-0 md:overflow-hidden md:flex md:flex-col'
+            : 'py-5 pb-12'
+        "
       >
         <slot />
       </main>
@@ -246,11 +251,9 @@ onMounted(() => {
       <!-- Minimal Admin Footer -->
       <footer
         class="border-t border-brand-hairsoft py-4 px-4 sm:px-6 lg:px-8 text-center text-xs text-brand-muted"
+        :class="isCompactWorkspace ? 'md:hidden' : ''"
       >
-        <span
-          >ShelfStack Admin Workspace &copy; {{ new Date().getFullYear() }}, Strict Operations
-          Mode</span
-        >
+        <span>ShelfStack Admin &copy; {{ new Date().getFullYear() }}</span>
       </footer>
     </div>
   </div>

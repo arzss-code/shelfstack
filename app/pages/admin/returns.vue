@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminReturnMetrics from '~/components/admin/returns/AdminReturnMetrics.vue'
+import { useClientTableSort } from '~/composables/useClientTableSort'
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 import UiInput from '~/components/ui/UiInput.vue'
@@ -39,13 +40,35 @@ const selectedTicket = ref<ReturnRequestItem | null>(null)
 const isDetailModalOpen = ref(false)
 
 const statusFilterTabs = [
-  { id: 'all', label: 'Semua' },
-  { id: 'requested', label: 'Menunggu Review' },
-  { id: 'approved', label: 'Disetujui' },
-  { id: 'item_received', label: 'Di Gudang' },
-  { id: 'completed', label: 'Selesai' },
-  { id: 'rejected', label: 'Ditolak' },
+  { value: 'all', label: 'Semua' },
+  { value: 'requested', label: 'Menunggu Review' },
+  { value: 'approved', label: 'Disetujui' },
+  { value: 'item_received', label: 'Di Gudang' },
+  { value: 'completed', label: 'Selesai' },
+  { value: 'rejected', label: 'Ditolak' },
 ]
+
+const returnColumns = [
+  { key: 'order', label: 'Pesanan & Pemohon', ariaLabel: 'pesanan dan pemohon' },
+  { key: 'reason', label: 'Alasan Kendala', ariaLabel: 'alasan kendala' },
+  { key: 'solution', label: 'Opsi Solusi', ariaLabel: 'opsi solusi' },
+  { key: 'status', label: 'Status Tiket', ariaLabel: 'status tiket' },
+  { key: 'created_at', label: 'Tanggal Pengajuan', ariaLabel: 'tanggal pengajuan' },
+] as const
+
+const {
+  sortKey,
+  sortDirection,
+  sortedItems: sortedReturns,
+  onSortChange,
+  getAriaSort,
+} = useClientTableSort(returnsList, {
+  order: (item) => `${item.order_number} ${item.customer_name}`,
+  reason: (item) => RETURN_REASON_LABELS[item.reason_type] || item.reason_type,
+  solution: (item) => (item.solution_type === 'refund' ? 'Refund' : 'Tukar Unit'),
+  status: (item) => RETURN_STATUS_MAP[item.status]?.label || item.status,
+  created_at: (item) => new Date(item.created_at).getTime() || 0,
+})
 
 const fetchReturns = async () => {
   isLoading.value = true
@@ -111,8 +134,8 @@ onMounted(() => {
 <template>
   <div class="space-y-5 text-brand-ink">
     <AdminPageHeader
-      title="Kelola Komplain & Retur Produk"
-      subtitle="Tinjau pengajuan retur, status pengiriman kembali, dan penyelesaian garansi."
+      title="Komplain & Retur"
+      subtitle="Pengajuan pengembalian barang, tukar unit, dan pengembalian dana."
       :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Komplain & Retur' }]"
     >
       <template #actions>
@@ -123,7 +146,7 @@ onMounted(() => {
           :loading="isLoading"
           @click="fetchReturns"
         >
-          Segarkan Data
+          Muat Ulang
         </UiButton>
       </template>
     </AdminPageHeader>
@@ -140,23 +163,11 @@ onMounted(() => {
     <div
       class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper"
     >
-      <!-- Status Tabs -->
-      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-        <button
-          v-for="tab in statusFilterTabs"
-          :key="tab.id"
-          type="button"
-          class="rounded-full px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all cursor-pointer min-h-[34px] border-0"
-          :class="
-            activeStatusFilter === tab.id
-              ? 'bg-brand-ink text-brand-onink shadow-whisper'
-              : 'bg-transparent text-brand-muted hover:bg-brand-canvas-soft hover:text-brand-ink'
-          "
-          @click="activeStatusFilter = tab.id"
-        >
-          {{ tab.label }}
-        </button>
-      </div>
+      <UiTabs
+        v-model="activeStatusFilter"
+        :items="statusFilterTabs"
+        aria-label="Filter status retur"
+      />
 
       <!-- Search Input -->
       <div class="w-full sm:w-64">
@@ -188,11 +199,23 @@ onMounted(() => {
             <tr
               class="border-b border-brand-hair bg-brand-canvas-soft text-[11px] font-semibold text-brand-muted uppercase tracking-wider"
             >
-              <th scope="col" class="py-2.5 px-3.5">Pesanan &amp; Pemohon</th>
-              <th scope="col" class="py-2.5 px-3.5">Alasan Kendala</th>
-              <th scope="col" class="py-2.5 px-3.5">Opsi Solusi</th>
-              <th scope="col" class="py-2.5 px-3.5">Status Tiket</th>
-              <th scope="col" class="py-2.5 px-3.5">Tanggal Pengajuan</th>
+              <th
+                v-for="col in returnColumns"
+                :key="col.key"
+                scope="col"
+                class="py-2.5 px-3.5 whitespace-nowrap"
+                :aria-sort="getAriaSort(col.key)"
+              >
+                <UiSortHeader
+                  :sort-key="col.key"
+                  :label="col.label"
+                  :active-key="sortKey"
+                  :direction="sortDirection"
+                  @sort="onSortChange"
+                >
+                  {{ col.label }}
+                </UiSortHeader>
+              </th>
               <th scope="col" class="py-2.5 px-3.5 text-right">Tindakan</th>
             </tr>
           </thead>
@@ -204,7 +227,7 @@ onMounted(() => {
               </td>
             </tr>
 
-            <tr v-else-if="returnsList.length === 0">
+            <tr v-else-if="sortedReturns.length === 0">
               <td colspan="6" class="py-12 text-center text-brand-muted">
                 <i class="pi pi-inbox text-2xl" aria-hidden="true" />
                 <p class="mt-2 font-medium text-xs">Tidak ada pengajuan retur yang cocok.</p>
@@ -212,7 +235,7 @@ onMounted(() => {
             </tr>
 
             <tr
-              v-for="item in returnsList"
+              v-for="item in sortedReturns"
               v-else
               :key="item.id"
               class="hover:bg-brand-canvas-soft/60 transition-colors"

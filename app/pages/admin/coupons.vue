@@ -45,18 +45,27 @@ const {
 <template>
   <div class="admin-coupons-page space-y-5">
     <AdminPageHeader
-      title="Kelola Voucher Promo"
-      subtitle="Atur kode kupon diskon, voucher penukaran koin, dan batas pemakaian."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Kelola Voucher' }]"
+      title="Voucher Diskon"
+      subtitle="Atur kode diskon checkout, voucher koin, dan kuota pemakaian."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Voucher' }]"
     >
       <template #actions>
+        <UiButton
+          variant="outline"
+          size="sm"
+          icon="pi-refresh"
+          :loading="loading"
+          @click="fetchCoupons"
+        >
+          Muat Ulang
+        </UiButton>
         <UiButton variant="primary" size="sm" icon="pi-plus" @click="openCreateModal">
-          Buat Voucher Baru
+          Buat Voucher
         </UiButton>
       </template>
     </AdminPageHeader>
 
-    <!-- Executive Metrics Bento Grid -->
+    <!-- Metrics Grid -->
     <AdminCouponMetrics :metrics="metrics" />
 
     <!-- Filter & Search Bar -->
@@ -64,9 +73,12 @@ const {
       class="relative z-20 flex flex-col items-stretch justify-between gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper sm:flex-row sm:items-center"
     >
       <div class="w-full sm:w-72">
+        <label for="admin-coupons-search" class="sr-only">Cari kode atau nama voucher</label>
         <UiInput
+          id="admin-coupons-search"
           v-model="searchQuery"
           size="sm"
+          type="search"
           placeholder="Cari kode atau nama voucher..."
           left-icon="pi-search"
           @input="fetchCoupons"
@@ -94,15 +106,6 @@ const {
             @change="fetchCoupons"
           />
         </div>
-
-        <UiIconButton
-          icon="pi-sync"
-          label="Segarkan data"
-          variant="neutral"
-          size="sm"
-          :loading="loading"
-          @click="fetchCoupons"
-        />
       </div>
     </div>
 

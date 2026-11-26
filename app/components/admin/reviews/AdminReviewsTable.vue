@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { AdminReviewItem } from '~~/shared/schemas/review'
+import { useClientTableSort } from '~/composables/useClientTableSort'
 
-defineProps<{
+const props = defineProps<{
   reviews: AdminReviewItem[]
   loading: boolean
   mutatingId: string | null
@@ -17,6 +18,30 @@ const emit = defineEmits<{
   (e: 'toggleStatus', review: AdminReviewItem): void
   (e: 'pageChange', page: number): void
 }>()
+
+const reviewColumns = [
+  { key: 'product', label: 'Produk', ariaLabel: 'produk', thClass: 'min-w-[200px]' },
+  { key: 'reviewer', label: 'Pelanggan', ariaLabel: 'pelanggan', thClass: 'min-w-[150px]' },
+  { key: 'rating', label: 'Rating', ariaLabel: 'rating', thClass: 'min-w-[120px]' },
+  { key: 'review_text', label: 'Isi Ulasan', ariaLabel: 'isi ulasan', thClass: 'min-w-[240px]' },
+  { key: 'created_at', label: 'Tanggal', ariaLabel: 'tanggal', thClass: 'min-w-[110px]' },
+  { key: 'status', label: 'Status', ariaLabel: 'status moderasi', thClass: 'min-w-[120px]' },
+] as const
+
+const {
+  sortKey,
+  sortDirection,
+  sortedItems: sortedReviews,
+  onSortChange,
+  getAriaSort,
+} = useClientTableSort(() => props.reviews, {
+  product: (r) => r.product_name,
+  reviewer: (r) => r.reviewer_name,
+  rating: (r) => r.rating,
+  review_text: (r) => r.review_text,
+  created_at: (r) => new Date(r.created_at).getTime() || 0,
+  status: (r) => (r.deleted_at ? 'Disembunyikan' : 'Aktif'),
+})
 
 const formatDate = (isoStr: string): string => {
   try {
@@ -49,13 +74,25 @@ const formatDate = (isoStr: string): string => {
           class="bg-brand-canvas-soft border-b border-brand-hair text-brand-muted uppercase tracking-wider text-[11px] font-semibold"
         >
           <tr>
-            <th scope="col" class="py-2.5 px-3.5 min-w-[200px]">Produk</th>
-            <th scope="col" class="py-2.5 px-3.5 min-w-[150px]">Pelanggan</th>
-            <th scope="col" class="py-2.5 px-3.5 min-w-[120px]">Rating</th>
-            <th scope="col" class="py-2.5 px-3.5 min-w-[260px]">Isi Ulasan</th>
-            <th scope="col" class="py-2.5 px-3.5 min-w-[110px]">Tanggal</th>
-            <th scope="col" class="py-2.5 px-3.5 min-w-[120px]">Status</th>
-            <th scope="col" class="py-2.5 px-3.5 text-right min-w-[120px]">Aksi Moderasi</th>
+            <th
+              v-for="col in reviewColumns"
+              :key="col.key"
+              scope="col"
+              class="py-2.5 px-3.5"
+              :class="col.thClass"
+              :aria-sort="getAriaSort(col.key)"
+            >
+              <UiSortHeader
+                :sort-key="col.key"
+                :label="col.label"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="onSortChange"
+              >
+                {{ col.label }}
+              </UiSortHeader>
+            </th>
+            <th scope="col" class="py-2.5 px-3.5 text-right min-w-[120px]">Aksi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
@@ -70,7 +107,7 @@ const formatDate = (isoStr: string): string => {
           </tr>
 
           <!-- Empty State -->
-          <tr v-else-if="reviews.length === 0">
+          <tr v-else-if="sortedReviews.length === 0">
             <td colspan="7" class="py-16 text-center text-brand-muted">
               <div class="max-w-sm mx-auto space-y-2">
                 <div
@@ -90,7 +127,7 @@ const formatDate = (isoStr: string): string => {
 
           <!-- Row List -->
           <tr
-            v-for="review in reviews"
+            v-for="review in sortedReviews"
             v-else
             :key="review.id"
             class="hover:bg-brand-canvas-soft/40 transition-colors"

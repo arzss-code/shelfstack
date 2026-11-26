@@ -1,10 +1,27 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { AdminReviewMetrics } from '~/composables/useAdminReviews'
 
-defineProps<{
+const props = defineProps<{
   metrics: AdminReviewMetrics
   loading: boolean
 }>()
+
+const filledStarsCount = computed(() =>
+  props.metrics.active > 0 ? Math.min(5, Math.max(0, Math.round(props.metrics.averageRating))) : 0,
+)
+
+const satisfactionRate = computed(() => {
+  if (typeof props.metrics.positiveRate === 'number') return props.metrics.positiveRate
+  if (props.metrics.active <= 0) return 0
+  const positiveFallback = Math.max(0, props.metrics.active - props.metrics.attention)
+  return Math.round((positiveFallback / props.metrics.active) * 100)
+})
+
+const fourStarCount = computed(() => {
+  if (props.metrics.distribution) return props.metrics.distribution[4]
+  return Math.max(0, props.metrics.active - props.metrics.fiveStar - props.metrics.attention)
+})
 </script>
 
 <template>
@@ -48,11 +65,36 @@ defineProps<{
         </div>
       </div>
       <div>
-        <p class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tabular">
-          {{ metrics.averageRating }} / 5.0
-        </p>
-        <div class="flex items-center gap-1 text-brand-warning mt-1" aria-hidden="true">
-          <i v-for="i in 5" :key="i" class="pi pi-star-fill text-[11px]" />
+        <div class="flex items-baseline justify-between gap-2">
+          <p class="font-display text-xl sm:text-2xl font-bold text-brand-ink m-0 tabular-nums">
+            <template v-if="metrics.active > 0"> {{ metrics.averageRating }} / 5.0 </template>
+            <template v-else> 0.0 / 5.0 </template>
+          </p>
+          <span
+            v-if="metrics.active > 0"
+            class="text-[11px] font-semibold text-brand-success-text tabular-nums"
+          >
+            {{ satisfactionRate }}% puas
+          </span>
+        </div>
+
+        <div class="flex items-center justify-between gap-2 mt-1">
+          <div class="flex items-center gap-0.5" aria-hidden="true">
+            <i
+              v-for="i in 5"
+              :key="i"
+              class="pi text-[10px]"
+              :class="
+                i <= filledStarsCount
+                  ? 'pi-star-fill text-brand-warning'
+                  : 'pi-star text-brand-hair'
+              "
+            />
+          </div>
+          <span v-if="metrics.active > 0" class="text-[11px] text-brand-muted tabular-nums">
+            {{ metrics.fiveStar }}x ★5 · {{ fourStarCount }}x ★4
+          </span>
+          <span v-else class="text-[11px] text-brand-muted">Belum ada ulasan</span>
         </div>
       </div>
     </div>

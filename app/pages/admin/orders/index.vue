@@ -34,6 +34,7 @@ const {
   fetchOrders,
   onStatusChange,
   onSearch,
+  resetDateFilters,
   onSortChange,
   handleExport,
   prevPage,
@@ -45,8 +46,8 @@ const {
   <div class="space-y-5">
     <AdminPageHeader
       title="Kelola Pesanan"
-      subtitle="Pantau pesanan masuk, verifikasi pembayaran, dan perbarui status pengiriman."
-      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Kelola Pesanan' }]"
+      subtitle="Daftar pesanan masuk, verifikasi pembayaran, dan status pengiriman."
+      :breadcrumbs="[{ label: 'Dashboard', to: '/admin' }, { label: 'Pesanan' }]"
     >
       <template #actions>
         <AdminOrderExportMenu
@@ -62,7 +63,7 @@ const {
           :loading="loading"
           @click="fetchOrders"
         >
-          Perbarui
+          Muat Ulang
         </UiButton>
       </template>
     </AdminPageHeader>
@@ -84,7 +85,7 @@ const {
 
       <!-- Search & Filter Form -->
       <form class="flex flex-wrap items-center gap-2" @submit.prevent="onSearch">
-        <label for="admin-orders-search" class="sr-only">Cari ID / Nama</label>
+        <label for="admin-orders-search" class="sr-only">Cari ID atau nama pelanggan</label>
         <div class="w-full sm:w-56">
           <UiInput
             id="admin-orders-search"
@@ -96,31 +97,51 @@ const {
           />
         </div>
 
-        <label for="admin-orders-from" class="sr-only">Tanggal mulai</label>
-        <div class="w-full sm:w-36">
-          <UiInput
+        <div
+          class="flex w-full items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3 py-1 sm:w-auto"
+        >
+          <label
+            for="admin-orders-from"
+            class="shrink-0 text-[11px] font-semibold text-brand-muted"
+          >
+            Dari
+          </label>
+          <input
             id="admin-orders-from"
             v-model="fromDate"
             type="date"
-            size="sm"
-            title="Tanggal mulai"
+            aria-label="Tanggal mulai pesanan"
+            title="Pilih tanggal awal periode pesanan"
+            class="min-w-0 flex-1 bg-transparent py-0.5 text-xs text-brand-ink focus:outline-none"
           />
         </div>
 
-        <span class="hidden text-xs text-brand-muted sm:inline">s.d.</span>
-
-        <label for="admin-orders-to" class="sr-only">Tanggal akhir</label>
-        <div class="w-full sm:w-36">
-          <UiInput
+        <div
+          class="flex w-full items-center gap-2 rounded-full border border-brand-hair bg-brand-canvas px-3 py-1 sm:w-auto"
+        >
+          <label for="admin-orders-to" class="shrink-0 text-[11px] font-semibold text-brand-muted">
+            Sampai
+          </label>
+          <input
             id="admin-orders-to"
             v-model="toDate"
             type="date"
-            size="sm"
-            title="Tanggal akhir"
+            aria-label="Tanggal akhir pesanan"
+            title="Pilih tanggal akhir periode pesanan"
+            class="min-w-0 flex-1 bg-transparent py-0.5 text-xs text-brand-ink focus:outline-none"
           />
         </div>
 
         <UiButton variant="secondary" size="sm" type="submit">Cari</UiButton>
+        <UiButton
+          v-if="fromDate || toDate"
+          variant="ghost"
+          size="sm"
+          type="button"
+          @click="resetDateFilters"
+        >
+          Reset Tanggal
+        </UiButton>
       </form>
     </div>
 

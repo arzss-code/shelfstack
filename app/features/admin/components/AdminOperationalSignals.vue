@@ -19,12 +19,12 @@ const {
 const systemToneBadge = computed(() => {
   switch (systemTone.value) {
     case 'success':
-      return { variant: 'success' as const, label: 'Sistem Optimal' }
+      return { variant: 'success' as const, label: 'Normal' }
     case 'danger':
-      return { variant: 'danger' as const, label: 'Koneksi Terputus' }
+      return { variant: 'danger' as const, label: 'Gangguan' }
     case 'warning':
     default:
-      return { variant: 'warning' as const, label: 'Perhatian Sistem' }
+      return { variant: 'warning' as const, label: 'Perlu Diperiksa' }
   }
 })
 </script>
@@ -32,7 +32,7 @@ const systemToneBadge = computed(() => {
 <template>
   <section
     aria-labelledby="operational-signals-heading"
-    class="rounded-card border border-brand-hair bg-brand-canvas-soft p-5 sm:p-6 shadow-whisper space-y-5"
+    class="rounded-card border border-brand-hair bg-brand-canvas p-5 shadow-whisper space-y-4"
   >
     <!-- Section Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -40,29 +40,29 @@ const systemToneBadge = computed(() => {
         <div class="flex flex-wrap items-center gap-2.5">
           <h2
             id="operational-signals-heading"
-            class="font-display text-base sm:text-lg font-bold text-brand-ink m-0"
+            class="font-display text-base font-bold text-brand-ink m-0"
           >
-            Sinyal Operasional &amp; Telemetri Sistem
+            Status Sistem
           </h2>
           <UiBadge :label="systemToneBadge.label" :variant="systemToneBadge.variant" />
         </div>
         <p class="font-body text-xs text-brand-muted m-0">
-          Observabilitas keandalan basis data, integrasi pembayaran, dan performa layanan.
+          Koneksi database, worker antrean pesanan, dan performa endpoint layanan.
         </p>
       </div>
 
       <div class="flex items-center gap-2.5 self-start sm:self-auto">
-        <span v-if="lastRefreshedAt" class="text-[11px] text-brand-muted tabular">
-          Diperbarui: {{ lastRefreshedAt }}
+        <span v-if="lastRefreshedAt" class="text-[11px] text-brand-muted tabular-nums">
+          Terakhir dicek: {{ lastRefreshedAt }}
         </span>
         <UiButton
-          variant="secondary"
+          variant="outline"
           size="sm"
           icon="pi-refresh"
           :loading="refreshing"
           @click="fetchSignals(true)"
         >
-          Sinkronkan
+          Muat Ulang
         </UiButton>
       </div>
     </div>
@@ -85,7 +85,7 @@ const systemToneBadge = computed(() => {
         <div class="flex items-center gap-2.5">
           <div
             class="w-2.5 h-2.5 rounded-full"
-            :class="isDatabaseUp ? 'bg-brand-success animate-pulse' : 'bg-brand-danger'"
+            :class="isDatabaseUp ? 'bg-brand-success' : 'bg-brand-danger'"
           />
           <div>
             <span class="text-xs font-semibold text-brand-ink block">PostgreSQL Supabase</span>

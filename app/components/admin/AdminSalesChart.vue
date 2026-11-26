@@ -47,57 +47,41 @@ onMounted(() => {
 })
 
 const svgWidth = 800
-const svgHeight = 220
+const svgHeight = 228
 const padLeft = 65
 const padRight = 25
-const padTop = 20
+const padTop = 28
 const padBottom = 35
-
-const chartWidth = computed(() => svgWidth - padLeft - padRight)
-const chartHeight = computed(() => svgHeight - padTop - padBottom)
+const chartWidth = svgWidth - padLeft - padRight
+const chartHeight = svgHeight - padTop - padBottom
 const points = computed<TrendDataPoint[]>(() => trendsData.value?.points || [])
-
+const hitWidth = computed(() => Math.max(32, chartWidth / Math.max(points.value.length - 1, 1)))
 const maxRevenue = computed(() => {
   const max = Math.max(...points.value.map((p) => p.revenue), 0)
   return max === 0 ? 1000000 : max * 1.15
 })
-
-const gridLevels = computed(() => {
-  const max = maxRevenue.value
-  return [
-    { value: max, y: padTop },
-    { value: max * 0.66, y: padTop + chartHeight.value * 0.33 },
-    { value: max * 0.33, y: padTop + chartHeight.value * 0.66 },
-    { value: 0, y: padTop + chartHeight.value },
-  ]
-})
-
+const gridLevels = computed(() => [
+  { value: maxRevenue.value, y: padTop },
+  { value: maxRevenue.value * 0.66, y: padTop + chartHeight * 0.33 },
+  { value: maxRevenue.value * 0.33, y: padTop + chartHeight * 0.66 },
+  { value: 0, y: padTop + chartHeight },
+])
 const calculatedCoords = computed(() => {
   const total = points.value.length
-  if (total === 0) return []
-  return points.value.map((pt, idx) => {
-    const x =
-      total > 1 ? padLeft + (idx / (total - 1)) * chartWidth.value : padLeft + chartWidth.value / 2
-    const y = padTop + chartHeight.value - (pt.revenue / maxRevenue.value) * chartHeight.value
-    return { x, y, pt }
-  })
+  return points.value.map((pt, idx) => ({
+    x: total > 1 ? padLeft + (idx / (total - 1)) * chartWidth : padLeft + chartWidth / 2,
+    y: padTop + chartHeight - (pt.revenue / maxRevenue.value) * chartHeight,
+    pt,
+  }))
 })
-
-const linePath = computed(() => {
-  const coords = calculatedCoords.value
-  if (coords.length === 0) return ''
-  return coords.reduce((acc, curr, idx) => {
-    return idx === 0 ? `M ${curr.x} ${curr.y}` : `${acc} L ${curr.x} ${curr.y}`
-  }, '')
-})
-
+const linePath = computed(() =>
+  calculatedCoords.value.map((c, idx) => `${idx === 0 ? 'M' : 'L'} ${c.x} ${c.y}`).join(' '),
+)
 const areaPath = computed(() => {
   const coords = calculatedCoords.value
   if (coords.length === 0) return ''
-  const bottomY = padTop + chartHeight.value
-  const first = coords[0]!
-  const last = coords[coords.length - 1]!
-  return `${linePath.value} L ${last.x} ${bottomY} L ${first.x} ${bottomY} Z`
+  const bottomY = padTop + chartHeight
+  return `${linePath.value} L ${coords[coords.length - 1]!.x} ${bottomY} L ${coords[0]!.x} ${bottomY} Z`
 })
 
 const activeHoverData = computed(() => {
@@ -105,37 +89,57 @@ const activeHoverData = computed(() => {
   return calculatedCoords.value[hoveredIndex.value] || null
 })
 
+const tooltipStyle = computed(() => {
+  const data = activeHoverData.value
+  if (!data) return {}
+  const rawLeft = (data.x / svgWidth) * 100
+  const clampedLeft = Math.min(86, Math.max(14, rawLeft))
+  const placeBelow = data.y < 105
+  const topPct = placeBelow ? (data.y / svgHeight) * 100 + 6 : (data.y / svgHeight) * 100 - 5
+  return {
+    left: `${clampedLeft}%`,
+    top: `${topPct}%`,
+    transform: placeBelow ? 'translate(-50%, 0)' : 'translate(-50%, -100%)',
+  }
+})
+
 const shouldShowLabel = (idx: number, total: number) => {
   if (total <= 7) return true
   if (total <= 14) return idx % 2 === 0 || idx === total - 1
   return idx % 5 === 0 || idx === total - 1
 }
+
+const summaryStats = computed(() => [
+  { label: 'Total Omzet', value: formatRupiah(trendsData.value?.summary.total_revenue || 0) },
+  { label: 'Total Pesanan', value: `${trendsData.value?.summary.total_orders || 0} pesanan` },
+  {
+    label: 'Rata-rata Nilai Pesanan',
+    value: formatRupiah(trendsData.value?.summary.average_order_value || 0),
+  },
+])
 </script>
 
 <template>
   <div class="rounded-card border border-brand-hair bg-brand-canvas p-5 shadow-whisper space-y-4">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
-        <h2 class="font-display text-base font-bold text-brand-ink m-0 flex items-center gap-2">
-          <i class="pi pi-chart-line text-brand-accent text-sm" />
-          <span>Tren Penjualan &amp; Pendapatan</span>
-        </h2>
+        <h2 class="font-display text-base font-bold text-brand-ink m-0">Grafik Penjualan</h2>
         <p class="text-xs text-brand-muted m-0 mt-0.5">
-          Visualisasi omzet harian dari transaksi lunas dan selesai.
+          Pendapatan harian dari pesanan lunas dan selesai.
         </p>
       </div>
 
       <div
-        class="inline-flex items-center rounded-lg border border-brand-hairsoft bg-brand-field p-1"
+        class="inline-flex items-center rounded-full border border-brand-hair bg-brand-canvas-soft p-1 self-start sm:self-auto"
       >
         <button
           v-for="p in periods"
           :key="p.id"
           type="button"
           :class="[
-            'px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer border-0',
+            'px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border-0',
             activePeriod === p.id
-              ? 'bg-brand-canvas text-brand-ink shadow-whisper'
+              ? 'bg-brand-ink text-brand-onink shadow-whisper'
               : 'bg-transparent text-brand-muted hover:text-brand-ink',
           ]"
           @click="activePeriod = p.id"
@@ -146,46 +150,35 @@ const shouldShowLabel = (idx: number, total: number) => {
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div class="p-3.5 rounded-field border border-brand-hairsoft bg-brand-canvas-soft space-y-1">
+      <div
+        v-for="item in summaryStats"
+        :key="item.label"
+        class="p-3 rounded-field border border-brand-hairsoft bg-brand-canvas-soft space-y-1"
+      >
         <span class="text-[11px] font-medium text-brand-muted uppercase tracking-wider block">
-          Total Omzet
+          {{ item.label }}
         </span>
-        <span class="font-display text-base font-bold text-brand-ink block tabular">
-          {{ formatRupiah(trendsData?.summary.total_revenue || 0) }}
-        </span>
-      </div>
-      <div class="p-3.5 rounded-field border border-brand-hairsoft bg-brand-canvas-soft space-y-1">
-        <span class="text-[11px] font-medium text-brand-muted uppercase tracking-wider block">
-          Volume Transaksi
-        </span>
-        <span class="font-display text-base font-bold text-brand-ink block tabular">
-          {{ trendsData?.summary.total_orders || 0 }} Pesanan
-        </span>
-      </div>
-      <div class="p-3.5 rounded-field border border-brand-hairsoft bg-brand-canvas-soft space-y-1">
-        <span class="text-[11px] font-medium text-brand-muted uppercase tracking-wider block">
-          Rata-rata Nilai Pesanan (AOV)
-        </span>
-        <span class="font-display text-base font-bold text-brand-ink block tabular">
-          {{ formatRupiah(trendsData?.summary.average_order_value || 0) }}
+        <span class="font-display text-base font-bold text-brand-ink block tabular-nums">
+          {{ item.value }}
         </span>
       </div>
     </div>
 
-    <div class="relative w-full overflow-hidden">
-      <div v-if="loading" class="h-56 w-full animate-pulse rounded-lg bg-brand-field" />
+    <div class="relative w-full overflow-visible">
+      <div
+        v-if="loading"
+        class="h-56 w-full animate-pulse rounded-lg bg-brand-field overflow-hidden"
+      />
 
-      <div v-else class="relative w-full">
+      <div v-else class="relative w-full overflow-visible">
         <div
           v-if="activeHoverData"
-          class="absolute z-20 pointer-events-none rounded-lg border border-brand-hair bg-brand-canvas px-3 py-2 text-xs shadow-floating transition-all transform -translate-x-1/2 -translate-y-full"
-          :style="{
-            left: `${(activeHoverData.x / svgWidth) * 100}%`,
-            top: `${(activeHoverData.y / svgHeight) * 100 - 4}%`,
-          }"
+          data-testid="sales-chart-tooltip"
+          class="absolute z-30 pointer-events-none rounded-lg border border-brand-hair bg-brand-canvas px-3 py-2 text-xs shadow-floating whitespace-nowrap"
+          :style="tooltipStyle"
         >
           <p class="font-bold text-brand-ink m-0">{{ activeHoverData.pt.label }}</p>
-          <p class="font-display text-brand-accent-text font-bold m-0 mt-0.5 tabular">
+          <p class="font-display text-brand-accent-text font-bold m-0 mt-0.5 tabular-nums">
             {{ formatRupiah(activeHoverData.pt.revenue) }}
           </p>
           <p class="text-[11px] text-brand-muted m-0">
@@ -247,7 +240,24 @@ const shouldShowLabel = (idx: number, total: number) => {
               @mouseenter="hoveredIndex = idx"
               @mouseleave="hoveredIndex = null"
             >
-              <circle :cx="coord.x" :cy="coord.y" r="14" fill="transparent" />
+              <rect
+                :x="coord.x - hitWidth / 2"
+                :y="padTop"
+                :width="hitWidth"
+                :height="chartHeight + 24"
+                fill="transparent"
+              />
+              <line
+                v-if="hoveredIndex === idx"
+                :x1="coord.x"
+                :y1="padTop"
+                :x2="coord.x"
+                :y2="padTop + chartHeight"
+                stroke="#0066ff"
+                stroke-width="1"
+                stroke-dasharray="3,3"
+                opacity="0.35"
+              />
               <circle
                 v-if="hoveredIndex === idx"
                 :cx="coord.x"
