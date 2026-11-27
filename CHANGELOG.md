@@ -4,6 +4,10 @@ Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
 ## [Unreleased]
 
+### Pembaruan Gambar Produk Katalog Studio Lintas Varian (2026-11-27)
+
+- **Aset Visual Katalog Produk (`public/images/products/*.jpg`, 32 berkas)**: Menyelesaikan generasi ulang gambar studio produk Batch 2 hingga Batch 5 (`Furnitur & Ruang Kerja`, `Rumah & Dapur`, `Pakaian & Aksesoris`, serta `Alat Tulis & Kerajinan`) sehingga seluruh 50 aset katalog memiliki sudut kamera, proporsi, dan pencahayaan seragam lintas varian warna.
+
 ### Perbaikan Grafik Ringkasan, Dropdown Pagination Terpusat, Pemilih Bulan/Tahun, & Pelacakan Perangkat Audit Log (2026-11-27)
 
 - **Grafik Ringkasan Penjualan (`/admin`, `AdminSalesChart.vue`, `AdminSalesChartControls.vue`, `/api/admin/stats/trends`)**:
