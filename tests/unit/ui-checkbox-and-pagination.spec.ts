@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import { nextTick, ref } from 'vue'
+import { createSSRApp, h, nextTick, ref } from 'vue'
+import { renderToString } from 'vue/server-renderer'
 import { createEvent, type H3Event } from 'h3'
 import { IncomingMessage, ServerResponse } from 'node:http'
 import { Socket } from 'node:net'
@@ -13,6 +14,7 @@ import {
 import UiCheckbox from '~/components/ui/UiCheckbox.vue'
 import UiDateRangePicker from '~/components/ui/UiDateRangePicker.vue'
 import UiPagination from '~/components/ui/UiPagination.vue'
+import UiSelect from '~/components/ui/UiSelect.vue'
 import { useClientPagination } from '~/composables/useClientPagination'
 import { getPresetDateRange } from '~/composables/useCalendarGrid'
 
@@ -238,5 +240,18 @@ describe('UiDateRangePicker (Month/Year selector), H3 headers.get, & Activity de
       platform: 'Windows',
     })
     expect(updateEqFn).toHaveBeenCalledWith('id', 'log-1')
+  })
+
+  it('menjaga UiSelect bebas markup SSR Teleport ketika teleport=false', async () => {
+    const app = createSSRApp({
+      render: () =>
+        h(UiSelect, {
+          modelValue: 'featured',
+          options: [{ value: 'featured', label: 'Pilihan Kurator' }],
+          teleport: false,
+        }),
+    })
+    const html = await renderToString(app)
+    expect(html).not.toContain('teleport')
   })
 })

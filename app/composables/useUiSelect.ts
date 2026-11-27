@@ -40,7 +40,8 @@ export function useUiSelect(
   const activeIndex = ref(-1)
   const rootRef = ref<HTMLElement | null>(null)
   const triggerRef = ref<HTMLButtonElement | null>(null)
-  const listboxRef = ref<HTMLElement | null>(null)
+  const menuRef = ref<{ listboxEl: HTMLElement | null } | null>(null)
+  const listboxRef = computed<HTMLElement | null>(() => menuRef.value?.listboxEl ?? null)
   const floatingStyle = ref<Record<string, string>>({})
   const parsedSlotOptions = ref<UiSelectOption[]>([])
 
@@ -257,6 +258,7 @@ export function useUiSelect(
     activeIndex,
     rootRef,
     triggerRef,
+    menuRef,
     listboxRef,
     floatingStyle,
     normalizedOptions,
