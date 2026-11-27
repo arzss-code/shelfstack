@@ -4,6 +4,11 @@ Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
 ## [Unreleased]
 
+### Sinkronisasi URL Aset Studio Katalog ke Database & Komponen Beranda (2026-11-27)
+
+- **Migrasi Sinkronisasi DB (`supabase/migrations/20261205000001_sync_curated_catalog_studio_images.sql`, `supabase/seed.sql`)**: Menyelaraskan seluruh `image_url` dan `gallery_urls` pada 5 kategori kanonik, 25 produk kurasi (termasuk `Ketel Leher Angsa Matte Black` dan 4 produk yang sebelumnya menunjuk URL lama `aida-public`), serta 48 varian SKU ke aset studio lokal `/images/products/*.jpg`, sekaligus menambahkan blok pembaruan idempoten pada `supabase/seed.sql`.
+- **Komponen Beranda & Pembersihan Aset (`HomeHero.vue`, `HomeFeaturedCategories.vue`, `useCategories.ts`)**: Mengganti sisa URL `aida-public` dan Unsplash fallback dengan aset lokal `/images/products/*.jpg` serta menghapus berkas duplikat `public/images/products/field-watch-black-angle.jpg` sehingga seluruh 50 berkas gambar cocok 1:1 dengan seed katalog.
+
 ### Pembaruan Gambar Produk Katalog Studio Lintas Varian (2026-11-27)
 
 - **Aset Visual Katalog Produk (`public/images/products/*.jpg`, 32 berkas)**: Menyelesaikan generasi ulang gambar studio produk Batch 2 hingga Batch 5 (`Furnitur & Ruang Kerja`, `Rumah & Dapur`, `Pakaian & Aksesoris`, serta `Alat Tulis & Kerajinan`) sehingga seluruh 50 aset katalog memiliki sudut kamera, proporsi, dan pencahayaan seragam lintas varian warna.
