@@ -148,6 +148,12 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // Prevent browsers or proxies from caching the service worker script across deploys
+    '/sw.js': {
+      headers: {
+        'cache-control': 'no-cache, no-store, must-revalidate',
+      },
+    },
     // Exempt payment webhook to prevent dropping legitimate gateway notifications/retries
     '/api/midtrans/notification': {
       security: {
