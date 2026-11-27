@@ -410,6 +410,45 @@ where not exists (
   where p.name = v.name and p.deleted_at is null
 );
 
+-- Pastikan image_url dan gallery_urls produk kurasi yang sudah ada ikut sinkron ke aset studio lokal
+update public.products p
+set
+  image_url = c.image_url,
+  gallery_urls = c.gallery_urls
+from (values
+  ('Headphone Studio ANC', '/images/products/headphone-anc-black.jpg', array['/images/products/headphone-anc-black.jpg', '/images/products/headphone-anc-silver.jpg']),
+  ('Keyboard Mekanikal Nirkabel 75%', '/images/products/keyboard-75-black.jpg', array['/images/products/keyboard-75-black.jpg', '/images/products/keyboard-75-white.jpg', '/images/products/keyboard-75-angle.jpg']),
+  ('Tetikus Ergonomis Nirkabel Precision', '/images/products/mouse-ergonomic-gray.jpg', array['/images/products/mouse-ergonomic-gray.jpg']),
+  ('Pengisi Daya GaN 100W Multi-Port', '/images/products/charger-gan-black.jpg', array['/images/products/charger-gan-black.jpg']),
+  ('Stand Laptop Ergonomis Aluminium', '/images/products/laptop-stand-silver.jpg', array['/images/products/laptop-stand-silver.jpg']),
+  ('Lampu Meja Task Aluminium', '/images/products/lamp-task-black.jpg', array['/images/products/lamp-task-black.jpg', '/images/products/lamp-task-white.jpg']),
+  ('Meja Kerja Modular Solid Oak', '/images/products/desk-oak-natural.jpg', array['/images/products/desk-oak-natural.jpg']),
+  ('Kursi Ergonomis Mesh Pro', '/images/products/chair-mesh-black.jpg', array['/images/products/chair-mesh-black.jpg']),
+  ('Tatakan Monitor Kayu Walnut', '/images/products/monitor-stand-walnut.jpg', array['/images/products/monitor-stand-walnut.jpg', '/images/products/monitor-stand-oak.jpg']),
+  ('Desk Mat Kulit Vegan Minimalis', '/images/products/desk-mat-black.jpg', array['/images/products/desk-mat-black.jpg']),
+  ('Ketel Leher Angsa Matte Black', '/images/products/kettle-gooseneck-black.jpg', array['/images/products/kettle-gooseneck-black.jpg']),
+  ('Dripper Kopi Keramik Pour-Over V60', '/images/products/dripper-v60-white.jpg', array['/images/products/dripper-v60-white.jpg']),
+  ('Penggiling Kopi Manual Stainless Steel', '/images/products/coffee-grinder-silver.jpg', array['/images/products/coffee-grinder-silver.jpg']),
+  ('Gelas Kaca Borosilikat Double-Wall 350ml', '/images/products/glass-borosilicate-clear.jpg', array['/images/products/glass-borosilicate-clear.jpg']),
+  ('Wadah Biji Kopi Kedap Udara Vakum', '/images/products/coffee-canister-black.jpg', array['/images/products/coffee-canister-black.jpg']),
+  ('Tas Komuter EDC Ballistic', '/images/products/backpack-edc-black.jpg', array['/images/products/backpack-edc-black.jpg', '/images/products/backpack-edc-green.jpg']),
+  ('Dompet Kartu Kulit Nabati Slim', '/images/products/wallet-leather-tan.jpg', array['/images/products/wallet-leather-tan.jpg']),
+  ('Jam Tangan Lapangan Otomatis Field Watch', '/images/products/field-watch-black.jpg', array['/images/products/field-watch-black.jpg', '/images/products/field-watch-olive.jpg', '/images/products/field-watch-angle.jpg']),
+  ('Kaus Katun Organik Heavyweight 240gsm', '/images/products/tshirt-heavyweight-white.jpg', array['/images/products/tshirt-heavyweight-white.jpg']),
+  ('Topi Baseball Katun Washed Unstructured', '/images/products/cap-baseball-black.jpg', array['/images/products/cap-baseball-black.jpg']),
+  ('Pena Gel Presisi Titanium', '/images/products/pen-titanium-black.jpg', array['/images/products/pen-titanium-black.jpg', '/images/products/pen-titanium-raw.jpg']),
+  ('Jurnal Grid Hardcover Kertas 120gsm', '/images/products/journal-grid-green.jpg', array['/images/products/journal-grid-green.jpg']),
+  ('Penggaris Segitiga Arsitek Aluminium', '/images/products/ruler-architect-black.jpg', array['/images/products/ruler-architect-black.jpg']),
+  ('Tempat Pensil Kulit Gulung Handcrafted', '/images/products/pencil-roll-brown.jpg', array['/images/products/pencil-roll-brown.jpg', '/images/products/pencil-roll-tan.jpg']),
+  ('Klip Kertas Kuningan Solid Vintage (Set 10)', '/images/products/clips-brass-vintage.jpg', array['/images/products/clips-brass-vintage.jpg'])
+) as c(name, image_url, gallery_urls)
+where p.name = c.name
+  and p.deleted_at is null
+  and (
+    p.image_url is distinct from c.image_url
+    or p.gallery_urls is distinct from c.gallery_urls
+  );
+
 -- 2.c Seed Varian Produk Dinamis (Product Variants)
 insert into public.product_variants (product_id, sku, name, attributes, price_cents, stock)
 select

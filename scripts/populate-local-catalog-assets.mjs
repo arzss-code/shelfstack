@@ -152,7 +152,7 @@ const ASSETS_MAP = [
     url: 'https://images.unsplash.com/photo-1554412933-514a83d2f3c8?auto=format&fit=crop&w=800&q=80',
   },
   {
-    filename: 'field-watch-black-angle.jpg',
+    filename: 'field-watch-angle.jpg',
     url: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=800&q=80',
   },
   {

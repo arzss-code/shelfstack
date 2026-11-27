@@ -50,6 +50,14 @@ const getCategoryCountLabel = (categoryId: string): string => {
   return 'Koleksi Terkurasi'
 }
 
+const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
+  tech: '/images/products/keyboard-75-black.jpg',
+  home: '/images/products/dripper-v60-white.jpg',
+  furniture: '/images/products/desk-oak-natural.jpg',
+  lifestyle: '/images/products/backpack-edc-black.jpg',
+  stationery: '/images/products/journal-grid-green.jpg',
+}
+
 const displayCategories = computed(() => {
   const source = props.customCategories ?? categoriesRef.value
   return source.slice(0, 5).map((cat, index) => {
@@ -65,7 +73,8 @@ const displayCategories = computed(() => {
       cta: `Lihat Koleksi ${firstName}`,
       image:
         cat.image_url ||
-        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80',
+        CATEGORY_FALLBACK_IMAGES[cat.slug] ||
+        '/images/products/keyboard-75-black.jpg',
       spanTwo: index === 0,
     }
   })

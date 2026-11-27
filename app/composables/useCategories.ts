@@ -14,7 +14,7 @@ export const CANONICAL_CATEGORIES: CategoryItem[] = [
     slug: 'tech',
     description:
       'Audio resolusi tinggi, perangkat pintar nirkabel, keyboard mekanikal, dan adaptor daya presisi.',
-    image_url: '/logo.svg',
+    image_url: '/images/products/keyboard-75-black.jpg',
     display_order: 1,
   },
   {
@@ -23,7 +23,7 @@ export const CANONICAL_CATEGORIES: CategoryItem[] = [
     slug: 'home',
     description:
       'Peralatan seduh kopi manual, gelas kaca borosilikat tahan panas, dan keramik meja makan minimalis.',
-    image_url: '/logo.svg',
+    image_url: '/images/products/dripper-v60-white.jpg',
     display_order: 2,
   },
   {
@@ -32,7 +32,7 @@ export const CANONICAL_CATEGORIES: CategoryItem[] = [
     slug: 'furniture',
     description:
       'Kursi ergonomis, meja modular solid, dan sistem rak penyimpanan terorganisir untuk ruang kerja.',
-    image_url: '/logo.svg',
+    image_url: '/images/products/desk-oak-natural.jpg',
     display_order: 3,
   },
   {
@@ -41,7 +41,7 @@ export const CANONICAL_CATEGORIES: CategoryItem[] = [
     slug: 'lifestyle',
     description:
       'Tas selempang harian, kaus katun organik combed, dan jam tangan fungsional berdaya tahan tinggi.',
-    image_url: '/logo.svg',
+    image_url: '/images/products/backpack-edc-black.jpg',
     display_order: 4,
   },
   {
@@ -50,7 +50,7 @@ export const CANONICAL_CATEGORIES: CategoryItem[] = [
     slug: 'stationery',
     description:
       'Pena presisi berbobot mantap, buku catatan bergaris halus, dan penggaris segitiga arsitektural.',
-    image_url: '/logo.svg',
+    image_url: '/images/products/journal-grid-green.jpg',
     display_order: 5,
   },
 ]
