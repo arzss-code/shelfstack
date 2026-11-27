@@ -70,7 +70,7 @@ const goToCheckout = () => {
     >
       <NuxtLink
         to="/"
-        class="hover:text-brand-ink no-underline text-brand-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded-sm"
+        class="hover:text-brand-ink no-underline text-brand-muted transition-colors focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 rounded-sm"
       >
         ShelfStack
       </NuxtLink>
@@ -139,7 +139,7 @@ const goToCheckout = () => {
             </span>
             <button
               type="button"
-              class="text-brand-warning-text hover:underline text-[11px] font-medium cursor-pointer bg-transparent border-0 p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded-sm"
+              class="text-brand-warning-text hover:underline text-[11px] font-medium cursor-pointer bg-transparent border-0 p-0 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 rounded-sm"
               @click="driftWarnings = []"
             >
               Tutup

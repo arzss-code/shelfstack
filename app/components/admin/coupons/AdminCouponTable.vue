@@ -2,6 +2,9 @@
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiIconButton from '~/components/ui/UiIconButton.vue'
 import UiEmptyState from '~/components/ui/UiEmptyState.vue'
+import UiPagination from '~/components/ui/UiPagination.vue'
+import { useClientPagination } from '~/composables/useClientPagination'
+import { useClientTableSort } from '~/composables/useClientTableSort'
 
 export interface AdminCoupon {
   id: string
@@ -27,7 +30,7 @@ export interface AdminCoupon {
   created_at: string
 }
 
-defineProps<{
+const props = defineProps<{
   coupons: AdminCoupon[]
   loading: boolean
 }>()
@@ -39,10 +42,44 @@ const emit = defineEmits<{
   viewUsages: [coupon: AdminCoupon]
   create: []
 }>()
+
+const couponColumns = [
+  { key: 'code', label: 'Kode Voucher', ariaLabel: 'kode voucher' },
+  { key: 'name', label: 'Nama & Tipe', ariaLabel: 'nama voucher' },
+  { key: 'discount', label: 'Nilai Diskon', ariaLabel: 'nilai diskon' },
+  { key: 'min_purchase', label: 'Min. Belanja', ariaLabel: 'minimal belanja' },
+  { key: 'coin_cost', label: 'Biaya Koin', ariaLabel: 'biaya koin' },
+  { key: 'usage', label: 'Kuota Pakai', ariaLabel: 'kuota pemakaian' },
+  { key: 'status', label: 'Status', ariaLabel: 'status voucher' },
+] as const
+
+const {
+  sortKey,
+  sortDirection,
+  sortedItems: sortedCoupons,
+  onSortChange,
+  getAriaSort,
+} = useClientTableSort(() => props.coupons, {
+  code: (c) => c.code,
+  name: (c) => c.name,
+  discount: (c) => c.discount_value,
+  min_purchase: (c) => c.min_purchase_cents,
+  coin_cost: (c) => c.coin_cost ?? 0,
+  usage: (c) => c.usage_count,
+  status: (c) => (c.is_expired ? 'Kedaluwarsa' : c.is_active ? 'Aktif' : 'Nonaktif'),
+})
+
+const {
+  page,
+  pageSize,
+  totalCount,
+  totalPages,
+  paginatedItems: paginatedCoupons,
+} = useClientPagination(sortedCoupons, 10)
 </script>
 
 <template>
-  <div class="overflow-hidden rounded-2xl border border-brand-hair bg-brand-canvas shadow-whisper">
+  <div class="overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper">
     <!-- Loading State -->
     <div v-if="loading" class="space-y-3 p-10 text-center">
       <i class="pi pi-spinner animate-spin text-2xl text-brand-muted" aria-hidden="true" />
@@ -61,30 +98,46 @@ const emit = defineEmits<{
     </div>
 
     <!-- Table View -->
-    <div v-else class="overflow-x-auto">
-      <table class="w-full text-left text-xs" role="table">
+    <div
+      v-else
+      tabindex="0"
+      role="region"
+      aria-label="Tabel daftar voucher promosi"
+      class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+    >
+      <table class="w-full text-left text-xs border-collapse" role="table">
         <thead
           class="border-b border-brand-hair bg-brand-canvas-soft text-[11px] font-semibold uppercase tracking-wider text-brand-muted"
         >
           <tr>
-            <th scope="col" class="px-4 py-3">Kode Voucher</th>
-            <th scope="col" class="px-4 py-3">Nama & Tipe</th>
-            <th scope="col" class="px-4 py-3">Nilai Diskon</th>
-            <th scope="col" class="px-4 py-3">Min. Belanja & Pagu</th>
-            <th scope="col" class="px-4 py-3">Biaya Koin</th>
-            <th scope="col" class="px-4 py-3">Kuota Pemakaian</th>
-            <th scope="col" class="px-4 py-3">Status</th>
-            <th scope="col" class="px-4 py-3 text-right">Aksi</th>
+            <th
+              v-for="col in couponColumns"
+              :key="col.key"
+              scope="col"
+              class="px-3.5 py-2.5 whitespace-nowrap"
+              :aria-sort="getAriaSort(col.key)"
+            >
+              <UiSortHeader
+                :sort-key="col.key"
+                :label="col.label"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="onSortChange"
+              >
+                {{ col.label }}
+              </UiSortHeader>
+            </th>
+            <th scope="col" class="px-3.5 py-2.5 text-right">Aksi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft">
           <tr
-            v-for="coupon in coupons"
+            v-for="coupon in paginatedCoupons"
             :key="coupon.id"
             class="transition-colors hover:bg-brand-canvas-soft/50"
           >
             <!-- Kode -->
-            <td class="px-4 py-3.5">
+            <td class="px-3.5 py-2.5">
               <span
                 class="rounded-lg border border-dashed border-brand-hair bg-brand-canvas-soft px-2.5 py-1 font-mono font-bold text-brand-ink"
               >
@@ -93,7 +146,7 @@ const emit = defineEmits<{
             </td>
 
             <!-- Nama & Tipe -->
-            <td class="px-4 py-3.5">
+            <td class="px-3.5 py-2.5">
               <div class="space-y-1">
                 <p class="m-0 font-semibold text-brand-ink">
                   {{ coupon.name }}
@@ -109,29 +162,26 @@ const emit = defineEmits<{
             </td>
 
             <!-- Nilai Diskon -->
-            <td class="px-4 py-3.5 font-bold tabular text-brand-ink">
+            <td class="px-3.5 py-2.5 font-bold tabular text-brand-ink">
               {{ coupon.formatted_discount }}
             </td>
 
             <!-- Min Belanja & Pagu -->
-            <td class="px-4 py-3.5 text-brand-muted">
+            <td class="px-3.5 py-2.5 text-brand-muted">
               <div class="tabular">Min: {{ coupon.formatted_min_purchase }}</div>
               <div class="text-[11px] tabular">Pagu: {{ coupon.formatted_max_discount }}</div>
             </td>
 
             <!-- Biaya Koin Loyalty -->
-            <td class="px-4 py-3.5">
-              <span
-                v-if="coupon.coin_cost"
-                class="font-medium tabular text-amber-700 dark:text-amber-400"
-              >
+            <td class="px-3.5 py-2.5">
+              <span v-if="coupon.coin_cost" class="font-medium tabular text-brand-warning-text">
                 {{ coupon.formatted_coin_cost }}
               </span>
               <span v-else class="text-brand-faint">-</span>
             </td>
 
             <!-- Kuota Penggunaan -->
-            <td class="px-4 py-3.5">
+            <td class="px-3.5 py-2.5">
               <div class="max-w-[120px] space-y-1">
                 <div class="flex items-center justify-between text-[11px] tabular text-brand-muted">
                   <span>{{ coupon.usage_count }}</span>
@@ -152,7 +202,7 @@ const emit = defineEmits<{
             </td>
 
             <!-- Status Semantik -->
-            <td class="px-4 py-3.5">
+            <td class="px-3.5 py-2.5">
               <UiBadge
                 :label="coupon.is_expired ? 'Kedaluwarsa' : coupon.is_active ? 'Aktif' : 'Nonaktif'"
                 :variant="coupon.is_expired ? 'danger' : coupon.is_active ? 'success' : 'default'"
@@ -160,7 +210,7 @@ const emit = defineEmits<{
             </td>
 
             <!-- Aksi -->
-            <td class="px-4 py-3.5 text-right">
+            <td class="px-3.5 py-2.5 text-right">
               <div class="inline-flex items-center gap-1">
                 <UiIconButton
                   icon="pi-history"
@@ -199,5 +249,15 @@ const emit = defineEmits<{
         </tbody>
       </table>
     </div>
+    <UiPagination
+      v-if="!loading && coupons.length > 0"
+      v-model="page"
+      v-model:page-size="pageSize"
+      :total-pages="totalPages"
+      :total-count="totalCount"
+      :loading="loading"
+      item-name="voucher"
+      compact
+    />
   </div>
 </template>

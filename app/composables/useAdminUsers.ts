@@ -23,7 +23,7 @@ export function useAdminUsers() {
   const currentPage = ref(1)
   const totalPages = ref(1)
   const totalCustomersCount = ref(0)
-  const itemsPerPage = 15
+  const itemsPerPage = ref(15)
 
   const sortOptions = [
     { value: 'ltv_desc', label: 'LTV Tertinggi' },
@@ -38,7 +38,7 @@ export function useAdminUsers() {
     try {
       const queryParams: Record<string, string | number> = {
         page: currentPage.value,
-        limit: itemsPerPage,
+        limit: itemsPerPage.value,
         sort: selectedSort.value,
       }
       if (searchQuery.value.trim()) {
@@ -80,6 +80,17 @@ export function useAdminUsers() {
     fetchCustomers()
   })
 
+  const setPageSize = (nextSize: number) => {
+    const safe = Math.min(100, Math.max(1, nextSize))
+    if (safe === itemsPerPage.value) return
+    itemsPerPage.value = safe
+    if (currentPage.value === 1) {
+      fetchCustomers()
+    } else {
+      currentPage.value = 1
+    }
+  }
+
   onMounted(() => {
     fetchCustomers()
   })
@@ -96,6 +107,8 @@ export function useAdminUsers() {
     currentPage,
     totalPages,
     totalCustomersCount,
+    pageSize: itemsPerPage,
+    setPageSize,
     sortOptions,
     hasCustomers,
     fetchCustomers,

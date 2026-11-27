@@ -6,6 +6,7 @@ import UiModal from '~/components/ui/UiModal.vue'
 import UiInput from '~/components/ui/UiInput.vue'
 import UiTextarea from '~/components/ui/UiTextarea.vue'
 import UiButton from '~/components/ui/UiButton.vue'
+import UiCheckbox from '~/components/ui/UiCheckbox.vue'
 import AddressLocationField from '~/components/account/AddressLocationField.vue'
 
 const props = withDefaults(
@@ -220,17 +221,11 @@ const handleSubmit = () => {
       />
 
       <div class="pt-2">
-        <label
-          class="flex items-center gap-2.5 cursor-pointer text-xs text-brand-ink font-medium select-none"
-        >
-          <input
-            v-model="form.is_default"
-            type="checkbox"
-            :disabled="loading"
-            class="w-4 h-4 rounded border-brand-hair text-brand-ink focus:ring-brand-ink accent-brand-ink cursor-pointer"
-          />
-          <span>Jadikan sebagai alamat pengiriman utama</span>
-        </label>
+        <UiCheckbox
+          v-model="form.is_default"
+          :disabled="loading"
+          label="Jadikan sebagai alamat pengiriman utama"
+        />
       </div>
 
       <!-- Action Buttons Footer -->

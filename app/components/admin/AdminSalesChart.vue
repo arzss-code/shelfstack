@@ -1,10 +1,23 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import AdminSalesChartControls from '~/components/admin/AdminSalesChartControls.vue'
+import {
+  CHART_PAD_BOTTOM,
+  CHART_PAD_LEFT,
+  CHART_PAD_RIGHT,
+  CHART_PAD_TOP,
+  CHART_PLOT_HEIGHT,
+  CHART_SVG_HEIGHT,
+  CHART_SVG_WIDTH,
+  type ChartMetric,
+  formatSalesAxisTick,
+  useAdminSalesChart,
+} from '~/composables/useAdminSalesChart'
 import { formatRupiah } from '~/utils/format'
 import type {
   AdminTrendsPeriod,
   AdminTrendsResponseData,
-  TrendDataPoint,
+  AdminTrendsStatusScope,
 } from '~~/shared/schemas/admin-stats'
 
 const props = withDefaults(defineProps<{ initialPeriod?: AdminTrendsPeriod }>(), {
@@ -12,22 +25,40 @@ const props = withDefaults(defineProps<{ initialPeriod?: AdminTrendsPeriod }>(),
 })
 
 const activePeriod = ref<AdminTrendsPeriod>(props.initialPeriod)
+const statusScope = ref<AdminTrendsStatusScope>('confirmed')
+const activeMetric = ref<ChartMetric>('revenue')
+const customFrom = ref('')
+const customTo = ref('')
 const loading = ref(true)
 const trendsData = ref<AdminTrendsResponseData | null>(null)
-const hoveredIndex = ref<number | null>(null)
 
-const periods: Array<{ id: AdminTrendsPeriod; label: string }> = [
-  { id: '7d', label: '7 Hari' },
-  { id: '30d', label: '30 Hari' },
-  { id: 'month', label: 'Bulan Ini' },
-]
+const {
+  hoveredIndex,
+  gridLevels,
+  hitWidth,
+  calculatedCoords,
+  linePath,
+  areaPath,
+  activeHoverData,
+  tooltipStyle,
+  shouldShowXAxisLabel,
+  summaryStats,
+} = useAdminSalesChart(trendsData, activeMetric)
 
 const fetchTrends = async () => {
   loading.value = true
   try {
+    const params: Record<string, string> = { period: activePeriod.value }
+    if (statusScope.value !== 'confirmed') {
+      params.status_scope = statusScope.value
+    }
+    if (activePeriod.value === 'custom' && (customFrom.value || customTo.value)) {
+      if (customFrom.value) params.from = customFrom.value
+      if (customTo.value) params.to = customTo.value
+    }
     const res = await $fetch<{ status: string; data: AdminTrendsResponseData }>(
       '/api/admin/stats/trends',
-      { params: { period: activePeriod.value } },
+      { params },
     )
     trendsData.value = res.data
   } catch (err: unknown) {
@@ -37,7 +68,25 @@ const fetchTrends = async () => {
   }
 }
 
-watch(activePeriod, () => {
+const selectPeriod = (next: AdminTrendsPeriod) => {
+  activePeriod.value = next
+  hoveredIndex.value = null
+  if (next === 'custom' && !customFrom.value && !customTo.value) {
+    const now = new Date()
+    const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 13)
+    customFrom.value = startDate.toISOString().slice(0, 10)
+    customTo.value = now.toISOString().slice(0, 10)
+  }
+  fetchTrends()
+}
+
+const onCustomDateChange = () => {
+  if (activePeriod.value !== 'custom') activePeriod.value = 'custom'
+  hoveredIndex.value = null
+  fetchTrends()
+}
+
+watch(statusScope, () => {
   hoveredIndex.value = null
   fetchTrends()
 })
@@ -46,146 +95,72 @@ onMounted(() => {
   fetchTrends()
 })
 
-const svgWidth = 800
-const svgHeight = 220
-const padLeft = 65
-const padRight = 25
-const padTop = 20
-const padBottom = 35
-
-const chartWidth = computed(() => svgWidth - padLeft - padRight)
-const chartHeight = computed(() => svgHeight - padTop - padBottom)
-const points = computed<TrendDataPoint[]>(() => trendsData.value?.points || [])
-
-const maxRevenue = computed(() => {
-  const max = Math.max(...points.value.map((p) => p.revenue), 0)
-  return max === 0 ? 1000000 : max * 1.15
+const lineStroke = computed(() => (activeMetric.value === 'orders' ? '#0f766e' : '#0066ff'))
+const granularityHint = computed(() => {
+  const g = trendsData.value?.granularity
+  if (g === 'month') return 'Agregasi bulanan'
+  if (g === 'week') return 'Agregasi mingguan'
+  return 'Agregasi harian'
 })
-
-const gridLevels = computed(() => {
-  const max = maxRevenue.value
-  return [
-    { value: max, y: padTop },
-    { value: max * 0.66, y: padTop + chartHeight.value * 0.33 },
-    { value: max * 0.33, y: padTop + chartHeight.value * 0.66 },
-    { value: 0, y: padTop + chartHeight.value },
-  ]
-})
-
-const calculatedCoords = computed(() => {
-  const total = points.value.length
-  if (total === 0) return []
-  return points.value.map((pt, idx) => {
-    const x =
-      total > 1 ? padLeft + (idx / (total - 1)) * chartWidth.value : padLeft + chartWidth.value / 2
-    const y = padTop + chartHeight.value - (pt.revenue / maxRevenue.value) * chartHeight.value
-    return { x, y, pt }
-  })
-})
-
-const linePath = computed(() => {
-  const coords = calculatedCoords.value
-  if (coords.length === 0) return ''
-  return coords.reduce((acc, curr, idx) => {
-    return idx === 0 ? `M ${curr.x} ${curr.y}` : `${acc} L ${curr.x} ${curr.y}`
-  }, '')
-})
-
-const areaPath = computed(() => {
-  const coords = calculatedCoords.value
-  if (coords.length === 0) return ''
-  const bottomY = padTop + chartHeight.value
-  const first = coords[0]!
-  const last = coords[coords.length - 1]!
-  return `${linePath.value} L ${last.x} ${bottomY} L ${first.x} ${bottomY} Z`
-})
-
-const activeHoverData = computed(() => {
-  if (hoveredIndex.value === null) return null
-  return calculatedCoords.value[hoveredIndex.value] || null
-})
-
-const shouldShowLabel = (idx: number, total: number) => {
-  if (total <= 7) return true
-  if (total <= 14) return idx % 2 === 0 || idx === total - 1
-  return idx % 5 === 0 || idx === total - 1
-}
 </script>
 
 <template>
-  <div class="rounded-card border border-brand-hair bg-brand-canvas p-6 shadow-whisper space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h2 class="font-display text-base font-bold text-brand-ink m-0 flex items-center gap-2">
-          <i class="pi pi-chart-line text-brand-accent text-sm" />
-          <span>Tren Penjualan &amp; Pendapatan</span>
-        </h2>
-        <p class="text-xs text-brand-muted m-0 mt-0.5">
-          Visualisasi omzet harian dari transaksi lunas dan selesai.
-        </p>
-      </div>
+  <section
+    aria-label="Grafik tren penjualan"
+    class="rounded-card border border-brand-hair bg-brand-canvas p-5 shadow-whisper space-y-4"
+  >
+    <AdminSalesChartControls
+      v-model:status-scope="statusScope"
+      v-model:active-metric="activeMetric"
+      v-model:custom-from="customFrom"
+      v-model:custom-to="customTo"
+      :active-period="activePeriod"
+      :granularity-hint="granularityHint"
+      @select-period="selectPeriod"
+      @custom-date-change="onCustomDateChange"
+    />
 
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
       <div
-        class="inline-flex items-center rounded-lg border border-brand-hairsoft bg-brand-field p-1"
+        v-for="item in summaryStats"
+        :key="item.label"
+        class="p-3 rounded-field border border-brand-hairsoft bg-brand-canvas-soft space-y-1"
       >
-        <button
-          v-for="p in periods"
-          :key="p.id"
-          type="button"
-          :class="[
-            'px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer border-0',
-            activePeriod === p.id
-              ? 'bg-brand-canvas text-brand-ink shadow-whisper'
-              : 'bg-transparent text-brand-muted hover:text-brand-ink',
-          ]"
-          @click="activePeriod = p.id"
-        >
-          {{ p.label }}
-        </button>
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-[11px] font-medium text-brand-muted uppercase tracking-wider">
+            {{ item.label }}
+          </span>
+          <span
+            v-if="item.delta !== null"
+            class="rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular"
+            :class="
+              item.delta >= 0
+                ? 'bg-brand-success-tint text-brand-success-text'
+                : 'bg-brand-danger-tint text-brand-danger-text'
+            "
+          >
+            {{ item.delta >= 0 ? `+${item.delta}%` : `${item.delta}%` }}
+          </span>
+        </div>
+        <span class="font-display text-base font-bold text-brand-ink block tabular-nums">
+          {{ item.value }}
+        </span>
+        <span class="text-[11px] text-brand-muted block truncate">{{ item.hint }}</span>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div class="p-3.5 rounded-field border border-brand-hairsoft bg-brand-canvas-soft space-y-1">
-        <span class="text-[11px] font-medium text-brand-muted uppercase tracking-wider block">
-          Total Omzet
-        </span>
-        <span class="font-display text-base font-bold text-brand-ink block tabular">
-          {{ formatRupiah(trendsData?.summary.total_revenue || 0) }}
-        </span>
-      </div>
-      <div class="p-3.5 rounded-field border border-brand-hairsoft bg-brand-canvas-soft space-y-1">
-        <span class="text-[11px] font-medium text-brand-muted uppercase tracking-wider block">
-          Volume Transaksi
-        </span>
-        <span class="font-display text-base font-bold text-brand-ink block tabular">
-          {{ trendsData?.summary.total_orders || 0 }} Pesanan
-        </span>
-      </div>
-      <div class="p-3.5 rounded-field border border-brand-hairsoft bg-brand-canvas-soft space-y-1">
-        <span class="text-[11px] font-medium text-brand-muted uppercase tracking-wider block">
-          Rata-rata Nilai Pesanan (AOV)
-        </span>
-        <span class="font-display text-base font-bold text-brand-ink block tabular">
-          {{ formatRupiah(trendsData?.summary.average_order_value || 0) }}
-        </span>
-      </div>
-    </div>
-
-    <div class="relative w-full overflow-hidden">
+    <div class="relative w-full overflow-visible">
       <div v-if="loading" class="h-56 w-full animate-pulse rounded-lg bg-brand-field" />
 
-      <div v-else class="relative w-full">
+      <div v-else class="relative w-full overflow-visible">
         <div
           v-if="activeHoverData"
-          class="absolute z-20 pointer-events-none rounded-lg border border-brand-hair bg-brand-canvas px-3 py-2 text-xs shadow-floating transition-all transform -translate-x-1/2 -translate-y-full"
-          :style="{
-            left: `${(activeHoverData.x / svgWidth) * 100}%`,
-            top: `${(activeHoverData.y / svgHeight) * 100 - 4}%`,
-          }"
+          data-testid="sales-chart-tooltip"
+          class="absolute z-30 pointer-events-none rounded-lg border border-brand-hair bg-brand-canvas px-3 py-2 text-xs shadow-floating whitespace-nowrap"
+          :style="tooltipStyle"
         >
           <p class="font-bold text-brand-ink m-0">{{ activeHoverData.pt.label }}</p>
-          <p class="font-display text-brand-accent font-bold m-0 mt-0.5 tabular">
+          <p class="font-display text-brand-accent-text font-bold m-0 mt-0.5 tabular-nums">
             {{ formatRupiah(activeHoverData.pt.revenue) }}
           </p>
           <p class="text-[11px] text-brand-muted m-0">
@@ -195,13 +170,13 @@ const shouldShowLabel = (idx: number, total: number) => {
 
         <svg
           class="w-full h-auto overflow-visible select-none"
-          :viewBox="`0 0 ${svgWidth} ${svgHeight}`"
+          :viewBox="`0 0 ${CHART_SVG_WIDTH} ${CHART_SVG_HEIGHT}`"
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
             <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#0066ff" stop-opacity="0.2" />
-              <stop offset="100%" stop-color="#0066ff" stop-opacity="0.0" />
+              <stop offset="0%" :stop-color="lineStroke" stop-opacity="0.2" />
+              <stop offset="100%" :stop-color="lineStroke" stop-opacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -209,9 +184,9 @@ const shouldShowLabel = (idx: number, total: number) => {
             <line
               v-for="grid in gridLevels"
               :key="grid.y"
-              :x1="padLeft"
+              :x1="CHART_PAD_LEFT"
               :y1="grid.y"
-              :x2="svgWidth - padRight"
+              :x2="CHART_SVG_WIDTH - CHART_PAD_RIGHT"
               :y2="grid.y"
               stroke="currentColor"
               class="text-brand-hairsoft"
@@ -220,12 +195,12 @@ const shouldShowLabel = (idx: number, total: number) => {
             <text
               v-for="grid in gridLevels"
               :key="'txt-' + grid.y"
-              :x="padLeft - 8"
+              :x="CHART_PAD_LEFT - 8"
               :y="grid.y + 3"
               text-anchor="end"
-              class="text-[9px] fill-brand-muted font-medium"
+              class="text-[10px] fill-brand-muted font-medium"
             >
-              {{ grid.value >= 1000000 ? (grid.value / 1000000).toFixed(1) + 'M' : grid.value }}
+              {{ formatSalesAxisTick(grid.value, activeMetric) }}
             </text>
           </g>
 
@@ -233,7 +208,7 @@ const shouldShowLabel = (idx: number, total: number) => {
           <path
             :d="linePath"
             fill="none"
-            stroke="#0066ff"
+            :stroke="lineStroke"
             stroke-width="2.5"
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -247,13 +222,30 @@ const shouldShowLabel = (idx: number, total: number) => {
               @mouseenter="hoveredIndex = idx"
               @mouseleave="hoveredIndex = null"
             >
-              <circle :cx="coord.x" :cy="coord.y" r="14" fill="transparent" />
+              <rect
+                :x="coord.x - hitWidth / 2"
+                :y="CHART_PAD_TOP"
+                :width="hitWidth"
+                :height="CHART_PLOT_HEIGHT + 24"
+                fill="transparent"
+              />
+              <line
+                v-if="hoveredIndex === idx"
+                :x1="coord.x"
+                :y1="CHART_PAD_TOP"
+                :x2="coord.x"
+                :y2="CHART_PAD_TOP + CHART_PLOT_HEIGHT"
+                :stroke="lineStroke"
+                stroke-width="1"
+                stroke-dasharray="3,3"
+                opacity="0.35"
+              />
               <circle
                 v-if="hoveredIndex === idx"
                 :cx="coord.x"
                 :cy="coord.y"
                 r="6.5"
-                fill="#0066ff"
+                :fill="lineStroke"
                 opacity="0.25"
               />
               <circle
@@ -261,13 +253,13 @@ const shouldShowLabel = (idx: number, total: number) => {
                 :cy="coord.y"
                 :r="hoveredIndex === idx ? 4 : 2.5"
                 fill="#ffffff"
-                stroke="#0066ff"
+                :stroke="lineStroke"
                 stroke-width="2"
               />
               <text
-                v-if="shouldShowLabel(idx, calculatedCoords.length)"
+                v-if="shouldShowXAxisLabel(idx, calculatedCoords.length)"
                 :x="coord.x"
-                :y="padTop + chartHeight + 20"
+                :y="CHART_SVG_HEIGHT - CHART_PAD_BOTTOM + 20"
                 text-anchor="middle"
                 class="text-[10px] fill-brand-muted font-medium"
               >
@@ -278,5 +270,5 @@ const shouldShowLabel = (idx: number, total: number) => {
         </svg>
       </div>
     </div>
-  </div>
+  </section>
 </template>

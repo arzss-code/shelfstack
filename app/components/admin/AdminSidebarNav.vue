@@ -34,7 +34,7 @@ const emit = defineEmits<{
       </div>
       <span
         v-if="item.to === '/admin/support' && unreadSupportCount > 0"
-        class="unread-support-badge rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white leading-none shadow-sm"
+        class="unread-support-badge rounded-full bg-brand-danger px-1.5 py-0.5 text-[10px] font-bold text-white leading-none shadow-sm"
       >
         {{ unreadSupportCount > 99 ? '99+' : unreadSupportCount }}
       </span>

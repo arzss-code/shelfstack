@@ -167,7 +167,7 @@ const handleSaveNewAddress = async (data: CreateAddressInput) => {
             v-model="searchQuery"
             type="search"
             placeholder="Cari penerima, jalan, atau kota..."
-            class="w-full pl-8 pr-3 py-2 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/15 transition-all"
+            class="w-full pl-8 pr-3 py-2 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint focus:outline-none focus:border-brand-ink focus:ring-1 focus:ring-inset focus:ring-brand-ink transition-all"
           />
         </div>
 

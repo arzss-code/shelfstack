@@ -5,6 +5,7 @@ import { createAddressSchema } from '~~/shared/schemas/address'
 import type { AdministrativeSelection } from '~~/shared/schemas/location'
 import { formatAdministrativeAddress } from '~~/shared/data/locations/indonesia-regions'
 import LocationPickerModal from '~/components/checkout/LocationPickerModal.vue'
+import UiCheckbox from '~/components/ui/UiCheckbox.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -191,16 +192,12 @@ const handleSubmit = () => {
       />
     </div>
 
-    <div class="flex items-center gap-2 pt-1">
-      <input
+    <div class="pt-1">
+      <UiCheckbox
         id="is_default_checkbox"
         v-model="form.is_default"
-        type="checkbox"
-        class="rounded border-brand-hair text-brand-accent focus:ring-brand-accent w-4 h-4 cursor-pointer"
+        label="Jadikan sebagai alamat utama"
       />
-      <label for="is_default_checkbox" class="text-xs text-brand-ink cursor-pointer select-none">
-        Jadikan sebagai alamat utama
-      </label>
     </div>
 
     <div class="flex items-center justify-end gap-2 pt-2 border-t border-brand-hairsoft">

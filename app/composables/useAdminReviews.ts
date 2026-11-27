@@ -1,5 +1,9 @@
 import { ref } from 'vue'
-import type { AdminReviewItem, AdminReviewStatus } from '../../shared/schemas/review'
+import type {
+  AdminReviewItem,
+  AdminReviewStatus,
+  ReviewDistribution,
+} from '../../shared/schemas/review'
 import { useUiToast } from './useUiToast'
 
 export interface AdminReviewMetrics {
@@ -9,6 +13,8 @@ export interface AdminReviewMetrics {
   fiveStar: number
   attention: number
   averageRating: number
+  positiveRate?: number
+  distribution?: ReviewDistribution
 }
 
 export function useAdminReviews() {
@@ -132,6 +138,13 @@ export function useAdminReviews() {
     fetchReviews()
   }
 
+  const setPageSize = (nextLimit: number) => {
+    const safeLimit = Math.min(50, Math.max(1, nextLimit))
+    pagination.value.limit = safeLimit
+    pagination.value.page = 1
+    fetchReviews()
+  }
+
   const setRating = (r?: number) => {
     ratingFilter.value = r
     pagination.value.page = 1
@@ -163,6 +176,7 @@ export function useAdminReviews() {
     fetchReviews,
     toggleReviewStatus,
     setPage,
+    setPageSize,
     setRating,
     setStatus,
     setSearch,

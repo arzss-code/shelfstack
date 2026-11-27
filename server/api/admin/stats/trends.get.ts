@@ -1,112 +1,59 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { adminTrendsQuerySchema, type AdminTrendsResponseData } from '~~/shared/schemas/admin-stats'
 import {
-  adminTrendsQuerySchema,
-  type AdminTrendsResponseData,
-  type TrendDataPoint,
-} from '~~/shared/schemas/admin-stats'
-
-const MONTH_NAMES = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'Mei',
-  'Jun',
-  'Jul',
-  'Agu',
-  'Sep',
-  'Okt',
-  'Nov',
-  'Des',
-]
-
-function formatDateLabel(dateStr: string): string {
-  const parts = dateStr.split('-')
-  const day = parts[2] || '01'
-  const monthIdx = parseInt(parts[1] || '1', 10) - 1
-  return `${day} ${MONTH_NAMES[monthIdx] || ''}`
-}
-
-function generateDateBuckets(period: '7d' | '30d' | 'month'): {
-  buckets: Record<string, TrendDataPoint>
-  startIso: string
-  endIso: string
-} {
-  const now = new Date()
-  const buckets: Record<string, TrendDataPoint> = {}
-
-  let startDate: Date
-  if (period === 'month') {
-    startDate = new Date(now.getFullYear(), now.getMonth(), 1)
-  } else if (period === '30d') {
-    startDate = new Date(now)
-    startDate.setDate(now.getDate() - 29)
-  } else {
-    // Default 7d
-    startDate = new Date(now)
-    startDate.setDate(now.getDate() - 6)
-  }
-  startDate.setHours(0, 0, 0, 0)
-
-  const endDate = new Date(now)
-  endDate.setHours(23, 59, 59, 999)
-
-  const cur = new Date(startDate)
-  while (cur <= endDate) {
-    const y = cur.getFullYear()
-    const m = String(cur.getMonth() + 1).padStart(2, '0')
-    const d = String(cur.getDate()).padStart(2, '0')
-    const key = `${y}-${m}-${d}`
-
-    buckets[key] = {
-      date: key,
-      label: formatDateLabel(key),
-      revenue_cents: 0,
-      revenue: 0,
-      order_count: 0,
-    }
-
-    cur.setDate(cur.getDate() + 1)
-  }
-
-  return {
-    buckets,
-    startIso: startDate.toISOString(),
-    endIso: endDate.toISOString(),
-  }
-}
+  calculateDeltaPct,
+  createTrendsBuckets,
+  resolveOrderBucketKey,
+  resolveTrendsStatuses,
+  resolveTrendsWindow,
+} from '../../../utils/admin-trends'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
 
   const query = await getValidatedQuery(event, (data) => adminTrendsQuerySchema.parse(data))
   const period = query.period || '7d'
+  const statusScope = query.status_scope || 'confirmed'
 
   const client = await serverSupabaseClient<Database>(event)
-  const { buckets, startIso, endIso } = generateDateBuckets(period)
+  const { startDate, endDate, prevStartDate, prevEndDate, granularity } = resolveTrendsWindow(
+    period,
+    query.from,
+    query.to,
+  )
+  const buckets = createTrendsBuckets(startDate, endDate, granularity)
+  const statuses = resolveTrendsStatuses(statusScope)
 
   try {
-    const { data: orders, error } = await client
-      .from('orders')
-      .select('id, total_cents, status, created_at')
-      .in('status', ['paid', 'shipped', 'completed'])
-      .gte('created_at', startIso)
-      .lte('created_at', endIso)
-      .order('created_at', { ascending: true })
+    const [currentRes, prevRes] = await Promise.all([
+      client
+        .from('orders')
+        .select('id, total_cents, status, created_at')
+        .in('status', statuses)
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString())
+        .order('created_at', { ascending: true }),
+      client
+        .from('orders')
+        .select('id, total_cents')
+        .in('status', statuses)
+        .gte('created_at', prevStartDate.toISOString())
+        .lte('created_at', prevEndDate.toISOString()),
+    ])
 
-    if (error) {
-      return errorResponse(event, 'Gagal mengambil data pesanan tren.', error, 500)
+    if (currentRes.error) {
+      return errorResponse(event, 'Gagal mengambil data pesanan tren.', currentRes.error, 500)
     }
 
-    for (const order of orders || []) {
+    for (const order of currentRes.data || []) {
       if (!order.created_at) continue
-      const dateKey = order.created_at.slice(0, 10)
-      if (buckets[dateKey]) {
+      const key = resolveOrderBucketKey(order.created_at, granularity)
+      if (key && buckets[key]) {
         const cents = order.total_cents || 0
-        buckets[dateKey].revenue_cents += cents
-        buckets[dateKey].revenue = buckets[dateKey].revenue_cents / 100
-        buckets[dateKey].order_count += 1
+        buckets[key].revenue_cents += cents
+        buckets[key].revenue = buckets[key].revenue_cents / 100
+        buckets[key].order_count += 1
       }
     }
 
@@ -116,17 +63,36 @@ export default defineEventHandler(async (event) => {
     const total_revenue = total_revenue_cents / 100
     const average_order_value_cents =
       total_orders > 0 ? Math.round(total_revenue_cents / total_orders) : 0
-    const average_order_value = average_order_value_cents / 100
+
+    const prevOrders = prevRes.data || []
+    const prevRevenueCents = prevOrders.reduce((acc, o) => acc + (o.total_cents || 0), 0)
+
+    const peakPoint = points.reduce(
+      (best, pt) => (pt.revenue > best.revenue ? pt : best),
+      points[0] || { label: '-', revenue: 0, order_count: 0 },
+    )
 
     const responseData: AdminTrendsResponseData = {
       period,
+      status_scope: statusScope,
+      granularity,
+      start_date: startDate.toISOString().slice(0, 10),
+      end_date: endDate.toISOString().slice(0, 10),
       points,
       summary: {
         total_revenue_cents,
         total_revenue,
         total_orders,
         average_order_value_cents,
-        average_order_value,
+        average_order_value: average_order_value_cents / 100,
+        peak_label: peakPoint.revenue > 0 ? peakPoint.label : '-',
+        peak_revenue: peakPoint.revenue,
+        peak_orders: peakPoint.order_count,
+        active_buckets: points.filter((p) => p.order_count > 0).length,
+        revenue_delta_pct: prevRes.error
+          ? null
+          : calculateDeltaPct(total_revenue_cents, prevRevenueCents),
+        orders_delta_pct: prevRes.error ? null : calculateDeltaPct(total_orders, prevOrders.length),
       },
     }
 

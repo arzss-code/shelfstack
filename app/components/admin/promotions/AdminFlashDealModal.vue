@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
+import UiCheckbox from '~/components/ui/UiCheckbox.vue'
 import { formatRupiah } from '~/utils/format'
 
 export interface FlashDealAdminRow {
@@ -216,7 +217,7 @@ async function submitDeal() {
           <input
             v-model="form.starts_local"
             type="datetime-local"
-            class="w-full rounded-field border border-brand-hair bg-brand-canvas px-3 py-2 text-xs text-brand-ink"
+            class="w-full rounded-field border border-brand-hair bg-brand-canvas px-3 py-2 text-xs text-brand-ink focus:border-brand-ink focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-ink"
           />
         </label>
         <label class="block space-y-1 text-xs font-medium text-brand-ink">
@@ -224,17 +225,12 @@ async function submitDeal() {
           <input
             v-model="form.ends_local"
             type="datetime-local"
-            class="w-full rounded-field border border-brand-hair bg-brand-canvas px-3 py-2 text-xs text-brand-ink"
+            class="w-full rounded-field border border-brand-hair bg-brand-canvas px-3 py-2 text-xs text-brand-ink focus:border-brand-ink focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-ink"
           />
         </label>
       </div>
 
-      <label
-        class="inline-flex items-center gap-2 text-xs font-medium text-brand-ink cursor-pointer"
-      >
-        <input v-model="form.is_active" type="checkbox" class="rounded border-brand-hair" />
-        <span>Aktifkan kampanye selama rentang jadwal</span>
-      </label>
+      <UiCheckbox v-model="form.is_active" label="Aktifkan kampanye selama rentang jadwal" />
 
       <div class="flex justify-end gap-2 pt-2">
         <UiButton type="button" variant="secondary" @click="emit('close')">Batal</UiButton>

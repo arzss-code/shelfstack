@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { AdminReviewItem } from '~~/shared/schemas/review'
+import { useClientTableSort } from '~/composables/useClientTableSort'
+import UiPagination from '~/components/ui/UiPagination.vue'
 
-defineProps<{
+const props = defineProps<{
   reviews: AdminReviewItem[]
   loading: boolean
   mutatingId: string | null
@@ -14,9 +16,34 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'toggleStatus', review: AdminReviewItem): void
-  (e: 'pageChange', page: number): void
+  toggleStatus: [review: AdminReviewItem]
+  pageChange: [page: number]
+  pageSizeChange: [size: number]
 }>()
+
+const reviewColumns = [
+  { key: 'product', label: 'Produk', ariaLabel: 'produk', thClass: 'min-w-[200px]' },
+  { key: 'reviewer', label: 'Pelanggan', ariaLabel: 'pelanggan', thClass: 'min-w-[150px]' },
+  { key: 'rating', label: 'Rating', ariaLabel: 'rating', thClass: 'min-w-[120px]' },
+  { key: 'review_text', label: 'Isi Ulasan', ariaLabel: 'isi ulasan', thClass: 'min-w-[240px]' },
+  { key: 'created_at', label: 'Tanggal', ariaLabel: 'tanggal', thClass: 'min-w-[110px]' },
+  { key: 'status', label: 'Status', ariaLabel: 'status moderasi', thClass: 'min-w-[120px]' },
+] as const
+
+const {
+  sortKey,
+  sortDirection,
+  sortedItems: sortedReviews,
+  onSortChange,
+  getAriaSort,
+} = useClientTableSort(() => props.reviews, {
+  product: (r) => r.product_name,
+  reviewer: (r) => r.reviewer_name,
+  rating: (r) => r.rating,
+  review_text: (r) => r.review_text,
+  created_at: (r) => new Date(r.created_at).getTime() || 0,
+  status: (r) => (r.deleted_at ? 'Disembunyikan' : 'Aktif'),
+})
 
 const formatDate = (isoStr: string): string => {
   try {
@@ -38,19 +65,36 @@ const formatDate = (isoStr: string): string => {
     data-testid="admin-reviews-table-wrapper"
   >
     <!-- Table Header / Overflow Container -->
-    <div class="overflow-x-auto min-w-0">
+    <div
+      tabindex="0"
+      role="region"
+      aria-label="Tabel moderasi ulasan produk"
+      class="overflow-x-auto min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+    >
       <table class="w-full text-left text-xs border-collapse">
         <thead
           class="bg-brand-canvas-soft border-b border-brand-hair text-brand-muted uppercase tracking-wider text-[11px] font-semibold"
         >
           <tr>
-            <th class="py-3 px-4 min-w-[200px]">Produk</th>
-            <th class="py-3 px-4 min-w-[150px]">Pelanggan</th>
-            <th class="py-3 px-4 min-w-[120px]">Rating</th>
-            <th class="py-3 px-4 min-w-[260px]">Isi Ulasan</th>
-            <th class="py-3 px-4 min-w-[110px]">Tanggal</th>
-            <th class="py-3 px-4 min-w-[120px]">Status</th>
-            <th class="py-3 px-4 text-right min-w-[120px]">Aksi Moderasi</th>
+            <th
+              v-for="col in reviewColumns"
+              :key="col.key"
+              scope="col"
+              class="py-2.5 px-3.5"
+              :class="col.thClass"
+              :aria-sort="getAriaSort(col.key)"
+            >
+              <UiSortHeader
+                :sort-key="col.key"
+                :label="col.label"
+                :active-key="sortKey"
+                :direction="sortDirection"
+                @sort="onSortChange"
+              >
+                {{ col.label }}
+              </UiSortHeader>
+            </th>
+            <th scope="col" class="py-2.5 px-3.5 text-right min-w-[120px]">Aksi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
@@ -65,7 +109,7 @@ const formatDate = (isoStr: string): string => {
           </tr>
 
           <!-- Empty State -->
-          <tr v-else-if="reviews.length === 0">
+          <tr v-else-if="sortedReviews.length === 0">
             <td colspan="7" class="py-16 text-center text-brand-muted">
               <div class="max-w-sm mx-auto space-y-2">
                 <div
@@ -85,7 +129,7 @@ const formatDate = (isoStr: string): string => {
 
           <!-- Row List -->
           <tr
-            v-for="review in reviews"
+            v-for="review in sortedReviews"
             v-else
             :key="review.id"
             class="hover:bg-brand-canvas-soft/40 transition-colors"
@@ -114,7 +158,8 @@ const formatDate = (isoStr: string): string => {
                   <NuxtLink
                     :to="`/product/${review.product_id}`"
                     target="_blank"
-                    class="text-[11px] text-brand-accent hover:underline inline-flex items-center gap-0.5 mt-0.5"
+                    rel="noopener noreferrer"
+                    class="text-[11px] text-brand-accent-text hover:underline inline-flex items-center gap-0.5 mt-0.5"
                   >
                     <span>Lihat di Toko</span>
                     <i class="pi pi-external-link text-[9px]" />
@@ -190,7 +235,7 @@ const formatDate = (isoStr: string): string => {
                 :class="[
                   review.deleted_at
                     ? 'bg-brand-success-tint text-brand-success-text border-brand-success-edge hover:bg-brand-success hover:text-white'
-                    : 'bg-brand-canvas-soft text-brand-danger border-brand-hair hover:bg-brand-danger hover:text-white hover:border-brand-danger',
+                    : 'bg-brand-canvas-soft text-brand-danger-text border-brand-hair hover:bg-brand-danger hover:text-white hover:border-brand-danger',
                 ]"
                 @click="emit('toggleStatus', review)"
               >
@@ -208,32 +253,17 @@ const formatDate = (isoStr: string): string => {
     </div>
 
     <!-- Pagination Footer -->
-    <div
-      v-if="pagination.totalPages > 1"
-      class="p-4 border-t border-brand-hair bg-brand-canvas-soft flex items-center justify-between text-caption text-brand-muted"
-    >
-      <span>
-        Menampilkan halaman {{ pagination.page }} dari {{ pagination.totalPages }} (Total
-        {{ pagination.totalCount }} ulasan)
-      </span>
-      <div class="flex items-center gap-1.5">
-        <button
-          type="button"
-          :disabled="pagination.page <= 1 || loading"
-          class="px-3 py-1 rounded-full border border-brand-hair bg-brand-canvas text-brand-ink text-xs font-semibold hover:bg-brand-canvas-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-          @click="emit('pageChange', pagination.page - 1)"
-        >
-          Sebelumnya
-        </button>
-        <button
-          type="button"
-          :disabled="pagination.page >= pagination.totalPages || loading"
-          class="px-3 py-1 rounded-full border border-brand-hair bg-brand-canvas text-brand-ink text-xs font-semibold hover:bg-brand-canvas-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-          @click="emit('pageChange', pagination.page + 1)"
-        >
-          Selanjutnya
-        </button>
-      </div>
-    </div>
+    <UiPagination
+      v-if="reviews.length > 0"
+      :model-value="pagination.page"
+      :total-pages="pagination.totalPages"
+      :total-count="pagination.totalCount"
+      :page-size="pagination.limit"
+      :loading="loading"
+      item-name="ulasan"
+      compact
+      @change="emit('pageChange', $event)"
+      @page-size-change="emit('pageSizeChange', $event)"
+    />
   </div>
 </template>

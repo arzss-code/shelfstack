@@ -1,6 +1,7 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { logger } from '../../../utils/logger'
+import { enrichRecentOrderActivityDevice } from '../../../utils/activity-log'
 
 export default defineEventHandler(async (event) => {
   const { user, profile } = await requireUser(event)
@@ -60,6 +61,8 @@ export default defineEventHandler(async (event) => {
       500,
     )
   }
+
+  await enrichRecentOrderActivityDevice(event, id)
 
   // Buat notifikasi otomatis pembatalan pesanan
   await createNotification(client, {

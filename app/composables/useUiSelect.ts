@@ -1,5 +1,9 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch, type Slots } from 'vue'
 import type { UiSelectOption } from '~/components/ui/UiSelect.vue'
+import {
+  buildUiSelectTriggerClass,
+  computeUiSelectFloatingStyle,
+} from '~/composables/useUiSelectLayout'
 
 export interface UiSelectPropsInput {
   id?: string
@@ -11,11 +15,13 @@ export interface UiSelectPropsInput {
   disabled?: boolean
   error?: string
   hint?: string
-  size?: 'sm' | 'md'
+  size?: 'xs' | 'sm' | 'md'
   block?: boolean
   pill?: boolean
   align?: 'left' | 'right'
   title?: string
+  teleport?: boolean
+  compactTrigger?: boolean
 }
 
 export function useUiSelect(
@@ -34,8 +40,9 @@ export function useUiSelect(
   const activeIndex = ref(-1)
   const rootRef = ref<HTMLElement | null>(null)
   const triggerRef = ref<HTMLButtonElement | null>(null)
-  const listboxRef = ref<HTMLElement | null>(null)
-
+  const menuRef = ref<{ listboxEl: HTMLElement | null } | null>(null)
+  const listboxRef = computed<HTMLElement | null>(() => menuRef.value?.listboxEl ?? null)
+  const floatingStyle = ref<Record<string, string>>({})
   const parsedSlotOptions = ref<UiSelectOption[]>([])
 
   function extractSlotOptions() {
@@ -81,20 +88,17 @@ export function useUiSelect(
 
   watch(
     () => props.options,
-    () => {
-      extractSlotOptions()
-    },
+    () => extractSlotOptions(),
     { immediate: true },
   )
 
   const normalizedOptions = computed<UiSelectOption[]>(() => {
     if (props.options && props.options.length > 0) {
-      return props.options.map((opt) => {
-        if (typeof opt === 'string' || typeof opt === 'number') {
-          return { value: opt, label: String(opt) }
-        }
-        return opt
-      })
+      return props.options.map((opt) =>
+        typeof opt === 'string' || typeof opt === 'number'
+          ? { value: opt, label: String(opt) }
+          : opt,
+      )
     }
     return parsedSlotOptions.value
   })
@@ -106,60 +110,45 @@ export function useUiSelect(
   })
 
   const displayLabel = computed(() => {
-    if (selectedOption.value) {
-      return selectedOption.value.label
-    }
+    if (selectedOption.value) return selectedOption.value.label
     return props.placeholder || 'Pilih opsi...'
   })
 
-  const isPill = computed(() => {
-    if (props.pill !== undefined) return props.pill
-    return props.size === 'sm'
-  })
+  const triggerClass = computed(() =>
+    buildUiSelectTriggerClass({
+      size: props.size,
+      pill: props.pill,
+      error: props.error,
+      isOpen: isOpen.value,
+      block: props.block,
+      compactTrigger: props.compactTrigger,
+      align: props.align,
+    }),
+  )
 
-  const triggerClass = computed(() => {
-    const geometry =
-      props.size === 'sm'
-        ? isPill.value
-          ? 'h-9 rounded-full py-1.5 px-3.5 text-xs'
-          : 'h-9 rounded-field py-1.5 px-3 text-xs'
-        : isPill.value
-          ? 'h-11 rounded-full py-2.5 px-4 text-sm'
-          : 'h-11 rounded-field py-2.5 px-3.5 text-sm'
-
-    const border = props.error
-      ? 'border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-200'
-      : isOpen.value
-        ? 'border-brand-ink ring-2 ring-brand-ink/10'
-        : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/10'
-
-    return [
-      'inline-flex items-center justify-between gap-2 border bg-brand-canvas text-brand-ink transition-all',
-      'cursor-pointer select-none text-left outline-none font-medium',
-      'disabled:cursor-not-allowed disabled:bg-brand-field disabled:text-brand-muted disabled:border-brand-hairsoft',
-      props.block ? 'w-full' : 'min-w-[120px]',
-      geometry,
-      border,
-    ].join(' ')
-  })
+  function updateFloatingPosition() {
+    floatingStyle.value = props.teleport
+      ? computeUiSelectFloatingStyle(triggerRef.value, props.align)
+      : {}
+  }
 
   function scrollActiveIntoView() {
     if (!listboxRef.value || activeIndex.value < 0) return
     const items = listboxRef.value.querySelectorAll('[role="option"]')
     const target = items[activeIndex.value] as HTMLElement | undefined
-    if (target) {
-      target.scrollIntoView({ block: 'nearest' })
-    }
+    if (target) target.scrollIntoView({ block: 'nearest' })
   }
 
   function openDropdown() {
     if (props.disabled) return
     isOpen.value = true
+    updateFloatingPosition()
     const curIdx = normalizedOptions.value.findIndex(
       (opt) => String(opt.value) === String(props.modelValue),
     )
     activeIndex.value = curIdx >= 0 ? curIdx : 0
     nextTick(() => {
+      updateFloatingPosition()
       scrollActiveIntoView()
     })
   }
@@ -171,21 +160,15 @@ export function useUiSelect(
 
   function toggleDropdown() {
     if (props.disabled) return
-    if (isOpen.value) {
-      closeDropdown()
-    } else {
-      openDropdown()
-    }
+    if (isOpen.value) closeDropdown()
+    else openDropdown()
   }
 
   function selectOption(opt: UiSelectOption) {
     if (opt.disabled) return
-    const strVal = String(opt.value)
-    onSelectValue(strVal)
+    onSelectValue(String(opt.value))
     closeDropdown()
-    nextTick(() => {
-      triggerRef.value?.focus()
-    })
+    nextTick(() => triggerRef.value?.focus())
   }
 
   function navigateOptions(step: number) {
@@ -194,79 +177,77 @@ export function useUiSelect(
     let next = activeIndex.value + step
     if (next < 0) next = count - 1
     if (next >= count) next = 0
-
     let attempts = 0
     while (normalizedOptions.value[next]?.disabled && attempts < count) {
       next = (next + step + count) % count
       attempts++
     }
-
     activeIndex.value = next
     scrollActiveIntoView()
   }
 
   function onTriggerKeydown(event: KeyboardEvent) {
     if (props.disabled) return
-
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault()
       if (!isOpen.value) openDropdown()
       else navigateOptions(event.key === 'ArrowDown' ? 1 : -1)
       return
     }
-
     if (event.key === 'Home' && isOpen.value) {
       event.preventDefault()
       activeIndex.value = 0
       scrollActiveIntoView()
       return
     }
-
     if (event.key === 'End' && isOpen.value) {
       event.preventDefault()
       activeIndex.value = normalizedOptions.value.length - 1
       scrollActiveIntoView()
       return
     }
-
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      if (!isOpen.value) {
-        openDropdown()
-      } else if (activeIndex.value >= 0 && activeIndex.value < normalizedOptions.value.length) {
+      if (!isOpen.value) openDropdown()
+      else if (activeIndex.value >= 0 && activeIndex.value < normalizedOptions.value.length) {
         const target = normalizedOptions.value[activeIndex.value]
         if (target && !target.disabled) selectOption(target)
       }
       return
     }
-
     if (event.key === 'Escape' && isOpen.value) {
       event.preventDefault()
       closeDropdown()
       triggerRef.value?.focus()
       return
     }
-
-    if (event.key === 'Tab' && isOpen.value) {
-      closeDropdown()
-    }
+    if (event.key === 'Tab' && isOpen.value) closeDropdown()
   }
 
   function handleClickOutside(event: MouseEvent) {
     if (!isOpen.value) return
     const target = event.target as Node | null
-    if (rootRef.value && target && !rootRef.value.contains(target)) {
+    if (!target) return
+    if (!rootRef.value?.contains(target) && !listboxRef.value?.contains(target)) {
       closeDropdown()
     }
+  }
+
+  function handleViewportChange() {
+    if (isOpen.value && props.teleport) updateFloatingPosition()
   }
 
   onMounted(() => {
     extractSlotOptions()
     document.addEventListener('pointerdown', handleClickOutside, { passive: true })
+    window.addEventListener('scroll', handleViewportChange, true)
+    window.addEventListener('resize', handleViewportChange, { passive: true })
   })
 
   onBeforeUnmount(() => {
     document.removeEventListener('pointerdown', handleClickOutside)
+    window.removeEventListener('scroll', handleViewportChange, true)
+    window.removeEventListener('resize', handleViewportChange)
   })
 
   return {
@@ -277,7 +258,9 @@ export function useUiSelect(
     activeIndex,
     rootRef,
     triggerRef,
+    menuRef,
     listboxRef,
+    floatingStyle,
     normalizedOptions,
     selectedOption,
     displayLabel,

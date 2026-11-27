@@ -1,5 +1,6 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
+import { enrichRecentOrderActivityDevice } from '../../../utils/activity-log'
 import type { OrderStatus } from '../../../../shared/constants/order-transitions'
 import type { CourierCode } from '../../../../shared/schemas/shipping'
 
@@ -74,6 +75,8 @@ export default defineEventHandler(async (event) => {
     no_op: boolean
     message: string
   }
+
+  await enrichRecentOrderActivityDevice(event, orderId, client)
 
   // Buat notifikasi otomatis dan kelola checkpoint pengiriman ke pelanggan saat status berubah
   if (!result.no_op && result.current_status !== result.previous_status) {

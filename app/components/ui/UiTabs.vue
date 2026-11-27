@@ -65,7 +65,7 @@ const onKeydown = (event: KeyboardEvent) => {
     :id="tablistId"
     role="tablist"
     :aria-label="ariaLabel || undefined"
-    class="rounded-full border border-brand-hair bg-brand-canvas-soft p-1 transition-all"
+    class="rounded-card sm:rounded-full border border-brand-hair bg-brand-canvas-soft p-1 transition-all"
     :class="[
       fullWidth
         ? 'flex w-full items-center gap-1 overflow-x-auto no-scrollbar scroll-smooth'
@@ -99,10 +99,10 @@ const onKeydown = (event: KeyboardEvent) => {
         :class="
           item.value === modelValue
             ? item.countTone === 'danger'
-              ? 'bg-rose-500 text-white'
+              ? 'bg-brand-danger text-white'
               : 'bg-brand-onink/20 text-brand-onink'
             : item.countTone === 'danger'
-              ? 'bg-rose-100 text-rose-700'
+              ? 'border border-brand-danger-edge bg-brand-danger-tint text-brand-danger-text'
               : 'bg-brand-hairsoft text-brand-muted'
         "
       >

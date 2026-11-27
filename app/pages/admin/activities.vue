@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
+import AdminOperationalSignals from '~/features/admin/components/AdminOperationalSignals.vue'
+import AdminExpiryQueueCard from '~/features/orders/components/AdminExpiryQueueCard.vue'
+import AdminActivityTable from '~/features/activities/components/AdminActivityTable.vue'
 import { useActivities } from '~/features/activities/composables/useActivities'
 import type { ActivityLog } from '~/features/activities/composables/useActivities'
 import {
@@ -6,13 +10,14 @@ import {
   NO_FILTER,
   distinctEntityTypes,
   filterActivities,
+  formatActivityEntityLabel,
   isFiltering,
 } from '~/features/activities/utils/activity-filter'
-import { formatDateTime } from '~/utils/format'
 import ActivityDetailDialog from '~/features/activities/components/ActivityDetailDialog.vue'
+import UiDateRangePicker from '~/components/ui/UiDateRangePicker.vue'
 
 useSeoMeta({
-  title: 'Activity Log',
+  title: 'Aktivitas & Status Sistem - Admin ShelfStack',
 })
 
 definePageMeta({
@@ -20,16 +25,34 @@ definePageMeta({
   middleware: 'admin',
 })
 
+const route = useRoute()
+const router = useRouter()
+const activeSection = ref<'logs' | 'system'>(route.query.tab === 'system' ? 'system' : 'logs')
+const sectionTabs = [
+  { value: 'logs', label: 'Riwayat Aktivitas' },
+  { value: 'system', label: 'Status Sistem' },
+]
+
+watch(activeSection, (val) => {
+  router.replace({ query: val === 'system' ? { ...route.query, tab: 'system' } : {} })
+})
+
 const { activities, loading, fetchActivities, subscribeToRealtime } = useActivities()
 const isDialogVisible = ref(false)
 const selectedActivity = ref<ActivityLog | null>(null)
 const selectedEntity = ref(NO_FILTER.entity)
 const selectedAction = ref(NO_FILTER.action)
+const searchQuery = ref('')
+const fromDate = ref('')
+const toDate = ref('')
 
 const entityOptions = computed(() => distinctEntityTypes(activities.value))
 const entitySelectOptions = computed(() => [
-  { value: '', label: 'Semua entitas' },
-  ...entityOptions.value.map((entity) => ({ value: entity, label: entity })),
+  { value: 'all', label: 'Semua Entitas' },
+  ...entityOptions.value.map((entity) => ({
+    value: entity,
+    label: formatActivityEntityLabel(entity),
+  })),
 ])
 
 const actionTabs = computed(() => [
@@ -37,20 +60,23 @@ const actionTabs = computed(() => [
   ...ACTIVITY_ACTIONS.map((action) => ({ value: action, label: action })),
 ])
 
-const filteredActivities = computed(() =>
-  filterActivities(activities.value, {
-    entity: selectedEntity.value,
-    action: selectedAction.value,
-  }),
-)
+const currentFilter = computed(() => ({
+  entity: selectedEntity.value,
+  action: selectedAction.value,
+  search: searchQuery.value,
+  fromDate: fromDate.value,
+  toDate: toDate.value,
+}))
 
-const filteringActive = computed(() =>
-  isFiltering({ entity: selectedEntity.value, action: selectedAction.value }),
-)
+const filteredActivities = computed(() => filterActivities(activities.value, currentFilter.value))
+const filteringActive = computed(() => isFiltering(currentFilter.value))
 
 const resetFilters = () => {
   selectedEntity.value = NO_FILTER.entity
   selectedAction.value = NO_FILTER.action
+  searchQuery.value = ''
+  fromDate.value = ''
+  toDate.value = ''
 }
 
 onMounted(() => {
@@ -58,166 +84,120 @@ onMounted(() => {
   subscribeToRealtime()
 })
 
-/** Waktu bisa null bila kolom kosong, tampilkan placeholder ringkas. */
-const formatDate = (dateStr: string | null) => formatDateTime(dateStr)
-
-const getActionVariant = (
-  action: string,
-): 'default' | 'success' | 'warning' | 'danger' | 'info' => {
-  switch (action) {
-    case 'CREATE':
-      return 'success'
-    case 'UPDATE':
-      return 'info'
-    case 'DELETE':
-      return 'danger'
-    case 'RESTORE':
-      return 'warning'
-    default:
-      return 'default'
-  }
-}
-
 const viewDetails = (activity: ActivityLog) => {
   selectedActivity.value = activity
   isDialogVisible.value = true
 }
-
-/** Baris baru dari realtime memakai tint sukses selama 2 detik, lalu composable menurunkan flag. */
-const rowClass = (data: ActivityLog) =>
-  data.isNew ? 'bg-brand-success-tint transition-colors duration-1000' : ''
 </script>
 
 <template>
-  <div>
-    <div class="mb-8 flex items-center justify-between">
-      <div>
-        <h1
-          class="m-0 mb-1 flex items-center gap-3 text-3xl font-bold tracking-tight text-brand-ink"
-        >
-          Activity Log
-          <span
-            class="inline-flex items-center gap-1.5 rounded-full bg-brand-success-tint px-2 py-1 text-xs font-medium text-brand-success-text ring-1 ring-inset ring-brand-success-edge"
-          >
-            <span class="relative flex h-2 w-2">
-              <span
-                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-success opacity-75"
-              />
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-success" />
-            </span>
-            Live
-          </span>
-        </h1>
-        <p class="m-0 text-brand-muted">Riwayat lengkap aktivitas dan perubahan sistem.</p>
-      </div>
-    </div>
-
-    <!-- Filter Bar -->
-    <div
-      class="mb-4 flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-4 md:flex-row md:items-center md:justify-between"
+  <div class="space-y-5">
+    <AdminPageHeader
+      title="Aktivitas & Status Sistem"
+      subtitle="Riwayat perubahan data admin dan kondisi layanan toko."
     >
-      <UiTabs v-model="selectedAction" :items="actionTabs" aria-label="Filter jenis aksi" />
-
-      <div class="flex items-center gap-2">
-        <span v-if="!loading" class="text-xs text-brand-muted">
-          Menampilkan {{ filteredActivities.length }} dari {{ activities.length }}
-        </span>
-        <label for="activity-entity-filter" class="sr-only">Filter entitas</label>
-        <UiSelect
-          id="activity-entity-filter"
-          v-model="selectedEntity"
-          :options="entitySelectOptions"
+      <template v-if="activeSection === 'logs'" #actions>
+        <UiButton
+          variant="outline"
           size="sm"
-          aria-label="Filter entitas"
-          class="max-w-[190px]"
-        />
-        <UiButton v-if="filteringActive" variant="ghost" size="sm" @click="resetFilters">
-          Reset
+          icon="pi-refresh"
+          :loading="loading"
+          @click="fetchActivities"
+        >
+          Muat Ulang
         </UiButton>
-      </div>
-    </div>
+      </template>
+    </AdminPageHeader>
 
-    <!-- Empty State -->
-    <UiEmptyState
-      v-if="!loading && filteredActivities.length === 0"
-      icon="pi-history"
-      :title="filteringActive ? 'Tidak ada hasil' : 'Belum ada aktivitas'"
-      :description="
-        filteringActive
-          ? 'Tidak ada aktivitas yang cocok dengan filter. Ubah filter atau reset untuk melihat semua.'
-          : 'Sistem belum mencatat aktivitas apa pun. Lakukan aksi pada produk untuk melihat jejak rekam di sini.'
-      "
-      :action-label="filteringActive ? 'Tampilkan semua' : ''"
-      @action="resetFilters"
+    <UiTabs
+      v-model="activeSection"
+      :items="sectionTabs"
+      aria-label="Bagian aktivitas dan status sistem"
     />
 
-    <!-- Tabel aktivitas: shimmer saat memuat, data setelahnya -->
-    <div
-      v-else
-      class="overflow-hidden rounded-2xl border border-brand-hair bg-brand-canvas-soft shadow-whisper"
-    >
-      <!-- Skeleton Loading (Shimmer) -->
-      <div v-if="loading" class="space-y-3 p-4" aria-busy="true">
-        <div v-for="i in 5" :key="i" class="flex items-center gap-4">
-          <UiSkeleton width="w-44" height="h-4" />
-          <UiSkeleton width="w-20" height="h-6" shape="pill" />
-          <div class="min-w-0 flex-1">
-            <UiSkeleton width="w-full" height="h-4" />
+    <div v-if="activeSection === 'system'" class="space-y-5">
+      <AdminOperationalSignals />
+      <AdminExpiryQueueCard />
+    </div>
+
+    <template v-else>
+      <div
+        data-testid="admin-activities-filter-bar"
+        class="flex flex-col gap-2.5 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper"
+      >
+        <div class="flex flex-col gap-2.5 xl:flex-row xl:items-center xl:justify-between">
+          <UiTabs v-model="selectedAction" :items="actionTabs" aria-label="Filter jenis aksi" />
+
+          <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 min-w-0">
+            <label for="activity-search-input" class="sr-only">Cari log aktivitas</label>
+            <div class="w-full min-w-[180px] sm:flex-1 xl:w-56 xl:flex-none">
+              <UiInput
+                id="activity-search-input"
+                v-model="searchQuery"
+                type="search"
+                size="sm"
+                left-icon="pi-search"
+                placeholder="Cari deskripsi, IP, order ID..."
+                clearable
+              />
+            </div>
+
+            <label for="activity-entity-filter" class="sr-only">Filter entitas</label>
+            <UiSelect
+              id="activity-entity-filter"
+              :model-value="selectedEntity || 'all'"
+              :options="entitySelectOptions"
+              size="sm"
+              pill
+              aria-label="Filter entitas"
+              @update:model-value="selectedEntity = $event === 'all' ? '' : $event"
+            />
+
+            <UiDateRangePicker
+              v-model:from="fromDate"
+              v-model:to="toDate"
+              aria-label="Filter rentang tanggal log aktivitas"
+            />
+
+            <UiButton v-if="filteringActive" variant="ghost" size="sm" @click="resetFilters">
+              Reset
+            </UiButton>
           </div>
-          <UiSkeleton width="w-24" height="h-4" />
-          <UiSkeleton width="w-32" height="h-4" />
-          <UiSkeleton width="w-7" height="h-7" shape="pill" />
+        </div>
+
+        <div
+          v-if="!loading && filteringActive"
+          class="flex items-center justify-between border-t border-brand-hairsoft pt-2 text-[11px] text-brand-muted"
+        >
+          <span class="tabular">
+            Hasil filter:
+            <strong class="font-semibold text-brand-ink">{{ filteredActivities.length }}</strong>
+            dari {{ activities.length }} log tercatat
+          </span>
         </div>
       </div>
 
-      <!-- Data Table -->
-      <div v-else class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr
-              class="border-b border-brand-hair bg-brand-canvas/60 text-brand-muted uppercase tracking-wider text-[11px]"
-            >
-              <th class="py-3 px-4 font-semibold whitespace-nowrap w-[180px]">Waktu</th>
-              <th class="py-3 px-4 font-semibold">Aksi</th>
-              <th class="py-3 px-4 font-semibold min-w-[250px]">Deskripsi</th>
-              <th class="py-3 px-4 font-semibold whitespace-nowrap">IP Address</th>
-              <th class="py-3 px-4 font-semibold whitespace-nowrap">Browser / OS</th>
-              <th class="py-3 px-4 font-semibold text-center w-[100px]">Detail</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-brand-hairsoft">
-            <tr
-              v-for="row in filteredActivities"
-              :key="row.id"
-              class="hover:bg-brand-canvas transition-colors"
-              :class="rowClass(row)"
-            >
-              <td class="py-3.5 px-4 font-medium text-brand-ink whitespace-nowrap">
-                {{ formatDate(row.created_at) }}
-              </td>
-              <td class="py-3.5 px-4">
-                <UiBadge :label="row.action" :variant="getActionVariant(row.action)" />
-              </td>
-              <td class="py-3.5 px-4 text-brand-ink">{{ row.description }}</td>
-              <td class="py-3.5 px-4 text-brand-muted whitespace-nowrap">
-                {{ row.ip_address || '-' }}
-              </td>
-              <td class="py-3.5 px-4 text-brand-muted whitespace-nowrap">
-                {{ row.browser || '-' }} • {{ row.platform || '-' }}
-              </td>
-              <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                <UiTooltip v-if="row.old_data || row.new_data" text="Lihat Detail" position="top">
-                  <UiIconButton icon="pi-search" label="Lihat Detail" @click="viewDetails(row)" />
-                </UiTooltip>
-                <span v-else class="text-brand-faint">Tidak ada</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <UiEmptyState
+        v-if="!loading && filteredActivities.length === 0"
+        icon="pi-history"
+        :title="filteringActive ? 'Tidak ada hasil' : 'Belum ada aktivitas'"
+        :description="
+          filteringActive
+            ? 'Tidak ada aktivitas yang cocok dengan filter. Ubah kata kunci atau reset untuk melihat semua.'
+            : 'Sistem belum mencatat aktivitas apa pun. Lakukan aksi pada produk untuk melihat jejak rekam di sini.'
+        "
+        :action-label="filteringActive ? 'Tampilkan semua' : ''"
+        @action="resetFilters"
+      />
 
-    <!-- Detail Dialog Component -->
+      <AdminActivityTable
+        v-else
+        :activities="filteredActivities"
+        :loading="loading"
+        @view-details="viewDetails"
+      />
+    </template>
+
     <ActivityDetailDialog v-model:visible="isDialogVisible" :activity="selectedActivity" />
   </div>
 </template>

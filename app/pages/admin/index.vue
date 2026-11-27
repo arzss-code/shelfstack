@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminStatCard from '~/features/admin/components/AdminStatCard.vue'
 import AdminSalesChart from '~/components/admin/AdminSalesChart.vue'
-import AdminOperationalSignals from '~/features/admin/components/AdminOperationalSignals.vue'
 import AdminRecentOrdersTable from '~/features/admin/components/AdminRecentOrdersTable.vue'
 import { formatRupiah } from '~/utils/format'
 import type { OrderStatus } from '~/types/order'
@@ -12,8 +12,8 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Dashboard Analytics - Admin ShelfStack',
-  description: 'Ringkasan eksekutif KPI bisnis, pendapatan, dan transaksi toko ShelfStack.',
+  title: 'Ringkasan Toko - Admin ShelfStack',
+  description: 'Ringkasan omzet bulanan, pesanan aktif, dan ketersediaan stok ShelfStack.',
 })
 
 interface AdminStatsResponse {
@@ -82,34 +82,26 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="space-y-8 pb-16">
-    <!-- Header Page -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
-          Dashboard Eksekutif
-        </h1>
-        <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1">
-          Pantau omzet bulanan, volume order tertunda, dan kesehatan stok inventaris secara
-          realtime.
-        </p>
-      </div>
-
-      <div class="flex items-center gap-3">
+  <div class="space-y-5">
+    <AdminPageHeader
+      title="Ringkasan Toko"
+      subtitle="Omzet bulanan, pesanan aktif, dan ketersediaan stok produk."
+    >
+      <template #actions>
         <UiButton
-          variant="secondary"
+          variant="outline"
           size="sm"
           icon="pi-refresh"
           :loading="refreshing"
           @click="fetchStats(true)"
         >
-          Perbarui Data
+          Muat Ulang
         </UiButton>
         <UiButton variant="primary" size="sm" icon="pi-shopping-bag" to="/admin/orders">
           Kelola Pesanan
         </UiButton>
-      </div>
-    </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- Error Alert -->
     <UiAlert v-if="errorMessage" tone="danger">
@@ -119,18 +111,19 @@ onUnmounted(() => {
     <!-- 4 KPI Metrics Grid -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <AdminStatCard
-        title="Revenue Bulan Ini"
+        title="Omzet Bulan Ini"
         :value="stats ? formatRupiah(stats.revenue.monthly_cents / 100) : 'Rp 0'"
-        subtitle="Dari pesanan lunas &amp; selesai"
+        subtitle="Dari pesanan lunas dan selesai"
         icon="pi-wallet"
         color="success"
+        to="/admin/orders?status=completed"
         :loading="loading"
       />
 
       <AdminStatCard
-        title="Pesanan Pending"
+        title="Pesanan Menunggu"
         :value="stats ? String(stats.counts.pending_orders) : '0'"
-        subtitle="Membutuhkan pembayaran/tindakan"
+        subtitle="Menunggu bayar atau konfirmasi"
         icon="pi-clock"
         color="warning"
         to="/admin/orders?status=pending"
@@ -138,30 +131,28 @@ onUnmounted(() => {
       />
 
       <AdminStatCard
-        title="Stok Kritis (< 5)"
+        title="Stok Menipis"
         :value="stats ? String(stats.counts.low_stock_products) : '0'"
-        subtitle="Varian produk perlu restock"
+        subtitle="Produk dengan stok di bawah 5 unit"
         icon="pi-exclamation-triangle"
         color="danger"
-        to="/admin/products"
+        to="/admin/products?tab=critical"
         :loading="loading"
       />
 
       <AdminStatCard
-        title="Total Pelanggan"
+        title="Pelanggan Terdaftar"
         :value="stats ? String(stats.counts.total_customers) : '0'"
-        subtitle="Akun pembeli terdaftar"
+        subtitle="Akun pembeli aktif"
         icon="pi-users"
         color="info"
+        to="/admin/users"
         :loading="loading"
       />
     </div>
 
     <!-- Sales & Revenue Trend Chart (Pure SVG) -->
     <AdminSalesChart />
-
-    <!-- Operational Signals & System Telemetry Section -->
-    <AdminOperationalSignals />
 
     <!-- Recent Transactions Table Section -->
     <AdminRecentOrdersTable :orders="stats?.recent_orders || []" :loading="loading" />

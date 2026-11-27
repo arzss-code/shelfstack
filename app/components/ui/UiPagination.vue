@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import UiSelect from './UiSelect.vue'
 
 const props = withDefaults(
   defineProps<{
-    /** Halaman aktif saat ini (1-based index) */
     modelValue?: number
-    /** Total jumlah halaman */
     totalPages: number
-    /** Total item keseluruhan untuk ringkasan data */
     totalCount?: number
-    /** Jumlah item per halaman */
     pageSize?: number
-    /** Status loading asynchronous */
     loading?: boolean
-    /** Label nama entitas dalam ringkasan (default: 'produk') */
     itemName?: string
-    /** Jumlah nomor halaman tetangga kiri/kanan yang tampil */
     siblingCount?: number
+    compact?: boolean
+    showPageSize?: boolean
+    pageSizeOptions?: number[]
   }>(),
   {
     modelValue: 1,
@@ -25,12 +22,17 @@ const props = withDefaults(
     loading: false,
     itemName: 'produk',
     siblingCount: 1,
+    compact: false,
+    showPageSize: undefined,
+    pageSizeOptions: undefined,
   },
 )
 
 const emit = defineEmits<{
   'update:modelValue': [page: number]
   change: [page: number]
+  'update:pageSize': [size: number]
+  pageSizeChange: [size: number]
 }>()
 
 const currentPage = computed(() => {
@@ -40,6 +42,18 @@ const currentPage = computed(() => {
 
 const isFirstPage = computed(() => currentPage.value <= 1)
 const isLastPage = computed(() => currentPage.value >= props.totalPages)
+const isPageSizeVisible = computed(
+  () => (props.showPageSize ?? props.compact) && (props.totalCount ?? 0) > 0,
+)
+
+const resolvedPageSizeOptions = computed(() => {
+  const base = props.pageSizeOptions ?? [5, 10, 15, 25, 50]
+  const merged = Array.from(new Set([...base, props.pageSize])).sort((a, b) => a - b)
+  return merged.map((size) => ({
+    value: String(size),
+    label: props.compact ? `${size} data` : String(size),
+  }))
+})
 
 type PageItem =
   | { type: 'page'; page: number; isCurrent: boolean; key: string }
@@ -48,7 +62,6 @@ type PageItem =
 const paginationItems = computed<PageItem[]>(() => {
   const total = props.totalPages
   const current = currentPage.value
-
   if (total <= 7) {
     return Array.from({ length: total }, (_, i) => ({
       type: 'page',
@@ -59,51 +72,30 @@ const paginationItems = computed<PageItem[]>(() => {
   }
 
   const items: PageItem[] = []
-  const leftSiblingIndex = Math.max(current - props.siblingCount, 1)
-  const rightSiblingIndex = Math.min(current + props.siblingCount, total)
+  const leftSibling = Math.max(current - props.siblingCount, 1)
+  const rightSibling = Math.min(current + props.siblingCount, total)
+  const showLeftEllipsis = leftSibling > 2
+  const showRightEllipsis = rightSibling < total - 1
 
-  const showLeftEllipsis = leftSiblingIndex > 2
-  const showRightEllipsis = rightSiblingIndex < total - 1
+  items.push({ type: 'page', page: 1, isCurrent: current === 1, key: 'page-1' })
 
-  // Always show first page
-  items.push({
-    type: 'page',
-    page: 1,
-    isCurrent: current === 1,
-    key: 'page-1',
-  })
-
-  // Left ellipsis or page 2
   if (showLeftEllipsis) {
     items.push({ type: 'ellipsis', key: 'ellipsis-left' })
-  } else if (leftSiblingIndex === 2) {
-    items.push({
-      type: 'page',
-      page: 2,
-      isCurrent: current === 2,
-      key: 'page-2',
-    })
+  } else if (leftSibling === 2) {
+    items.push({ type: 'page', page: 2, isCurrent: current === 2, key: 'page-2' })
   }
 
-  // Middle pages
-  const middleStart = showLeftEllipsis ? leftSiblingIndex : 2
-  const middleEnd = showRightEllipsis ? rightSiblingIndex : total - 1
-
-  for (let i = middleStart; i <= middleEnd; i++) {
+  const startMid = showLeftEllipsis ? leftSibling : 2
+  const endMid = showRightEllipsis ? rightSibling : total - 1
+  for (let i = startMid; i <= endMid; i++) {
     if (i !== 1 && i !== total) {
-      items.push({
-        type: 'page',
-        page: i,
-        isCurrent: current === i,
-        key: `page-${i}`,
-      })
+      items.push({ type: 'page', page: i, isCurrent: current === i, key: `page-${i}` })
     }
   }
 
-  // Right ellipsis or penultimate page
   if (showRightEllipsis) {
     items.push({ type: 'ellipsis', key: 'ellipsis-right' })
-  } else if (rightSiblingIndex === total - 1 && total > 2) {
+  } else if (rightSibling === total - 1 && total > 2) {
     items.push({
       type: 'page',
       page: total - 1,
@@ -112,16 +104,9 @@ const paginationItems = computed<PageItem[]>(() => {
     })
   }
 
-  // Always show last page
   if (total > 1) {
-    items.push({
-      type: 'page',
-      page: total,
-      isCurrent: current === total,
-      key: `page-${total}`,
-    })
+    items.push({ type: 'page', page: total, isCurrent: current === total, key: `page-${total}` })
   }
-
   return items
 })
 
@@ -139,6 +124,13 @@ const goToPage = (page: number) => {
   emit('update:modelValue', page)
   emit('change', page)
 }
+
+const onPageSizeSelect = (rawValue: string) => {
+  const next = Number(rawValue)
+  if (!Number.isFinite(next) || next < 1 || next === props.pageSize) return
+  emit('update:pageSize', next)
+  emit('pageSizeChange', next)
+}
 </script>
 
 <template>
@@ -146,14 +138,26 @@ const goToPage = (page: number) => {
     role="navigation"
     aria-label="Paginasi Halaman"
     :aria-busy="loading"
-    class="ui-pagination flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-brand-hairsoft pt-6"
+    :class="
+      compact
+        ? 'ui-pagination flex flex-col gap-2.5 border-t border-brand-hair bg-brand-canvas-soft/60 px-4 py-2.5 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center'
+        : 'ui-pagination flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-brand-hairsoft pt-6'
+    "
     data-testid="ui-pagination"
   >
-    <!-- Ringkasan Data (Left on desktop, bottom on mobile) -->
-    <div
-      class="text-xs text-brand-muted m-0 order-2 sm:order-1 text-center sm:text-left select-none"
+    <p
+      class="flex items-center justify-center lg:justify-start gap-1.5 text-xs text-brand-muted m-0 order-2 lg:order-1 select-none tabular"
     >
-      <template v-if="totalCount != null && totalCount > 0">
+      <template v-if="compact && totalCount != null && totalCount > 0">
+        <span
+          class="inline-flex items-center rounded-full border border-brand-hairsoft bg-brand-canvas px-2 py-0.5 text-[11px] font-semibold text-brand-ink"
+        >
+          {{ totalPages === 1 ? `Total ${totalCount}` : `${itemRangeText} / ${totalCount}` }}
+          {{ itemName }}
+        </span>
+        <span class="text-[11px] text-brand-faint"> Hal {{ currentPage }}/{{ totalPages }} </span>
+      </template>
+      <template v-else-if="totalCount != null && totalCount > 0">
         Menampilkan <span class="font-semibold text-brand-ink">{{ itemRangeText }}</span> dari
         <span class="font-semibold text-brand-ink">{{ totalCount }}</span> {{ itemName }}
       </template>
@@ -161,17 +165,40 @@ const goToPage = (page: number) => {
         Halaman <span class="font-semibold text-brand-ink">{{ currentPage }}</span> dari
         <span class="font-semibold text-brand-ink">{{ totalPages }}</span>
       </template>
+    </p>
+
+    <div
+      v-if="isPageSizeVisible"
+      class="flex items-center justify-center gap-1.5 order-3 lg:order-2"
+      data-testid="pagination-page-size-wrap"
+    >
+      <span class="text-[11px] font-medium text-brand-muted whitespace-nowrap">Tampilkan</span>
+      <UiSelect
+        :model-value="String(pageSize)"
+        :options="resolvedPageSizeOptions"
+        placeholder=""
+        size="xs"
+        pill
+        compact-trigger
+        teleport
+        align="left"
+        aria-label="Jumlah data per halaman"
+        data-testid="pagination-page-size"
+        @change="onPageSizeSelect"
+      />
     </div>
 
-    <!-- Kontrol Navigasi Halaman -->
     <div
-      class="flex items-center gap-1 sm:gap-1.5 order-1 sm:order-2 flex-wrap justify-center"
+      class="flex items-center gap-1 sm:gap-1.5 order-1 lg:order-3 lg:justify-end flex-wrap justify-center"
       data-testid="pagination-controls"
     >
-      <!-- Tombol Sebelumnya -->
       <button
         type="button"
-        class="inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:outline-none"
+        :class="
+          compact
+            ? 'inline-flex h-7 items-center gap-1 px-2.5 rounded-full text-[11px] font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0'
+            : 'inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0'
+        "
         :disabled="isFirstPage || loading"
         aria-label="Halaman Sebelumnya"
         data-testid="pagination-prev"
@@ -184,25 +211,29 @@ const goToPage = (page: number) => {
         <span class="hidden sm:inline">Sebelumnya</span>
       </button>
 
-      <!-- Nomor-Nomor Halaman & Ellipsis -->
       <div class="flex items-center gap-1 sm:gap-1.5">
         <template v-for="item in paginationItems" :key="item.key">
-          <!-- Separator Ellipsis -->
           <span
             v-if="item.type === 'ellipsis'"
-            class="w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-xs text-brand-muted select-none"
+            :class="
+              compact
+                ? 'w-6 h-7 flex items-center justify-center text-[11px] text-brand-muted select-none'
+                : 'w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center text-xs text-brand-muted select-none'
+            "
             aria-hidden="true"
             data-testid="pagination-ellipsis"
           >
             ...
           </span>
 
-          <!-- Tombol Nomor Halaman -->
           <button
             v-else
             type="button"
-            class="w-8 h-8 sm:w-9 sm:h-9 rounded-full text-xs sm:text-sm font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:outline-none"
+            class="rounded-full font-semibold flex items-center justify-center transition-all cursor-pointer select-none active:scale-95 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
             :class="[
+              compact
+                ? 'min-w-[28px] h-7 px-1 text-[11px]'
+                : 'w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm',
               item.page === currentPage
                 ? 'bg-brand-ink text-brand-onink shadow-whisper'
                 : 'bg-transparent text-brand-muted hover:text-brand-ink hover:bg-brand-canvas-soft border border-transparent hover:border-brand-hair',
@@ -218,10 +249,13 @@ const goToPage = (page: number) => {
         </template>
       </div>
 
-      <!-- Tombol Selanjutnya -->
       <button
         type="button"
-        class="inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:outline-none"
+        :class="
+          compact
+            ? 'inline-flex h-7 items-center gap-1 px-2.5 rounded-full text-[11px] font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0'
+            : 'inline-flex items-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-full text-xs font-semibold border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft hover:border-brand-ink/40 active:scale-[0.97] transition-all disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-brand-canvas cursor-pointer select-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0'
+        "
         :disabled="isLastPage || loading"
         aria-label="Halaman Selanjutnya"
         data-testid="pagination-next"

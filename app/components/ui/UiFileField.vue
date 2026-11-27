@@ -83,7 +83,7 @@ const clear = () => {
 
       <label
         :for="inputId"
-        class="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-brand-hair bg-brand-canvas-soft px-3.5 py-1.5 text-xs font-semibold text-brand-ink transition-colors hover:bg-brand-field focus-within:ring-2 focus-within:ring-brand-ink/30"
+        class="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-brand-hair bg-brand-canvas-soft px-3.5 py-1.5 text-xs font-semibold text-brand-ink transition-colors hover:bg-brand-field focus-within:border-brand-ink focus-within:ring-1 focus-within:ring-inset focus-within:ring-brand-ink"
         :class="disabled ? 'pointer-events-none opacity-60' : ''"
       >
         <i class="pi pi-upload text-[10px]" aria-hidden="true" />

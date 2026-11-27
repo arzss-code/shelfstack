@@ -73,7 +73,7 @@ const onSortChange = (value: string) => {
         :key="opt.id"
         type="button"
         :aria-pressed="stockFilter === opt.id"
-        class="wishlist-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap cursor-pointer transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-1"
+        class="wishlist-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap cursor-pointer transition-colors duration-150 motion-reduce:transition-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
         :class="
           stockFilter === opt.id
             ? 'bg-brand-ink text-brand-onink border-brand-ink'
@@ -106,14 +106,14 @@ const onSortChange = (value: string) => {
           autocomplete="off"
           :value="searchQuery"
           placeholder="Cari di wishlist…"
-          class="wishlist-search-input w-full h-9 pl-8 pr-8 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:border-brand-accent [&::-webkit-search-cancel-button]:hidden"
+          class="wishlist-search-input w-full h-9 pl-8 pr-8 text-xs rounded-full border border-brand-hair bg-brand-canvas text-brand-ink placeholder:text-brand-faint transition-colors focus:border-brand-ink focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-ink [&::-webkit-search-cancel-button]:hidden"
           @input="onSearchInput"
         />
         <button
           v-if="searchQuery"
           type="button"
           aria-label="Hapus pencarian wishlist"
-          class="wishlist-clear-btn absolute right-1.5 top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-full text-brand-muted hover:text-brand-ink hover:bg-brand-field transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent cursor-pointer"
+          class="wishlist-clear-btn absolute right-1.5 top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-full text-brand-muted hover:text-brand-ink hover:bg-brand-field transition-colors focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 cursor-pointer"
           @click="emit('update:searchQuery', '')"
         >
           <i class="pi pi-times text-[10px]" aria-hidden="true" />

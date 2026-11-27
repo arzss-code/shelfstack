@@ -187,7 +187,7 @@ const handleSubmit = async () => {
               v-for="star in 5"
               :key="star"
               type="button"
-              class="group rounded p-1 text-2xl transition-transform duration-150 hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+              class="group rounded p-1 text-2xl transition-transform duration-150 hover:scale-110 active:scale-95 focus:outline-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
               :aria-label="`${star} bintang`"
               @click="setRating(star)"
               @mouseenter="hoverRating = star"

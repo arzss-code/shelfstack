@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminFlashDealModal, {
   type FlashDealAdminRow,
 } from '~/components/admin/promotions/AdminFlashDealModal.vue'
-import { formatRupiah } from '~/utils/format'
+import AdminFlashDealTable from '~/components/admin/promotions/AdminFlashDealTable.vue'
 
 definePageMeta({
   layout: 'admin',
@@ -31,29 +32,6 @@ const loading = ref(true)
 const errorMsg = ref<string | null>(null)
 const isModalOpen = ref(false)
 const editingDeal = ref<FlashDealAdminRow | null>(null)
-
-function getDealStatusBadge(deal: FlashDealAdminRow): {
-  label: string
-  variant: 'success' | 'info' | 'warning' | 'default'
-} {
-  if (!deal.is_active) return { label: 'Nonaktif', variant: 'default' }
-  const now = Date.now()
-  const start = new Date(deal.starts_at).getTime()
-  const end = new Date(deal.ends_at).getTime()
-  if (now < start) return { label: 'Terjadwal', variant: 'info' }
-  if (now > end || deal.claimed >= deal.quota) return { label: 'Berakhir', variant: 'warning' }
-  return { label: 'Aktif Live', variant: 'success' }
-}
-
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 async function loadData() {
   loading.value = true
@@ -117,25 +95,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1
-          class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0 mb-1"
+  <div class="space-y-5">
+    <AdminPageHeader
+      title="Promo & Flash Sale"
+      subtitle="Jadwal promo berbatas waktu dan kuota klaim produk."
+    >
+      <template #actions>
+        <UiButton
+          variant="outline"
+          size="sm"
+          icon="pi-refresh"
+          :loading="loading"
+          @click="loadData"
         >
-          Promo &amp; Flash Sale
-        </h1>
-        <p class="text-xs sm:text-sm text-brand-muted m-0">
-          Kelola jadwal kampanye Flash Deals aktif, kuota klaim, dan potongan harga resmi.
-        </p>
-      </div>
-      <div class="flex items-center gap-2">
-        <UiButton variant="outline" icon="pi-refresh" :loading="loading" @click="loadData">
-          Segarkan
+          Muat Ulang
         </UiButton>
-        <UiButton variant="primary" icon="pi-plus" @click="openCreate">Buat Flash Sale</UiButton>
-      </div>
-    </div>
+        <UiButton variant="primary" size="sm" icon="pi-plus" @click="openCreate">
+          Buat Flash Sale
+        </UiButton>
+      </template>
+    </AdminPageHeader>
 
     <UiAlert v-if="errorMsg" tone="danger" class="text-xs">
       <div class="flex items-center justify-between gap-3">
@@ -157,51 +136,13 @@ onMounted(() => {
       @action="openCreate"
     />
 
-    <div v-else class="grid grid-cols-1 gap-3">
-      <article
-        v-for="deal in deals"
-        :key="deal.id"
-        class="rounded-card border border-brand-hair bg-brand-canvas p-4 sm:p-5 shadow-whisper flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-      >
-        <div class="space-y-1.5 min-w-0">
-          <div class="flex flex-wrap items-center gap-2">
-            <h2 class="m-0 font-display text-sm sm:text-base font-bold text-brand-ink truncate">
-              {{ deal.products?.name || `Produk #${deal.product_id}` }}
-            </h2>
-            <UiBadge
-              :label="getDealStatusBadge(deal).label"
-              :variant="getDealStatusBadge(deal).variant"
-            />
-            <UiBadge :label="`-${deal.discount_percentage}%`" variant="danger" />
-          </div>
-
-          <div
-            class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-brand-muted tabular-nums"
-          >
-            <span>
-              Harga Promo:
-              <strong class="text-brand-ink">{{
-                formatRupiah(deal.promo_price_cents / 100)
-              }}</strong>
-            </span>
-            <span>Kuota Klaim: {{ deal.claimed }} / {{ deal.quota }}</span>
-            <span
-              >Jadwal: {{ formatDateTime(deal.starts_at) }} -
-              {{ formatDateTime(deal.ends_at) }}</span
-            >
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2 shrink-0">
-          <UiButton size="sm" variant="secondary" icon="pi-pencil" @click="openEdit(deal)">
-            Edit
-          </UiButton>
-          <UiButton size="sm" variant="danger" icon="pi-trash" @click="confirmArchive(deal)">
-            Hapus
-          </UiButton>
-        </div>
-      </article>
-    </div>
+    <AdminFlashDealTable
+      v-else
+      :deals="deals"
+      :loading="loading"
+      @edit="openEdit"
+      @archive="confirmArchive"
+    />
 
     <AdminFlashDealModal
       :show="isModalOpen"

@@ -205,7 +205,9 @@ async function deleteCategory(cat: CategoryItem) {
         </div>
       </form>
 
-      <div class="divide-y divide-brand-hairsoft border border-brand-hair rounded-card">
+      <div
+        class="overflow-hidden divide-y divide-brand-hairsoft border border-brand-hair rounded-card"
+      >
         <div
           v-for="cat in categories"
           :key="cat.id"

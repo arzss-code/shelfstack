@@ -14,13 +14,13 @@ export class AdminDashboardPage extends BasePage {
 
   constructor(page: Page) {
     super(page)
-    this.heading = page.getByRole('heading', { name: 'Dashboard Eksekutif' })
-    this.revenueCard = page.getByText('Revenue Bulan Ini')
-    this.pendingOrdersCard = page.getByText('Pesanan Pending')
-    this.lowStockCard = page.getByText('Stok Kritis (< 5)')
-    this.totalCustomersCard = page.getByText('Total Pelanggan')
+    this.heading = page.getByRole('heading', { name: 'Ringkasan Toko' })
+    this.revenueCard = page.getByText('Omzet Bulan Ini')
+    this.pendingOrdersCard = page.getByText('Pesanan Menunggu')
+    this.lowStockCard = page.getByText('Stok Menipis')
+    this.totalCustomersCard = page.getByText('Pelanggan Terdaftar')
     this.manageOrdersButton = page.getByRole('link', { name: 'Kelola Pesanan' }).first()
-    this.refreshButton = page.getByRole('button', { name: 'Perbarui Data' })
+    this.refreshButton = page.getByRole('button', { name: 'Muat Ulang' })
     this.recentTransactionsHeading = page.getByRole('heading', { name: 'Transaksi Terbaru' })
   }
 

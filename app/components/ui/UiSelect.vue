@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useSlots } from 'vue'
+import UiSelectMenu from '~/components/ui/UiSelectMenu.vue'
 import { useUiSelect } from '~/composables/useUiSelect'
 
 export interface UiSelectOption {
@@ -24,14 +25,20 @@ const props = withDefaults(
     error?: string
     /** Sarana bantu di bawah kontrol, tampil hanya bila tidak ada error. */
     hint?: string
-    /** `sm` untuk strip filter/toolbar, `md` untuk field formulir. */
-    size?: 'sm' | 'md'
+    /** `xs` untuk kontrol header padat, `sm` untuk strip filter/toolbar, `md` untuk field formulir. */
+    size?: 'xs' | 'sm' | 'md'
     block?: boolean
     /** Memaksa bentuk stadium pill (rounded-full). Default true jika size sm. */
     pill?: boolean
     /** Posisi popover: left atau right. */
     align?: 'left' | 'right'
     title?: string
+    /** Kelas tambahan untuk elemen native select tersembunyi (kontrak aksesibilitas/test). */
+    selectClass?: string
+    /** Render popover ke body via ClientOnly agar bebas kliping overflow-hidden & aman SSR. */
+    teleport?: boolean
+    /** Ukuran ringkas h-7 sejajar tombol pagination Next/Prev. */
+    compactTrigger?: boolean
   }>(),
   {
     id: undefined,
@@ -47,6 +54,9 @@ const props = withDefaults(
     pill: undefined,
     align: 'left',
     title: undefined,
+    selectClass: '',
+    teleport: false,
+    compactTrigger: false,
   },
 )
 
@@ -65,7 +75,8 @@ const {
   activeIndex,
   rootRef,
   triggerRef,
-  listboxRef,
+  menuRef,
+  floatingStyle,
   normalizedOptions,
   selectedOption,
   displayLabel,
@@ -97,15 +108,17 @@ const {
     </label>
 
     <div class="relative" :class="{ 'z-50': isOpen }">
-      <!-- Hidden native select untuk kompatibilitas form autofill dan screen reader -->
       <select
         :id="selectId"
         tabindex="-1"
         aria-hidden="true"
         :value="modelValue ?? ''"
         :disabled="disabled"
-        class="sr-only pointer-events-none"
-        @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+        :class="['sr-only pointer-events-none', selectClass]"
+        @change="
+          (emit('update:modelValue', ($event.target as HTMLSelectElement).value),
+          emit('change', ($event.target as HTMLSelectElement).value))
+        "
       >
         <option v-if="placeholder" value="" disabled :selected="!modelValue">
           {{ placeholder }}
@@ -121,7 +134,6 @@ const {
         </option>
       </select>
 
-      <!-- Custom Trigger Button -->
       <button
         ref="triggerRef"
         type="button"
@@ -168,71 +180,43 @@ const {
         </svg>
       </button>
 
-      <!-- Custom Floating Popover Menu -->
-      <Transition
-        enter-active-class="transition duration-150 ease-out"
-        enter-from-class="transform scale-95 opacity-0 -translate-y-1"
-        enter-to-class="transform scale-100 opacity-100 translate-y-0"
-        leave-active-class="transition duration-100 ease-in"
-        leave-from-class="transform scale-100 opacity-100 translate-y-0"
-        leave-to-class="transform scale-95 opacity-0 -translate-y-1"
-      >
-        <div
-          v-if="isOpen"
-          :id="listboxId"
-          ref="listboxRef"
-          role="listbox"
-          tabindex="-1"
-          :aria-activedescendant="activeIndex >= 0 ? `${selectId}-opt-${activeIndex}` : undefined"
-          :class="[
-            'absolute z-50 mt-1.5 max-h-60 overflow-y-auto bg-brand-canvas border border-brand-hair rounded-card p-1 shadow-floating outline-none',
-            align === 'right' ? 'right-0' : 'left-0',
-            block ? 'w-full' : 'min-w-full w-max max-w-xs sm:max-w-sm',
-          ]"
-        >
-          <div
-            v-if="normalizedOptions.length === 0"
-            class="px-3 py-2 text-xs text-brand-muted text-center"
-          >
-            Tidak ada opsi
-          </div>
-          <button
-            v-for="(opt, idx) in normalizedOptions"
-            :id="`${selectId}-opt-${idx}`"
-            :key="opt.value"
-            type="button"
-            role="option"
-            :aria-selected="String(opt.value) === String(modelValue)"
-            :disabled="opt.disabled"
-            :class="[
-              'w-full flex items-center justify-between gap-3 px-3 py-2 text-left text-xs rounded-xl transition-colors cursor-pointer select-none border-0',
-              String(opt.value) === String(modelValue)
-                ? 'bg-brand-canvas-soft text-brand-ink font-semibold'
-                : activeIndex === idx
-                  ? 'bg-brand-canvas-soft/80 text-brand-ink font-medium'
-                  : 'text-brand-ink hover:bg-brand-canvas-soft hover:text-brand-ink font-normal',
-              opt.disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : '',
-            ]"
-            @click="selectOption(opt)"
-            @mouseenter="activeIndex = idx"
-          >
-            <div class="flex flex-col min-w-0">
-              <span class="truncate">{{ opt.label }}</span>
-              <span v-if="opt.description" class="text-[10px] text-brand-muted truncate">
-                {{ opt.description }}
-              </span>
-            </div>
-            <i
-              v-if="String(opt.value) === String(modelValue)"
-              class="pi pi-check text-[11px] text-brand-accent shrink-0 font-bold"
-              aria-hidden="true"
-            />
-          </button>
-        </div>
-      </Transition>
+      <ClientOnly v-if="teleport">
+        <Teleport to="body">
+          <UiSelectMenu
+            ref="menuRef"
+            :is-open="isOpen"
+            :listbox-id="listboxId"
+            :select-id="selectId"
+            :active-index="activeIndex"
+            :model-value="modelValue"
+            :normalized-options="normalizedOptions"
+            :teleport="true"
+            :floating-style="floatingStyle"
+            :align="align"
+            :block="block"
+            @select="selectOption"
+            @hover-index="activeIndex = $event"
+          />
+        </Teleport>
+      </ClientOnly>
+      <UiSelectMenu
+        v-else
+        ref="menuRef"
+        :is-open="isOpen"
+        :listbox-id="listboxId"
+        :select-id="selectId"
+        :active-index="activeIndex"
+        :model-value="modelValue"
+        :normalized-options="normalizedOptions"
+        :teleport="false"
+        :floating-style="floatingStyle"
+        :align="align"
+        :block="block"
+        @select="selectOption"
+        @hover-index="activeIndex = $event"
+      />
     </div>
 
-    <!-- Hidden slot for backwards compatibility if callers pass <option> children -->
     <div v-if="$slots.default" class="hidden" aria-hidden="true">
       <slot />
     </div>

@@ -44,7 +44,7 @@ function selectRole(role: 'customer' | 'admin') {
       <!-- Role: Pelanggan (Buyer) -->
       <button
         type="button"
-        class="group relative flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/50 min-h-[44px]"
+        class="group relative flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all cursor-pointer focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 min-h-[44px]"
         :class="[
           selectedRole === 'customer'
             ? 'border-brand-ink bg-brand-canvas shadow-whisper text-brand-ink'
@@ -86,7 +86,7 @@ function selectRole(role: 'customer' | 'admin') {
       <!-- Role: Admin Ops (Staff) -->
       <button
         type="button"
-        class="group relative flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/50 min-h-[44px]"
+        class="group relative flex items-center justify-between rounded-lg border px-2.5 py-2 text-left transition-all cursor-pointer focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 min-h-[44px]"
         :class="[
           selectedRole === 'admin'
             ? 'border-brand-ink bg-brand-canvas shadow-whisper text-brand-ink'

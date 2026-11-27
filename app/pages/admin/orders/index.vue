@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import AdminExpiryQueueCard from '~/features/orders/components/AdminExpiryQueueCard.vue'
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
+import UiDateRangePicker from '~/components/ui/UiDateRangePicker.vue'
+import AdminOrderExportMenu from '~/features/orders/components/AdminOrderExportMenu.vue'
 import AdminOrderTable from '~/features/orders/components/AdminOrderTable.vue'
 
 definePageMeta({
@@ -26,115 +28,86 @@ const {
   totalOrders,
   errorMessage,
   exporting,
+  exportingFormat,
   statusTabs,
   totalPages,
   fetchOrders,
   onStatusChange,
   onSearch,
+  resetDateFilters,
   onSortChange,
-  handleExportCsv,
+  handleExport,
   prevPage,
   nextPage,
+  setPage,
+  setPageSize,
 } = useAdminOrdersList()
 </script>
 
 <template>
-  <div class="space-y-6 pb-16">
-    <!-- Header -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <div class="flex items-center gap-3">
-          <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-brand-ink m-0">
-            Kelola Pesanan
-          </h1>
-          <span
-            class="inline-flex items-center gap-1.5 rounded-full border border-brand-success-edge bg-brand-success-tint px-2.5 py-0.5 text-[11px] font-medium text-brand-success-text"
-          >
-            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-success" />
-            Live Realtime
-          </span>
-        </div>
-        <p class="font-body text-xs sm:text-sm text-brand-muted m-0 mt-1">
-          Pantau seluruh pesanan, verifikasi pembayaran, dan jalankan pembaruan logistik secara
-          langsung.
-        </p>
-      </div>
+  <div class="space-y-5">
+    <AdminPageHeader
+      title="Kelola Pesanan"
+      subtitle="Daftar pesanan masuk, verifikasi pembayaran, dan status pengiriman."
+    >
+      <template #actions>
+        <AdminOrderExportMenu
+          :exporting="exporting"
+          :active-format="exportingFormat"
+          @export="handleExport"
+        />
 
-      <div class="flex items-center gap-2">
         <UiButton
           variant="outline"
-          size="sm"
-          icon="pi-download"
-          :loading="exporting"
-          @click="handleExportCsv"
-        >
-          Ekspor CSV
-        </UiButton>
-
-        <UiButton
-          variant="secondary"
           size="sm"
           icon="pi-refresh"
           :loading="loading"
           @click="fetchOrders"
         >
-          Perbarui
+          Muat Ulang
         </UiButton>
-      </div>
-    </div>
-
-    <!-- BullMQ Order Expiry & DLQ Telemetry -->
-    <AdminExpiryQueueCard />
+      </template>
+    </AdminPageHeader>
 
     <!-- Filter & Search Controls -->
-    <div class="flex flex-col gap-3 rounded-2xl border border-brand-hair bg-brand-canvas-soft p-4">
-      <!-- Status Tabs -->
-      <UiTabs
-        :model-value="activeStatus"
-        :items="statusTabs"
-        aria-label="Filter status pesanan"
-        @update:model-value="onStatusChange"
-      />
+    <div
+      class="rounded-card border border-brand-hair bg-brand-canvas p-2.5 sm:p-3 shadow-whisper"
+      data-testid="admin-orders-filter-bar"
+    >
+      <form
+        class="flex flex-col gap-2.5 xl:flex-row xl:items-center xl:justify-between"
+        @submit.prevent="onSearch"
+      >
+        <UiTabs
+          :model-value="activeStatus"
+          :items="statusTabs"
+          aria-label="Filter status pesanan"
+          class="self-start max-w-full"
+          @update:model-value="onStatusChange"
+        />
 
-      <!-- Search & Filter Form -->
-      <form class="flex flex-wrap items-center gap-2" @submit.prevent="onSearch">
-        <label for="admin-orders-search" class="sr-only">Cari ID / Nama</label>
-        <div class="w-full sm:w-56">
-          <UiInput
-            id="admin-orders-search"
-            v-model="searchQuery"
-            type="search"
-            size="sm"
-            left-icon="pi-search"
-            placeholder="Cari ID / Nama..."
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 min-w-0">
+          <label for="admin-orders-search" class="sr-only">Cari ID atau nama pelanggan</label>
+          <div class="w-full min-w-[180px] sm:flex-1 xl:w-52 xl:flex-none">
+            <UiInput
+              id="admin-orders-search"
+              v-model="searchQuery"
+              type="search"
+              size="sm"
+              left-icon="pi-search"
+              placeholder="Cari ID / Nama..."
+            />
+          </div>
+
+          <UiDateRangePicker
+            v-model:from="fromDate"
+            v-model:to="toDate"
+            class="flex-1 sm:flex-none"
+            @change="onSearch"
           />
+
+          <UiButton variant="secondary" size="sm" type="submit" class="shrink-0">Cari</UiButton>
         </div>
-
-        <label for="admin-orders-from" class="sr-only">Tanggal mulai</label>
-        <div class="w-full sm:w-36">
-          <UiInput
-            id="admin-orders-from"
-            v-model="fromDate"
-            type="date"
-            size="sm"
-            title="Tanggal mulai"
-          />
-        </div>
-
-        <span class="hidden text-xs text-brand-muted sm:inline">s.d.</span>
-
-        <label for="admin-orders-to" class="sr-only">Tanggal akhir</label>
-        <div class="w-full sm:w-36">
-          <UiInput
-            id="admin-orders-to"
-            v-model="toDate"
-            type="date"
-            size="sm"
-            title="Tanggal akhir"
-          />
-        </div>
-
-        <UiButton variant="secondary" size="sm" type="submit">Cari</UiButton>
       </form>
     </div>
 
@@ -155,6 +128,8 @@ const {
       :sort-direction="sortDirection"
       @prev-page="prevPage"
       @next-page="nextPage"
+      @page-change="setPage"
+      @page-size-change="setPageSize"
       @sort-change="onSortChange"
     />
   </div>

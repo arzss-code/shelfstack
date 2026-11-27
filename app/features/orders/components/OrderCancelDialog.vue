@@ -46,7 +46,7 @@ const handleConfirm = () => {
               v-model="reason"
               type="radio"
               :value="r"
-              class="text-brand-accent focus:ring-brand-accent"
+              class="text-brand-ink accent-brand-ink focus:ring-brand-ink focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
             />
             <span class="text-brand-ink">{{ r }}</span>
           </label>

@@ -48,20 +48,32 @@ export function useActivities() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'activity_logs' },
         (payload) => {
-          // Add temporary 'isNew' flag for UI highlighting
           const newActivity: ActivityLog = {
             ...(payload.new as unknown as ActivityLog),
             isNew: true,
           }
           activities.value.unshift(newActivity)
 
-          // Remove highlight flag after 2 seconds
           setTimeout(() => {
             const index = activities.value.findIndex((a) => a.id === newActivity.id)
             if (index !== -1 && activities.value[index]) {
               activities.value[index]!.isNew = false
             }
           }, 2000)
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'activity_logs' },
+        (payload) => {
+          const updated = payload.new as unknown as ActivityLog
+          const index = activities.value.findIndex((a) => a.id === updated.id)
+          if (index !== -1) {
+            activities.value[index] = {
+              ...updated,
+              isNew: activities.value[index]?.isNew,
+            }
+          }
         },
       )
       .subscribe()

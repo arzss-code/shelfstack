@@ -27,7 +27,7 @@ const productUrl = computed(() => `/product/${props.item.slug || props.item.prod
       <!-- Compact Studio Thumbnail -->
       <NuxtLink
         :to="productUrl"
-        class="wishlist-media block rounded-media bg-brand-canvas-soft border border-brand-hairsoft overflow-hidden shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+        class="wishlist-media block rounded-media bg-brand-canvas-soft border border-brand-hairsoft overflow-hidden shrink-0 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
       >
         <img
           v-if="item.imageUrl"
@@ -57,7 +57,7 @@ const productUrl = computed(() => `/product/${props.item.slug || props.item.prod
         >
           <NuxtLink
             :to="productUrl"
-            class="text-brand-ink hover:text-brand-accent transition-colors no-underline line-clamp-2 sm:line-clamp-1 break-words focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded-sm"
+            class="text-brand-ink hover:text-brand-accent transition-colors no-underline line-clamp-2 sm:line-clamp-1 break-words focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 rounded-sm"
           >
             {{ item.name }}
           </NuxtLink>
@@ -133,7 +133,7 @@ const productUrl = computed(() => `/product/${props.item.slug || props.item.prod
           type="button"
           :aria-label="`Hapus ${item.name} dari wishlist`"
           :title="`Hapus ${item.name} dari wishlist`"
-          class="wishlist-remove relative inline-flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full border border-transparent text-brand-muted transition-colors duration-150 motion-reduce:transition-none hover:border-brand-danger-edge hover:bg-brand-danger-tint hover:text-brand-danger-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-1 cursor-pointer"
+          class="wishlist-remove relative inline-flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full border border-transparent text-brand-muted transition-colors duration-150 motion-reduce:transition-none hover:border-brand-danger-edge hover:bg-brand-danger-tint hover:text-brand-danger-text focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 cursor-pointer"
           @click="emit('remove', item.productId, item.name)"
         >
           <i class="pi pi-trash text-xs" aria-hidden="true" />

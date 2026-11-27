@@ -4,19 +4,17 @@ import { BasePage } from './BasePage'
 
 export class AdminOrdersPage extends BasePage {
   readonly heading: Locator
-  readonly liveIndicator: Locator
   readonly refreshButton: Locator
   readonly searchInput: Locator
   readonly tableRows: Locator
 
-  readonly exportCsvButton: Locator
+  readonly exportMenuButton: Locator
 
   constructor(page: Page) {
     super(page)
     this.heading = page.getByRole('heading', { name: 'Kelola Pesanan' })
-    this.liveIndicator = page.getByText('Live Realtime')
-    this.refreshButton = page.getByRole('button', { name: 'Perbarui' })
-    this.exportCsvButton = page.getByRole('button', { name: 'Ekspor CSV' })
+    this.refreshButton = page.getByRole('button', { name: 'Muat Ulang' })
+    this.exportMenuButton = page.getByRole('button', { name: /ekspor data/i })
     this.searchInput = page.getByPlaceholder('Cari ID / Nama...')
     this.tableRows = page.locator('table tbody tr')
   }
@@ -27,7 +25,6 @@ export class AdminOrdersPage extends BasePage {
 
   async assertPageLoaded(): Promise<void> {
     await expect(this.heading).toBeVisible({ timeout: 15000 })
-    await expect(this.liveIndicator).toBeVisible()
     await expect(this.searchInput).toBeVisible()
   }
 

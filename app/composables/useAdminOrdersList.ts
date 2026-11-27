@@ -16,12 +16,12 @@ export function useAdminOrdersList() {
   const fromDate = ref('')
   const toDate = ref('')
   const page = ref(1)
-  const pageSize = 15
+  const pageSize = ref(15)
   const sortKey = ref<string | null>(null)
   const sortDirection = ref<'desc' | 'asc' | null>(null)
 
   const sortParam = computed(() => {
-    if (!sortKey.value || !sortDirection.value) return ''
+    if (!sortKey.value || !sortDirection.value || sortKey.value === 'items') return ''
     const col = sortKey.value === 'id' ? 'created_at' : sortKey.value
     return `${col}_${sortDirection.value}`
   })
@@ -31,6 +31,7 @@ export function useAdminOrdersList() {
   const totalOrders = ref(0)
   const errorMessage = ref('')
   const exporting = ref(false)
+  const exportingFormat = ref<'csv' | 'xlsx' | null>(null)
   let orderChannel: RealtimeChannel | null = null
 
   const statusTabs = [
@@ -45,12 +46,14 @@ export function useAdminOrdersList() {
   const fetchOrders = async () => {
     loading.value = true
     errorMessage.value = ''
-    const from = (page.value - 1) * pageSize
-    const to = from + pageSize - 1
+    const from = (page.value - 1) * pageSize.value
+    const to = from + pageSize.value - 1
     try {
       const params: Record<string, string | number> = { from, to }
       if (activeStatus.value) params.status = activeStatus.value
       if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
+      if (fromDate.value) params.date_from = fromDate.value
+      if (toDate.value) params.date_to = toDate.value
       if (sortParam.value) params.sort = sortParam.value
 
       const res = await $fetch<{
@@ -79,29 +82,53 @@ export function useAdminOrdersList() {
     fetchOrders()
   }
 
-  const onSortChange = (payload: { key: string | null; direction: 'desc' | 'asc' | null }) => {
-    sortKey.value = payload.key
-    sortDirection.value = payload.direction
+  const resetDateFilters = () => {
+    fromDate.value = ''
+    toDate.value = ''
     page.value = 1
     fetchOrders()
   }
 
-  const handleExportCsv = async () => {
+  const onSortChange = (payload: { key: string | null; direction: 'desc' | 'asc' | null }) => {
+    sortKey.value = payload.direction ? payload.key : null
+    sortDirection.value = payload.direction
+    if (sortKey.value === 'items') {
+      const factor = sortDirection.value === 'desc' ? -1 : 1
+      orders.value = [...orders.value].sort(
+        (a, b) => ((a.order_items?.length || 0) - (b.order_items?.length || 0)) * factor,
+      )
+      return
+    }
+    page.value = 1
+    fetchOrders()
+  }
+
+  const handleExport = async (format: 'csv' | 'xlsx' = 'csv') => {
     exporting.value = true
+    exportingFormat.value = format
     try {
-      const params: Record<string, string> = {}
+      const params: Record<string, string> = { format }
       if (activeStatus.value) params.status = activeStatus.value
       if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
       if (fromDate.value) params.from = fromDate.value
       if (toDate.value) params.to = toDate.value
       if (sortParam.value) params.sort = sortParam.value
 
-      const res = await $fetch<string>('/api/admin/orders/export', { params, responseType: 'text' })
-      const blob = new Blob([res], { type: 'text/csv;charset=utf-8;' })
+      const dateStamp = new Date().toISOString().slice(0, 10)
+      const mimeType =
+        format === 'xlsx'
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          : 'text/csv;charset=utf-8;'
+      const buf = await $fetch<ArrayBuffer>('/api/admin/orders/export', {
+        params,
+        responseType: 'arrayBuffer',
+      })
+      const blob = new Blob([buf], { type: mimeType })
+
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', `laporan-pesanan-${new Date().toISOString().slice(0, 10)}.csv`)
+      link.setAttribute('download', `laporan-pesanan-${dateStamp}.${format}`)
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -109,21 +136,30 @@ export function useAdminOrdersList() {
 
       toast.show({
         title: 'Ekspor Berhasil',
-        message: 'Laporan CSV pesanan berhasil diunduh.',
+        message:
+          format === 'xlsx'
+            ? 'Laporan Excel (.xlsx) pesanan berhasil diunduh.'
+            : 'Laporan CSV pesanan berhasil diunduh.',
         tone: 'success',
       })
     } catch {
       toast.show({
         title: 'Gagal Ekspor',
-        message: 'Gagal mengunduh laporan CSV pesanan.',
+        message:
+          format === 'xlsx'
+            ? 'Gagal mengunduh laporan Excel pesanan.'
+            : 'Gagal mengunduh laporan CSV pesanan.',
         tone: 'error',
       })
     } finally {
       exporting.value = false
+      exportingFormat.value = null
     }
   }
 
-  const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize) || 1)
+  const handleExportCsv = () => handleExport('csv')
+
+  const totalPages = computed(() => Math.ceil(totalOrders.value / pageSize.value) || 1)
 
   const prevPage = () => {
     if (page.value > 1) {
@@ -137,6 +173,19 @@ export function useAdminOrdersList() {
       page.value++
       fetchOrders()
     }
+  }
+
+  const setPage = (next: number) => {
+    if (next < 1 || next > totalPages.value || next === page.value) return
+    page.value = next
+    fetchOrders()
+  }
+
+  const setPageSize = (nextSize: number) => {
+    if (!Number.isFinite(nextSize) || nextSize < 1 || nextSize === pageSize.value) return
+    pageSize.value = nextSize
+    page.value = 1
+    fetchOrders()
   }
 
   const setupRealtime = () => {
@@ -223,14 +272,19 @@ export function useAdminOrdersList() {
     totalOrders,
     errorMessage,
     exporting,
+    exportingFormat,
     statusTabs,
     totalPages,
     fetchOrders,
     onStatusChange,
     onSearch,
+    resetDateFilters,
     onSortChange,
+    handleExport,
     handleExportCsv,
     prevPage,
     nextPage,
+    setPage,
+    setPageSize,
   }
 }

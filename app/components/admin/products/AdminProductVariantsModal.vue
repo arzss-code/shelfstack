@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import UiCheckbox from '~/components/ui/UiCheckbox.vue'
 import type { Product } from '~/types/product'
 import { formatRupiah } from '~/utils/format'
 import { useAdminProductVariants } from '~/composables/useAdminProductVariants'
@@ -93,12 +94,7 @@ const {
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-          <label
-            class="inline-flex items-center gap-2 text-xs font-medium text-brand-ink cursor-pointer"
-          >
-            <input v-model="form.is_active" type="checkbox" class="rounded border-brand-hair" />
-            <span>Varian aktif di etalase</span>
-          </label>
+          <UiCheckbox v-model="form.is_active" label="Varian aktif di etalase" />
           <UiButton type="submit" variant="primary" size="sm" :loading="saving">
             {{ editingId ? 'Simpan Perubahan' : 'Tambah Varian' }}
           </UiButton>
@@ -116,7 +112,10 @@ const {
         description="Produk ini menggunakan stok tunggal. Tambahkan varian di atas bila memiliki opsi SKU berbeda."
       />
 
-      <div v-else class="divide-y divide-brand-hairsoft border border-brand-hair rounded-card">
+      <div
+        v-else
+        class="overflow-hidden divide-y divide-brand-hairsoft border border-brand-hair rounded-card"
+      >
         <div v-for="v in variants" :key="v.id" class="p-3.5 space-y-2.5 bg-brand-canvas">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div class="min-w-0">

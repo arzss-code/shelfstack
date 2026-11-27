@@ -9,6 +9,7 @@ import { requireAdmin } from '../../../../utils/auth'
 import { errorResponse, successResponse } from '../../../../utils/response'
 import { createNotification } from '../../../../utils/notifications'
 import { RETURN_STATUS_MAP } from '../../../../utils/return-request'
+import { insertActivityLogWithDevice } from '../../../../utils/activity-log'
 import { rehydratePrivateStorageUrl } from '../../../../utils/private-storage'
 import { logger } from '../../../../utils/logger'
 
@@ -95,16 +96,13 @@ export default defineEventHandler(async (event) => {
       logger.warn('[RMA Review] Gagal mengirim notifikasi', {}, err)
     })
 
-    try {
-      await client.from('activity_logs').insert({
-        entity_type: 'return_request',
-        entity_id: 0,
-        action: 'UPDATE',
-        description: `Admin memperbarui status tiket retur ${returnId} menjadi ${payload.status}`,
-      })
-    } catch {
-      // non-blocking
-    }
+    await insertActivityLogWithDevice(client, event, {
+      entity_type: 'return_request',
+      entity_id: 0,
+      action: 'UPDATE',
+      description: `Admin memperbarui status tiket retur ${returnId} menjadi ${payload.status}`,
+      new_data: { return_id: returnId, order_id: updatedTicket.order_id, status: payload.status },
+    })
 
     return successResponse('Keputusan tiket retur berhasil disimpan', {
       ...updatedTicket,

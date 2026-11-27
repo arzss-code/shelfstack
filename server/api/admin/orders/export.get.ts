@@ -1,12 +1,18 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { generateOrdersCsv, parseExportDateRange, type OrderCsvRow } from '~/utils/csv'
+import { generateOrdersXlsx } from '~~/server/utils/xlsx'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
 
   const client = await serverSupabaseClient<Database>(event)
   const query = getQuery(event)
+
+  const rawFormat = typeof query.format === 'string' ? query.format.trim().toLowerCase() : 'csv'
+  if (rawFormat !== 'csv' && rawFormat !== 'xlsx') {
+    return errorResponse(event, 'Format ekspor harus csv atau xlsx.', null, 400)
+  }
 
   const status = (query.status as string) || ''
   const search = (query.search as string) || ''
@@ -18,6 +24,8 @@ export default defineEventHandler(async (event) => {
     'total_asc',
     'name_asc',
     'name_desc',
+    'status_asc',
+    'status_desc',
   ]
   const sort = sortAllowlist.includes(rawSort) ? rawSort : 'created_at_desc'
 
@@ -61,6 +69,10 @@ export default defineEventHandler(async (event) => {
         return dbQuery.order('address->>name', { ascending: true }).limit(1000)
       case 'name_desc':
         return dbQuery.order('address->>name', { ascending: false }).limit(1000)
+      case 'status_asc':
+        return dbQuery.order('status', { ascending: true }).limit(1000)
+      case 'status_desc':
+        return dbQuery.order('status', { ascending: false }).limit(1000)
       case 'created_at_desc':
       default:
         return dbQuery.order('created_at', { ascending: false }).limit(1000)
@@ -85,8 +97,23 @@ export default defineEventHandler(async (event) => {
     }
   })
 
+  const dateStamp = new Date().toISOString().slice(0, 10)
+  if (rawFormat === 'xlsx') {
+    const xlsxBuffer = generateOrdersXlsx(rows)
+    const filename = `laporan-pesanan-shelfstack-${dateStamp}.xlsx`
+
+    setHeader(
+      event,
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    setHeader(event, 'Content-Disposition', `attachment; filename="${filename}"`)
+
+    return xlsxBuffer
+  }
+
   const csvContent = generateOrdersCsv(rows)
-  const filename = `laporan-pesanan-shelfstack-${new Date().toISOString().slice(0, 10)}.csv`
+  const filename = `laporan-pesanan-shelfstack-${dateStamp}.csv`
 
   setHeader(event, 'Content-Type', 'text/csv; charset=utf-8')
   setHeader(event, 'Content-Disposition', `attachment; filename="${filename}"`)

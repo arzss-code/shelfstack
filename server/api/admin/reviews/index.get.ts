@@ -3,6 +3,7 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import {
   adminReviewQuerySchema,
+  calculateReviewStats,
   formatReviewerName,
   type AdminReviewItem,
 } from '../../../../shared/schemas/review'
@@ -64,10 +65,11 @@ export default defineEventHandler(async (event) => {
   const attentionReviews = allReviews?.filter((r) => !r.deleted_at && r.rating <= 3).length || 0
 
   const activeRatings = allReviews?.filter((r) => !r.deleted_at).map((r) => r.rating) || []
-  const avgRating =
-    activeRatings.length > 0
-      ? Number((activeRatings.reduce((a, b) => a + b, 0) / activeRatings.length).toFixed(2))
-      : 5.0
+  const reviewStats = calculateReviewStats(activeRatings)
+  const avgRating = activeRatings.length > 0 ? reviewStats.average_rating : 0
+  const positiveCount = reviewStats.distribution[4] + reviewStats.distribution[5]
+  const positiveRate =
+    activeRatings.length > 0 ? Math.round((positiveCount / activeRatings.length) * 100) : 0
 
   type RawReviewRow = {
     id: string
@@ -150,6 +152,8 @@ export default defineEventHandler(async (event) => {
       fiveStar: fiveStarReviews,
       attention: attentionReviews,
       averageRating: avgRating,
+      positiveRate,
+      distribution: reviewStats.distribution,
     },
   })
 })

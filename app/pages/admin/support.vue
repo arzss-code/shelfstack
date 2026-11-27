@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminSupportInboxList from '~/components/admin/support/AdminSupportInboxList.vue'
 import AdminSupportChatPane from '~/components/admin/support/AdminSupportChatPane.vue'
 import AdminContactInboxPanel from '~/components/admin/support/AdminContactInboxPanel.vue'
@@ -103,49 +104,52 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="space-y-4 text-brand-ink">
-    <!-- Header -->
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h1 class="text-xl font-bold tracking-tight text-brand-ink flex items-center gap-2">
-          <span>Bantuan & Live Chat</span>
-          <span
-            v-if="totalUnreadCount > 0"
-            class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700"
-          >
-            {{ totalUnreadCount }} belum dibalas
-          </span>
-        </h1>
-        <p class="text-xs text-brand-muted">
-          Pusat layanan percakapan langsung dan resolusi kendala pelanggan secara real-time.
-        </p>
-      </div>
+  <div class="flex flex-col gap-2.5 text-brand-ink md:flex-1 md:min-h-0 md:overflow-hidden">
+    <AdminPageHeader
+      title="Bantuan &amp; Live Chat"
+      subtitle="Balas percakapan pelanggan dan kelola pesan formulir kontak."
+      class="!pb-2.5 shrink-0"
+    >
+      <template v-if="totalUnreadCount > 0" #title-badge>
+        <span
+          class="inline-flex items-center rounded-full border border-brand-danger-edge bg-brand-danger-tint px-2 py-0.5 text-xs font-semibold text-brand-danger-text"
+        >
+          {{ totalUnreadCount }} belum dibalas
+        </span>
+      </template>
 
-      <div class="flex items-center gap-2">
-        <UiButton size="sm" variant="outline" :loading="isLoadingThreads" @click="refreshData">
-          <i class="pi pi-refresh text-xs" />
-          <span class="hidden sm:inline">Segarkan</span>
+      <template #actions>
+        <UiButton
+          size="sm"
+          variant="outline"
+          icon="pi-refresh"
+          :loading="isLoadingThreads"
+          @click="refreshData"
+        >
+          <span class="sr-only sm:not-sr-only">Muat Ulang</span>
         </UiButton>
-      </div>
-    </div>
+      </template>
+    </AdminPageHeader>
 
     <!-- Error Banner -->
-    <UiAlert v-if="error && activeChannel === 'live_chat'" tone="danger" class="text-xs">
+    <UiAlert v-if="error && activeChannel === 'live_chat'" tone="danger" class="text-xs shrink-0">
       {{ error }}
     </UiAlert>
 
-    <UiTabs
-      v-model="activeChannel"
-      :items="channelTabs"
-      aria-label="Kanal layanan bantuan pelanggan"
-    />
+    <div class="shrink-0">
+      <UiTabs
+        v-model="activeChannel"
+        :items="channelTabs"
+        aria-label="Kanal layanan bantuan pelanggan"
+      />
+    </div>
 
     <AdminContactInboxPanel v-if="activeChannel === 'contact_inbox'" />
 
-    <!-- Workspace Dual-Pane Container -->
+    <!-- Workspace Dual-Pane Container (Viewport-Fit on Desktop) -->
     <div
       v-else
-      class="h-[calc(100vh-14rem)] min-h-[580px] flex rounded-card border border-brand-hair bg-brand-canvas shadow-whisper overflow-hidden"
+      class="h-[72dvh] min-h-[440px] md:h-auto md:min-h-0 md:flex-1 flex rounded-card border border-brand-hair bg-brand-canvas shadow-whisper overflow-hidden"
     >
       <!-- Left Pane: Thread Inbox List -->
       <aside

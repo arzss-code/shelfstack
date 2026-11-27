@@ -81,8 +81,8 @@ const effectiveInputMode = computed<'email' | 'tel' | 'url' | 'search' | 'decima
 const controlClass = computed(() => {
   const geometry = props.size === 'sm' ? 'h-9 rounded-full text-xs' : 'h-11 rounded-field text-sm'
   const border = props.error
-    ? 'border-rose-300 focus:border-rose-500'
-    : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink'
+    ? 'border-rose-300 focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-rose-500'
+    : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-ink'
   const padding = props.leftIcon
     ? props.size === 'sm'
       ? 'pl-[34px]'
@@ -156,7 +156,7 @@ const controlClass = computed(() => {
         v-if="showPasswordToggle && type === 'password'"
         type="button"
         :class="[
-          'absolute top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-ink transition-colors flex items-center justify-center focus-visible:outline-brand-accent rounded-field cursor-pointer',
+          'absolute top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-ink transition-colors flex items-center justify-center focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0 rounded-field cursor-pointer',
           size === 'sm'
             ? 'right-0 w-10 h-10 min-w-[40px] min-h-[40px]'
             : 'right-0 w-11 h-11 min-w-[44px] min-h-[44px]',

@@ -1,21 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useAdminUsers } from '~/composables/useAdminUsers'
+import { useClientTableSort } from '~/composables/useClientTableSort'
+import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminUserMetrics from '~/components/admin/users/AdminUserMetrics.vue'
-import UiInput from '~/components/ui/UiInput.vue'
-import UiSelect from '~/components/ui/UiSelect.vue'
-import UiButton from '~/components/ui/UiButton.vue'
-import UiCard from '~/components/ui/UiCard.vue'
-import UiEmptyState from '~/components/ui/UiEmptyState.vue'
-import UiBadge from '~/components/ui/UiBadge.vue'
 import AdminCustomer360Drawer from '~/components/admin/users/AdminCustomer360Drawer.vue'
 import type { AdminCustomerSummary } from '~~/shared/types/admin-crm'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 useSeoMeta({
-  title: 'CRM Pelanggan & LTV - ShelfStack Admin',
-  description:
-    'Kelola basis data pelanggan resmi ShelfStack, pantau Customer Lifetime Value (LTV), dan riwayat belanja.',
+  title: 'Data Pelanggan - Admin ShelfStack',
+  description: 'Daftar pelanggan, riwayat transaksi, dan total belanja di ShelfStack.',
 })
 
 const {
@@ -28,6 +23,8 @@ const {
   currentPage,
   totalPages,
   totalCustomersCount,
+  pageSize,
+  setPageSize,
   sortOptions,
   hasCustomers,
   fetchCustomers,
@@ -35,6 +32,33 @@ const {
 
 const selectedCustomer = ref<AdminCustomerSummary | null>(null)
 const isDetailDrawerOpen = ref(false)
+
+const userColumns = [
+  { key: 'name', label: 'Pelanggan', thClass: '', align: 'left' as const },
+  { key: 'createdAt', label: 'Terdaftar', thClass: '', align: 'left' as const },
+  { key: 'totalOrders', label: 'Pesanan', thClass: 'text-center', align: 'center' as const },
+  { key: 'ltv', label: 'Total Belanja', thClass: 'text-right', align: 'right' as const },
+  { key: 'lastOrderAt', label: 'Pesanan Terakhir', thClass: '', align: 'left' as const },
+]
+
+const {
+  sortKey,
+  sortDirection,
+  sortedItems: sortedCustomers,
+  onSortChange,
+  resetSort,
+  getAriaSort,
+} = useClientTableSort(customers, {
+  name: (c) => c.fullName,
+  createdAt: (c) => (c.createdAt ? new Date(c.createdAt).getTime() : null),
+  totalOrders: (c) => c.totalOrders,
+  ltv: (c) => c.totalSpentCents,
+  lastOrderAt: (c) => (c.lastOrderAt ? new Date(c.lastOrderAt).getTime() : null),
+})
+
+watch(selectedSort, () => {
+  resetSort()
+})
 
 const openCustomerDetail = (customer: AdminCustomerSummary) => {
   selectedCustomer.value = customer
@@ -56,44 +80,35 @@ const formatDate = (dateStr?: string | null) => {
 </script>
 
 <template>
-  <div class="admin-users-page space-y-6">
-    <!-- Header Section -->
-    <div
-      class="flex flex-col justify-between gap-4 border-b border-brand-hair pb-4 sm:flex-row sm:items-center"
+  <div class="admin-users-page space-y-5">
+    <AdminPageHeader
+      title="Data Pelanggan"
+      subtitle="Riwayat transaksi dan total belanja per pelanggan."
     >
-      <div>
-        <div class="mb-1 flex items-center gap-2 text-xs text-brand-muted">
-          <NuxtLink to="/admin" class="no-underline hover:text-brand-ink">Dashboard</NuxtLink>
-          <span class="text-brand-faint">/</span>
-          <span class="font-semibold text-brand-ink">CRM Pelanggan</span>
-        </div>
-        <h1 class="font-display text-2xl font-bold tracking-tight text-brand-ink sm:text-3xl">
-          Pelanggan &amp; Customer Lifetime Value
-        </h1>
-        <p class="mt-0.5 text-xs text-brand-muted sm:text-sm">
-          Pantau akumulasi belanja pembeli (LTV), total frekuensi pesanan, dan profil pelanggan
-          aktif.
-        </p>
-      </div>
-
-      <UiButton
-        variant="outline"
-        size="sm"
-        icon="pi-refresh"
-        :loading="loading"
-        @click="fetchCustomers"
-      >
-        Segarkan Data
-      </UiButton>
-    </div>
+      <template #actions>
+        <UiButton
+          variant="outline"
+          size="sm"
+          icon="pi-refresh"
+          :loading="loading"
+          @click="fetchCustomers"
+        >
+          Muat Ulang
+        </UiButton>
+      </template>
+    </AdminPageHeader>
 
     <!-- Executive Metrics Grid -->
     <AdminUserMetrics :metrics="metrics" />
 
     <!-- Toolbar Filters -->
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      class="flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper sm:flex-row sm:items-center sm:justify-between"
+    >
       <div class="w-full sm:max-w-xs">
+        <label for="admin-users-search" class="sr-only">Cari nama atau email pelanggan</label>
         <UiInput
+          id="admin-users-search"
           v-model="searchQuery"
           size="sm"
           type="search"
@@ -109,8 +124,8 @@ const formatDate = (dateStr?: string | null) => {
     <!-- Customers Table Card -->
     <UiCard :padded="false" class="overflow-hidden">
       <!-- Error state -->
-      <div v-if="error" class="p-6 text-center text-xs text-brand-danger">
-        <i class="pi pi-exclamation-circle text-lg mb-1 block" />
+      <div v-if="error" class="p-6 text-center text-xs text-brand-danger-text">
+        <i class="pi pi-exclamation-circle text-lg mb-1 block" aria-hidden="true" />
         <p class="m-0 font-medium">{{ error }}</p>
         <UiButton size="xs" variant="outline" class="mt-2" @click="fetchCustomers"
           >Coba Lagi</UiButton
@@ -118,7 +133,7 @@ const formatDate = (dateStr?: string | null) => {
       </div>
 
       <!-- Loading skeleton state -->
-      <div v-else-if="loading && !hasCustomers" class="p-6 space-y-4">
+      <div v-else-if="loading && !hasCustomers" class="p-4 space-y-3" aria-busy="true">
         <div v-for="i in 5" :key="i" class="h-12 w-full animate-pulse rounded-lg bg-brand-field" />
       </div>
 
@@ -131,27 +146,47 @@ const formatDate = (dateStr?: string | null) => {
       />
 
       <!-- Table View -->
-      <div v-else class="overflow-x-auto">
+      <div
+        v-else
+        tabindex="0"
+        role="region"
+        aria-label="Tabel data pelanggan dan LTV"
+        class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+      >
         <table class="w-full text-left text-xs border-collapse">
           <thead>
             <tr
-              class="border-b border-brand-hairsoft bg-brand-canvas-soft/60 text-brand-muted uppercase tracking-wider text-[11px]"
+              class="border-b border-brand-hair bg-brand-canvas-soft text-brand-muted uppercase tracking-wider text-[11px]"
             >
-              <th class="py-3 px-4 font-semibold">Pelanggan</th>
-              <th class="py-3 px-4 font-semibold">Terdaftar</th>
-              <th class="py-3 px-4 font-semibold text-center">Total Pesanan</th>
-              <th class="py-3 px-4 font-semibold text-right">Nilai Belanja (LTV)</th>
-              <th class="py-3 px-4 font-semibold">Pesanan Terakhir</th>
-              <th class="py-3 px-4 font-semibold text-center">Aksi</th>
+              <th
+                v-for="col in userColumns"
+                :key="col.key"
+                scope="col"
+                class="py-2.5 px-3.5"
+                :class="col.thClass"
+                :aria-sort="getAriaSort(col.key)"
+              >
+                <UiSortHeader
+                  :sort-key="col.key"
+                  :label="col.label"
+                  :align="col.align"
+                  :active-key="sortKey"
+                  :direction="sortDirection"
+                  @sort="onSortChange"
+                >
+                  {{ col.label }}
+                </UiSortHeader>
+              </th>
+              <th scope="col" class="py-2.5 px-3.5 font-semibold text-center">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
             <tr
-              v-for="c in customers"
+              v-for="c in sortedCustomers"
               :key="c.userId"
               class="hover:bg-brand-canvas-soft/40 transition-colors"
             >
-              <td class="py-3 px-4">
+              <td class="py-2.5 px-3.5">
                 <div class="flex items-center gap-3">
                   <div
                     class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-field text-brand-ink font-bold text-xs border border-brand-hair"
@@ -160,6 +195,7 @@ const formatDate = (dateStr?: string | null) => {
                       v-if="c.avatarUrl"
                       :src="c.avatarUrl"
                       :alt="c.fullName"
+                      referrerpolicy="no-referrer"
                       class="h-full w-full rounded-full object-cover"
                     />
                     <span v-else>{{ c.fullName.charAt(0).toUpperCase() }}</span>
@@ -170,30 +206,30 @@ const formatDate = (dateStr?: string | null) => {
                   </div>
                 </div>
               </td>
-              <td class="py-3 px-4 text-brand-muted whitespace-nowrap">
+              <td class="py-2.5 px-3.5 text-brand-muted whitespace-nowrap">
                 {{ formatDate(c.createdAt) }}
               </td>
-              <td class="py-3 px-4 text-center">
+              <td class="py-2.5 px-3.5 text-center">
                 <UiBadge :label="`${c.totalOrders} order`" variant="default" />
               </td>
-              <td class="py-3 px-4 text-right">
+              <td class="py-2.5 px-3.5 text-right">
                 <span class="font-display font-bold text-sm text-brand-ink tabular">{{
                   c.formattedLtv
                 }}</span>
                 <span
                   v-if="c.completedOrders > 0"
-                  class="block text-[10.5px] text-brand-success font-medium"
+                  class="block text-[10.5px] text-brand-success-text font-medium"
                 >
                   {{ c.completedOrders }} lunas
                 </span>
               </td>
-              <td class="py-3 px-4 text-brand-muted whitespace-nowrap">
+              <td class="py-2.5 px-3.5 text-brand-muted whitespace-nowrap">
                 {{ formatDate(c.lastOrderAt) }}
               </td>
-              <td class="py-3 px-4 text-center">
-                <UiButton size="xs" variant="ghost" icon="pi-eye" @click="openCustomerDetail(c)"
-                  >Rincian</UiButton
-                >
+              <td class="py-2.5 px-3.5 text-center">
+                <UiButton size="xs" variant="outline" icon="pi-eye" @click="openCustomerDetail(c)">
+                  Rincian
+                </UiButton>
               </td>
             </tr>
           </tbody>
@@ -201,33 +237,17 @@ const formatDate = (dateStr?: string | null) => {
       </div>
 
       <!-- Pagination Footer -->
-      <div
-        v-if="totalPages > 1"
-        class="flex items-center justify-between border-t border-brand-hairsoft px-4 py-3 text-xs text-brand-muted"
-      >
-        <span
-          >Menampilkan halaman {{ currentPage }} dari {{ totalPages }} (Total
-          {{ totalCustomersCount }} pelanggan)</span
-        >
-        <div class="flex items-center gap-1.5">
-          <UiButton
-            size="xs"
-            variant="outline"
-            :disabled="currentPage <= 1 || loading"
-            @click="currentPage--"
-          >
-            Sebelumnya
-          </UiButton>
-          <UiButton
-            size="xs"
-            variant="outline"
-            :disabled="currentPage >= totalPages || loading"
-            @click="currentPage++"
-          >
-            Selanjutnya
-          </UiButton>
-        </div>
-      </div>
+      <UiPagination
+        v-if="sortedCustomers.length > 0"
+        v-model="currentPage"
+        :total-pages="totalPages"
+        :total-count="totalCustomersCount"
+        :page-size="pageSize"
+        :loading="loading"
+        item-name="pelanggan"
+        compact
+        @page-size-change="setPageSize"
+      />
     </UiCard>
 
     <!-- Customer 360 Slide-Over Drawer -->

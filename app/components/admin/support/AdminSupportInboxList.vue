@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   formatStatusLabel,
   statusDotClass,
@@ -60,6 +60,17 @@ try {
 }
 
 const isDropdownOpen = ref(false)
+const dropdownRef = ref<HTMLElement | null>(null)
+
+const closeOnOutsideClick = (event: MouseEvent) => {
+  if (!isDropdownOpen.value) return
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+    isDropdownOpen.value = false
+  }
+}
+
+onMounted(() => document.addEventListener('click', closeOnOutsideClick))
+onBeforeUnmount(() => document.removeEventListener('click', closeOnOutsideClick))
 
 const tabs = [
   { key: 'all', label: 'Semua' },
@@ -125,77 +136,89 @@ const onSearchInput = (e: Event) => {
   <div
     class="admin-support-inbox-list flex h-full flex-col border-r border-brand-hair bg-brand-canvas"
   >
-    <!-- Search Bar with Icon -->
-    <div class="border-b border-brand-hair p-3">
+    <div class="border-b border-brand-hair bg-brand-canvas p-2.5 space-y-2 shrink-0">
       <div class="relative">
         <i
-          class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-muted pointer-events-none"
+          class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-brand-muted pointer-events-none"
+          aria-hidden="true"
         />
         <input
           type="text"
           :value="effectiveSearchQuery"
           placeholder="Cari nama atau email..."
-          class="search-input w-full rounded-field border border-brand-hair bg-brand-canvas-soft pl-8 pr-3 py-1.5 text-xs text-brand-ink placeholder:text-brand-faint focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors"
+          aria-label="Cari percakapan pelanggan"
+          class="search-input h-8 w-full rounded-full border border-brand-hair bg-brand-canvas pl-8 pr-3 text-xs text-brand-ink placeholder:text-brand-faint hover:border-brand-faint focus:border-brand-ink focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-ink transition-colors"
           @input="onSearchInput"
         />
       </div>
-    </div>
 
-    <!-- Status Filter Dropdown Section (Replaces cramped text tabs) -->
-    <div class="filter-section relative border-b border-brand-hair bg-brand-canvas-soft/30 p-2.5">
-      <button
-        type="button"
-        class="filter-dropdown-trigger flex w-full items-center justify-between rounded-field border border-brand-hair bg-brand-canvas px-3 py-1.5 text-xs text-brand-ink shadow-xs transition-colors hover:border-brand-ink focus:outline-none cursor-pointer"
-        aria-label="Filter status percakapan"
-        @click="isDropdownOpen = !isDropdownOpen"
-      >
-        <div class="flex items-center gap-2 min-w-0">
-          <span class="text-brand-muted text-[11px] font-medium shrink-0">Filter:</span>
-          <span
-            class="h-2 w-2 shrink-0 rounded-full"
-            :class="statusDotClass(effectiveFilterStatus)"
-          />
-          <span class="truncate font-semibold text-brand-ink">
-            {{ activeTabLabel }}
-          </span>
-        </div>
-        <i
-          class="pi pi-chevron-down text-[10px] text-brand-muted transition-transform duration-200"
-          :class="isDropdownOpen ? 'rotate-180' : ''"
-        />
-      </button>
-
-      <!-- Dropdown Popover Menu with Test Contracts Preserved -->
       <div
-        v-show="isDropdownOpen"
-        class="status-tabs filter-menu absolute left-2.5 right-2.5 top-[calc(100%+4px)] z-30 rounded-card border border-brand-hair bg-brand-canvas p-1.5 shadow-floating space-y-0.5"
+        ref="dropdownRef"
+        class="filter-section relative"
+        @keydown.escape="isDropdownOpen = false"
       >
         <button
-          v-for="tab in tabs"
-          :key="tab.key"
           type="button"
-          :data-status="tab.key"
-          class="tab-btn filter-tab flex w-full items-center justify-between rounded-field px-2.5 py-2 text-xs transition-colors text-left cursor-pointer"
+          class="filter-dropdown-trigger flex h-8 w-full items-center justify-between rounded-field border bg-brand-canvas px-2.5 text-xs text-brand-ink transition-colors cursor-pointer outline-none"
           :class="
-            effectiveFilterStatus === tab.key
-              ? 'active-tab bg-brand-canvas-soft font-semibold text-brand-ink'
-              : 'text-brand-ink hover:bg-brand-canvas-soft/70'
+            isDropdownOpen
+              ? 'border-brand-ink ring-1 ring-inset ring-brand-ink'
+              : 'border-brand-hair hover:border-brand-faint focus:border-brand-ink focus:ring-1 focus:ring-inset focus:ring-brand-ink'
           "
-          @click="onSelectTab(tab.key)"
+          :aria-expanded="isDropdownOpen"
+          aria-haspopup="listbox"
+          @click="isDropdownOpen = !isDropdownOpen"
         >
           <div class="flex items-center gap-2 min-w-0">
-            <span class="h-2 w-2 shrink-0 rounded-full" :class="statusDotClass(tab.key)" />
-            <span class="truncate">{{ tab.label }}</span>
+            <span class="text-brand-muted text-[11px] font-medium shrink-0">Filter:</span>
+            <span
+              class="h-2 w-2 shrink-0 rounded-full"
+              :class="statusDotClass(effectiveFilterStatus)"
+            />
+            <span class="truncate font-semibold text-brand-ink">
+              {{ activeTabLabel }}
+            </span>
           </div>
           <i
-            v-if="effectiveFilterStatus === tab.key"
-            class="pi pi-check text-[10px] text-brand-ink shrink-0"
+            class="pi pi-chevron-down text-[10px] text-brand-muted transition-transform duration-200 shrink-0"
+            :class="isDropdownOpen ? 'rotate-180' : ''"
+            aria-hidden="true"
           />
         </button>
+
+        <div
+          v-show="isDropdownOpen"
+          role="listbox"
+          aria-label="Filter status percakapan"
+          class="status-tabs filter-menu absolute left-0 right-0 top-[calc(100%+4px)] z-30 rounded-card border border-brand-hair bg-brand-canvas p-1 shadow-floating space-y-0.5"
+        >
+          <button
+            v-for="tab in tabs"
+            :key="tab.key"
+            type="button"
+            :data-status="tab.key"
+            class="tab-btn filter-tab flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-xs transition-colors text-left cursor-pointer border-0"
+            :class="
+              effectiveFilterStatus === tab.key
+                ? 'active-tab bg-brand-canvas-soft font-semibold text-brand-ink'
+                : 'text-brand-ink hover:bg-brand-canvas-soft/70'
+            "
+            @click="onSelectTab(tab.key)"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="h-2 w-2 shrink-0 rounded-full" :class="statusDotClass(tab.key)" />
+              <span class="truncate">{{ tab.label }}</span>
+            </div>
+            <i
+              v-if="effectiveFilterStatus === tab.key"
+              class="pi pi-check text-[10px] text-brand-ink shrink-0 font-bold"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Thread Cards List -->
     <div class="thread-items flex-1 overflow-y-auto divide-y divide-brand-hair/60">
       <div
         v-if="effectiveThreads.length === 0"
@@ -209,26 +232,35 @@ const onSearchInput = (e: Event) => {
         v-for="thread in effectiveThreads"
         :key="thread.id"
         :data-id="thread.id"
-        class="thread-card thread-item flex cursor-pointer items-center justify-between p-3.5 transition-colors hover:bg-brand-canvas-soft/80"
+        class="thread-card thread-item flex cursor-pointer items-center justify-between p-3 transition-colors hover:bg-brand-canvas-soft/80"
         :class="[
           effectiveActiveThreadId === thread.id
-            ? 'active-thread is-active bg-brand-accent-tint/60 ring-1 ring-inset ring-brand-accent-edge'
+            ? 'active-thread is-active bg-brand-canvas-soft border-l-2 border-l-brand-ink'
             : '',
         ]"
         @click="onSelectThread(thread.id)"
       >
         <div class="flex flex-1 items-center gap-2.5 min-w-0 mr-2">
-          <!-- Avatar -->
-          <div
-            class="customer-avatar flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-xs font-semibold text-brand-ink overflow-hidden shadow-xs"
-          >
-            <img
-              v-if="thread.customer_avatar_url"
-              :src="thread.customer_avatar_url"
-              :alt="thread.customer_name"
-              class="h-full w-full object-cover"
-            />
-            <span v-else>{{ getInitials(thread.customer_name) }}</span>
+          <!-- Avatar & Unread Badge -->
+          <div class="relative shrink-0">
+            <div
+              class="customer-avatar flex h-9 w-9 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-xs font-semibold text-brand-ink overflow-hidden shadow-xs"
+            >
+              <img
+                v-if="thread.customer_avatar_url"
+                :src="thread.customer_avatar_url"
+                :alt="thread.customer_name"
+                referrerpolicy="no-referrer"
+                class="h-full w-full object-cover"
+              />
+              <span v-else>{{ getInitials(thread.customer_name) }}</span>
+            </div>
+            <span
+              v-if="thread.unread_by_admin_count > 0"
+              class="unread-admin-badge unread-badge absolute -top-1 -right-1 z-10 flex h-4 min-w-[16px] items-center justify-center rounded-full border border-brand-canvas bg-brand-danger px-1 text-[10px] font-bold text-white shadow-xs tabular-nums"
+            >
+              {{ thread.unread_by_admin_count }}
+            </span>
           </div>
 
           <!-- Customer details & last snippet -->
@@ -247,8 +279,8 @@ const onSearchInput = (e: Event) => {
           </div>
         </div>
 
-        <!-- Status pill & unread badge -->
-        <div class="flex shrink-0 flex-col items-end gap-1.5">
+        <!-- Status pill -->
+        <div class="flex shrink-0 flex-col items-end">
           <span
             class="status-pill inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
             :class="statusPillClass(thread.status)"
@@ -257,12 +289,6 @@ const onSearchInput = (e: Event) => {
           >
             <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(thread.status)" />
             <span>{{ formatStatusLabel(thread.status) }}</span>
-          </span>
-          <span
-            v-if="thread.unread_by_admin_count > 0"
-            class="unread-admin-badge unread-badge flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white shadow-xs"
-          >
-            {{ thread.unread_by_admin_count }}
           </span>
         </div>
       </div>

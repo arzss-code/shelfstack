@@ -16,28 +16,28 @@ export const formatStatusLabel = (status: string): string => {
 export const statusDotClass = (status: string): string => {
   switch (status) {
     case 'open':
-      return 'bg-sky-500'
+      return 'bg-brand-accent'
     case 'waiting_admin':
-      return 'bg-amber-500'
+      return 'bg-brand-warning'
     case 'waiting_customer':
-      return 'bg-blue-500'
+      return 'bg-brand-muted'
     case 'resolved':
-      return 'bg-emerald-500'
+      return 'bg-brand-success'
     default:
-      return 'bg-gray-400'
+      return 'bg-brand-faint'
   }
 }
 
 export const statusPillClass = (status: string): string => {
   switch (status) {
     case 'open':
-      return 'bg-sky-50 text-sky-700 border border-sky-200'
+      return 'bg-brand-accent-tint text-brand-accent-text border border-brand-accent-edge'
     case 'waiting_admin':
-      return 'bg-amber-50 text-amber-700 border border-amber-200'
+      return 'bg-brand-warning-tint text-brand-warning-text border border-brand-warning-edge'
     case 'waiting_customer':
-      return 'bg-blue-50 text-blue-700 border border-blue-200'
+      return 'bg-brand-canvas-soft text-brand-ink border border-brand-hair'
     case 'resolved':
-      return 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+      return 'bg-brand-success-tint text-brand-success-text border border-brand-success-edge'
     default:
       return 'bg-brand-canvas-soft text-brand-muted border border-brand-hair'
   }

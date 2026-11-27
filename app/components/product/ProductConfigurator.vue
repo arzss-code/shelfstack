@@ -155,7 +155,7 @@ watch(
               'w-9 h-9 rounded-full border-2 transition-all cursor-pointer flex items-center justify-center',
               c.class,
               selectedColor === c.name
-                ? 'border-brand-accent ring-2 ring-brand-accent/30 scale-105'
+                ? 'border-brand-ink ring-1 ring-inset ring-brand-ink scale-105'
                 : 'border-brand-hair hover:scale-105',
             ]"
             @click="selectedColor = c.name"
@@ -221,7 +221,7 @@ watch(
             pattern="[0-9]*"
             aria-label="Jumlah unit pesanan"
             :disabled="isOutOfStock"
-            class="w-10 text-center font-display font-bold text-sm text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-brand-canvas focus:ring-1 focus:ring-brand-accent/40 rounded-sm transition-all py-1 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            class="w-10 text-center font-display font-bold text-sm text-brand-ink bg-transparent border-0 outline-none tabular-nums focus:bg-brand-canvas focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-brand-ink rounded-sm transition-all py-1 select-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             @focus="($event.target as HTMLInputElement).select()"
             @input="handleQuantityInput"
             @blur="handleQuantityBlur"

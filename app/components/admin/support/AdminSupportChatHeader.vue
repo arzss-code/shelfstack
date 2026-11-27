@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import UiSelect, { type UiSelectOption } from '~/components/ui/UiSelect.vue'
+
 export interface SupportThreadCustomer {
   id: string
   customer_name: string
@@ -47,7 +49,7 @@ const statusDotClass = (status: string): string => {
     case 'open':
       return 'bg-brand-accent'
     case 'waiting_admin':
-      return 'bg-brand-warning animate-pulse'
+      return 'bg-brand-warning'
     case 'waiting_customer':
       return 'bg-brand-muted'
     case 'resolved':
@@ -72,19 +74,25 @@ const statusDescription = (status: string): string => {
   }
 }
 
-const onStatusChange = (e: Event) => {
-  const val = (e.target as HTMLSelectElement).value
+const statusOptions: UiSelectOption[] = [
+  { value: 'open', label: 'Baru (open)' },
+  { value: 'waiting_admin', label: 'Perlu Respon CS' },
+  { value: 'waiting_customer', label: 'Menunggu Pelanggan' },
+  { value: 'resolved', label: 'Selesai' },
+]
+
+const onStatusSelect = (val: string) => {
   emit('updateStatus', val)
 }
 </script>
 
 <template>
   <div
-    class="pane-header flex items-center justify-between border-b border-brand-hair bg-brand-canvas px-4 py-3 shrink-0 shadow-xs"
+    class="pane-header flex flex-wrap items-center justify-between gap-2 border-b border-brand-hair bg-brand-canvas px-3.5 py-2.5 shrink-0"
   >
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2.5 min-w-0">
       <div
-        class="customer-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-xs font-bold text-brand-ink overflow-hidden shadow-xs"
+        class="customer-avatar flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas-soft text-xs font-bold text-brand-ink overflow-hidden"
       >
         <img
           v-if="thread.customer_avatar_url"
@@ -94,20 +102,22 @@ const onStatusChange = (e: Event) => {
         />
         <span v-else>{{ getInitials(thread.customer_name) }}</span>
       </div>
-      <div>
-        <div class="customer-name text-sm font-bold text-brand-ink flex items-center gap-2">
-          <span>{{ thread.customer_name }}</span>
+      <div class="min-w-0">
+        <div
+          class="customer-name text-sm font-bold text-brand-ink flex items-center gap-2 truncate"
+        >
+          <span class="truncate">{{ thread.customer_name }}</span>
         </div>
-        <div class="customer-email text-xs text-brand-muted font-mono">
+        <div class="customer-email text-[11px] text-brand-muted font-mono truncate">
           {{ thread.customer_email }}
         </div>
       </div>
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2 shrink-0">
       <!-- Status Badge with Dot Indicator & Tooltip Title -->
       <span
-        class="status-badge inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize cursor-help"
+        class="status-badge inline-flex h-6 items-center gap-1.5 rounded-full border px-2 text-[11px] font-semibold capitalize cursor-help"
         :data-status="thread.status"
         :class="statusBadgeClass(thread.status)"
         :title="statusDescription(thread.status)"
@@ -116,31 +126,25 @@ const onStatusChange = (e: Event) => {
         }}</span
       >
 
-      <!-- Status Dropdown Wrapper -->
-      <div class="relative">
-        <select
-          :value="thread.status"
-          class="status-select appearance-none rounded-field border border-brand-hair bg-brand-canvas-soft pl-2.5 pr-7 py-1 text-xs font-medium text-brand-ink focus:border-brand-ink focus:bg-brand-canvas focus:outline-none transition-colors cursor-pointer"
-          aria-label="Ubah status percakapan"
-          @change="onStatusChange"
-        >
-          <option value="open">open (Baru)</option>
-          <option value="waiting_admin">waiting_admin (Perlu Respon CS)</option>
-          <option value="waiting_customer">waiting_customer (Menunggu Pelanggan)</option>
-          <option value="resolved">resolved (Selesai)</option>
-        </select>
-        <i
-          class="pi pi-chevron-down pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-brand-muted"
-        />
-      </div>
+      <UiSelect
+        :model-value="thread.status"
+        :options="statusOptions"
+        size="xs"
+        :pill="false"
+        align="right"
+        select-class="status-select"
+        aria-label="Ubah status percakapan"
+        class="w-[168px]"
+        @change="onStatusSelect"
+      />
 
       <!-- 1-Click Resolve Button -->
       <button
         type="button"
-        class="btn-resolve inline-flex items-center gap-1.5 rounded-field bg-brand-success hover:opacity-90 px-3 py-1 text-xs text-white font-medium shadow-xs transition-colors active:scale-95"
+        class="btn-resolve inline-flex h-8 items-center gap-1.5 rounded-field bg-brand-success hover:opacity-90 px-3 text-xs text-white font-semibold transition-all active:scale-95 cursor-pointer border-0 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-0"
         @click="emit('updateStatus', 'resolved')"
       >
-        <i class="pi pi-check text-[10px]" />
+        <i class="pi pi-check text-[10px]" aria-hidden="true" />
         <span>Selesaikan Tiket</span>
       </button>
     </div>
