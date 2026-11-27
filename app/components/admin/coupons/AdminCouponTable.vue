@@ -75,7 +75,7 @@ const {
   totalCount,
   totalPages,
   paginatedItems: paginatedCoupons,
-} = useClientPagination(sortedCoupons, 12)
+} = useClientPagination(sortedCoupons, 10)
 </script>
 
 <template>

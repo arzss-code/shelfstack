@@ -5,6 +5,7 @@ import { adminVariantCreateSchema } from '../../../../../../shared/schemas/produ
 import { requireAdmin } from '../../../../../utils/auth'
 import { errorResponse, successResponse } from '../../../../../utils/response'
 import { logger } from '../../../../../utils/logger'
+import { insertActivityLogWithDevice } from '../../../../../utils/activity-log'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
@@ -57,17 +58,13 @@ export default defineEventHandler(async (event) => {
     return errorResponse(event, 'Gagal menyimpan varian produk baru', insertError.message, 500)
   }
 
-  try {
-    await client.from('activity_logs').insert({
-      entity_type: 'product',
-      entity_id: productId,
-      action: 'UPDATE',
-      description: `Menambahkan varian SKU ${created.sku} (${created.name})`,
-      new_data: { variant_id: created.id, sku: created.sku, stock: created.stock },
-    })
-  } catch {
-    // Non-fatal audit logging
-  }
+  await insertActivityLogWithDevice(client, event, {
+    entity_type: 'product',
+    entity_id: productId,
+    action: 'UPDATE',
+    description: `Menambahkan varian SKU ${created.sku} (${created.name})`,
+    new_data: { variant_id: created.id, sku: created.sku, stock: created.stock },
+  })
 
   setResponseStatus(event, 201)
   return successResponse('Varian produk berhasil ditambahkan', created)

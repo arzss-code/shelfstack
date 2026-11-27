@@ -2,14 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import AdminSalesChart from '../../app/components/admin/AdminSalesChart.vue'
+import { formatSalesAxisTick } from '../../app/composables/useAdminSalesChart'
 import {
   adminTrendsPeriodSchema,
   adminTrendsQuerySchema,
+  adminTrendsStatusScopeSchema,
   type AdminTrendsResponseData,
 } from '../../shared/schemas/admin-stats'
 
 const { mockFetch } = vi.hoisted(() => {
-  const fMock = vi.fn() as any
+  const fMock = vi.fn() as ReturnType<typeof vi.fn> & {
+    create?: () => unknown
+    raw?: ReturnType<typeof vi.fn>
+  }
   fMock.create = () => fMock
   fMock.raw = vi.fn()
   return {
@@ -28,6 +33,8 @@ vi.stubGlobal('$fetch', mockFetch)
 
 const mockTrendsData: AdminTrendsResponseData = {
   period: '7d',
+  status_scope: 'confirmed',
+  granularity: 'day',
   points: [
     {
       date: '2026-11-08',
@@ -85,6 +92,12 @@ const mockTrendsData: AdminTrendsResponseData = {
     total_orders: 17,
     average_order_value_cents: 82058800,
     average_order_value: 820588,
+    peak_label: '14 Nov',
+    peak_revenue: 4500000,
+    peak_orders: 5,
+    active_buckets: 6,
+    revenue_delta_pct: 12.5,
+    orders_delta_pct: 6.3,
   },
 }
 
@@ -97,22 +110,36 @@ describe('Admin Sales Trends & Analytics', () => {
     })
   })
 
-  describe('Schema Validation', () => {
-    it('validates allowed periods in adminTrendsPeriodSchema', () => {
+  describe('Schema Validation & Axis Formatting', () => {
+    it('validates allowed periods and status scopes cleanly', () => {
       expect(adminTrendsPeriodSchema.parse('7d')).toBe('7d')
       expect(adminTrendsPeriodSchema.parse('30d')).toBe('30d')
+      expect(adminTrendsPeriodSchema.parse('90d')).toBe('90d')
       expect(adminTrendsPeriodSchema.parse('month')).toBe('month')
+      expect(adminTrendsPeriodSchema.parse('year')).toBe('year')
+      expect(adminTrendsPeriodSchema.parse('custom')).toBe('custom')
       expect(adminTrendsPeriodSchema.safeParse('invalid').success).toBe(false)
+
+      expect(adminTrendsStatusScopeSchema.parse('confirmed')).toBe('confirmed')
+      expect(adminTrendsStatusScopeSchema.parse('completed')).toBe('completed')
+      expect(adminTrendsStatusScopeSchema.parse('all_active')).toBe('all_active')
     })
 
-    it('defaults to 7d when period query is missing or empty', () => {
+    it('defaults to 7d & confirmed when query is empty and formats Rupiah Y ticks concisely', () => {
       const parsed = adminTrendsQuerySchema.parse({})
       expect(parsed.period).toBe('7d')
+      expect(parsed.status_scope).toBe('confirmed')
+
+      expect(formatSalesAxisTick(0, 'revenue')).toBe('Rp 0')
+      expect(formatSalesAxisTick(666666.6667, 'revenue')).toBe('Rp 667rb')
+      expect(formatSalesAxisTick(1500000, 'revenue')).toBe('Rp 1,5jt')
+      expect(formatSalesAxisTick(2000000000, 'revenue')).toBe('Rp 2M')
+      expect(formatSalesAxisTick(12.4, 'orders')).toBe('12')
     })
   })
 
   describe('AdminSalesChart Component', () => {
-    it('renders chart header, period buttons, and summary KPIs', async () => {
+    it('renders chart header, period/status filters, metric toggle, and 4 summary KPIs', async () => {
       const wrapper = mount(AdminSalesChart, {
         props: { initialPeriod: '7d' },
       })
@@ -120,11 +147,14 @@ describe('Admin Sales Trends & Analytics', () => {
 
       expect(wrapper.text()).toContain('Grafik Penjualan')
       expect(wrapper.text()).toContain('7 Hari')
-      expect(wrapper.text()).toContain('30 Hari')
-      expect(wrapper.text()).toContain('Bulan Ini')
+      expect(wrapper.text()).toContain('90 Hari')
+      expect(wrapper.text()).toContain('Tahun Ini')
+      expect(wrapper.text()).toContain('Kustom')
 
       expect(wrapper.text()).toContain('Total Omzet')
       expect(wrapper.text()).toContain('17 pesanan')
+      expect(wrapper.text()).toContain('Puncak Periode')
+      expect(wrapper.text()).toContain('+12.5%')
       expect(wrapper.html()).not.toContain('font-mono')
       expect(wrapper.html()).not.toContain('overflow-hidden')
     })
@@ -137,27 +167,18 @@ describe('Admin Sales Trends & Analytics', () => {
 
       const svg = wrapper.find('svg')
       expect(svg.exists()).toBe(true)
-
-      const gridLines = wrapper.findAll('.grid-lines line')
-      expect(gridLines.length).toBeGreaterThanOrEqual(3)
-
-      const circles = wrapper.findAll('.data-points circle')
-      expect(circles.length).toBeGreaterThan(0)
-
-      const line = wrapper.find('path[stroke="#0066ff"]')
-      expect(line.exists()).toBe(true)
+      expect(wrapper.findAll('.grid-lines line').length).toBeGreaterThanOrEqual(3)
+      expect(wrapper.findAll('.data-points circle').length).toBeGreaterThan(0)
+      expect(wrapper.find('path[stroke="#0066ff"]').exists()).toBe(true)
     })
 
-    it('switches period and triggers refetch when another period button is clicked', async () => {
+    it('switches period, opens custom date range picker, and refetches cleanly', async () => {
       const wrapper = mount(AdminSalesChart, {
         props: { initialPeriod: '7d' },
       })
       await flushPromises()
 
-      const buttons = wrapper.findAll('button')
-      const monthButton = buttons.find((b) => b.text().includes('Bulan Ini'))
-      expect(monthButton).toBeDefined()
-
+      const monthButton = wrapper.findAll('button').find((b) => b.text().includes('Bulan Ini'))
       await monthButton?.trigger('click')
       await flushPromises()
 
@@ -167,6 +188,11 @@ describe('Admin Sales Trends & Analytics', () => {
           params: { period: 'month' },
         }),
       )
+
+      const customButton = wrapper.findAll('button').find((b) => b.text().includes('Kustom'))
+      await customButton?.trigger('click')
+      await flushPromises()
+      expect(wrapper.find('[data-testid="date-range-trigger"]').exists()).toBe(true)
     })
   })
 })

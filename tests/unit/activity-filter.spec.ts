@@ -4,6 +4,9 @@ import {
   NO_FILTER,
   distinctEntityTypes,
   filterActivities,
+  formatActivityAgent,
+  formatActivityEntityLabel,
+  formatActivityIp,
   isFiltering,
   type ActivityLog,
 } from '~/features/activities/utils/activity-filter'
@@ -25,12 +28,38 @@ function makeLog(overrides: Partial<ActivityLog> = {}): ActivityLog {
   }
 }
 
-describe('Filter log aktivitas admin (D-04)', () => {
+describe('Filter & Format log aktivitas admin (D-04)', () => {
   const logs = [
-    makeLog({ id: 'a1', entity_type: 'product', action: 'CREATE' }),
-    makeLog({ id: 'a2', entity_type: 'product', action: 'UPDATE' }),
-    makeLog({ id: 'a3', entity_type: 'order', action: 'UPDATE' }),
-    makeLog({ id: 'a4', entity_type: 'order', action: 'DELETE' }),
+    makeLog({
+      id: 'a1',
+      entity_type: 'product',
+      action: 'CREATE',
+      created_at: '2026-10-16T10:00:00.000Z',
+      description: 'Menambahkan keyboard',
+      ip_address: '127.0.0.1 (Localhost)',
+    }),
+    makeLog({
+      id: 'a2',
+      entity_type: 'product',
+      action: 'UPDATE',
+      created_at: '2026-10-18T10:00:00.000Z',
+      description: 'Stok diperbarui',
+    }),
+    makeLog({
+      id: 'a3',
+      entity_type: 'order',
+      action: 'UPDATE',
+      created_at: '2026-10-27T10:00:00.000Z',
+      description: 'Status pesanan diperbarui menjadi: shipped',
+      new_data: { order_id: 'ord-abc-123' },
+    }),
+    makeLog({
+      id: 'a4',
+      entity_type: 'order',
+      action: 'DELETE',
+      created_at: '2026-10-30T10:00:00.000Z',
+      description: 'Pesanan dibatalkan',
+    }),
   ]
 
   it('tanpa filter mengembalikan semua baris', () => {
@@ -52,6 +81,30 @@ describe('Filter log aktivitas admin (D-04)', () => {
     expect(result.map((r) => r.id)).toEqual(['a2'])
   })
 
+  it('filter kata kunci dan rentang tanggal', () => {
+    expect(
+      filterActivities(logs, { entity: '', action: '', search: 'ord-abc-123' }).map((r) => r.id),
+    ).toEqual(['a3'])
+
+    expect(
+      filterActivities(logs, {
+        entity: '',
+        action: '',
+        fromDate: '2026-10-27',
+        toDate: '2026-10-30',
+      }).map((r) => r.id),
+    ).toEqual(['a3', 'a4'])
+  })
+
+  it('memformat entitas, IP, dan browser/OS tanpa menampilkan - • -', () => {
+    expect(formatActivityEntityLabel('return_request')).toBe('Komplain & Retur')
+    expect(formatActivityEntityLabel('order')).toBe('Pesanan')
+    expect(formatActivityIp(null)).toBe('Sistem')
+    expect(formatActivityIp('127.0.0.1 (Localhost)')).toBe('127.0.0.1 (Localhost)')
+    expect(formatActivityAgent(null, null)).toBe('Sistem Otomatis')
+    expect(formatActivityAgent('Edge', 'Windows')).toBe('Edge · Windows')
+  })
+
   it('kombinasi tanpa hasil mengembalikan array kosong', () => {
     expect(filterActivities(logs, { entity: 'refund', action: '' })).toEqual([])
   })
@@ -69,10 +122,12 @@ describe('Filter log aktivitas admin (D-04)', () => {
     expect(distinctEntityTypes(withBlank)).toEqual(['order', 'product'])
   })
 
-  it('status filter aktif terdeteksi benar', () => {
+  it('status filter aktif terdeteksi benar termasuk pencarian dan rentang tanggal', () => {
     expect(isFiltering(NO_FILTER)).toBe(false)
     expect(isFiltering({ entity: 'order', action: '' })).toBe(true)
     expect(isFiltering({ entity: '', action: 'DELETE' })).toBe(true)
+    expect(isFiltering({ entity: '', action: '', search: 'shipped' })).toBe(true)
+    expect(isFiltering({ entity: '', action: '', fromDate: '2026-10-27' })).toBe(true)
   })
 
   it('daftar aksi sesuai enum activity_action', () => {

@@ -71,7 +71,7 @@ const {
   totalCount,
   totalPages,
   paginatedItems: paginatedDeals,
-} = useClientPagination(sortedDeals, 12)
+} = useClientPagination(sortedDeals, 10)
 </script>
 
 <template>

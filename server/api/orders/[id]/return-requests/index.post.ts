@@ -16,6 +16,7 @@ import {
 } from '../../../../utils/private-storage'
 import { createNotification } from '../../../../utils/notifications'
 import { logger } from '../../../../utils/logger'
+import { insertActivityLogWithDevice } from '../../../../utils/activity-log'
 
 export default defineEventHandler(async (event) => {
   const orderId = getRouterParam(event, 'id')
@@ -157,16 +158,13 @@ export default defineEventHandler(async (event) => {
   })
 
   // 7. Catat audit log aktivitas
-  try {
-    await client.from('activity_logs').insert({
-      entity_type: 'return_request',
-      entity_id: 0,
-      action: 'CREATE',
-      description: `Pengajuan retur dibuat oleh pelanggan untuk pesanan ${orderId} (${payload.reason_type})`,
-    })
-  } catch {
-    // non-blocking
-  }
+  await insertActivityLogWithDevice(client, event, {
+    entity_type: 'return_request',
+    entity_id: 0,
+    action: 'CREATE',
+    description: `Pengajuan retur dibuat oleh pelanggan untuk pesanan ${orderId} (${payload.reason_type})`,
+    new_data: { order_id: orderId, return_id: createdRequest.id, reason_type: payload.reason_type },
+  })
 
   const signedProofUrls = await Promise.all(
     (createdRequest.proof_image_urls || []).map((url) =>

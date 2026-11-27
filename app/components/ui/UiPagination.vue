@@ -47,9 +47,12 @@ const isPageSizeVisible = computed(
 )
 
 const resolvedPageSizeOptions = computed(() => {
-  const base = props.pageSizeOptions ?? (props.pageSize === 15 ? [10, 15, 25, 50] : [12, 25, 50])
+  const base = props.pageSizeOptions ?? [5, 10, 15, 25, 50]
   const merged = Array.from(new Set([...base, props.pageSize])).sort((a, b) => a - b)
-  return merged.map((size) => ({ value: String(size), label: String(size) }))
+  return merged.map((size) => ({
+    value: String(size),
+    label: props.compact ? `${size} data` : String(size),
+  }))
 })
 
 type PageItem =
@@ -137,40 +140,56 @@ const onPageSizeSelect = (rawValue: string) => {
     :aria-busy="loading"
     :class="
       compact
-        ? 'ui-pagination flex flex-col sm:flex-row items-center justify-between gap-2.5 border-t border-brand-hair bg-brand-canvas-soft/60 px-4 py-2.5'
+        ? 'ui-pagination flex flex-col gap-2.5 border-t border-brand-hair bg-brand-canvas-soft/60 px-4 py-2.5 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center'
         : 'ui-pagination flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-brand-hairsoft pt-6'
     "
     data-testid="ui-pagination"
   >
-    <div
-      class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 text-xs text-brand-muted m-0 order-2 sm:order-1 select-none"
+    <p
+      class="flex items-center justify-center lg:justify-start gap-1.5 text-xs text-brand-muted m-0 order-2 lg:order-1 select-none tabular"
     >
-      <span>
-        <template v-if="totalCount != null && totalCount > 0">
-          Menampilkan <span class="font-semibold text-brand-ink">{{ itemRangeText }}</span> dari
-          <span class="font-semibold text-brand-ink">{{ totalCount }}</span> {{ itemName }}
-        </template>
-        <template v-else>
-          Halaman <span class="font-semibold text-brand-ink">{{ currentPage }}</span> dari
-          <span class="font-semibold text-brand-ink">{{ totalPages }}</span>
-        </template>
-      </span>
+      <template v-if="compact && totalCount != null && totalCount > 0">
+        <span
+          class="inline-flex items-center rounded-full border border-brand-hairsoft bg-brand-canvas px-2 py-0.5 text-[11px] font-semibold text-brand-ink"
+        >
+          {{ totalPages === 1 ? `Total ${totalCount}` : `${itemRangeText} / ${totalCount}` }}
+          {{ itemName }}
+        </span>
+        <span class="text-[11px] text-brand-faint"> Hal {{ currentPage }}/{{ totalPages }} </span>
+      </template>
+      <template v-else-if="totalCount != null && totalCount > 0">
+        Menampilkan <span class="font-semibold text-brand-ink">{{ itemRangeText }}</span> dari
+        <span class="font-semibold text-brand-ink">{{ totalCount }}</span> {{ itemName }}
+      </template>
+      <template v-else>
+        Halaman <span class="font-semibold text-brand-ink">{{ currentPage }}</span> dari
+        <span class="font-semibold text-brand-ink">{{ totalPages }}</span>
+      </template>
+    </p>
 
-      <div v-if="isPageSizeVisible" class="inline-flex items-center gap-1.5">
-        <span class="text-[11px] text-brand-muted">Tampilkan</span>
-        <UiSelect
-          :model-value="String(pageSize)"
-          :options="resolvedPageSizeOptions"
-          size="xs"
-          aria-label="Jumlah data per halaman"
-          data-testid="pagination-page-size"
-          @change="onPageSizeSelect"
-        />
-      </div>
+    <div
+      v-if="isPageSizeVisible"
+      class="flex items-center justify-center gap-1.5 order-3 lg:order-2"
+      data-testid="pagination-page-size-wrap"
+    >
+      <span class="text-[11px] font-medium text-brand-muted whitespace-nowrap">Tampilkan</span>
+      <UiSelect
+        :model-value="String(pageSize)"
+        :options="resolvedPageSizeOptions"
+        placeholder=""
+        size="xs"
+        pill
+        compact-trigger
+        teleport
+        align="left"
+        aria-label="Jumlah data per halaman"
+        data-testid="pagination-page-size"
+        @change="onPageSizeSelect"
+      />
     </div>
 
     <div
-      class="flex items-center gap-1 sm:gap-1.5 order-1 sm:order-2 flex-wrap justify-center"
+      class="flex items-center gap-1 sm:gap-1.5 order-1 lg:order-3 lg:justify-end flex-wrap justify-center"
       data-testid="pagination-controls"
     >
       <button

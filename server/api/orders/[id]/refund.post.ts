@@ -4,6 +4,7 @@ import type { Database } from '~/types/database.types'
 import { executeMidtransRefund, type MidtransRefundResult } from '../../../utils/midtrans'
 import { logger } from '../../../utils/logger'
 import { metrics } from '../../../utils/metrics'
+import { enrichRecentOrderActivityDevice } from '../../../utils/activity-log'
 
 export default defineEventHandler(async (event) => {
   // 1. Authorization: Administrator Only
@@ -194,6 +195,7 @@ export default defineEventHandler(async (event) => {
       bank_confirmed_at?: string
     }
 
+    await enrichRecentOrderActivityDevice(event, orderId, client)
     metrics.recordRefund(true)
     return successResponse('Refund berhasil diproses dan dikonfirmasi oleh payment gateway', {
       refund_id: finalResult.refund_id,
@@ -219,6 +221,7 @@ export default defineEventHandler(async (event) => {
       .eq('id', attempt.refund_id)
   }
 
+  await enrichRecentOrderActivityDevice(event, orderId, client)
   metrics.recordRefund(true)
   return successResponse(
     'Permintaan refund telah diterima oleh payment gateway dan menunggu konfirmasi bank (bank_confirmed_at)',

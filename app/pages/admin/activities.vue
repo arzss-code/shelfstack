@@ -10,9 +10,11 @@ import {
   NO_FILTER,
   distinctEntityTypes,
   filterActivities,
+  formatActivityEntityLabel,
   isFiltering,
 } from '~/features/activities/utils/activity-filter'
 import ActivityDetailDialog from '~/features/activities/components/ActivityDetailDialog.vue'
+import UiDateRangePicker from '~/components/ui/UiDateRangePicker.vue'
 
 useSeoMeta({
   title: 'Aktivitas & Status Sistem - Admin ShelfStack',
@@ -40,11 +42,17 @@ const isDialogVisible = ref(false)
 const selectedActivity = ref<ActivityLog | null>(null)
 const selectedEntity = ref(NO_FILTER.entity)
 const selectedAction = ref(NO_FILTER.action)
+const searchQuery = ref('')
+const fromDate = ref('')
+const toDate = ref('')
 
 const entityOptions = computed(() => distinctEntityTypes(activities.value))
 const entitySelectOptions = computed(() => [
-  { value: 'all', label: 'Semua entitas' },
-  ...entityOptions.value.map((entity) => ({ value: entity, label: entity })),
+  { value: 'all', label: 'Semua Entitas' },
+  ...entityOptions.value.map((entity) => ({
+    value: entity,
+    label: formatActivityEntityLabel(entity),
+  })),
 ])
 
 const actionTabs = computed(() => [
@@ -52,20 +60,23 @@ const actionTabs = computed(() => [
   ...ACTIVITY_ACTIONS.map((action) => ({ value: action, label: action })),
 ])
 
-const filteredActivities = computed(() =>
-  filterActivities(activities.value, {
-    entity: selectedEntity.value,
-    action: selectedAction.value,
-  }),
-)
+const currentFilter = computed(() => ({
+  entity: selectedEntity.value,
+  action: selectedAction.value,
+  search: searchQuery.value,
+  fromDate: fromDate.value,
+  toDate: toDate.value,
+}))
 
-const filteringActive = computed(() =>
-  isFiltering({ entity: selectedEntity.value, action: selectedAction.value }),
-)
+const filteredActivities = computed(() => filterActivities(activities.value, currentFilter.value))
+const filteringActive = computed(() => isFiltering(currentFilter.value))
 
 const resetFilters = () => {
   selectedEntity.value = NO_FILTER.entity
   selectedAction.value = NO_FILTER.action
+  searchQuery.value = ''
+  fromDate.value = ''
+  toDate.value = ''
 }
 
 onMounted(() => {
@@ -110,47 +121,75 @@ const viewDetails = (activity: ActivityLog) => {
     </div>
 
     <template v-else>
-      <!-- Filter Bar -->
       <div
-        class="flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3.5 shadow-whisper md:flex-row md:items-center md:justify-between"
+        data-testid="admin-activities-filter-bar"
+        class="flex flex-col gap-2.5 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper"
       >
-        <UiTabs v-model="selectedAction" :items="actionTabs" aria-label="Filter jenis aksi" />
+        <div class="flex flex-col gap-2.5 xl:flex-row xl:items-center xl:justify-between">
+          <UiTabs v-model="selectedAction" :items="actionTabs" aria-label="Filter jenis aksi" />
 
-        <div class="flex items-center gap-2">
-          <span v-if="!loading" class="text-xs text-brand-muted">
-            Menampilkan {{ filteredActivities.length }} dari {{ activities.length }}
+          <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 min-w-0">
+            <label for="activity-search-input" class="sr-only">Cari log aktivitas</label>
+            <div class="w-full min-w-[180px] sm:flex-1 xl:w-56 xl:flex-none">
+              <UiInput
+                id="activity-search-input"
+                v-model="searchQuery"
+                type="search"
+                size="sm"
+                left-icon="pi-search"
+                placeholder="Cari deskripsi, IP, order ID..."
+                clearable
+              />
+            </div>
+
+            <label for="activity-entity-filter" class="sr-only">Filter entitas</label>
+            <UiSelect
+              id="activity-entity-filter"
+              :model-value="selectedEntity || 'all'"
+              :options="entitySelectOptions"
+              size="sm"
+              pill
+              aria-label="Filter entitas"
+              @update:model-value="selectedEntity = $event === 'all' ? '' : $event"
+            />
+
+            <UiDateRangePicker
+              v-model:from="fromDate"
+              v-model:to="toDate"
+              aria-label="Filter rentang tanggal log aktivitas"
+            />
+
+            <UiButton v-if="filteringActive" variant="ghost" size="sm" @click="resetFilters">
+              Reset
+            </UiButton>
+          </div>
+        </div>
+
+        <div
+          v-if="!loading && filteringActive"
+          class="flex items-center justify-between border-t border-brand-hairsoft pt-2 text-[11px] text-brand-muted"
+        >
+          <span class="tabular">
+            Hasil filter:
+            <strong class="font-semibold text-brand-ink">{{ filteredActivities.length }}</strong>
+            dari {{ activities.length }} log tercatat
           </span>
-          <label for="activity-entity-filter" class="sr-only">Filter entitas</label>
-          <UiSelect
-            id="activity-entity-filter"
-            :model-value="selectedEntity || 'all'"
-            :options="entitySelectOptions"
-            size="sm"
-            aria-label="Filter entitas"
-            class="max-w-[190px]"
-            @update:model-value="selectedEntity = $event === 'all' ? '' : $event"
-          />
-          <UiButton v-if="filteringActive" variant="ghost" size="sm" @click="resetFilters">
-            Reset
-          </UiButton>
         </div>
       </div>
 
-      <!-- Empty State -->
       <UiEmptyState
         v-if="!loading && filteredActivities.length === 0"
         icon="pi-history"
         :title="filteringActive ? 'Tidak ada hasil' : 'Belum ada aktivitas'"
         :description="
           filteringActive
-            ? 'Tidak ada aktivitas yang cocok dengan filter. Ubah filter atau reset untuk melihat semua.'
+            ? 'Tidak ada aktivitas yang cocok dengan filter. Ubah kata kunci atau reset untuk melihat semua.'
             : 'Sistem belum mencatat aktivitas apa pun. Lakukan aksi pada produk untuk melihat jejak rekam di sini.'
         "
         :action-label="filteringActive ? 'Tampilkan semua' : ''"
         @action="resetFilters"
       />
 
-      <!-- Tabel aktivitas: shimmer saat memuat, data setelahnya -->
       <AdminActivityTable
         v-else
         :activities="filteredActivities"
@@ -159,7 +198,6 @@ const viewDetails = (activity: ActivityLog) => {
       />
     </template>
 
-    <!-- Detail Dialog Component -->
     <ActivityDetailDialog v-model:visible="isDialogVisible" :activity="selectedActivity" />
   </div>
 </template>

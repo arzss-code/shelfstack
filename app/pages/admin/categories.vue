@@ -116,12 +116,13 @@ onMounted(() => {
           left-icon="pi-search"
         />
       </div>
-      <div class="text-xs text-brand-muted">
-        Menampilkan
-        <span class="font-semibold text-brand-ink tabular-nums">{{
-          filteredCategories.length
-        }}</span>
-        dari {{ categories.length }} kategori
+      <div v-if="searchQuery.trim()" class="flex items-center gap-2">
+        <span
+          class="inline-flex items-center rounded-full border border-brand-hair bg-brand-canvas-soft px-2.5 py-1 text-[11px] font-medium text-brand-muted tabular"
+        >
+          Filter: {{ filteredCategories.length }} dari {{ categories.length }} kategori
+        </span>
+        <UiButton variant="ghost" size="xs" @click="searchQuery = ''">Reset</UiButton>
       </div>
     </div>
 

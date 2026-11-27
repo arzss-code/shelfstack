@@ -66,7 +66,7 @@ const {
   totalCount,
   totalPages,
   paginatedItems: paginatedCategories,
-} = useClientPagination(sortedCategories, 12)
+} = useClientPagination(sortedCategories, 10)
 </script>
 
 <template>

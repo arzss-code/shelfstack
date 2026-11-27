@@ -8,6 +8,11 @@ import UiTooltip from '~/components/ui/UiTooltip.vue'
 import { useClientPagination } from '~/composables/useClientPagination'
 import { useClientTableSort } from '~/composables/useClientTableSort'
 import type { ActivityLog } from '~/features/activities/composables/useActivities'
+import {
+  formatActivityAgent,
+  formatActivityEntityLabel,
+  formatActivityIp,
+} from '~/features/activities/utils/activity-filter'
 import { formatDateTime } from '~/utils/format'
 
 const props = defineProps<{
@@ -20,9 +25,9 @@ const emit = defineEmits<{
 }>()
 
 const activityColumns = [
-  { key: 'created_at', label: 'Waktu', thClass: 'whitespace-nowrap w-[180px]' },
-  { key: 'action', label: 'Aksi', thClass: '' },
-  { key: 'description', label: 'Deskripsi', thClass: 'min-w-[250px]' },
+  { key: 'created_at', label: 'Waktu', thClass: 'whitespace-nowrap w-[170px]' },
+  { key: 'action', label: 'Aksi', thClass: 'whitespace-nowrap' },
+  { key: 'description', label: 'Aktivitas & Entitas', thClass: 'min-w-[260px]' },
   { key: 'ip_address', label: 'IP Address', thClass: 'whitespace-nowrap' },
   { key: 'browser', label: 'Browser / OS', thClass: 'whitespace-nowrap' },
 ] as const
@@ -37,8 +42,8 @@ const {
   created_at: (row) => (row.created_at ? new Date(row.created_at).getTime() : 0),
   action: (row) => row.action,
   description: (row) => row.description,
-  ip_address: (row) => row.ip_address || '',
-  browser: (row) => `${row.browser || ''} ${row.platform || ''}`.trim(),
+  ip_address: (row) => formatActivityIp(row.ip_address),
+  browser: (row) => formatActivityAgent(row.browser, row.platform),
 })
 
 const {
@@ -47,7 +52,7 @@ const {
   totalCount,
   totalPages,
   paginatedItems: paginatedActivities,
-} = useClientPagination(sortedActivities, 15)
+} = useClientPagination(sortedActivities, 10)
 
 const formatDate = (dateStr: string | null) => formatDateTime(dateStr)
 
@@ -76,7 +81,7 @@ const rowClass = (data: ActivityLog) =>
   <div class="overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper">
     <div v-if="loading" class="space-y-3 p-4" aria-busy="true">
       <div v-for="i in 5" :key="i" class="flex items-center gap-4">
-        <UiSkeleton width="w-44" height="h-4" />
+        <UiSkeleton width="w-40" height="h-4" />
         <UiSkeleton width="w-20" height="h-6" shape="pill" />
         <div class="min-w-0 flex-1">
           <UiSkeleton width="w-full" height="h-4" />
@@ -117,7 +122,7 @@ const rowClass = (data: ActivityLog) =>
                 {{ col.label }}
               </UiSortHeader>
             </th>
-            <th scope="col" class="py-2.5 px-3.5 font-semibold text-center w-[100px]">Detail</th>
+            <th scope="col" class="py-2.5 px-3.5 font-semibold text-center w-[90px]">Detail</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft">
@@ -127,18 +132,32 @@ const rowClass = (data: ActivityLog) =>
             class="hover:bg-brand-canvas-soft/50 transition-colors"
             :class="rowClass(row)"
           >
-            <td class="py-2.5 px-3.5 font-medium text-brand-ink whitespace-nowrap">
+            <td class="py-2.5 px-3.5 font-medium text-brand-ink whitespace-nowrap tabular">
               {{ formatDate(row.created_at) }}
             </td>
             <td class="py-2.5 px-3.5">
               <UiBadge :label="row.action" :variant="getActionVariant(row.action)" />
             </td>
-            <td class="py-2.5 px-3.5 text-brand-ink">{{ row.description }}</td>
-            <td class="py-2.5 px-3.5 text-brand-muted whitespace-nowrap">
-              {{ row.ip_address || '-' }}
+            <td class="py-2.5 px-3.5 text-brand-ink">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="font-medium text-brand-ink">{{ row.description }}</span>
+                <span
+                  v-if="row.entity_type"
+                  class="rounded-full border border-brand-hairsoft bg-brand-canvas-soft px-2 py-0.5 text-[10px] font-medium text-brand-muted"
+                >
+                  {{ formatActivityEntityLabel(row.entity_type) }}
+                </span>
+              </div>
             </td>
-            <td class="py-2.5 px-3.5 text-brand-muted whitespace-nowrap">
-              {{ row.browser || '-' }} • {{ row.platform || '-' }}
+            <td class="py-2.5 px-3.5 whitespace-nowrap tabular">
+              <span :class="row.ip_address ? 'text-brand-ink font-medium' : 'text-brand-faint'">
+                {{ formatActivityIp(row.ip_address) }}
+              </span>
+            </td>
+            <td class="py-2.5 px-3.5 whitespace-nowrap">
+              <span :class="row.browser || row.platform ? 'text-brand-muted' : 'text-brand-faint'">
+                {{ formatActivityAgent(row.browser, row.platform) }}
+              </span>
             </td>
             <td class="py-2.5 px-3.5 text-center whitespace-nowrap">
               <UiTooltip v-if="row.old_data || row.new_data" text="Lihat Detail" position="top">

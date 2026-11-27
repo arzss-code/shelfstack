@@ -45,7 +45,7 @@ const {
   totalCount,
   totalPages,
   paginatedItems: paginatedReturns,
-} = useClientPagination(sortedReturns, 12)
+} = useClientPagination(sortedReturns, 10)
 
 const formatDate = (dateStr: string) => {
   return new Intl.DateTimeFormat('id-ID', {

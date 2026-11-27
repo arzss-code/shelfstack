@@ -2,6 +2,23 @@
 
 Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
+## [Unreleased]
+
+### Perbaikan Grafik Ringkasan, Dropdown Pagination Terpusat, Pemilih Bulan/Tahun, & Pelacakan Perangkat Audit Log (2026-11-27)
+
+- **Grafik Ringkasan Penjualan (`/admin`, `AdminSalesChart.vue`, `AdminSalesChartControls.vue`, `/api/admin/stats/trends`)**:
+  - Menambahkan filter periode yang lebih lengkap (`7 Hari`, `30 Hari`, `90 Hari`, `Bulan Ini`, `Tahun Ini`, dan `Kustom` dengan integrasi `UiDateRangePicker`), pemilih cakupan status pesanan (`Status: Lunas & Selesai`, `Khusus Selesai`, `Semua Pesanan Aktif`), toggle metrik (`Omzet` vs `Transaksi`), serta agregasi sumbu otomatis (harian, mingguan, bulanan).
+  - Menambahkan kartu metrik `Puncak Periode`, persentase perbandingan periode sebelumnya (dihitung dari rentang DB pendahulu yang sebanding), dan memperbaiki format tick sumbu Y ke satuan ringkas Indonesia (`Rp 0`, `rb`, `jt`, `M`) tanpa angka desimal mentah.
+- **Perbaikan Dropdown Pagination, Posisi Tengah, Anti-Clip, & Redundansi Label (`UiPagination.vue`, `UiSelect.vue`, `useUiSelect.ts`)**:
+  - Memperbaiki popover dropdown pagination yang terpotong oleh batas `overflow-hidden` card tabel melalui opsi `<Teleport to="body">` dengan koordinat viewport adaptif (membuka ke atas bila ruang bawah sempit).
+  - Memindahkan kontrol dropdown `Tampilkan` ke posisi tengah di footer pagination dengan opsi kompak `[5, 10, 15, 25, 50]` data per halaman (`12` diselaraskan ke `10`), tinggi trigger `h-7` (`28px`) pil yang identik dengan tombol `Sebelumnya` / angka / `Selanjutnya`, serta lebar ringkas.
+  - Menghapus label penghitung duplikat (`Menampilkan 15 dari 15` di `activities.vue` dan `Menampilkan X dari Y kategori` di `categories.vue`) saat tidak memfilter, menggantinya dengan chip hasil filter saat pencarian/filter aktif serta merapikan ringkasan jumlah di footer `UiPagination.vue`.
+- **Pemilihan Bulan & Tahun pada Rentang Tanggal (`UiDateRangePicker.vue`, `useCalendarGrid.ts`, `useDateRangePicker.ts`)**:
+  - Menambahkan kontrol pilih langsung **Bulan** (`Jan`..`Des`) dan **Tahun** pada header kalender kustom, serta memperbaiki listener luar menggunakan `pointerdown` agar pergantian grid bulan/tahun tidak menutup dialog kalender.
+- **Audit Log IP Address, Browser/OS, & Filter Lengkap (`activities.vue`, `AdminActivityTable.vue`, `ActivityDetailDialog.vue`, `server/utils/activity-log.ts`, `server/utils/device.ts`)**:
+  - Menambahkan helper server `insertActivityLogWithDevice` dan `enrichRecentOrderActivityDevice` untuk melengkapi `ip_address`, `browser`, dan `platform` pada mutasi status pesanan, konfirmasi terima, pembatalan, refund, tiket retur, serta varian produk (`Edge`/`Edg/` terdeteksi tepat sebelum `Chrome`).
+  - Mengganti tampilan kosong `- • -` pada log sistem/riwayat lama di `AdminActivityTable.vue` dan `ActivityDetailDialog.vue` menjadi label `Sistem` / `Sistem Otomatis`, menambahkan label entitas berbahasa Indonesia, serta melengkapi filter halaman `/admin/activities` dengan input pencarian dan `UiDateRangePicker`.
+
 ## [v1.1.0-beta.36] - 2026-11-26
 
 ### Standardisasi Desain Admin, View Tabel Produk, Ekspor Excel/CSV Pesanan, & Audit WCAG 2.1 AA (11/11 Rute)

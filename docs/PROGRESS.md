@@ -6,9 +6,9 @@
 
 ## 📌 Status Terkini
 
-- **Pekerjaan aktif:** Rilis `v1.1.0-beta.36` (standardisasi desain kompak & konsisten 11 rute back-office admin melalui `AdminPageHeader.vue`, breadcrumb header global `AdminTopBreadcrumb.vue`, dan `AdminCategoryMetrics.vue`; penyeragaman fokus hitam konsisten tanpa celah di `main.css` & seluruh primitif UI serta penyelarasan vertikal tengah `UiCheckbox.vue`; filter bar kompak `/admin/orders` & `/admin/reviews` plus dropdown berlabel jelas `Semua Bintang`/`Semua entitas`; pencerahan bintang `--brand-warning` `#f59e0b`/`#fbbf24` dengan pemisahan kontras teks `--brand-warning-text` `#92400e`; pagination seragam `<UiPagination compact>` dan `useClientPagination.ts` di seluruh tabel admin termasuk ekstraksi `AdminActivityTable.vue`, `AdminReturnTable.vue`, `AdminFlashDealTable.vue`, `AdminCategoryTable.vue`; penyeragaman copy tombol `Muat Ulang`, rating desimal `5.0 / 5.0`, dan `Detail Pelanggan`; pemindahan `Status Sistem` & `Antrean Pesanan Kedaluwarsa` ke `/admin/activities?tab=system`; mode `Grid`/`Tabel` di `/admin/products`; tombol gabung `Excel (.xlsx)` & `CSV` di `/admin/orders`; alias `h3@1.15.11` ESM di `vitest.config.ts`; serta remediasi P0/P1/P2 WCAG 2.1 AA dan Dark Mode). Sisa 20 gambar studio varian katalog terjadwal otomatis di branch `feat/catalog-variant-images` sebelum freeze `v1.1.0`.
+- **Pekerjaan aktif:** Branch `fix/admin-ui-audit` di atas `v1.1.0-beta.36` (penyelarasan penuh 11 rute admin termasuk batch lanjutan 2026-11-27: filter lengkap & format sumbu Y grafik penjualan `AdminSalesChart.vue`; perbaikan klipping dropdown pagination lewat `UiSelect` `teleport` + `h-7` pil rata tengah bernilai `5..50` data serta penghapusan penghitung duplikat `Menampilkan X dari Y` di filter bar `activities.vue`/`categories.vue`; kontrol pemilih Bulan & Tahun pada `UiDateRangePicker.vue`; serta pelacakan `ip_address`/`browser`/`platform` pada mutasi pesanan & retur di Audit Log tanpa tampilan `- • -` ditambah filter pencarian & rentang tanggal di `/admin/activities`). Sisa 6 gambar studio varian katalog Batch 5 dijadwalkan otomatis di branch `feat/catalog-variant-images` sebelum freeze `v1.1.0`.
 - **Versi rilis aktif:** `v1.1.0-beta.36` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
-- **Quality Gate Terkini (2026-11-27):** `pnpm audit --audit-level=high` 0 kerentanan · `pnpm lint` EXIT 0 (0 error, 0 warning) · `nuxi typecheck` EXIT 0 · `vitest run` 149 file / 1.454 test lolos 100% · `pnpm build` EXIT 0 (`30 MB`) · Playwright `tests/e2e/a11y.spec.ts` (7/7) + Axe-Core 11/11 rute admin Light + Dark 0 violation & 0 horizontal overflow · 0 file `app/`/`server/` melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
+- **Quality Gate Terkini (2026-11-27):** `pnpm audit --audit-level=high` 0 kerentanan · `pnpm lint` EXIT 0 · `nuxi typecheck` EXIT 0 · `vitest run` 149 file / 1.457 test lolos 100% · `pnpm build` EXIT 0 (`30.1 MB`) · Playwright `tests/e2e/a11y.spec.ts` (7/7) + audit interaktif Chromium produksi `0` console error / `0` dropdown clipping / `0` horizontal overflow Light, Dark, & Mobile · 0 file `app/`/`server/` melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
 - **Keputusan Arsitektur:**
   - Model Bisnis: **Single-Vendor E-Commerce** (ShelfStack sebagai penjual kurasi resmi)
   - Payment Gateway: **Midtrans Sandbox** (metode Snap Popup/Redirect; BUKAN mock, tidak ada lapisan mock di kode)
@@ -49,7 +49,16 @@
 
 - Sinkronisasi skema remote selesai diverifikasi (2026-11-25): `pnpm dlx supabase migration list --linked` mengonfirmasi seluruh 49 migrasi lokal, termasuk `20261202000001`, `20261203000001`, dan `20261204000001` (`public.email_outbox`, `contact_messages`, `deleted_at` kategori/flash deals, RPC `admin_restock_product`), sudah diterapkan dan sinkron penuh pada proyek Supabase `mbcyttxkfppcdvwitrif`. Runtime test PostgreSQL multi-koneksi lokal tetap belum dieksekusi karena daemon Docker lokal offline.
 - Cleanup avatar best-effort tetap tidak memakai antrean retry terpisah bila Storage API gagal sementara setelah update profil sukses.
-- Regenerasi foto studio varian produk katalog masih menyisakan 20 gambar (dimulai dari `coffee-grinder-silver.jpg`) yang dijadwalkan lanjut otomatis pada branch `feat/catalog-variant-images` mengikuti jendela kuota generator gambar.
+- Regenerasi foto studio varian produk katalog menyisakan 6 gambar Batch 5 (dimulai dari `pen-titanium-raw.jpg`) pada branch `feat/catalog-variant-images` mengikuti jendela kuota generator gambar.
+
+### 🔭 Catatan Next Phase: Tinjauan Komplain & Retur serta Penyempurnaan Halaman Admin
+
+1. **Tinjau Komplain & Retur (`/admin/returns`, `AdminReturnTable.vue`, `AdminReturnDetailModal.vue`)**:
+   - Jadikan kartu metrik di `AdminReturnMetrics.vue` interaktif (klik untuk menyaring tab status terkait), serta tambahkan filter rentang tanggal (`UiDateRangePicker`) dan jenis solusi (`Refund` vs `Tukar Unit`) pada toolbar filter.
+   - Pada `AdminReturnDetailModal.vue`, ganti input bebas `Kurir Pengganti` menjadi `<UiSelect>` kurir standar yang konsisten dengan pesanan, tambahkan pengaman fallback ketika signed URL gambar bukti kedaluwarsa/gagal dimuat, serta pertegas validasi/panduan alasan penolakan klaim.
+2. **Tinjauan Lanjutan Halaman Admin Sekunder (`/admin/users`, `/admin/promotions`, `/admin/coupons`, `/admin/support`)**:
+   - Tambah filter segmen pelanggan (`/admin/users`) dan filter status aktif/kedaluwarsa (`/admin/promotions`, `/admin/coupons`), serta audit ergonomics pane kanan `/admin/support` pada layar laptop berdimensi pendek.
+   - Migrasikan pagination tabel yang masih client-side (`users`, `activities`, `returns`, `products` mode tabel, `reviews`) ke server-side offset/cursor pagination untuk kesiapan dataset ribuan baris pasca-`v1.1.0`.
 
 ## 🚀 Riwayat Kemajuan per Fase
 

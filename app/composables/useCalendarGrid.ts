@@ -86,6 +86,20 @@ export function buildMonthGrid(year: number, month: number, todayIso: string): C
   return cells
 }
 
+export function getCalendarYearOptions(
+  anchorYear: number,
+  pastYears = 5,
+  futureYears = 2,
+): number[] {
+  const minYear = Math.min(anchorYear - 1, new Date().getFullYear() - pastYears)
+  const maxYear = Math.max(anchorYear + 1, new Date().getFullYear() + futureYears)
+  const years: number[] = []
+  for (let y = maxYear; y >= minYear; y--) {
+    years.push(y)
+  }
+  return years
+}
+
 export function getPresetDateRange(
   preset: 'today' | 'last7' | 'last30' | 'thisMonth',
   now: Date = new Date(),

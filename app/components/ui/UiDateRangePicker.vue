@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
-  buildMonthGrid,
   formatIsoShortId,
-  getPresetDateRange,
   ID_MONTH_NAMES,
+  ID_MONTH_SHORT,
   ID_WEEKDAY_SHORT,
-  parseIsoDateParts,
-  toLocalIsoDate,
 } from '~/composables/useCalendarGrid'
+import { useDateRangePicker } from '~/composables/useDateRangePicker'
 
 const props = withDefaults(
   defineProps<{
@@ -16,12 +13,14 @@ const props = withDefaults(
     to?: string
     placeholder?: string
     ariaLabel?: string
+    align?: 'left' | 'right'
   }>(),
   {
     from: '',
     to: '',
     placeholder: 'Rentang Tanggal',
-    ariaLabel: 'Pilih rentang tanggal pesanan',
+    ariaLabel: 'Pilih rentang tanggal',
+    align: 'right',
   },
 )
 
@@ -31,110 +30,33 @@ const emit = defineEmits<{
   change: [range: { from: string; to: string }]
 }>()
 
-const rootRef = ref<HTMLElement | null>(null)
-const triggerRef = ref<HTMLButtonElement | null>(null)
-const isOpen = ref(false)
-const draftStart = ref(props.from)
-
-const now = new Date()
-const todayIso = toLocalIsoDate(now)
-const initialFocus = parseIsoDateParts(props.from || props.to)
-const viewYear = ref(initialFocus?.year ?? now.getFullYear())
-const viewMonth = ref(initialFocus?.month ?? now.getMonth())
-
-watch(
-  () => [props.from, props.to],
-  ([nextFrom, nextTo]) => {
-    draftStart.value = nextFrom && !nextTo ? nextFrom : ''
-    const parts = parseIsoDateParts(nextFrom || nextTo || '')
-    if (parts) {
-      viewYear.value = parts.year
-      viewMonth.value = parts.month
-    }
-  },
-)
-
-const hasRange = computed(() => Boolean(props.from || props.to))
-
-const triggerLabel = computed(() => {
-  if (props.from && props.to) {
-    if (props.from === props.to) return formatIsoShortId(props.from)
-    const fromYear = parseIsoDateParts(props.from)?.year
-    const toYear = parseIsoDateParts(props.to)?.year
-    return `${formatIsoShortId(props.from, fromYear !== toYear)} - ${formatIsoShortId(props.to)}`
-  }
-  if (props.from) return `Dari ${formatIsoShortId(props.from)}`
-  if (props.to) return `Sampai ${formatIsoShortId(props.to)}`
-  return props.placeholder
+const {
+  rootRef,
+  triggerRef,
+  isOpen,
+  panelView,
+  draftStart,
+  viewYear,
+  viewMonth,
+  hasRange,
+  triggerLabel,
+  yearOptions,
+  cells,
+  shiftMonth,
+  selectMonth,
+  selectYear,
+  commitRange,
+  onDayClick,
+  applyPreset,
+  clearRange,
+  isSelectedEndpoint,
+  isInSelectedRange,
+  closeAndFocusTrigger,
+} = useDateRangePicker(props, {
+  onUpdateFrom: (value) => emit('update:from', value),
+  onUpdateTo: (value) => emit('update:to', value),
+  onChange: (range) => emit('change', range),
 })
-
-const monthHeading = computed(() => `${ID_MONTH_NAMES[viewMonth.value]} ${viewYear.value}`)
-const cells = computed(() => buildMonthGrid(viewYear.value, viewMonth.value, todayIso))
-
-const shiftMonth = (delta: number) => {
-  const next = new Date(viewYear.value, viewMonth.value + delta, 1)
-  viewYear.value = next.getFullYear()
-  viewMonth.value = next.getMonth()
-}
-
-const commitRange = (from: string, to: string, closeAfter = true) => {
-  emit('update:from', from)
-  emit('update:to', to)
-  emit('change', { from, to })
-  if (closeAfter) {
-    isOpen.value = false
-  }
-}
-
-const onDayClick = (iso: string) => {
-  if (!draftStart.value) {
-    draftStart.value = iso
-    emit('update:from', iso)
-    emit('update:to', '')
-    return
-  }
-  const [from, to] = iso < draftStart.value ? [iso, draftStart.value] : [draftStart.value, iso]
-  draftStart.value = ''
-  commitRange(from, to, true)
-}
-
-const applyPreset = (preset: 'today' | 'last7' | 'last30' | 'thisMonth') => {
-  draftStart.value = ''
-  const range = getPresetDateRange(preset)
-  const parts = parseIsoDateParts(range.to)
-  if (parts) {
-    viewYear.value = parts.year
-    viewMonth.value = parts.month
-  }
-  commitRange(range.from, range.to, true)
-}
-
-const clearRange = () => {
-  draftStart.value = ''
-  commitRange('', '', true)
-}
-
-const activeStart = computed(() => draftStart.value || props.from)
-const activeEnd = computed(() => (draftStart.value ? '' : props.to))
-
-const isSelectedEndpoint = (iso: string) => iso === activeStart.value || iso === activeEnd.value
-const isInSelectedRange = (iso: string) =>
-  Boolean(activeStart.value && activeEnd.value && iso > activeStart.value && iso < activeEnd.value)
-
-const closeAndFocusTrigger = () => {
-  isOpen.value = false
-  triggerRef.value?.focus()
-}
-
-const handleDocumentClick = (event: MouseEvent) => {
-  if (!isOpen.value || !rootRef.value) return
-  if (!rootRef.value.contains(event.target as Node)) {
-    isOpen.value = false
-  }
-}
-
-onMounted(() => document.addEventListener('click', handleDocumentClick))
-onBeforeUnmount(() => document.removeEventListener('click', handleDocumentClick))
 </script>
 
 <template>
@@ -170,7 +92,10 @@ onBeforeUnmount(() => document.removeEventListener('click', handleDocumentClick)
       role="dialog"
       aria-label="Kalender rentang tanggal"
       data-testid="date-range-popover"
-      class="absolute left-0 sm:left-auto sm:right-0 top-[calc(100%+6px)] z-50 w-[300px] max-w-[calc(100vw-2rem)] rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-floating space-y-2.5"
+      :class="[
+        'absolute left-0 top-[calc(100%+6px)] z-50 w-[300px] max-w-[calc(100vw-2rem)] rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-floating space-y-2.5',
+        align === 'left' ? 'sm:left-0 sm:right-auto' : 'sm:left-auto sm:right-0',
+      ]"
     >
       <div class="flex flex-wrap gap-1">
         <button
@@ -189,27 +114,105 @@ onBeforeUnmount(() => document.removeEventListener('click', handleDocumentClick)
         </button>
       </div>
 
-      <div class="flex items-center justify-between pt-0.5">
+      <div class="flex items-center justify-between gap-1.5 pt-0.5">
         <button
           type="button"
           aria-label="Bulan sebelumnya"
-          class="flex h-7 w-7 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft cursor-pointer"
+          class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft cursor-pointer"
           @click="shiftMonth(-1)"
         >
           <i class="pi pi-chevron-left text-[10px]" aria-hidden="true" />
         </button>
-        <span class="text-xs font-semibold text-brand-ink">{{ monthHeading }}</span>
+
+        <div class="flex items-center gap-1 min-w-0">
+          <button
+            type="button"
+            data-testid="date-range-month-btn"
+            aria-label="Pilih bulan"
+            :aria-pressed="panelView === 'months'"
+            class="inline-flex h-7 items-center gap-1 rounded-full border px-2.5 text-[11px] font-semibold transition-colors cursor-pointer"
+            :class="
+              panelView === 'months'
+                ? 'border-brand-ink bg-brand-ink text-brand-onink'
+                : 'border-brand-hair bg-brand-canvas-soft text-brand-ink hover:border-brand-ink/40'
+            "
+            @click="panelView = panelView === 'months' ? 'days' : 'months'"
+          >
+            <span>{{ ID_MONTH_NAMES[viewMonth] }}</span>
+            <i class="pi pi-chevron-down text-[9px]" aria-hidden="true" />
+          </button>
+
+          <button
+            type="button"
+            data-testid="date-range-year-btn"
+            aria-label="Pilih tahun"
+            :aria-pressed="panelView === 'years'"
+            class="inline-flex h-7 items-center gap-1 rounded-full border px-2.5 text-[11px] font-semibold tabular transition-colors cursor-pointer"
+            :class="
+              panelView === 'years'
+                ? 'border-brand-ink bg-brand-ink text-brand-onink'
+                : 'border-brand-hair bg-brand-canvas-soft text-brand-ink hover:border-brand-ink/40'
+            "
+            @click="panelView = panelView === 'years' ? 'days' : 'years'"
+          >
+            <span>{{ viewYear }}</span>
+            <i class="pi pi-chevron-down text-[9px]" aria-hidden="true" />
+          </button>
+        </div>
+
         <button
           type="button"
           aria-label="Bulan berikutnya"
-          class="flex h-7 w-7 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft cursor-pointer"
+          class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-brand-hair bg-brand-canvas text-brand-ink hover:bg-brand-canvas-soft cursor-pointer"
           @click="shiftMonth(1)"
         >
           <i class="pi pi-chevron-right text-[10px]" aria-hidden="true" />
         </button>
       </div>
 
-      <div class="grid grid-cols-7 gap-y-0.5 text-center">
+      <div
+        v-if="panelView === 'months'"
+        data-testid="date-range-month-grid"
+        class="grid grid-cols-3 gap-1.5 py-1"
+      >
+        <button
+          v-for="(mLabel, mIdx) in ID_MONTH_SHORT"
+          :key="mLabel"
+          type="button"
+          class="h-8 rounded-field border text-xs font-medium transition-colors cursor-pointer"
+          :class="
+            viewMonth === mIdx
+              ? 'border-brand-ink bg-brand-ink text-brand-onink font-semibold'
+              : 'border-brand-hairsoft bg-brand-canvas-soft text-brand-ink hover:border-brand-ink/40'
+          "
+          @click="selectMonth(mIdx)"
+        >
+          {{ mLabel }}
+        </button>
+      </div>
+
+      <div
+        v-else-if="panelView === 'years'"
+        data-testid="date-range-year-grid"
+        class="grid grid-cols-3 gap-1.5 py-1 max-h-48 overflow-y-auto"
+      >
+        <button
+          v-for="yVal in yearOptions"
+          :key="yVal"
+          type="button"
+          class="h-8 rounded-field border text-xs font-medium tabular transition-colors cursor-pointer"
+          :class="
+            viewYear === yVal
+              ? 'border-brand-ink bg-brand-ink text-brand-onink font-semibold'
+              : 'border-brand-hairsoft bg-brand-canvas-soft text-brand-ink hover:border-brand-ink/40'
+          "
+          @click="selectYear(yVal)"
+        >
+          {{ yVal }}
+        </button>
+      </div>
+
+      <div v-else class="grid grid-cols-7 gap-y-0.5 text-center">
         <span
           v-for="wd in ID_WEEKDAY_SHORT"
           :key="wd"
