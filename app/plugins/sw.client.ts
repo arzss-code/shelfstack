@@ -4,7 +4,7 @@ export interface ServiceWorkerRegistrationOptions {
 }
 
 export function shouldSkipServiceWorkerRegistration(): boolean {
-  if (import.meta.test) {
+  if (import.meta.test || import.meta.dev) {
     return true
   }
   if ('process' in globalThis && globalThis.process && typeof globalThis.process === 'object') {
@@ -36,7 +36,26 @@ export async function registerServiceWorker(
 }
 
 export default defineNuxtPlugin(() => {
-  if (shouldSkipServiceWorkerRegistration() || typeof window === 'undefined') {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  // Purge previously registered dev service workers so local assets stay fresh
+  if (
+    import.meta.dev &&
+    !import.meta.test &&
+    typeof navigator !== 'undefined' &&
+    'serviceWorker' in navigator
+  ) {
+    void navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) =>
+        registrations.forEach((registration) => void registration.unregister()),
+      )
+    return
+  }
+
+  if (shouldSkipServiceWorkerRegistration()) {
     return
   }
 

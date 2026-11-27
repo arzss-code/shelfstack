@@ -4,6 +4,10 @@ Catatan update resmi pengembangan **ShelfStack** (E-Commerce Platform).
 
 ## [Unreleased]
 
+### Perbaikan Revalidasi Cache Service Worker & Header `/sw.js` (2026-11-28)
+
+- **Service Worker (`public/sw.js`, `app/plugins/sw.client.ts`, `nuxt.config.ts`)**: Menaikkan `CACHE_NAME` ke `shelfstack-static-v2` agar cache lama terhapus otomatis, menerapkan _stale-while-revalidate_ (`cache: 'no-cache'`) untuk `/images/*`, melewati registrasi SW dan membersihkan registrasi dev pada `import.meta.dev`, serta menambahkan header `Cache-Control: no-cache, no-store, must-revalidate` untuk `/sw.js` di `routeRules`.
+
 ### Sinkronisasi URL Aset Studio Katalog ke Database & Komponen Beranda (2026-11-27)
 
 - **Migrasi Sinkronisasi DB (`supabase/migrations/20261205000001_sync_curated_catalog_studio_images.sql`, `supabase/seed.sql`)**: Menyelaraskan seluruh `image_url` dan `gallery_urls` pada 5 kategori kanonik, 25 produk kurasi (termasuk `Ketel Leher Angsa Matte Black` dan 4 produk yang sebelumnya menunjuk URL lama `aida-public`), serta 48 varian SKU ke aset studio lokal `/images/products/*.jpg`, sekaligus menambahkan blok pembaruan idempoten pada `supabase/seed.sql`.

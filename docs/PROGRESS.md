@@ -6,7 +6,7 @@
 
 ## 📌 Status Terkini
 
-- **Pekerjaan aktif:** Branch `fix/sync-catalog-image-urls` di atas `develop` (`v1.1.0-beta.36` setelah PR `#124` ter-merge): menyinkronkan `image_url`/`gallery_urls` database Supabase (`5` kategori, `25` produk kurasi termasuk `Ketel Leher Angsa Matte Black`, serta `48` varian SKU) dan komponen beranda (`HomeHero.vue`, `HomeFeaturedCategories.vue`, `useCategories.ts`) ke 50 aset studio lokal `/images/products/*.jpg`.
+- **Pekerjaan aktif:** Branch `fix/sw-cache-revalidation` di atas `develop` (`v1.1.0-beta.36` setelah PR `#125` ter-merge): menaikkan Service Worker ke `shelfstack-static-v2` dengan _stale-while-revalidate_ untuk `/images/*`, menonaktifkan registrasi SW di mode dev, dan menyetel header `no-cache` untuk `/sw.js`.
 - **Versi rilis aktif:** `v1.1.0-beta.36` (sinkron pada `version.json`, `package.json`, dan `CHANGELOG.md`).
 - **Quality Gate Terkini (2026-11-27):** `pnpm audit --audit-level=high` 0 kerentanan · `pnpm lint` EXIT 0 · `nuxi typecheck` EXIT 0 · `vitest run` 150 file / 1.462 test lolos 100% · `pnpm build` EXIT 0 (`30.1 MB`) · Playwright suite lengkap (`36 passed`, `1 skipped` `shots.spec.ts`) + `category-journey.spec.ts` + `a11y.spec.ts` (Light & Dark 0 violation & 0 SSR hydration mismatch) · 0 file `app/`/`server/` melampaui 300 baris · 0 `: any` / `as any` di luar `app/types/database.types.ts`.
 - **Keputusan Arsitektur:**

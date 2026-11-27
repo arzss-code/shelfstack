@@ -76,7 +76,7 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
     it('precaches safe shell assets on install and purges old caches on activate', async () => {
       const sw = createSwHarness()
       await dispatchWaitUntil(sw.listeners.get('install'), {})
-      expect(sw.cachesApi.open).toHaveBeenCalledWith('shelfstack-static-v1')
+      expect(sw.cachesApi.open).toHaveBeenCalledWith('shelfstack-static-v2')
       const shellAssets =
         '/site.webmanifest /favicon.svg /favicon-32x32.png /apple-touch-icon.png /logo.svg'.split(
           ' ',
@@ -85,11 +85,11 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
       expect(sw.skipWaiting).toHaveBeenCalledTimes(1)
 
       sw.cachesApi.keys.mockResolvedValueOnce(
-        'shelfstack-static-v0 shelfstack-static-v1 other'.split(' '),
+        'shelfstack-static-v1 shelfstack-static-v2 other'.split(' '),
       )
       await dispatchWaitUntil(sw.listeners.get('activate'), {})
       expect(sw.cachesApi.delete).toHaveBeenCalledTimes(1)
-      expect(sw.cachesApi.delete).toHaveBeenCalledWith('shelfstack-static-v0')
+      expect(sw.cachesApi.delete).toHaveBeenCalledWith('shelfstack-static-v1')
       expect(sw.clientsApi.claim).toHaveBeenCalledTimes(1)
     })
 
@@ -114,33 +114,39 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
       }
     })
 
-    it('serves cached static assets and caches network misses for safe paths only', async () => {
+    it('serves cached shell cache-first, revalidates /images/ in background, and caches misses', async () => {
       const sw = createSwHarness()
       const fetchHandler = sw.listeners.get('fetch')
+      const invoke = (url: string) => {
+        let resP: Promise<Response> | undefined
+        let bgP: Promise<unknown> | undefined
+        fetchHandler?.({
+          waitUntil: (p) => (bgP = p),
+          respondWith: (p) => (resP = p),
+          request: { method: 'GET', url },
+        })
+        return { resP, getBg: () => bgP }
+      }
+
       const hit = new Response('svg', { status: 200 })
       sw.cacheStore.match.mockResolvedValueOnce(hit)
-      let hitP: Promise<Response> | undefined
-      fetchHandler?.({
-        waitUntil: vi.fn(),
-        respondWith: (p) => (hitP = p),
-        request: { method: 'GET', url: 'https://shelfstack.atsiilaarya.me/favicon.svg' },
-      })
-      expect(await hitP).toBe(hit)
+      expect(await invoke('https://shelfstack.atsiilaarya.me/favicon.svg').resP).toBe(hit)
       expect(sw.fetchMock).not.toHaveBeenCalled()
+
+      sw.cacheStore.match.mockResolvedValueOnce(hit)
+      sw.fetchMock.mockResolvedValueOnce(new Response('fresh-img', { status: 200 }))
+      const imgCall = invoke('https://shelfstack.atsiilaarya.me/images/products/kettle.jpg')
+      expect(await imgCall.resP).toBe(hit)
+      await imgCall.getBg()
+      expect(sw.fetchMock).toHaveBeenCalledWith(expect.anything(), { cache: 'no-cache' })
+      expect(sw.cacheStore.put).toHaveBeenCalledTimes(1)
 
       sw.cacheStore.match.mockResolvedValueOnce(undefined)
       sw.fetchMock.mockResolvedValueOnce(new Response('img', { status: 200 }))
-      let missP: Promise<Response> | undefined
-      fetchHandler?.({
-        waitUntil: vi.fn(),
-        respondWith: (p) => (missP = p),
-        request: {
-          method: 'GET',
-          url: 'https://shelfstack.atsiilaarya.me/images/auth-showcase.jpg',
-        },
-      })
-      expect((await missP)?.status).toBe(200)
-      expect(sw.cacheStore.put).toHaveBeenCalledTimes(1)
+      expect(
+        (await invoke('https://shelfstack.atsiilaarya.me/images/auth-showcase.jpg').resP)?.status,
+      ).toBe(200)
+      expect(sw.cacheStore.put).toHaveBeenCalledTimes(2)
     })
 
     it('parses push payloads, falls back safely, and sanitizes external notification URLs', async () => {
@@ -158,12 +164,7 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
       )
 
       await dispatchWaitUntil(pushHandler, {
-        data: {
-          json: () => {
-            throw new Error('bad json')
-          },
-          text: () => 'Pesan teks biasa',
-        },
+        data: { json: () => JSON.parse('{'), text: () => 'Pesan teks biasa' },
       })
       expect(sw.reg.showNotification).toHaveBeenLastCalledWith(
         'ShelfStack',
@@ -206,7 +207,7 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
       class MockNotification {
         static permission = 'granted'
         onclick?: () => void
-        constructor(_t: string, _o?: NotificationOptions) {
+        constructor() {
           instances.push(this)
         }
       }
@@ -272,9 +273,7 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
       expect(w2.text()).toContain('Notifikasi Browser Aktif')
     })
 
-    it('configures CSP worker-src self and respects line/em-dash/any constraints', () => {
-      const config = fs.readFileSync(path.resolve(process.cwd(), 'nuxt.config.ts'), 'utf-8')
-      expect(config).toContain("'worker-src': [\"'self'\"]")
+    it('configures CSP worker-src self, sw.js no-cache, dev skip, and size limits', () => {
       const files =
         'public/sw.js app/plugins/sw.client.ts app/utils/desktop-notification.ts app/components/notification/NotificationHeader.vue nuxt.config.ts eslint.config.mjs tests/unit/pwa-service-worker.spec.ts'.split(
           ' ',
@@ -284,6 +283,12 @@ describe('PWA Service Worker & Browser Notification Suite', () => {
         expect(src.split('\n').length, `${rel} > 300 lines`).toBeLessThanOrEqual(300)
         expect(src, `${rel} has em dash`).not.toContain('\u2014')
         expect(src, `${rel} has any`).not.toMatch(/:\s*any\b|\bas\s+any\b/)
+        if (rel === 'nuxt.config.ts') {
+          expect(src).toContain("'worker-src': [\"'self'\"]")
+          expect(src).toContain("'/sw.js'")
+          expect(src).toContain('no-cache, no-store, must-revalidate')
+        }
+        if (rel === 'app/plugins/sw.client.ts') expect(src).toContain('import.meta.dev')
       }
     })
   })

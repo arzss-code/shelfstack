@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'shelfstack-static-'
-const CACHE_NAME = `${CACHE_PREFIX}v1`
+const CACHE_NAME = `${CACHE_PREFIX}v2`
 
 const PRECACHE_URLS = [
   '/site.webmanifest',
@@ -183,24 +183,33 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
+  const revalidateAsset = (cache) =>
+    fetch(request, { cache: 'no-cache' }).then(async (networkResponse) => {
+      if (
+        networkResponse &&
+        networkResponse.ok &&
+        networkResponse.type !== 'opaque' &&
+        networkResponse.type !== 'error'
+      ) {
+        await cache.put(request, networkResponse.clone())
+      }
+      return networkResponse
+    })
+
+  const isUnhashedMedia = parsedUrl.pathname.startsWith('/images/')
+
   event.respondWith(
     caches.open(CACHE_NAME).then(async (cache) => {
       const cachedResponse = await cache.match(request)
       if (cachedResponse) {
+        if (isUnhashedMedia) {
+          event.waitUntil(revalidateAsset(cache).catch(() => undefined))
+        }
         return cachedResponse
       }
 
       try {
-        const networkResponse = await fetch(request)
-        if (
-          networkResponse &&
-          networkResponse.ok &&
-          networkResponse.type !== 'opaque' &&
-          networkResponse.type !== 'error'
-        ) {
-          await cache.put(request, networkResponse.clone())
-        }
-        return networkResponse
+        return await revalidateAsset(cache)
       } catch {
         return new Response('Static asset unavailable offline', {
           status: 503,
