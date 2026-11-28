@@ -176,7 +176,7 @@ export const PERIOD_OPTIONS: Array<{ id: AdminTrendsPeriod; label: string }> = [
 ]
 
 export const STATUS_SCOPE_OPTIONS: Array<{ value: AdminTrendsStatusScope; label: string }> = [
-  { value: 'confirmed', label: 'Status: Lunas & Selesai' },
-  { value: 'completed', label: 'Status: Khusus Selesai' },
-  { value: 'all_active', label: 'Status: Semua Pesanan Aktif' },
+  { value: 'confirmed', label: 'Lunas & Selesai' },
+  { value: 'completed', label: 'Khusus Selesai' },
+  { value: 'all_active', label: 'Semua Aktif' },
 ]

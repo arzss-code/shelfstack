@@ -10,13 +10,16 @@ const props = defineProps<{
   isTrash?: boolean
   /** Mode etalase publik: sembunyikan tombol edit/hapus, kartu klik ke detail. */
   hideActions?: boolean
-  /** Kepadatan grid: compact (4 kolom), spacious (3 kolom), atau admin (1/2/3/4 kolom adaptif). */
-  density?: 'compact' | 'spacious' | 'admin'
+  /** Kepadatan grid: compact (4 kolom), dense (6 kolom kategori), spacious (3 kolom), atau admin (1/2/3/4 kolom adaptif). */
+  density?: 'compact' | 'dense' | 'spacious' | 'admin'
 }>()
 
 const gridClass = computed(() => {
   if (props.density === 'admin') {
     return 'grid gap-3 sm:gap-4 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4'
+  }
+  if (props.density === 'dense') {
+    return 'grid gap-2.5 sm:gap-3 lg:gap-3.5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'
   }
   if (props.density === 'spacious') {
     return 'grid gap-3 sm:gap-4 md:gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'
@@ -39,7 +42,7 @@ const emit = defineEmits<{
     <!-- Loading State: Modernist Skeletal Grid -->
     <div v-if="loading" :class="gridClass">
       <div
-        v-for="i in 8"
+        v-for="i in density === 'dense' ? 12 : 8"
         :key="i"
         class="flex flex-col bg-brand-canvas border border-brand-hair rounded-card overflow-hidden animate-pulse"
       >
@@ -98,12 +101,15 @@ const emit = defineEmits<{
         <div
           class="w-14 h-14 rounded-full bg-brand-canvas border border-brand-hair flex items-center justify-center mb-4 text-brand-muted shadow-whisper"
         >
-          <i class="pi pi-box text-xl" />
+          <i class="pi pi-box text-xl" aria-hidden="true" />
         </div>
         <h3 class="font-display m-0 mb-2 text-lg font-bold text-brand-ink">Tidak ada hasil</h3>
         <p class="font-body m-0 text-sm text-brand-muted max-w-md leading-relaxed">
-          Belum ada produk dalam katalog. Anda dapat mulai menambahkan item baru melalui dashboard
-          manajemen katalog.
+          {{
+            hideActions
+              ? 'Belum ada produk aktif yang tersedia pada koleksi ini. Silakan jelajahi kategori lainnya di katalog.'
+              : 'Belum ada produk dalam katalog. Anda dapat mulai menambahkan item baru melalui dashboard manajemen katalog.'
+          }}
         </p>
       </template>
     </div>
@@ -116,6 +122,7 @@ const emit = defineEmits<{
         :product="product"
         :hide-actions="hideActions"
         :is-trash="isTrash"
+        :dense="density === 'dense'"
         @edit="emit('edit', $event)"
         @delete="emit('delete', $event)"
         @restore="emit('restore', $event)"

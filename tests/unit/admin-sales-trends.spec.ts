@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import AdminSalesChart from '../../app/components/admin/AdminSalesChart.vue'
-import { formatSalesAxisTick } from '../../app/composables/useAdminSalesChart'
+import { STATUS_SCOPE_OPTIONS, formatSalesAxisTick } from '../../app/composables/useAdminSalesChart'
 import {
   adminTrendsPeriodSchema,
   adminTrendsQuerySchema,
@@ -193,6 +193,38 @@ describe('Admin Sales Trends & Analytics', () => {
       await customButton?.trigger('click')
       await flushPromises()
       expect(wrapper.find('[data-testid="date-range-trigger"]').exists()).toBe(true)
+    })
+
+    it('renders concise Status prefix, compact metric toggle, and refetches on status scope change', async () => {
+      const wrapper = mount(AdminSalesChart, {
+        props: { initialPeriod: '7d' },
+      })
+      await flushPromises()
+
+      expect(STATUS_SCOPE_OPTIONS.map((o) => o.label)).toEqual([
+        'Lunas & Selesai',
+        'Khusus Selesai',
+        'Semua Aktif',
+      ])
+      expect(wrapper.text()).toContain('Status:')
+      expect(wrapper.text()).toContain('Lunas & Selesai')
+
+      const metricButtons = wrapper.find('[aria-label="Metrik grafik"]').findAll('button')
+      const transaksiBtn = metricButtons.find((b) => b.text() === 'Transaksi')
+      expect(transaksiBtn?.attributes('aria-pressed')).toBe('false')
+      await transaksiBtn?.trigger('click')
+      expect(transaksiBtn?.attributes('aria-pressed')).toBe('true')
+      expect(wrapper.find('path[stroke="#0f766e"]').exists()).toBe(true)
+
+      const nativeStatusSelect = wrapper.find('select')
+      await nativeStatusSelect.setValue('completed')
+      await flushPromises()
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/admin/stats/trends',
+        expect.objectContaining({
+          params: { period: '7d', status_scope: 'completed' },
+        }),
+      )
     })
   })
 })

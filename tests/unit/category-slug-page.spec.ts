@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import CategorySlugPage from '../../app/pages/c/[slug].vue'
-import UiBadge from '../../app/components/ui/UiBadge.vue'
+import { formatRupiah } from '../../app/utils/format'
 import UiButton from '../../app/components/ui/UiButton.vue'
 import UiEmptyState from '../../app/components/ui/UiEmptyState.vue'
 
@@ -54,7 +54,6 @@ mockNuxtImport('useAsyncData', () => mockAsyncData)
 
 const globalOptions = {
   components: {
-    UiBadge,
     UiButton,
     UiEmptyState,
   },
@@ -64,8 +63,23 @@ const globalOptions = {
       props: ['to'],
     },
     ProductList: {
-      template: '<div data-testid="mock-product-list"><slot /></div>',
-      props: ['products', 'loading', 'density', 'hideActions'],
+      template: '<div data-testid="mock-product-list" :data-density="density"><slot /></div>',
+      props: ['products', 'loading', 'density', 'hideActions', 'isSearching'],
+    },
+    CategoryToolbar: {
+      template: '<div data-testid="mock-category-toolbar" />',
+      props: [
+        'selectedSort',
+        'sortOptions',
+        'inStockOnly',
+        'viewMode',
+        'totalCount',
+        'displayedCount',
+        'searchQuery',
+        'selectedPricePreset',
+        'selectedRating',
+        'categoryName',
+      ],
     },
   },
 }
@@ -84,9 +98,15 @@ describe('Category Pretty Slug Route Page (app/pages/c/[slug].vue)', () => {
     })
 
     expect(wrapper.text()).toContain('Tech & Gadget')
-    expect(wrapper.text()).toContain('Kategori Resmi')
     expect(wrapper.text()).toContain('1 Produk Aktif')
-    expect(wrapper.find('[data-testid="mock-product-list"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('1/1 siap kirim')
+    expect(wrapper.text()).toContain(formatRupiah(1850000))
+    const listEl = wrapper.find('[data-testid="mock-product-list"]')
+    expect(listEl.exists()).toBe(true)
+    expect(listEl.attributes('data-density')).toBe('dense')
+
+    const switcherLinks = wrapper.findAll('nav[aria-label="Pilih kategori produk"] a')
+    expect(switcherLinks.length).toBeGreaterThanOrEqual(6)
 
     expect(mockSeoMeta).toHaveBeenCalledWith(
       expect.objectContaining({

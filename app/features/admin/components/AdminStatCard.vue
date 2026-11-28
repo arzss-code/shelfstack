@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NuxtLink } from '#components'
+
 export type AdminStatTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'
 
 interface Props {
@@ -51,10 +53,14 @@ const colorStyles = computed(() => {
 
 <template>
   <component
-    :is="to ? 'NuxtLink' : 'div'"
+    :is="to ? NuxtLink : 'div'"
     :to="to || undefined"
-    class="relative overflow-hidden rounded-card border border-brand-hair bg-brand-canvas p-4 no-underline shadow-whisper"
-    :class="to ? 'transition-colors duration-150 hover:border-brand-ink cursor-pointer group' : ''"
+    class="block relative overflow-hidden rounded-card border border-brand-hair bg-brand-canvas p-4 no-underline shadow-whisper"
+    :class="
+      to
+        ? 'transition-colors duration-150 hover:border-brand-ink focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-2 cursor-pointer group'
+        : ''
+    "
   >
     <div class="space-y-2 min-w-0">
       <div class="flex items-center justify-between gap-2">
