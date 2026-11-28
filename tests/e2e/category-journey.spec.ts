@@ -21,9 +21,10 @@ test.describe('Etalase Kategori Publik (/c/[slug]) [TC-CAT-01]', () => {
     )
     await expect(breadcrumbNav).toContainText('Tech & Gadget')
 
-    // 3. Verifikasi Kartu Header Kategori Terkurasi
+    // 3. Verifikasi Kartu Header Kategori Terkurasi & Navigasi Kategori
     await expect(page.getByRole('heading', { level: 1, name: 'Tech & Gadget' })).toBeVisible()
-    await expect(page.getByText('Kategori Resmi')).toBeVisible()
+    await expect(page.getByText(/\d+ Produk Aktif/)).toBeVisible()
+    await expect(page.locator('nav[aria-label="Pilih kategori produk"]')).toBeVisible()
 
     // 4. Verifikasi Tombol Menuju Katalog dengan Filter
     const filterBtn = page.getByRole('link', { name: 'Filter Lengkap di Katalog' })
@@ -65,6 +66,6 @@ test.describe('Etalase Kategori Publik (/c/[slug]) [TC-CAT-01]', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: 'Alat Tulis & Kerajinan' }),
     ).toBeVisible()
-    await expect(page.getByText('Kategori Resmi')).toBeVisible()
+    await expect(page.getByText(/\d+ Produk Aktif/)).toBeVisible()
   })
 })

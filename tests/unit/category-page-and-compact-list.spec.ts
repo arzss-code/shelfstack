@@ -3,6 +3,8 @@ import { mount } from '@vue/test-utils'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { createPinia, setActivePinia } from 'pinia'
 import CategoryToolbar from '../../app/components/category/CategoryToolbar.vue'
+import ProductList from '../../app/features/products/components/ProductList.vue'
+import ProductCard from '../../app/features/products/components/ProductCard.vue'
 import ProductCompactList from '../../app/features/products/components/ProductCompactList.vue'
 import ProductCompactCard from '../../app/features/products/components/ProductCompactCard.vue'
 import { useKatalogFilters } from '../../app/composables/useKatalogFilters'
@@ -123,10 +125,96 @@ describe('Category Page & Compact List View Suite', () => {
 
       const listBtn = wrapper.find('button[aria-label="Tampilan List"]')
       expect(listBtn.exists()).toBe(true)
+      expect(listBtn.attributes('aria-pressed')).toBe('false')
       await listBtn.trigger('click')
 
       expect(wrapper.emitted('update:viewMode')).toBeTruthy()
       expect(wrapper.emitted('update:viewMode')?.[0]).toEqual(['list'])
+    })
+
+    it('merender filter harga, rating, pencarian kategori, status live, dan tombol reset aktif', async () => {
+      const wrapper = mount(CategoryToolbar, {
+        props: {
+          selectedSort: 'featured',
+          sortOptions,
+          inStockOnly: true,
+          viewMode: 'grid',
+          totalCount: 12,
+          displayedCount: 6,
+          searchQuery: 'keyboard',
+          selectedPricePreset: 'above1m',
+          selectedRating: '4.5',
+          categoryName: 'Tech & Gadget',
+        },
+        global: globalStubs,
+      })
+
+      expect(wrapper.find('[role="status"]').text()).toContain('6 dari 12 Produk')
+      expect(wrapper.text()).toContain('Kata kunci: "keyboard"')
+      expect(wrapper.text()).toContain('> Rp 1jt')
+      expect(wrapper.text()).toContain('Bintang 4.5+')
+
+      const resetBtn = wrapper.findAll('button').find((b) => b.text().includes('Reset Filter'))
+      expect(resetBtn).toBeDefined()
+      await resetBtn?.trigger('click')
+      expect(wrapper.emitted('resetFilters')).toBeTruthy()
+    })
+  })
+
+  describe('Component: ProductList.vue (6-Column Dense Category Mode) & ProductCard.vue', () => {
+    it('merender grid 6 kolom responsif dan 12 skeleton pada density="dense"', () => {
+      const loadingWrapper = mount(ProductList, {
+        props: {
+          products: [],
+          loading: true,
+          density: 'dense',
+          hideActions: true,
+        },
+        global: globalStubs,
+      })
+
+      expect(loadingWrapper.findAll('.animate-pulse').length).toBe(12)
+      expect(loadingWrapper.find('.lg\\:grid-cols-6').exists()).toBe(true)
+
+      const gridWrapper = mount(ProductList, {
+        props: {
+          products: [sampleProduct],
+          loading: false,
+          density: 'dense',
+          hideActions: true,
+        },
+        global: globalStubs,
+      })
+      expect(gridWrapper.find('.lg\\:grid-cols-6').exists()).toBe(true)
+    })
+
+    it('merender tautan kartu ProductCard tanpa tabindex="-1" agar dapat diakses keyboard', () => {
+      const wrapper = mount(ProductCard, {
+        props: {
+          product: sampleProduct,
+          hideActions: true,
+          dense: true,
+        },
+        global: globalStubs,
+      })
+
+      const link = wrapper.find('a')
+      expect(link.exists()).toBe(true)
+      expect(link.attributes('tabindex')).toBeUndefined()
+    })
+
+    it('tidak menampilkan copy admin dashboard pada empty state etalase publik', () => {
+      const wrapper = mount(ProductList, {
+        props: {
+          products: [],
+          loading: false,
+          density: 'dense',
+          hideActions: true,
+        },
+        global: globalStubs,
+      })
+
+      expect(wrapper.text()).not.toContain('dashboard manajemen katalog')
     })
   })
 
