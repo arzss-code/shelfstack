@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ProfileThemeCard from '~/components/account/ProfileThemeCard.vue'
 
@@ -51,6 +51,33 @@ describe('Stage 3 Remediations: Tokens, Theme Toggle, UX 5-States, & Strict Typi
     expect(navbarSrc).not.toContain('UiThemeToggle')
     expect(drawerSrc).not.toContain('UiThemeToggle')
     expect(adminLayoutSrc).not.toContain('UiThemeToggle')
+  })
+
+  it('defaults to light mode even when OS prefers dark scheme and no preference is saved', () => {
+    const originalMatchMedia = window.matchMedia
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query === '(prefers-color-scheme: dark)',
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }))
+
+    try {
+      const wrapper = mount(ProfileThemeCard)
+      const lightBtn = wrapper.get('[data-testid="settings-theme-light"]')
+      const darkBtn = wrapper.get('[data-testid="settings-theme-dark"]')
+
+      expect(document.documentElement.classList.contains('dark')).toBe(false)
+      expect(localStorage.getItem('shelfstack-theme')).toBeNull()
+      expect(lightBtn.attributes('aria-pressed')).toBe('true')
+      expect(darkBtn.attributes('aria-pressed')).toBe('false')
+    } finally {
+      window.matchMedia = originalMatchMedia
+    }
   })
 
   it('enforces error state with retry CTA and min-w-0 320px guard on /katalog and /c/[slug]', () => {

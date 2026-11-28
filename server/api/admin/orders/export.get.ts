@@ -2,6 +2,7 @@ import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { generateOrdersCsv, parseExportDateRange, type OrderCsvRow } from '~/utils/csv'
 import { generateOrdersXlsx } from '~~/server/utils/xlsx'
+import { buildAdminOrderSearchFilter } from '../../../utils/order-search'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
@@ -53,8 +54,9 @@ export default defineEventHandler(async (event) => {
     dbQuery = dbQuery.lt('created_at', dateResult.range.toExclusiveIso)
   }
 
-  if (search.trim()) {
-    dbQuery = dbQuery.or(`id.ilike.%${search.trim()}%,address->>name.ilike.%${search.trim()}%`)
+  const searchFilter = buildAdminOrderSearchFilter(search)
+  if (searchFilter) {
+    dbQuery = dbQuery.or(searchFilter)
   }
 
   const { data, error } = await (() => {
