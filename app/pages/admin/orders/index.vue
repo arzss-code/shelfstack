@@ -31,10 +31,11 @@ const {
   exportingFormat,
   statusTabs,
   totalPages,
+  hasActiveFilters,
   fetchOrders,
   onStatusChange,
   onSearch,
-  resetDateFilters,
+  resetFilters,
   onSortChange,
   handleExport,
   prevPage,
@@ -105,8 +106,6 @@ const {
             class="flex-1 sm:flex-none"
             @change="onSearch"
           />
-
-          <UiButton variant="secondary" size="sm" type="submit" class="shrink-0">Cari</UiButton>
         </div>
       </form>
     </div>
@@ -126,11 +125,13 @@ const {
       :total-pages="totalPages"
       :sort-key="sortKey"
       :sort-direction="sortDirection"
+      :has-active-filters="hasActiveFilters"
       @prev-page="prevPage"
       @next-page="nextPage"
       @page-change="setPage"
       @page-size-change="setPageSize"
       @sort-change="onSortChange"
+      @reset-filters="resetFilters"
     />
   </div>
 </template>

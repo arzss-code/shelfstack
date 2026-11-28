@@ -32,7 +32,10 @@ const {
   usagesCoupon,
   statusOptions,
   typeOptions,
+  hasActiveFilters,
   fetchCoupons,
+  resetFilters,
+  triggerSearchNow,
   openCreateModal,
   openEditModal,
   openUsagesModal,
@@ -71,7 +74,7 @@ const {
     <div
       class="relative z-20 flex flex-col items-stretch justify-between gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper sm:flex-row sm:items-center"
     >
-      <div class="w-full sm:w-72">
+      <form class="w-full sm:w-72" @submit.prevent="triggerSearchNow">
         <label for="admin-coupons-search" class="sr-only">Cari kode atau nama voucher</label>
         <UiInput
           id="admin-coupons-search"
@@ -80,9 +83,8 @@ const {
           type="search"
           placeholder="Cari kode atau nama voucher..."
           left-icon="pi-search"
-          @input="fetchCoupons"
         />
-      </div>
+      </form>
 
       <div class="flex w-full flex-wrap items-center gap-2.5 sm:w-auto sm:flex-nowrap">
         <div class="w-full sm:w-36">
@@ -112,11 +114,13 @@ const {
     <AdminCouponTable
       :coupons="coupons"
       :loading="loading"
+      :has-active-filters="hasActiveFilters"
       @toggle-status="toggleCouponStatus"
       @edit="openEditModal"
       @delete="confirmDelete"
       @view-usages="openUsagesModal"
       @create="openCreateModal"
+      @reset-filters="resetFilters"
     />
 
     <!-- Create & Edit Modal Subcomponent -->

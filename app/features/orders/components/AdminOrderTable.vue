@@ -39,8 +39,9 @@ const props = withDefaults(
     totalPages: number
     sortKey?: string | null
     sortDirection?: 'desc' | 'asc' | null
+    hasActiveFilters?: boolean
   }>(),
-  { sortKey: null, sortDirection: null },
+  { sortKey: null, sortDirection: null, hasActiveFilters: false },
 )
 
 const emit = defineEmits<{
@@ -49,6 +50,7 @@ const emit = defineEmits<{
   pageChange: [page: number]
   pageSizeChange: [size: number]
   sortChange: [payload: { key: string | null; direction: 'desc' | 'asc' | null }]
+  resetFilters: []
 }>()
 
 const onOrderPageChange = (nextPage: number) => {
@@ -96,16 +98,18 @@ const formatDate = (dateStr: string) => {
 <template>
   <div class="overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper">
     <!-- Skeleton Loading -->
-    <div v-if="loading" class="space-y-3 p-4" aria-busy="true">
+    <div v-if="loading && orders.length === 0" class="space-y-3 p-4" aria-busy="true">
       <UiSkeleton v-for="i in 5" :key="i" height="h-12" />
     </div>
 
     <!-- Empty State -->
     <div v-else-if="orders.length === 0" class="p-6">
       <UiEmptyState
-        icon="pi-inbox"
+        :icon="hasActiveFilters ? 'pi-search' : 'pi-inbox'"
         title="Tidak ada pesanan ditemukan."
         description="Coba ubah filter status, kata kunci pencarian, atau rentang tanggal."
+        :action-label="hasActiveFilters ? 'Reset Filter' : ''"
+        @action="emit('resetFilters')"
       />
     </div>
 
@@ -115,7 +119,11 @@ const formatDate = (dateStr: string) => {
       tabindex="0"
       role="region"
       aria-label="Tabel daftar pesanan"
-      class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+      :aria-busy="loading ? 'true' : undefined"
+      :class="[
+        'overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink transition-opacity',
+        loading ? 'opacity-60' : '',
+      ]"
     >
       <table class="w-full border-collapse text-left text-xs">
         <thead>

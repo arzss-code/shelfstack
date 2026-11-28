@@ -1,142 +1,29 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
-import type { ContactMessageStatus } from '~~/shared/schemas/contact'
+import {
+  CONTACT_STATUS_FILTER_OPTIONS as statusFilterOptions,
+  CONTACT_STATUS_SELECT_OPTIONS as statusSelectOptions,
+  formatContactDateTime as formatDateTime,
+  getContactStatusBadge as getStatusBadge,
+  useAdminContacts,
+} from '~/composables/useAdminContacts'
 
-interface ContactInboxItem {
-  id: string
-  ticket_code: string
-  name: string
-  email: string
-  category: string
-  order_number: string | null
-  message: string
-  status: ContactMessageStatus
-  admin_notes: string | null
-  resolved_at: string | null
-  created_at: string
-}
-
-const toast = useUiToast()
-
-const items = ref<ContactInboxItem[]>([])
-const selectedId = ref<string | null>(null)
-const statusFilter = ref<'all' | ContactMessageStatus>('all')
-const searchQuery = ref('')
-const loading = ref(true)
-const saving = ref(false)
-const errorMsg = ref<string | null>(null)
-
-const editState = reactive<{
-  status: ContactMessageStatus
-  admin_notes: string
-}>({
-  status: 'open',
-  admin_notes: '',
-})
-
-const selectedItem = computed(() => items.value.find((i) => i.id === selectedId.value) || null)
-
-const statusFilterOptions: Array<{ value: 'all' | ContactMessageStatus; label: string }> = [
-  { value: 'all', label: 'Semua' },
-  { value: 'open', label: 'Baru' },
-  { value: 'in_progress', label: 'Diproses' },
-  { value: 'resolved', label: 'Selesai' },
-]
-
-const statusSelectOptions = [
-  { value: 'open', label: 'Baru (Open)' },
-  { value: 'in_progress', label: 'Sedang Diproses' },
-  { value: 'resolved', label: 'Selesai Ditindaklanjuti' },
-]
-
-function getStatusBadge(status: ContactMessageStatus): {
-  label: string
-  variant: 'warning' | 'info' | 'success'
-} {
-  if (status === 'resolved') return { label: 'Selesai', variant: 'success' }
-  if (status === 'in_progress') return { label: 'Diproses', variant: 'info' }
-  return { label: 'Baru', variant: 'warning' }
-}
-
-function selectContact(item: ContactInboxItem) {
-  selectedId.value = item.id
-  editState.status = item.status
-  editState.admin_notes = item.admin_notes || ''
-}
-
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
-async function fetchContacts() {
-  loading.value = true
-  errorMsg.value = null
-  try {
-    const res = await $fetch<{
-      data: { items: ContactInboxItem[] }
-    }>('/api/admin/contacts', {
-      params: {
-        status: statusFilter.value,
-        q: searchQuery.value.trim() || undefined,
-      },
-    })
-    items.value = res.data?.items || []
-    if (items.value.length > 0 && !selectedItem.value) {
-      selectContact(items.value[0]!)
-    }
-  } catch (err: unknown) {
-    const e = err as { data?: { message?: string }; message?: string }
-    errorMsg.value = e.data?.message || e.message || 'Gagal memuat inbox pesan kontak.'
-  } finally {
-    loading.value = false
-  }
-}
-
-async function saveUpdate() {
-  if (!selectedItem.value) return
-  saving.value = true
-  try {
-    const res = await $fetch<{ data: ContactInboxItem }>(
-      `/api/admin/contacts/${selectedItem.value.id}`,
-      {
-        method: 'PATCH',
-        body: {
-          status: editState.status,
-          admin_notes: editState.admin_notes.trim() || null,
-        },
-      },
-    )
-    const idx = items.value.findIndex((i) => i.id === selectedItem.value?.id)
-    if (idx !== -1 && res.data) {
-      items.value[idx] = res.data
-    }
-    toast.show({ title: 'Tersimpan', message: 'Status pesan kontak diperbarui.', tone: 'success' })
-  } catch (err: unknown) {
-    const e = err as { data?: { message?: string }; message?: string }
-    toast.show({
-      title: 'Gagal Memperbarui',
-      message: e.data?.message || e.message || 'Gagal memperbarui status pesan kontak.',
-      tone: 'error',
-    })
-  } finally {
-    saving.value = false
-  }
-}
-
-function applyStatusFilter(value: 'all' | ContactMessageStatus) {
-  statusFilter.value = value
-  fetchContacts()
-}
-
-onMounted(() => {
-  fetchContacts()
-})
+const {
+  items,
+  statusFilter,
+  searchQuery,
+  loading,
+  saving,
+  errorMsg,
+  editState,
+  selectedItem,
+  hasActiveFilters,
+  selectContact,
+  fetchContacts,
+  saveUpdate,
+  applyStatusFilter,
+  resetFilters,
+  triggerSearchNow: triggerNow,
+} = useAdminContacts()
 </script>
 
 <template>
@@ -159,18 +46,16 @@ onMounted(() => {
         </button>
       </div>
 
-      <form class="flex items-center gap-2 w-full sm:w-auto" @submit.prevent="fetchContacts">
-        <div class="w-full sm:w-64">
-          <label for="admin-contact-search" class="sr-only">Cari pesan kontak</label>
-          <UiInput
-            id="admin-contact-search"
-            v-model="searchQuery"
-            size="sm"
-            left-icon="pi-search"
-            placeholder="Cari tiket, nama, email..."
-          />
-        </div>
-        <UiButton type="submit" size="sm" variant="secondary">Cari</UiButton>
+      <form class="w-full sm:w-64" @submit.prevent="triggerNow">
+        <label for="admin-contact-search" class="sr-only">Cari pesan kontak</label>
+        <UiInput
+          id="admin-contact-search"
+          v-model="searchQuery"
+          type="search"
+          size="sm"
+          left-icon="pi-search"
+          placeholder="Cari tiket, nama, email..."
+        />
       </form>
     </div>
 
@@ -181,20 +66,30 @@ onMounted(() => {
       </div>
     </UiAlert>
 
-    <div v-if="loading" class="space-y-3">
+    <div v-if="loading && items.length === 0" class="space-y-3" aria-busy="true">
       <div v-for="i in 4" :key="i" class="h-16 rounded-card bg-brand-field animate-pulse" />
     </div>
 
     <UiEmptyState
       v-else-if="items.length === 0"
-      icon="pi-envelope"
-      title="Belum Ada Pesan Kontak"
-      description="Pesan yang dikirim pelanggan melalui formulir /contact akan tampil di sini."
+      :icon="hasActiveFilters ? 'pi-search' : 'pi-envelope'"
+      :title="hasActiveFilters ? 'Tidak Ada Pesan Ditemukan' : 'Belum Ada Pesan Kontak'"
+      :description="
+        hasActiveFilters
+          ? 'Ubah kata kunci pencarian atau filter status untuk melihat pesan lain.'
+          : 'Pesan yang dikirim pelanggan melalui formulir /contact akan tampil di sini.'
+      "
+      :action-label="hasActiveFilters ? 'Reset Filter' : ''"
+      @action="resetFilters"
     />
 
     <div
       v-else
-      class="grid grid-cols-1 lg:grid-cols-12 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper overflow-hidden md:flex-1 md:min-h-0"
+      :aria-busy="loading ? 'true' : undefined"
+      :class="[
+        'grid grid-cols-1 lg:grid-cols-12 rounded-card border border-brand-hair bg-brand-canvas shadow-whisper overflow-hidden md:flex-1 md:min-h-0 transition-opacity',
+        loading ? 'opacity-60' : '',
+      ]"
     >
       <div
         class="lg:col-span-5 divide-y divide-brand-hairsoft border-b lg:border-b-0 lg:border-r border-brand-hair overflow-y-auto max-h-[360px] lg:max-h-none md:h-full"

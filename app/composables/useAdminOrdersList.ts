@@ -4,6 +4,7 @@ import type { AdminOrderRow } from '~/features/orders/components/AdminOrderTable
 import type { Database } from '~/types/database.types'
 import type { OrderStatus } from '~/types/order'
 import { useUiToast } from '~/composables/useUiToast'
+import { useAdminDebouncedSearch } from '~/composables/useAdminDebouncedSearch'
 
 export function useAdminOrdersList() {
   const route = useRoute()
@@ -43,50 +44,70 @@ export function useAdminOrdersList() {
     { label: 'Dibatalkan', value: 'cancelled' },
   ]
 
+  const hasActiveFilters = computed(() =>
+    Boolean(searchQuery.value.trim() || fromDate.value || toDate.value || activeStatus.value),
+  )
+
+  const { runAbortable, triggerNow, clearQuery } = useAdminDebouncedSearch(searchQuery, () => {
+    page.value = 1
+    void fetchOrders()
+  })
+
   const fetchOrders = async () => {
-    loading.value = true
     errorMessage.value = ''
     const from = (page.value - 1) * pageSize.value
     const to = from + pageSize.value - 1
-    try {
-      const params: Record<string, string | number> = { from, to }
-      if (activeStatus.value) params.status = activeStatus.value
-      if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
-      if (fromDate.value) params.date_from = fromDate.value
-      if (toDate.value) params.date_to = toDate.value
-      if (sortParam.value) params.sort = sortParam.value
+    await runAbortable(
+      loading,
+      async ({ signal, isCurrent }) => {
+        const params: Record<string, string | number> = { from, to }
+        if (activeStatus.value) params.status = activeStatus.value
+        if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
+        if (fromDate.value) params.date_from = fromDate.value
+        if (toDate.value) params.date_to = toDate.value
+        if (sortParam.value) params.sort = sortParam.value
 
-      const res = await $fetch<{
-        status: string
-        data: { orders: AdminOrderRow[]; total: number }
-      }>('/api/admin/orders', { params })
-      orders.value = res.data.orders
-      totalOrders.value = res.data.total
-    } catch (err: unknown) {
-      const fetchErr = err as { data?: { message?: string } }
-      errorMessage.value = fetchErr.data?.message || 'Gagal memuat daftar pesanan admin.'
-    } finally {
-      loading.value = false
-    }
+        const res = await $fetch<{
+          status: string
+          data: { orders: AdminOrderRow[]; total: number }
+        }>('/api/admin/orders', { params, signal })
+        if (!isCurrent()) return
+        orders.value = res.data.orders
+        totalOrders.value = res.data.total
+      },
+      (err) => {
+        const fetchErr = err as { data?: { message?: string } }
+        errorMessage.value = fetchErr.data?.message || 'Gagal memuat daftar pesanan admin.'
+      },
+    )
   }
 
   const onStatusChange = (val: string) => {
     activeStatus.value = val
     page.value = 1
     router.push({ query: val ? { status: val } : {} })
-    fetchOrders()
+    void fetchOrders()
   }
 
   const onSearch = () => {
-    page.value = 1
-    fetchOrders()
+    triggerNow()
   }
 
   const resetDateFilters = () => {
     fromDate.value = ''
     toDate.value = ''
     page.value = 1
-    fetchOrders()
+    void fetchOrders()
+  }
+
+  const resetFilters = () => {
+    clearQuery()
+    fromDate.value = ''
+    toDate.value = ''
+    activeStatus.value = ''
+    page.value = 1
+    router.push({ query: {} })
+    void fetchOrders()
   }
 
   const onSortChange = (payload: { key: string | null; direction: 'desc' | 'asc' | null }) => {
@@ -275,10 +296,12 @@ export function useAdminOrdersList() {
     exportingFormat,
     statusTabs,
     totalPages,
+    hasActiveFilters,
     fetchOrders,
     onStatusChange,
     onSearch,
     resetDateFilters,
+    resetFilters,
     onSortChange,
     handleExport,
     handleExportCsv,

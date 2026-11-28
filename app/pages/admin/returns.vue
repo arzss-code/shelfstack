@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import AdminPageHeader from '~/components/admin/AdminPageHeader.vue'
 import AdminReturnMetrics from '~/components/admin/returns/AdminReturnMetrics.vue'
 import AdminReturnTable from '~/components/admin/returns/AdminReturnTable.vue'
@@ -8,6 +8,7 @@ import UiInput from '~/components/ui/UiInput.vue'
 import UiAlert from '~/components/ui/UiAlert.vue'
 import AdminReturnDetailModal from '~/components/admin/returns/AdminReturnDetailModal.vue'
 import type { ReturnRequestItem } from '~~/shared/schemas/return-request'
+import { useAdminDebouncedSearch } from '~/composables/useAdminDebouncedSearch'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
@@ -41,33 +42,43 @@ const statusFilterTabs = [
   { value: 'rejected', label: 'Ditolak' },
 ]
 
+const hasActiveFilters = computed(() =>
+  Boolean(searchQuery.value.trim() || activeStatusFilter.value !== 'all'),
+)
+
+const { runAbortable, triggerNow, clearQuery } = useAdminDebouncedSearch(searchQuery, () => {
+  void fetchReturns()
+})
+
 const fetchReturns = async () => {
-  isLoading.value = true
   errorMessage.value = null
+  await runAbortable(
+    isLoading,
+    async ({ signal, isCurrent }) => {
+      const params = new URLSearchParams()
+      if (activeStatusFilter.value !== 'all') params.append('status', activeStatusFilter.value)
+      if (searchQuery.value.trim()) params.append('search', searchQuery.value.trim())
 
-  try {
-    const params = new URLSearchParams()
-    if (activeStatusFilter.value !== 'all') params.append('status', activeStatusFilter.value)
-    if (searchQuery.value.trim()) params.append('search', searchQuery.value.trim())
+      const response = await $fetch<{
+        status: string
+        data: {
+          metrics: typeof metrics.value
+          returns: ReturnRequestItem[]
+        }
+      }>(`/api/admin/returns?${params.toString()}`, { signal })
 
-    const response = await $fetch<{
-      status: string
-      data: {
-        metrics: typeof metrics.value
-        returns: ReturnRequestItem[]
+      if (!isCurrent()) return
+      if (response && response.data) {
+        returnsList.value = response.data.returns
+        metrics.value = response.data.metrics
       }
-    }>(`/api/admin/returns?${params.toString()}`)
-
-    if (response && response.data) {
-      returnsList.value = response.data.returns
-      metrics.value = response.data.metrics
-    }
-  } catch (err: unknown) {
-    const fetchErr = err as { data?: { message?: string }; message?: string }
-    errorMessage.value = fetchErr?.data?.message || fetchErr?.message || 'Gagal memuat data retur.'
-  } finally {
-    isLoading.value = false
-  }
+    },
+    (err) => {
+      const fetchErr = err as { data?: { message?: string }; message?: string }
+      errorMessage.value =
+        fetchErr?.data?.message || fetchErr?.message || 'Gagal memuat data retur.'
+    },
+  )
 }
 
 const openDetailModal = (ticket: ReturnRequestItem) => {
@@ -75,16 +86,17 @@ const openDetailModal = (ticket: ReturnRequestItem) => {
   isDetailModalOpen.value = true
 }
 
-watch(activeStatusFilter, () => {
-  fetchReturns()
-})
+const resetFilters = () => {
+  clearQuery()
+  if (activeStatusFilter.value !== 'all') {
+    activeStatusFilter.value = 'all'
+  } else {
+    void fetchReturns()
+  }
+}
 
-let searchDebounce: ReturnType<typeof setTimeout> | null = null
-watch(searchQuery, () => {
-  if (searchDebounce) clearTimeout(searchDebounce)
-  searchDebounce = setTimeout(() => {
-    fetchReturns()
-  }, 350)
+watch(activeStatusFilter, () => {
+  void fetchReturns()
 })
 
 onMounted(() => {
@@ -130,7 +142,7 @@ onMounted(() => {
       />
 
       <!-- Search Input -->
-      <div class="w-full sm:w-64">
+      <form class="w-full sm:w-64" @submit.prevent="triggerNow">
         <label for="admin-returns-search" class="sr-only">Cari order atau pemohon</label>
         <UiInput
           id="admin-returns-search"
@@ -139,13 +151,18 @@ onMounted(() => {
           type="search"
           left-icon="pi-search"
           placeholder="Cari order / nama pemohon..."
-          clearable
         />
-      </div>
+      </form>
     </div>
 
     <!-- Data Table -->
-    <AdminReturnTable :returns="returnsList" :loading="isLoading" @review="openDetailModal" />
+    <AdminReturnTable
+      :returns="returnsList"
+      :loading="isLoading"
+      :has-active-filters="hasActiveFilters"
+      @review="openDetailModal"
+      @reset-filters="resetFilters"
+    />
 
     <!-- Review Modal -->
     <AdminReturnDetailModal

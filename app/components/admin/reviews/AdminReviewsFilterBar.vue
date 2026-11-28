@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import type { AdminReviewStatus } from '~~/shared/schemas/review'
 import type { AdminReviewMetrics } from '~/composables/useAdminReviews'
 import UiTabs, { type UiTabItem } from '~/components/ui/UiTabs.vue'
@@ -17,17 +17,8 @@ const emit = defineEmits<{
   (e: 'update:status', value: AdminReviewStatus): void
   (e: 'update:rating', value: number | undefined): void
   (e: 'update:search', value: string): void
+  (e: 'submitSearch'): void
 }>()
-
-const localSearch = ref(props.searchQuery)
-let debounceTimer: ReturnType<typeof setTimeout> | null = null
-
-watch(localSearch, (val) => {
-  if (debounceTimer) clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(() => {
-    emit('update:search', val)
-  }, 300)
-})
 
 const statusTabs = computed<UiTabItem[]>(() => [
   { value: 'all', label: 'Semua', count: props.metrics.total },
@@ -82,17 +73,18 @@ function onRatingChange(value: string) {
         />
       </div>
 
-      <div class="w-full sm:w-60">
+      <form class="w-full sm:w-60" @submit.prevent="emit('submitSearch')">
         <label for="admin-reviews-search" class="sr-only">Cari teks ulasan</label>
         <UiInput
           id="admin-reviews-search"
-          v-model="localSearch"
+          :model-value="searchQuery"
           type="search"
           size="sm"
           left-icon="pi-search"
           placeholder="Cari teks ulasan..."
+          @update:model-value="emit('update:search', $event)"
         />
-      </div>
+      </form>
     </div>
   </div>
 </template>

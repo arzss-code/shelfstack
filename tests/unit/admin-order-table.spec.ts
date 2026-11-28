@@ -140,4 +140,58 @@ describe('AdminOrderTable Component', () => {
     await page3Btn.trigger('click')
     expect(wrapper.emitted('pageChange')?.at(-1)).toEqual([3])
   })
+
+  it('keeps existing order rows visible when refreshing in loading state', () => {
+    const wrapper = mount(AdminOrderTable, {
+      props: {
+        orders: mockOrders,
+        loading: true,
+        page: 1,
+        pageSize: 15,
+        totalOrders: 2,
+        totalPages: 1,
+      },
+      global: {
+        stubs: globalStubs,
+      },
+    })
+
+    expect(wrapper.find('table').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Budi Santoso')
+    expect(wrapper.find('[aria-busy="true"]').exists()).toBe(true)
+  })
+
+  it('shows Reset Filter button in empty state only when filters are active and emits resetFilters', async () => {
+    const unfiltered = mount(AdminOrderTable, {
+      props: {
+        orders: [],
+        loading: false,
+        page: 1,
+        pageSize: 15,
+        totalOrders: 0,
+        totalPages: 1,
+        hasActiveFilters: false,
+      },
+      global: { stubs: globalStubs },
+    })
+    expect(unfiltered.text()).not.toContain('Reset Filter')
+
+    const filtered = mount(AdminOrderTable, {
+      props: {
+        orders: [],
+        loading: false,
+        page: 1,
+        pageSize: 15,
+        totalOrders: 0,
+        totalPages: 1,
+        hasActiveFilters: true,
+      },
+      global: { stubs: globalStubs },
+    })
+
+    const resetBtn = filtered.findAll('button').find((b) => b.text().includes('Reset Filter'))
+    expect(resetBtn).toBeDefined()
+    await resetBtn!.trigger('click')
+    expect(filtered.emitted('resetFilters')).toBeTruthy()
+  })
 })

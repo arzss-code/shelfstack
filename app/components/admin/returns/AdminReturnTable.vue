@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { watch } from 'vue'
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiButton from '~/components/ui/UiButton.vue'
+import UiEmptyState from '~/components/ui/UiEmptyState.vue'
 import UiPagination from '~/components/ui/UiPagination.vue'
 import UiSortHeader from '~/components/ui/UiSortHeader.vue'
 import { useClientPagination } from '~/composables/useClientPagination'
@@ -8,13 +10,18 @@ import { useClientTableSort } from '~/composables/useClientTableSort'
 import { RETURN_REASON_LABELS, RETURN_STATUS_MAP } from '~~/server/utils/return-request'
 import type { ReturnRequestItem } from '~~/shared/schemas/return-request'
 
-const props = defineProps<{
-  returns: ReturnRequestItem[]
-  loading: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    returns: ReturnRequestItem[]
+    loading: boolean
+    hasActiveFilters?: boolean
+  }>(),
+  { hasActiveFilters: false },
+)
 
 const emit = defineEmits<{
   review: [ticket: ReturnRequestItem]
+  resetFilters: []
 }>()
 
 const returnColumns = [
@@ -47,6 +54,13 @@ const {
   paginatedItems: paginatedReturns,
 } = useClientPagination(sortedReturns, 10)
 
+watch(
+  () => props.returns,
+  () => {
+    page.value = 1
+  },
+)
+
 const formatDate = (dateStr: string) => {
   return new Intl.DateTimeFormat('id-ID', {
     day: 'numeric',
@@ -61,10 +75,34 @@ const formatDate = (dateStr: string) => {
 <template>
   <div class="overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper">
     <div
+      v-if="loading && sortedReturns.length === 0"
+      class="py-12 text-center text-brand-muted"
+      aria-busy="true"
+    >
+      <i class="pi pi-spinner pi-spin text-lg" aria-hidden="true" />
+      <p class="mt-2 text-xs">Memuat daftar pengajuan retur...</p>
+    </div>
+
+    <div v-else-if="sortedReturns.length === 0" class="p-6">
+      <UiEmptyState
+        :icon="hasActiveFilters ? 'pi-search' : 'pi-inbox'"
+        title="Tidak ada pengajuan retur yang cocok."
+        description="Coba ubah filter status atau kata kunci pencarian."
+        :action-label="hasActiveFilters ? 'Reset Filter' : ''"
+        @action="emit('resetFilters')"
+      />
+    </div>
+
+    <div
+      v-else
       tabindex="0"
       role="region"
       aria-label="Tabel pengajuan komplain dan retur"
-      class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+      :aria-busy="loading ? 'true' : undefined"
+      :class="[
+        'overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink transition-opacity',
+        loading ? 'opacity-60' : '',
+      ]"
     >
       <table class="w-full text-left text-xs border-collapse">
         <thead>
@@ -92,23 +130,8 @@ const formatDate = (dateStr: string) => {
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft">
-          <tr v-if="loading">
-            <td colspan="6" class="py-12 text-center text-brand-muted">
-              <i class="pi pi-spinner pi-spin text-lg" aria-hidden="true" />
-              <p class="mt-2 text-xs">Memuat daftar pengajuan retur...</p>
-            </td>
-          </tr>
-
-          <tr v-else-if="sortedReturns.length === 0">
-            <td colspan="6" class="py-12 text-center text-brand-muted">
-              <i class="pi pi-inbox text-2xl" aria-hidden="true" />
-              <p class="mt-2 font-medium text-xs">Tidak ada pengajuan retur yang cocok.</p>
-            </td>
-          </tr>
-
           <tr
             v-for="item in paginatedReturns"
-            v-else
             :key="item.id"
             class="hover:bg-brand-canvas-soft/60 transition-colors"
           >
@@ -157,7 +180,7 @@ const formatDate = (dateStr: string) => {
       </table>
     </div>
     <UiPagination
-      v-if="!loading && returns.length > 0"
+      v-if="returns.length > 0"
       v-model="page"
       v-model:page-size="pageSize"
       :total-pages="totalPages"

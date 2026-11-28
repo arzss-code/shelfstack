@@ -27,7 +27,10 @@ const {
   setPageSize,
   sortOptions,
   hasCustomers,
+  hasActiveFilters,
   fetchCustomers,
+  resetFilters,
+  triggerSearchNow,
 } = useAdminUsers()
 
 const selectedCustomer = ref<AdminCustomerSummary | null>(null)
@@ -105,7 +108,7 @@ const formatDate = (dateStr?: string | null) => {
     <div
       class="flex flex-col gap-3 rounded-card border border-brand-hair bg-brand-canvas p-3 shadow-whisper sm:flex-row sm:items-center sm:justify-between"
     >
-      <div class="w-full sm:max-w-xs">
+      <form class="w-full sm:max-w-xs" @submit.prevent="triggerSearchNow">
         <label for="admin-users-search" class="sr-only">Cari nama atau email pelanggan</label>
         <UiInput
           id="admin-users-search"
@@ -115,7 +118,7 @@ const formatDate = (dateStr?: string | null) => {
           left-icon="pi-search"
           placeholder="Cari nama atau email..."
         />
-      </div>
+      </form>
       <div class="flex items-center gap-2">
         <UiSelect v-model="selectedSort" size="sm" prefix="Urutkan:" :options="sortOptions" pill />
       </div>
@@ -142,7 +145,9 @@ const formatDate = (dateStr?: string | null) => {
         v-else-if="!hasCustomers"
         title="Tidak Ada Pelanggan Ditemukan"
         description="Tidak ada data akun pelanggan yang sesuai dengan kriteria pencarian Anda."
-        icon="pi-users"
+        :icon="hasActiveFilters ? 'pi-search' : 'pi-users'"
+        :action-label="hasActiveFilters ? 'Reset Filter' : ''"
+        @action="resetFilters"
       />
 
       <!-- Table View -->
@@ -151,7 +156,11 @@ const formatDate = (dateStr?: string | null) => {
         tabindex="0"
         role="region"
         aria-label="Tabel data pelanggan dan LTV"
-        class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+        :aria-busy="loading ? 'true' : undefined"
+        :class="[
+          'overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink transition-opacity',
+          loading ? 'opacity-60' : '',
+        ]"
       >
         <table class="w-full text-left text-xs border-collapse">
           <thead>
