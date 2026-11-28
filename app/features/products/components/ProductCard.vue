@@ -9,10 +9,13 @@ const props = withDefaults(
     product: Product
     hideActions?: boolean
     isTrash?: boolean
+    /** Mode grid 6 kolom agar padding & tipografi tetap proporsional. */
+    dense?: boolean
   }>(),
   {
     hideActions: true,
     isTrash: false,
+    dense: false,
   },
 )
 
@@ -46,9 +49,8 @@ const {
     <!-- Stretched Semantic Link for Accessibility, Hover URL & SEO -->
     <NuxtLink
       :to="`/product/${product.slug || product.id}`"
-      class="absolute inset-0 z-0 rounded-card"
+      class="absolute inset-0 z-0 rounded-card focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-brand-ink focus-visible:outline-offset-2"
       :aria-label="product.name"
-      tabindex="-1"
     />
 
     <!-- Curved Ribbon Badge: Flush to Left Edge -->
@@ -115,7 +117,8 @@ const {
 
     <!-- Compact Content Body: Zero divider lines, small crisp typography -->
     <div
-      class="p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 flex-1 relative z-10 pointer-events-none"
+      class="flex flex-col justify-between flex-1 relative z-10 pointer-events-none"
+      :class="dense ? 'p-2.5 sm:p-3 gap-2' : 'p-3 sm:p-3.5 gap-2.5'"
     >
       <div class="space-y-1">
         <!-- Top Row: Category (Left) and Rating (Right) -->
@@ -132,7 +135,7 @@ const {
             v-if="formattedRating"
             class="flex items-center gap-1 shrink-0 text-[11px] font-bold text-brand-ink tabular-nums"
           >
-            <i class="pi pi-star-fill text-brand-warning text-[10px]" />
+            <i class="pi pi-star-fill text-brand-warning text-[10px]" aria-hidden="true" />
             <span>{{ formattedRating }}</span>
           </div>
         </div>
@@ -151,7 +154,8 @@ const {
         <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 min-w-0">
           <!-- Price on Left -->
           <span
-            class="font-display font-bold text-[13px] sm:text-[15px] text-brand-ink tabular-nums tracking-tight whitespace-nowrap"
+            class="font-display font-bold text-brand-ink tabular-nums tracking-tight whitespace-nowrap"
+            :class="dense ? 'text-xs sm:text-sm' : 'text-[13px] sm:text-[15px]'"
           >
             {{ formatRupiah(product.price) }}
           </span>
@@ -159,14 +163,15 @@ const {
           <!-- Stock Status / Verified Sold on Right (Storefront Mode) -->
           <span
             v-if="hideActions"
-            class="text-[11px] font-medium tabular-nums shrink-0 whitespace-nowrap"
-            :class="
+            class="font-medium tabular-nums shrink-0 whitespace-nowrap"
+            :class="[
+              dense ? 'text-[10px] sm:text-[11px]' : 'text-[11px]',
               product.stock === 0
                 ? 'text-brand-danger font-semibold'
                 : product.stock <= 3
                   ? 'text-brand-warning-text font-semibold'
-                  : 'text-brand-muted'
-            "
+                  : 'text-brand-muted',
+            ]"
           >
             {{ stockStatusText }}
           </span>

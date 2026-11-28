@@ -137,7 +137,7 @@ onMounted(async () => {
           <span class="text-brand-faint">/</span>
           <span class="text-brand-ink font-semibold">Katalog</span>
         </nav>
-        <h1 class="font-display text-2xl sm:text-3xl font-bold text-brand-ink m-0">Katalog</h1>
+        <h1 class="sr-only">Katalog</h1>
       </div>
     </header>
 
