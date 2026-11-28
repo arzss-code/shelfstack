@@ -1,6 +1,7 @@
 import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/database.types'
 import { parseExportDateRange } from '~/utils/csv'
+import { buildAdminOrderSearchFilter } from '../../utils/order-search'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
@@ -37,8 +38,9 @@ export default defineEventHandler(async (event) => {
     dbQuery = dbQuery.eq('status', status as Database['public']['Enums']['order_status'])
   }
 
-  if (search.trim()) {
-    dbQuery = dbQuery.or(`id.ilike.%${search.trim()}%,address->>name.ilike.%${search.trim()}%`)
+  const searchFilter = buildAdminOrderSearchFilter(search)
+  if (searchFilter) {
+    dbQuery = dbQuery.or(searchFilter)
   }
 
   if (dateResult.range.fromIso) {
