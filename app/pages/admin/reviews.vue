@@ -26,6 +26,7 @@ const {
   statusFilter,
   searchQuery,
   mutatingId,
+  hasActiveFilters,
   fetchReviews,
   toggleReviewStatus,
   setPage,
@@ -33,6 +34,8 @@ const {
   setRating,
   setStatus,
   setSearch,
+  resetFilters,
+  triggerSearchNow,
 } = useAdminReviews()
 
 onMounted(() => {
@@ -71,6 +74,7 @@ onMounted(() => {
       @update:status="setStatus"
       @update:rating="setRating"
       @update:search="setSearch"
+      @submit-search="triggerSearchNow"
     />
 
     <!-- Reviews Table -->
@@ -78,10 +82,12 @@ onMounted(() => {
       :reviews="reviews"
       :loading="loading"
       :mutating-id="mutatingId"
+      :has-active-filters="hasActiveFilters"
       :pagination="pagination"
       @toggle-status="toggleReviewStatus"
       @page-change="setPage"
       @page-size-change="setPageSize"
+      @reset-filters="resetFilters"
     />
   </div>
 </template>

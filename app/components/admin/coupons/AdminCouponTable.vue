@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { watch } from 'vue'
 import UiBadge from '~/components/ui/UiBadge.vue'
 import UiIconButton from '~/components/ui/UiIconButton.vue'
 import UiEmptyState from '~/components/ui/UiEmptyState.vue'
@@ -30,10 +31,14 @@ export interface AdminCoupon {
   created_at: string
 }
 
-const props = defineProps<{
-  coupons: AdminCoupon[]
-  loading: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    coupons: AdminCoupon[]
+    loading: boolean
+    hasActiveFilters?: boolean
+  }>(),
+  { hasActiveFilters: false },
+)
 
 const emit = defineEmits<{
   toggleStatus: [coupon: AdminCoupon]
@@ -41,6 +46,7 @@ const emit = defineEmits<{
   delete: [coupon: AdminCoupon]
   viewUsages: [coupon: AdminCoupon]
   create: []
+  resetFilters: []
 }>()
 
 const couponColumns = [
@@ -76,12 +82,19 @@ const {
   totalPages,
   paginatedItems: paginatedCoupons,
 } = useClientPagination(sortedCoupons, 10)
+
+watch(
+  () => props.coupons,
+  () => {
+    page.value = 1
+  },
+)
 </script>
 
 <template>
   <div class="overflow-hidden rounded-card border border-brand-hair bg-brand-canvas shadow-whisper">
     <!-- Loading State -->
-    <div v-if="loading" class="space-y-3 p-10 text-center">
+    <div v-if="loading && coupons.length === 0" class="space-y-3 p-10 text-center" aria-busy="true">
       <i class="pi pi-spinner animate-spin text-2xl text-brand-muted" aria-hidden="true" />
       <p class="text-xs text-brand-muted">Memuat data voucher promosi...</p>
     </div>
@@ -89,11 +102,11 @@ const {
     <!-- Empty State -->
     <div v-else-if="coupons.length === 0" class="p-6">
       <UiEmptyState
-        icon="pi-ticket"
+        :icon="hasActiveFilters ? 'pi-search' : 'pi-ticket'"
         title="Tidak ada voucher yang cocok"
         description="Coba ubah kata kunci filter status atau buat voucher promosi baru."
-        action-label="Buat Voucher Baru"
-        @action="emit('create')"
+        :action-label="hasActiveFilters ? 'Reset Filter' : 'Buat Voucher Baru'"
+        @action="hasActiveFilters ? emit('resetFilters') : emit('create')"
       />
     </div>
 
@@ -103,7 +116,11 @@ const {
       tabindex="0"
       role="region"
       aria-label="Tabel daftar voucher promosi"
-      class="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+      :aria-busy="loading ? 'true' : undefined"
+      :class="[
+        'overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink transition-opacity',
+        loading ? 'opacity-60' : '',
+      ]"
     >
       <table class="w-full text-left text-xs border-collapse" role="table">
         <thead
@@ -250,7 +267,7 @@ const {
       </table>
     </div>
     <UiPagination
-      v-if="!loading && coupons.length > 0"
+      v-if="coupons.length > 0"
       v-model="page"
       v-model:page-size="pageSize"
       :total-pages="totalPages"

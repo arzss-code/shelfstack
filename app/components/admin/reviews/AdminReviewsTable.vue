@@ -1,24 +1,30 @@
 <script setup lang="ts">
 import type { AdminReviewItem } from '~~/shared/schemas/review'
 import { useClientTableSort } from '~/composables/useClientTableSort'
+import UiEmptyState from '~/components/ui/UiEmptyState.vue'
 import UiPagination from '~/components/ui/UiPagination.vue'
 
-const props = defineProps<{
-  reviews: AdminReviewItem[]
-  loading: boolean
-  mutatingId: string | null
-  pagination: {
-    page: number
-    limit: number
-    totalCount: number
-    totalPages: number
-  }
-}>()
+const props = withDefaults(
+  defineProps<{
+    reviews: AdminReviewItem[]
+    loading: boolean
+    mutatingId: string | null
+    hasActiveFilters?: boolean
+    pagination: {
+      page: number
+      limit: number
+      totalCount: number
+      totalPages: number
+    }
+  }>(),
+  { hasActiveFilters: false },
+)
 
 const emit = defineEmits<{
   toggleStatus: [review: AdminReviewItem]
   pageChange: [page: number]
   pageSizeChange: [size: number]
+  resetFilters: []
 }>()
 
 const reviewColumns = [
@@ -64,12 +70,38 @@ const formatDate = (isoStr: string): string => {
     class="rounded-card border border-brand-hair bg-brand-canvas shadow-whisper overflow-hidden flex flex-col"
     data-testid="admin-reviews-table-wrapper"
   >
+    <div
+      v-if="loading && sortedReviews.length === 0"
+      class="py-12 text-center text-brand-muted"
+      aria-busy="true"
+    >
+      <div class="flex items-center justify-center gap-2 text-xs">
+        <i class="pi pi-spin pi-spinner text-base text-brand-accent" />
+        <span>Memuat data ulasan pelanggan...</span>
+      </div>
+    </div>
+
+    <div v-else-if="sortedReviews.length === 0" class="p-6">
+      <UiEmptyState
+        :icon="hasActiveFilters ? 'pi-search' : 'pi-comments'"
+        title="Tidak Ada Ulasan Ditemukan"
+        description="Tidak ada ulasan produk yang sesuai dengan kriteria filter saat ini."
+        :action-label="hasActiveFilters ? 'Reset Filter' : ''"
+        @action="emit('resetFilters')"
+      />
+    </div>
+
     <!-- Table Header / Overflow Container -->
     <div
+      v-else
       tabindex="0"
       role="region"
       aria-label="Tabel moderasi ulasan produk"
-      class="overflow-x-auto min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+      :aria-busy="loading ? 'true' : undefined"
+      :class="[
+        'overflow-x-auto min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink transition-opacity',
+        loading ? 'opacity-60' : '',
+      ]"
     >
       <table class="w-full text-left text-xs border-collapse">
         <thead
@@ -98,39 +130,9 @@ const formatDate = (isoStr: string): string => {
           </tr>
         </thead>
         <tbody class="divide-y divide-brand-hairsoft text-brand-ink">
-          <!-- Loading State -->
-          <tr v-if="loading">
-            <td colspan="7" class="py-12 text-center text-brand-muted">
-              <div class="flex items-center justify-center gap-2">
-                <i class="pi pi-spin pi-spinner text-base text-brand-accent" />
-                <span>Memuat data ulasan pelanggan...</span>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Empty State -->
-          <tr v-else-if="sortedReviews.length === 0">
-            <td colspan="7" class="py-16 text-center text-brand-muted">
-              <div class="max-w-sm mx-auto space-y-2">
-                <div
-                  class="w-10 h-10 rounded-full bg-brand-canvas-soft border border-brand-hair flex items-center justify-center text-brand-faint mx-auto"
-                >
-                  <i class="pi pi-comments text-lg" />
-                </div>
-                <p class="font-display text-sm font-bold text-brand-ink m-0">
-                  Tidak Ada Ulasan Ditemukan
-                </p>
-                <p class="text-caption text-brand-muted m-0">
-                  Tidak ada ulasan produk yang sesuai dengan kriteria filter saat ini.
-                </p>
-              </div>
-            </td>
-          </tr>
-
           <!-- Row List -->
           <tr
             v-for="review in sortedReviews"
-            v-else
             :key="review.id"
             class="hover:bg-brand-canvas-soft/40 transition-colors"
             data-testid="admin-review-row"

@@ -4,6 +4,7 @@ import type {
   AdminCrmMetrics,
   AdminCustomersResponse,
 } from '~~/shared/types/admin-crm'
+import { useAdminDebouncedSearch } from '~/composables/useAdminDebouncedSearch'
 
 export function useAdminUsers() {
   const customers = ref<AdminCustomerSummary[]>([])
@@ -32,52 +33,64 @@ export function useAdminUsers() {
     { value: 'name_asc', label: 'Nama (A-Z)' },
   ]
 
-  const fetchCustomers = async () => {
-    loading.value = true
-    error.value = null
-    try {
-      const queryParams: Record<string, string | number> = {
-        page: currentPage.value,
-        limit: itemsPerPage.value,
-        sort: selectedSort.value,
-      }
-      if (searchQuery.value.trim()) {
-        queryParams.search = searchQuery.value.trim()
-      }
+  const hasActiveFilters = computed(() => Boolean(searchQuery.value.trim()))
 
-      const res = await $fetch<AdminCustomersResponse>('/api/admin/users', {
-        query: queryParams,
-      })
-
-      customers.value = res.customers || []
-      metrics.value = res.metrics
-      totalPages.value = res.pagination.totalPages
-      totalCustomersCount.value = res.pagination.total
-    } catch (err: unknown) {
-      const e = err as { data?: { message?: string }; message?: string }
-      error.value = e.data?.message || e.message || 'Gagal memuat data pelanggan admin CRM.'
-    } finally {
-      loading.value = false
+  const fetchFromFirstPage = () => {
+    if (currentPage.value !== 1) {
+      currentPage.value = 1
+      return
     }
+    void fetchCustomers()
   }
 
-  // Debounced search / watch
-  let searchTimeout: ReturnType<typeof setTimeout> | null = null
-  watch(searchQuery, () => {
-    currentPage.value = 1
-    if (searchTimeout) clearTimeout(searchTimeout)
-    searchTimeout = setTimeout(() => {
-      fetchCustomers()
-    }, 300)
-  })
+  const { runAbortable, triggerNow, clearQuery } = useAdminDebouncedSearch(
+    searchQuery,
+    fetchFromFirstPage,
+  )
+
+  const fetchCustomers = async () => {
+    error.value = null
+    await runAbortable(
+      loading,
+      async ({ signal, isCurrent }) => {
+        const queryParams: Record<string, string | number> = {
+          page: currentPage.value,
+          limit: itemsPerPage.value,
+          sort: selectedSort.value,
+        }
+        if (searchQuery.value.trim()) {
+          queryParams.search = searchQuery.value.trim()
+        }
+
+        const res = await $fetch<AdminCustomersResponse>('/api/admin/users', {
+          query: queryParams,
+          signal,
+        })
+
+        if (!isCurrent()) return
+        customers.value = res.customers || []
+        metrics.value = res.metrics
+        totalPages.value = res.pagination.totalPages
+        totalCustomersCount.value = res.pagination.total
+      },
+      (err) => {
+        const e = err as { data?: { message?: string }; message?: string }
+        error.value = e.data?.message || e.message || 'Gagal memuat data pelanggan admin CRM.'
+      },
+    )
+  }
+
+  const resetFilters = () => {
+    clearQuery()
+    fetchFromFirstPage()
+  }
 
   watch(selectedSort, () => {
-    currentPage.value = 1
-    fetchCustomers()
+    fetchFromFirstPage()
   })
 
   watch(currentPage, () => {
-    fetchCustomers()
+    void fetchCustomers()
   })
 
   const setPageSize = (nextSize: number) => {
@@ -111,6 +124,9 @@ export function useAdminUsers() {
     setPageSize,
     sortOptions,
     hasCustomers,
+    hasActiveFilters,
     fetchCustomers,
+    resetFilters,
+    triggerSearchNow: triggerNow,
   }
 }

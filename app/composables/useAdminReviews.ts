@@ -1,10 +1,11 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type {
   AdminReviewItem,
   AdminReviewStatus,
   ReviewDistribution,
 } from '../../shared/schemas/review'
 import { useUiToast } from './useUiToast'
+import { useAdminDebouncedSearch } from './useAdminDebouncedSearch'
 
 export interface AdminReviewMetrics {
   total: number
@@ -45,55 +46,67 @@ export function useAdminReviews() {
 
   const toast = useUiToast()
 
+  const hasActiveFilters = computed(() =>
+    Boolean(
+      searchQuery.value.trim() || ratingFilter.value !== undefined || statusFilter.value !== 'all',
+    ),
+  )
+
+  const { runAbortable, triggerNow, clearQuery } = useAdminDebouncedSearch(searchQuery, () => {
+    pagination.value.page = 1
+    void fetchReviews()
+  })
+
   const fetchReviews = async () => {
-    loading.value = true
     error.value = null
+    await runAbortable(
+      loading,
+      async ({ signal, isCurrent }) => {
+        const params = new URLSearchParams()
+        params.set('page', String(pagination.value.page))
+        params.set('limit', String(pagination.value.limit))
+        params.set('status', statusFilter.value)
 
-    try {
-      const params = new URLSearchParams()
-      params.set('page', String(pagination.value.page))
-      params.set('limit', String(pagination.value.limit))
-      params.set('status', statusFilter.value)
-
-      if (ratingFilter.value) {
-        params.set('rating', String(ratingFilter.value))
-      }
-      if (searchQuery.value.trim()) {
-        params.set('q', searchQuery.value.trim())
-      }
-
-      const res = await $fetch<{
-        success: boolean
-        message: string
-        data: {
-          items: AdminReviewItem[]
-          pagination: {
-            page: number
-            limit: number
-            totalCount: number
-            totalPages: number
-          }
-          metrics: AdminReviewMetrics
+        if (ratingFilter.value) {
+          params.set('rating', String(ratingFilter.value))
         }
-      }>(`/api/admin/reviews?${params.toString()}`)
+        if (searchQuery.value.trim()) {
+          params.set('q', searchQuery.value.trim())
+        }
 
-      if (res?.data) {
-        reviews.value = res.data.items || []
-        pagination.value = res.data.pagination || pagination.value
-        metrics.value = res.data.metrics || metrics.value
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Gagal memuat ulasan pelanggan'
-      error.value = msg
-      toast.add({
-        severity: 'error',
-        summary: 'Gagal Memuat Ulasan',
-        detail: msg,
-        life: 4000,
-      })
-    } finally {
-      loading.value = false
-    }
+        const res = await $fetch<{
+          success: boolean
+          message: string
+          data: {
+            items: AdminReviewItem[]
+            pagination: {
+              page: number
+              limit: number
+              totalCount: number
+              totalPages: number
+            }
+            metrics: AdminReviewMetrics
+          }
+        }>(`/api/admin/reviews?${params.toString()}`, { signal })
+
+        if (!isCurrent()) return
+        if (res?.data) {
+          reviews.value = res.data.items || []
+          pagination.value = res.data.pagination || pagination.value
+          metrics.value = res.data.metrics || metrics.value
+        }
+      },
+      (err) => {
+        const msg = err instanceof Error ? err.message : 'Gagal memuat ulasan pelanggan'
+        error.value = msg
+        toast.add({
+          severity: 'error',
+          summary: 'Gagal Memuat Ulasan',
+          detail: msg,
+          life: 4000,
+        })
+      },
+    )
   }
 
   const toggleReviewStatus = async (review: AdminReviewItem) => {
@@ -159,8 +172,14 @@ export function useAdminReviews() {
 
   const setSearch = (q: string) => {
     searchQuery.value = q
+  }
+
+  const resetFilters = () => {
+    clearQuery()
+    ratingFilter.value = undefined
+    statusFilter.value = 'all'
     pagination.value.page = 1
-    fetchReviews()
+    void fetchReviews()
   }
 
   return {
@@ -173,6 +192,7 @@ export function useAdminReviews() {
     statusFilter,
     searchQuery,
     mutatingId,
+    hasActiveFilters,
     fetchReviews,
     toggleReviewStatus,
     setPage,
@@ -180,5 +200,7 @@ export function useAdminReviews() {
     setRating,
     setStatus,
     setSearch,
+    resetFilters,
+    triggerSearchNow: triggerNow,
   }
 }

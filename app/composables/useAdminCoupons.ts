@@ -1,9 +1,10 @@
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import type { CouponMetrics } from '~/components/admin/coupons/AdminCouponMetrics.vue'
 import type { AdminCoupon } from '~/components/admin/coupons/AdminCouponTable.vue'
 import type { CouponFormPayload } from '~/components/admin/coupons/AdminCouponModal.vue'
 import { useUiToast } from '~/composables/useUiToast'
 import { useUiConfirm } from '~/composables/useUiConfirm'
+import { useAdminDebouncedSearch } from '~/composables/useAdminDebouncedSearch'
 
 export function useAdminCoupons() {
   const toast = useUiToast()
@@ -45,35 +46,53 @@ export function useAdminCoupons() {
     { value: 'fixed', label: 'Nominal (Rp)' },
   ]
 
+  const hasActiveFilters = computed(() =>
+    Boolean(searchQuery.value.trim() || statusFilter.value !== 'all' || typeFilter.value !== 'all'),
+  )
+
+  const { runAbortable, triggerNow, clearQuery } = useAdminDebouncedSearch(searchQuery, () => {
+    void fetchCoupons()
+  })
+
   const fetchCoupons = async () => {
-    loading.value = true
-    try {
-      const params: Record<string, string> = {}
-      if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
-      if (statusFilter.value !== 'all') params.status = statusFilter.value
-      if (typeFilter.value !== 'all') params.discount_type = typeFilter.value
+    await runAbortable(
+      loading,
+      async ({ signal, isCurrent }) => {
+        const params: Record<string, string> = {}
+        if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
+        if (statusFilter.value !== 'all') params.status = statusFilter.value
+        if (typeFilter.value !== 'all') params.discount_type = typeFilter.value
 
-      const res = await $fetch<{
-        status: string
-        data: { coupons: AdminCoupon[]; metrics: CouponMetrics }
-      }>('/api/admin/coupons', {
-        query: params,
-      })
+        const res = await $fetch<{
+          status: string
+          data: { coupons: AdminCoupon[]; metrics: CouponMetrics }
+        }>('/api/admin/coupons', {
+          query: params,
+          signal,
+        })
 
-      if (res?.data) {
-        coupons.value = res.data.coupons
-        metrics.value = res.data.metrics
-      }
-    } catch (err: unknown) {
-      const errObj = err as { data?: { message?: string } }
-      toast.show({
-        title: 'Gagal Memuat Data',
-        message: errObj?.data?.message || 'Gagal memuat daftar voucher. Silakan refresh halaman.',
-        tone: 'error',
-      })
-    } finally {
-      loading.value = false
-    }
+        if (!isCurrent()) return
+        if (res?.data) {
+          coupons.value = res.data.coupons
+          metrics.value = res.data.metrics
+        }
+      },
+      (err) => {
+        const errObj = err as { data?: { message?: string } }
+        toast.show({
+          title: 'Gagal Memuat Data',
+          message: errObj?.data?.message || 'Gagal memuat daftar voucher. Silakan refresh halaman.',
+          tone: 'error',
+        })
+      },
+    )
+  }
+
+  const resetFilters = () => {
+    clearQuery()
+    statusFilter.value = 'all'
+    typeFilter.value = 'all'
+    void fetchCoupons()
   }
 
   onMounted(() => {
@@ -209,7 +228,10 @@ export function useAdminCoupons() {
     usagesCoupon,
     statusOptions,
     typeOptions,
+    hasActiveFilters,
     fetchCoupons,
+    resetFilters,
+    triggerSearchNow: triggerNow,
     openCreateModal,
     openEditModal,
     openUsagesModal,

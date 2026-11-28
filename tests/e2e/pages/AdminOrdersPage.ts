@@ -37,7 +37,7 @@ export class AdminOrdersPage extends BasePage {
 
   async searchOrder(query: string): Promise<void> {
     await this.searchInput.fill(query)
-    await this.page.getByRole('button', { name: 'Cari' }).click()
+    await this.searchInput.press('Enter')
   }
 
   async getOrderRowCount(): Promise<number> {
